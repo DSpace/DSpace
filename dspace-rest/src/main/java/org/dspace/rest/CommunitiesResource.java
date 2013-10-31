@@ -39,9 +39,11 @@ public class CommunitiesResource {
     private static org.dspace.core.Context context;
 
     private static final boolean writeStatistics;
+    private static final int maxPagination;
 	
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
+		maxPagination=ConfigurationManager.getIntProperty("rest", "max_pagination");
 	}
     
     /*
@@ -75,25 +77,56 @@ public class CommunitiesResource {
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Community[] list(@QueryParam("expand") String expand) {
+    public org.dspace.rest.common.CommunityReturn list(@QueryParam("expand") String expand,
+    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+    		@Context HttpServletRequest request) {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
                 //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
                 context.getDBConnection().setAutoCommit(true);
             }
-
+            
+            if(limit==null || limit<0 || limit>maxPagination){
+            	limit=maxPagination;
+            }
+            int count=0;
+            int added=0;
             org.dspace.content.Community[] topCommunities = org.dspace.content.Community.findAllTop(context);
             ArrayList<org.dspace.rest.common.Community> communityArrayList = new ArrayList<org.dspace.rest.common.Community>();
             for(org.dspace.content.Community community : topCommunities) {
-                if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
-                    //Only list communities that this user has access to.
-                    org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand, context);
-                    communityArrayList.add(restCommunity);
-                }
+            	if(count>=offset && added<(offset+limit)){
+	                if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
+	                    //Only list communities that this user has access to.
+	                    org.dspace.rest.common.Community restCommunity = new org.dspace.rest.common.Community(community, expand, context);
+	                    communityArrayList.add(restCommunity);
+	                    added++;
+	                }
+            	}else if(added>=limit){
+            		break;
+            	}
+            	count++;
             }
+            
+            org.dspace.rest.common.Context community_context = new org.dspace.rest.common.Context();
+            org.dspace.rest.common.CommunityReturn community_return = new org.dspace.rest.common.CommunityReturn();
+            
 
-            return communityArrayList.toArray(new org.dspace.rest.common.Community[0]);
+            StringBuffer requestURL = request.getRequestURL();
+            String queryString = request.getQueryString();
+            
+            if (queryString == null) {
+            	community_context.setQuery(requestURL.toString());
+            } else {
+            	community_context.setQuery(requestURL.append('?').append(queryString).toString());
+            }
+            community_context.setLimit(limit);
+            community_context.setOffset(offset);
+            community_context.setTotal_count(topCommunities.length);
+            community_return.setContext(community_context);
+            community_return.setCommunity(communityArrayList);
+            
+            return community_return;
 
         } catch (SQLException e) {
             log.error(e.getMessage());

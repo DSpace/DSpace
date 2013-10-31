@@ -14,6 +14,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
+import org.dspace.rest.common.CollectionReturn;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -44,9 +45,11 @@ public class CollectionsResource {
     private static org.dspace.core.Context context;
     
     private static final boolean writeStatistics;
+    private static final int maxPagination;
 	
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
+		maxPagination=ConfigurationManager.getIntProperty("rest", "max_pagination");
 	}
 
     /*
@@ -82,7 +85,9 @@ public class CollectionsResource {
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset) {
+    public org.dspace.rest.common.CollectionReturn list(@QueryParam("expand") String expand, 
+    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+    		@Context HttpServletRequest request) {
         try {
             if(context == null || !context.isValid() ) {
                 context = new org.dspace.core.Context();
@@ -92,12 +97,16 @@ public class CollectionsResource {
 
             org.dspace.content.Collection[] collections;
 
-            //Only support paging if limit/offset are 0 or positive values.
-            if(limit != null && limit >= 0 && offset != null && offset >= 0) {
-                collections = org.dspace.content.Collection.findAll(context, limit, offset);
-            } else {
-                collections = org.dspace.content.Collection.findAll(context);
+          //make sure maximum count per page is more than allowed
+            if(limit==null || limit<0 || limit>maxPagination){
+            	limit=maxPagination;
             }
+            if(offset==null){
+            	offset=0;
+            }
+            
+            collections = org.dspace.content.Collection.findAll(context, limit, offset);
+
 
             ArrayList<org.dspace.rest.common.Collection> collectionArrayList = new ArrayList<org.dspace.rest.common.Collection>();
             for(org.dspace.content.Collection collection : collections) {
@@ -107,7 +116,26 @@ public class CollectionsResource {
                 } // Not showing restricted-access collections
             }
 
-            return collectionArrayList.toArray(new org.dspace.rest.common.Collection[0]);
+            CollectionReturn collection_return= new CollectionReturn();
+            collection_return.setCollection(collectionArrayList);
+            
+            org.dspace.rest.common.Context collection_context = new org.dspace.rest.common.Context();
+
+            StringBuffer requestURL = request.getRequestURL();
+            String queryString = request.getQueryString();
+            
+            if (queryString == null) {
+            	collection_context.setQuery(requestURL.toString());
+            } else {
+            	collection_context.setQuery(requestURL.append('?').append(queryString).toString());
+            }
+            collection_context.setLimit(limit);
+            collection_context.setOffset(offset);
+            collection_context.setTotal_count(collections.length);
+            collection_return.setContext(collection_context);
+            collection_return.setCollection(collectionArrayList);
+            
+            return collection_return;
 
         } catch (SQLException e) {
             log.error(e.getMessage());

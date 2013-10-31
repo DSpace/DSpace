@@ -82,7 +82,7 @@ public class ItemsResource {
             org.dspace.content.Item item;
             while(items.hasNext() && added<size){
             	item = items.next();
-            	if(count>=offset && count<(offset+size)){
+            	if(count>=offset && added<(offset+size)){
             		if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
                         selectedItems.add(new org.dspace.rest.common.Item(item, expand, context));
                         added++;

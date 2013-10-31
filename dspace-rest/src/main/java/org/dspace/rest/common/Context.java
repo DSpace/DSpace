@@ -8,6 +8,10 @@
 
 package org.dspace.rest.common;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
@@ -15,7 +19,36 @@ public class Context {
 	
 	private int limit;
 	private int offset;
+	private int total_count;
 	private String query;
+	private String query_date;
+	
+	private static String dateFormat="yyyy-MM-dd'T'HH:mm:ss";
+	
+	private static SimpleDateFormat sdf;
+	
+	static{
+		sdf=new SimpleDateFormat(dateFormat);
+	}
+	
+	public Context(){
+		query_date = sdf.format(new Date());
+	}
+	
+	public int getTotal_count() {
+		return total_count;
+	}
+	public void setTotal_count(int total_count) {
+		this.total_count = total_count;
+	}
+	
+	@XmlElement
+	public String getQuery_date() {
+		return query_date;
+	}
+	public void setQuery_date(Date query_date) {
+		this.query_date = sdf.format(query_date);
+	}
 	
 	public int getLimit() {
 		return limit;
