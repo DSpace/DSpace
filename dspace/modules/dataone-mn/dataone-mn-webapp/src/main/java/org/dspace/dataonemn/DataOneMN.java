@@ -57,7 +57,12 @@ public class DataOneMN extends HttpServlet implements Constants {
     private static final String RDF_CONTENT_TYPE = "application/rdf+xml; charset=UTF-8";
     private static final String TEXT_XML_CONTENT_TYPE = "text/xml; charset=UTF-8";
     private static final int DATA_FILE_COLLECTION = 1;
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");    
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ") {
+        public StringBuffer format(Date date, StringBuffer toAppendTo, java.text.FieldPosition pos) {
+            StringBuffer toFix = super.format(date, toAppendTo, pos);
+            return toFix.insert(toFix.length()-2, ':');
+        }
+    };
     
     private String myFiles;
     private String myPackages;
