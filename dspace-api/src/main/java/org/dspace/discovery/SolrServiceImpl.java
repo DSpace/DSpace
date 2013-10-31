@@ -2279,29 +2279,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SearchServiceException
      */
     @Override    
-    public void commit(Boolean commit) throws SearchServiceException
+    public void commit(boolean nrt) throws SearchServiceException
     {
-        if (commit != null)
+        if (nrt) // softcommit
         {
-            if (commit) //softcommit
+            try
             {
-                try
+                if (getSolr() != null)
                 {
-                    if (getSolr() != null)
-                    {
-                        getSolr().commit(false, false, true);
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new SearchServiceException(e.getMessage(), e);
+                    getSolr().commit(false, false, true);
                 }
             }
-            else
+            catch (Exception e)
             {
-                //hard commit
-                commit();
+                throw new SearchServiceException(e.getMessage(), e);
             }
-        }
+        }        
     }
 }

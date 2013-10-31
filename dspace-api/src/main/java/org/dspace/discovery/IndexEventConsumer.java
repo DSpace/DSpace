@@ -40,15 +40,12 @@ public class IndexEventConsumer implements Consumer {
 
     DSpace dspace = new DSpace();
 
-    private Boolean doCommit = null; 
+    private Boolean softCommit = null; 
     
     IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
     public void initialize() throws Exception {
-        String stringDoCommit = dspace.getConfigurationService().getProperty("discovery.index.commit");
-        if(stringDoCommit!=null) {
-            doCommit = Boolean.parseBoolean(stringDoCommit);
-        }
+        softCommit = dspace.getConfigurationService().getPropertyAsType("discovery.index.nrt", true);        
     }
 
     /**
@@ -201,7 +198,7 @@ public class IndexEventConsumer implements Consumer {
             }
             
             if(pushCommit) {            
-                indexer.commit(doCommit);
+                indexer.commit(softCommit);
             }
         }
 
