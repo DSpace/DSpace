@@ -62,7 +62,6 @@ public class Collection extends DSpaceObject {
         this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
         this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
-        this.setLicense(collection.getLicense());
         
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
@@ -110,6 +109,9 @@ public class Collection extends DSpaceObject {
             if(collection.getLogo() != null) {
                 this.logo = new Bitstream(collection.getLogo(), null);
             }
+        }
+        else {
+        	this.addExpand("logo");
         }
 
         if(!expandFields.contains("all")) {
