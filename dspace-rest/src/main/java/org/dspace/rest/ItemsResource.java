@@ -24,6 +24,9 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.ItemReturn;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -90,6 +93,7 @@ public class ItemsResource {
             	}
             	count++;
             }
+            
             org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
             item_context.setLimit(size);
             item_context.setOffset(offset);
@@ -100,6 +104,16 @@ public class ItemsResource {
             	item_context.setQuery(requestURL.toString());
             } else {
             	item_context.setQuery(requestURL.append('?').append(queryString).toString());
+            }
+            
+          //get item count
+            String myQuery = "SELECT count(*) as count FROM item WHERE in_archive='1' ";
+                   
+            TableRow row = DatabaseManager.querySingle(context, myQuery);
+            if(row!=null){
+            	log.debug("count " + row.hasColumn("count"));
+            	log.debug("count " + row.getLongColumn("count"));
+            	item_context.setTotal_count(row.getLongColumn("count"));
             }
             
             ItemReturn item_return= new ItemReturn();

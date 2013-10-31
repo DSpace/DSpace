@@ -19,7 +19,7 @@ public class Context {
 	
 	private int limit;
 	private int offset;
-	private int total_count;
+	private long total_count;
 	private String query;
 	private String query_date;
 	
@@ -35,10 +35,10 @@ public class Context {
 		query_date = sdf.format(new Date());
 	}
 	
-	public int getTotal_count() {
+	public long getTotal_count() {
 		return total_count;
 	}
-	public void setTotal_count(int total_count) {
+	public void setTotal_count(long total_count) {
 		this.total_count = total_count;
 	}
 	
