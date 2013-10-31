@@ -28,7 +28,7 @@ public interface VoucherValidationService {
 
       public boolean voucherUsed(Context context,String voucherCode);
 
-      public Voucher create(Context context,String code,String status,Date creation,String explanation,String customer, Integer generator)throws SQLException,AuthorizeException;
+      public Voucher create(Context context,String code,String status,Date creation,String explanation,String customer, Integer generator, String batchId)throws SQLException,AuthorizeException;
 
       public Voucher findById(Context context,Integer voucherId)throws SQLException;
 

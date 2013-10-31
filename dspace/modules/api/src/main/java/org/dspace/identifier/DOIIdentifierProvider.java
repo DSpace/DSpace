@@ -1,6 +1,7 @@
 package org.dspace.identifier;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
@@ -524,7 +525,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             String versionNumber = "" + DOT + (version.getVersionNumber());
             doi = new DOI(canonical + versionNumber, item);
         } else {
-            String var = buildVar();
+            String var = NoidGenerator.buildVar();
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
 
             if (existsIdDOI(doi.toString()))
