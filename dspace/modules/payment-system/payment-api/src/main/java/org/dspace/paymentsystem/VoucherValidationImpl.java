@@ -122,11 +122,11 @@ public class VoucherValidationImpl implements VoucherValidationService
     public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer, Integer generator) throws SQLException,AuthorizeException {
         ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
         int i =0;
-        String batchId = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.batchId.length"));
+        String batchId = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.batchId.length",5));
         while(i < totalNumber)
         {
             Random random = new Random();
-            String code = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.code.length"));
+            String code = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.code.length",8));
             vouchers.add(create(context,code,status, creation, explanation,customer,generator,batchId));
             i=i+1;
         }
