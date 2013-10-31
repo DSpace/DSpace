@@ -5,6 +5,7 @@ import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.doi.CDLDataCiteService;
@@ -525,7 +526,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             String versionNumber = "" + DOT + (version.getVersionNumber());
             doi = new DOI(canonical + versionNumber, item);
         } else {
-            String var = NoidGenerator.buildVar();
+            String var = NoidGenerator.buildVar(mySuffixVarLength);
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
 
             if (existsIdDOI(doi.toString()))
