@@ -200,28 +200,29 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         }
 
 
-        FacetField facet = queryResults.getFacetField("location.coll");
-        if(facet != null){
-            java.util.List<FacetField.Count> facetVals = facet.getValues();
-            if(facetVals != null)
-            {
-                org.dspace.app.xmlui.wing.element.List list = results.addList("tabs");
-                //Add primary collection (data packages) first
-                for (FacetField.Count count : facetVals) {
-                    if(count.getName().equals(DATA_PACKAGE_COLLECTION)){
-                        buildTabs(count,request,list);
+        if(queryResults != null) {
+            FacetField facet = queryResults.getFacetField("location.coll");
+            if(facet != null){
+                java.util.List<FacetField.Count> facetVals = facet.getValues();
+                if(facetVals != null)
+                {
+                    org.dspace.app.xmlui.wing.element.List list = results.addList("tabs");
+                    //Add primary collection (data packages) first
+                    for (FacetField.Count count : facetVals) {
+                        if(count.getName().equals(DATA_PACKAGE_COLLECTION)){
+                            buildTabs(count,request,list);
+                        }
+                    }
+                    //remove dryadlab collection
+                    for (FacetField.Count count : facetVals) {
+                        if(!count.getName().equals(DATA_FILE_COLLECTION)&&!count.getName().equals(DATA_PACKAGE_COLLECTION)&&!count.getName().equals(DRYAD_LAB_COLLECTION)){
+                            buildTabs(count,request,list);
+                        }
                     }
                 }
-                //remove dryadlab collection 
-                for (FacetField.Count count : facetVals) {
-                    if(!count.getName().equals(DATA_FILE_COLLECTION)&&!count.getName().equals(DATA_PACKAGE_COLLECTION)&&!count.getName().equals(DRYAD_LAB_COLLECTION)){
-                        buildTabs(count,request,list);
-                    }
-                }
+
             }
-
         }
-
         if (queryResults != null &&
                 queryResults.getResults().getNumFound() > 0) {
 
