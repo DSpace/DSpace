@@ -342,6 +342,16 @@ public class PaypalImpl implements PaypalService{
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);
+                            for(String s:results)
+                            {
+                                String[] strings = s.split("=");
+                                if(strings[0].contains("PNREF"))
+                                {
+                                    shoppingCart.setTransactionId(strings[1]);
+                                    break;
+                                }
+                            }
+
                             shoppingCart.update();
                             sendPaymentApprovedEmail(c, wfi, shoppingCart);
                             return true;
