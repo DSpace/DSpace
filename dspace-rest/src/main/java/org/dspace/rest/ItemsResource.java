@@ -10,16 +10,21 @@ package org.dspace.rest;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import javax.servlet.http.HttpServletRequest;
+import org.dspace.handle.HandleManager;
+import org.dspace.rest.common.DSpaceObject;
+import org.dspace.search.DSQuery;
+import org.dspace.search.QueryArgs;
+import org.dspace.search.QueryResults;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -29,6 +34,7 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -76,8 +82,6 @@ public class ItemsResource {
             if(offset==null){
             	offset=0;
             }
-            log.debug("limit " + size + " offset " + offset);
-            
             ArrayList<org.dspace.rest.common.Item> selectedItems= new ArrayList<org.dspace.rest.common.Item>();
             ItemIterator items = org.dspace.content.Item.findAll(context);
             int count=0;
@@ -161,13 +165,90 @@ public class ItemsResource {
         }
     }
     
+
+    // /items/search?q=Albert Einstein
+    @GET
+    @Path("/search")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.ItemReturn search(
+    		@QueryParam("q") String query,
+    		@QueryParam("expand") String expand,
+    		@QueryParam("limit") Integer limit, 
+    		@QueryParam("offset") Integer offset,
+    		@Context HttpServletRequest request) throws WebApplicationException{
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+
+            if(limit==null || limit>maxPagination){
+            	limit=maxPagination;
+            }
+            if(offset==null){
+            	offset=0;
+            }
+            
+            QueryArgs queryArgs = new QueryArgs();
+            queryArgs.setQuery(query);
+            QueryResults queryResults = DSQuery.doQuery(context, queryArgs);
+
+            List<String> handleList = queryResults.getHitHandles();
+            List<org.dspace.rest.common.Item> dsoList = new ArrayList<org.dspace.rest.common.Item>();
+            int added=0;
+            int count=0;
+            for(String handle : handleList) {
+                org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+                if(dso instanceof  org.dspace.content.Item){
+                	if(count>=offset && added<(offset+limit)){
+	                	org.dspace.content.Item item = ( org.dspace.content.Item)dso;
+	                	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+	                	   dsoList.add(new org.dspace.rest.common.Item(item, expand, context));
+	                	   added++;
+	                	}
+                	} 
+                	if(added>=limit){
+                		break;
+                	}
+                }
+                count++;
+            }
+            
+            org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
+            org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
+            item_context.setLimit(limit);
+            item_context.setOffset(offset);
+            item_context.setTotal_count(handleList.size());
+            StringBuffer requestURL = request.getRequestURL();
+            String queryString = request.getQueryString();
+
+            if (queryString == null) {
+            	item_context.setQuery(requestURL.toString());
+            } else {
+            	item_context.setQuery(requestURL.append('?').append(queryString).toString());
+            }
+            item_return.setContext(item_context);
+            item_return.setItem(dsoList);
+            
+
+            return item_return;
+
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
     
     private void writeStats(Integer item_id, String user_ip, String user_agent,
 			String xforwarderfor, HttpHeaders headers,
 			HttpServletRequest request) {
 		
     	try{
-    		DSpaceObject item = DSpaceObject.find(context, Constants.ITEM, item_id);
+    		 org.dspace.content.DSpaceObject item =  org.dspace.content.DSpaceObject.find(context, Constants.ITEM, item_id);
     		
     		if(user_ip==null || user_ip.length()==0){
     			new DSpace().getEventService().fireEvent(
@@ -193,5 +274,4 @@ public class ItemsResource {
 		}
     		
 	}
-
 }
