@@ -106,13 +106,11 @@ public class ItemsResource {
             	item_context.setQuery(requestURL.append('?').append(queryString).toString());
             }
             
-          //get item count
+            //get item count
             String myQuery = "SELECT count(*) as count FROM item WHERE in_archive='1' ";
                    
             TableRow row = DatabaseManager.querySingle(context, myQuery);
             if(row!=null){
-            	log.debug("count " + row.hasColumn("count"));
-            	log.debug("count " + row.getLongColumn("count"));
             	item_context.setTotal_count(row.getLongColumn("count"));
             }
             

@@ -15,6 +15,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.CollectionReturn;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -131,7 +133,14 @@ public class CollectionsResource {
             }
             collection_context.setLimit(limit);
             collection_context.setOffset(offset);
-            collection_context.setTotal_count(collections.length);
+            
+            String myQuery = "SELECT count(*) as count FROM collection";
+            
+            TableRow row = DatabaseManager.querySingle(context, myQuery);
+            if(row!=null){
+            	collection_context.setTotal_count(row.getLongColumn("count"));
+            }
+            
             collection_return.setContext(collection_context);
             collection_return.setCollection(collectionArrayList);
             
