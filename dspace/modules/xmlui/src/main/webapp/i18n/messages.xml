@@ -411,6 +411,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.all">In any field</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.date.issued.year">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.subject_filter">Subject</message>
+	<message key="xmlui.Discovery.SimpleSearch.filter_text"><span class="accessibly-hidden">Filter Text</span></message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">At the request of the author, this item
