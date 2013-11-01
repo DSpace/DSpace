@@ -9,8 +9,10 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -27,6 +29,8 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.OAIHarvester;
+import org.dspace.core.Context;
+import com.atmire.responselogging.SolrResponseLogging;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
@@ -81,15 +85,10 @@ public class DSpaceCocoonServletFilter implements Filter
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        // Any errors thrown in disabling the caches aren't significant to
-        // the normal execution of the application, so we ignore them
-        catch (RuntimeException e)
+        catch (Throwable t)
         {
-            LOG.error(e.getMessage(), e);
-        }
-        catch (Exception e)
-        {
-            LOG.error(e.getMessage(), e);
+            // Any errors thrown in disabling the caches aren't significant to
+            // the normal execution of the application, so we ignore them
         }
 
         /**
@@ -137,11 +136,7 @@ public class DSpaceCocoonServletFilter implements Filter
 
 
         }
-        catch (RuntimeException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
+        catch (Throwable t)
         {
             throw new ServletException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
@@ -149,7 +144,7 @@ public class DSpaceCocoonServletFilter implements Filter
                             "This has likely occurred because either the file does not exist, or it's permissions \n" +
                             "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                             "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                            "either the local servlet or global context.\n\n",e);
+                            "either the local servlet or global context.\n\n",t);
         }
     }
 
@@ -183,11 +178,7 @@ public class DSpaceCocoonServletFilter implements Filter
 
             XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
         }
-        catch (RuntimeException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
+        catch (Throwable t)
         {
             throw new ServletException(
                     "\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
@@ -195,7 +186,7 @@ public class DSpaceCocoonServletFilter implements Filter
                             "This has likely occurred because either the file does not exist, or it's permissions \n" +
                             "are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
                             "configuration file should be named \"xmlui.xconf\" and located inside the standard \n" +
-                            "DSpace configuration directory. \n\n",e);
+                            "DSpace configuration directory. \n\n",t);
         }
 
         if (ConfigurationManager.getBooleanProperty("harvester.autoStart"))
@@ -203,13 +194,9 @@ public class DSpaceCocoonServletFilter implements Filter
             try {
                 OAIHarvester.startNewScheduler();
             }
-            catch (RuntimeException e)
+            catch (Throwable t)
             {
-                LOG.error(e.getMessage(), e);
-            }
-            catch (Exception e)
-            {
-                LOG.error(e.getMessage(), e);
+                LOG.error(t.getMessage(), t);
             }
         }
 
@@ -223,6 +210,7 @@ public class DSpaceCocoonServletFilter implements Filter
      */
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain arg2) throws IOException, ServletException {
+        Date start = new Date();
 
         HttpServletRequest realRequest = (HttpServletRequest)request;
         HttpServletResponse realResponse = (HttpServletResponse) response;
@@ -244,16 +232,21 @@ public class DSpaceCocoonServletFilter implements Filter
             }
 
             arg2.doFilter(realRequest, realResponse);
-
-        } catch (RuntimeException e) {
+        } catch (SocketException se) {
             ContextUtil.abortContext(realRequest);
-            LOG.error("Serious Runtime Error Occurred Processing Request!", e);
-            throw e;
-        } catch (Exception e) {
+            // suppress Client abort exceptions in logs
+            if(LOG.isDebugEnabled())
+                LOG.debug(se.getMessage(),se);
+        } catch (Throwable t) {
             ContextUtil.abortContext(realRequest);
-            LOG.error("Serious Error Occurred Processing Request!", e);
+            // Limit output to not report other request error stacktraces in logs
+            LOG.error(t.getMessage());
+            if(LOG.isDebugEnabled())
+                LOG.debug(t.getMessage(),t);
         } finally {
             // Close out the DSpace context no matter what.
+            Date end = new Date();
+            SolrResponseLogging.post((Context) realRequest.getAttribute(ContextUtil.DSPACE_CONTEXT), realRequest, start, end);
             ContextUtil.completeContext(realRequest);
         }
     }
