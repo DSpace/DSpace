@@ -31,7 +31,7 @@ public class PaymentSystemConfigurationManager {
     private static Properties notIntegratedJournalFee = null;
     private static Properties sizeFileFeeAfter = null;
     private static Properties symbols = null;
-
+    private static Properties symbolISO = null;
     private static List<String> countrySortedList = null;
     private static String maxFileSize = ConfigurationManager.getProperty("payment-system", "dryad.paymentsystem.maxFileSize");
 
@@ -51,7 +51,7 @@ public class PaymentSystemConfigurationManager {
     private static String UnitSize = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.unitSize");
 
     private static String currencySymbolList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.currencySymbol");
-
+    private static String currencySymbolISOList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.currencySymbol.ISO");
     static
     {
         country = new Properties();
@@ -60,12 +60,14 @@ public class PaymentSystemConfigurationManager {
         notIntegratedJournalFee = new Properties();
         sizeFileFeeAfter = new Properties();
         symbols = new Properties();
+        symbolISO = new Properties();
         String[] currencyArray = currencyConfig.split(";");
         String[] prices = priceList.split(";");
         String[] countryArray = countryList.split(";");
         String[] notIntegratedJournalFees = notIntegratedJournalFeeList.split(";");
         String[] sizeFileFeeAfterArray = sizeFileFeeAfterList.split(";");
         String[] currencySymbolArray = currencySymbolList.split(";");
+        String[] currencySymbolISOArray = currencySymbolISOList.split(";");
         countrySortedList = Arrays.asList(countryArray);
 
         Collections.sort(countrySortedList, String.CASE_INSENSITIVE_ORDER);
@@ -102,6 +104,11 @@ public class PaymentSystemConfigurationManager {
             String[] temp = symbol.split(":");
             symbols.setProperty(temp[0],temp[1]);
         }
+        for(String symbol:currencySymbolISOArray)
+        {
+            String[] temp = symbol.split(":");
+            symbolISO.setProperty(temp[0],temp[1]);
+        }
     }
 
     public static String getCurrencySymbol(String currency)
@@ -109,6 +116,11 @@ public class PaymentSystemConfigurationManager {
                 String value = symbols.getProperty(currency);
                 return (value != null) ? value.trim() : "";
         }
+    public static String getCurrencySymbolISO(String currency)
+    {
+        String value = symbolISO.getProperty(currency);
+        return (value != null) ? value.trim() : "";
+    }
     /**
      * Get a configuration property
      *

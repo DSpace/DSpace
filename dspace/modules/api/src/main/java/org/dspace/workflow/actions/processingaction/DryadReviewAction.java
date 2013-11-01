@@ -76,16 +76,19 @@ public class DryadReviewAction extends ProcessingAction {
             String journal = values[0].value;
             if(journal!=null){
                 Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
-                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
-		log.debug("reviewers for journal " + journal + " are " + emails);
-                String[] emails_=emails.split(",");
-                for(String email : emails_){
-                    if(!mailsSent.contains(email)){
-			sendReviewerEmail(c, email, wf, uuid.toString());
-                        mailsSent.add(email);
+                if(properties!=null){
+                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+                    log.debug("reviewers for journal " + journal + " are " + emails);
+                    if(emails != null) {
+                        String[] emails_=emails.split(",");
+                        for(String email : emails_){
+                            if(!mailsSent.contains(email)){
+                                sendReviewerEmail(c, email, wf, uuid.toString());
+                                mailsSent.add(email);
+                            }
+                        }
                     }
                 }
-
             }
         }
     }
