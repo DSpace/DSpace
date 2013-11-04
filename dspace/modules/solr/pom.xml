@@ -86,7 +86,13 @@
    		<artifactId>dspace-solr-webapp</artifactId>
    		<version>1.4.0.1</version>
    		<classifier>classes</classifier>
-        <type>jar</type>
+      <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
    	</dependency>
    </dependencies>
 
