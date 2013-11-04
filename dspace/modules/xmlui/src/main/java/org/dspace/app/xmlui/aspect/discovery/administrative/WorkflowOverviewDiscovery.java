@@ -93,10 +93,10 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
 
             List<FacetField.Count> statusFilters  = queryResults.getFacetField("DSpaceStatus_filter").getValues();
             for (FacetField.Count count : statusFilters) {
-                if(count.getName().equals("Submission")){
-                    //Submissions are not rendered here
-                    continue;
-                }
+//                if(count.getName().equals("Submission")){
+//                    Submissions are not rendered here
+//                    continue;
+//                }
                 if(0 < count.getCount()){
                     if(count.getName().equals("Workflow")){
                         //Retrieve the seperate workflow steps
