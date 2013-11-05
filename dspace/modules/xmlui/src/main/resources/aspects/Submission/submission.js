@@ -382,6 +382,8 @@ function doSubmissionControl(){
  */
 function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 {
+  cocoon.log.info("starting submissionControl ch=" + collectionHandle + " wID=" + workspaceID + " initStep=" + initStepAndPage, null);
+
 	//load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
 	
@@ -408,8 +410,8 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
      	// Loop forever, exit cases such as save, remove, or completed
         // will call cocoon.exit() stopping execution.
         
-  		cocoon.log.debug("Current step & page=" + state.stepAndPage, null);
-  		cocoon.log.debug("Current ERROR Fields=" + getErrorFields(), null);
+  		cocoon.log.info("Current step & page=" + state.stepAndPage, null);
+  		cocoon.log.info("Current ERROR Fields=" + getErrorFields(), null);
     	
     	//----------------------------------------------------------
     	// #1: Actually load the next page in the process
@@ -421,24 +423,26 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 
         //Make sure we skip any steps that are not accessible
         var possibleNewStepConfig = submissionInfo.getSubmissionConfig().getStep(step);
+        cocoon.log.info("after getSubmissionConfig().getStep()");
         while(!FlowUtils.isStepAccessible(getDSContext(), possibleNewStepConfig.getProcessingClassName(), submissionInfo)){
             state.progressIterator++;
             state.stepAndPage = stepsInSubmission[state.progressIterator];
             step = String(state.stepAndPage).split(".")[0];
             possibleNewStepConfig = submissionInfo.getSubmissionConfig().getStep(step);
-            cocoon.log.debug("Skipped step & page=" + state.stepAndPage + " reason: not accessible");
+            cocoon.log.info("Skipped step & page=" + state.stepAndPage + " reason: not accessible");
         }
-
+      cocoon.log.info("Setting page reached to step=" + step + " page=" + page);
         //Set the current page we've reached in current step
 	    FlowUtils.setPageReached(getDSContext(),workspaceID, step, page);
-	  
+	    cocoon.log.info("After setPageReached");
 	  	//Load this step's configuration
 	  	var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
-	  		
+	  	cocoon.log.info("After getStep");
+	  		  		
     	//Pass it all the info it needs, including any response/error flags
     	//in case an error occurred
     	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag); 
-    	
+    	cocoon.log.info("After doNextPage");
     	var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
         var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
         var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
@@ -450,6 +454,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         // Only step forward to next page if no errors on this page
         if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
+            cocoon.log.info("User clicked next for a non-interactive step");
            	state.progressIterator++;
            	
            	var totalSteps = stepsInSubmission.length;
@@ -461,7 +466,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
            		if(inWorkflow==false)
            		{
            		  	//Submission is completed!
-           			cocoon.log.debug("Submission Completed!");
+           			cocoon.log.info("Submission Completed!");
            			
            			showCompleteConfirmation(collectionHandle);
            		}
@@ -481,14 +486,15 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
                     state.stepAndPage = stepsInSubmission[state.progressIterator];
                     possibleNewStep = String(state.stepAndPage).split(".")[0];
                     possibleNewStepConfig = submissionInfo.getSubmissionConfig().getStep(possibleNewStep);
-                    cocoon.log.debug("Skipped step & page=" + state.stepAndPage + " reason: not accessible");
+                    cocoon.log.info("Skipped step & page=" + state.stepAndPage + " reason: not accessible");
                 }
-           		cocoon.log.debug("Next Step & Page=" + state.stepAndPage);
+           		cocoon.log.info("Next Step & Page=" + state.stepAndPage);
         	}
         }//User clicked "<- Previous" button
         else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON) && 
         			(response_flag==AbstractProcessingStep.STATUS_COMPLETE || state.stepAndPage == maxStepAndPage))
         {  
+            cocoon.log.info("User clicked previous");
             var stepBack = true;
             
             //Need to find the previous step which HAS a user interface.
@@ -525,11 +531,12 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
             }
 
             
-            cocoon.log.debug("Previous Step & Page=" + state.stepAndPage);
+            cocoon.log.info("Previous Step & Page=" + state.stepAndPage);
         }
         // User clicked "Save/Cancel" Button
         else if (cocoon.request.get(AbstractProcessingStep.CANCEL_BUTTON))
         {
+          cocoon.log.info("User clicked save/cancel");
         	var inWorkflow = submissionInfo.isInWorkflow();
         	if (inWorkflow && response_flag==AbstractProcessingStep.STATUS_COMPLETE)
         	{
@@ -548,6 +555,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         // if there are no errors to be resolved
         if(response_flag==AbstractProcessingStep.STATUS_COMPLETE || state.stepAndPage == maxStepAndPage)
         {
+          cocoon.log.info("response_flag is complete and stepAndPage is max");
 	        var names = cocoon.request.getParameterNames();
 	        while(names.hasMoreElements())
 	        {
@@ -562,7 +570,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	                {
 	                   state.stepAndPage = newStepAndPage;
 	                   
-					   cocoon.log.debug("Jump To Step & Page=" + state.stepAndPage);
+					   cocoon.log.info("Jump To Step & Page=" + state.stepAndPage);
 	                   
 	                   //reset progress iterator
 	                   for(var i=0; i<stepsInSubmission.length; i++)
@@ -577,8 +585,9 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	            }//end if submit_jump pressed
 	        }//end while more elements
         }//end if no errors
+        cocoon.log.info("looping...");
     } while ( 1 == 1)
-
+  cocoon.log.info("submissionControl over");
 }
 
 /**
@@ -606,8 +615,10 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
  	//(otherwise, this is just a processing step)
  	if(stepHasUI(stepConfig))
  	{
+ 	  cocoon.log.info("calling sendPageAndWait with collection handle=" + collectionHandle + " workspaceID=" + workspaceID + " transformer=" + stepConfig.getXMLUIClassName());
  		//prepend URI with the handle of the collection, and go there!
  		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":stepConfig.getXMLUIClassName(),"error":String(response_flag),"error_fields":getErrorFields()});
+ 		cocoon.log.info("after sendPageAndWait");
     }
         
     //-------------------------------------
