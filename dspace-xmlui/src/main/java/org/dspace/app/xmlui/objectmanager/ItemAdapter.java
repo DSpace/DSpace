@@ -956,9 +956,8 @@ public class ItemAdapter extends AbstractAdapter
         Bundle[] bundles = item.getBundles();
 
         // Filename of original will be filename of the derived bitstream
-        // minus the extension (last 4 chars - .jpg or .txt)
-        String originalFilename = derived.getName().substring(0,
-                derived.getName().length() - 4);
+        // minus the extension (ie everything from and including the last "." character)
+        String originalFilename = derived.getName().substring(0, derived.getName().lastIndexOf("."));
 
         // First find "original" bundle
         for (int i = 0; i < bundles.length; i++)
