@@ -184,9 +184,9 @@
                 <execution>
                   <phase>process-test-resources</phase>
                   <configuration>
-                    <tasks>
+                    <target>
                         <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
-                    </tasks>
+                    </target>
                   </configuration>
                   <goals>
                     <goal>run</goal>
