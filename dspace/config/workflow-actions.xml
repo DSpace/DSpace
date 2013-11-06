@@ -14,9 +14,8 @@
     <bean id="noUserSelectionActionAPI" class="org.dspace.workflow.actions.userassignment.NoUserSelectionAction" scope="prototype"/>
     <bean id="claimActionAPI" class="org.dspace.workflow.actions.userassignment.ClaimAction" scope="prototype"/>
 
-    <bean id="pendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.PendingPublicationAction" scope="prototype"/>
-
     <bean id="registerPendingPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.RegisterPendingPublicationAction" scope="prototype"/>
+    <bean id="afterPublicationActionAPI" class="org.dspace.workflow.actions.processingaction.AfterPublicationAction" scope="prototype"/>
 
     <bean id="reAuthorizationPaymentActionAPI" class="org.dspace.workflow.actions.processingaction.ReAuthorizationPaymentAction" scope="prototype"/>
 
@@ -54,18 +53,18 @@
         <property name="requiresUI" value="false"/>
     </bean>
 
-    <bean id="pendingPublicationAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
-        <constructor-arg type="java.lang.String" value="pendingPublicationAction"/>
-
-        <property name="processingAction" ref="pendingPublicationActionAPI"/>
-        <property name="requiresUI" value="false"/>
-    </bean>
-
     <bean id="registerPendingPublicationAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="registerPendingPublicationAction"/>
 
         <property name="processingAction" ref="registerPendingPublicationActionAPI"/>
         <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="afterPublicationAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="afterPublicationAction"/>
+
+        <property name="processingAction" ref="afterPublicationActionAPI"/>
+        <property name="requiresUI" value="true"/>
     </bean>
 
     <!--User selection actions-->

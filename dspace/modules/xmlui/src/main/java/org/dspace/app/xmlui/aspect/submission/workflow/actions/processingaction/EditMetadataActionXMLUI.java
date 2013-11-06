@@ -26,6 +26,8 @@ import org.dspace.versioning.VersionHistory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import org.dspace.doi.DryadDOIRegistrationHelper;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -48,6 +50,10 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help");
     protected static final Message T_approve_submit =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit");
+    protected static final Message T_blackout_help =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_help");
+    protected static final Message T_blackout_submit =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_submit");
     protected static final Message T_reject_help =
             message("xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_help");
     protected static final Message T_reject_submit =
@@ -89,6 +95,16 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
 
     private static final Message T_head_has_part =
             message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
+
+    /* Reasons for suggesting blackout or archive */
+    protected static final Message T_blackout_reason_blackout_true =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_reason_blackout_true");
+    protected static final Message T_blackout_reason_journal_not_integrated =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_reason_journal_not_integrated");
+    protected static final Message T_archive_reason_blackout_false =
+            message("xmlui.Submission.workflow.EditMetadataActionXMLUI.archive_reason_blackout_false");
+
+    private DryadJournalSubmissionUtils.RecommendedBlackoutAction recommendedBlackoutAction;
 
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
@@ -134,6 +150,9 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
             }
         }
 
+        // Check if this item should enter blackout by default or not
+        this.recommendedBlackoutAction = DryadJournalSubmissionUtils.recommendedBlackoutAction(context, item, collection);
+
         switch (page){
             case EditMetadataAction.MAIN_PAGE:
                 renderMainPage(div);
@@ -150,15 +169,41 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
 
+        Boolean blackoutRecommended;
+        blackoutRecommended = (recommendedBlackoutAction == DryadJournalSubmissionUtils.RecommendedBlackoutAction.BLACKOUT_TRUE
+                || recommendedBlackoutAction == DryadJournalSubmissionUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
 
-        //TODO: if we have a last task change button name to archive !
-        // Approve task
-        Row row = table.addRow();
-        row.addCellContent(T_approve_help);
-        row.addCell().addButton("submit_approve").setValue(T_approve_submit);
+        // Approve
+        Row approveRow = table.addRow(null, null, blackoutRecommended ? "" : "archive_or_blackout_recommended");
+        Cell helpCell = approveRow.addCell();
+        helpCell.addContent(T_approve_help);
+        if(!blackoutRecommended) {
+            // Could check reason too but there's onyl one reason blackout is not recommended:
+            // integrated journal w/ blackout=false or not present
+            helpCell.addContent(T_archive_reason_blackout_false);
+        }
+        Cell buttonCell = approveRow.addCell();
+        buttonCell.addButton("submit_approve").setValue(T_approve_submit);
+
+        Row blackoutRow = table.addRow(null, null, blackoutRecommended ? "archive_or_blackout_recommended" : "");
+        helpCell = blackoutRow.addCell();
+        helpCell.addContent(T_blackout_help);
+        if(blackoutRecommended) {
+            switch(recommendedBlackoutAction) {
+                case BLACKOUT_TRUE:
+                    helpCell.addContent(T_blackout_reason_blackout_true);
+                    break;
+                case JOURNAL_NOT_INTEGRATED:
+                    helpCell.addContent(T_blackout_reason_journal_not_integrated);
+                    break;
+                default:
+                    break;
+            }
+        }        buttonCell = blackoutRow.addCell();
+        buttonCell.addButton("submit_blackout").setValue(T_blackout_submit);
 
         // Reject item
-        row = table.addRow();
+        Row row = table.addRow();
         row.addCellContent(T_reject_help);
         row.addCell().addButton("submit_reject").setValue(T_reject_submit);
 
