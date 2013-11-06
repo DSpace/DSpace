@@ -30,7 +30,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.core.Context;
-import com.atmire.responselogging.SolrResponseLogging;
+//import com.atmire.responselogging.SolrResponseLogging;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
@@ -246,7 +246,7 @@ public class DSpaceCocoonServletFilter implements Filter
         } finally {
             // Close out the DSpace context no matter what.
             Date end = new Date();
-            SolrResponseLogging.post((Context) realRequest.getAttribute(ContextUtil.DSPACE_CONTEXT), realRequest, start, end);
+	    //            SolrResponseLogging.post((Context) realRequest.getAttribute(ContextUtil.DSPACE_CONTEXT), realRequest, start, end);
             ContextUtil.completeContext(realRequest);
         }
     }
