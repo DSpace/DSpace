@@ -46,7 +46,7 @@
                      <execution>
                         <phase>generate-sources</phase>
                         <configuration>
-                           <tasks>
+                           <target>
                               <taskdef resource="axis-tasks.properties" classpathref="maven.compile.classpath" />
                               <mkdir dir="src/main/config" />
                               <axis-java2wsdl classname="org.dspace.app.dav.LNISoapServlet" location="http://localhost/dspace/lni/DSpaceLNI" methods="lookup,propfind,proppatch,copy" namespace="http://dspace.org/xmlns/lni" output="src/main/resources/dspace-lni.wsdl" />
@@ -54,7 +54,7 @@
                               <axis-wsdl2java output="src/main/java" verbose="true" url="src/main/resources/dspace-lni.wsdl">
                                  <mapping namespace="http://dspace.org/xmlns/lni" package="org.dspace.app.dav.client" />
                               </axis-wsdl2java>
-                           </tasks>
+                           </target>
                         </configuration>
                         <goals>
                            <goal>run</goal>
