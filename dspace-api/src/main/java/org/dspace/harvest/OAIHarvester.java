@@ -1090,7 +1090,7 @@ public class OAIHarvester {
      */
     public static class HarvestScheduler implements Runnable
     {
-        private EPerson harvestAdmin;
+        private static EPerson harvestAdmin;
 
         private Context mainContext;
 
@@ -1161,7 +1161,7 @@ public class OAIHarvester {
 
         public HarvestScheduler() throws SQLException, AuthorizeException {
             mainContext = new Context();
-            String harvestAdminParam = ConfigurationManager.getProperty("harvester.eperson");
+            String harvestAdminParam = ConfigurationManager.getProperty("oai", "harvester.eperson");
             harvestAdmin = null;
             if (harvestAdminParam != null && harvestAdminParam.length() > 0)
             {
@@ -1334,7 +1334,7 @@ public class OAIHarvester {
         public static void addThread(int collecionID) throws SQLException, IOException, AuthorizeException {
             log.debug("****** Entered the addThread method. Active threads: " + harvestThreads.toString());
             Context subContext = new Context();
-            //subContext.setCurrentUser(harvestAdmin);
+            subContext.setCurrentUser(harvestAdmin);
 
             HarvestedCollection hc = HarvestedCollection.find(subContext, collecionID);
             hc.setHarvestStatus(HarvestedCollection.STATUS_QUEUED);
