@@ -110,18 +110,18 @@
 	String valueString = "";
 	if (value!=null)
 	{
-		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value);
+		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value, "UTF-8");
 	}
 	
     String sharedLink = linkBase + urlFragment + "?";
 
     if (bix.getName() != null)
-        sharedLink += "type=" + URLEncoder.encode(bix.getName());
+        sharedLink += "type=" + URLEncoder.encode(bix.getName(), "UTF-8");
 
-    sharedLink += "&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber())) +
-				  "&amp;order=" + URLEncoder.encode(direction) +
-				  "&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage())) +
-				  "&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl())) +
+    sharedLink += "&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber()), "UTF-8") +
+				  "&amp;order=" + URLEncoder.encode(direction, "UTF-8") +
+				  "&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage()), "UTF-8") +
+				  "&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl()), "UTF-8") +
 				  valueString;
 	
 	String next = sharedLink;

@@ -78,9 +78,9 @@
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
-	String sharedLink = linkBase + "browse?type=" + URLEncoder.encode(bix.getName()) + 
-						"&amp;order=" + URLEncoder.encode(direction) + 
-						"&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage()));
+	String sharedLink = linkBase + "browse?type=" + URLEncoder.encode(bix.getName(), "UTF-8") +
+						"&amp;order=" + URLEncoder.encode(direction, "UTF-8") +
+						"&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage()), "UTF-8");
 	
 	// prepare the next and previous links
 	String next = sharedLink;
