@@ -471,7 +471,7 @@
  	                        <xsl:text>/static/icons/lock24.png</xsl:text>
  	                     </xsl:attribute>
  	                      <xsl:attribute name="alt">
- 	                        <xsl:text>Bloqueado</xsl:text>
+ 	                        <i18n:text>xmlui.dri2xhtml.METS-1.0.blocked</i18n:text>
  	                      </xsl:attribute>               
  	                    </img>
                      </xsl:if>
