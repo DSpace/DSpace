@@ -88,6 +88,11 @@
     DiscoverQuery qArgs = (DiscoverQuery) request.getAttribute("queryArgs");
     String sortedBy = qArgs.getSortField();
     String order = qArgs.getSortOrder().toString();
+    String sortIdx = null;
+    if (sortedBy != null && sortedBy.startsWith("bi_sort_"))
+    {
+    	sortIdx = sortedBy.substring(8,sortedBy.length()-5);
+    }
     String ascSelected = (SortOption.ASCENDING.equalsIgnoreCase(order)   ? "selected=\"selected\"" : "");
     String descSelected = (SortOption.DESCENDING.equalsIgnoreCase(order) ? "selected=\"selected\"" : "");
     String httpFilters ="";
@@ -150,6 +155,17 @@
 					})
 				}
 			});
+		
+		jQ('th.sortable').click(function(){
+			var cls = jQ(this).attr('class');
+			var pos = cls.indexOf('sort_',0);
+			var endPos = cls.indexOf(' ',pos);
+			if (endPos == -1) endPos = cls.length;
+			var sortby = cls.substr(pos+5,endPos-pos-5);
+			jQ('#update-form').find('input[name="order"]').val(jQ(this).hasClass("sorted_asc")?"DESC":"ASC");
+			jQ('#update-form').find('input[name="sort_by"]').val('bi_sort_'+sortby+'_sort');
+			jQ('#update-form').submit();
+		});
 	});
 </script>		
 </c:set>
@@ -163,7 +179,7 @@
 <div class="discovery-search-form">
     <%-- Controls for a repeat search --%>
 	<div class="discovery-query">
-    <form action="simple-search" method="get">
+    <form id="update-form" action="simple-search" method="get">
          <label for="tlocation">
          	<fmt:message key="jsp.search.results.searchin"/>
          </label>
@@ -539,7 +555,7 @@ if (pageTotal > pageCurrent)
 	        <c:set var="typeName"><%= ((ACrisObject) mapOthers.get(otype)[0].getBrowsableDSpaceObject()).getPublicPath() %></c:set>
 	        <%-- <h3>Community Hits:</h3> --%>
 	        <h3><fmt:message key="jsp.search.results.cris.${typeName}"/></h3>
-	        <dspace:browselist config="cris${typeName}" items="<%= mapOthers.get(otype) %>" />
+	        <dspace:browselist config="cris${typeName}" items="<%= mapOthers.get(otype) %>"  order="<%= order %>" sortBy="<%= sortIdx %>" />
 	    <% 	        
 	    }
 	}
