@@ -1226,5 +1226,26 @@ parameter that is being used (see variable defined above) -->
             <xsl:value-of select="."/>
         </xsl:comment>
     </xsl:template>
-        
+
+
+
+    <!-- remove country link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-country']/dri:xref">
+        <a id="remove-country" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeCountry()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </a>
+    </xsl:template>
+
+    <!-- remove voucher link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-voucher']/dri:xref">
+        <a id="remove-voucher" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeVoucher()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </a>
+    </xsl:template>
 </xsl:stylesheet>

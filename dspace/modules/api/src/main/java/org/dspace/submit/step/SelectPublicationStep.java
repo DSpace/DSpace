@@ -55,6 +55,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_INVALID_JOURNAL = 4;
     public static final int ERROR_PUBMED_DOI = 8;
     public static final int ERROR_GENERIC = 9;
+    public static final int ERROR_PUBMED_NAME = 11;
+
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -99,7 +101,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             properties.load(new FileInputStream(journalPropFile));
             String journalTypes = properties.getProperty("journal.order");
             for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim();
+                String journalType = journalTypes.split(",")[i].trim().toLowerCase();
                 String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
                 String metadataDir = properties.getProperty("journal." + journalType + ".metadataDir");
                 String integrated = properties.getProperty("journal." + journalType + ".integrated");
@@ -196,6 +198,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 	    // attempt to process a DOI or PMID entered in the UI
             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
                 String identifier = request.getParameter("article_doi");
+                String journal = request.getParameter("unknown_doi");
                 if(identifier!=null && !identifier.equals("")){
 
                     if(identifier.indexOf('/')!=-1){
@@ -205,6 +208,28 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     else{
                        if(!processPubMed(context, item, identifier))
                             return ERROR_PUBMED_DOI;
+                    }
+                }
+                else
+                {
+                    if(journal==null||journal.length()==0)
+                    {
+                        return ERROR_PUBMED_NAME;
+                    }
+                    else{
+                        journal=journal.replace("*", "");
+                        journal=journal.trim();
+                        journalID = DryadJournalSubmissionUtils.findKeyByFullname(journal);
+                        if(journalID==null) journalID=journal;
+                        if(journalID==null||journalID.equals("")){
+                            return ERROR_INVALID_JOURNAL;
+                        }
+                        else if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
+
+                            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
+
+                            return ERROR_SELECT_JOURNAL;
+                        }
                     }
                 }
 

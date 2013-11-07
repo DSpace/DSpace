@@ -205,9 +205,6 @@
             </map:match>
 
 
-            <map:match type="wildcard" pattern="submit-checkout">
-                <map:transform type="ShoppingCart"/>
-            </map:match>
 
             <map:match type="wildcard" pattern="submit-paypal-checkout">
                 <map:transform type="paypalReturnStep">

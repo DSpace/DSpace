@@ -2465,9 +2465,18 @@ div.step-link{
     display:none;
 }
 
+/* add style for shopping cart in checkout page*/
+ul#aspect_submission_submit_CheckoutStep_list_transaction{
+    display: none;
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+    width:100% !important;
+
 table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.archive_or_blackout_recommended  {
     background-color: #eee;
     border: thin solid #aaa;
+
 }
 
 .voucher-error{

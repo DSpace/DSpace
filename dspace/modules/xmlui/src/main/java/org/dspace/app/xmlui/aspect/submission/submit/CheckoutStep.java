@@ -41,6 +41,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CheckoutStep responsible for supplying interface for Paypal Checkout.
@@ -67,13 +69,83 @@ public class CheckoutStep extends AbstractStep {
         helpDivision.addPara(T_HELP);
 
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
-
+        //set the shoppingcart exist parameter to be true to avoid the generationg of shoppingcart in the option section
+        mainDiv.addHidden("shopping-cart-exist").setValue("true");
         Request request = ObjectModelHelper.getRequest(objectModel);
         SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
         org.dspace.content.Item item = submissionInfo.getSubmissionItem().getItem();
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        Map<String,String> messages = new HashMap<String,String>();
+        try{
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+
+        //when user apply a voucher code
+        VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+        String voucherCode = "";
+        if(request.getParameter("apply")!=null)
+        {    //user is using the voucher code
+            voucherCode = request.getParameter("voucher");
+            if(voucherCode!=null&&voucherCode.length()>0){
+                if(!voucherValidationService.voucherUsed(context,voucherCode)) {
+                    Voucher voucher = Voucher.findByCode(context,voucherCode);
+                    shoppingCart.setVoucher(voucher.getID());
+                }
+                else
+                {
+                    String errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
+                    messages.put("voucher",errorMessage);
+
+                }
+            }
+            else
+            {
+                shoppingCart.setVoucher(null);
+
+            }
+
+        }
+
+        //when user select a country
+            String country =request.getParameter("country");
+            if(country!=null&&country.length()>0)
+            {
+               if(PaymentSystemConfigurationManager.getCountryProperty(country)!=null)
+               {
+                   shoppingCart.setCountry(country);
+
+               }
+               else
+               {
+                   shoppingCart.setCountry(null);
+
+               }
+
+            }
+            else
+            {
+                shoppingCart.setCountry(null);
+
+            }
+        //when user select a different currency
+
+            String currency =request.getParameter("currency");
+            if(currency!=null&&currency.length()>0)
+            {
+                if(PaymentSystemConfigurationManager.getCurrencyProperty(currency)!=null)
+                {
+                    shoppingCart.setCurrency(currency);
+
+                }
+            }
+            paymentSystemService.updateTotal(context,shoppingCart,null);
+        }catch (Exception e)
+        {
+
+        }
+
         PaypalService paypalService = new DSpace().getSingletonService(PaypalService.class);
-        paypalService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"A",request,item,dso);
+        paypalService.generateUserForm(context,mainDiv,actionURL,knot.getId(),"A",request,item,dso,messages);
 
 
     }

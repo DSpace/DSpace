@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  *  This is the API interface for the Shopping Cart to
@@ -47,7 +48,7 @@ public interface PaypalService
 
     public boolean verifyCreditCard(Context context, Item item, HttpServletRequest request);
 
-    public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException;
+    public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso,Map<String,String> messages) throws WingException, SQLException;
 
     public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart);
 
