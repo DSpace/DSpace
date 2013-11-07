@@ -725,9 +725,9 @@
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
     <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>
     <message key="xmlui.Submission.submit.AccessStep.access_settings">Visible to a group of selected users (no selection needed for Anonymous)</message>
-    <message key="xmlui.Submission.submit.AccessStep.open_access">Once item is accepted into archive</message>
-    <message key="xmlui.Submission.submit.AccessStep.embargo">From specific date onwards</message>
-    <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Allow access for this group</message>
+    <message key="xmlui.Submission.submit.AccessStep.open_access">Allow access once item is accepted into archive</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo">Embargo until specific date</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Access for selected group</message>
     <message key="xmlui.Submission.submit.AccessStep.name">Policy name</message>
     <message key="xmlui.Submission.submit.AccessStep.name_help">A short, descriptive name for the policy (up to 30 characters). May be shown to end users. Example: "Staff-only". Optional but recommended.</message>
     <message key="xmlui.Submission.submit.AccessStep.description">Description</message>
@@ -741,7 +741,7 @@
     <message key="xmlui.Submission.submit.AccessStep.table_policies">Group policies</message>
     <message key="xmlui.Submission.submit.AccessStep.policies_help">Policies listed in this section override any default policies for the collection you're submitting to. If you wish to set an embargo but the target collection allows access for any user, you must set a policy that allows access for the Anonymous group only from a specific date onwards.</message>
     <message key="xmlui.Submission.submit.AccessStep.no_policies">No group policies have been set up for this item.</message>
-    <message key="xmlui.Submission.submit.AccessStep.new_policy_head">New policy</message>
+    <message key="xmlui.Submission.submit.AccessStep.new_policy_head">Embargo</message>
     <message key="xmlui.Submission.submit.AccessStep.private_settings">Private item</message>
     <message key="xmlui.Submission.submit.AccessStep.private_settings_help">If selected, the item won't be searchable</message>
     <message key="xmlui.Submission.submit.AccessStep.private_settings_label">Private</message>
@@ -752,7 +752,7 @@
     <message key="xmlui.Submission.submit.AccessStep.column4">End Date</message>
     <message key="xmlui.Submission.submit.AccessStep.table_edit_button">Edit</message>
     <message key="xmlui.Submission.submit.AccessStep.table_delete_button">Remove</message>
-    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
     <message key="xmlui.Submission.submit.AccessStep.review_policy_line">Name: {0}; action: {1}, group: {2}, start date: {3}, end date: {4}</message>
     <message key="xmlui.Submission.submit.AccessStep.review_public_item">The item will be searchable</message>
     <message key="xmlui.Submission.submit.AccessStep.review_private_item">The item will not be searchable</message>
