@@ -164,6 +164,7 @@ public class DryadReviewAction extends ProcessingAction {
 
     private void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
 	log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
+        try {
         String template;
         boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
         if(isDataPackage)
@@ -191,7 +192,9 @@ public class DryadReviewAction extends ProcessingAction {
         }else{
             //Get the data package
             Item dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
-            email.addArgument(dataPackage.getName());
+            if(dataPackage!=null){
+                email.addArgument(dataPackage.getName());
+            }
             //TODO: DECENT URL !
             email.addArgument(HandleManager.resolveToURL(c, dataPackage.getHandle()));
         }
@@ -216,9 +219,9 @@ public class DryadReviewAction extends ProcessingAction {
 	email.addArgument(manuScriptIdentifier);
 
 	
-        try {
+
             email.send();
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error(LogManager.getHeader(c, "Error while email reviewer", "WorkflowItemId: " + wf.getID()), e);
         }
     }
