@@ -472,9 +472,6 @@ public class PaypalImpl implements PaypalService{
                 if(voucher1!=null){
                     paypalService.generateVoucherForm(voucher,voucher1.getCode(),actionURL,knotId);
                 }
-                else if(voucherCode!=null&&voucherCode.length()>0){
-                    paypalService.generateVoucherForm(voucher,voucherCode,actionURL,knotId);
-                }
                 else{
                     paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
                 }
