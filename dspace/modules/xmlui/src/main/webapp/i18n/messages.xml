@@ -3046,7 +3046,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
             </ul>
         </div>
     </message>
-    <message key="xmlui.Submission.submit.Checkout.help"><div>Your card will not be charged untill your submission is approved by Dyrad. Your card information will NOT be stored By Dryad.</div>
+    <message key="xmlui.Submission.submit.Checkout.help"><div>Your card will not be charged until your submission is approved by Dyrad. Your card information will NOT be stored by Dryad.</div>
     </message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
