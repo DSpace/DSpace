@@ -425,7 +425,7 @@
     		var colman = j('#select-collection-manual').val();
     		if (colman != -1)
     		{
-    			j('#collectionid-manual').val(colman);
+    			j('#collectionid').val(colman);
     			j('#form-submission').submit();
     		}
     		else
