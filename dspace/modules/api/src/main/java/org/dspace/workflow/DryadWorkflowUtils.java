@@ -78,7 +78,11 @@ public class DryadWorkflowUtils {
                 }
                 result.add(datasetItem);
             } catch (Exception e){
-                log.error(LogManager.getHeader(context, "Error while retrieving data files", "datapackage: " + dataPackage.getID()), e);
+
+                if(log.isInfoEnabled())
+                    log.info(LogManager.getHeader(context, "Error while retrieving data files", "datapackage: " + dataPackage.getID() + "datafile: " + dataFileUrl.value));
+                if(log.isDebugEnabled())
+                    log.debug(e.getMessage(),e);
             }
         }
         return result.toArray(new Item[result.size()]);
