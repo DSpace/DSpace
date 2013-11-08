@@ -54,25 +54,29 @@ public class DoiController {
                 }
                 else{
                     Context context = new Context();
-                    context.turnOffAuthorisationSystem();
-                    DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                    Item item = (Item)dis.resolve(context, doi.toString());
+                    try {
+                        context.turnOffAuthorisationSystem();
+                        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+                        Item item = (Item)dis.resolve(context, doi.toString());
 
-                    DCValue[] uris = item.getMetadata("dc.identifier.uri");
-                    if(uris!=null && uris.length > 0){
+                        DCValue[] uris = item.getMetadata("dc.identifier.uri");
+                        if(uris!=null && uris.length > 0){
 
-                        String canonicalPrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-                        String dryadURL = ConfigurationManager.getProperty("dryad.url");
+                            String canonicalPrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
+                            String dryadURL = ConfigurationManager.getProperty("dryad.url");
 
-                        String uri = uris[0].value;
+                            String uri = uris[0].value;
 
-                        // dryad.url = http://datadryad.org
-                        // handle.canonical.prefix = http://hdl.handle.net/
-                        uri = uri.replace(canonicalPrefix, dryadURL + "/handle/");
-                        writer.println(uri);
-                    }
-                    else{
-                        writer.println("DOI not present.");
+                            // dryad.url = http://datadryad.org
+                            // handle.canonical.prefix = http://hdl.handle.net/
+                            uri = uri.replace(canonicalPrefix, dryadURL + "/handle/");
+                            writer.println(uri);
+                        }
+                        else{
+                            writer.println("DOI not present.");
+                        }
+                    } finally {
+                        context.abort();
                     }
                 }
                 // return resource: http://localhost:8100/resource/doi:10.5061/dryad.20
