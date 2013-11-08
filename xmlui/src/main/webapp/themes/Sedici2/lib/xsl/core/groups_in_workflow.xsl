@@ -48,19 +48,19 @@
 			 		<!-- El siguiente XPath me devuelve los nombres de cada coleccion: "dri:row/dri:cell[position()=4]/dri:xref[not(text()=following::dri:xref/text())]" -->
 			    	<xsl:for-each select="dri:row/dri:cell[position()=4]/dri:xref[not(text()=following::dri:xref/text())]"> 
 			  			<xsl:variable name="collec" select="./text()"/> 			 		
-			  			<xsl:for-each select="key('unasignedGroups',$collec)">
-							<xsl:if test="$collec != $nameCollectionAutoarchive">
-								<tbody>
-									<xsl:call-template name="createFirstRowGroup">
-										<xsl:with-param name="nameFirstRowGroup" select="$collec"/>
-										<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$collec))"/>
-									</xsl:call-template>
-									<xsl:call-template name="beginApplyTemplates">
-				    					<xsl:with-param name="targetNodes" select="."/>
-				    				</xsl:call-template>
-			    				</tbody>
-							</xsl:if>				    			
-					    </xsl:for-each>
+			  			<xsl:if test="$collec != $nameCollectionAutoarchive">
+			  				<tbody>
+			  					<xsl:call-template name="createFirstRowGroup">
+									<xsl:with-param name="nameFirstRowGroup" select="$collec"/>
+									<xsl:with-param name="quantityRowsGroup" select="count(key('unasignedGroups',$collec))"/>
+								</xsl:call-template>
+				  				<xsl:for-each select="key('unasignedGroups',$collec)">
+										<xsl:call-template name="beginApplyTemplates">
+					    					<xsl:with-param name="targetNodes" select="."/>
+					    				</xsl:call-template>
+								</xsl:for-each>
+							</tbody>
+						</xsl:if>				    								    					        
 			  		</xsl:for-each>
 			  		<!-- Se procesa la fila que contiene el button de submit -->
 			  		<xsl:apply-templates select="dri:row[dri:cell/dri:field/@type='button' and dri:cell/dri:field/@n='submit_take_tasks']"/>
