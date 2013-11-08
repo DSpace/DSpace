@@ -508,7 +508,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             String name =  journalNames.get(i);
             String no_asterisk = name;
             if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-                name += "*";
+                //name += "*";
                 journalID.addOption(val.equals(selectedJournalId), no_asterisk, name);
 
         }
