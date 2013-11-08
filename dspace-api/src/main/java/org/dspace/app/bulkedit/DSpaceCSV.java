@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.*;
+import java.sql.SQLException;
 
 /**
  * Utility class to read and write CSV files
@@ -381,9 +382,9 @@ public class DSpaceCSV implements Serializable
      *
      * @param i The DSpace item
      *
-     * @throws Exception if something goes wrong with adding the Item
+     * @throws SQLException if something goes wrong with adding the Item
      */
-    public final void addItem(Item i) throws Exception
+    public final void addItem(Item i) throws SQLException
     {
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());

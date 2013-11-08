@@ -17,6 +17,8 @@ import org.dspace.handle.HandleManager;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.util.List;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
@@ -30,7 +32,10 @@ public class MetadataExport
 
     /** Whether to export all metadata, or just normally edited metadata */
     private boolean exportAll;
-
+    
+    /** Logger */
+    private static Logger log = Logger.getLogger(MetadataExport.class);
+    
     /**
      * Set up a new metadata export
      *
@@ -135,8 +140,10 @@ public class MetadataExport
             // Return the results
             return csv;
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
+            log.error(Priority.FATAL, e);
+            System.out.println(e.getMessage());
             return null;
         }
     }
