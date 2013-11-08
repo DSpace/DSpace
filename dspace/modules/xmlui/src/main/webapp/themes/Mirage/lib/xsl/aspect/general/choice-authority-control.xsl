@@ -125,7 +125,14 @@
         </xsl:attribute>
         <xsl:attribute name="title">
           <xsl:text>xmlui.authority.confidence.description.cf_</xsl:text>
-          <xsl:value-of select="$lcConfidence"/>
+          <xsl:choose>
+            <xsl:when test="string-length($lcConfidence) > 0">
+              <xsl:value-of select="$lcConfidence"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>unset</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:attribute>
       </img>
     </xsl:template>
