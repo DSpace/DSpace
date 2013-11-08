@@ -758,6 +758,12 @@ placeholders for header images -->
 					});
 				});
 		</script>
+				
+		<script type="text/javascript">
+			$(document).ready(function () {
+    			$('table').accordion({autoHeight: false , collapsible: true, active: false, header: '.collection-title' });
+			});
+		</script>
     </xsl:template>
 
     <!--

@@ -3877,3 +3877,17 @@ margin-left:10px;}
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
+
+#aspect_submission_Submissions_div_submissions 
+tbody.ui-accordion-header td{
+	color:#454545;
+	font-weight:bold;
+	background-color:#ddd;
+	 
+}
+ 
+
+#aspect_submission_Submissions_div_submissions 
+table.dropdown-table.ui-accordion tr:hover td{
+	background-color:#F6F8F9;
+}

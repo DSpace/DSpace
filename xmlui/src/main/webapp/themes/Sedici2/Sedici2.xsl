@@ -58,6 +58,7 @@
     <xsl:import href="lib/xsl/core/paginas_estaticas.xsl"/>
     <xsl:import href="lib/xsl/core/templatesEspecificos/profile.xsl"/>
     <xsl:import href="lib/xsl/core/templatesEspecificos/form_fecha_publicacion.xsl"/>
+    <xsl:import href="lib/xsl/core/groups_in_workflow.xsl"/>
     <xsl:output indent="yes"/>
     
 
