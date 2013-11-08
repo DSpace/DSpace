@@ -2,6 +2,8 @@ package org.dspace.app.xmlui.aspect.discovery;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -19,6 +21,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
@@ -82,6 +85,19 @@ public class MyTasksTransformer extends DiscoverySubmissions{
     private static final Message T_doi_registered =
         message("xmlui.Submission.MyTasks.doi_registered");
 
+    private static final List<String> taskDisplayOrder;
+
+    static {
+        String tasksOrderString = ConfigurationManager.getProperty("workflow", "mytasks.task.order");
+        String[] taskOrder = StringUtils.split(tasksOrderString, ",");
+        if(taskOrder != null)
+        {
+            taskDisplayOrder = Arrays.asList(taskOrder);
+        } else {
+            taskDisplayOrder = ListUtils.EMPTY_LIST;
+        }
+    }
+
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -134,9 +150,11 @@ public class MyTasksTransformer extends DiscoverySubmissions{
             if(statusFilters != null){
                 List<FacetField.Count> workflowSteps = queryResults.getFacetField("WorkflowstepTask_filter").getValues();
                 if(workflowSteps != null){
-                    for (FacetField.Count workflowStep : workflowSteps) {
-                        if(0 < workflowStep.getCount()){
-                            renderResultBlock(results, workflowStep);
+                    for (String taskName : taskDisplayOrder) {
+                        for (FacetField.Count workflowStep : workflowSteps) {
+                            if (0 < workflowStep.getCount() && workflowStep.getName().equals(taskName)) {
+                                renderResultBlock(results, workflowStep);
+                            }
                         }
                     }
                 }
