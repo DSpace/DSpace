@@ -157,15 +157,6 @@ public class JSPStartSubmissionLookupStep extends JSPStep
                         Constants.ADD);
             }
 
-            // This is a special case, where the user came back to this
-            // page after not selecting a collection. This will display
-            // the "Please select a collection" message to the user
-            if (collectionID == -1)
-            {
-                // specify "no collection" error message should be displayed
-                request.setAttribute("no.collection", Boolean.TRUE);
-            }
-
             // save collections to request for JSP
             request.setAttribute("collections", collections);
             request.setAttribute("collectionID", collectionID);

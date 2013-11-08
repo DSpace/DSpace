@@ -124,6 +124,8 @@
 
 		
 	<div id="tabs-search-accordion">
+	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/></a></h3>
+		<div id="manual-accordion">&nbsp;</div>
 <%		
 	if (searchProviders != null && searchProviders.size() > 0) {
 	%>
@@ -157,9 +159,8 @@
 			<textarea class="form-control submission-lookup-search" name="search_authors" id="search_authors"cols="50" row="4"></textarea>
 		</div>
 		
-		<div class="btn-group col-md-offset-5">			
-			<button type="button" class="btn btn-primary" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
-			<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
+		<div class="row">			
+			<button type="button" class="btn btn-primary col-md-2 pull-right" id="search_go"><fmt:message key="jsp.submit.start-lookup-submission.search-go"/></button>
 		</div>
 		</form>
 	</div>
@@ -201,9 +202,8 @@
 			}
 %></div></div></div><%
 		} %>				
-	<div class="btn-group col-md-offset-5">	
-		<button class="btn btn-primary" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
-		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button></td></tr>
+	<div class="row">	
+		&nbsp;<button class="btn btn-primary col-md-2 pull-right" type="button" id="lookup_idenfifiers"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
 	</div>
 	</form>
 	</div>
@@ -258,11 +258,7 @@
 					<% }  %>
 				</select>
 				</div>
-	</div>
-			
-	<div class="btn-group col-md-offset-5">	
-		<button class="btn btn-primary" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.identifier.lookup"/></button>
-		<button type="button" class="btn btn-default exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
+				<button class="btn btn-primary col-md-2 pull-right" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.byfile.process"/></button>
 	</div>
 		</form>
 	</div>
@@ -270,8 +266,6 @@
 		
 	} %>
 
-	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.manual-submission"/></a></h3>
-		<div id="manual-accordion">&nbsp;</div>
 	</div>
 
 </div>
@@ -306,6 +300,9 @@
 			</form>
 		</div>	
 	</div>
+	<div class="row container">
+        <button type="button" class="btn btn-default col-md-2 pull-right exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
+    </div>
 </div>
 </div>
 		<div id="hidden-area" style="display: none;">
@@ -390,7 +387,7 @@
 <%  } else { %>
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
 <%  } %>
-
+	<br/>
 	   <p><fmt:message key="jsp.general.goto"/><br />
 	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
 	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
@@ -409,7 +406,10 @@
    				}
     		}
     	});
-    	j('#tabs-search-accordion').accordion({ 
+    	j('#tabs-search-accordion').accordion({
+    			heightStyle: "content",
+    			collapsible: true,
+    			active: false,
     			beforeActivate: function( event, ui ) {
     				if ('manual-accordion' == ui.newPanel.attr('id'))
    					{
@@ -418,14 +418,14 @@
     			}
     	});
     	j('#link-ricerca-identificatore').click(function(){
-    		j('#tabs-search-accordion').accordion({'active': 1});
+    		j('#tabs-search-accordion').accordion({'active': 2});
     	});
     	j('button').button();
     	j('#manual-submission-button').click(function(event){
     		var colman = j('#select-collection-manual').val();
     		if (colman != -1)
     		{
-    			j('#collectionid-manual').val(colman);
+    			j('#collectionid').val(colman);
     			j('#form-submission').submit();
     		}
     		else
@@ -463,6 +463,7 @@
     			j("#select-collection-file-div").show();
     		}
     	});
+    	j('#tabs-search-accordion').accordion({'active': 0});
     --></script>
 	   
 </dspace:layout>

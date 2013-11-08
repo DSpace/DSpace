@@ -181,9 +181,18 @@ submissionLookupShowDetails = function(info){
 	start.append(j('#jsfilldatabuttonmessage').text());
 	start.button();
 	start.click(function(){
-		j('#collectionid').val(j('#select-collection').val());
-		j('#iuuid').val(info.uuid);
-		j('#form-submission').submit();
+		var selcolid = j('#select-collection').val();
+		if (selcolid != null && selcolid != -1)
+		{
+			j('#collectionid').val(selcolid);
+			j('#iuuid').val(info.uuid);
+			j('#form-submission').submit();
+		}
+		else
+		{
+			j('#no-collection-warn').modal('show');
+			j('#loading-details').modal('hide');
+		}
 	});
 	modalfooter.append(start);
 	j('#loading-details').modal('show');

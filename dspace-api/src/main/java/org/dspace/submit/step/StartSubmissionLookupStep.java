@@ -176,7 +176,8 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
 
             List<ItemSubmissionLookupDTO> dto = new ArrayList<ItemSubmissionLookupDTO>();
@@ -185,7 +186,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             {
                 dto.add(itemLookup);
             }
-            else if (fuuidLookup != null)
+            else if (fuuidLookup != null && !fuuidLookup.isEmpty())
             {
                 String[] ss = fuuidLookup.split(",");
                 for (String s : ss)
