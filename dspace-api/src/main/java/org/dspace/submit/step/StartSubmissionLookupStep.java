@@ -176,7 +176,8 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
 
             List<ItemSubmissionLookupDTO> dto = new ArrayList<ItemSubmissionLookupDTO>();
