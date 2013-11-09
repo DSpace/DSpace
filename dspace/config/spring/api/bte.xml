@@ -339,8 +339,8 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="pubmedID" value="pmid" />
 				<entry key="doi" value="doi" />
-				<entry key="issn" value="issn" />
-				<entry key="eissn" value="eissn" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="jeissn" />
 				<entry key="journalTitle" value="journal" />
 				<entry key="title" value="title" />
 				<entry key="pubblicationModel" value="" />
@@ -404,18 +404,17 @@
 	<bean name="crossrefInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="journalRef" value="journal" />
+				<entry key="journalTitle" value="journal" />
 				<entry key="doi" value="doi" />
 				<entry key="authors" value="authors" />
-				<entry key="comment" value="note" />
+				<entry key="issn" value="jissn" />
+				<entry key="eissn" value="jeissn" />
 				<entry key="year" value="issued" />
 				<entry key="articleTitle" value="title" />
-				<entry key="summary" value="abstract" />
-				<entry key="splashPageUrl" value="url" />
-				<entry key="pdfUrl" value="fulltextUrl" />
-				<entry key="primaryCategory" value="arxivCategory" />
-				<entry key="category" value="arxivCategory" />
-				<entry key="source" value="arxivID" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="firstPage" value="firstpage" />
+				<entry key="lastPage" value="lastpage" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -444,8 +443,8 @@
 				<entry value="issue" key="dc.relation.issue" />
 				<entry value="language" key="dc.language.iso" />
 				<entry value="subtype" key="dc.type.contribution" />
-				<!-- <entry key="keywords" key="dc.subject"/> -->
-				<entry value="mesh" key="dc.subject" />
+				<!-- <entry value="keywords" key="dc.subject"/> --> 
+				<entry value="mesh" key="dc.subject" /> 
 				<entry value="firstpage" key="dc.relation.firstpage" />
 				<entry value="lastpage" key="dc.relation.lastpage" />
 				<entry value="abstract" key="dc.description.abstract" />
@@ -455,8 +454,6 @@
 				<entry value="authorsWithAffiliations" key="" />
 				<entry value="authors" key="dc.contributor.author" />
 				<entry value="articleNumber" key="dc.relation.article" />
-				<entry value="firstpage" key="dc.relation.firstpage" />
-				<entry value="firstpage" key="dc.relation.firstpage" />
 
 			</map>
 		</constructor-arg>

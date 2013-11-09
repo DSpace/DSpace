@@ -100,7 +100,7 @@ public class PubmedUtils
             record.addValue("title", new StringValue(title));
 
         Element abstractElement = XMLUtils
-                .getSingleElement(medline, "Abstract");
+                .getSingleElement(article, "Abstract");
         if (abstractElement == null)
         {
             abstractElement = XMLUtils.getSingleElement(medline,
