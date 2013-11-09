@@ -140,14 +140,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(selectedJournalId!=null){
             String journalPath = "";
             try{
+                final java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
+                final java.util.List<String> journalDirs = org.dspace.submit.step.SelectPublicationStep.journalDirs;
                 journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
                 pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 journalStatus = pBean.getStatus();
                 journalName = pBean.getJournalName();
-                if(journalName!=null && !journalName.equals("")) {
-                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-                        journalName += "*";
-                }
+//                if(journalName!=null && !journalName.equals("")) {
+//                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
+//                        journalName += "*";
+//                }
             }catch (Exception e)
             {
                  //invalid journalID
@@ -512,7 +514,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             String name =  journalNames.get(i);
             String no_asterisk = name;
             if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-                name += "*";
+                //name += "*";
                 journalID.addOption(val.equals(selectedJournalId), no_asterisk, name);
 
         }
