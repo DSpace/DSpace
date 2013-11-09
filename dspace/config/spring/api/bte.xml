@@ -161,6 +161,7 @@
 			<list>
 			    <ref bean="fieldMergeModifier"/>
 			    <ref bean="valueConcatenationModifier"/>
+			    <ref bean="languageCondeModifier"/>
 			</list>
 		</property>
 	</bean>
@@ -188,6 +189,8 @@
 	    <property name="separator" value=";" />
 	    <property name="whitespaceAfter" value="true" />
 	</bean>
+
+        <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
 
 	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
 	    <property name="outputMap" ref="outputMap"/>
