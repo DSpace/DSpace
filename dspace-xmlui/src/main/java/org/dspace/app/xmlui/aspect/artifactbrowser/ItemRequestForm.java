@@ -147,7 +147,7 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 
 		itemRequest.addPara(T_para1);
 		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
-		if (titleDC != null || titleDC.length > 0)
+		if (titleDC != null && titleDC.length > 0)
 			itemRequest.addPara(titleDC[0].value);
 
 		List form = itemRequest.addList("form", List.TYPE_FORM);
