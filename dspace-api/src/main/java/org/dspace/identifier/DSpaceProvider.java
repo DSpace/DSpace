@@ -4,17 +4,12 @@
  * Mark H. Wood, IUPUI University Library, Nov 11, 2013
  */
 
-package org.dspace.identifier.dspace;
+package org.dspace.identifier;
 
 import java.sql.SQLException;
+import java.util.UUID;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.identifier.DSpace;
-import org.dspace.identifier.Identifier;
-import org.dspace.identifier.IdentifierException;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierProvider;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
@@ -23,7 +18,7 @@ import org.dspace.storage.rdbms.TableRow;
  *
  * @author mwood
  */
-public class Provider
+public class DSpaceProvider
         extends IdentifierProvider
 {
     @Override
@@ -49,6 +44,7 @@ public class Provider
             row.setColumn("object_id", dso.getID());
             row.setColumn("object_type", dso.getType());
             DatabaseManager.insert(context, row);
+            context.commit();
         } catch (SQLException ex)
         {
             throw new IdentifierException("Unable to store a DSpace object identifier", ex);
@@ -60,16 +56,7 @@ public class Provider
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        TableRow row;
-        try
-        {
-            row = DatabaseManager.querySingleTable(context,
-                    "ObjectID", "SELECT max(dspace_id) FROM ObjectID");
-        } catch (SQLException ex)
-        {
-            throw new IdentifierException(ex);
-        }
-        return String.valueOf(row.getIntColumn("dspace_id") + 1);
+        return UUID.randomUUID().toString(); // XXX different type of UUID?
     }
 
     @Override
@@ -81,10 +68,10 @@ public class Provider
         try {
             row = DatabaseManager.querySingleTable(context, "ObjectID",
                     "SELECT object_id, object_type FROM ObjectID WHERE dspace_id = ?",
-                    Integer.parseInt(identifier));
+                    identifier);
         } catch (SQLException ex)
         {
-            throw new IdentifierNotFoundException("ID unknown", ex);
+            throw new IdentifierNotResolvableException("ID unknown", ex);
         }
         int type = row.getIntColumn("object_type");
         int id = row.getIntColumn("object_id");
@@ -111,7 +98,7 @@ public class Provider
         } catch (SQLException ex) {
             throw new IdentifierNotFoundException(ex);
         }
-        return String.valueOf(row.getIntColumn("dspace_id"));
+        return row.getStringColumn("dspace_id");
     }
 
     @Override
