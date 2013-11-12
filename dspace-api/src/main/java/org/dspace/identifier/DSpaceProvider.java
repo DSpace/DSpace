@@ -1,7 +1,9 @@
-/*
- * Copyright 2013 Indiana University.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Mark H. Wood, IUPUI University Library, Nov 11, 2013
+ * http://www.dspace.org/license/
  */
 
 package org.dspace.identifier;
