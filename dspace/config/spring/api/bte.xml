@@ -161,7 +161,7 @@
 			<list>
 			    <ref bean="fieldMergeModifier"/>
 			    <ref bean="valueConcatenationModifier"/>
-			    <ref bean="languageCondeModifier"/>
+			    <ref bean="languageCodeModifier"/>
 			</list>
 		</property>
 	</bean>
