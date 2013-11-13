@@ -9,6 +9,7 @@
 package org.dspace.rest.common;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -22,6 +23,22 @@ public class Context {
 	private long total_count;
 	private String query;
 	private String query_date;
+	private ArrayList<String> error;
+	
+	public ArrayList<String> getError() {
+		return error;
+	}
+
+	public void setError(ArrayList<String> error) {
+		this.error = error;
+	}
+	
+	public void addError(String err) {
+		if(error == null){
+			error = new ArrayList<String>();
+		}
+		error.add(err);
+	}
 	
 	private static String dateFormat="yyyy-MM-dd'T'HH:mm:ss";
 	

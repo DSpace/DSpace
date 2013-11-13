@@ -22,13 +22,19 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Properties;
 
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.ItemReturn;
+import org.dspace.rest.search.Search;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -46,12 +52,40 @@ import java.util.List;
 @Path("/items")
 public class ItemsResource {
 	
+	private static final String OFFSET = "offset";
+
+	private static final String LIMIT = "limit";
+
+	private static final String EXPAND = "expand";
+
+	private static final String SEARCH_PREFIX="item.search.";
+	
 	private static final boolean writeStatistics;
 	private static final int maxPagination;
+	private static final HashMap<String,String> searchMapping;
+	private static final ArrayList<String> reservedWords;
+	private static final String searchClass;
 	
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
 		maxPagination=ConfigurationManager.getIntProperty("rest", "max_pagination");
+		HashMap<String,String> sm = new HashMap<String,String>();
+		Enumeration<?> propertyNames = ConfigurationManager.getProperties("rest").propertyNames();
+        while(propertyNames.hasMoreElements())
+        {
+            String key = ((String) propertyNames.nextElement()).trim();
+            if (key.startsWith(SEARCH_PREFIX)){
+            	sm.put(key.substring(SEARCH_PREFIX.length()), ConfigurationManager.getProperty("rest", key));
+            }
+        }
+        searchMapping = sm;
+        searchClass=ConfigurationManager.getProperty("rest","implementing.search.class");
+        
+        ArrayList<String> resevedWord= new ArrayList<String>();
+        resevedWord.add(OFFSET);
+        resevedWord.add(LIMIT);
+        resevedWord.add(EXPAND);
+        reservedWords=resevedWord;
 	}
 	
 	 /** log4j category */
@@ -64,9 +98,9 @@ public class ItemsResource {
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.ItemReturn list(
-    		@QueryParam("expand") String expand,
-    		@QueryParam("limit") Integer size, 
-    		@QueryParam("offset") Integer offset,
+    		@QueryParam(EXPAND) String expand,
+    		@QueryParam(LIMIT) Integer size, 
+    		@QueryParam(OFFSET) Integer offset,
     		@Context HttpServletRequest request)  throws WebApplicationException {
     	
     	try {
@@ -121,7 +155,6 @@ public class ItemsResource {
             ItemReturn item_return= new ItemReturn();
             item_return.setContext(item_context);
             item_return.setItem(selectedItems);
-            
             return(item_return);
            
             
@@ -136,7 +169,7 @@ public class ItemsResource {
     @GET
     @Path("/{item_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Item getItem(@PathParam("item_id") Integer item_id, @QueryParam("expand") String expand,
+    public org.dspace.rest.common.Item getItem(@PathParam("item_id") Integer item_id, @QueryParam(EXPAND) String expand,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException {
     	
@@ -172,9 +205,9 @@ public class ItemsResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.ItemReturn search(
     		@QueryParam("q") String query,
-    		@QueryParam("expand") String expand,
-    		@QueryParam("limit") Integer limit, 
-    		@QueryParam("offset") Integer offset,
+    		@QueryParam(EXPAND) String expand,
+    		@QueryParam(LIMIT) Integer limit, 
+    		@QueryParam(OFFSET) Integer offset,
     		@Context HttpServletRequest request) throws WebApplicationException{
         try {
             if(context == null || !context.isValid()) {
@@ -182,57 +215,18 @@ public class ItemsResource {
                 //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
                 context.getDBConnection().setAutoCommit(true);
             }
-
             if(limit==null || limit>maxPagination){
-            	limit=maxPagination;
-            }
-            if(offset==null){
-            	offset=0;
-            }
+    			limit=maxPagination;
+    		}
+    		if(offset==null){
+    			offset=0;
+    		}
             
-            QueryArgs queryArgs = new QueryArgs();
-            queryArgs.setQuery(query);
-            QueryResults queryResults = DSQuery.doQuery(context, queryArgs);
-
-            List<String> handleList = queryResults.getHitHandles();
-            List<org.dspace.rest.common.Item> dsoList = new ArrayList<org.dspace.rest.common.Item>();
-            int added=0;
-            int count=0;
-            for(String handle : handleList) {
-                org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-                if(dso instanceof  org.dspace.content.Item){
-                	if(count>=offset && added<(offset+limit)){
-	                	org.dspace.content.Item item = ( org.dspace.content.Item)dso;
-	                	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
-	                	   dsoList.add(new org.dspace.rest.common.Item(item, expand, context));
-	                	   added++;
-	                	}
-                	} 
-                	if(added>=limit){
-                		break;
-                	}
-                }
-                count++;
-            }
-            
-            org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
-            org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
-            item_context.setLimit(limit);
-            item_context.setOffset(offset);
-            item_context.setTotal_count(handleList.size());
-            StringBuffer requestURL = request.getRequestURL();
-            String queryString = request.getQueryString();
-
-            if (queryString == null) {
-            	item_context.setQuery(requestURL.toString());
+            if(query!=null){
+            	return luceneSearch(query, expand, limit, offset, request);
             } else {
-            	item_context.setQuery(requestURL.append('?').append(queryString).toString());
+            	return parameterSearch(expand, limit, offset, request);
             }
-            item_return.setContext(item_context);
-            item_return.setItem(dsoList);
-            
-
-            return item_return;
 
         } catch (SQLException e) {
             log.error(e.getMessage());
@@ -242,7 +236,129 @@ public class ItemsResource {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
+	private org.dspace.rest.common.ItemReturn luceneSearch(String query,
+			String expand, Integer limit, Integer offset,
+			HttpServletRequest request) throws IOException, SQLException,
+			WebApplicationException {
+		
+		QueryArgs queryArgs = new QueryArgs();
+		queryArgs.setQuery(query);
+		QueryResults queryResults = DSQuery.doQuery(context, queryArgs);
+
+		List<String> handleList = queryResults.getHitHandles();
+		List<org.dspace.rest.common.Item> dsoList = new ArrayList<org.dspace.rest.common.Item>();
+		int added=0;
+		int count=0;
+		for(String handle : handleList) {
+		    org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+		    if(dso instanceof  org.dspace.content.Item){
+		    	if(count>=offset && added<(offset+limit)){
+		        	org.dspace.content.Item item = ( org.dspace.content.Item)dso;
+		        	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+		        	   dsoList.add(new org.dspace.rest.common.Item(item, expand, context));
+		        	   added++;
+		        	}
+		    	} 
+		    	if(added>=limit){
+		    		break;
+		    	}
+		    }
+		    count++;
+		}
+		
+		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
+		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
+		item_context.setLimit(limit);
+		item_context.setOffset(offset);
+		item_context.setTotal_count(handleList.size());
+		StringBuffer requestURL = request.getRequestURL();
+		String queryString = request.getQueryString();
+
+		if (queryString == null) {
+			item_context.setQuery(requestURL.toString());
+		} else {
+			item_context.setQuery(requestURL.append('?').append(queryString).toString());
+		}
+		item_return.setContext(item_context);
+		item_return.setItem(dsoList);
+		
+		
+
+		return item_return;
+	}
+	
+	private org.dspace.rest.common.ItemReturn parameterSearch(
+			String expand, Integer limit, Integer offset,
+			HttpServletRequest request) throws IOException, SQLException,
+			WebApplicationException {
+				
+		String query  = request.getQueryString();
+		
+		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
+		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
+		item_context.setLimit(limit);
+		item_context.setOffset(offset);
+		item_return.setContext(item_context);
+		StringBuffer requestURL = request.getRequestURL();
+		String queryString = request.getQueryString();
+
+		if (queryString == null) {
+			item_context.setQuery(requestURL.toString());
+		} else {
+			item_context.setQuery(requestURL.append('?').append(queryString).toString());
+		}		
+		if(searchClass==null){
+			log.error("'implementing.search.class' not set in rest config");
+			item_context.addError("'implementing.search.class' not set in rest config");
+			return item_return;
+		}		
+		String[] queryparts = query.split("&");
+		HashMap<String,String> querymap= new HashMap<String,String>();
+		for(String q : queryparts){
+			String [] segments = q.split("=");
+			if(segments.length==2){
+				if(searchMapping.containsKey(segments[0])){
+					querymap.put(searchMapping.get(segments[0]), segments[1]);
+					log.debug("segments " + segments[0] + " " + segments[1]);
+				} else if(!reservedWords.contains(segments[0])){
+					log.error("query parameter " + segments[0] + " not supported");
+					item_context.addError("not recognised query parameter: " + segments[0]);
+					return item_return;
+				}
+			} else {
+				item_context.addError("value to query parameter \"" + q + "\" not correctly set");
+				return item_return;
+			}
+		}
+		
+		try{
+			Class<?> clazz = Class.forName(searchClass);
+			Constructor<?> constructor = clazz.getConstructor();
+			Search instance = (Search) constructor.newInstance();
+			item_return.setItem(instance.search(context, querymap, expand, limit, offset));
+			item_context.setTotal_count(item_return.getItem().size());
+		} catch(ClassNotFoundException ex) {
+			item_context.addError("'implementing.search.class' does not point to an existing class");
+			log.error(ex);
+		} catch(NoSuchMethodException ex) {
+			item_context.addError("'implementing.search.class' does have an empty contructor");
+			log.error(ex);
+		} catch(InstantiationException ex) {
+			item_context.addError("constructor for 'implementing.search.class' could not be instantiated");
+			log.error(ex);
+		} catch(IllegalAccessException ex) {
+			item_context.addError("'caught IllegalAccessException for instance of 'implementing.search.class'");
+			log.error(ex);
+		} catch(InvocationTargetException ex) {
+			item_context.addError("'caught InvocationTargetException for instance of 'implementing.search.class'");
+			log.error(ex);
+		}
+    		
+		return item_return;
+	}
+	
+	
     private void writeStats(Integer item_id, String user_ip, String user_agent,
 			String xforwarderfor, HttpHeaders headers,
 			HttpServletRequest request) {
