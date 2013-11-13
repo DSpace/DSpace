@@ -2815,4 +2815,11 @@ public class Item extends DSpaceObject
 
        return new ItemIterator(context, rows);
    }
+
+   /**
+    * Force an update to last_modified
+    */
+   public void touch() {
+        modified = true;
+   }
 }
