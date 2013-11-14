@@ -25,8 +25,8 @@
 		Uncomment these properties if you want lookup in metadata the email and the name of the author to contact for request copy.
 		If you don't configure that or if the requested item doesn't have these metadata the submitter data are used as fail over
 		 
-		<property name="emailMetadata" value="schema.element.qualfier" />
-		<property name="fullNameMatadata" value="schema.element.qualfier" /> 
+		<property name="emailMetadata" value="schema.element.qualifier" />
+		<property name="fullNameMatadata" value="schema.element.qualifier" /> 
 		
 	-->	
 	</bean>

@@ -22,8 +22,8 @@
     <xsl:output indent="yes"/>
 
 <!--
-    These templaes are devoted to rendering the search results for discovery.
-    Since discovery used hit highlighting seperate templates are required !
+    These templates are devoted to rendering the search results for Discovery.
+    Since Discovery uses hit highlighting separate templates are required !
 -->
 
 

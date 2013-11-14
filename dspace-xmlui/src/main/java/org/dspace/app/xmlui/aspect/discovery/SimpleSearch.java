@@ -162,7 +162,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         if(0 < filterFields.size() && filterTypes.size() == 0)
         {
-            //Display the add filters url ONLY if we have no filters selected & fitlers can be added
+            //Display the add filters url ONLY if we have no filters selected & filters can be added
             searchList.addItem().addXref("display-filters", T_filters_show);
         }
         addHiddenFormFields("search", request, fqs, mainSearchDiv);

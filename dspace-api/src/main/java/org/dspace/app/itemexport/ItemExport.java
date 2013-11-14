@@ -957,7 +957,7 @@ public class ItemExport
             }
         }
 
-        // if we have any items to process then kick off annonymous thread
+        // if we have any items to process then kick off anonymous thread
         if (itemsMap.size() > 0)
         {
             Thread go = new Thread()

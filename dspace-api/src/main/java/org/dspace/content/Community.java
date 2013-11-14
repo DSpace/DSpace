@@ -802,7 +802,7 @@ public class Community extends DSpaceObject
     /**
      * Return an array of collections of this community and its subcommunities
      * 
-     * @return an array of colections
+     * @return an array of collections
      */
 
     public Collection[] getAllCollections() throws SQLException

@@ -1277,7 +1277,7 @@ public class SolrLogger
 
     public static void shardSolrIndex() throws IOException, SolrServerException {
         /*
-        Start by faceting by year so we can include each year in a seperate core !
+        Start by faceting by year so we can include each year in a separate core !
          */
         SolrQuery yearRangeQuery = new SolrQuery();
         yearRangeQuery.setQuery("*:*");

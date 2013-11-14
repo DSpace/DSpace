@@ -680,11 +680,11 @@ public abstract class AbstractAdapter
         AttributesImpl attributes = new AttributesImpl();
         for (AttributeMap attributeMap : attributeMaps)
         {
-            boolean diffrentNamespaces = false;
+            boolean differentNamespaces = false;
             Namespace attributeNamespace = attributeMap.getNamespace();
             if (attributeNamespace != null && !(attributeNamespace.URI.equals(elementNamespace.URI)))
             {
-                diffrentNamespaces = true;
+                differentNamespaces = true;
             }
 
             // copy each one over.
@@ -695,7 +695,7 @@ public abstract class AbstractAdapter
                     continue;
                 }
 
-                if (diffrentNamespaces)
+                if (differentNamespaces)
                 {
                     attributes.addAttribute(attributeNamespace.URI, attr.getKey(),
                             qName(attributeNamespace, attr.getKey()), "CDATA", attr.getValue());
