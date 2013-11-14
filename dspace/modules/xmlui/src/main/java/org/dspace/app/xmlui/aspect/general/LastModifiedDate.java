@@ -35,7 +35,7 @@ public class LastModifiedDate extends AbstractConfigurableAction implements Thre
             super.configure(configuration);
 
             // RFC-822 Date with a GMT based time zone
-            this.formatter = FastDateFormat.getInstance("EEE, dd MMM yyyy kk:mm:ss zzz", DateUtils.UTC_TIME_ZONE);
+            this.formatter = FastDateFormat.getInstance("EEE, dd MMM yyyy kk:mm:ss zzz");
             this.days = configuration.getChild("days").getValueAsInteger(0);
             this.hours = configuration.getChild("hours").getValueAsInteger(0);
             this.minutes = configuration.getChild("minutes").getValueAsInteger(0);
@@ -49,34 +49,18 @@ public class LastModifiedDate extends AbstractConfigurableAction implements Thre
             Calendar calendar = Calendar.getInstance(DateUtils.UTC_TIME_ZONE);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             Map values = new HashMap(3);
-
-            /* Get the current time and output as the last modified header */
             String value = this.formatter.format(calendar);
 
-            response.setHeader("Last-Modified", value);
-            values.put("last-modified",  value);
             if(dso instanceof Item)
             {
                 Item item = (Item) dso;
                 Date lastModified = item.getLastModified();
-
-
-                /* Advance the time as much as required */
-                calendar.add(Calendar.DATE, lastModified.getDate());
-                calendar.add(Calendar.HOUR, lastModified.getHours());
-                calendar.add(Calendar.MINUTE, lastModified.getMinutes());
-                calendar.add(Calendar.SECOND, lastModified.getSeconds());
-
-
+                /* Get the current time and output as the last modified header */
+                value =  lastModified.toString();
             }
-            else
-            {
-                /* Advance the time as much as required */
-                calendar.add(Calendar.DATE, this.days);
-                calendar.add(Calendar.HOUR, this.hours);
-                calendar.add(Calendar.MINUTE, this.minutes);
-                calendar.add(Calendar.SECOND, this.seconds);
-            }
+            response.setHeader("Last-Modified", value);
+            values.put("last-modified",  value);
+
             /* Return the headers */
             return(Collections.unmodifiableMap(values));
 
