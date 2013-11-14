@@ -37,6 +37,8 @@ public interface SubmissionLookupDataLoader extends DataLoader
 
     public final static String SCOPUSEID = "scopuseid";
 
+    public final static String CINII = "cinii";
+
     public final static String TYPE = "type";
 
     List<String> getSupportedIdentifiers();
