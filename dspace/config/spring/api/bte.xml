@@ -20,6 +20,7 @@
 				<entry key="pubmedXML" value-ref="pubmedFileDataLoader" />
 				<entry key="crossrefXML" value-ref="crossRefFileDataLoader" />
 				<entry key="arxivXML" value-ref="arXivFileDataLoader" />
+				<entry key="ciniiXML" value-ref="ciniiFileDataLoader" />
 				<entry key="bibtex" value-ref="bibTeXDataLoader" />
 				<entry key="ris" value-ref="risDataLoader" />
 				<entry key="endnote" value-ref="endnoteDataLoader" />
@@ -81,9 +82,11 @@
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
+	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
 	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
 	            <entry key="crossRefXML" value-ref="crossRefFileDataLoader"/>
 	            <entry key="arXivXML" value-ref="arXivFileDataLoader"/>
+	            <entry key="ciniiXML" value-ref="ciniiFileDataLoader"/>
 	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
 	            <entry key="ris" value-ref="risDataLoader"/>
 	            <entry key="endnote" value-ref="endnoteDataLoader"/>
@@ -438,6 +441,38 @@
 		</constructor-arg>
 	</bean>
 
+	<!-- CiNii -->
+	<bean id="ciniiOnlineDataLoader" class="org.dspace.submit.lookup.CiNiiOnlineDataLoader">
+            <property name="searchProvider" value="true" />
+            <property name="fieldMap" ref="ciniiInputMap" />
+	</bean>
+
+	<bean id="ciniiFileDataLoader" class="org.dspace.submit.lookup.CiNiiFileDataLoader">
+            <property name="fieldMap" ref="ciniiInputMap" />
+	</bean>
+
+	<bean name="ciniiInputMap" class="java.util.HashMap" scope="prototype">
+            <constructor-arg>
+                <map key-type="java.lang.String" value-type="java.lang.String">
+                    <entry key="naid" value="naid" />
+                    <entry key="ncid" value="ncid" />
+                    <entry key="issn" value="jissn" />
+                    <entry key="journal" value="journal" />
+                    <entry key="title" value="title" />
+                    <entry key="issued" value="issued" />
+                    <entry key="volume" value="volume" />
+                    <entry key="issue" value="issue" />
+                    <entry key="spage" value="firstpage" />
+                    <entry key="epage" value="lastpage" />
+                    <entry key="language" value="language" />
+                    <entry key="description" value="abstract" />
+                    <entry key="subjects" value="keywords" />
+                    <entry key="authors" value="authors" />
+                    <entry key="publisher" value="publisher" />
+                </map>
+            </constructor-arg>
+	</bean>
+
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
 	<!-- **************************************************************************************************** -->
@@ -466,6 +501,7 @@
 				<entry value="allkeywords" key="dc.subject" />
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
+				<entry value="publisher" key="dc.publisher" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
 				<entry value="url" key="" />
@@ -483,6 +519,10 @@
 				<entry value="editionnumber" key="" />
 				<entry value="seriestitle" key="" />
 				<entry value="volumetitle" key="" />
+				<entry value="titleAlternative" key="" />
+				<entry value="authorAlternative" key="" />
+				<entry value="ncid" key="" />
+				<entry value="naid" key="" />
 				 -->
 				 
 			</map>
