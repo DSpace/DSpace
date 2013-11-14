@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
+import org.dspace.utils.DSpace;
 
 
 public class EditShoppingcartForm  extends AbstractDSpaceTransformer
@@ -115,7 +116,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
         Properties countries  = PaymentSystemConfigurationManager.getAllCountryProperty();
         Properties currencies  = PaymentSystemConfigurationManager.getAllCurrencyProperty();
-
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
         // Get our parameters;
         int shoppingcartID = parameters.getParameterAsInteger("shoppingcart_id",-1);
@@ -360,6 +361,17 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             identity.addLabel(T_name11);
             identity.addItem().addContent(surCharge);
         }
+        identity.addLabel("Order date");
+        if(shoppingcart.getOrderDate()!=null)
+            identity.addItem().addContent(shoppingcart.getOrderDate().toString());
+        identity.addLabel("Payment date");
+        if(shoppingcart.getPaymentDate()!=null)
+            identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
+        identity.addLabel("Notes");
+        if(shoppingcart.getNote()!=null)
+            identity.addItem("note","note").addTextArea("note").setValue(shoppingcart.getNote());
+        else
+            identity.addItem("note","note").addTextArea("note");
 
         identity.addLabel(T_name7);
         identity.addItem().addContent(Double.toString(total));
@@ -370,6 +382,9 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             buttons.addButton("submit_save").setValue(T_submit_save);
         }
         edit.addHidden("administrative-continue").setValue(knot.getId());
+
+
+
     }
 
 }

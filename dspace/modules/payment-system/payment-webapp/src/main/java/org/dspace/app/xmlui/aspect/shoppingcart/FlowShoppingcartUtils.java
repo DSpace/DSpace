@@ -84,6 +84,14 @@ public class FlowShoppingcartUtils {
            }
         }
 
+        String note = request.getParameter("note");
+        if (!StringUtils.isEmpty(note)){
+            shoppingCart.setNote(note);
+        }
+        else
+        {
+            shoppingCart.setNote(null);
+        }
 
         if (result.getErrors() == null) {
 
@@ -101,10 +109,17 @@ public class FlowShoppingcartUtils {
                 shoppingCart.setVoucher(null);
             }
 
-            if (country != null && countryOriginal!=null && countryOriginal.length()>0 && !countryOriginal.equals(country)) {
+            if (country != null &&!country.equals(countryOriginal)) {
                 shoppingCart.setCountry(country);
             }
-            if (currency != null && !currencyOriginal.equals(currency)) {
+            else
+            {
+                if(country!=null&&country.length()==0)
+                {
+                    shoppingCart.setCountry(null);
+                }
+            }
+            if (currency != null && !currency.equals(currencyOriginal)) {
                 paymentSystemService.setCurrency(shoppingCart,currency);
             }
             else{
@@ -142,6 +157,7 @@ public class FlowShoppingcartUtils {
                     shoppingCart.setTransactionId(transactionId);
                 }
             }
+
 
             paymentSystemService.updateTotal(context,shoppingCart,null);
             context.commit();
