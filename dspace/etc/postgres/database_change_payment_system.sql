@@ -41,5 +41,8 @@ CREATE TABLE voucher
   code VARCHAR(256),
   customer VARCHAR(256),
   generator INTEGER,
-  explanation VARCHAR(256)
+  explanation VARCHAR(256),
+  batch_id VARCHAR(256)
 );
+
+ALTER TABLE voucher ADD COLUMN batch_id VARCHAR(256);

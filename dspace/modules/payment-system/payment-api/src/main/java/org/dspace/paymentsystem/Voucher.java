@@ -29,6 +29,8 @@ public class Voucher {
 
     public static final int CODE = 4;
 
+    public static final int BATCH_ID = 5;
+
     public static final String STATUS_USED = "used";
     public static final String STATUS_OPEN = "open";
     private static Logger log = Logger.getLogger(Voucher.class);
@@ -69,6 +71,16 @@ public class Voucher {
     public String getCode()
     {
         return myRow.getStringColumn("code");
+    }
+
+    /**
+     * Get the batch_id
+     *
+     * @return integer code (or null if the column is an SQL NULL)
+     */
+    public String getBatchId()
+    {
+        return myRow.getStringColumn("batch_id");
     }
 
 
@@ -114,6 +126,18 @@ public class Voucher {
         modified = true;
     }
 
+
+    /**
+     * Set the batch_id
+     *
+     * @return int batch_id (or null if the column is an SQL NULL)
+     */
+    public void setBatchId(String batchId)
+    {
+
+        myRow.setColumn("batch_id",batchId);
+        modified = true;
+    }
 
 
     /**
@@ -340,7 +364,7 @@ public class Voucher {
         String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
         queryBuf.append("SELECT * FROM voucher WHERE voucher_id = ? OR ");
-        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) ORDER BY voucher_id ASC ");
+        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR LOWER(batch_id) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR  LOWER(explanation) LIKE LOWER(?) OR to_char(creation, 'YYYY-MM-DD') LIKE ? ORDER BY voucher_id ASC ");
 
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -395,18 +419,18 @@ public class Voucher {
         }
 
         // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {int_param,params,params,params};
+        Object[] paramArr = new Object[] {int_param,params,params,params,params,params,params};
         if (limit > 0 && offset > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, limit, offset};
+            paramArr = new Object[]{int_param, params, params, params,params, params,params, limit, offset};
         }
         else if (limit > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, limit};
+            paramArr = new Object[]{int_param, params, params, params,params, params,params, limit};
         }
         else if (offset > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, offset};
+            paramArr = new Object[]{int_param, params, params, params,params, params,params, offset};
         }
 
         // Get all the voucher that match the query

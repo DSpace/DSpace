@@ -107,6 +107,9 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
             message("xmlui.voucher.ManageVoucherMain.search_column6");
 
 
+    private static final Message T_search_column7 =
+            message("xmlui.voucher.ManageVoucherMain.search_column7");
+
 
 
 
@@ -216,6 +219,7 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
 
         header.addCell().addContent(T_search_column5);
         header.addCell().addContent(T_search_column6);
+        header.addCell().addContent(T_search_column7);
         CheckBox selectVoucherService;
         for (Voucher voucher : vouchers)
         {
@@ -263,7 +267,7 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
                 row.addCell().addContent("");
             }
 
-
+            row.addCell().addContent(voucher.getBatchId());
         }
 
         if (vouchers.length <= 0)

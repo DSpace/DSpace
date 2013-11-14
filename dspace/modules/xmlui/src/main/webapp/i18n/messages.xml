@@ -3469,6 +3469,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.ManageVoucherMain.search_column3">Value</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column4">Create Date</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column5">Explanation</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column7">Batch Id</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create_link">Create new voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_browse_link">Browse all voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create">Create new voucher</message>
@@ -3476,7 +3477,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.property.ManageVoucherMain.actions_search">Search voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_search">Search voucher</message>
 
-    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its code, value and expiration date</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its id, code, batch id , status and expiration date(2011-01-01)</message>
     <message key="xmlui.property.ManageVoucherMain.actions_browse_link">Browse All vouchers</message>
     <message key="xmlui.property.ManageVoucherMain.actions_create_link">Create new voucher</message>
 
