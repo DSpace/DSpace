@@ -1145,6 +1145,33 @@ parameter that is being used (see variable defined above) -->
         </input>
     </xsl:template>
 
+     <!--add attribute placeholder and title for other repository-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.other_repo_name']" mode="normalField">
+        <input>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:attribute name="placeholder">
+                <xsl:text>Repository name</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="title">
+                <xsl:text>Repository name</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="value">
+                <xsl:choose>
+                    <xsl:when test="./dri:value[@type='raw']">
+                        <xsl:value-of select="./dri:value[@type='raw']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="dri:value/i18n:text">
+                <xsl:attribute name="i18n:attr">value</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates />
+        </input>
+    </xsl:template>
+
     <!--payment-->
     <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country' or @id ='aspect.submission.StepTransformer.field.country']">
     <select onchange="javascript:updateOrder()">
