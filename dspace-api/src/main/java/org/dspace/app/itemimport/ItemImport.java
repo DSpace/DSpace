@@ -1975,6 +1975,7 @@ public class ItemImport
                     {
                         // create a new dspace context
                         context = new Context();
+                        context.setCurrentUser(eperson);
                         context.setIgnoreAuthorization(true);
                         
                         File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
