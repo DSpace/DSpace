@@ -380,16 +380,16 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="journalRef" value="journal" />
 				<entry key="doi" value="doi" />
-				<entry key="authors" value="authors" />
+				<entry key="author" value="authors" />
+				<entry key="authorWithAffiliation" value="authorsWithAffiliation" />
 				<entry key="comment" value="note" />
-				<entry key="year" value="issued" />
+				<entry key="published" value="issued" />
 				<entry key="articleTitle" value="title" />
 				<entry key="summary" value="abstract" />
-				<entry key="splashPageUrl" value="url" />
+				<entry key="id" value="url" />
 				<entry key="pdfUrl" value="fulltextUrl" />
 				<entry key="primaryCategory" value="arxivCategory" />
 				<entry key="category" value="arxivCategory" />
-				<entry key="source" value="arxivID" />
 			</map>
 		</constructor-arg>
 	</bean>
