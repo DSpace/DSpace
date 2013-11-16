@@ -52,7 +52,6 @@
     String discoverableChecked = item.isDiscoverable() ? "" : " checked=\"checked\"";
 
 %>
-
 <dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.access.title" nocache="true">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
@@ -68,16 +67,7 @@
 <%
     }
 %>
-<%
-    if (advanced)
-    {
-%>
-		<div class="panel panel-info"><div class="panel-heading"><fmt:message key="jsp.submit.access.plist.heading"/></div>
-        <dspace:policieslist policies="<%= policies %>" />
-        </div>
-<%
-    }
-%>
+
 
 		<div class="panel panel-primary"><div class="panel-heading"><fmt:message key="jsp.submit.access.access_setting.heading"/></div>
 		<div class="panel-body">
@@ -100,6 +90,19 @@
         <dspace:access-setting subInfo="<%= subInfo %>" dso="<%= subInfo.getSubmissionItem().getItem() %>" embargo="<%= advanced ? true : false %>" addpolicy="<%= advanced ? true : false %>" />
 		</div>
 		</div>
+		
+<%
+    if (advanced)
+    {
+%>
+		<div class="panel panel-info"><div class="panel-heading"><fmt:message key="jsp.submit.access.plist.heading"/></div>
+		<div id="policies-help" class="container help-block"><fmt:message key="jsp.submit.access.policy_setting.help"/></div>
+        <dspace:policieslist policies="<%= policies %>" />
+        </div>
+<%
+    }
+%>		
+		
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <div class="row">
         <%= SubmissionController.getSubmissionParameters(context, request) %>
