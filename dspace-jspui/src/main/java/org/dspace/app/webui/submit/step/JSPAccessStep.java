@@ -41,6 +41,8 @@ public class JSPAccessStep extends JSPStep
     /** JSP which edits the selected resource policy to the user * */
     private static final String EDIT_POLICY_JSP = "/submit/edit-policy.jsp";
 
+    private static final String REVIEW_JSP = "/submit/review-policy.jsp";
+    
     /** is AdvancedEmbargo enabled? */
     private static final boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
     
@@ -177,7 +179,21 @@ public class JSPAccessStep extends JSPStep
     public String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
     {
-        return NO_JSP;
+     
+        List<ResourcePolicy> resourcePolicies;
+        try
+        {
+            resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+            
+            subInfo.put("policies-item-review", resourcePolicies);
+            subInfo.put("policies-advanced-form", advanced);
+        }
+        catch (SQLException e)
+        {
+            new RuntimeException(e);
+        }       
+
+        return REVIEW_JSP;
     }
 
 }

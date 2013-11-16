@@ -13,9 +13,11 @@
   - Parameters to pass in to this page (from review.jsp)
   -    submission.jump - the step and page number (e.g. stepNum.pageNum) to create a "jump-to" link
   --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.ResourcePolicy"%>
+<%@page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -84,8 +86,28 @@
 	        case 2:
 	            %><fmt:message key="jsp.submit.review.supported"/><%
 	        }
-%>        
-	                                            <br />
+%>    
+<% List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
+<% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
+		<% int countPolicies = 0; 
+		   //follow iteration used to extract only real count for custom policy in simple embargo form (usually when upload a file will be create also the policy for Anonymous)
+		   if(!(Boolean)subInfo.get("policies-advanced-form")) { 
+				for(ResourcePolicy rp : rpolicies) {
+			    	if(rp.getStartDate()!=null){
+			        	countPolicies++;
+			    	}
+				}
+		   }
+		   else {
+		       //in advanced embargo form we shouldn't create the policy for Anonymous so the count is equal to size of policies list
+		       countPolicies = rpolicies.size();
+		   }
+		%>
+		<% if(countPolicies>0) { %>		
+			<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
+		<% } %>
+<% } %>
+<br />	                                     
 <%
 	    }
 	}
