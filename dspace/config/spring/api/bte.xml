@@ -340,27 +340,30 @@
 	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="pubmedID" value="pmid" />
+				<entry key="pubmedID" value="pubmedID" />
 				<entry key="doi" value="doi" />
-				<entry key="issn" value="jissn" />
-				<entry key="eissn" value="jeissn" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
 				<entry key="journalTitle" value="journal" />
-				<entry key="title" value="title" />
-				<entry key="pubblicationModel" value="" />
-				<entry key="year" value="issued" />
-				<entry key="volume" value="volume" />
-				<entry key="issue" value="issue" />
+				<entry key="articleTitle" value="title" />
+				<entry key="pubDate" value="issued" />
+				<entry key="journalVolume" value="volume" />
+				<entry key="journalIssue" value="issue" />
 				<entry key="language" value="language" />
-				<entry key="type" value="subtype" />
-				<entry key="primaryKeywords" value="keywords" />
-				<entry key="secondaryKeywords" value="keywords" />
-				<entry key="primaryMeshHeadings" value="mesh" />
-				<entry key="secondaryMeshHeadings" value="mesh" />
+				<entry key="publicationType" value="subtype" />
+				<entry key="primaryKeyword" value="keywords" />
+				<entry key="secondaryKeyword" value="keywords" />
+				<entry key="primaryMeshHeading" value="mesh" />
+				<entry key="secondaryMeshHeading" value="mesh" />
 				<entry key="startPage" value="firstpage" />
 				<entry key="endPage" value="lastpage" />
-				<entry key="summary" value="abstract" />
-				<entry key="status" value="publicationstatus" />
-				<entry key="authors" value="authors" />
+				<entry key="abstractText" value="abstract" />
+				<entry key="publicationStatus" value="publicationStatus" />
+				<entry key="author" value="authors" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="pubblicationModel" value="" />
+				 -->
 			</map>
 		</constructor-arg>
 	</bean>
