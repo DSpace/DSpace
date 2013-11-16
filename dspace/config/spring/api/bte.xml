@@ -413,14 +413,27 @@
 				<entry key="journalTitle" value="journal" />
 				<entry key="doi" value="doi" />
 				<entry key="authors" value="authors" />
-				<entry key="issn" value="jissn" />
-				<entry key="eissn" value="jeissn" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
 				<entry key="year" value="issued" />
 				<entry key="articleTitle" value="title" />
 				<entry key="volume" value="volume" />
 				<entry key="issue" value="issue" />
 				<entry key="firstPage" value="firstpage" />
 				<entry key="lastPage" value="lastpage" />
+				<entry key="printISBN" value="pisbn" />
+				<entry key="electronicISBN" value="eisbn" />
+				<entry key="editionNumber" value="editionnumber" />
+				<entry key="seriesTitle" value="seriestitle" />
+				<entry key="volumeTitle" value="volumetitle" />
+				<entry key="editors" value="editors" />
+				<entry key="translators" value="translators" />
+				<entry key="chairs" value="chairs" />
+				<entry key="doyType" value="subtype" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="publicationType" value="" />
+				 -->
 			</map>
 		</constructor-arg>
 	</bean>

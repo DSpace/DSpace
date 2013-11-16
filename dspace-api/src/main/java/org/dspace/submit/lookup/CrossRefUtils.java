@@ -59,7 +59,7 @@ public class CrossRefUtils
         String itemType = doi != null ? XMLUtils.getElementAttribute(dataRoot,
                 "doi", "type") : "unspecified";
         if (itemType != null)
-            record.addValue("itemType", new StringValue(itemType));
+            record.addValue("doiType", new StringValue(itemType));
 
         List<Element> identifier = XMLUtils.getElementList(dataRoot, "issn");
         for (Element ident : identifier)
@@ -69,24 +69,38 @@ public class CrossRefUtils
             {
                 String issn = ident.getTextContent().trim();
                 if (issn != null)
-                    record.addValue("issn", new StringValue(issn));
+                    record.addValue("printISSN", new StringValue(issn));
             }
             else
             {
                 String eissn = ident.getTextContent().trim();
                 if (eissn != null)
-                    record.addValue("eissn", new StringValue(eissn));
+                    record.addValue("electronicISSN", new StringValue(eissn));
             }
         }
-
-        String isbn = XMLUtils.getElementValue(dataRoot, "isbn");
-        if (isbn != null)
-            record.addValue("isbn", new StringValue(isbn));
+        
+        List<Element> identifierisbn = XMLUtils.getElementList(dataRoot, "isbn");
+        for (Element ident : identifierisbn)
+        {
+            if ("print".equalsIgnoreCase(ident.getAttribute("type"))
+                    || StringUtils.isNotBlank(ident.getAttribute("type")))
+            {
+                String issn = ident.getTextContent().trim();
+                if (issn != null)
+                    record.addValue("printISBN", new StringValue(issn));
+            }
+            else
+            {
+                String eissn = ident.getTextContent().trim();
+                if (eissn != null)
+                    record.addValue("electronicISBN", new StringValue(eissn));
+            }
+        }
 
         String editionNumber = XMLUtils.getElementValue(dataRoot,
                 "editionNumber");
         if (editionNumber != null)
-            record.addValue("volume", new StringValue(editionNumber));
+            record.addValue("editionNumber", new StringValue(editionNumber));
 
         String volume = XMLUtils.getElementValue(dataRoot, "volume");
         if (volume != null)
