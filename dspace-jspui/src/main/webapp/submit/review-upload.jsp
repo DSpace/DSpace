@@ -15,6 +15,7 @@
   --%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@page import="org.dspace.core.ConfigurationManager"%>
 <%@page import="org.dspace.authorize.AuthorizeManager"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>
@@ -42,11 +43,20 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+	
+    boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 	//get the step number (for jump-to link)
 	String stepJump = (String) request.getParameter("submission.jump");
 
     Item item = subInfo.getSubmissionItem().getItem();
+	        
+	//is advanced upload embargo step?
+	Object isUploadWithEmbargoB = subInfo.get("upload-with-embargo");
+	boolean isUploadWithEmbargo = false;
+	if(isUploadWithEmbargoB!=null) {
+	    isUploadWithEmbargo = (Boolean)isUploadWithEmbargoB;
+	}
 %>
 
 
@@ -87,11 +97,13 @@
 	            %><fmt:message key="jsp.submit.review.supported"/><%
 	        }
 %>    
-<% List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
+<%
+if(isUploadWithEmbargo) {
+List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
 		<% int countPolicies = 0; 
 		   //follow iteration used to extract only real count for custom policy in simple embargo form (usually when upload a file will be create also the policy for Anonymous)
-		   if(!(Boolean)subInfo.get("policies-advanced-form")) { 
+		   if(!advanced) { 
 				for(ResourcePolicy rp : rpolicies) {
 			    	if(rp.getStartDate()!=null){
 			        	countPolicies++;
@@ -106,7 +118,9 @@
 		<% if(countPolicies>0) { %>		
 			<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
 		<% } %>
-<% } %>
+<% } 
+}
+%>
 <br />	                                     
 <%
 	    }

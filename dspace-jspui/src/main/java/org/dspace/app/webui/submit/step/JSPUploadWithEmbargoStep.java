@@ -448,4 +448,11 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
         JSPStepManager.showJSP(request, response, subInfo, EDIT_POLICY_JSP);
     }
 
+    @Override
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        subInfo.put("upload-with-embargo", true);
+        return super.getReviewJSP(context, request, response, subInfo);
+    }
 }

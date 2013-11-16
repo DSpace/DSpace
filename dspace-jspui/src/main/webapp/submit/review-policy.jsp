@@ -13,9 +13,11 @@
   - Parameters to pass in to this page (from review.jsp)
   -    submission.jump - the step and page number (e.g. stepNum.pageNum) to create a "jump-to" link
   --%>
-<%@page import="java.util.Date"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@page import="org.dspace.core.ConfigurationManager"%>
+<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="java.util.Date"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
@@ -42,6 +44,10 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+	
+    // Policies List
+    List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+    boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 	//get the step number (for jump-to link)
 	String stepJump = (String) request.getParameter("submission.jump");
@@ -66,10 +72,9 @@
 	</div>
 </div>
 
-<% List<ResourcePolicy> rpolicies = (List<ResourcePolicy>)subInfo.get("policies-item-review"); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
 <div class="col-md-10">
-		<% if((Boolean)subInfo.get("policies-advanced-form")) { %>
+		<% if(advanced) { %>
 			<div class="row">
 				<span class="metadataFieldLabel col-md-10"><fmt:message key="jsp.submit.access.plist.heading"/></span>
 			</div>
@@ -77,16 +82,17 @@
 				<dspace:policieslist policies="<%= rpolicies %>" showButton="false" />
 			</div>
 		<% } else { %>
+			<% Date startDate = rpolicies.get(0).getStartDate(); 
+		    if(startDate!=null) { %>
 			<div class="row">
 			<span class="metadataFieldLabel col-md-4"><fmt:message key="jsp.submit.access.embargo_setting.heading"/></span>
 			<span
 			class="metadataFieldValue col-md-8">
-		    <% Date startDate = rpolicies.get(0).getStartDate(); 
-		    if(startDate!=null) { %>
-		    	<fmt:message key="jsp.submit.access.review.embargoed"><fmt:param><%= startDate %></fmt:param></fmt:message>
-		    <% } %>
+
+		    	<fmt:message key="jsp.submit.access.review.embargoed"><fmt:param><%= startDate %></fmt:param></fmt:message>		    
 		    </span>
 		    </div>
+		    <% } %>
 		<% } %>
 	
 </div>
