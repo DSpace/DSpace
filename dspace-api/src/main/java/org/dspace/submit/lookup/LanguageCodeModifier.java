@@ -31,7 +31,7 @@ public class LanguageCodeModifier extends AbstractModifier
     private static Map<String, String> lang3to2 = null;
     static
     {
-        lang3to2 = new HashMap();
+        lang3to2 = new HashMap<String, String>();
         for (Locale locale : Locale.getAvailableLocales())
         {
             try
