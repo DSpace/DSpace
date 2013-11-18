@@ -56,8 +56,16 @@ public class SubmissionFileTest {
     driver.findElement(By.id("aspect_submission_StepTransformer_field_dataset-file")).clear();
     driver.findElement(By.id("aspect_submission_StepTransformer_field_dataset-file")).sendKeys(uploadFile);
     driver.findElement(By.id("aspect_submission_StepTransformer_field_dc_title")).clear();
-    driver.findElement(By.id("aspect_submission_StepTransformer_field_dc_title")).sendKeys("IGNORE: Automated Test Submission File");
+    String title = "IGNORE: Automated Test Submission File";
+    driver.findElement(By.id("aspect_submission_StepTransformer_field_dc_title")).sendKeys(title);
     driver.findElement(By.id("aspect_submission_StepTransformer_field_submit_next")).click();
+
+    // Assert that the page is reached and contains Submission overview
+    assertTrue("Submission overview after file upload", driver.findElement(By.cssSelector("h1.ds-div-head")).getText().contains("Submission overview"));
+
+    // Assert that the uploaded file is listed on the page
+    assertTrue("Uploaded file appears on page", driver.findElement(By.id("aspect_submission_submit_OverviewStep_list_datasets")).getText().contains(title));
+
     // 3. Delete submission - can't get this working with selenium
     // 4. Logout
     driver.findElement(By.linkText("Logout")).click();
