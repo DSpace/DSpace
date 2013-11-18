@@ -32,7 +32,7 @@ public class SubmissionTest extends TestCase {
 
 	// login
 	driver.get(baseUrl+ "/");
-	driver.findElement(By.linkText("Login")).click();
+	driver.findElement(By.id("login-item")).click();
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_email")).clear();
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_email")).sendKeys("seleniumtest@datadryad.org");
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_password")).clear();
@@ -46,7 +46,7 @@ public class SubmissionTest extends TestCase {
 	driver.findElement(By.id("aspect_submission_StepTransformer_field_submit_next")).click();
 
 	// assert the the page is correct and the correct manuscript metadata was imported
-	assertEquals("Dryad Submission", driver.getTitle());
+	assertEquals("Dryad Submission - Dryad", driver.getTitle());
 	assertTrue("imported keywords contain Nummulites", idContains("aspect_submission_StepTransformer_div_submit-describe-publication", "Nummulites"));
 		
 	// remove the partial submission
