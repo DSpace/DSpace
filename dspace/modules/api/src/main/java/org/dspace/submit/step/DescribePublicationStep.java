@@ -762,11 +762,12 @@ public class DescribePublicationStep extends AbstractProcessingStep {
                     s = "Data from: " + s;
                 }
 
-		// ensure the article DOI is in the proper format
+		// ensure the article DOI is in the proper format if it's a DOI
                 if (element.equals("relation") && qualifier.equals("isreferencedby")) {
 		    if(s.toLowerCase().startsWith("http://dx.doi.org/")) {
 			s = "doi:" + s.substring("http://dx.doi.org/".length());
-		    } else if(!s.toLowerCase().startsWith("doi:")) {
+		    } else if(!s.toLowerCase().startsWith("doi:") &&
+                            !s.toLowerCase().startsWith("pmid:")) {
 			s = "doi:" + s;
 		    }
                 }
