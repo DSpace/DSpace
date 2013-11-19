@@ -2053,6 +2053,24 @@
                          alt="Paleobiology cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Palaeontology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://onlinelibrary.wiley.com/journal/10.1111/(ISSN)1475-4983')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PALA.gif"
+                         alt="Palaeontology cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "PhytoKeys"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
