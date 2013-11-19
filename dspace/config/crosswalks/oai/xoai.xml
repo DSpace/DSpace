@@ -27,6 +27,7 @@
 			<Format refid="qdc" />
 			<Format refid="marc" />
 			<Format refid="uketd_dc" />
+			<!-- <Format refid="junii2" /> -->
 		</Context> 
 		
 		<!--
@@ -159,6 +160,12 @@
 			<XSLT>metadataFormats/uketd_dc.xsl</XSLT>
 			<Namespace>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/</Namespace>
 			<SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
+		</Format>
+		<Format id="junii2">
+			<Prefix>junii2</Prefix>
+			<XSLT>metadataFormats/junii2.xsl</XSLT>
+			<Namespace>http://irdb.nii.ac.jp/oai</Namespace>
+			<SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3_0.xsd</SchemaLocation>
 		</Format>
 	</Formats>
 	
