@@ -983,10 +983,14 @@ public class ObjectManager implements Constants {
 	    List<Identifier> dataIds = new ArrayList<Identifier>();
 	    for(int i=0; i < dataFiles.length; i++) {
 		String dataFileIdString  = normalizeDoi(dataFiles[i].value);
+                Item fileItem = getDSpaceItem(dataFileIdString);
+                // Do not include files that are embargoed (dc.date.available not present)
+                if(fileItem.getMetadata("dc.date.available").length == 0) {
+                    continue;
+                }
 		String dataFileTimestamp = "";
 		if(idTimestamp.length() > 0) {
 		    // get the timestamp for this file
-		    Item fileItem = getDSpaceItem(dataFileIdString);
 		    Date fileModDate = fileItem.getLastModified();
 		    String fileModString = dateFormatter.format(fileModDate);
 		    dataFileTimestamp = "?ver=" + fileModString;
