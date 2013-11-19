@@ -16,6 +16,9 @@ DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 # Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
 JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 
+# Java options
+export JAVA_OPTS="-Xmx2048M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
+
 # Class path for DSpace will be:
 #   Any existing classpath
 #   The JARs (WEB-INF/lib/*.jar)
