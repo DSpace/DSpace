@@ -122,9 +122,9 @@ public class LocalIndexer implements com.atmire.authority.indexer.IndexerInterfa
 
         String no_asterisk_value = value;
 
-        if(haveToAddAsterisk(value)){
+        /*if(haveToAddAsterisk(value)){
             value+="*";
-        }
+        } */
 
         values.put(DOC_ID, Utils.getMD5(value));
         values.put(DOC_SOURCE, SOURCE);
