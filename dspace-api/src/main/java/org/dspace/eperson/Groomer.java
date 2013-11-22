@@ -10,7 +10,6 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.*;
@@ -71,13 +70,19 @@ public class Groomer
         // List accounts with unsalted passwords
         else if (command.hasOption('u'))
         {
-            findUnsalted(command);
+            findUnsalted();
         }
         // Should not happen:  verb option defined but no code!
         else
             System.err.println("Unimplemented verb:  " + verbs.getSelected());
     }
 
+    /**
+     * Find and optionally delete accounts not logged in recently.
+     *
+     * @param command a parsed command line.
+     * @throws SQLException from callees.
+     */
     private static void aging(CommandLine command) throws SQLException
     {
             if (!command.hasOption('b'))
@@ -135,9 +140,7 @@ public class Groomer
                     else
                         try {
                             account.delete();
-                        } catch (AuthorizeException ex) {
-                            // XXX SNH
-                        } catch (EPersonDeletionException ex) {
+                        } catch (AuthorizeException | EPersonDeletionException ex) {
                             System.err.println(ex.getMessage());
                         }
                     }
@@ -147,7 +150,12 @@ public class Groomer
             myContext.complete();
     }
 
-    private static void findUnsalted(CommandLine command)
+    /**
+     * List accounts having no password salt.
+     *
+     * @throws SQLException
+     */
+    private static void findUnsalted()
             throws SQLException
     {
         Context myContext = new Context();
