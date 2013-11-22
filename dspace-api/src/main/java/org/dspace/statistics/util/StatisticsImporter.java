@@ -549,14 +549,14 @@ public class StatisticsImporter
 
         // Find our solr server
         String sserver = ConfigurationManager.getProperty(
-                SolrLogger.CFG_MODULE, "server");
+                SolrLogger.CFG_STAT_MODULE, "server");
         if (verbose)
         {
             System.out.println("Writing to solr server at: " + sserver);
         }
         solr = new HttpSolrServer(sserver);
 
-        String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_MODULE,
+        String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_USAGE_MODULE,
                 "dbfile");
         try
         {
