@@ -122,7 +122,7 @@ public class Groomer
                     List<String> whyNot = account.getDeleteConstraints();
                     if (!whyNot.isEmpty())
                     {
-                        System.out.print("  Cannot be deleted; referenced in");
+                        System.out.print("\tCannot be deleted; referenced in");
                         for (String table : whyNot)
                         {
                             System.out.print(' ');
