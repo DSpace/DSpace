@@ -109,7 +109,9 @@ public class Groomer
                 EPerson account = EPerson.find(myContext, id);
 
                 System.out.print(id);
-                System.out.print(' ');
+                System.out.print('\t');
+                System.out.print(account.getLastActive());
+                System.out.print('\t');
                 System.out.print(account.getEmail());
                 System.out.print('\t');
                 System.out.print(account.getNetid());
