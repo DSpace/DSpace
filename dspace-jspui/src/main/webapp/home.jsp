@@ -174,7 +174,7 @@ if (submissions != null && submissions.count() > 0)
 <%
 }
 %>
-<div class="col-md-3">
+<div class="col-md-4">
     <%= sideNews %>
 </div>
 </div>
