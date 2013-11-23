@@ -38,13 +38,13 @@
 <%-- form to navigate to any of the three options available --%>
 <form method="post" action="">
     <div class="row">
-    	<input class="btn btn-default col-md-12" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-main.add.button"/>"/>
+    	<input class="btn btn-primary col-md-6 col-md-offset-3" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-main.add.button"/>"/>
     </div>
     <div class="row">
-    	<input class="btn btn-default col-md-12" type="submit" name="submit_view" value="<fmt:message key="jsp.dspace-admin.supervise-main.view.button"/>"/>
+    	<input class="btn btn-info col-md-6 col-md-offset-3" type="submit" name="submit_view" value="<fmt:message key="jsp.dspace-admin.supervise-main.view.button"/>"/>
     </div>
     <div class="row">    
-    	<input class="btn btn-default col-md-12" type="submit" name="submit_clean" value="<fmt:message key="jsp.dspace-admin.supervise-main.clean.button"/>"/>
+    	<input class="btn btn-warning col-md-6 col-md-offset-3" type="submit" name="submit_clean" value="<fmt:message key="jsp.dspace-admin.supervise-main.clean.button"/>"/>
     </div>
 </form>
 <div align="center" />

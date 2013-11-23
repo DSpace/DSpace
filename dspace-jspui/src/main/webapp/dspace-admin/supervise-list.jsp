@@ -46,15 +46,8 @@
 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#supervision\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
 </h1>
 
-<h3><fmt:message key="jsp.dspace-admin.supervise-list.subheading"/></h3>
+<p class="help-block"><fmt:message key="jsp.dspace-admin.supervise-list.subheading"/></p>
 
-
-<div align="center" />
-<%-- form to navigate to the "add supervisory settings" page --%> 
-<form method="post" action="">
-    <input class="btn btn-default" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-list.add.button"/>"/>
-    <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-list.back.button"/>"/>
-</form>
 
 <table class="table">
     <tr>
@@ -95,7 +88,7 @@
             <%-- form to navigate to the item policies --%>
             <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                 <input type="hidden" name="item_id" value="<%=supervisedItems[i].getItem().getID() %>"/>
-                <input class="btn btn-default" type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.supervise-list.policies.button"/>"/>
+                <input class="btn btn-info" type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.supervise-list.policies.button"/>"/>
             </form>
         </td>
         <td class="<%= row %>RowEvenCol">
@@ -125,7 +118,7 @@
             <form method="post" action="">
             <input type="hidden" name="gID" value="<%= supervisors[j].getID() %>"/>
             <input type="hidden" name="siID" value="<%= supervisedItems[i].getID() %>"/>
-            <input class="btn btn-default" type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
+            <input class="btn btn-danger" type="submit" name="submit_remove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
             </form>
         </td>
     </tr> 
@@ -137,4 +130,11 @@
 %>
 
 </table>
+<div class="pull-right">
+<%-- form to navigate to the "add supervisory settings" page --%> 
+<form method="post" action="">
+    <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.supervise-list.back.button"/>"/>
+    <input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.supervise-list.add.button"/>"/>
+</form>
+</div>
 </dspace:layout>

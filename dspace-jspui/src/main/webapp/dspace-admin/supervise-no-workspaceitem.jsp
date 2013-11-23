@@ -21,6 +21,7 @@
     prefix="fmt" %>
     
 <dspace:layout titlekey="jsp.dspace-admin.supervise-no-workspaceitem.title"
+               style="submission"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
@@ -28,9 +29,9 @@
 
 <h1><fmt:message key="jsp.dspace-admin.supervise-no-workspaceitem.heading"/></h1>
 
-<p><fmt:message key="<%= request.getAttribute("errorKey") %>"/></p>
+<p class="alert alert-danger"><fmt:message key="${errorKey}"/></p>
 
-<div align="center">
+<div class="text-center">
 <a href="<%= request.getContextPath() %>/dspace-admin/supervise"><fmt:message key="jsp.dspace-admin.supervise-no-workspaceitem.return"/></a>
 </div>
 

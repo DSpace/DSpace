@@ -46,7 +46,7 @@
 
 <h1><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.heading"/></h1>
 
-<h3><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></h3>
+<p class="help-block"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></p>
 
 <%
         DCValue[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
@@ -55,7 +55,7 @@
 %>
 <div class="row">
 <label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.titleheader"/>:</label>
-<span class="col-md-3">
+<span>
 <%
 		if (titleArray.length > 0)
 		{
@@ -74,28 +74,27 @@
 </div>
 <div class="row">
 <label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/>:</label>
-<span class="col-md-3">
+<span>
 <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
 </span>
 </div>
 <div class="row">
 <label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/>:</label>
-<span class="col-md-3">
+<span>
 <%= group.getName() %>
 </span>
 </div>
+<br/>
+<p class="text-danger lead"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/></p>
 
-<div class="row">
-<label class="col-md-5"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/></label>
-</div>
-
+<div class="pull-right">
 <%-- form to request removal of supervisory linking --%>
 <form method="post" action="">
     <input type="hidden" name="gID" value="<%= group.getID() %>"/>
     <input type="hidden" name="siID" value="<%= wsItem.getID() %>"/>
-    <input class="btn btn-default" type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
     <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
+    <input class="btn btn-danger" type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
 </form>
-
+</div>
 
 </dspace:layout>
