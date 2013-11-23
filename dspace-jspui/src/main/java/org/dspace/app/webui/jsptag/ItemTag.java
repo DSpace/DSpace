@@ -732,7 +732,9 @@ public class ItemTag extends TagSupport
                 out.print(LocaleSupport.getLocalizedMessage(pageContext,
                           "org.dspace.app.webui.jsptag.ItemTag.appears"));
             }
-            out.print("</td><td class=\"metadataFieldValue\">");
+            out.print("</td><td class=\"metadataFieldValue\""+
+            		(style.equals("full")?"colspan=\"2\"":"")
+            		+">");
 
             for (int i = 0; i < collections.length; i++)
             {
