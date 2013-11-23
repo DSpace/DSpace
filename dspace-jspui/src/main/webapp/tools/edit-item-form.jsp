@@ -493,8 +493,6 @@
 <%      row = (row.equals("odd") ? "even" : "odd");
     } %>
 
-            <tr><td>&nbsp;</td></tr>
-
             <tr>
         
                 <td headers="t1" colspan="3" class="<%= row %>RowEvenCol">
