@@ -21,36 +21,32 @@
 		<param-name>dspace-config</param-name>
 		<param-value>${dspace.dir}/config/dspace.cfg</param-value>
 	</context-param>
-	
+
 	<context-param>
-		<description>
-			The location of the main DSpace configuration file
-		</description>
+		<description>The location of the main DSpace configuration file</description>
 		<param-name>dspace.dir</param-name>
 		<param-value>${dspace.dir}</param-value>
 	</context-param>
-	
+
 	<listener>
-		<listener-class>
-			org.dspace.app.util.DSpaceContextListener
-		</listener-class>
+		<listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
 	</listener>
-	
-	<servlet>
-		<servlet-name>oai</servlet-name>
-		<servlet-class>org.dspace.xoai.DSpaceOAIDataProvider</servlet-class>
-	</servlet>
-	
-	<servlet>
-		<servlet-name>static</servlet-name>
-		<servlet-class>org.dspace.xoai.util.FileServlet</servlet-class>
-	</servlet>
-	
-	<servlet-mapping>
-		<servlet-name>static</servlet-name>
-		<url-pattern>/static/*</url-pattern>
-	</servlet-mapping>
-	
+
+    <servlet>
+        <servlet-name>oai</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>
+                org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>org.dspace.xoai.app.DSpaceWebappConfiguration</param-value>
+        </init-param>
+    </servlet>
+
 	<servlet-mapping>
 		<servlet-name>oai</servlet-name>
 		<url-pattern>/*</url-pattern>
