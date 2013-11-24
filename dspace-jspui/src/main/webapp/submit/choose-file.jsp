@@ -165,6 +165,27 @@
    		$('input[name="<%=UploadStep.SUBMIT_SKIP_BUTTON%>"]').on('click', function(){
    			$('#tfile').val('');
    		});
+   		$('input[name="submit_prev"]').on('click', function(){
+   			$('#tfile').val('');
+   			$('#ajaxUpload').val(false);
+   			$('#uploadForm')
+  				.append('<input type="hidden" name="submit_prev" value="1">');
+  			$('#uploadForm').submit();
+   		});
+   		$('input[name^="submit_jump_"]').on('click', function(){
+   			$('#tfile').val('');
+   			$('#ajaxUpload').val(false);
+   			$('#uploadForm')
+  				.append('<input type="hidden" name="'+j(this).attr('name')+'" value="1">');
+  			$('#uploadForm').submit();
+   		});
+   		$('input[name="submit_cancel"]').on('click', function(){
+   			$('#tfile').val('');
+   			$('#ajaxUpload').val(false);
+   			$('#uploadForm')
+  				.append('<input type="hidden" name="submit_cancel" value="1">');
+  			$('#uploadForm').submit();
+   		});
    		$('#uploadForm').append('<input type="hidden" id="ajaxUpload" name="ajaxUpload" value="true" />');
    		// track the upload progress for all the submit buttons other than the skip
    		$('input[type="submit"]').not(":disabled")
@@ -223,7 +244,7 @@
    						$('#virusFound').dialog("open");				
    	    			}
    					else {
-   						$('#uploadError').dialog("open");
+						$('#uploadError').dialog("open");
    					}
    	    		}    		
    	            });
