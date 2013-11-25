@@ -169,8 +169,8 @@
    		// track the upload progress for all the submit buttons other than the skip
    		$('input[type="submit"]').not(":disabled")
    		.on('click', function(e){   			
-   			$('#uploadForm').attr('target','uploadFormIFrame');
    			if ($('#tfile').val() != null && $('#tfile').val() != '') {
+   				$('#uploadForm').attr('target','uploadFormIFrame');
 	   			initProgressBar($);
 	   			setTimeout(function() {
 					monitorProgressJSON($);					
@@ -188,15 +188,20 @@
    					}
 	   				resultFile = jsonResult.files[0];
    				} catch (err) {
+   					// a file has been upload, the answer is html isntead of json because 
+   					// come from a different step. Just ignore the target step and reload 
+   					// the upload list screen. We need to let the user known that the file 
+   					// has been uploaded
    					resultFile = new Object();
 	   				resultFile.status = null;
    				}
    				
-   	    		if (resultFile.status == <%= UploadStep.STATUS_COMPLETE %> || 
+   	    		if (resultFile.status == null || resultFile.status == <%= UploadStep.STATUS_COMPLETE %> || 
    	    				resultFile.status == <%= UploadStep.STATUS_UNKNOWN_FORMAT %>)
    	    		{
    	    			completeProgressBar($, resultFile.size);
-   		           	if (resultFile.status == <%= UploadStep.STATUS_COMPLETE %>)
+   		           	if (resultFile.status == null || 
+   		           			resultFile.status == <%= UploadStep.STATUS_COMPLETE %>)
    	           		{
    		           		$('#uploadFormPostAjax').removeAttr('enctype')
    		           			.append('<input type="hidden" name="<%= UploadStep.SUBMIT_UPLOAD_BUTTON %>" value="1">');
@@ -380,7 +385,7 @@
 %>
                     <%-- Please give a brief description of the contents of this file, for
                     example "Main article", or "Experiment data readings." --%>
-					<div class="alert alert-info"><fmt:message key="jsp.submit.choose-file.info9"/></div>
+					<div class="help-block"><fmt:message key="jsp.submit.choose-file.info9"/></div>
                 <%-- <td class="submitFormLabel">File Description:</td> --%>
                 <div class="row">
 					<label for="tdescription" class="col-md-<%= bSherpa?"3":"2" %>"><fmt:message key="jsp.submit.choose-file.filedescr"/></label>
