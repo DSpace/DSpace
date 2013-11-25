@@ -8,6 +8,8 @@
 package org.dspace.app.util;
 
 import java.sql.SQLException;
+
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 
 import java.io.IOException;
@@ -1001,30 +1003,25 @@ public class GoogleMetadata
     private String getPDFSimpleUrl(Item item)
     {
         try {
-            Bundle[] contentBundles = item.getBundles("ORIGINAL");
-            if (contentBundles.length > 0) {
-                Bitstream[] bitstreams = contentBundles[0].getBitstreams();
-                if (bitstreams.length == 1) {
-                    if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")) {
-                        StringBuilder path = new StringBuilder();
-                        path.append(ConfigurationManager.getProperty("dspace.url"));
+	        Bitstream bitstream = findLinkableFulltext(item);
+	        if (bitstream != null) {
+		        StringBuilder path = new StringBuilder();
+		        path.append(ConfigurationManager.getProperty("dspace.url"));
 
-                        if (item.getHandle() != null) {
-                            path.append("/bitstream/");
-                            path.append(item.getHandle());
-                            path.append("/");
-                            path.append(bitstreams[0].getSequenceID());
-                        } else {
-                            path.append("/retrieve/");
-                            path.append(bitstreams[0].getID());
-                        }
+		        if (item.getHandle() != null) {
+			        path.append("/bitstream/");
+			        path.append(item.getHandle());
+			        path.append("/");
+			        path.append(bitstream.getSequenceID());
+		        } else {
+			        path.append("/retrieve/");
+			        path.append(bitstream.getID());
+		        }
 
-                        path.append("/");
-                        path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));
-                        return path.toString();
-                    }
-                }
-            }
+		        path.append("/");
+		        path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+		        return path.toString();
+	        }
         } catch (UnsupportedEncodingException ex) {
             log.debug(ex.getMessage());
         } catch (SQLException ex) {
@@ -1034,7 +1031,62 @@ public class GoogleMetadata
         return "";
     }
 
-    /**
+	/**
+	 * A bitstream is considered linkable fulltext when it is either
+	 * <ul>
+	 *     <li>the item's only bitstream (in the ORIGINAL bundle); or</li>
+	 *     <li>the primary bitstream</li>
+	 * </ul>
+	 * Additionally, this bitstream must be publicly viewable.
+	 * @param item
+	 * @return
+	 * @throws SQLException
+	 */
+	private Bitstream findLinkableFulltext(Item item) throws SQLException {
+		Bitstream bestSoFar = null;
+		int bitstreamCount = 0;
+		Bundle[] contentBundles = item.getBundles("ORIGINAL");
+		for (Bundle bundle : contentBundles) {
+			int primaryBitstreamId = bundle.getPrimaryBitstreamID();
+			Bitstream[] bitstreams = bundle.getBitstreams();
+			for (Bitstream candidate : bitstreams) {
+				if (candidate.getID() == primaryBitstreamId) { // is primary -> use this one
+					if (isPublic(candidate)) {
+						return candidate;
+					}
+				} else if (bestSoFar == null) {
+					bestSoFar = candidate;
+				}
+				bitstreamCount++;
+			}
+		}
+		if (bitstreamCount > 1 || !isPublic(bestSoFar)) {
+			bestSoFar = null;
+		}
+
+		return bestSoFar;
+	}
+
+	private boolean isPublic(Bitstream bitstream) {
+		if (bitstream == null) {
+			return false;
+		}
+		boolean result = false;
+		Context context = null;
+		try {
+			context = new Context();
+			result = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ, true);
+		} catch (SQLException e) {
+			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
+		} finally {
+			if (context != null) {
+				context.abort();
+			}
+		}
+		return result;
+	}
+
+	/**
      * 
      * 
      * @param Field
