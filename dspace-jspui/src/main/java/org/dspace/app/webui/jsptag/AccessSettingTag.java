@@ -82,6 +82,9 @@ public class AccessSettingTag extends TagSupport
         String label_reason = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_reason");
         String button_confirm = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.button_confirm");
 
+        String help_name = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.name_help");
+        String help_reason = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.reason_help");
+
         JspWriter out = pageContext.getOut();
         StringBuffer sb = new StringBuffer();
 
@@ -134,7 +137,8 @@ public class AccessSettingTag extends TagSupport
                 // Name
             	sb.append("<div class=\"form-group\">");
                 sb.append(label_name).append("\n");                
-                sb.append("<input class=\"form-control\" name=\"name\" id=\"policy_name\" type=\"text\" value=\"").append(name).append("\" />\n");
+                sb.append("<p class=\"help-block\">").append(help_name).append("</p>").append("\n");             
+                sb.append("<input class=\"form-control\" name=\"name\" id=\"policy_name\" type=\"text\" maxlength=\"30\" value=\"").append(name).append("\" />\n");
                 sb.append("</div>"); 
                 		
                 // Group
@@ -179,13 +183,28 @@ public class AccessSettingTag extends TagSupport
             }
             else
             {
-            	sb.append("<div class=\"form-group\">");
-            	sb.append(label_date).append("\n");                
-                sb.append("<input class=\"form-control\" name=\"embargo_until_date\" id=\"embargo_until_date\" type=\"text\" value=\"").append(startDate).append("\"").append(disabled).append(" />\n");;
-                sb.append("<span class=\"help-block\">"+radio_help+"</span><br/>");                
+            	sb.append("<div class=\"form-group col-md-12\">");
+            	sb.append("<div class=\"col-md-2\">");
+            	sb.append(label_date);
+            	sb.append("</div>");
+            	sb.append("<div class=\"col-md-2\">");
+                sb.append("<input class=\"form-control\" name=\"embargo_until_date\" id=\"embargo_until_date\" maxlength=\"10\" size=\"10\" type=\"text\" value=\"").append(startDate).append("\"").append(disabled).append(" />\n");
+                sb.append("</div>");
+                sb.append("<div class=\"col-md-8\">");
+                sb.append("<span class=\"help-block\">"+radio_help+"</span>");
+                sb.append("</div>");
+                sb.append("</div>");
                 // Reason                
-                sb.append(label_reason).append("\n");                
+                sb.append("<div class=\"form-group col-md-12\">");
+                sb.append("<div class=\"col-md-12\">");
+                sb.append(label_reason).append("\n"); 
+                sb.append("</div>");
+                sb.append("<div class=\"col-md-12\">");
+                sb.append("<p class=\"help-block\">").append(help_reason).append("</p>").append("\n");
+                sb.append("</div>");
+                sb.append("<div class=\"col-md-12\">");
                 sb.append("<textarea class=\"form-control\" name=\"reason\" id=\"reason\" cols=\"30\" rows=\"5\"").append(disabled).append(">").append(reason).append("</textarea>\n");
+                sb.append("</div>");
                 sb.append("</div>");
             }
 
