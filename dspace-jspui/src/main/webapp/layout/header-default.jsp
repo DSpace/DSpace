@@ -140,9 +140,8 @@
 <div class="container banner">
 	<div class="row">
 		<div class="col-md-9 brand">
-		<h1>DSpace <small>JSPUI</small></h1>
-        <h4>DSpace preserves and enables easy and open access to all types of digital content including text, images, moving images, mpegs and data sets</h4>
-        <a href="http://www.dspace.org"><button class="btn btn-primary">Learn More</button></a> 
+		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
+        <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
         <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif">
         </div>
