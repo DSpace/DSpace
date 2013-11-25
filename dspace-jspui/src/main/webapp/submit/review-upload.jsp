@@ -105,10 +105,26 @@ List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(conte
 		   //show information about policies setting only in the case of advanced embargo form
 		   if(advanced) {  
 		       countPolicies = rpolicies.size();
-		   }
 		%>
-		<% if(countPolicies>0) { %>		
-			<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
+			<% if(countPolicies>0) { %>		
+				<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
+			<% } %>
+		<% } else { %>
+				<% for(ResourcePolicy rpolicy : rpolicies) { 
+						if(rpolicy.getStartDate()!=null) {
+						%>
+							<i class="label label-info"><fmt:message key="jsp.submit.review.policies.embargoed"><fmt:param><%= rpolicy.getStartDate() %></fmt:param></fmt:message></i>				    
+						<%
+						}
+						else { 
+						%>
+							<i class="label label-success"><fmt:message key="jsp.submit.review.policies.openaccess"/></i>														    
+					    <%
+						}
+					}
+				%>
+				
+				
 		<% } %>
 <% } 
 }
