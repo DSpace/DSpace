@@ -49,7 +49,7 @@ public class DOIIdentifierException extends IdentifierException {
      * be registered. This error code signals that a unreserved DOI should be
      * registered and that the registration agency denied it.
      */
-    public static final int REGISTER_FIRST = 6;
+    public static final int RESERVE_FIRST = 6;
     /**
      * Error while authenticating against the registration agency.
      */
@@ -97,7 +97,7 @@ public class DOIIdentifierException extends IdentifierException {
                 return "FOREIGN_DOI";
             case BAD_ANSWER:
                 return "BAD_ANSWER";
-            case REGISTER_FIRST:
+            case RESERVE_FIRST:
                 return "REGISTER_FIRST";
             case AUTHENTICATION_ERROR:
                 return "AUTHENTICATION_ERROR";

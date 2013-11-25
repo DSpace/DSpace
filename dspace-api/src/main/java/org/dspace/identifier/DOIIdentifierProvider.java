@@ -348,7 +348,7 @@ public class DOIIdentifierProvider
             catch (DOIIdentifierException die)
             {
                 // do we have to reserve DOI before we can register it?
-                if (die.getCode() == DOIIdentifierException.REGISTER_FIRST)
+                if (die.getCode() == DOIIdentifierException.RESERVE_FIRST)
                 {
                     this.reserveOnline(context, dso, identifier);
                     connector.registerDOI(context, dso, doi);

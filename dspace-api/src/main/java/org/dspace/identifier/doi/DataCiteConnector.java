@@ -600,7 +600,7 @@ implements DOIConnector
                         + "of DOIs. The DOI we wanted to register had not been "
                         + "reserved in advance. Please contact the administrator "
                         + "or take a look in DSpace log file.",
-                        DOIIdentifierException.REGISTER_FIRST);
+                        DOIIdentifierException.RESERVE_FIRST);
             }
             // Catch all other http status code in case we forgot one.
             default :
