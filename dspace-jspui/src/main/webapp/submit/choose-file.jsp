@@ -171,10 +171,14 @@
    		.on('click', function(e){   			
    			if ($('#tfile').val() != null && $('#tfile').val() != '') {
    				$('#uploadForm').attr('target','uploadFormIFrame');
-	   			initProgressBar($);
+   	   			initProgressBar($);
 	   			setTimeout(function() {
 					monitorProgressJSON($);					
 				}, 100);
+   			}
+   			else
+  			{
+				$('#ajaxUpload').val(false);
    			}
    			$('#uploadFormIFrame').on('load',function(){
    				var resultFile = null;
