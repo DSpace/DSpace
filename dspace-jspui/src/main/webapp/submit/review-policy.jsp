@@ -39,20 +39,11 @@
 <%
     request.setAttribute("LanguageSwitch", "hide");
 
-    // Obtain DSpace context
-    Context context = UIUtil.obtainContext(request);    
-
-	//get submission information object
-    SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
-	
-    // Policies List
-    List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
-    boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
-
-	//get the step number (for jump-to link)
-	String stepJump = (String) request.getParameter("submission.jump");
-
-    Item item = subInfo.getSubmissionItem().getItem();
+    //get the step number (for jump-to link)
+    String stepJump = (String) request.getParameter("submission.jump");
+    Boolean isDiscoverable = (Boolean) request.getAttribute("submission.item.isdiscoverable");
+    List<ResourcePolicy> rpolicies = (List<ResourcePolicy>)request.getAttribute("submission.item.rpolicies");
+    Boolean advanced = (Boolean) request.getAttribute("advancedEmbargo");
 %>
 
 
@@ -63,7 +54,7 @@
 	<div class="row">
 		<span class="metadataFieldLabel col-md-4"><fmt:message key="jsp.submit.access.private_setting.heading"/></span> 
 		<span
-			class="metadataFieldValue col-md-8"> <% if(item.isDiscoverable()) { %>
+			class="metadataFieldValue col-md-8"> <% if(isDiscoverable) { %>
 			<fmt:message
 				key="jsp.submit.access.private_setting.review.discoverable" /> <% } else { %>
 			<fmt:message
