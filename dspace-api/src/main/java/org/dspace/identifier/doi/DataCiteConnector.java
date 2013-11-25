@@ -450,7 +450,22 @@ implements DOIConnector
     @Override
     public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
-    {
+    {   
+        // check if DOI is reserved at the registration agency
+        if (this.isDOIReserved(context, doi))
+        {
+            // if doi is registered for this object we still should check its
+            // status in our database (see below).
+            // if it is registered for another object we should notify an admin
+            if (!this.isDOIReserved(context, dso, doi))
+            {
+                log.warn("DOI {} is reserved for another object already.", doi);
+                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
+            }
+            // the DOI is reserved for this Object. We use {@code reserveDOI} to
+            // send metadata updates, so don't return here!
+        }
+
         this.prepareXwalk();
         
         if (!this.xwalk.canDisseminate(dso))
@@ -557,7 +572,40 @@ implements DOIConnector
     public void registerDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
-        log.debug("Want to register DOI {}!", doi);
+        // check if the DOI is already registered online
+        if (this.isDOIRegistered(context, doi))
+        {
+            // if it is registered for another object we should notify an admin
+            if (!this.isDOIRegistered(context, dso, doi))
+            {
+                // DOI is reserved for another object
+                log.warn("DOI {} is registered for another object already.", doi);
+                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
+            }
+            // doi is registered for this object, we're done
+            return;
+        }
+        else
+        {
+            // DataCite wants us to reserve a DOI before we can register it
+            if (!this.isDOIReserved(context, dso, doi))
+            {
+                // check if doi is already reserved for another dso
+                if (this.isDOIReserved(context, doi))
+                {
+                    log.warn("Trying to register DOI {}, that is reserved for "
+                            + "another dso.", doi);
+                    throw new DOIIdentifierException("Trying to register a DOI "
+                            + "that is reserved for another object.",
+                            DOIIdentifierException.DOI_ALREADY_EXISTS);
+                }
+                
+                // the DOIIdentifierProvider should catch and handle this
+                throw new DOIIdentifierException("You need to reserve a DOI "
+                        + "before you can register it.",
+                        DOIIdentifierException.RESERVE_FIRST);
+            }
+        }
 
         // send doi=<doi>\nurl=<url> to mds/doi
         DataCiteResponse resp = null;
@@ -619,6 +667,15 @@ implements DOIConnector
     public void updateMetadata(Context context, DSpaceObject dso, String doi) 
             throws DOIIdentifierException
     { 
+        // check if doi is reserved for another object
+        if (!this.isDOIReserved(context, dso, doi) && this.isDOIReserved(context, doi))
+        {
+            log.warn("Trying to update metadata for DOI {}, that is reserved"
+                    + " for another dso.", doi);
+            throw new DOIIdentifierException("Trying to update metadta for "
+                    + "a DOI that is reserved for another object.",
+                    DOIIdentifierException.DOI_ALREADY_EXISTS);
+        }
         // We can use reserveDOI to update metadata. Datacite API uses the same
         // request for reservartion as for updating metadata.
         this.reserveDOI(context, dso, doi);
