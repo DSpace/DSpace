@@ -9,16 +9,23 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.step.AccessStep;
@@ -37,6 +44,11 @@ public class JSPAccessStep extends JSPStep
     private static final String EDIT_POLICY_JSP = "/submit/edit-policy.jsp";
 
     private static final String REVIEW_JSP = "/submit/review-policy.jsp";
+    
+    private boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(JSPAccessStep.class);
     
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -171,6 +183,22 @@ public class JSPAccessStep extends JSPStep
     public String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
     {
+        
+        // Policies List
+        List<ResourcePolicy> rpolicies = new ArrayList<ResourcePolicy>();
+        try
+        {
+            rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+        }
+        catch (SQLException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+
+        Item item = subInfo.getSubmissionItem().getItem();        
+        request.setAttribute("submission.item.isdiscoverable", item.isDiscoverable());
+        request.setAttribute("submission.item.rpolicies", rpolicies);
+        request.setAttribute("advancedEmbargo", advanced);
         return REVIEW_JSP;
     }
 
