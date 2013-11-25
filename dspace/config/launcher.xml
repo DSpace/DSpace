@@ -120,16 +120,24 @@
     </command>
 
     <command>
-        <name>index</name>
-        <description>General index command (requires extra parameters)</description>
+        <name>index-db-browse</name>
+        <description>General browse index command (requires extra parameters)</description>
         <step>
             <class>org.dspace.browse.IndexBrowse</class>
         </step>
     </command>
+
+    <command>
+        <name>index-discovery</name>
+        <description>Update Discovery Solr Search Index</description>
+        <step>
+            <class>org.dspace.discovery.IndexClient</class>
+        </step>
+    </command>
     
     <command>
-        <name>index-init</name>
-        <description>Initialise the search and browse indexes</description>
+        <name>index-lucene-init</name>
+        <description>Initialise the Lucene search and browse indexes</description>
         <step passuserargs="false">
             <class>org.dspace.browse.IndexBrowse</class>
             <argument>-f</argument>
@@ -145,8 +153,8 @@
     </command>
 
     <command>
-        <name>index-update</name>
-        <description>Update the search and browse indexes</description>
+        <name>index-lucene-update</name>
+        <description>Update the Lucene search and browse indexes</description>
         <step passuserargs="false">
             <class>org.dspace.browse.IndexBrowse</class>
             <argument>-i</argument>
@@ -347,7 +355,7 @@
         </step>
     </command>
 
-     <command>
+    <command>
         <name>setup-database</name>
         <description>Create the database tables</description>
         <step>
@@ -376,14 +384,6 @@
         <description>Update handle records and metadata when moving from one handle to another</description>
         <step>
             <class>org.dspace.handle.UpdateHandlePrefix</class>
-        </step>
-    </command>
-
-    <command>
-        <name>update-discovery-index</name>
-        <description>Update Discovery Solr Search Index</description>
-        <step>
-            <class>org.dspace.discovery.IndexClient</class>
         </step>
     </command>
 
