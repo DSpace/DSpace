@@ -52,7 +52,7 @@
     Item item = subInfo.getSubmissionItem().getItem();
 	        
 	//is advanced upload embargo step?
-	Object isUploadWithEmbargoB = subInfo.get("upload-with-embargo");
+	Object isUploadWithEmbargoB = request.getAttribute("submission.step.uploadwithembargo");
 	boolean isUploadWithEmbargo = false;
 	if(isUploadWithEmbargoB!=null) {
 	    isUploadWithEmbargo = (Boolean)isUploadWithEmbargoB;
@@ -101,17 +101,9 @@
 if(isUploadWithEmbargo) {
 List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
-		<% int countPolicies = 0; 
-		   //follow iteration used to extract only real count for custom policy in simple embargo form (usually when upload a file will be create also the policy for Anonymous)
-		   if(!advanced) { 
-				for(ResourcePolicy rp : rpolicies) {
-			    	if(rp.getStartDate()!=null){
-			        	countPolicies++;
-			    	}
-				}
-		   }
-		   else {
-		       //in advanced embargo form we shouldn't create the policy for Anonymous so the count is equal to size of policies list
+		<% int countPolicies = 0;
+		   //show information about policies setting only in the case of advanced embargo form
+		   if(advanced) {  
 		       countPolicies = rpolicies.size();
 		   }
 		%>
