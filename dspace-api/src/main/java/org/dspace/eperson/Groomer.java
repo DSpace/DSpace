@@ -58,9 +58,10 @@ public class Groomer
         }
 
          // Help the user
-        if (command.hasOption('h') || command.hasOption('?'))
+        if (null == command || command.hasOption('h') || command.hasOption('?'))
         {
             new HelpFormatter().printHelp(USAGE, options);
+            System.exit(0);
         }
         // Scan for disused accounts
         else if (command.hasOption('a'))
