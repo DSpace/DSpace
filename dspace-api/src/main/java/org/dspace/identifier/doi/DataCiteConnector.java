@@ -65,12 +65,12 @@ implements DOIConnector
      * Stores the scheme used to connect to the DataCite server. It will be set
      * by spring dependency injection.
      */
-    private String SCHEME;
+    protected String SCHEME;
     /**
      * Stores the hostname of the DataCite server. Set by spring dependency
      * injection.
      */
-    private String HOST;
+    protected String HOST;
     
     /**
      * Path on the DataCite server used to generate DOIs. Set by spring
@@ -188,7 +188,7 @@ implements DOIConnector
         this.CROSSWALK_NAME = CROSSWALK_NAME;
     }
     
-    private void prepareXwalk()
+    protected void prepareXwalk()
     {
         if (null != this.xwalk)
             return;
@@ -203,7 +203,7 @@ implements DOIConnector
         }
     }
     
-    private String getUsername()
+    protected String getUsername()
     {
         if (null == this.USERNAME)
         {
@@ -218,7 +218,7 @@ implements DOIConnector
         return this.USERNAME;
     }
     
-    private String getPassword()
+    protected String getPassword()
     {
         if (null == this.PASSWORD)
         {
@@ -681,7 +681,7 @@ implements DOIConnector
         this.reserveDOI(context, dso, doi);
     }
     
-    private DataCiteResponse sendDOIPostRequest(String doi, String url)
+    protected DataCiteResponse sendDOIPostRequest(String doi, String url)
             throws DOIIdentifierException
     {
         // post mds/doi/
@@ -731,7 +731,7 @@ implements DOIConnector
     }
     
     
-    private DataCiteResponse sendMetadataDeleteRequest(String doi)
+    protected DataCiteResponse sendMetadataDeleteRequest(String doi)
             throws DOIIdentifierException
     {
         // delete mds/metadata/<doi>
@@ -756,19 +756,19 @@ implements DOIConnector
         return sendHttpRequest(httpdelete, doi);
     }
     
-    private DataCiteResponse sendDOIGetRequest(String doi)
+    protected DataCiteResponse sendDOIGetRequest(String doi)
             throws DOIIdentifierException
     {
         return sendGetRequest(doi, DOI_PATH);
     }
     
-    private DataCiteResponse sendMetadataGetRequest(String doi)
+    protected DataCiteResponse sendMetadataGetRequest(String doi)
             throws DOIIdentifierException
     {
         return sendGetRequest(doi, METADATA_PATH);
     }
     
-    private DataCiteResponse sendGetRequest(String doi, String path)
+    protected DataCiteResponse sendGetRequest(String doi, String path)
             throws DOIIdentifierException
     {
         URIBuilder uribuilder = new URIBuilder();
@@ -792,7 +792,7 @@ implements DOIConnector
         return sendHttpRequest(httpget, doi);
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
+    protected DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
             throws DOIIdentifierException
     {
         Format format = Format.getCompactFormat();
@@ -801,7 +801,7 @@ implements DOIConnector
         return sendMetadataPostRequest(doi, xout.outputString(new Document(metadataRoot)));
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
+    protected DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
             throws DOIIdentifierException
     {
         // post mds/metadata/
@@ -856,7 +856,7 @@ implements DOIConnector
      * @return
      * @throws DOIIdentifierException 
      */
-    private DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
+    protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
             throws DOIIdentifierException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -980,7 +980,7 @@ implements DOIConnector
     }
 
     // returns null or handle
-    private String extractAlternateIdentifier(Context context, String content)
+    protected String extractAlternateIdentifier(Context context, String content)
     throws SQLException, DOIIdentifierException
     {
         if (content == null)
@@ -1026,12 +1026,12 @@ implements DOIConnector
         return handle;
     }
     
-    private String extractDOI(Element root) {
+    protected String extractDOI(Element root) {
         Element doi = root.getChild("identifier", root.getNamespace());
         return (null == doi) ? null : doi.getTextTrim();
     }
 
-    private Element addDOI(String doi, Element root) {
+    protected Element addDOI(String doi, Element root) {
         if (null != extractDOI(root))
         {
             return root;
@@ -1042,7 +1042,7 @@ implements DOIConnector
         return root.addContent(0, identifier);
     }
 
-    private class DataCiteResponse
+    protected class DataCiteResponse
     {
         private final int statusCode;
         private final String content;
