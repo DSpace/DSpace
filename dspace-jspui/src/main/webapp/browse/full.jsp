@@ -14,7 +14,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
@@ -166,6 +166,16 @@
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
 <%@page import="java.util.Set"%>
+<c:set var="dspace.layout.head" scope="request">
+<script type="text/javascript">
+function sortBy(idx, ord)
+{
+	jQuery("#ssort_by").val(idx);
+	jQuery("#sorder").val(ord);
+	jQuery("#sortform").submit();
+}
+</script>
+</c:set>
 <dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
@@ -428,6 +438,7 @@
 	</form>
 	</div>
 
+
 	<%-- give us the top report on what we are looking at --%>
 	<div align="center" class="browse_range">
 		<fmt:message key="browse.full.range">
@@ -514,6 +525,42 @@
 	<!-- <%= bi.toString() %> -->
 	--%>
 
+
+
+<form id="sortform" method="get" action="<%= formaction %>">
+<input type="hidden" name="type" value="<%= bix.getName() %>"/>
+<%
+                if (bi.hasAuthority())
+                {
+                %><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+                }
+                else if (bi.hasValue())
+                {
+                        %><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
+                }
+%>
+<%
+        Set<SortOption> setSortOptions = SortOption.getSortOptions();
+        if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
+        {
+%>
+                <input type="hidden" id="ssort_by" name="sort_by"
+<%
+                for (SortOption sortBy : setSortOptions)
+                {
+            if (sortBy.isVisible())
+            {
+                %><%= (sortBy.getName().equals(sortedBy) ? "value=\""+sortBy.getNumber()+"\"" : "") %><%
+            }
+        }
+%>
+                />
+<%
+        }
+%>
+
+                <input type="hidden" id="sorder" name="order" value="<%= direction %>" />
+</form>
 </dspace:layout>
 
 

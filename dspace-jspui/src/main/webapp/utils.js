@@ -264,6 +264,3 @@ function isBrowser(b,v) {
 		  else  versionOk = (v <= parseInt(navigator.appVersion));
 		  return browserOk && versionOk;
 }
-
-
-

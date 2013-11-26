@@ -155,13 +155,13 @@ public class StatisticsDataGenerator
 		Context context = new Context();
         // Find our solrserver
         HttpSolrServer solr = new HttpSolrServer(
-                ConfigurationManager.getProperty(SolrLogger.CFG_MODULE,
+                ConfigurationManager.getProperty(SolrLogger.CFG_STAT_MODULE,
                         "server"));
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
 		String prevIp = null;
-        String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_MODULE,
+        String dbfile = ConfigurationManager.getProperty(SolrLogger.CFG_USAGE_MODULE,
                 "dbfile");
 		LookupService cl = new LookupService(dbfile,
 				LookupService.GEOIP_STANDARD);

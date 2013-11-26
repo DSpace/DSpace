@@ -12,7 +12,8 @@
 
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<!-- CRIS Item enhanced metadata -->
+	<!-- CRIS Item enhanced metadata, used to add dynamically to the item information from linked
+     CRIS entities as it was metadata of the item -->
 	<bean class="org.dspace.app.cris.discovery.CrisItemEnhancer">
 		<property name="alias" value="author" />
 		<property name="metadata">
@@ -31,7 +32,9 @@
 			</map>
 		</property>
 	</bean>
-
+	
+	<!-- CRIS enhanced metadata, used to add dynamically to the CRIS entity information from linked
+         CRIS entities as it was metadata of the current CRIS entity from clazz -->
 	<bean class="org.dspace.app.cris.discovery.CrisEnhancer">
 		<property name="clazz">
 			<value>org.dspace.app.cris.model.Project</value>
@@ -60,6 +63,8 @@
 		</property>
 	</bean>
 	
+	<!-- CRIS nested enhanced metadata, used to add dynamically to the CRIS entity information from the nested
+     CRIS entities as it was metadata of the current CRIS entity from clazz -->
 	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
 		scope="prototype">
 		<property name="applicationService" ref="applicationService" />

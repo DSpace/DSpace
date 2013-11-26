@@ -280,14 +280,12 @@ public class ItemListTag extends TagSupport {
 							+ "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
 				} else {
                     // Otherwise, don't constrain the width
-					// allen: the hub is using this line to define table
 					out.println("<table border=\"0\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
                 }
 
                 // Output the known column widths
                 out.print("<colgroup>");
 
-				// allen modified, added one line
 				out.print("<col width=\"5\" />");
 
 				for (int w = 0; w < widthArr.length; w++) {
@@ -328,7 +326,6 @@ public class ItemListTag extends TagSupport {
 				out.print("</th>");
 			}
 
-			// allen modified, added <th/> for item# column
 			out.print("<th />");
 
 			for (int colIdx = 0; colIdx < fieldArr.length; colIdx++) {
@@ -385,7 +382,6 @@ public class ItemListTag extends TagSupport {
                 // prepare the strings for the header
                 String id = "t" + Integer.toString(colIdx + 1);
 
-				// allen modified, use simple "oddRow"
 				// String css = "oddRow" + cOddOrEven[colIdx] + "Col";
 				String css = "oddRow";
 
@@ -438,7 +434,6 @@ public class ItemListTag extends TagSupport {
                         + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
             }
 
-			// allen modified, added one line
             out.print("</tr>");
 
             // now output each item row
@@ -451,8 +446,6 @@ public class ItemListTag extends TagSupport {
 				} else {
 					rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
                 }
-
-				// allen modified, output a counter showing line number
 
 				if (inputName != null) {
 					out.print("<td align=\"right\" class=\"oddRowOddCol\">");

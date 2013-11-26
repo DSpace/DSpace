@@ -23,11 +23,11 @@
     
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>
-	<lucene.version>3.5.0</lucene.version>
-	<solr.version>4.0.0</solr.version>
+		<lucene.version>3.5.0</lucene.version>
+		<solr.version>4.0.0</solr.version>
 		<!-- Warning hibernate core many pom point to 3.3.2.GA to be compliant with hibernate-annotation 3.4.0.GA (required by spring ORM 3.1.1.RELEASE)-->
 		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
-		<org.jdyna.version>4.2</org.jdyna.version>		
+		<org.jdyna.version>4.3-SNAPSHOT</org.jdyna.version>		
 		<it.cilea.ccommons.version>1.2</it.cilea.ccommons.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
@@ -1314,23 +1314,37 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:git:https://github.com/CILEA/DSpace.git</connection>
-      <developerConnection>scm:git:https://github.com/CILEA/DSpace.git</developerConnection>
-      <url>https://github.com/CILEA/DSpace.git</url>
+      <connection>scm:git:https://github.com/Cineca/DSpace.git</connection>
+      <developerConnection>scm:git:https://github.com/Cineca/DSpace.git</developerConnection>
+      <url>https://github.com/Cineca/DSpace.git</url>
       <tag>dspace-cris-master</tag>
    </scm>
 
    <repositories>
        <repository>
-			<id>cilea-repo</id>
-			<name>CILEA Maven Repository</name>
-			<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
+			<id>cineca-repo</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
 				<checksumPolicy>never</checksumPolicy>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</snapshots>
+		</repository>
+		
+		<repository>
+			<id>cineca-repo-snapshot</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
 				<checksumPolicy>never</checksumPolicy>
 			</snapshots>
 		</repository>
@@ -1352,17 +1366,17 @@
    	<distributionManagement>
     	<repository>
         	<id>repo</id>
-        	<name>CILEA Maven Repository</name>
-        	<url>https://github.com/CILEA/mvn-repo/raw/master/releases</url>
+        	<name>Cineca Maven Repository</name>
+        	<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
     	</repository>
     	<snapshotRepository>
         	<id>snapshot-repo</id>
-        	<name>CILEA Maven Repository</name>
-        	<url>https://github.com/CILEA/mvn-repo/raw/master/snapshots</url>
+        	<name>Cineca Maven Repository</name>
+        	<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
     	</snapshotRepository>
     	<site>
             <id>website</id>
-            <url>http://cilea.github.io/dspace-cris/index.html</url>
+            <url>http://cineca.github.io/dspace-cris/index.html</url>
         </site>        
 	</distributionManagement>
 

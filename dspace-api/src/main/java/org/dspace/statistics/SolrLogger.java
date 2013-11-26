@@ -79,7 +79,8 @@ import com.Ostermiller.util.CSVPrinter;
 public class SolrLogger
 {
 
-    public static final String CFG_MODULE = "solr-statistics";
+    public static final String CFG_STAT_MODULE = "solr-statistics";
+    public static final String CFG_USAGE_MODULE = "usage-statistics";
 
     private static Logger log = Logger.getLogger(SolrLogger.class);
 
@@ -114,7 +115,7 @@ public class SolrLogger
         if (useProxies == null)
         {
             boolean result = false;
-            if ("true".equals(ConfigurationManager.getProperty(CFG_MODULE,
+            if ("true".equals(ConfigurationManager.getProperty(CFG_STAT_MODULE,
                     "useProxies")))
             {
                 result = true;
@@ -132,9 +133,9 @@ public class SolrLogger
         {
 
             log.info("solr-statistics.spidersfile:"
-                    + ConfigurationManager.getProperty(CFG_MODULE,
+                    + ConfigurationManager.getProperty(CFG_STAT_MODULE,
                             "spidersfile"));
-            String pcore = ConfigurationManager.getProperty(CFG_MODULE,
+            String pcore = ConfigurationManager.getProperty(CFG_STAT_MODULE,
                     "server");
             log.info("solr-statistics.server:" + pcore);
 
@@ -199,7 +200,7 @@ public class SolrLogger
         try
         {
             if (isSpiderBot
-                    && !ConfigurationManager.getBooleanProperty(CFG_MODULE,
+                    && !ConfigurationManager.getBooleanProperty(CFG_USAGE_MODULE,
                             "logBots", true))
             {
                 return;
