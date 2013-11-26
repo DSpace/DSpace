@@ -687,7 +687,7 @@ implements DOIConnector
         // post mds/doi/
         // body must contaion "doi=<doi>\nurl=<url>}n"
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH);
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(DOI_PATH);
         
         HttpPost httppost = null;
         try
@@ -698,7 +698,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -736,7 +736,7 @@ implements DOIConnector
     {
         // delete mds/metadata/<doi>
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(METADATA_PATH
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(METADATA_PATH
                 + doi.substring(DOI.SCHEME.length()));
         
         HttpDelete httpdelete = null;
@@ -748,7 +748,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -772,7 +772,7 @@ implements DOIConnector
             throws DOIIdentifierException
     {
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(path
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(path
                 + doi.substring(DOI.SCHEME.length()));
         
         HttpGet httpget = null;
@@ -784,7 +784,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -807,7 +807,7 @@ implements DOIConnector
         // post mds/metadata/
         // body must contain metadata in DataCite-XML.
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(METADATA_PATH);
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(METADATA_PATH);
         
         HttpPost httppost = null;
         try
@@ -818,7 +818,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
