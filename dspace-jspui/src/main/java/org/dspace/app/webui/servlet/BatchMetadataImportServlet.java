@@ -96,7 +96,7 @@ public class BatchMetadataImportServlet extends DSpaceServlet
         	
         	//Get all the possible data loaders from the Spring configuration
         	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-        	List<String> inputTypes = Lists.newArrayList(dls.getDataLoaders().keySet());
+        	List<String> inputTypes =dls.getFileDataLoaders();
         	
         	request.setAttribute("input-types", inputTypes);
         	
@@ -150,8 +150,7 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     {
     	//Get all the possible data loaders from the Spring configuration
     	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-    	List<String> inputTypes = Lists.newArrayList(dls.getDataLoaders().keySet());
-    	
+    	List<String> inputTypes = dls.getFileDataLoaders();
     	request.setAttribute("input-types", inputTypes);
     	
     	//Get all collections
