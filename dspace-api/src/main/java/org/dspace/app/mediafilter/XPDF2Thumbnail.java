@@ -9,7 +9,6 @@ package org.dspace.app.mediafilter;
 
 import java.awt.Graphics2D;
 import java.awt.Color;
-//import java.awt.image.BufferedImage;
 import java.awt.image.*;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
