@@ -258,8 +258,8 @@
 					<% }  %>
 				</select>
 				</div>
-				<button class="btn btn-primary col-md-2 pull-right" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.byfile.process"/></button>
 	</div>
+	<button class="btn btn-primary col-md-2 pull-right" type="button" id="loadfile_go"><fmt:message key="jsp.submit.start-lookup-submission.byfile.process"/></button>
 		</form>
 	</div>
 <% 
