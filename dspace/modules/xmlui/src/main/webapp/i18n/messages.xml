@@ -404,6 +404,7 @@
 	<message key="xmlui.Discovery.AbstractSearch.type_dc.date.issued.year_filter">Refine by: Date published</message>
 	<message key="xmlui.discovery.SearchFacetFilter.no-results">No refinement values found</message>
 	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine Search</message>
+	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.empty">No results to refine.  Try a different search.</message>
 
 	<message key="xmlui.Discovery.SimpleSearch.filter_help"> </message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Refinements</message>
