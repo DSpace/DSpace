@@ -192,6 +192,7 @@
            </activation>
            <properties>
                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
                <filters.file>${root.basedir}/build.properties</filters.file>
            </properties>
        </profile>
@@ -209,9 +210,11 @@
            </activation>
            <properties>
                 <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
                 <filters.file>${root.basedir}/${env}.properties</filters.file>
            </properties>
        </profile>
+
 
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment
