@@ -193,9 +193,6 @@
             </xsl:if>
             -->
 
-            <!-- Add version. --> 
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='provenance']" />
-
             <!-- Add rights. -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='rights']" />
 
@@ -413,18 +410,6 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
-        DataCite (15)
-        Adds Version information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='description' and @qualifier='provenance']">
-        <xsl:if test="contains(text(),'Made available')">
-            <xsl:element name="version">
-                <xsl:value-of select="." />
-            </xsl:element>
-        </xsl:if>
-    </xsl:template>
-    
     <!-- 
         DataCite (16)
         Adds Rights information
