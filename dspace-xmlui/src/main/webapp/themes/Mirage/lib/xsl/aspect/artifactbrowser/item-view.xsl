@@ -388,7 +388,7 @@
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
         <div class="file-wrapper clearfix">
-            <div class="thumbnail-wrapper">
+            <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
                 <a class="image-link">
                     <xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
