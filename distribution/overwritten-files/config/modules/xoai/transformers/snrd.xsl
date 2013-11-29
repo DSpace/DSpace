@@ -40,6 +40,7 @@
 				<xsl:with-param name="liftDate" select="doc:element[@name='sedici']/doc:element[@name='embargo']/doc:element[@name='liftDate']/doc:element/doc:field/text()"/>
 			</xsl:call-template>
 			
+			
 			<xsl:apply-templates select="@*|node()" />
 
 	  </doc:metadata>
@@ -85,7 +86,13 @@
 						</doc:element>
 						<doc:element name='embargoEndDate'>
 							<doc:element name='es'>
-								<doc:field name="value"><xsl:value-of select="$liftDate" /></doc:field>
+								<doc:field name="value">
+								<xsl:call-template name="formatdate">
+									<xsl:with-param name="datestr">
+										<xsl:value-of select="$liftDate" />
+									</xsl:with-param>
+								</xsl:call-template>
+									</doc:field>
 							</doc:element>
 						</doc:element>
 					</doc:element>
@@ -395,4 +402,42 @@
 		</xsl:variable>
 		<xsl:value-of select="$sub" />
 	</xsl:template>
+
+	<!-- Éste template modifica el texto referido al lenguaje del item-->
+	<xsl:template match="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']">
+		
+		<xsl:variable name="language" select="./doc:element/doc:field[@name='value']/text()"/>
+		
+		<xsl:variable name="valueLanguage">
+			<xsl:choose>
+				<xsl:when test="$language='es'">
+					esp
+				</xsl:when>
+				<xsl:when test="$language='en'">
+					eng
+				</xsl:when>
+				<xsl:when test="$language='pt'">
+					por
+				</xsl:when>
+				<xsl:when test="$language='fr'">
+					fra
+				</xsl:when>
+				<xsl:when test="$language='it'">
+					ita
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$language"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<doc:element name="language">
+            <doc:element name="es">
+				<doc:field name="value">
+					<xsl:value-of select="normalize-space($valueLanguage)"/>
+				</doc:field>
+			</doc:element>
+		</doc:element>	
+	</xsl:template>
+
 </xsl:stylesheet>

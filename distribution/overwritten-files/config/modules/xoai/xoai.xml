@@ -90,6 +90,10 @@
 			<!-- Regla 5 -->
 			<Filter refid="authorexistsFilter"/>
 			
+			<Filter refid="formatExistsFilter"/>
+			
+			<Filter refid="snrddocumentsubtypeFilter"/>
+			
 			<!-- Regla 7 -->
 <!-- 	TBD		<Filter refid="directorExisteParaTesisFilter"/> -->
 			
@@ -203,10 +207,11 @@
 			</Parameter>
 		</Filter>
 		
+		<!-- ¿Exists bitstreams associated to the item? -->
 		<Filter id="formatExistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
 			<Parameter key="field">
-				<Value>dc.format</Value>
+				<Value>dc.format.mimetype</Value>
 			</Parameter>
 		</Filter>
 		
@@ -273,47 +278,28 @@
 			</Parameter>
 		</Filter>
 		
-		<Filter id="snrddocumenttypeFilter">
+		<Filter id="snrddocumentsubtypeFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<Value>dc.type</Value>
+				<Value>sedici.subtype</Value>
 			</Parameter>
 			<Parameter key="operator">
 				<Value>equal</Value>
 			</Parameter>
 			<Parameter key="value">
-				<Value>artículo</Value>
-				<Value>libro</Value>
-				<Value>parte de libro</Value>
-				<Value>documento de</Value>
-				<Value>conferencia</Value>
-				<Value>tesis doctoral</Value>
-				<Value>tesis de maestría</Value>
-				<Value>tesis de grado</Value>
-				<Value>trabajo final de grado</Value>
-				<Value>patente</Value>
-				<Value>marca</Value>
-				<Value>modelo industrial</Value>
-				<Value>modelo de utilidad</Value>
-				<Value>documento legal</Value>
-				<Value>reseña artículo</Value>
-				<Value>revisión literaria</Value>
-				<Value>documento de trabajo</Value>
-				<Value>informe técnico</Value>
-				<Value>fotografía</Value>
-				<Value>plano</Value>
-				<Value>mapa</Value>
-				<Value>diapositiva</Value>
-				<Value>póster</Value>
-				<Value>imagen satelital</Value>
-				<Value>radiografía</Value>
-				<Value>transparencia</Value>
-				<Value>diapositiva de microscopio</Value>
-				<Value>película</Value>
-				<Value>documental</Value>
-				<Value>videograbación</Value>
-				<Value>conjunto de dato</Value>
-				<Value>proyecto de investigación</Value>
+				<Value>Articulo</Value>
+				<Value>Documento de trabajo</Value>
+				<Value>Revision</Value>
+				<Value>Informe tecnico</Value>
+				<Value>Patente</Value>
+				<Value>Tesis de doctorado</Value>
+				<Value>Tesis de maestria</Value>
+				<Value>Trabajo de especializacion</Value>
+				<Value>Trabajo final de grado</Value>
+				<Value>Tesis de grado</Value>
+				<Value>Libro</Value>
+				<Value>Capitulo de libro</Value>
+				<Value>Objeto de conferencia</Value>
 			</Parameter>
 		</Filter>
 		
