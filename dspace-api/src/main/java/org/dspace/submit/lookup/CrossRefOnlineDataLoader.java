@@ -19,7 +19,6 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.httpclient.HttpException;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.dspace.core.Context;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;
@@ -66,7 +65,7 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             List<Record> results = new ArrayList<Record>();
             
             if (getApiKey() == null){
-            	throw new RuntimeCryptoException("No CrossRef API key is specified!");
+            	throw new RuntimeException("No CrossRef API key is specified!");
             }
             
             try
@@ -99,7 +98,7 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             int year) throws HttpException, IOException
     {
     	if (getApiKey() == null){
-        	throw new RuntimeCryptoException("No CrossRef API key is specified!");
+        	throw new RuntimeException("No CrossRef API key is specified!");
         }
     	
         List<Record> items = crossrefService.search(context, title, author,
