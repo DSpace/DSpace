@@ -570,7 +570,24 @@ public class BrowseListTag extends TagSupport
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
-
+                    else {
+                    	//In case title has no value, replace it with "undefined" so as the user has something to
+                    	//click in order to access the item page
+                    	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
+                    	if (field.equals(titleField) && (items[i].isWithdrawn() || !isDiscoverable(hrq, items[i])))
+                        {
+                            metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
+                        }
+                        // format the title field correctly (as long as the item isn't withdrawn, link to it)
+                        else if (field.equals(titleField))
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
+                            + "<span style=\"font-style:italic\">("+undefined+")</span>"
+                            + "</a>";
+                        }
+                    }
+                    
                     // prepare extra special layout requirements for dates
                     String extras = "";
                     if (isDate[colIdx])
