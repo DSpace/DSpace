@@ -29,7 +29,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.jdom.JDOMException;
@@ -58,7 +57,7 @@ public class CrossRefService
         this.timeout = timeout;
     }
 
-    public List<Record> search(Context context, Set<String> dois)
+    public List<Record> search(Context context, Set<String> dois, String apiKey)
             throws HttpException, IOException, JDOMException,
             ParserConfigurationException, SAXException
     {
@@ -67,84 +66,77 @@ public class CrossRefService
         {
             for (String record : dois)
             {
-                try
-                {
-                    if (!ConfigurationManager
-                            .getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
-                    {
-                        GetMethod method = null;
-                        try
-                        {
-                            String apiKey = ConfigurationManager
-                                    .getProperty(SubmissionLookupService.CFG_MODULE, "crossref.api-key");
+            	try
+            	{
+            		GetMethod method = null;
+            		try
+            		{
+            			HttpClient client = new HttpClient();
+            			client.setConnectionTimeout(timeout);
+            			method = new GetMethod(
+            					"http://www.crossref.org/openurl/");
 
-                            HttpClient client = new HttpClient();
-                            client.setConnectionTimeout(timeout);
-                            method = new GetMethod(
-                                    "http://www.crossref.org/openurl/");
+            			NameValuePair pid = new NameValuePair("pid", apiKey);
+            			NameValuePair noredirect = new NameValuePair(
+            					"noredirect", "true");
+            			NameValuePair id = new NameValuePair("id", record);
+            			method.setQueryString(new NameValuePair[] { pid,
+            					noredirect, id });
+            			// Execute the method.
+            			int statusCode = client.executeMethod(method);
 
-                            NameValuePair pid = new NameValuePair("pid", apiKey);
-                            NameValuePair noredirect = new NameValuePair(
-                                    "noredirect", "true");
-                            NameValuePair id = new NameValuePair("id", record);
-                            method.setQueryString(new NameValuePair[] { pid,
-                                    noredirect, id });
-                            // Execute the method.
-                            int statusCode = client.executeMethod(method);
+            			if (statusCode != HttpStatus.SC_OK)
+            			{
+            				throw new RuntimeException("Http call failed: "
+            						+ method.getStatusLine());
+            			}
 
-                            if (statusCode != HttpStatus.SC_OK)
-                            {
-                                throw new RuntimeException("Http call failed: "
-                                        + method.getStatusLine());
-                            }
+            			Record crossitem;
+            			try
+            			{
+            				DocumentBuilderFactory factory = DocumentBuilderFactory
+            						.newInstance();
+            				factory.setValidating(false);
+            				factory.setIgnoringComments(true);
+            				factory.setIgnoringElementContentWhitespace(true);
 
-                            Record crossitem;
-                            try
-                            {
-                                DocumentBuilderFactory factory = DocumentBuilderFactory
-                                        .newInstance();
-                                factory.setValidating(false);
-                                factory.setIgnoringComments(true);
-                                factory.setIgnoringElementContentWhitespace(true);
+            				DocumentBuilder db = factory
+            						.newDocumentBuilder();
+            				Document inDoc = db.parse(method
+            						.getResponseBodyAsStream());
 
-                                DocumentBuilder db = factory
-                                        .newDocumentBuilder();
-                                Document inDoc = db.parse(method
-                                        .getResponseBodyAsStream());
+            				Element xmlRoot = inDoc.getDocumentElement();
+            				Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
+            				Element body = XMLUtils.getSingleElement(queryResult, "body");
+            				Element dataRoot = XMLUtils.getSingleElement(body, "query");
 
-                                Element xmlRoot = inDoc.getDocumentElement();
-                                Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
-                                Element body = XMLUtils.getSingleElement(queryResult, "body");
-                                Element dataRoot = XMLUtils.getSingleElement(body, "query");
-
-                                crossitem = CrossRefUtils
-                                        .convertCrossRefDomToRecord(dataRoot);
-                                results.add(crossitem);
-                            }
-                            catch (Exception e)
-                            {
-                                log.warn(LogManager
-                                        .getHeader(
-                                                context,
-                                                "retrieveRecordDOI",
-                                                record
-                                                        + " DOI is not valid or not exist: "
-                                                        + e.getMessage()));
-                            }
-                        }
-                        finally
-                        {
-                            if (method != null)
-                            {
-                                method.releaseConnection();
-                            }
-                        }
-                    }
-                }
-                catch (RuntimeException rt)
-                {
-                    log.error(rt.getMessage(), rt);
-                }
+            				crossitem = CrossRefUtils
+            						.convertCrossRefDomToRecord(dataRoot);
+            				results.add(crossitem);
+            			}
+            			catch (Exception e)
+            			{
+            				log.warn(LogManager
+            						.getHeader(
+            								context,
+            								"retrieveRecordDOI",
+            								record
+            								+ " DOI is not valid or not exist: "
+            								+ e.getMessage()));
+            			}
+            		}
+            		finally
+            		{
+            			if (method != null)
+            			{
+            				method.releaseConnection();
+            			}
+            		}
+            	}
+            	catch (RuntimeException rt)
+            	{
+            		log.error(rt.getMessage(), rt);
+            	}
             }
         }
         return results;
@@ -176,7 +168,7 @@ public class CrossRefService
     }
 
     public List<Record> search(Context context, String title, String authors,
-            int year, int count) throws IOException, HttpException
+            int year, int count, String apiKey) throws IOException, HttpException
     {
         GetMethod method = null;
         try
@@ -210,7 +202,7 @@ public class CrossRefService
             }
             method.releaseConnection();
 
-            return search(context, dois);
+            return search(context, dois, apiKey);
         }
         catch (Exception e)
         {
