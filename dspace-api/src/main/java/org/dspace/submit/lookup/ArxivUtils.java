@@ -39,16 +39,16 @@ public class ArxivUtils
 
         String articleTitle = XMLUtils.getElementValue(dataRoot, "title");
         if (articleTitle != null)
-            record.addValue("articleTitle", new StringValue(articleTitle));
+            record.addValue("title", new StringValue(articleTitle));
         String summary = XMLUtils.getElementValue(dataRoot, "summary");
         if (summary != null)
             record.addValue("summary", new StringValue(summary));
         String year = XMLUtils.getElementValue(dataRoot, "published");
         if (year != null)
-            record.addValue("year", new StringValue(year));
+            record.addValue("published", new StringValue(year));
         String splashPageUrl = XMLUtils.getElementValue(dataRoot, "id");
         if (splashPageUrl != null)
-            record.addValue("splashPageUrl", new StringValue(splashPageUrl));
+            record.addValue("id", new StringValue(splashPageUrl));
         String comment = XMLUtils.getElementValue(dataRoot, "arxiv:comment");
         if (comment != null)
             record.addValue("comment", new StringValue(comment));
@@ -119,62 +119,39 @@ public class ArxivUtils
             record.addField("category", values);
         }
 
-        List<String[]> authors = new LinkedList<String[]>();
+        List<String> authors = new LinkedList<String>();
+        List<String> authorsWithAffiliations = new LinkedList<String>();
         List<Element> authorList = XMLUtils.getElementList(dataRoot, "author");
         if (authorList != null)
         {
             for (Element authorElement : authorList)
             {
-                String nomeCompleto = authorElement.getTextContent();
-                String[] nomeSplit = nomeCompleto.split("\\s+");
-                String nome = "";
-                String cognome = "";
-                if (nomeSplit.length > 2)
-                {
-                    String senzaPunti = nomeCompleto.replace("\\.", "");
-                    String[] tmp = senzaPunti.split("\\s+");
-
-                    int start = 1;
-                    if (tmp.length == nomeSplit.length)
-                    {
-                        for (int idx = 2; idx < tmp.length; idx++)
-                        {
-                            if (tmp[idx].length() > 1)
-                            {
-                                start = idx;
-                            }
-                        }
-                    }
-                    for (int i = 0; i < start; i++)
-                    {
-                        nome += nomeSplit[i];
-                    }
-                    for (int i = start; i < nomeSplit.length; i++)
-                    {
-                        cognome += nomeSplit[i];
-                    }
-                }
-                else if (nomeSplit.length == 2)
-                {
-                    nome = nomeSplit[0];
-                    cognome = nomeSplit[1];
-                }
-                else
-                {
-                    cognome = nomeCompleto;
-                }
-                authors.add(new String[] { nome, cognome });
+            	String authorName = XMLUtils.getElementValue(authorElement, "name");
+            	String authorAffiliation = XMLUtils.getElementValue(authorElement, "arxiv:affiliation");
+            	
+            	authors.add(authorName);
+            	authorsWithAffiliations.add(authorName +": " + authorAffiliation);
             }
         }
 
         if (authors.size() > 0)
         {
             List<Value> values = new LinkedList<Value>();
-            for (String[] sArray : authors)
+            for (String sArray : authors)
             {
-                values.add(new StringValue(sArray[1] + ", " + sArray[0]));
+                values.add(new StringValue(sArray));
             }
-            record.addField("authors", values);
+            record.addField("author", values);
+        }
+        
+        if (authorsWithAffiliations.size() > 0)
+        {
+            List<Value> values = new LinkedList<Value>();
+            for (String sArray : authorsWithAffiliations)
+            {
+                values.add(new StringValue(sArray));
+            }
+            record.addField("authorWithAffiliation", values);
         }
 
         return record;

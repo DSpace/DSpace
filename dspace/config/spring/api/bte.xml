@@ -128,7 +128,7 @@
 	    <property name="fieldKeys">
 	        <list>
 	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
-	        	<value>publicationstatus</value>
+	        	<value>publicationStatus</value>
 	        </list>
 	    </property>
 	</bean>
@@ -161,6 +161,7 @@
 			<list>
 			    <ref bean="fieldMergeModifier"/>
 			    <ref bean="valueConcatenationModifier"/>
+			    <ref bean="languageCodeModifier"/>
 			</list>
 		</property>
 	</bean>
@@ -188,6 +189,8 @@
 	    <property name="separator" value=";" />
 	    <property name="whitespaceAfter" value="true" />
 	</bean>
+
+        <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
 
 	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
 	    <property name="outputMap" ref="outputMap"/>
@@ -337,27 +340,30 @@
 	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="pubmedID" value="pmid" />
+				<entry key="pubmedID" value="pubmedID" />
 				<entry key="doi" value="doi" />
-				<entry key="issn" value="issn" />
-				<entry key="eissn" value="eissn" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
 				<entry key="journalTitle" value="journal" />
-				<entry key="title" value="title" />
-				<entry key="pubblicationModel" value="" />
-				<entry key="year" value="issued" />
-				<entry key="volume" value="volume" />
-				<entry key="issue" value="issue" />
+				<entry key="articleTitle" value="title" />
+				<entry key="pubDate" value="issued" />
+				<entry key="journalVolume" value="volume" />
+				<entry key="journalIssue" value="issue" />
 				<entry key="language" value="language" />
-				<entry key="type" value="subtype" />
-				<entry key="primaryKeywords" value="keywords" />
-				<entry key="secondaryKeywords" value="keywords" />
-				<entry key="primaryMeshHeadings" value="mesh" />
-				<entry key="secondaryMeshHeadings" value="mesh" />
+				<entry key="publicationType" value="subtype" />
+				<entry key="primaryKeyword" value="keywords" />
+				<entry key="secondaryKeyword" value="keywords" />
+				<entry key="primaryMeshHeading" value="mesh" />
+				<entry key="secondaryMeshHeading" value="mesh" />
 				<entry key="startPage" value="firstpage" />
 				<entry key="endPage" value="lastpage" />
-				<entry key="summary" value="abstract" />
-				<entry key="status" value="publicationstatus" />
-				<entry key="authors" value="authors" />
+				<entry key="abstractText" value="abstract" />
+				<entry key="publicationStatus" value="publicationStatus" />
+				<entry key="author" value="authors" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="pubblicationModel" value="" />
+				 -->
 			</map>
 		</constructor-arg>
 	</bean>
@@ -377,16 +383,16 @@
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="journalRef" value="journal" />
 				<entry key="doi" value="doi" />
-				<entry key="authors" value="authors" />
+				<entry key="author" value="authors" />
+				<entry key="authorWithAffiliation" value="authorsWithAffiliation" />
 				<entry key="comment" value="note" />
-				<entry key="year" value="issued" />
+				<entry key="published" value="issued" />
 				<entry key="articleTitle" value="title" />
 				<entry key="summary" value="abstract" />
-				<entry key="splashPageUrl" value="url" />
+				<entry key="id" value="url" />
 				<entry key="pdfUrl" value="fulltextUrl" />
 				<entry key="primaryCategory" value="arxivCategory" />
 				<entry key="category" value="arxivCategory" />
-				<entry key="source" value="arxivID" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -404,18 +410,30 @@
 	<bean name="crossrefInputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="journalRef" value="journal" />
+				<entry key="journalTitle" value="journal" />
 				<entry key="doi" value="doi" />
 				<entry key="authors" value="authors" />
-				<entry key="comment" value="note" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
 				<entry key="year" value="issued" />
 				<entry key="articleTitle" value="title" />
-				<entry key="summary" value="abstract" />
-				<entry key="splashPageUrl" value="url" />
-				<entry key="pdfUrl" value="fulltextUrl" />
-				<entry key="primaryCategory" value="arxivCategory" />
-				<entry key="category" value="arxivCategory" />
-				<entry key="source" value="arxivID" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="firstPage" value="firstpage" />
+				<entry key="lastPage" value="lastpage" />
+				<entry key="printISBN" value="pisbn" />
+				<entry key="electronicISBN" value="eisbn" />
+				<entry key="editionNumber" value="editionnumber" />
+				<entry key="seriesTitle" value="seriestitle" />
+				<entry key="volumeTitle" value="volumetitle" />
+				<entry key="editors" value="editors" />
+				<entry key="translators" value="translators" />
+				<entry key="chairs" value="chairs" />
+				<entry key="doyType" value="subtype" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="publicationType" value="" />
+				 -->
 			</map>
 		</constructor-arg>
 	</bean>
@@ -433,31 +451,40 @@
 	<bean name="outputMap" class="java.util.HashMap" scope="prototype">
 		<constructor-arg>
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry value="pmid" key="dc.identifier.pmid" />
-				<entry value="doi" key="dc.identifier.doi" />
-				<entry value="jissn" key="dc.relation.issn" />
-				<entry value="jeissn" key="dc.relation.eissn" />
-				<entry value="journal" key="dc.relation.ispartofjournal" />
+				<entry value="jissn" key="dc.identifier.issn" />
+				<entry value="pisbn" key="dc.identifier.isbn" />
+				<entry value="journal" key="dc.source" />
 				<entry value="title" key="dc.title" />
 				<entry value="issued" key="dc.date.issued" />
-				<entry value="volume" key="dc.relation.volume" />
-				<entry value="issue" key="dc.relation.issue" />
 				<entry value="language" key="dc.language.iso" />
-				<entry value="subtype" key="dc.type.contribution" />
-				<!-- <entry key="keywords" key="dc.subject"/> -->
-				<entry value="mesh" key="dc.subject" />
-				<entry value="firstpage" key="dc.relation.firstpage" />
-				<entry value="lastpage" key="dc.relation.lastpage" />
-				<entry value="abstract" key="dc.description.abstract" />
-				<entry value="publicationstatus" key="dc.type.publicationstatus" />
-				<!-- <entry key="authorsWithAffiliations" key="dc.contributor.author"/> -->
-				<!-- <entry key="authors" key="dc.contributor.author|authorsWithAffiliations"/> -->
-				<entry value="authorsWithAffiliations" key="" />
+				<entry value="subtype" key="dc.type" />
 				<entry value="authors" key="dc.contributor.author" />
-				<entry value="articleNumber" key="dc.relation.article" />
-				<entry value="firstpage" key="dc.relation.firstpage" />
-				<entry value="firstpage" key="dc.relation.firstpage" />
-
+				<entry value="editors" key="dc.contributor.editor" />
+				<entry value="translators" key="dc.contributor.other" />
+				<entry value="chairs" key="dc.contributor.other" />
+				<entry value="abstract" key="dc.description.abstract" />
+				<entry value="allkeywords" key="dc.subject" />
+				<entry value="arxivCategory" key="dc.subject" />
+				<entry value="doi" key="dc.identifier" />
+				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
+				<!-- 
+				<entry value="url" key="" />
+				<entry value="note" key="" />
+				<entry value="fulltextUrl" key="" />
+				<entry value="authorsWithAffiliation" key="" />
+				<entry value="pubmedID" key="" />
+				<entry value="publicationStatus" key="" />
+				<entry value="jeissn" key="" />
+				<entry value="volume" key="" />
+				<entry value="issue" key="" />
+				<entry value="firstpage" key="" />
+				<entry value="lastpage" key="" />
+				<entry value="eisbn" key="" />
+				<entry value="editionnumber" key="" />
+				<entry value="seriestitle" key="" />
+				<entry value="volumetitle" key="" />
+				 -->
+				 
 			</map>
 		</constructor-arg>
 	</bean>

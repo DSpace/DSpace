@@ -38,19 +38,19 @@ public class PubmedUtils
     {
         MutableRecord record = new SubmissionLookupPublication("");
 
-        Map<String, String> mounthToNum = new HashMap<String, String>();
-        mounthToNum.put("Jan", "01");
-        mounthToNum.put("Feb", "02");
-        mounthToNum.put("Mar", "03");
-        mounthToNum.put("Apr", "04");
-        mounthToNum.put("May", "05");
-        mounthToNum.put("Jun", "06");
-        mounthToNum.put("Jul", "07");
-        mounthToNum.put("Aug", "08");
-        mounthToNum.put("Sep", "09");
-        mounthToNum.put("Oct", "10");
-        mounthToNum.put("Nov", "11");
-        mounthToNum.put("Dec", "12");
+        Map<String, String> monthToNum = new HashMap<String, String>();
+        monthToNum.put("Jan", "01");
+        monthToNum.put("Feb", "02");
+        monthToNum.put("Mar", "03");
+        monthToNum.put("Apr", "04");
+        monthToNum.put("May", "05");
+        monthToNum.put("Jun", "06");
+        monthToNum.put("Jul", "07");
+        monthToNum.put("Aug", "08");
+        monthToNum.put("Sep", "09");
+        monthToNum.put("Oct", "10");
+        monthToNum.put("Nov", "11");
+        monthToNum.put("Dec", "12");
 
         Element medline = XMLUtils.getSingleElement(pubArticle,
                 "MedlineCitation");
@@ -87,20 +87,20 @@ public class PubmedUtils
 
         String status = XMLUtils.getElementValue(pubmed, "PublicationStatus");
         if (status != null)
-            record.addValue("status", new StringValue(status));
+            record.addValue("publicationStatus", new StringValue(status));
 
         String pubblicationModel = XMLUtils.getElementAttribute(medline,
                 "Article", "PubModel");
         if (pubblicationModel != null)
-            record.addValue("pubblicationModel", new StringValue(
+            record.addValue("pubModel", new StringValue(
                     pubblicationModel));
 
         String title = XMLUtils.getElementValue(article, "ArticleTitle");
         if (title != null)
-            record.addValue("title", new StringValue(title));
+            record.addValue("articleTitle", new StringValue(title));
 
         Element abstractElement = XMLUtils
-                .getSingleElement(medline, "Abstract");
+                .getSingleElement(article, "Abstract");
         if (abstractElement == null)
         {
             abstractElement = XMLUtils.getSingleElement(medline,
@@ -111,7 +111,7 @@ public class PubmedUtils
             String summary = XMLUtils.getElementValue(abstractElement,
                     "AbstractText");
             if (summary != null)
-                record.addValue("summary", new StringValue(summary));
+                record.addValue("abstractText", new StringValue(summary));
         }
 
         List<String[]> authors = new LinkedList<String[]>();
@@ -141,7 +141,7 @@ public class PubmedUtils
             {
                 values.add(new StringValue(sArray[1] + ", " + sArray[0]));
             }
-            record.addField("authors", values);
+            record.addField("author", values);
         }
 
         Element journal = XMLUtils.getSingleElement(article, "Journal");
@@ -156,13 +156,13 @@ public class PubmedUtils
                     {
                         String issn = jnumber.getTextContent().trim();
                         if (issn != null)
-                            record.addValue("issn", new StringValue(issn));
+                            record.addValue("printISSN", new StringValue(issn));
                     }
                     else
                     {
                         String eissn = jnumber.getTextContent().trim();
                         if (eissn != null)
-                            record.addValue("eissn", new StringValue(eissn));
+                            record.addValue("electronicISSN", new StringValue(eissn));
                     }
                 }
             }
@@ -178,37 +178,40 @@ public class PubmedUtils
                 String volume = XMLUtils.getElementValue(journalIssueElement,
                         "Volume");
                 if (volume != null)
-                    record.addValue("volume", new StringValue(volume));
+                    record.addValue("journalVolume", new StringValue(volume));
 
                 String issue = XMLUtils.getElementValue(journalIssueElement,
                         "Issue");
                 if (issue != null)
-                    record.addValue("issue", new StringValue(issue));
+                    record.addValue("journalIssue", new StringValue(issue));
 
-                Element pubDataElement = XMLUtils.getSingleElement(
+                Element pubDateElement = XMLUtils.getSingleElement(
                         journalIssueElement, "PubDate");
 
-                String year = null;
-                if (pubDataElement != null)
+                String pubDate = null;
+                if (pubDateElement != null)
                 {
-                    year = XMLUtils.getElementValue(pubDataElement, "Year");
+                	pubDate = XMLUtils.getElementValue(pubDateElement, "Year");
 
-                    String mounth = XMLUtils.getElementValue(pubDataElement,
+                    String mounth = XMLUtils.getElementValue(pubDateElement,
                             "Month");
                     String day = XMLUtils
-                            .getElementValue(pubDataElement, "Day");
+                            .getElementValue(pubDateElement, "Day");
                     if (StringUtils.isNotBlank(mounth)
-                            && mounthToNum.containsKey(mounth))
+                            && monthToNum.containsKey(mounth))
                     {
-                        year += "-" + mounthToNum.get(mounth);
+                    	pubDate += "-" + monthToNum.get(mounth);
                         if (StringUtils.isNotBlank(day))
                         {
-                            year += "-" + (day.length() == 1 ? "0" + day : day);
+                        	pubDate += "-" + (day.length() == 1 ? "0" + day : day);
                         }
                     }
                 }
-                if (year != null)
-                    record.addValue("year", new StringValue(year));
+                if (pubDate == null){
+                	pubDate = XMLUtils.getElementValue(pubDateElement, "MedlineDate");
+                }
+                if (pubDate != null)
+                    record.addValue("pubDate", new StringValue(pubDate));
             }
 
             String language = XMLUtils.getElementValue(article, "Language");
@@ -234,7 +237,7 @@ public class PubmedUtils
                 {
                     values.add(new StringValue(s));
                 }
-                record.addField("type", values);
+                record.addField("publicationType", values);
             }
 
             List<String> primaryKeywords = new LinkedList<String>();
@@ -264,7 +267,7 @@ public class PubmedUtils
                 {
                     values.add(new StringValue(s));
                 }
-                record.addField("primaryKeywords", values);
+                record.addField("primaryKeyword", values);
             }
             if (secondaryKeywords.size() > 0)
             {
@@ -273,7 +276,7 @@ public class PubmedUtils
                 {
                     values.add(new StringValue(s));
                 }
-                record.addField("secondaryKeywords", values);
+                record.addField("secondaryKeyword", values);
             }
 
             List<String> primaryMeshHeadings = new LinkedList<String>();
@@ -306,7 +309,7 @@ public class PubmedUtils
                 {
                     values.add(new StringValue(s));
                 }
-                record.addField("primaryMeshHeadings", values);
+                record.addField("primaryMeshHeading", values);
             }
             if (secondaryMeshHeadings.size() > 0)
             {
@@ -315,7 +318,7 @@ public class PubmedUtils
                 {
                     values.add(new StringValue(s));
                 }
-                record.addField("secondaryMeshHeadings", values);
+                record.addField("secondaryMeshHeading", values);
             }
 
             Element paginationElement = XMLUtils.getSingleElement(article,

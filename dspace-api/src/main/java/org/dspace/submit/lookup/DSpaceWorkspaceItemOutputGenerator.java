@@ -332,9 +332,9 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
             {
                 if (dcinput.getSchema().equals(schema)
                         && dcinput.getElement().equals(element)
-                        && (dcinput.getQualifier() != null && dcinput
+                        && ((dcinput.getQualifier() != null && dcinput
                                 .getQualifier().equals(qualifier))
-                        || (dcinput.getQualifier() == null && qualifier == null))
+                        || (dcinput.getQualifier() == null && qualifier == null)))
                 {
                     return dcinput;
                 }
