@@ -101,7 +101,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             properties.load(new FileInputStream(journalPropFile));
             String journalTypes = properties.getProperty("journal.order");
             for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim().toLowerCase();
+                String journalType = journalTypes.split(",")[i].trim();
                 String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
                 String metadataDir = properties.getProperty("journal." + journalType + ".metadataDir");
                 String integrated = properties.getProperty("journal." + journalType + ".integrated");

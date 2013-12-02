@@ -131,10 +131,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
-        if(selectedJournalId!=null)
-        {
-            selectedJournalId = selectedJournalId.toLowerCase();
-        }
         String manuscriptNumber = request.getParameter("manu");
 	log.debug("initializing submission UI for journal " + selectedJournalId + ", manu " + manuscriptNumber);
         PublicationBean pBean = null;
@@ -374,10 +370,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
                 else if(request.getParameter("journalIDStatusInReview")!=null&&!request.getParameter("journalIDStatusInReview").equals("")){
                     selectedJournalId = request.getParameter("journalIDStatusInReview");
-                    if(selectedJournalId!=null)
-                    {
-                        selectedJournalId = selectedJournalId.toLowerCase();
-                    }
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
