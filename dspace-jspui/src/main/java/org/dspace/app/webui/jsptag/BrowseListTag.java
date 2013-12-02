@@ -570,16 +570,16 @@ public class BrowseListTag extends TagSupport
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
-                    else {
-                    	//In case title has no value, replace it with "undefined" so as the user has something to
-                    	//click in order to access the item page
+                    //In case title has no value, replace it with "undefined" so as the user has something to
+                	//click in order to access the item page
+                    else if (field.equals(titleField)){
                     	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
-                    	if (field.equals(titleField) && items[i].isWithdrawn())
+                    	if (items[i].isWithdrawn())
                         {
                             metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
                         }
                         // format the title field correctly (as long as the item isn't withdrawn, link to it)
-                        else if (field.equals(titleField))
+                        else
                         {
                             metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
                             + items[i].getHandle() + "\">"
