@@ -61,3 +61,6 @@ input.ds-authority-lock.is-locked
   { background-image: url(../../../image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(../../../image/unlock24.png); }
+
+/* field required in submission */
+.label-required:after { content:" *"; }
