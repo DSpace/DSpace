@@ -443,7 +443,7 @@
 
 	<!-- CiNii -->
 	<bean id="ciniiOnlineDataLoader" class="org.dspace.submit.lookup.CiNiiOnlineDataLoader">
-            <property name="searchProvider" value="true" />
+            <property name="searchProvider" value="false" />
             <property name="fieldMap" ref="ciniiInputMap" />
 	</bean>
 
