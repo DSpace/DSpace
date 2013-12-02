@@ -29,7 +29,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,23 +47,24 @@ public class CiNiiService
         this.timeout = timeout;
     }
 
-    public Record getByCiNiiID(String id) throws HttpException,
+    public Record getByCiNiiID(String id, String appId) throws HttpException,
             IOException
     {
-            return search(id);
+            return search(id, appId);
     }
 
-    public List<Record> searchByTerm(String title, String author, int year)
+    public List<Record> searchByTerm(String title, String author, int year, 
+            int maxResults, String appId)
             throws HttpException, IOException
     {
         List<Record> records = new ArrayList<Record>();
 
-        List<String> ids = getCiNiiIDs(title, author, year);
+        List<String> ids = getCiNiiIDs(title, author, year, maxResults, appId);
         if (ids != null && ids.size() > 0)
         {
             for (String id : ids)
             {
-                Record record = search(id);
+                Record record = search(id, appId);
                 if (record != null)
                 {
                     records.add(record);
@@ -79,100 +79,53 @@ public class CiNiiService
      * Get metadata by searching CiNii RDF API with CiNii NAID
      *
      */
-    private Record search(String id) throws IOException, HttpException
+    private Record search(String id, String appId)
+        throws IOException, HttpException
     {
-        String appid = ConfigurationManager.getProperty(SubmissionLookupService.CFG_MODULE, "cinii.appid");
-        // Need CiNii Application ID to use the CiNii API
-        if (appid == null)
+        GetMethod method = null;
+        try
         {
-            log.warn("cinii.appid is not set!");
-            return null;
-        }
+            HttpClient client = new HttpClient();
+            client.setTimeout(timeout);
+            method = new GetMethod("http://ci.nii.ac.jp/naid/"+id+".rdf?appid="+appId);
+            // Execute the method.
+            int statusCode = client.executeMethod(method);
 
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
-        {
-            GetMethod method = null;
+            if (statusCode != HttpStatus.SC_OK)
+            {
+                if (statusCode == HttpStatus.SC_BAD_REQUEST)
+                    throw new RuntimeException("CiNii RDF is not valid");
+                else
+                    throw new RuntimeException("CiNii RDF Http call failed: "
+                            + method.getStatusLine());
+            }
+
             try
             {
-                HttpClient client = new HttpClient();
-                client.setTimeout(timeout);
-                method = new GetMethod("http://ci.nii.ac.jp/naid/"+id+".rdf?appid="+appid);
-                // Execute the method.
-                int statusCode = client.executeMethod(method);
+                DocumentBuilderFactory factory = DocumentBuilderFactory
+                        .newInstance();
+                factory.setValidating(false);
+                factory.setIgnoringComments(true);
+                factory.setIgnoringElementContentWhitespace(true);
 
-                if (statusCode != HttpStatus.SC_OK)
-                {
-                    if (statusCode == HttpStatus.SC_BAD_REQUEST)
-                        throw new RuntimeException("CiNii RDF is not valid");
-                    else
-                        throw new RuntimeException("CiNii RDF Http call failed: "
-                                + method.getStatusLine());
-                }
+                DocumentBuilder db = factory.newDocumentBuilder();
+                Document inDoc = db.parse(method.getResponseBodyAsStream());
 
-                try
-                {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory
-                            .newInstance();
-                    factory.setValidating(false);
-                    factory.setIgnoringComments(true);
-                    factory.setIgnoringElementContentWhitespace(true);
+                Element xmlRoot = inDoc.getDocumentElement();
 
-                    DocumentBuilder db = factory.newDocumentBuilder();
-                    Document inDoc = db.parse(method.getResponseBodyAsStream());
-
-                    Element xmlRoot = inDoc.getDocumentElement();
-
-                    return CiNiiUtils.convertCiNiiDomToRecord(xmlRoot);
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(
-                            "CiNii RDF identifier is not valid or not exist");
-                }
+                return CiNiiUtils.convertCiNiiDomToRecord(xmlRoot);
             }
-            finally
+            catch (Exception e)
             {
-                if (method != null)
-                {
-                    method.releaseConnection();
-                }
+                throw new RuntimeException(
+                        "CiNii RDF identifier is not valid or not exist");
             }
         }
-        else
+        finally
         {
-            InputStream stream = null;
-            try
+            if (method != null)
             {
-                File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
-                                + "/config/crosswalks/demo/cinii.xml");
-                stream = new FileInputStream(file);
-                try
-                {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory
-                            .newInstance();
-                    factory.setValidating(false);
-                    factory.setIgnoringComments(true);
-                    factory.setIgnoringElementContentWhitespace(true);
-                    DocumentBuilder db = factory.newDocumentBuilder();
-                    Document inDoc = db.parse(stream);
-
-                    Element xmlRoot = inDoc.getDocumentElement();
-
-                    return CiNiiUtils.convertCiNiiDomToRecord(xmlRoot);
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(
-                            "CiNii RDF identifier is not valid or not exist");
-                }
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.close();
-                }
+                method.releaseConnection();
             }
         }
     }
@@ -181,17 +134,10 @@ public class CiNiiService
      * Get CiNii NAIDs by searching CiNii OpenURL API with title, author and year
      *
      */
-    private  List<String> getCiNiiIDs(String title, String author, int year) 
+    private  List<String> getCiNiiIDs(String title, String author, int year, 
+        int maxResults, String appId) 
         throws IOException, HttpException
     {
-        String appid = ConfigurationManager.getProperty(SubmissionLookupService.CFG_MODULE, "cinii.appid");
-        // Need CiNii Application ID to use the CiNii API
-        if (appid == null)
-        {
-            log.warn("cinii.appid is not set!");
-            return null;
-        }
-
         // Need at least one query term
         if (title == null && author == null && year == -1)
         {
@@ -205,7 +151,8 @@ public class CiNiiService
             HttpClient client = new HttpClient();
             client.setTimeout(timeout);
             StringBuilder query = new StringBuilder();
-            query.append("format=rss&appid=").append(appid);
+            query.append("format=rss&appid=").append(appId)
+                 .append("&count=").append(maxResults);
             if (title != null)
             {
                 query.append("&title=").append(URLEncoder.encode(title, "UTF-8"));

@@ -29,6 +29,12 @@ public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     private boolean searchProvider = true;
 
+    /** Application id to use CiNii */
+    private String appId = null;
+
+    /** max result number to return */
+    private int maxResults = 10;
+
     public void setCiNiiService(CiNiiService ciniiService)
     {
         this.ciniiService = ciniiService;
@@ -55,6 +61,11 @@ public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     public List<Record> getByIdentifier(Context context,
             Map<String, Set<String>> keys) throws HttpException, IOException
     {
+        if (appId == null)
+        {
+            throw new RuntimeException("No CiNii Application ID is specified!");
+        }
+
         List<Record> results = new ArrayList<Record>();
         if (keys != null)
         {
@@ -63,7 +74,7 @@ public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             {
                 for (String ciniiid : ciniiids)
                 {
-                    Record record = ciniiService.getByCiNiiID(ciniiid);
+                    Record record = ciniiService.getByCiNiiID(ciniiid, getAppId());
                     if (record != null)
                     {
                         results.add(convertFields(record));
@@ -78,6 +89,32 @@ public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     public List<Record> search(Context context, String title, String author, int year)
         throws HttpException, IOException
     {
-        return ciniiService.searchByTerm(title, author, year);
+        if (appId == null)
+        {
+            throw new RuntimeException("No CiNii Application ID is specified!");
+        }
+
+        return ciniiService.searchByTerm(title, author, year, 
+            getMaxResults(), getAppId());
+    }
+
+    public String getAppId()
+    {
+        return appId;
+    }
+
+    public void setAppId(String appId)
+    {
+        this.appId = appId;
+    }
+
+    public int getMaxResults()
+    {
+        return maxResults;
+    }
+
+    public void setMaxResults(int maxResults)
+    {
+        this.maxResults = maxResults;
     }
 }

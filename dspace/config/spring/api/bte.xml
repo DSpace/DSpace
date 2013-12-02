@@ -444,6 +444,16 @@
 	<!-- CiNii -->
 	<bean id="ciniiOnlineDataLoader" class="org.dspace.submit.lookup.CiNiiOnlineDataLoader">
             <property name="searchProvider" value="false" />
+            <!-- For CiNii service you need to obtain an Application ID from NII. 
+                 Once you get it, add it to the following configuration value.
+                 For details, see http://ci.nii.ac.jp/info/en/api/developer.html
+             -->
+            <property name="appId" value="" />
+            <!-- Uncomment the following line if you want to define the max results 
+                 returned by the CiNii free text (by author, title, date) search. 
+                 Default value is 10 
+             -->
+            <!-- <property name="maxResults" value="10" /> -->
             <property name="fieldMap" ref="ciniiInputMap" />
 	</bean>
 
