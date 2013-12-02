@@ -71,6 +71,8 @@ function initdatasetsubmissionfile() {
         }
     });
 
+    // Hide the other repo name initially
+    jQuery("input[name='other_repo_name']").hide();
 
     //For our identifier a hint needs to be created
     var dataFileIdenTxt = jQuery('input#aspect_submission_StepTransformer_field_datafile_identifier');

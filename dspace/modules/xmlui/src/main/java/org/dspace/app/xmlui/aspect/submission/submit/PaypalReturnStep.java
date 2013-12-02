@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Provides Return Step from Paypal to present result from processed Paypal transaction
@@ -82,14 +83,20 @@ public class PaypalReturnStep extends AbstractStep {
                                  if(message.equals("Verified")){
                                      //authorization
                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
+                                     Date now = new Date();
+                                     shoppingCart.setOrderDate(now);
                                  }
 				 else if ("4".equals(result)) {
 				     //authorization, but paypal isn't supporting our zero-dollar transaction
                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
+                                     Date now = new Date();
+                                     shoppingCart.setOrderDate(now);
 				 }
 				 else
                                  {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                                     Date now = new Date();
+                                     shoppingCart.setPaymentDate(now);
                                  }
                                 //submitUrl = FlowUtils.processPaypalCheckout(context, request,response,item);
 				 body.addDivision("successful").addPara(T_PayPalVerified);
@@ -123,7 +130,7 @@ public class PaypalReturnStep extends AbstractStep {
                     //TODO: handle the exceptions
                    // System.out.println("errors in generate the payment form");
                     log.error("Exception when entering the checkout step:", e);
-                    addErrorLink(body,"errors in generate the payment form");
+                    addErrorLink(body,"errors in generate the payment form:"+e.getMessage());
                 }
             }
             else

@@ -70,6 +70,7 @@ public class SimpleSearch extends AbstractSearch implements
 	private static final Message T_FILTER_HELP = message("xmlui.Discovery.SimpleSearch.filter_help");
 	private static final Message T_FILTER_HEAD = message("xmlui.Discovery.SimpleSearch.filter_head");
 	private static final Message T_FILTERS_SELECTED = message("xmlui.ArtifactBrowser.SimpleSearch.filter.selected");
+        private static final Message T_FILTER_TEXT_LABEL = message("xmlui.Discovery.SimpleSearch.filter_text");
 
 	/**
 	 * Add Page metadata.
@@ -221,7 +222,9 @@ public class SimpleSearch extends AbstractSearch implements
 			}
 
 			// Add a box so we can search for our value
-			filterComp.addText("filter");
+                        // This needs to set the label
+			Text filterField = filterComp.addText("filter", "label-at-left-nobr");
+                        filterField.setLabel(T_FILTER_TEXT_LABEL);
 
 			// And last add an add button
 			filterComp.enableAddOperation();

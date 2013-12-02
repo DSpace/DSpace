@@ -14,6 +14,7 @@
         </map:readers>
         <map:actions>
             <map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction"/>
+            <map:action name="LastModifiedDate" src="org.dspace.app.xmlui.aspect.general.LastModifiedDate"/>
         </map:actions>
         <map:selectors>
             <map:selector name="IfModifiedSinceSelector" src="org.dspace.app.xmlui.aspect.general.IfModifiedSinceSelector"/>
@@ -84,6 +85,7 @@
             			      </map:when>
             			    </map:select>
 
+            <map:act type="LastModifiedDate"/>
 
 			<map:parameter name="expires" value="now"/>
 
