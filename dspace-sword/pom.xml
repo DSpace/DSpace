@@ -15,7 +15,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>4.0-rc2</version>
+      <version>4.0-rc3-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
