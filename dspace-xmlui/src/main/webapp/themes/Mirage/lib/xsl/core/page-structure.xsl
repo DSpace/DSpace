@@ -263,7 +263,7 @@
 
                                 FnArray.prototype.execute = function()
                                 {
-                                    for( var i=0; i <xsl:text disable-output-escaping="yes">&lt;</xsl:text> this.funcs.length; i++ )
+                                    for( var i=0; i &lt; this.funcs.length; i++ )
                                     {
                                         this.funcs[i]();
                                     }
