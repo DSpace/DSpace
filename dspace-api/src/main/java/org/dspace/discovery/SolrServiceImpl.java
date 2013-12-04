@@ -142,7 +142,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-            if (urlValidator.isValid(solrService))
+            if (urlValidator.isValid(solrService)||ConfigurationManager.getBooleanProperty("discovery","solr.url.validation.enabled",true))
             {
                 try {
                     log.debug("Solr URL: " + solrService);
