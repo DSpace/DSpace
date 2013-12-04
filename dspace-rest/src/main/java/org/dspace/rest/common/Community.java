@@ -58,6 +58,7 @@ public class Community extends DSpaceObject{
 
         this.setCopyrightText(community.getMetadata(org.dspace.content.Community.COPYRIGHT_TEXT));
         this.setIntroductoryText(community.getMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT));
+        this.setShortDescription(community.getMetadata(org.dspace.content.Community.SHORT_DESCRIPTION));
         this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
         this.setCountItems(community.countItems());
 
