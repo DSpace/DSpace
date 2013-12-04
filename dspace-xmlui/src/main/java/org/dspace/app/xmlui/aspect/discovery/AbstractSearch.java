@@ -401,7 +401,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         //}// Empty query
     }
 
-    protected String addFilterQueriesToUrl(String pageURLMask) {
+    protected String addFilterQueriesToUrl(String pageURLMask) throws UIException {
         Map<String, String[]> filterQueryParams = getParameterFilterQueries();
         if(filterQueryParams != null)
         {
@@ -413,7 +413,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 {
                     for (String filterQueryValue : filterQueryValues)
                     {
-                        maskBuilder.append("&").append(filterQueryParam).append("=").append(filterQueryValue);
+                        maskBuilder.append("&").append(filterQueryParam).append("=").append(encodeForURL(filterQueryValue));
                     }
                 }
             }
