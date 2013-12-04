@@ -385,8 +385,9 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(Item i) throws Exception
     {
-        // If the item is not in the archive, the call to get its handle below will fail
-        if (i.isWithdrawn() || !i.isArchived() || i.getOwningCollection() == null) {
+        // If the item does not have an "owningCollection" the the below "getHandle()" call will fail
+        // This should not happen but is here for safety.
+        if (i.getOwningCollection() == null) {
             return;
         }
 

@@ -137,6 +137,9 @@ public class MetadataExport
         }
         catch (Exception e)
         {
+            // Something went wrong...
+            System.err.println("Error exporting to CSV:");
+            e.printStackTrace();
             return null;
         }
     }
