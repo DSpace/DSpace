@@ -535,6 +535,23 @@ public class ItemListTag extends TagSupport
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
+                    //In case title has no value, replace it with "undefined" so as the user has something to
+                	//click in order to access the item page
+                    else if (field.equals(titleField)){
+                    	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
+                    	if (items[i].isWithdrawn())
+                        {
+                            metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
+                        }
+                        // format the title field correctly (as long as the item isn't withdrawn, link to it)
+                        else
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
+                            + "<span style=\"font-style:italic\">("+undefined+")</span>"
+                            + "</a>";
+                        }
+                    }
 
                     // prepare extra special layout requirements for dates
                     String extras = "";
