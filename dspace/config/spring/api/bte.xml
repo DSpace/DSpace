@@ -60,6 +60,35 @@
 		name="org.dspace.submit.lookup.SubmissionLookupService">
 		<property name="phase1TransformationEngine" ref="phase1TransformationEngine" />
 		<property name="phase2TransformationEngine" ref="phase2TransformationEngine" />
+		<!-- Uncomment the following property if you want specific fields to appear in the detail presentation
+			 of a publication. Default values are the ones shown below -->
+		<!-- 
+		<property name="detailFields">
+	        <list>
+	        	<value>title</value>
+                <value>authors</value>
+                <value>editors</value>
+                <value>translators</value>
+                <value>chairs</value>
+                <value>issued</value>
+                <value>abstract</value>
+                <value>doi</value>
+                <value>journal</value>
+                <value>volume</value>
+                <value>issue</value>
+                <value>jissn</value>
+                <value>jeissn</value>
+                <value>pisbn</value>
+                <value>eisbn</value>
+                <value>arxivCategory</value>
+                <value>keywords</value>
+                <value>mesh</value>
+                <value>language</value>
+                <value>subtype</value>
+                <value>translators</value>
+	        </list>
+	    </property>
+	    -->
 	</bean>
 
 	<!-- **************************************************************************************************** -->
@@ -400,6 +429,14 @@
 	<!-- CrossRef Data Loaders -->
 	<bean id="crossRefOnlineDataLoader" class="org.dspace.submit.lookup.CrossRefOnlineDataLoader">
 		<property name="searchProvider" value="false" />
+		<!-- For CrossRef service you need to obtain an API Key from CrossRef. Once you get it, add it 
+			 to the following configuration value 
+		-->
+		<property name="apiKey" value="" />
+		<!-- Uncomment the following line if you want to define the max results returned by the 
+			 CrossRef free text (by author, title, date) search. Default value is 10 
+		-->
+		<!-- <property name="maxResults" value="10" /> -->
 		<property name="fieldMap" ref="crossrefInputMap" />
 	</bean>
 

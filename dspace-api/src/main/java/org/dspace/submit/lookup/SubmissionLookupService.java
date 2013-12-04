@@ -55,6 +55,8 @@ public class SubmissionLookupService
     private TransformationEngine phase1TransformationEngine;
 
     private TransformationEngine phase2TransformationEngine;
+    
+    private List<String> detailFields = null;
 
     public void setPhase2TransformationEngine(
             TransformationEngine phase2TransformationEngine)
@@ -212,4 +214,12 @@ public class SubmissionLookupService
     {
         return this.fileProviders;
     }
+
+	public List<String> getDetailFields() {
+		return detailFields;
+	}
+
+	public void setDetailFields(List<String> detailFields) {
+		this.detailFields = detailFields;
+	}
 }

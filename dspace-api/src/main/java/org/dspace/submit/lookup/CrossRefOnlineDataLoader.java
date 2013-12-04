@@ -35,6 +35,9 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     private boolean searchProvider = true;
 
+    private String apiKey = null;
+    private int maxResults = 10;
+    
     public void setSearchProvider(boolean searchProvider)
     {
         this.searchProvider = searchProvider;
@@ -60,9 +63,14 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             Set<String> dois = keys.get(DOI);
             List<Record> items = null;
             List<Record> results = new ArrayList<Record>();
+            
+            if (getApiKey() == null){
+            	throw new RuntimeException("No CrossRef API key is specified!");
+            }
+            
             try
             {
-                items = crossrefService.search(context, dois);
+                items = crossrefService.search(context, dois, getApiKey());
             }
             catch (JDOMException e)
             {
@@ -89,8 +97,12 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     public List<Record> search(Context context, String title, String author,
             int year) throws HttpException, IOException
     {
+    	if (getApiKey() == null){
+        	throw new RuntimeException("No CrossRef API key is specified!");
+        }
+    	
         List<Record> items = crossrefService.search(context, title, author,
-                year, 10);
+                year, getMaxResults(), getApiKey());
         return items;
     }
 
@@ -99,4 +111,20 @@ public class CrossRefOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     {
         return searchProvider;
     }
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public int getMaxResults() {
+		return maxResults;
+	}
+
+	public void setMaxResults(int maxResults) {
+		this.maxResults = maxResults;
+	}
 }

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class PubmedUtils
 {
 
-    public static Record convertCrossRefDomToRecord(Element pubArticle)
+    public static Record convertPubmedDomToRecord(Element pubArticle)
     {
         MutableRecord record = new SubmissionLookupPublication("");
 
