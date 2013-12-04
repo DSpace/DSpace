@@ -11,11 +11,11 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import javax.servlet.http.HttpServletRequest;
 import org.dspace.handle.HandleManager;
-import org.dspace.rest.common.DSpaceObject;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 
+import java.net.URLDecoder;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -28,16 +28,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Properties;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.rest.common.ItemReturn;
 import org.dspace.rest.search.Search;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import java.util.List;
@@ -165,6 +164,43 @@ public class ItemsResource {
          }
     	
     }
+    
+    @GET
+    @Path("/{prefix}/{suffix}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Item getItem(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,  @QueryParam(EXPAND) String expand,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException {
+    	
+    	
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            if(dso instanceof org.dspace.content.Item){
+            	org.dspace.content.Item item = (org.dspace.content.Item)dso;
+	            if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+	            	if(writeStatistics){
+	    				writeStats(item, user_ip, user_agent, xforwarderfor, headers, request);
+	    			}
+	                return new org.dspace.rest.common.Item(item, expand, context);
+	            } else {
+	                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+	            }
+            } else {
+            	throw new WebApplicationException(Response.Status.NO_CONTENT);
+            }
+
+        } catch (SQLException e)  {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @GET
     @Path("/{item_id}")
@@ -185,7 +221,7 @@ public class ItemsResource {
 
             if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
             	if(writeStatistics){
-    				writeStats(item_id, user_ip, user_agent, xforwarderfor, headers, request);
+    				writeStats(item, user_ip, user_agent, xforwarderfor, headers, request);
     			}
                 return new org.dspace.rest.common.Item(item, expand, context);
             } else {
@@ -293,7 +329,8 @@ public class ItemsResource {
 			HttpServletRequest request) throws IOException, SQLException,
 			WebApplicationException {
 				
-		String query  = request.getQueryString();
+		String query  =  request.getQueryString();
+		
 		
 		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
 		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
@@ -306,31 +343,52 @@ public class ItemsResource {
 		if (queryString == null) {
 			item_context.setQuery(requestURL.toString());
 		} else {
-			item_context.setQuery(requestURL.append('?').append(queryString).toString());
+			item_context.setQuery(requestURL.append('?').append(URLDecoder.decode(queryString,"UTF-8")).toString());
 		}		
 		if(searchClass==null){
 			log.error("'implementing.search.class' not set in rest config");
 			item_context.addError("'implementing.search.class' not set in rest config");
 			return item_return;
 		}		
+
+		Map<String,String[]> requestMap=request.getParameterMap();
+		
+		
 		String[] queryparts = query.split("&");
 		HashMap<String,String> querymap= new HashMap<String,String>();
-		for(String q : queryparts){
-			String [] segments = q.split("=");
-			if(segments.length==2){
-				if(searchMapping.containsKey(segments[0])){
-					querymap.put(searchMapping.get(segments[0]), segments[1]);
-					log.debug("segments " + segments[0] + " " + segments[1]);
-				} else if(!reservedWords.contains(segments[0])){
-					log.error("query parameter " + segments[0] + " not supported");
-					item_context.addError("not recognised query parameter: " + segments[0]);
-					return item_return;
+		Iterator<String> requestKeys=requestMap.keySet().iterator();
+		while(requestKeys.hasNext()){
+			String key = requestKeys.next();
+			String[] values = requestMap.get(key);
+			log.debug("key, value " + key + " " + values);
+			if(searchMapping.containsKey(key) && values!=null){
+				for(String value : values){
+					querymap.put(searchMapping.get(key), URLDecoder.decode(value,"UTF-8"));
+					log.debug("segments " + key + " " +"not decoded "+ value +" decoded "+ URLDecoder.decode(value,"UTF-8"));
 				}
-			} else {
-				item_context.addError("value to query parameter \"" + q + "\" not correctly set");
+			} else if(!reservedWords.contains(key)){
+				log.error("query parameter " + key + " not supported or value null");
+				item_context.addError("not recognised query parameter: " + key);
 				return item_return;
 			}
 		}
+		
+//		for(String q : queryparts){
+//			String [] segments = q.split("=");
+//			if(segments.length==2){
+//				if(searchMapping.containsKey(segments[0])){
+//					querymap.put(searchMapping.get(segments[0]), URLDecoder.decode(segments[1],"UTF-8"));
+//					log.debug("segments " + segments[0] + " " + URLDecoder.decode(segments[1],"UTF-8"));
+//				} else if(!reservedWords.contains(segments[0])){
+//					log.error("query parameter " + segments[0] + " not supported");
+//					item_context.addError("not recognised query parameter: " + segments[0]);
+//					return item_return;
+//				}
+//			} else {
+//				item_context.addError("value to query parameter \"" + q + "\" not correctly set");
+//				return item_return;
+//			}
+//		}
 		
 		try{
 			Class<?> clazz = Class.forName(searchClass);
@@ -359,35 +417,29 @@ public class ItemsResource {
 	}
 	
 	
-    private void writeStats(Integer item_id, String user_ip, String user_agent,
+    private void writeStats(org.dspace.content.DSpaceObject dso, String user_ip, String user_agent,
 			String xforwarderfor, HttpHeaders headers,
 			HttpServletRequest request) {
 		
-    	try{
-    		 org.dspace.content.DSpaceObject item =  org.dspace.content.DSpaceObject.find(context, Constants.ITEM, item_id);
-    		
-    		if(user_ip==null || user_ip.length()==0){
-    			new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     request,
-	                                     context,
-	                                     item));
-    		} else{
-	    		new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     user_ip,
-	                                     user_agent,
-	                                     xforwarderfor,
-	                                     context,
-	                                     item));
-    		}
-    		log.debug("fired event");
-    		
-		} catch(SQLException ex){
-			log.error("SQL exception can't write usageEvent \n" + ex);
+		if(user_ip==null || user_ip.length()==0){
+			new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     request,
+                                     context,
+                                     dso));
+		} else{
+    		new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     user_ip,
+                                     user_agent,
+                                     xforwarderfor,
+                                     context,
+                                     dso));
 		}
+		log.debug("fired event");
+    		
     		
 	}
 }

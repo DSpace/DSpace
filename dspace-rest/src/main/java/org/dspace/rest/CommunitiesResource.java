@@ -9,14 +9,12 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
+import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -133,6 +131,40 @@ public class CommunitiesResource {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } //finally?
     }
+    
+    @GET
+    @Path("/{prefix}/{suffix}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Community getCommunity(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,   @QueryParam("expand") String expand,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+        try {
+            if(context == null || !context.isValid() ) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            if(dso instanceof org.dspace.content.Community){
+            	org.dspace.content.Community community = (org.dspace.content.Community)dso;
+	            if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
+	            	if(writeStatistics){
+	    				writeStats(community, user_ip, user_agent, xforwarderfor, headers, request);
+	    			}
+	                return new org.dspace.rest.common.Community(community, expand, context);
+	            } else {
+	                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+	            }
+            } else {
+            	throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        } //finally?
+    }
+
 
     @GET
     @Path("/{community_id}")
@@ -150,7 +182,7 @@ public class CommunitiesResource {
             org.dspace.content.Community community = org.dspace.content.Community.find(context, community_id);
             if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
             	if(writeStatistics){
-    				writeStats(community_id, user_ip, user_agent, xforwarderfor, headers, request);
+    				writeStats(community, user_ip, user_agent, xforwarderfor, headers, request);
     			}
                 return new org.dspace.rest.common.Community(community, expand, context);
             } else {
@@ -162,35 +194,27 @@ public class CommunitiesResource {
         } //finally?
     }
     
-    private void writeStats(Integer community_id, String user_ip, String user_agent,
+    private void writeStats(org.dspace.content.DSpaceObject dso, String user_ip, String user_agent,
  			String xforwarderfor, HttpHeaders headers,
  			HttpServletRequest request) {
  		
-     	try{
-     		DSpaceObject community = DSpaceObject.find(context, Constants.COMMUNITY, community_id);
-     		
-     		if(user_ip==null || user_ip.length()==0){
-     			new DSpace().getEventService().fireEvent(
- 	                     new UsageEvent(
- 	                                     UsageEvent.Action.VIEW,
- 	                                     request,
- 	                                     context,
- 	                                    community));
-     		} else{
- 	    		new DSpace().getEventService().fireEvent(
- 	                     new UsageEvent(
- 	                                     UsageEvent.Action.VIEW,
- 	                                     user_ip,
- 	                                     user_agent,
- 	                                     xforwarderfor,
- 	                                     context,
- 	                                    community));
-     		}
-     		log.debug("fired event");
-     		
- 		} catch(SQLException ex){
- 			log.error("SQL exception can't write usageEvent \n" + ex);
+ 		if(user_ip==null || user_ip.length()==0){
+ 			new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     request,
+                                     context,
+                                     dso));
+ 		} else{
+    		new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     user_ip,
+                                     user_agent,
+                                     xforwarderfor,
+                                     context,
+                                     dso));
  		}
-     		
+ 		log.debug("fired event");
  	}
 }

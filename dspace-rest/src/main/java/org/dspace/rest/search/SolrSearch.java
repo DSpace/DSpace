@@ -20,7 +20,6 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SolrServiceImpl;
-import org.dspace.rest.common.Item;
 
 import org.apache.log4j.Logger;
 
