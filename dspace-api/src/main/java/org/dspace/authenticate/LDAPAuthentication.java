@@ -252,13 +252,18 @@ public class LDAPAuthentication
 
                 // If there is no email and the email domain is set, add it to the netid
                 String email = ldap.ldapEmail;
-                if (((email == null) || ("".equals(email))) &&
-                    (!"".equals(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
+
+                if ((StringUtils.isEmpty(email)) &&
+                        (StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
                 {
                     email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
                 }
+                else
+                {
+                    email = netid;
+                }
 
-                if ((email != null) && (!"".equals(email)))
+                if (StringUtils.isNotEmpty(email))
                 {
                     try
                     {
@@ -288,19 +293,19 @@ public class LDAPAuthentication
                                 {
                                     context.setIgnoreAuthorization(true);
                                     eperson = EPerson.create(context);
-                                    if ((email != null) && (!"".equals(email)))
+                                    if (StringUtils.isNotEmpty(email))
                                     {
                                         eperson.setEmail(email);
                                     }
-                                    if ((ldap.ldapGivenName!=null) && (!ldap.ldapGivenName.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapGivenName))
                                     {
                                         eperson.setFirstName(ldap.ldapGivenName);
                                     }
-                                    if ((ldap.ldapSurname!=null) && (!ldap.ldapSurname.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapSurname))
                                     {
                                         eperson.setLastName(ldap.ldapSurname);
                                     }
-                                    if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapPhone))                                    
                                     {
                                         eperson.setMetadata("phone", ldap.ldapPhone);
                                     }
