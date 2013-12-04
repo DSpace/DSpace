@@ -249,15 +249,21 @@ public class LDAPAuthentication
                 // Register the new user automatically
                 log.info(LogManager.getHeader(context,
                                 "autoregister", "netid=" + netid));
-
-                // If there is no email and the email domain is set, add it to the netid
+                
                 String email = ldap.ldapEmail;
-                if (((email == null) || ("".equals(email))) &&
-                    (!"".equals(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
-                {
-                    email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
+                if (StringUtils.isEmpty(email))
+                { 
+                    // If there is no email and the email domain is set, add it to the netid
+                    if ((StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
+                    {
+                        email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"); 
+                    }
+                    else
+                    {
+                       email = netid;
+                    }
                 }
-
+                
                 if ((email != null) && (!"".equals(email)))
                 {
                     try
