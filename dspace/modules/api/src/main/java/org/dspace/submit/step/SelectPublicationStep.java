@@ -101,7 +101,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             properties.load(new FileInputStream(journalPropFile));
             String journalTypes = properties.getProperty("journal.order");
             for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim().toLowerCase();
+                String journalType = journalTypes.split(",")[i].trim();
                 String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
                 String metadataDir = properties.getProperty("journal." + journalType + ".metadataDir");
                 String integrated = properties.getProperty("journal." + journalType + ".integrated");
@@ -111,6 +111,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
 
+		//once we have read the properties from the file, make the journal's name case-insensitive
+		journalType = journalType.toLowerCase();
+		
                 journalVals.add(journalType);
                 journalNames.add(journalDisplay);
                 journalDirs.add(metadataDir);
