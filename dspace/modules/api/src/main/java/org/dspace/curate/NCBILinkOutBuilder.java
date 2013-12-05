@@ -31,7 +31,6 @@ public class NCBILinkOutBuilder extends AbstractCurationTask{
     List<String>linkOutDBAbbrevList = null;
     
 //    static Logger logger = Logger.getLogger(NCBILinkOutBuilder.class.getName());
-    private Context dspaceContext;
     private static Logger LOGGER = LoggerFactory.getLogger(NCBILinkOutBuilder.class);
 
     static final String NCBIEntrezPrefix = "";
@@ -45,14 +44,6 @@ public class NCBILinkOutBuilder extends AbstractCurationTask{
     public void init(Curator curator, String taskID) throws IOException{
         super.init(curator, taskID);
         
-        try {
-            dspaceContext = new Context();
-        } catch (SQLException e1) {
-            LOGGER.error("Unable to create Dspace context");
-            LOGGER.error("Exception was " + e1);
-            return;
-        }
-
         // init article to data package mapping
         articleDataMap = new HashMap<String,Set<String>>();
         
