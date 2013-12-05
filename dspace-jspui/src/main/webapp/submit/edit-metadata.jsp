@@ -255,7 +255,7 @@
     }
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
       boolean readonly, int fieldCountIncr, String label, PageContext pageContext, int collectionID)
       throws java.io.IOException
     {
@@ -275,7 +275,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">").append(label).append("</label>");
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
 	  sb.append("<div class=\"col-md-10\">");     
       for (int i = 0; i < fieldCount; i++)
       {
@@ -369,7 +369,7 @@
     }
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
       boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request)
       throws java.io.IOException
     {
@@ -382,7 +382,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label><div class=\"col-md-10\">");
       
@@ -484,7 +484,7 @@
 
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      boolean readonly, int fieldCountIncr, String label, PageContext pageContext)
+      boolean required, boolean readonly, int fieldCountIncr, String label, PageContext pageContext)
       throws java.io.IOException
     {
 
@@ -497,7 +497,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       	.append(label)
       	.append("</label><div class=\"col-md-10\">");
       
@@ -566,7 +566,7 @@
     }
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
@@ -580,7 +580,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       	.append(label)
       	.append("</label><div class=\"col-md-10\">");
       
@@ -654,7 +654,7 @@
     }
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, int collectionID)
       throws java.io.IOException
     {
@@ -668,7 +668,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label>");
       sb.append("<div class=\"col-md-10\">");  
@@ -744,7 +744,7 @@
     }
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary)
       throws java.io.IOException
     {
@@ -758,7 +758,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label>");
       sb.append("<div class=\"col-md-10\">");
@@ -880,7 +880,7 @@
     
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable,
+      String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable, boolean required,
       boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext)
       throws java.io.IOException
     {
@@ -907,7 +907,7 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       	.append(label)
       	.append("</label>");
       sb.append("<div class=\"col-md-10\">");
@@ -995,7 +995,7 @@
 
     void doDropDown(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      boolean readonly, List valueList, String label)
+      boolean required, boolean readonly, List valueList, String label)
       throws java.io.IOException
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -1004,7 +1004,7 @@
       String display, value;
       int j;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label>");
 
@@ -1043,14 +1043,14 @@
     }
     
     void doChoiceSelect(javax.servlet.jsp.JspWriter out, PageContext pageContext, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
       boolean readonly, List valueList, String label, int collectionID)
       throws java.io.IOException
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       .append(label)
       .append("</label>");
 
@@ -1068,7 +1068,7 @@
     /** Display Checkboxes or Radio buttons, depending on if repeatable! **/
     void doList(javax.servlet.jsp.JspWriter out, Item item,
             String fieldName, String schema, String element, String qualifier, boolean repeatable,
-            boolean readonly, List valueList, String label)
+            boolean required,boolean readonly, List valueList, String label)
             throws java.io.IOException
           {
                 DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -1084,7 +1084,7 @@
                 numColumns = 2;
 
             //print out the field label
-			sb.append("<div class=\"row\"><label class=\"col-md-2\">")
+			sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         	  .append(label)
         	  .append("</label>");
      		
@@ -1279,9 +1279,10 @@
        int fieldCountIncr;
        boolean repeatable;
        String vocabulary;
-
+	   boolean required;
+	   
        vocabulary = inputs[z].getVocabulary();
-       
+       required = inputs[z].isRequired();
        
        if (dcQualifier != null && !dcQualifier.equals("*"))
           fieldName = dcSchema + "_" + dcElement + '_' + dcQualifier;
@@ -1343,54 +1344,54 @@
        if (inputType.equals("name"))
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                          repeatable, readonly, fieldCountIncr, label, pageContext, collectionID);
+                                          repeatable, required, readonly, fieldCountIncr, label, pageContext, collectionID);
        }
        else if (isSelectable(fieldName))
        {
            doChoiceSelect(out, pageContext, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                   repeatable, readonly, inputs[z].getPairs(), label, collectionID);
+                                   repeatable, required, readonly, inputs[z].getPairs(), label, collectionID);
        }
        else if (inputType.equals("date"))
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                          repeatable, readonly, fieldCountIncr, label, pageContext, request);
+                          repeatable, required, readonly, fieldCountIncr, label, pageContext, request);
        }
        else if (inputType.equals("series"))
        {
            doSeriesNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                              repeatable, readonly, fieldCountIncr, label, pageContext);
+                              repeatable, required, readonly, fieldCountIncr, label, pageContext);
        }
        else if (inputType.equals("qualdrop_value"))
        {
-           doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable,
+           doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable, required,
                                    readonly, fieldCountIncr, inputs[z].getPairs(), label, pageContext);
        }
        else if (inputType.equals("textarea"))
        {
                    doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                  repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
+                                  repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
                                   closedVocabulary, collectionID);
        }
        else if (inputType.equals("dropdown"))
        {
                         doDropDown(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                   repeatable, readonly, inputs[z].getPairs(), label);
+                                   repeatable, required, readonly, inputs[z].getPairs(), label);
        }
        else if (inputType.equals("twobox"))
        {
                         doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
-                                 closedVocabulary);
+                                 repeatable, required, readonly, fieldCountIncr, label, pageContext, 
+                                 vocabulary, closedVocabulary);
        }
        else if (inputType.equals("list"))
        {
           doList(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                        repeatable, readonly, inputs[z].getPairs(), label);
+                        repeatable, required, readonly, inputs[z].getPairs(), label);
        }
        else
        {
                         doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
+                                 repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
                                  closedVocabulary, collectionID);
        }
        

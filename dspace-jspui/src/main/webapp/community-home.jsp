@@ -141,12 +141,16 @@
     }
 %>
 			</h3>
-			<!-- Wrapper for slides -->
-		  <div class="carousel-inner">
+		
 	<%
 		Item[] items = rs.getRecentSubmissions();
 		boolean first = true;
-		for (int i = 0; i < items.length; i++)
+		if(items!=null && items.length>0) 
+		{ 
+	%>	
+		<!-- Wrapper for slides -->
+		  <div class="carousel-inner">
+	<%	for (int i = 0; i < items.length; i++)
 		{
 			DCValue[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
 			String displayTitle = "Untitled";
@@ -169,8 +173,8 @@
 				first = false;
 		     }
 		%>
-		  </div>
-
+		</div>
+		
 		  <!-- Controls -->
 		  <a class="left carousel-control" href="#recent-submissions-carousel" data-slide="prev">
 		    <span class="icon-prev"></span>
@@ -185,6 +189,11 @@
 		    <li data-target="#recent-submissions-carousel" data-slide-to="<%= i %>"></li>
 		    <% } %>
 	      </ol>
+		
+		<%
+		}
+		%>
+		  
      </div></div></div>
 <%
 	}
