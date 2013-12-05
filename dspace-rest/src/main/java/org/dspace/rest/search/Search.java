@@ -15,6 +15,6 @@ import org.dspace.core.Context;
 
 public interface Search {
 	
-	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset);
+	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset, String sortfield, String sortorder);
 
 }

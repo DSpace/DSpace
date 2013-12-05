@@ -52,16 +52,18 @@ import java.util.List;
 public class ItemsResource {
 	
 	private static final String OFFSET = "offset";
-
 	private static final String LIMIT = "limit";
-
 	private static final String EXPAND = "expand";
+	private static final String ORDER_ASC = "order_asc";
+	private static final String ORDER_DESC = "order_desc";
 
 	private static final String SEARCH_PREFIX="item.search.";
+	private static final String SORT_PREFIX="item.sort.";
 	
 	private static final boolean writeStatistics;
 	private static final int maxPagination;
 	private static final HashMap<String,String> searchMapping;
+	private static final HashMap<String,String> sortMapping;
 	private static final ArrayList<String> reservedWords;
 	private static final String searchClass;
 	
@@ -69,6 +71,7 @@ public class ItemsResource {
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
 		maxPagination=ConfigurationManager.getIntProperty("rest", "max_pagination");
 		HashMap<String,String> sm = new HashMap<String,String>();
+		HashMap<String,String> sortm = new HashMap<String,String>();
 		Enumeration<?> propertyNames = ConfigurationManager.getProperties("rest").propertyNames();
         while(propertyNames.hasMoreElements())
         {
@@ -76,15 +79,22 @@ public class ItemsResource {
             if (key.startsWith(SEARCH_PREFIX)){
             	sm.put(key.substring(SEARCH_PREFIX.length()), ConfigurationManager.getProperty("rest", key));
             }
+            if (key.startsWith(SORT_PREFIX)){
+            	sortm.put(key.substring(SORT_PREFIX.length()), ConfigurationManager.getProperty("rest", key));
+            }
         }
         searchMapping = sm;
+        sortMapping = sortm;
+
         searchClass=ConfigurationManager.getProperty("rest","implementing.search.class");
         
-        ArrayList<String> resevedWord= new ArrayList<String>();
-        resevedWord.add(OFFSET);
-        resevedWord.add(LIMIT);
-        resevedWord.add(EXPAND);
-        reservedWords=resevedWord;
+        ArrayList<String> reservedWord= new ArrayList<String>();
+        reservedWord.add(OFFSET);
+        reservedWord.add(LIMIT);
+        reservedWord.add(EXPAND);
+        reservedWord.add(ORDER_ASC);
+        reservedWord.add(ORDER_DESC);
+        reservedWords=reservedWord;
 	}
 	
 	 /** log4j category */
@@ -244,6 +254,8 @@ public class ItemsResource {
     		@QueryParam(EXPAND) String expand,
     		@QueryParam(LIMIT) Integer limit, 
     		@QueryParam(OFFSET) Integer offset,
+    		@QueryParam(ORDER_ASC) String order_asc,
+    		@QueryParam(ORDER_DESC) String order_desc,
     		@Context HttpServletRequest request) throws WebApplicationException{
         try {
             if(context == null || !context.isValid()) {
@@ -261,7 +273,7 @@ public class ItemsResource {
             if(query!=null){
             	return luceneSearch(query, expand, limit, offset, request);
             } else {
-            	return parameterSearch(expand, limit, offset, request);
+            	return parameterSearch(expand, limit, offset, request, order_asc, order_desc);
             }
 
         } catch (SQLException e) {
@@ -326,12 +338,9 @@ public class ItemsResource {
 	
 	private org.dspace.rest.common.ItemReturn parameterSearch(
 			String expand, Integer limit, Integer offset,
-			HttpServletRequest request) throws IOException, SQLException,
+			HttpServletRequest request, String order_asc, String order_desc) throws IOException, SQLException,
 			WebApplicationException {
 				
-		String query  =  request.getQueryString();
-		
-		
 		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
 		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
 		item_context.setLimit(limit);
@@ -354,7 +363,6 @@ public class ItemsResource {
 		Map<String,String[]> requestMap=request.getParameterMap();
 		
 		
-		String[] queryparts = query.split("&");
 		HashMap<String,String> querymap= new HashMap<String,String>();
 		Iterator<String> requestKeys=requestMap.keySet().iterator();
 		while(requestKeys.hasNext()){
@@ -373,28 +381,37 @@ public class ItemsResource {
 			}
 		}
 		
-//		for(String q : queryparts){
-//			String [] segments = q.split("=");
-//			if(segments.length==2){
-//				if(searchMapping.containsKey(segments[0])){
-//					querymap.put(searchMapping.get(segments[0]), URLDecoder.decode(segments[1],"UTF-8"));
-//					log.debug("segments " + segments[0] + " " + URLDecoder.decode(segments[1],"UTF-8"));
-//				} else if(!reservedWords.contains(segments[0])){
-//					log.error("query parameter " + segments[0] + " not supported");
-//					item_context.addError("not recognised query parameter: " + segments[0]);
-//					return item_return;
-//				}
-//			} else {
-//				item_context.addError("value to query parameter \"" + q + "\" not correctly set");
-//				return item_return;
-//			}
-//		}
+		if(order_asc!=null && order_desc!=null){
+			log.error("Both order ascending and order descending set - invalid use");
+			item_context.addError("It is not allowed to set both parameters 'order_asc' and 'order_desc'.");
+			return item_return;
+		}
+		String sortfield=null;
+		String field=null;
+		String sortorder=null;
+		if(order_asc!=null){
+			sortorder="asc";
+			field=order_asc;
+		} else if (order_desc!=null){
+			sortorder="desc";
+			field=order_desc;
+		}
+		
+		if(field!=null && sortMapping.containsKey(field)){
+			sortfield = sortMapping.get(field);
+		} else if(field!=null){
+			log.error("order field " + field+ " not supported");
+			item_context.addError("not recognised order field: " + field);
+			return item_return;
+		}
+
+		
 		
 		try{
 			Class<?> clazz = Class.forName(searchClass);
 			Constructor<?> constructor = clazz.getConstructor();
 			Search instance = (Search) constructor.newInstance();
-			item_return.setItem(instance.search(context, querymap, expand, limit, offset));
+			item_return.setItem(instance.search(context, querymap, expand, limit, offset,sortfield,sortorder));
 			item_context.setTotal_count(item_return.getItem().size());
 		} catch(ClassNotFoundException ex) {
 			item_context.addError("'implementing.search.class' does not point to an existing class");

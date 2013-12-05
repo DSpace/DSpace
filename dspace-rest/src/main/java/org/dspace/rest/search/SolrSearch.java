@@ -28,7 +28,7 @@ public class SolrSearch implements Search{
 	private static final Logger log = Logger.getLogger(SolrSearch.class);
 	
 	@Override
-	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset){
+	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset, String sortField, String sortOrder){
 		ArrayList<org.dspace.rest.common.Item> results = new ArrayList<org.dspace.rest.common.Item>();
 		StringBuffer query_string=new StringBuffer();
 		Iterator<String> keyset= searchTerms.keySet().iterator();
@@ -43,6 +43,9 @@ public class SolrSearch implements Search{
 		SolrServiceImpl solr = new SolrServiceImpl();
 		DiscoverQuery query = new DiscoverQuery();
 		query.setQuery(query_string.toString());
+		if(sortField!=null && sortOrder!=null){
+			query.setSortField(sortField, sortOrder.compareTo("asc")==0?DiscoverQuery.SORT_ORDER.asc:DiscoverQuery.SORT_ORDER.desc);
+		}
 		int added =0;
 		int current=0;
 		try {

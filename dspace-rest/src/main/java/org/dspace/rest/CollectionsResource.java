@@ -10,10 +10,8 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.rest.common.Collection;
+import org.dspace.handle.HandleManager;
 import org.dspace.rest.common.CollectionReturn;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -169,7 +167,7 @@ public class CollectionsResource {
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collection_id);
             if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
             	if(writeStatistics){
-    				writeStats(collection_id, user_ip, user_agent, xforwarderfor, headers, request);
+    				writeStats(collection, user_ip, user_agent, xforwarderfor, headers, request);
     			}
                 return new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
             } else {
@@ -180,36 +178,63 @@ public class CollectionsResource {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GET
+    @Path("/{prefix}/{suffix}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Collection getCollection(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix, @QueryParam("expand") String expand, 
+    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+        try {
+            if(context == null || !context.isValid() ) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            if(dso instanceof org.dspace.content.Collection){
+            	org.dspace.content.Collection collection = (org.dspace.content.Collection)dso;
+	            if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
+	            	if(writeStatistics){
+	    				writeStats(collection, user_ip, user_agent, xforwarderfor, headers, request);
+	    			}
+	                return new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
+	            } else {
+	                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+	            }
+	        } else {
+	        	throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+	        }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     
-    private void writeStats(Integer collection_id, String user_ip, String user_agent,
-			String xforwarderfor, HttpHeaders headers,
-			HttpServletRequest request) {
-		
-    	try{
-    		DSpaceObject collection = DSpaceObject.find(context, Constants.COLLECTION, collection_id);
-    		
-    		if(user_ip==null || user_ip.length()==0){
-    			new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     request,
-	                                     context,
-	                                     collection));
-    		} else{
-	    		new DSpace().getEventService().fireEvent(
-	                     new UsageEvent(
-	                                     UsageEvent.Action.VIEW,
-	                                     user_ip,
-	                                     user_agent,
-	                                     xforwarderfor,
-	                                     context,
-	                                     collection));
-    		}
-    		log.debug("fired event");
-    		
-		} catch(SQLException ex){
-			log.error("SQL exception can't write usageEvent \n" + ex);
-		}
-    		
-	}
+    private void writeStats(org.dspace.content.DSpaceObject dso, String user_ip, String user_agent,
+ 			String xforwarderfor, HttpHeaders headers,
+ 			HttpServletRequest request) {
+ 		
+ 		if(user_ip==null || user_ip.length()==0){
+ 			new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     request,
+                                     context,
+                                     dso));
+ 		} else{
+    		new DSpace().getEventService().fireEvent(
+                     new UsageEvent(
+                                     UsageEvent.Action.VIEW,
+                                     user_ip,
+                                     user_agent,
+                                     xforwarderfor,
+                                     context,
+                                     dso));
+ 		}
+ 		log.debug("fired event");
+ 	}
 }
