@@ -276,22 +276,7 @@ public class DOIIdentifierProvider
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
         
-        // check if DOI is reserved at the registration agency
-        if (connector.isDOIReserved(context, doi))
-        {
-            // if doi is registered for this object we still should check its
-            // status in our database (see below).
-            // if it is registered for another object we should notify an admin
-            if (!connector.isDOIReserved(context, dso, doi))
-            {
-                log.warn("DOI {} is reserved for another object already.", doi);
-                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
-            }
-        }
-        else
-        {
-            connector.reserveDOI(context, dso, doi);
-        }
+        connector.reserveDOI(context, dso, doi);
         
         doiRow.setColumn("status", IS_RESERVED);
         DatabaseManager.update(context, doiRow);
@@ -311,52 +296,21 @@ public class DOIIdentifierProvider
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
         
-        // check if the DOI is already registered online
-        if (connector.isDOIRegistered(context, doi))
-        {
-            // if doi is registered for this object we still should check its
-            // status in our database (see below).
-            // if it is registered for another object we should notify an admin
-            if (!connector.isDOIRegistered(context, dso, doi))
-            {
-                // DOI is reserved for another object
-                log.warn("DOI {} is registered for another object already.", doi);
-                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
-            }
+        // register DOI Online
+        try {
+            connector.registerDOI(context, dso, doi);
         }
-        else
+        catch (DOIIdentifierException die)
         {
-            // check if doi is reserved for this specific dso
-            if (!connector.isDOIReserved(context, dso, doi))
+            // do we have to reserve DOI before we can register it?
+            if (die.getCode() == DOIIdentifierException.RESERVE_FIRST)
             {
-                // check if doi is already reserved for another dso
-                if (connector.isDOIReserved(context, doi))
-                {
-                    log.warn("Trying to register DOI {}, that is reserved for "
-                            + "another dso.", doi);
-                    throw new DOIIdentifierException("Trying to register a DOI "
-                            + "that is reserved for another object.",
-                            DOIIdentifierException.DOI_ALREADY_EXISTS);
-                }
-
-                connector.reserveDOI(context, dso, doi);
-            }
-            // register DOI Online
-            try {
+                this.reserveOnline(context, dso, identifier);
                 connector.registerDOI(context, dso, doi);
             }
-            catch (DOIIdentifierException die)
+            else
             {
-                // do we have to reserve DOI before we can register it?
-                if (die.getCode() == DOIIdentifierException.REGISTER_FIRST)
-                {
-                    this.reserveOnline(context, dso, identifier);
-                    connector.registerDOI(context, dso, doi);
-                }
-                else
-                {
-                    throw die;
-                }
+                throw die;
             }
         }
 
@@ -375,7 +329,6 @@ public class DOIIdentifierProvider
         
         doiRow.setColumn("status", IS_REGISTERED);
         DatabaseManager.update(context, doiRow);        
-
     }
     
     public void updateMetadata(Context context, DSpaceObject dso, String identifier)
@@ -451,23 +404,9 @@ public class DOIIdentifierProvider
         if (DELETED == doiRow.getIntColumn("status") ||
                 TO_BE_DELETED == doiRow.getIntColumn("status"))
         {
-            throw new DOIIdentifierException("You tried to register a DOI that "
-                    + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
-        }
-        
-
-        // check if doi is reserved for this specific dso
-        if (connector.isDOIReserved(context, identifier))
-        {
-            // check if doi is reserved for this specific dso
-            if (!connector.isDOIReserved(context, dso, doi))
-            {
-                log.warn("Trying to update metadata for DOI {}, that is reserved"
-                        + " for another dso.", doi);
-                throw new DOIIdentifierException("Trying to update metadta for "
-                        + "a DOI that is reserved for another object.",
-                        DOIIdentifierException.DOI_ALREADY_EXISTS);
-            }
+            throw new DOIIdentifierException("You tried to update the metadata"
+                    + "of a DOI that is marked as DELETED.",
+                    DOIIdentifierException.DOI_IS_DELETED);
         }
         
         connector.updateMetadata(context, dso, doi);

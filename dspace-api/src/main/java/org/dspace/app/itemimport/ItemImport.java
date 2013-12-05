@@ -1340,11 +1340,33 @@ public class ItemImport
                                     + sRegistrationLine);
                             continue;
                         }
-                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
+                        
+                        // look for descriptions
+                        boolean descriptionExists = false;
+                        String descriptionMarker = "\tdescription:";
+                        int dMarkerIndex = line.indexOf(descriptionMarker);
+                        int dEndIndex = 0;
+                        if (dMarkerIndex > 0)
+                        {
+                        	dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                        	if (dEndIndex == -1)
+                        	{
+                        		dEndIndex = line.length();
+                        	}
+                        	descriptionExists = true;
+                        }
+                        String sDescription = "";
+                        if (descriptionExists)
+                        {
+                        	sDescription = line.substring(dMarkerIndex, dEndIndex);
+                        	sDescription = sDescription.replaceFirst("description:", "");
+                        }
+
+                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         System.out.println("\tRegistering Bitstream: " + sFilePath
                                 + "\tAssetstore: " + iAssetstore
                                 + "\tBundle: " + sBundle
-                                + "\tDescription: " + sBundle);
+                                + "\tDescription: " + sDescription);
                         continue;				// process next line in contents file
                     }
 
@@ -1571,7 +1593,7 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void registerBitstream(Context c, Item i, int assetstore, 
-            String bitstreamPath, String bundleName )
+            String bitstreamPath, String bundleName, String description )
         	throws SQLException, IOException, AuthorizeException
     {
         // TODO validate assetstore number
@@ -1622,6 +1644,7 @@ public class ItemImport
 	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
 	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
 	        bs.setFormat(bf);
+	        bs.setDescription(description);
 
 	        bs.update();
         }

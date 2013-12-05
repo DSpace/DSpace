@@ -159,6 +159,7 @@
 			<XSLT>metadataFormats/uketd_dc.xsl</XSLT>
 			<Namespace>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/</Namespace>
 			<SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
+			<Filter refid="thesisFilter" />
 		</Format>
 	</Formats>
 	
@@ -240,6 +241,18 @@
 			</Parameter>
 			<Parameter key="value">
 				<Value>info:eu-repo/grantAgreement/EC/FP</Value>
+			</Parameter>
+		</Filter>
+		<Filter id="thesisFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>contains</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Thesis</Value>
 			</Parameter>
 		</Filter>
 	</Filters>

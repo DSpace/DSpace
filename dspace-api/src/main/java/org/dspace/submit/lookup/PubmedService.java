@@ -212,128 +212,71 @@ public class PubmedService
             throws HttpException, IOException, ParserConfigurationException,
             SAXException
     {
-        List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
-        {
-            GetMethod method = null;
-            try
-            {
-                HttpClient client = new HttpClient();
-                client.setTimeout(5 * timeout);
-                method = new GetMethod(
-                        "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+    	List<Record> results = new ArrayList<Record>();
+    	GetMethod method = null;
+    	try
+    	{
+    		HttpClient client = new HttpClient();
+    		client.setTimeout(5 * timeout);
+    		method = new GetMethod(
+    				"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
 
-                NameValuePair db = new NameValuePair("db", "pubmed");
-                NameValuePair retmode = new NameValuePair("retmode", "xml");
-                NameValuePair rettype = new NameValuePair("rettype", "full");
-                NameValuePair id = new NameValuePair("id", StringUtils.join(
-                        pubmedIDs.iterator(), ","));
-                method.setQueryString(new NameValuePair[] { db, retmode,
-                        rettype, id });
-                // Execute the method.
-                int statusCode = client.executeMethod(method);
+    		NameValuePair db = new NameValuePair("db", "pubmed");
+    		NameValuePair retmode = new NameValuePair("retmode", "xml");
+    		NameValuePair rettype = new NameValuePair("rettype", "full");
+    		NameValuePair id = new NameValuePair("id", StringUtils.join(
+    				pubmedIDs.iterator(), ","));
+    		method.setQueryString(new NameValuePair[] { db, retmode,
+    				rettype, id });
+    		// Execute the method.
+    		int statusCode = client.executeMethod(method);
 
-                if (statusCode != HttpStatus.SC_OK)
-                {
-                    throw new RuntimeException("WS call failed: "
-                            + method.getStatusLine());
-                }
+    		if (statusCode != HttpStatus.SC_OK)
+    		{
+    			throw new RuntimeException("WS call failed: "
+    					+ method.getStatusLine());
+    		}
 
-                DocumentBuilderFactory factory = DocumentBuilderFactory
-                        .newInstance();
-                factory.setValidating(false);
-                factory.setIgnoringComments(true);
-                factory.setIgnoringElementContentWhitespace(true);
+    		DocumentBuilderFactory factory = DocumentBuilderFactory
+    				.newInstance();
+    		factory.setValidating(false);
+    		factory.setIgnoringComments(true);
+    		factory.setIgnoringElementContentWhitespace(true);
 
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document inDoc = builder
-                        .parse(method.getResponseBodyAsStream());
+    		DocumentBuilder builder = factory.newDocumentBuilder();
+    		Document inDoc = builder
+    				.parse(method.getResponseBodyAsStream());
 
-                Element xmlRoot = inDoc.getDocumentElement();
-                List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
-                        "PubmedArticle");
+    		Element xmlRoot = inDoc.getDocumentElement();
+    		List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
+    				"PubmedArticle");
 
-                for (Element xmlArticle : pubArticles)
-                {
-                    Record pubmedItem = null;
-                    try
-                    {
-                        pubmedItem = PubmedUtils
-                                .convertCrossRefDomToRecord(xmlArticle);
-                        results.add(pubmedItem);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RuntimeException(
-                                "PubmedID is not valid or not exist: "
-                                        + e.getMessage(), e);
-                    }
-                }
+    		for (Element xmlArticle : pubArticles)
+    		{
+    			Record pubmedItem = null;
+    			try
+    			{
+    				pubmedItem = PubmedUtils
+    						.convertPubmedDomToRecord(xmlArticle);
+    				results.add(pubmedItem);
+    			}
+    			catch (Exception e)
+    			{
+    				throw new RuntimeException(
+    						"PubmedID is not valid or not exist: "
+    								+ e.getMessage(), e);
+    			}
+    		}
 
-                return results;
-            }
-            finally
-            {
-                if (method != null)
-                {
-                    method.releaseConnection();
-                }
-            }
-        }
-        else
-        {
-            InputStream stream = null;
-            try
-            {
-                File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
-                                + "/config/crosswalks/demo/pubmed.xml");
-                stream = new FileInputStream(file);
-
-                DocumentBuilderFactory factory = DocumentBuilderFactory
-                        .newInstance();
-                factory.setValidating(false);
-                factory.setIgnoringComments(true);
-                factory.setIgnoringElementContentWhitespace(true);
-
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document inDoc = builder.parse(stream);
-
-                Element xmlRoot = inDoc.getDocumentElement();
-                List<Element> pubArticles = XMLUtils.getElementList(xmlRoot,
-                        "PubmedArticle");
-
-                for (Element xmlArticle : pubArticles)
-                {
-                    Record pubmedItem = null;
-                    try
-                    {
-                        pubmedItem = PubmedUtils
-                                .convertCrossRefDomToRecord(xmlArticle);
-                        results.add(pubmedItem);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RuntimeException(
-                                "PubmedID is not valid or not exist: "
-                                        + e.getMessage(), e);
-                    }
-                }
-
-                return results;
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.close();
-                }
-            }
-        }
+    		return results;
+    	}
+    	finally
+    	{
+    		if (method != null)
+    		{
+    			method.releaseConnection();
+    		}
+    	}
     }
 
     public List<Record> search(String doi, String pmid) throws HttpException,

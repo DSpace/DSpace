@@ -93,7 +93,7 @@ public class PubmedFileDataLoader extends FileDataLoader
                 Record record = null;
                 try
                 {
-                    record = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
+                    record = PubmedUtils.convertPubmedDomToRecord(xmlArticle);
                     recordSet.addRecord(convertFields(record));
                 }
                 catch (Exception e)

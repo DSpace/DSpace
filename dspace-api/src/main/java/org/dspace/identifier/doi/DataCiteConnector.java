@@ -65,12 +65,12 @@ implements DOIConnector
      * Stores the scheme used to connect to the DataCite server. It will be set
      * by spring dependency injection.
      */
-    private String SCHEME;
+    protected String SCHEME;
     /**
      * Stores the hostname of the DataCite server. Set by spring dependency
      * injection.
      */
-    private String HOST;
+    protected String HOST;
     
     /**
      * Path on the DataCite server used to generate DOIs. Set by spring
@@ -188,7 +188,7 @@ implements DOIConnector
         this.CROSSWALK_NAME = CROSSWALK_NAME;
     }
     
-    private void prepareXwalk()
+    protected void prepareXwalk()
     {
         if (null != this.xwalk)
             return;
@@ -203,7 +203,7 @@ implements DOIConnector
         }
     }
     
-    private String getUsername()
+    protected String getUsername()
     {
         if (null == this.USERNAME)
         {
@@ -218,7 +218,7 @@ implements DOIConnector
         return this.USERNAME;
     }
     
-    private String getPassword()
+    protected String getPassword()
     {
         if (null == this.PASSWORD)
         {
@@ -450,7 +450,22 @@ implements DOIConnector
     @Override
     public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
-    {
+    {   
+        // check if DOI is reserved at the registration agency
+        if (this.isDOIReserved(context, doi))
+        {
+            // if doi is registered for this object we still should check its
+            // status in our database (see below).
+            // if it is registered for another object we should notify an admin
+            if (!this.isDOIReserved(context, dso, doi))
+            {
+                log.warn("DOI {} is reserved for another object already.", doi);
+                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
+            }
+            // the DOI is reserved for this Object. We use {@code reserveDOI} to
+            // send metadata updates, so don't return here!
+        }
+
         this.prepareXwalk();
         
         if (!this.xwalk.canDisseminate(dso))
@@ -557,7 +572,40 @@ implements DOIConnector
     public void registerDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
-        log.debug("Want to register DOI {}!", doi);
+        // check if the DOI is already registered online
+        if (this.isDOIRegistered(context, doi))
+        {
+            // if it is registered for another object we should notify an admin
+            if (!this.isDOIRegistered(context, dso, doi))
+            {
+                // DOI is reserved for another object
+                log.warn("DOI {} is registered for another object already.", doi);
+                throw new DOIIdentifierException(DOIIdentifierException.DOI_ALREADY_EXISTS);
+            }
+            // doi is registered for this object, we're done
+            return;
+        }
+        else
+        {
+            // DataCite wants us to reserve a DOI before we can register it
+            if (!this.isDOIReserved(context, dso, doi))
+            {
+                // check if doi is already reserved for another dso
+                if (this.isDOIReserved(context, doi))
+                {
+                    log.warn("Trying to register DOI {}, that is reserved for "
+                            + "another dso.", doi);
+                    throw new DOIIdentifierException("Trying to register a DOI "
+                            + "that is reserved for another object.",
+                            DOIIdentifierException.DOI_ALREADY_EXISTS);
+                }
+                
+                // the DOIIdentifierProvider should catch and handle this
+                throw new DOIIdentifierException("You need to reserve a DOI "
+                        + "before you can register it.",
+                        DOIIdentifierException.RESERVE_FIRST);
+            }
+        }
 
         // send doi=<doi>\nurl=<url> to mds/doi
         DataCiteResponse resp = null;
@@ -600,7 +648,7 @@ implements DOIConnector
                         + "of DOIs. The DOI we wanted to register had not been "
                         + "reserved in advance. Please contact the administrator "
                         + "or take a look in DSpace log file.",
-                        DOIIdentifierException.REGISTER_FIRST);
+                        DOIIdentifierException.RESERVE_FIRST);
             }
             // Catch all other http status code in case we forgot one.
             default :
@@ -619,18 +667,27 @@ implements DOIConnector
     public void updateMetadata(Context context, DSpaceObject dso, String doi) 
             throws DOIIdentifierException
     { 
+        // check if doi is reserved for another object
+        if (!this.isDOIReserved(context, dso, doi) && this.isDOIReserved(context, doi))
+        {
+            log.warn("Trying to update metadata for DOI {}, that is reserved"
+                    + " for another dso.", doi);
+            throw new DOIIdentifierException("Trying to update metadta for "
+                    + "a DOI that is reserved for another object.",
+                    DOIIdentifierException.DOI_ALREADY_EXISTS);
+        }
         // We can use reserveDOI to update metadata. Datacite API uses the same
         // request for reservartion as for updating metadata.
         this.reserveDOI(context, dso, doi);
     }
     
-    private DataCiteResponse sendDOIPostRequest(String doi, String url)
+    protected DataCiteResponse sendDOIPostRequest(String doi, String url)
             throws DOIIdentifierException
     {
         // post mds/doi/
         // body must contaion "doi=<doi>\nurl=<url>}n"
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(DOI_PATH);
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(DOI_PATH);
         
         HttpPost httppost = null;
         try
@@ -641,7 +698,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -674,12 +731,12 @@ implements DOIConnector
     }
     
     
-    private DataCiteResponse sendMetadataDeleteRequest(String doi)
+    protected DataCiteResponse sendMetadataDeleteRequest(String doi)
             throws DOIIdentifierException
     {
         // delete mds/metadata/<doi>
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(METADATA_PATH
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(METADATA_PATH
                 + doi.substring(DOI.SCHEME.length()));
         
         HttpDelete httpdelete = null;
@@ -691,7 +748,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -699,23 +756,23 @@ implements DOIConnector
         return sendHttpRequest(httpdelete, doi);
     }
     
-    private DataCiteResponse sendDOIGetRequest(String doi)
+    protected DataCiteResponse sendDOIGetRequest(String doi)
             throws DOIIdentifierException
     {
         return sendGetRequest(doi, DOI_PATH);
     }
     
-    private DataCiteResponse sendMetadataGetRequest(String doi)
+    protected DataCiteResponse sendMetadataGetRequest(String doi)
             throws DOIIdentifierException
     {
         return sendGetRequest(doi, METADATA_PATH);
     }
     
-    private DataCiteResponse sendGetRequest(String doi, String path)
+    protected DataCiteResponse sendGetRequest(String doi, String path)
             throws DOIIdentifierException
     {
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(path
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(path
                 + doi.substring(DOI.SCHEME.length()));
         
         HttpGet httpget = null;
@@ -727,7 +784,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -735,7 +792,7 @@ implements DOIConnector
         return sendHttpRequest(httpget, doi);
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
+    protected DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
             throws DOIIdentifierException
     {
         Format format = Format.getCompactFormat();
@@ -744,13 +801,13 @@ implements DOIConnector
         return sendMetadataPostRequest(doi, xout.outputString(new Document(metadataRoot)));
     }
     
-    private DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
+    protected DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
             throws DOIIdentifierException
     {
         // post mds/metadata/
         // body must contain metadata in DataCite-XML.
         URIBuilder uribuilder = new URIBuilder();
-        uribuilder.setScheme("https").setHost(HOST).setPath(METADATA_PATH);
+        uribuilder.setScheme(SCHEME).setHost(HOST).setPath(METADATA_PATH);
         
         HttpPost httppost = null;
         try
@@ -761,7 +818,7 @@ implements DOIConnector
         {
             log.error("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!");
-            log.error("The URL was {}.", "https://" + HOST +
+            log.error("The URL was {}.", SCHEME + "://" + HOST +
                     DOI_PATH + "/" + doi.substring(DOI.SCHEME.length()));
             throw new RuntimeException("The URL we constructed to check a DOI "
                     + "produced a URISyntaxException. Please check the configuration parameters!", e);
@@ -799,7 +856,7 @@ implements DOIConnector
      * @return
      * @throws DOIIdentifierException 
      */
-    private DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
+    protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
             throws DOIIdentifierException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -923,7 +980,7 @@ implements DOIConnector
     }
 
     // returns null or handle
-    private String extractAlternateIdentifier(Context context, String content)
+    protected String extractAlternateIdentifier(Context context, String content)
     throws SQLException, DOIIdentifierException
     {
         if (content == null)
@@ -969,12 +1026,12 @@ implements DOIConnector
         return handle;
     }
     
-    private String extractDOI(Element root) {
+    protected String extractDOI(Element root) {
         Element doi = root.getChild("identifier", root.getNamespace());
         return (null == doi) ? null : doi.getTextTrim();
     }
 
-    private Element addDOI(String doi, Element root) {
+    protected Element addDOI(String doi, Element root) {
         if (null != extractDOI(root))
         {
             return root;
@@ -985,7 +1042,7 @@ implements DOIConnector
         return root.addContent(0, identifier);
     }
 
-    private class DataCiteResponse
+    protected class DataCiteResponse
     {
         private final int statusCode;
         private final String content;

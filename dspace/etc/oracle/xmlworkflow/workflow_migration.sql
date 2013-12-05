@@ -5,28 +5,28 @@ INSERT INTO cwf_collectionrole (collectionrole_id, role_id, group_id, collection
 SELECT
 cwf_collectionrole_seq.nextval as collectionrole_id,
 'reviewer' AS role_id,
-eperson_group_id AS group_id,
-to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_1', '')) AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_1';
+collection.workflow_step_1 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_1 IS NOT NULL;
 
 INSERT INTO cwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
 cwf_collectionrole_seq.nextval as collectionrole_id,
 'editor' AS role_id,
-eperson_group_id AS group_id,
-to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_2', '')) AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_2';
+collection.workflow_step_2 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_2 IS NOT NULL;
 
 INSERT INTO cwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
 cwf_collectionrole_seq.nextval as collectionrole_id,
 'finaleditor' AS role_id,
-eperson_group_id AS group_id,
-to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_3', '')) AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_3';
+collection.workflow_step_3 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_3 IS NOT NULL;
 
 
 -- Migrate workflow items

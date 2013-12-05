@@ -329,7 +329,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest
     private Map<String, Object> getDetails(ItemSubmissionLookupDTO item,
             Context context)
     {
-        List<String> fieldOrder = getFieldOrderFromConfiguration();
+        List<String> fieldOrder = getFieldOrder();
         Record totalData = item.getTotalPublication(service.getProviders());
         Set<String> availableFields = totalData.getFields();
         List<String[]> fieldsLabels = new ArrayList<String[]>();
@@ -339,10 +339,8 @@ public class SubmissionLookupJSONRequest extends JSONRequest
             {
                 try
                 {
-                    fieldsLabels.add(new String[] {
-                            f,
-                            I18nUtil.getMessage("jsp.submission-lookup.detail."
-                                    + f, context) });
+                	if (totalData.getValues(f)!=null && totalData.getValues(f).size()>0)
+                		fieldsLabels.add(new String[] {f, I18nUtil.getMessage("jsp.submission-lookup.detail."+ f, context) });
                 }
                 catch (MissingResourceException e)
                 {
@@ -368,24 +366,37 @@ public class SubmissionLookupJSONRequest extends JSONRequest
         return data;
     }
 
-    private List<String> getFieldOrderFromConfiguration()
+    private List<String> getFieldOrder()
     {
-        String config = ConfigurationManager
-                .getProperty("submission-lookup.detail.fields");
-        if (config == null)
-        {
-            config = "title,authors,editors,years,doi,pmid,eid,arxiv,journal,jissn,jeissn,volume,issue,serie,sissn,seissn,abstract,mesh,keywords,subtype";
-        }
-        List<String> result = new ArrayList<String>();
-        String[] split = config.split(",");
-        for (String s : split)
-        {
-            if (StringUtils.isNotBlank(s))
-            {
-                result.add(s.trim());
-            }
-        }
-        return result;
+    	if (service.getDetailFields()!=null){
+    		return service.getDetailFields();
+    	}
+    	
+    	//Default values, in case the property is not set
+    	List<String> defaultValues = new ArrayList<String>();
+    	defaultValues.add("title");
+    	defaultValues.add("authors");
+    	defaultValues.add("editors");
+    	defaultValues.add("translators");
+    	defaultValues.add("chairs");
+    	defaultValues.add("issued");
+    	defaultValues.add("abstract");
+    	defaultValues.add("doi");
+    	defaultValues.add("journal");
+    	defaultValues.add("volume");
+    	defaultValues.add("issue");
+    	defaultValues.add("publisher");
+    	defaultValues.add("jissn");
+    	defaultValues.add("pisbn");
+    	defaultValues.add("eisbn");
+    	defaultValues.add("arxivCategory");
+    	defaultValues.add("keywords");
+    	defaultValues.add("mesh");
+    	defaultValues.add("language");
+    	defaultValues.add("subtype");
+    	defaultValues.add("translators");
+        
+    	return defaultValues;
     }
 
     private List<Map<String, Object>> getLightResultList(

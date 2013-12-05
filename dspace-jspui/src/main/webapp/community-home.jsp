@@ -226,7 +226,8 @@
 </div>
 <div class="row">
 <%
-    if (subcommunities.length != 0)
+	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);
+	if (subcommunities.length != 0)
     {
 %>
 	<div class="col-md-6">
@@ -241,7 +242,7 @@
 			<div class="list-group-item row">  
 <%  
 		Bitstream logoCom = subcommunities[j].getLogo();
-		if (logoCom != null) { %>
+		if (showLogos && logoCom != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCom.getID() %>" /> 
 			</div>
@@ -297,7 +298,7 @@
 			<div class="list-group-item row">  
 <%  
 		Bitstream logoCol = collections[i].getLogo();
-		if (logoCol != null) { %>
+		if (showLogos && logoCol != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCol.getID() %>" /> 
 			</div>
