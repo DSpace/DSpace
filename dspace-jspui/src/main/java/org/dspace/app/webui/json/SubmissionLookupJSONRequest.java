@@ -385,6 +385,7 @@ public class SubmissionLookupJSONRequest extends JSONRequest
     	defaultValues.add("journal");
     	defaultValues.add("volume");
     	defaultValues.add("issue");
+    	defaultValues.add("publisher");
     	defaultValues.add("jissn");
     	defaultValues.add("pisbn");
     	defaultValues.add("eisbn");
