@@ -178,6 +178,11 @@
 						<map:parameter name="locale" value="{locale}"/>
 					</map:transform>
 				</map:act>
+                                  <!-- IDENTIFIER NOT FOUND PAGE -->
+                                  <map:match pattern="identifier-not-found">
+
+                                        <map:serialize type="xhtml" status-code="404"/>
+                                  </map:match>
 
 				<!-- Step 5: Serialize to the browser -->
 				<map:serialize type="xhtml"/>
