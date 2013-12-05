@@ -39,8 +39,6 @@ public class RisView implements View {
     public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         DSpaceObject item = (DSpaceObject)request.getAttribute(ResourceIdentifierController.DSPACE_OBJECT);
-        Context context = new Context();
-        context.turnOffAuthorisationSystem();
 
         String doi = DOIIdentifierProvider.getDoiValue((Item) item);
         String fileName = doi.substring(doi.lastIndexOf('/') +1).replace('.', '_') + ".ris";

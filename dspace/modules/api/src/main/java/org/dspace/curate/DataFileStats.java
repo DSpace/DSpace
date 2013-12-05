@@ -159,7 +159,8 @@ public class DataFileStats extends AbstractCurationTask {
             Item item = (Item)dso;
 
 	    if(!item.isArchived()) {
-		return Curator.CURATE_SKIP;
+		    context.abort();
+            return Curator.CURATE_SKIP;
 	    }
 	    
 	    try {

@@ -54,19 +54,11 @@ public class UpdateHandleRelationshipsToDOIs extends AbstractCurationTask {
     // list of maps
     // [ item: <item_id>, relationship: <dc_haspart>, original_value: <http://hdl...>, new_value
     
-    private Context dspaceContext;
 
     @Override
     public void init(Curator curator, String taskID) throws IOException{
         super.init(curator, taskID);
         // init dspace context to allow access to database
-        try {
-            dspaceContext = new Context();
-        } catch (SQLException e1) {
-            log.error("Exception instantiating Context", e1);
-            return;
-        }
-
     }
 
     private void formatResults() {
@@ -106,7 +98,7 @@ public class UpdateHandleRelationshipsToDOIs extends AbstractCurationTask {
         return Curator.CURATE_SUCCESS;
     }
 
-    private void findHandleRelationships(Item item, String mdString) throws IOException {
+    private void findHandleRelationships(Item item, String mdString) throws IOException, SQLException {
         DCValue[] relationshipMetadataValues = item.getMetadata(mdString);
         for(DCValue relationshipValue : relationshipMetadataValues) {
             String handlePrefix = null;
@@ -125,44 +117,52 @@ public class UpdateHandleRelationshipsToDOIs extends AbstractCurationTask {
                 // this hasPartValue references a handle.
                 // Figure out what item it is and update to a DOI
                 String handleOnly = relationshipValue.value.substring(handlePrefix.length());
-                DSpaceObject referencedObject = dereference(dspaceContext, handleOnly);
-                if(referencedObject == null) {
-                    log.error("Unable to find referenced object with handle: " + handleOnly);
-                } else if(referencedObject.getType() == Constants.ITEM) {
-                    // get the DOI identifier for referenced object if it is an item
-                    Item referencedItem = (Item)referencedObject;
-                    DCValue referencedItemMetadata[] = referencedItem.getMetadata("dc.identifier");
-                    // find the DOI identifier
-                    String referencedDOI = null;
-                    for(DCValue identifierMetadataValue : referencedItemMetadata) {
-                        if(identifierMetadataValue.value.startsWith(DOI_PREFIX)) {
-                            referencedDOI = identifierMetadataValue.value;
-                            break;
+                Context context = new Context();
+                try {
+                    DSpaceObject referencedObject = dereference(context, handleOnly);
+                    if(referencedObject == null) {
+                        log.error("Unable to find referenced object with handle: " + handleOnly);
+                    } else if(referencedObject.getType() == Constants.ITEM) {
+                        // get the DOI identifier for referenced object if it is an item
+                        Item referencedItem = (Item)referencedObject;
+                        DCValue referencedItemMetadata[] = referencedItem.getMetadata("dc.identifier");
+                        // find the DOI identifier
+                        String referencedDOI = null;
+                        for(DCValue identifierMetadataValue : referencedItemMetadata) {
+                            if(identifierMetadataValue.value.startsWith(DOI_PREFIX)) {
+                                referencedDOI = identifierMetadataValue.value;
+                                break;
+                            }
+                        }
+                        if(referencedDOI == null) {
+                            log.log(Level.ERROR, "No DOI found for referenced item: " + referencedItem.getID());
+                        } else {
+                            log.log(Level.INFO, "Found DOI " + referencedDOI + " for referenced item:" + referencedItem.getID());
+                            Map<String, Object> map = relationshipTable.get(item.getID());
+                            if(map == null) {
+                                map = new HashMap<String, Object>();
+                            }
+                            List<Map<String, Object>> relationships = (List<Map<String, Object>>) map.get(mdString);
+                            if(relationships == null) {
+                                relationships = new ArrayList<Map<String, Object> >();
+                                map.put(mdString, relationships);
+                            }
+                            {
+                                Map<String, Object> relationship = new HashMap<String, Object>();
+                                relationship.put(ITEM_ID_KEY, item.getID());
+                                relationship.put(RELATIONSHIP_KEY, relationshipValue.qualifier);
+                                relationship.put(ORIGINAL_VALUE_KEY, relationshipValue.value);
+                                relationship.put(NEW_VALUE_KEY, referencedDOI);
+                                relationship.put(ORIGINAL_ELEMENT_KEY, relationshipValue);
+                                relationships.add(relationship); // now back into map
+                            }
+                            relationshipTable.put(item.getID(), map);
                         }
                     }
-                    if(referencedDOI == null) {
-                        log.log(Level.ERROR, "No DOI found for referenced item: " + referencedItem.getID());
-                    } else {
-                        log.log(Level.INFO, "Found DOI " + referencedDOI + " for referenced item:" + referencedItem.getID());
-                        Map<String, Object> map = relationshipTable.get(item.getID());
-                        if(map == null) {
-                            map = new HashMap<String, Object>();
-                        }
-                        List<Map<String, Object>> relationships = (List<Map<String, Object>>) map.get(mdString);
-                        if(relationships == null) {
-                            relationships = new ArrayList<Map<String, Object> >();
-                            map.put(mdString, relationships);
-                        }
-                        {
-                            Map<String, Object> relationship = new HashMap<String, Object>();
-                            relationship.put(ITEM_ID_KEY, item.getID());
-                            relationship.put(RELATIONSHIP_KEY, relationshipValue.qualifier);
-                            relationship.put(ORIGINAL_VALUE_KEY, relationshipValue.value);
-                            relationship.put(NEW_VALUE_KEY, referencedDOI);
-                            relationship.put(ORIGINAL_ELEMENT_KEY, relationshipValue);
-                            relationships.add(relationship); // now back into map
-                        }
-                        relationshipTable.put(item.getID(), map);
+                } finally {
+                    if(context != null)
+                    {
+                        context.abort();
                     }
                 }
             }

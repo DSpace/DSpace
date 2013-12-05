@@ -1211,6 +1211,7 @@ public class FlowUtils {
                 //For each repo name we have to call the packager once
                 for(String repoName : reponameToHandles.keySet()){
                     List<String> handles = reponameToHandles.get(repoName);
+                    Context context = null;
                     try{
                         //We start of by copying the starting arguments
                         ArrayList<String> args = (ArrayList<String>) startingArgs.clone();
@@ -1234,7 +1235,7 @@ public class FlowUtils {
                         args.add("-");
 
                         log.info("Calling the packager (for thread: " + threadId + ") with arguments: " + Arrays.toString(args.toArray(new String[args.size()])));
-                        Context context = new Context();
+                        context = new Context();
                         PackageParameters pkgParams = new PackageParameters();
                         //-d option
                         //-i option
@@ -1283,6 +1284,11 @@ public class FlowUtils {
                     } catch (Exception e){
                         log.error("Error an unknown exception occurred when posting a handle in the export handles thread, logdata: [" + getLogData() + " repoName:" + repoName + " handlesToPost:" + Arrays.toString(handles.toArray(new String[handles.size()])) +  " ]");
 
+                    } finally {
+                        if(context != null)
+                        {
+                            context.abort();
+                        }
                     }
                 }
             }catch (Exception e){

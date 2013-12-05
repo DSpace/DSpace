@@ -47,7 +47,6 @@ public class ShoppingCartConsumer implements Consumer {
             log.warn("Shopping cart consumer should not have been given this kind of Subject in an event, skipping: "+ event.toString());
             return;
         }
-        Context context = new Context();
         DSpaceObject subject = event.getSubject(ctx);
 
         DSpaceObject object = event.getObject(ctx);
@@ -60,19 +59,19 @@ public class ShoppingCartConsumer implements Consumer {
             // Bundle.getItem.....
             Item[] item = bundle.getItems();
             if(item!=null&&item.length>0){
-            Item publication =  DryadWorkflowUtils.getDataPackage(context, item[0]);
+            Item publication =  DryadWorkflowUtils.getDataPackage(ctx, item[0]);
 
             if(publication==null) publication=item[0];
 
             DCValue[] journal = publication.getMetadata("prism.publicationName");
-            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,publication.getID());
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(ctx,publication.getID());
             if(shoppingCart!=null)
             {
                Double oldPrice = shoppingCart.getTotal();
                //recaculate based on the current rate
-               Double newPrice = paymentSystemService.calculateShoppingCartTotal(context,shoppingCart,journal[0].value);
+               Double newPrice = paymentSystemService.calculateShoppingCartTotal(ctx,shoppingCart,journal[0].value);
 
-               Double oversized = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
+               Double oversized = paymentSystemService.getSurchargeLargeFileFee(ctx,shoppingCart);
 
                if(!oldPrice.equals(newPrice))
                {
