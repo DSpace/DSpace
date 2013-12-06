@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
-
 import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -70,7 +70,6 @@ import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
-
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 
@@ -93,7 +92,15 @@ import org.dspace.app.util.Util;
  *
  * @author Mark Diggory
  * @author Graham Triggs
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class DSIndexer
 {
     private static final Logger log = Logger.getLogger(DSIndexer.class);

@@ -20,7 +20,15 @@ import org.apache.lucene.util.Version;
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter
  * and stopword filter. Intentionally omits the stemming filter (which is used
  * by DSAnalyzer)
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class DSNonStemmingAnalyzer extends DSAnalyzer
 {
     /**
