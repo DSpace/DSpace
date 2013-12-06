@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -26,6 +27,8 @@ import org.apache.log4j.Logger;
 public class SolrSearch implements Search{
 	
 	private static final Logger log = Logger.getLogger(SolrSearch.class);
+	
+	private DiscoverResult result;
 	
 	@Override
 	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset, String sortField, String sortOrder){
@@ -43,22 +46,18 @@ public class SolrSearch implements Search{
 		SolrServiceImpl solr = new SolrServiceImpl();
 		DiscoverQuery query = new DiscoverQuery();
 		query.setQuery(query_string.toString());
+		query.setMaxResults(limit);
+		query.setStart(offset);
 		if(sortField!=null && sortOrder!=null){
 			query.setSortField(sortField, sortOrder.compareTo("asc")==0?DiscoverQuery.SORT_ORDER.asc:DiscoverQuery.SORT_ORDER.desc);
 		}
-		int added =0;
-		int current=0;
 		try {
-			DiscoverResult result =solr.search(context, query);
+			result =solr.search(context, query);
 			List<DSpaceObject>  list=result.getDspaceObjects();
 			for(DSpaceObject obj : list){
-				if(obj instanceof org.dspace.content.Item && current>=offset){
+				if(obj instanceof org.dspace.content.Item 
+					&& AuthorizeManager.authorizeActionBoolean(context, obj, org.dspace.core.Constants.READ)) {
 					results.add(new org.dspace.rest.common.Item((org.dspace.content.Item)obj, expand, context));
-					added++;
-				}
-				current++;
-				if(added>=limit){
-					break;
 				}
 			}
 		} catch (SearchServiceException e) {
@@ -69,5 +68,15 @@ public class SolrSearch implements Search{
 		
 		return results;
 	}
+
+	@Override
+	public long getTotalCount() {
+		if(result!=null){
+			return result.getTotalSearchResults();
+		}
+		return 0;
+	}
+	
+	
 
 }

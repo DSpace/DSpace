@@ -446,7 +446,7 @@ public class ItemsResource {
 			Constructor<?> constructor = clazz.getConstructor();
 			Search instance = (Search) constructor.newInstance();
 			item_return.setItem(instance.search(context, querymap, expand, limit, offset,sortfield,sortorder));
-			item_context.setTotal_count(item_return.getItem().size());
+			item_context.setTotal_count(instance.getTotalCount());
 		} catch(ClassNotFoundException ex) {
 			item_context.addError("'implementing.search.class' does not point to an existing class");
 			log.error(ex);
