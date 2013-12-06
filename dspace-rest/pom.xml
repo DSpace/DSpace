@@ -126,7 +126,4 @@
         	<artifactId>dspace-services</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <finalName>${artifactId}</finalName>
-    </build>
 </project>
