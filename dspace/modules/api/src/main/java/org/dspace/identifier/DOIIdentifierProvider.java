@@ -517,7 +517,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             Version previous = history.getPrevious(version);
             String canonical = DOIIdentifierProvider.getDoiValue(previous.getItem());
             String versionNumber = "" + DOT + (version.getVersionNumber());
-            doi = new DOI(canonical + versionNumber, item);
+            doi = new DOI(myDoiPrefix,myLocalPartPrefix+ versionNumber, item);
         } else {
             String var = NoidGenerator.buildVar(mySuffixVarLength);
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
@@ -723,6 +723,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     Item previousDataPackage = previous.getItem();
 
                     updateHasPartDataFile(context,previousDataPackage,id,oldDOI[0].value);
+                    updateIsPartDataFile(context,item,previousDataPackage);
                 }
             }
         }
@@ -784,6 +785,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     private void updateHasPartDataPackage(Context c, Item item, String idNew, String idOld) throws AuthorizeException, SQLException {
+        //update current datafile's doi that is recorded in the datapackage
         Item dataPackage =org.dspace.workflow.DryadWorkflowUtils.getDataPackage(c, item);
         DCValue[] doiVals = dataPackage.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", Item.ANY);
 
@@ -798,7 +800,17 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         dataPackage.update();
     }
 
+    private void updateIsPartDataFile(Context c, Item dataFile, Item previousDataPackage) throws AuthorizeException, SQLException {
+        //update current datafiles ispartof metadata
+        DCValue[] ids = previousDataPackage.getMetadata(DOIIdentifierProvider.identifierMetadata.schema,DOIIdentifierProvider.identifierMetadata.element,DOIIdentifierProvider.identifierMetadata.qualifier,Item.ANY);
 
+        if(ids!=null&&ids.length>0){
+            dataFile.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY);
+
+           dataFile.addMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY,ids[0].value);
+           dataFile.update();
+        }
+    }
 
     private boolean existsIdDOI(String idDoi) {
         // This method is used to check if a newly generated DOI String collides
