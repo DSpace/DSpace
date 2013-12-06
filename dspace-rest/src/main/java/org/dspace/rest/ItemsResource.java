@@ -285,6 +285,40 @@ public class ItemsResource {
         }
     }
 
+    @GET
+    @Path("/search/help")
+    @Produces({MediaType.TEXT_HTML})
+    public String search_help(){
+    	StringBuilder content= new StringBuilder();
+    	content.append("<H1>Search by lucene query</H1>");
+    	content.append("Use parameter 'q' and specify a correct lucene search query. E.g. /items/search?q=Albert Einstein<br/>");
+    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
+    	content.append("<H1>Search by parameters</H1>");
+    	content.append("You can search on the following fields:");
+    	content.append("<table border =\"1\">");
+    	Iterator<String> search =searchMapping.keySet().iterator();
+    	while(search.hasNext()){
+    		content.append("<tr><td>"+search.next()+"</td></tr>");
+    	}
+    	content.append("</table>");
+    	content.append("All fields in a query are takens as 'and' catenations.<br/>");
+    	content.append("For an exact matching string surround string with '\"', e.g. \"Albert Einstein\". Leaving out '\"' searches for items which either Albert or Einstein.<br/>");
+    	content.append("You have to URL encode special characters in your query, e.g. \"Alpha &amp; Omega\" should be submitted as \"Alpha %26 Omega\"<br/>");
+    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford<br/>searches for content with the author Albert Einstein which were published by someone with Oxford in their name.");
+    	content.append("Sorting can be don either ascending or descanding on one field. Use paramter 'order_asc' or 'order_desc'. You can sort by the following fields: ");
+    	Iterator<String> sort = sortMapping.keySet().iterator();
+    	content.append("<table border =\"1\">");
+    	while(sort.hasNext()){
+    		content.append("<tr><td>"+sort.next()+"</td></tr>");
+    	}
+    	content.append("</table>");
+    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
+    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford&amp;order_desc=title&amp;expand=metadata&amp;limit=10<br/>" +
+    			"This searches for content by Albert Einstein and published by someone with Oxford in the titel; the results will contain a maximum of 10 " +
+    			"itmes sorted by title in descending order with all metadata information displayed.");
+    	return new String("<html><title>Search Help Page</title><body>" + content.toString() + "</body></html>");
+    }
+    
 	private org.dspace.rest.common.ItemReturn luceneSearch(String query,
 			String expand, Integer limit, Integer offset,
 			HttpServletRequest request) throws IOException, SQLException,
