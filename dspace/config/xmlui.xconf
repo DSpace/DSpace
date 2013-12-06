@@ -120,6 +120,13 @@
             Also make sure to comment out the above 'Discovery' aspect
             (in the "Basic Features/Aspects" group) as leaving it on together
             with Searching Artifacts aspect will cause UI overlap issues
+            
+			@deprecated Since DSpace 4 the system use an abstraction layer named
+ 			Discovery to provide access to different search provider. The
+ 			legacy system build upon Apache Lucene is likely to be removed in
+ 			a future version. If you are interested in use Lucene as backend
+ 			for the DSpace search system please consider to build a Lucene
+ 			implementation of the Discovery interfaces
         -->
         <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />-->
 
