@@ -9,13 +9,19 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import javax.servlet.http.HttpServletRequest;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
+import org.dspace.rest.common.ItemReturn;
+import org.dspace.rest.search.Search;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
-import java.net.URLDecoder;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -24,22 +30,9 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.rest.common.ItemReturn;
-import org.dspace.rest.search.Search;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -152,14 +145,8 @@ public class ItemsResource {
             } else {
             	item_context.setQuery(requestURL.append('?').append(queryString).toString());
             }
-            
-            //get item count
-            String myQuery = "SELECT count(*) as count FROM item WHERE in_archive='1' ";
-                   
-            TableRow row = DatabaseManager.querySingle(context, myQuery);
-            if(row!=null){
-            	item_context.setTotal_count(row.getLongColumn("count"));
-            }
+
+            item_context.setTotal_count(Item.countAll(context));
             
             ItemReturn item_return= new ItemReturn();
             item_return.setContext(item_context);
@@ -174,11 +161,14 @@ public class ItemsResource {
          }
     	
     }
-    
+
+    /**
+     * Get a specific Item by its Handle: prefix/suffix
+     */
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Item getItem(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,  @QueryParam(EXPAND) String expand,
+    public org.dspace.rest.common.Item getItem(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix,  @QueryParam(EXPAND) String expand,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException {
     	
@@ -211,7 +201,9 @@ public class ItemsResource {
         }
     }
 
-
+    /**
+     * Get an Item by its internal item_id
+     */
     @GET
     @Path("/{item_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
