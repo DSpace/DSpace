@@ -161,11 +161,14 @@ public class ItemsResource {
          }
     	
     }
-    
+
+    /**
+     * Get a specific Item by its Handle: prefix/suffix
+     */
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Item getItem(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,  @QueryParam(EXPAND) String expand,
+    public org.dspace.rest.common.Item getItem(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix,  @QueryParam(EXPAND) String expand,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException {
     	
@@ -198,7 +201,9 @@ public class ItemsResource {
         }
     }
 
-
+    /**
+     * Get an Item by its internal item_id
+     */
     @GET
     @Path("/{item_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
