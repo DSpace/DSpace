@@ -488,16 +488,20 @@ public class CDLDataCiteService {
 
 
     private String encodeAnvl(String target, Map<String, String> metadata) {
-        Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
         StringBuffer b = new StringBuffer();
-        // anvil is _key: value. If incoming target is null, do not include it in the result
-        if(target != null) {
-            b.append("_target: " + escape(target) + "\n");
-        }
-	while (i.hasNext()) {
-            Map.Entry<String, String> e = i.next();
-            b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
-        }
+
+	if(metadata.entrySet() != null) {
+	    Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
+
+	    // anvil is _key: value. If incoming target is null, do not include it in the result
+	    if(target != null) {
+		b.append("_target: " + escape(target) + "\n");
+	    }
+	    while (i.hasNext()) {
+		Map.Entry<String, String> e = i.next();
+		b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
+	    }
+	}
 	return b.toString();
     }
 
