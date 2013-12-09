@@ -153,13 +153,8 @@ public class ItemsResource {
             	item_context.setQuery(requestURL.append('?').append(queryString).toString());
             }
             
-            //get item count
-            String myQuery = "SELECT count(*) as count FROM item WHERE in_archive='1' ";
-                   
-            TableRow row = DatabaseManager.querySingle(context, myQuery);
-            if(row!=null){
-            	item_context.setTotal_count(row.getLongColumn("count"));
-            }
+            
+           	item_context.setTotal_count(org.dspace.content.Item.getCount(context));
             
             ItemReturn item_return= new ItemReturn();
             item_return.setContext(item_context);

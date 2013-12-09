@@ -384,6 +384,23 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Returns the total number of collections
+     * @param context
+     * @return number of collections; -1 in case of error 
+     * @throws SQLException
+     */
+    public static long getCount(Context context) throws SQLException {
+    	String query = "SELECT count(*) as count FROM collection";
+        
+        TableRow row = DatabaseManager.querySingle(context, query);
+        if(row!=null){
+        	 return row.getLongColumn("count");
+        } else {
+        	return -1;
+        }
+    }
+    
+    /**
      * Get the in_archive items in this collection. The order is indeterminate.
      *
      * @return an iterator over the items in the collection.

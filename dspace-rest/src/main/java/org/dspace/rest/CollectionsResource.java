@@ -132,12 +132,7 @@ public class CollectionsResource {
             collection_context.setLimit(limit);
             collection_context.setOffset(offset);
             
-            String myQuery = "SELECT count(*) as count FROM collection";
-            
-            TableRow row = DatabaseManager.querySingle(context, myQuery);
-            if(row!=null){
-            	collection_context.setTotal_count(row.getLongColumn("count"));
-            }
+            collection_context.setTotal_count(org.dspace.content.Collection.getCount(context));
             
             collection_return.setContext(collection_context);
             collection_return.setCollection(collectionArrayList);
