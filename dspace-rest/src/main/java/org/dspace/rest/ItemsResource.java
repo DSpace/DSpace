@@ -9,37 +9,36 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import javax.servlet.http.HttpServletRequest;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
+import org.dspace.rest.common.ItemReturn;
+import org.dspace.rest.search.Search;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
-import java.net.URLDecoder;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.rest.common.ItemReturn;
-import org.dspace.rest.search.Search;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -153,8 +152,7 @@ public class ItemsResource {
             	item_context.setQuery(requestURL.append('?').append(queryString).toString());
             }
             
-            
-           	item_context.setTotal_count(org.dspace.content.Item.getCount(context));
+            item_context.setTotal_count(Item.countAll(context));
             
             ItemReturn item_return= new ItemReturn();
             item_return.setContext(item_context);
@@ -169,11 +167,14 @@ public class ItemsResource {
          }
     	
     }
-    
+
+    /**
+     * Get a specific Item by its Handle: prefix/suffix
+     */
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public org.dspace.rest.common.Item getItem(@PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,  @QueryParam(EXPAND) String expand,
+    public org.dspace.rest.common.Item getItem(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix,  @QueryParam(EXPAND) String expand,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException {
     	
@@ -206,7 +207,9 @@ public class ItemsResource {
         }
     }
 
-
+    /**
+     * Get an Item by its internal item_id
+     */
     @GET
     @Path("/{item_id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -279,40 +282,97 @@ public class ItemsResource {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     @GET
     @Path("/search/help")
     @Produces({MediaType.TEXT_HTML})
     public String search_help(){
-    	StringBuilder content= new StringBuilder();
-    	content.append("<H1>Search by lucene query</H1>");
-    	content.append("Use parameter 'q' and specify a correct lucene search query. E.g. /items/search?q=Albert Einstein<br/>");
-    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
-    	content.append("<H1>Search by parameters</H1>");
-    	content.append("You can search on the following fields:");
-    	content.append("<table border =\"1\">");
+    	BufferedReader br=null;
+    	InputStream input=null;
+    	String marker1="\\{searchfields\\}";
+    	String marker2="\\{sortfields\\}";
+    	StringBuilder content = new StringBuilder();
+    	StringBuilder searchfields= new StringBuilder();
+    	StringBuilder sortfields= new StringBuilder();
+    	try {
+			input= this.getClass().getClassLoader().getResourceAsStream("/html/searchHelp.html");
+			br = new BufferedReader(new InputStreamReader(input));
+			String line;
+			while((line=br.readLine())!=null){
+				content.append(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			log.error(e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.error(e);
+		} finally {
+			if(input!=null){
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.error(e);
+				}
+			}
+			if(br!=null){
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.error(e);
+				}
+			}
+		}
     	Iterator<String> search =searchMapping.keySet().iterator();
     	while(search.hasNext()){
-    		content.append("<tr><td>"+search.next()+"</td></tr>");
+    		searchfields.append("<tr><td>"+search.next()+"</td></tr>");
     	}
-    	content.append("</table>");
-    	content.append("All fields in a query are takens as 'and' catenations.<br/>");
-    	content.append("For an exact matching string surround string with '\"', e.g. \"Albert Einstein\". Leaving out '\"' searches for items which either Albert or Einstein.<br/>");
-    	content.append("You have to URL encode special characters in your query, e.g. \"Alpha &amp; Omega\" should be submitted as \"Alpha %26 Omega\"<br/>");
-    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford<br/>searches for content with the author Albert Einstein which were published by someone with Oxford in their name.");
-    	content.append("Sorting can be don either ascending or descanding on one field. Use paramter 'order_asc' or 'order_desc'. You can sort by the following fields: ");
     	Iterator<String> sort = sortMapping.keySet().iterator();
-    	content.append("<table border =\"1\">");
     	while(sort.hasNext()){
-    		content.append("<tr><td>"+sort.next()+"</td></tr>");
+    		sortfields.append("<tr><td>"+sort.next()+"</td></tr>");
     	}
-    	content.append("</table>");
-    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
-    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford&amp;order_desc=title&amp;expand=metadata&amp;limit=10<br/>" +
-    			"This searches for content by Albert Einstein and published by someone with Oxford in the titel; the results will contain a maximum of 10 " +
-    			"itmes sorted by title in descending order with all metadata information displayed.");
-    	return new String("<html><title>Search Help Page</title><body>" + content.toString() + "</body></html>");
+    	String all=content.toString();
+    	all=all.replaceAll(marker1, searchfields.toString());
+    	all=all.replaceAll(marker2, sortfields.toString());
+    	
+    	return all;
     }
+
+//    @GET
+//    @Path("/search/help")
+//    @Produces({MediaType.TEXT_HTML})
+//    public String search_help(){
+//    	StringBuilder content= new StringBuilder();
+//    	content.append("<H1>Search by lucene query</H1>");
+//    	content.append("Use parameter 'q' and specify a correct lucene search query. E.g. /items/search?q=Albert Einstein<br/>");
+//    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
+//    	content.append("<H1>Search by parameters</H1>");
+//    	content.append("You can search on the following fields:");
+//    	content.append("<table border =\"1\">");
+//    	Iterator<String> search =searchMapping.keySet().iterator();
+//    	while(search.hasNext()){
+//    		content.append("<tr><td>"+search.next()+"</td></tr>");
+//    	}
+//    	content.append("</table>");
+//    	content.append("All fields in a query are takens as 'and' catenations.<br/>");
+//    	content.append("For an exact matching string surround string with '\"', e.g. \"Albert Einstein\". Leaving out '\"' searches for items which either Albert or Einstein.<br/>");
+//    	content.append("You have to URL encode special characters in your query, e.g. \"Alpha &amp; Omega\" should be submitted as \"Alpha %26 Omega\"<br/>");
+//    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford<br/>searches for content with the author Albert Einstein which were published by someone with Oxford in their name.");
+//    	content.append("Sorting can be don either ascending or descanding on one field. Use paramter 'order_asc' or 'order_desc'. You can sort by the following fields: ");
+//    	Iterator<String> sort = sortMapping.keySet().iterator();
+//    	content.append("<table border =\"1\">");
+//    	while(sort.hasNext()){
+//    		content.append("<tr><td>"+sort.next()+"</td></tr>");
+//    	}
+//    	content.append("</table>");
+//    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
+//    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford&amp;order_desc=title&amp;expand=metadata&amp;limit=10<br/>" +
+//    			"This searches for content by Albert Einstein and published by someone with Oxford in the titel; the results will contain a maximum of 10 " +
+//    			"itmes sorted by title in descending order with all metadata information displayed.");
+//    	return new String("<html><title>Search Help Page</title><body>" + content.toString() + "</body></html>");
+//    }
     
 	private org.dspace.rest.common.ItemReturn luceneSearch(String query,
 			String expand, Integer limit, Integer offset,

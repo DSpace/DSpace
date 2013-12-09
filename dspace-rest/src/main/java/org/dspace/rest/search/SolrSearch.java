@@ -8,12 +8,7 @@
 
 package org.dspace.rest.search;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -22,7 +17,11 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SolrServiceImpl;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class SolrSearch implements Search{
 	
@@ -33,16 +32,16 @@ public class SolrSearch implements Search{
 	@Override
 	public ArrayList<org.dspace.rest.common.Item> search(Context context, HashMap<String,String>searchTerms, String expand, Integer limit, Integer offset, String sortField, String sortOrder){
 		ArrayList<org.dspace.rest.common.Item> results = new ArrayList<org.dspace.rest.common.Item>();
-		StringBuffer query_string=new StringBuffer();
+		StringBuilder query_string=new StringBuilder();
 		Iterator<String> keyset= searchTerms.keySet().iterator();
 		while(keyset.hasNext()){
 			String key = keyset.next();
-			query_string.append(key+":"+searchTerms.get(key));
+			query_string.append(key).append(":").append(searchTerms.get(key));
 			if(keyset.hasNext()){
 				query_string.append(" AND ");
 			}
 		}
-		log.debug("serach query: " + query_string.toString());
+		log.debug("search query: " + query_string.toString());
 		SolrServiceImpl solr = new SolrServiceImpl();
 		DiscoverQuery query = new DiscoverQuery();
 		query.setQuery(query_string.toString());
@@ -55,15 +54,14 @@ public class SolrSearch implements Search{
 			result =solr.search(context, query);
 			List<DSpaceObject>  list=result.getDspaceObjects();
 			for(DSpaceObject obj : list){
-				if(obj instanceof org.dspace.content.Item 
-					&& AuthorizeManager.authorizeActionBoolean(context, obj, org.dspace.core.Constants.READ)) {
+				if(obj instanceof org.dspace.content.Item && AuthorizeManager.authorizeActionBoolean(context, obj, org.dspace.core.Constants.READ)) {
 					results.add(new org.dspace.rest.common.Item((org.dspace.content.Item)obj, expand, context));
 				}
 			}
 		} catch (SearchServiceException e) {
-			log.error(e.toString());
+			log.error(e.getMessage());
 		} catch (SQLException e) {
-			log.error(e.toString());
+			log.error(e.getMessage());
 		}
 		
 		return results;
