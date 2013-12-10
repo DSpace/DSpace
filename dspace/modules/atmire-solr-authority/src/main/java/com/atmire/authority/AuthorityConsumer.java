@@ -83,7 +83,11 @@ public class AuthorityConsumer implements Consumer {
         DCValue[] vals = item.getMetadata("prism.publicationName");
         if (vals.length > 0) {
             String journal = vals[0].value;
-
+            //Remove asterisks from journal name
+            if(journal!=null&&journal.endsWith("*"))
+            {
+               journal = journal.replace("*","");
+            }
             ServiceManager serviceManager=getServiceManager();
             IndexerInterface local = serviceManager.getServiceByName(null, LocalIndexer.class);
             IndexingService solrIndexer = serviceManager.getServiceByName(IndexingService.class.getName(),IndexingService.class);

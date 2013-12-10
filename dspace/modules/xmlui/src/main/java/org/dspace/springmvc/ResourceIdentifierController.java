@@ -213,6 +213,11 @@ public class ResourceIdentifierController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
 
+        } finally {
+            if(context != null)
+            {
+                context.abort();
+            }
         }
     }
 
@@ -264,6 +269,11 @@ public class ResourceIdentifierController {
 
         } catch (IdentifierNotResolvableException e) {
             return STATUS_FORBIDDEN;
+        } finally {
+            if(context != null)
+            {
+                context.abort();
+            }
         }
     }
 
