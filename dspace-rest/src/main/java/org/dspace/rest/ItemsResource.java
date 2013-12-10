@@ -15,9 +15,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.rest.common.ItemReturn;
 import org.dspace.rest.search.Search;
-import org.dspace.search.DSQuery;
-import org.dspace.search.QueryArgs;
-import org.dspace.search.QueryResults;
+//import org.dspace.search.DSQuery;
+//import org.dspace.search.QueryArgs;
+//import org.dspace.search.QueryResults;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -269,7 +268,7 @@ public class ItemsResource {
     		}
             
             if(query!=null){
-            	return luceneSearch(query, expand, limit, offset, request);
+            	return luceneSearch(query, expand, limit, offset, request, order_asc, order_desc);
             } else {
             	return parameterSearch(expand, limit, offset, request, order_asc, order_desc);
             }
@@ -340,90 +339,122 @@ public class ItemsResource {
     	return all;
     }
 
-//    @GET
-//    @Path("/search/help")
-//    @Produces({MediaType.TEXT_HTML})
-//    public String search_help(){
-//    	StringBuilder content= new StringBuilder();
-//    	content.append("<H1>Search by lucene query</H1>");
-//    	content.append("Use parameter 'q' and specify a correct lucene search query. E.g. /items/search?q=Albert Einstein<br/>");
-//    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
-//    	content.append("<H1>Search by parameters</H1>");
-//    	content.append("You can search on the following fields:");
-//    	content.append("<table border =\"1\">");
-//    	Iterator<String> search =searchMapping.keySet().iterator();
-//    	while(search.hasNext()){
-//    		content.append("<tr><td>"+search.next()+"</td></tr>");
-//    	}
-//    	content.append("</table>");
-//    	content.append("All fields in a query are takens as 'and' catenations.<br/>");
-//    	content.append("For an exact matching string surround string with '\"', e.g. \"Albert Einstein\". Leaving out '\"' searches for items which either Albert or Einstein.<br/>");
-//    	content.append("You have to URL encode special characters in your query, e.g. \"Alpha &amp; Omega\" should be submitted as \"Alpha %26 Omega\"<br/>");
-//    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford<br/>searches for content with the author Albert Einstein which were published by someone with Oxford in their name.");
-//    	content.append("Sorting can be don either ascending or descanding on one field. Use paramter 'order_asc' or 'order_desc'. You can sort by the following fields: ");
-//    	Iterator<String> sort = sortMapping.keySet().iterator();
-//    	content.append("<table border =\"1\">");
-//    	while(sort.hasNext()){
-//    		content.append("<tr><td>"+sort.next()+"</td></tr>");
-//    	}
-//    	content.append("</table>");
-//    	content.append("Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>");
-//    	content.append("Example: /items/search?author=\"Albert Einstein\"&amp;publisher=Oxford&amp;order_desc=title&amp;expand=metadata&amp;limit=10<br/>" +
-//    			"This searches for content by Albert Einstein and published by someone with Oxford in the titel; the results will contain a maximum of 10 " +
-//    			"itmes sorted by title in descending order with all metadata information displayed.");
-//    	return new String("<html><title>Search Help Page</title><body>" + content.toString() + "</body></html>");
-//    }
+    
+//	private org.dspace.rest.common.ItemReturn luceneSearch(String query,
+//			String expand, Integer limit, Integer offset,
+//			HttpServletRequest request) throws IOException, SQLException,
+//			WebApplicationException {
+//		
+//		QueryArgs queryArgs = new QueryArgs();
+//		queryArgs.setQuery(query);
+//		QueryResults queryResults = DSQuery.doQuery(context, queryArgs);
+//
+//		List<String> handleList = queryResults.getHitHandles();
+//		List<org.dspace.rest.common.Item> dsoList = new ArrayList<org.dspace.rest.common.Item>();
+//		int added=0;
+//		int count=0;
+//		for(String handle : handleList) {
+//		    org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+//		    if(dso instanceof  org.dspace.content.Item){
+//		    	if(count>=offset && added<(offset+limit)){
+//		        	org.dspace.content.Item item = ( org.dspace.content.Item)dso;
+//		        	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+//		        	   dsoList.add(new org.dspace.rest.common.Item(item, expand, context));
+//		        	   added++;
+//		        	}
+//		    	} 
+//		    	if(added>=limit){
+//		    		break;
+//		    	}
+//		    }
+//		    count++;
+//		}
+//		
+//		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
+//		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
+//		item_context.setLimit(limit);
+//		item_context.setOffset(offset);
+//		item_context.setTotal_count(handleList.size());
+//		StringBuffer requestURL = request.getRequestURL();
+//		String queryString = request.getQueryString();
+//
+//		if (queryString == null) {
+//			item_context.setQuery(requestURL.toString());
+//		} else {
+//			item_context.setQuery(requestURL.append('?').append(queryString).toString());
+//		}
+//		item_return.setContext(item_context);
+//		item_return.setItem(dsoList);
+//		
+//		
+//
+//		return item_return;
+//	}
+    
     
 	private org.dspace.rest.common.ItemReturn luceneSearch(String query,
-			String expand, Integer limit, Integer offset,
-			HttpServletRequest request) throws IOException, SQLException,
-			WebApplicationException {
-		
-		QueryArgs queryArgs = new QueryArgs();
-		queryArgs.setQuery(query);
-		QueryResults queryResults = DSQuery.doQuery(context, queryArgs);
-
-		List<String> handleList = queryResults.getHitHandles();
-		List<org.dspace.rest.common.Item> dsoList = new ArrayList<org.dspace.rest.common.Item>();
-		int added=0;
-		int count=0;
-		for(String handle : handleList) {
-		    org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-		    if(dso instanceof  org.dspace.content.Item){
-		    	if(count>=offset && added<(offset+limit)){
-		        	org.dspace.content.Item item = ( org.dspace.content.Item)dso;
-		        	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
-		        	   dsoList.add(new org.dspace.rest.common.Item(item, expand, context));
-		        	   added++;
-		        	}
-		    	} 
-		    	if(added>=limit){
-		    		break;
-		    	}
-		    }
-		    count++;
-		}
-		
+	String expand, Integer limit, Integer offset,
+	HttpServletRequest request, String order_asc, String order_desc) throws IOException, SQLException,
+	WebApplicationException {
 		org.dspace.rest.common.ItemReturn item_return = new org.dspace.rest.common.ItemReturn();
 		org.dspace.rest.common.Context item_context = new org.dspace.rest.common.Context();
 		item_context.setLimit(limit);
 		item_context.setOffset(offset);
-		item_context.setTotal_count(handleList.size());
-		StringBuffer requestURL = request.getRequestURL();
-		String queryString = request.getQueryString();
-
-		if (queryString == null) {
-			item_context.setQuery(requestURL.toString());
-		} else {
-			item_context.setQuery(requestURL.append('?').append(queryString).toString());
-		}
 		item_return.setContext(item_context);
-		item_return.setItem(dsoList);
+		if(order_asc!=null && order_desc!=null){
+			log.error("Both order ascending and order descending set - invalid use");
+			item_context.addError("It is not allowed to set both parameters 'order_asc' and 'order_desc'.");
+			return item_return;
+		}
+		String sortfield=null;
+		String field=null;
+		String sortorder=null;
+		if(order_asc!=null){
+			sortorder="asc";
+			field=order_asc;
+		} else if (order_desc!=null){
+			sortorder="desc";
+			field=order_desc;
+		}
+		
+		if(field!=null && sortMapping.containsKey(field)){
+			sortfield = sortMapping.get(field);
+		} else if(field!=null){
+			log.error("order field " + field+ " not supported");
+			item_context.addError("not recognised order field: " + field);
+			return item_return;
+		}
+		
+		try{
+			Class<?> clazz = Class.forName(searchClass);
+			Constructor<?> constructor = clazz.getConstructor();
+			Search instance = (Search) constructor.newInstance();
+			item_return.setItem(instance.searchAll(context, query, expand, limit, offset, sortfield, sortorder));
+			item_context.setTotal_count(instance.getTotalCount());
+		} catch(ClassNotFoundException ex) {
+			item_context.addError("'implementing.search.class' does not point to an existing class");
+			log.error(ex);
+		} catch(NoSuchMethodException ex) {
+			item_context.addError("'implementing.search.class' does have an empty contructor");
+			log.error(ex);
+		} catch(InstantiationException ex) {
+			item_context.addError("constructor for 'implementing.search.class' could not be instantiated");
+			log.error(ex);
+		} catch(IllegalAccessException ex) {
+			item_context.addError("'caught IllegalAccessException for instance of 'implementing.search.class'");
+			log.error(ex);
+		} catch(InvocationTargetException ex) {
+			item_context.addError("'caught InvocationTargetException for instance of 'implementing.search.class'");
+			log.error(ex);
+		}
+    		
+		return item_return;
+
 		
 		
 
-		return item_return;
 	}
+    
 	
 	private org.dspace.rest.common.ItemReturn parameterSearch(
 			String expand, Integer limit, Integer offset,

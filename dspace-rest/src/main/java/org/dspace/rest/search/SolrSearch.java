@@ -16,6 +16,7 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SolrServiceImpl;
+import org.dspace.rest.common.Item;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -73,6 +74,40 @@ public class SolrSearch implements Search{
 			return result.getTotalSearchResults();
 		}
 		return 0;
+	}
+
+	@Override
+	public ArrayList<Item> searchAll(Context context, String query,
+			String expand, Integer limit, Integer offset, String sortField,
+			String sortOrder) {
+		ArrayList<org.dspace.rest.common.Item> results = new ArrayList<org.dspace.rest.common.Item>();
+		StringBuilder query_string=new StringBuilder();
+		query_string.append("{!lucene q.op=AND}");
+		query_string.append(query);
+		log.debug("search query: " + query_string.toString());
+		SolrServiceImpl solr = new SolrServiceImpl();
+		DiscoverQuery dis_query = new DiscoverQuery();
+		dis_query.setQuery(query_string.toString());
+		dis_query.setMaxResults(limit);
+		dis_query.setStart(offset);
+		if(sortField!=null && sortOrder!=null){
+			dis_query.setSortField(sortField, sortOrder.compareTo("asc")==0?DiscoverQuery.SORT_ORDER.asc:DiscoverQuery.SORT_ORDER.desc);
+		}
+		try {
+			result =solr.search(context, dis_query);
+			List<DSpaceObject>  list=result.getDspaceObjects();
+			for(DSpaceObject obj : list){
+				if(obj instanceof org.dspace.content.Item && AuthorizeManager.authorizeActionBoolean(context, obj, org.dspace.core.Constants.READ)) {
+					results.add(new org.dspace.rest.common.Item((org.dspace.content.Item)obj, expand, context));
+				}
+			}
+		} catch (SearchServiceException e) {
+			log.error(e.getMessage());
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+		}
+		
+		return results;
 	}
 	
 	
