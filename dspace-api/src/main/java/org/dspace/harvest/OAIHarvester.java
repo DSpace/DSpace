@@ -29,6 +29,8 @@ import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import ORG.oclc.oai.harvester2.verb.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -62,12 +64,6 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-
-import ORG.oclc.oai.harvester2.verb.GetRecord;
-import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
-import ORG.oclc.oai.harvester2.verb.ListRecords;
-import ORG.oclc.oai.harvester2.verb.ListSets;
 
 
 /**
@@ -945,29 +941,21 @@ public class OAIHarvester {
     	try {
             //If we do not want to harvest from one set, then skip this.
     		if(!"all".equals(oaiSetId)){
-                ListSets ls = new ListSets(oaiSource);
+                ListIdentifiers ls = new ListIdentifiers(oaiSource, null, null, oaiSetId, DMDOAIPrefix);
 
                 // The only error we can really get here is "noSetHierarchy"
                 if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
                     for (int i=0; i<ls.getErrors().getLength(); i++) {
                         String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
-                        errorSet.add(errorCode);
+                        errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec (" + errorCode + ")");
                     }
                 }
                 else {
                     // Drilling down to /OAI-PMH/ListSets/set
                     Document reply = db.build(ls.getDocument());
                     Element root = reply.getRootElement();
-                    List<Element> sets= root.getChild("ListSets",OAI_NS).getChildren("set",OAI_NS);
-
-                    for (Element set : sets)
-                    {
-                        String setSpec = set.getChildText("setSpec", OAI_NS);
-                        if (setSpec.equals(oaiSetId)) {
-                            foundSet = true;
-                            break;
-                        }
-                    }
+                    //Check if we can find items, if so this indicates that we have children and our sets exist
+                    foundSet = 0 < root.getChild("ListIdentifiers",OAI_NS).getChildren().size();
 
                     if (!foundSet) {
                         errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");
