@@ -43,7 +43,7 @@
             </alternativeOutcome>
         </step>
         
-        <step id="reAuthorizationPaymentStep" userSelectionMethod="claimAction" role="curator">
+        <step id="reAuthorizationPaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
         </step>
         
