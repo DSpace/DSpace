@@ -33,17 +33,23 @@ public class LastModifiedDate extends AbstractConfigurableAction implements Thre
         public void configure(Configuration configuration)
                 throws ConfigurationException {
             super.configure(configuration);
+
+            // RFC-822 Date with a GMT based time zone
+            this.formatter = FastDateFormat.getInstance("EEE, dd MMM yyyy kk:mm:ss zzz");
+            this.days = configuration.getChild("days").getValueAsInteger(0);
+            this.hours = configuration.getChild("hours").getValueAsInteger(0);
+            this.minutes = configuration.getChild("minutes").getValueAsInteger(0);
+            this.seconds = configuration.getChild("seconds").getValueAsInteger(0);
         }
 
         public Map act(Redirector redirector, SourceResolver resolver,
                        Map objectModel, String source, Parameters parameters)
                 throws Exception {
             Response response = ObjectModelHelper.getResponse(objectModel);
-
+            Calendar calendar = Calendar.getInstance(DateUtils.UTC_TIME_ZONE);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             Map values = new HashMap(3);
-            Date date = new Date();
-            String value = date.toString();
+            String value = this.formatter.format(calendar);
 
             if(dso instanceof Item)
             {
