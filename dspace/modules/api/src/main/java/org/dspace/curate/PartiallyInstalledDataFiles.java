@@ -126,8 +126,12 @@ public class PartiallyInstalledDataFiles extends AbstractCurationTask {
         try {
             context.turnOffAuthorisationSystem();
             for(Integer workflowId : partiallyInstalledFiles.keySet()) {
-                WorkflowItem wfi = WorkflowItem.find(context, workflowId);
-                WorkflowManager.archive(context, wfi, false);
+                try {
+                    WorkflowItem wfi = WorkflowItem.find(context, workflowId);
+                    WorkflowManager.archive(context, wfi, false);
+                } catch (Exception ex) {
+                    log.error("Exception installing item with workflowId: " + workflowId, ex);
+                }
             }
             context.restoreAuthSystemState();
             context.commit();
