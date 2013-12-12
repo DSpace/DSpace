@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Item;
 import org.dspace.core.*;
@@ -377,15 +378,33 @@ public class PaypalImpl implements PaypalService{
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type) throws WingException,SQLException {
+    public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type,Context context) throws WingException,SQLException {
 
         //return false if there is error in loading from paypal
         String secureTokenId = getSecureTokenId();
         String secureToken = generateSecureToken(shoppingCart,secureTokenId,Integer.toString(shoppingCart.getItem()),type);
-
+        WorkspaceItem workspaceItem=null;
         if(secureToken==null){
-            showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
-	    log.error("PayPal Secure Token is null");
+            EPerson ePerson = context.getCurrentUser();
+            try{
+                workspaceItem=WorkspaceItem.findByItemId(context,shoppingCart.getItem());
+            }
+            catch (Exception e)
+            {
+                log.error("couldn't find the item in the workspace, so block peopele other than admmin"+e);
+            }
+            if(workspaceItem!=null||AuthorizeManager.isAdmin(context,ePerson))
+            {
+                showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
+
+            }
+            else
+            {
+                //don't show the skip button if item is not in workspace steps and not admin users
+                showHelpPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please contact administrator regarding payment. Error code: Secure-null");
+
+            }
+            log.error("PayPal Secure Token is null");
 
         }
         else{
@@ -442,6 +461,12 @@ public class PaypalImpl implements PaypalService{
         Division error = mainDiv.addDivision("error");
         error.addPara(message);
         error.addHidden("show_button").setValue("Skip payment and submit");
+    }
+
+    public void showHelpPaymentButton(Division mainDiv,String message)throws WingException{
+        Division error = mainDiv.addDivision("error");
+        error.addPara(message);
+        //error.addHidden("show_button").setValue("Skip payment and submit");
     }
 
     public void addButtons(Division mainDiv)throws WingException{
@@ -513,7 +538,7 @@ public class PaypalImpl implements PaypalService{
                     paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
                 }
                 Division creditcard = mainDiv.addDivision("creditcard");
-                paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type);
+                paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type,context);
 
             }
 
