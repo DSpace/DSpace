@@ -424,7 +424,7 @@ public class CDLDataCiteService {
             String crosswalk = "DIM2DATACITE";
             // If item is in publication blackout, get the appropriate crosswalk
             if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                log.info("Item is in publication blackout, using blackout crosswalk");
+                log.info("Item " + item.getHandle() + " is in publication blackout, using blackout crosswalk");
                 crosswalk = "DIM2DATACITE-BLACKOUT";
             }
             DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalk);
@@ -433,13 +433,13 @@ public class CDLDataCiteService {
             String xmlout = outputter.outputString(element);
             metadata.put(DATACITE, xmlout);
         } catch (CrosswalkException e) {
-            e.printStackTrace();
+            log.error("unable to create metadata list for " + item.getHandle(), e);
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
+	    log.error("unable to create metadata list for " + item.getHandle(), e);
+	} catch (AuthorizeException e) {
+	    log.error("unable to create metadata list for " + item.getHandle(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+	    log.error("unable to create metadata list for " + item.getHandle(), e);
         }
         return metadata;
     }
@@ -488,16 +488,20 @@ public class CDLDataCiteService {
 
 
     private String encodeAnvl(String target, Map<String, String> metadata) {
-        Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
         StringBuffer b = new StringBuffer();
-        // anvil is _key: value. If incoming target is null, do not include it in the result
-        if(target != null) {
-            b.append("_target: " + escape(target) + "\n");
-        }
-	while (i.hasNext()) {
-            Map.Entry<String, String> e = i.next();
-            b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
-        }
+
+	if(metadata.entrySet() != null) {
+	    Iterator<Map.Entry<String, String>> i = metadata.entrySet().iterator();
+
+	    // anvil is _key: value. If incoming target is null, do not include it in the result
+	    if(target != null) {
+		b.append("_target: " + escape(target) + "\n");
+	    }
+	    while (i.hasNext()) {
+		Map.Entry<String, String> e = i.next();
+		b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
+	    }
+	}
 	return b.toString();
     }
 
