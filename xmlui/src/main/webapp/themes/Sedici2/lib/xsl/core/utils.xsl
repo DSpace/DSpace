@@ -169,7 +169,7 @@
          	 <h2><i18n:text>sedici.home.buscar_material.title</i18n:text></h2>
          	 <p>
          	 	<i18n:text>sedici.home.buscar_material.info_pre</i18n:text>
-         	 	<span class="resource_count">26500</span>
+         	 	<span class="resource_count">29000</span>
          	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
          	 </p>
 	     <form>
