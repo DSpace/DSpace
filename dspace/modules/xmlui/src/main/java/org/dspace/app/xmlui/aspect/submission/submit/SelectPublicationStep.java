@@ -136,8 +136,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         String manuscriptNumber = request.getParameter("manu");
 	log.debug("initializing submission UI for journal " + selectedJournalId + ", manu " + manuscriptNumber);
         PublicationBean pBean = null;
-
-
+	
         // get journal status and name
         String journalStatus = null;
         String journalName = null;
@@ -150,15 +149,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 journalStatus = pBean.getStatus();
                 journalName = pBean.getJournalName();
-//                if(journalName!=null && !journalName.equals("")) {
-//                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-//                        journalName += "*";
-//                }
             }catch (Exception e)
             {
                  //invalid journalID
                 this.errorFlag = org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL;
-
+		log.error("Error etting parameters for invalid JournalID: " + selectedJournalId, e);
             }
         }
 
@@ -358,8 +353,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         for (int i = 0; i < journalVals.size(); i++){
             String val =  journalVals.get(i);
             String name =  journalNames.get(i);
-//            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-//                name += "*";
 
             // add only journal with allowReviewWorkflow=true;
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
