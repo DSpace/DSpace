@@ -153,7 +153,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             {
                  //invalid journalID
                 this.errorFlag = org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL;
-		log.error("Error etting parameters for invalid JournalID: " + selectedJournalId, e);
+		log.error("Error getting parameters for invalid JournalID: " + selectedJournalId, e);
             }
         }
 
