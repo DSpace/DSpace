@@ -59,14 +59,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     public void init(Curator curator, String taskID) throws IOException{
         super.init(curator, taskID);
         // init dspace context to allow access to database
-        try {
-            dspaceContext = new Context();
-        } catch (SQLException e1) {
-            LOGGER.error("Unable to create Dspace context");
-            LOGGER.error("Exception was " + e1);
-            return;
-        }
-
     }
 
     @Override
@@ -92,7 +84,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     @Override
     protected void performItem(Item item){
         final String handle = item.getHandle();
-        final StringBuilder result = new StringBuilder(200);
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
             if (partof != null && partof.length==1){  //and articles
@@ -120,6 +111,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 }
                 Item parentItem = null;
                 try{
+                    dspaceContext = new Context();
                     parentItem = (Item)HandleManager.resolveToObject(dspaceContext, shortHandle);
                     if (parentItem != null){
                         DCValue[] citationValues = parentItem.getDC("identifier", "citation", null);
@@ -140,6 +132,11 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     LOGGER.error("EmbargoManager unable to authorize access to embargo data for this item");
                 } catch (IOException e) {
                     LOGGER.error("EmbargoManager generated an IOException when accessing embargo data for this item");
+                } finally {
+                    if(dspaceContext != null)
+                    {
+                        dspaceContext.abort();
+                    }
                 }
                         
             }

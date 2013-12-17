@@ -131,6 +131,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
+        if(selectedJournalId!=null)
+        {
+            selectedJournalId = selectedJournalId.toLowerCase();
+        }
         String manuscriptNumber = request.getParameter("manu");
 	log.debug("initializing submission UI for journal " + selectedJournalId + ", manu " + manuscriptNumber);
         PublicationBean pBean = null;
@@ -142,14 +146,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(selectedJournalId!=null){
             String journalPath = "";
             try{
+                final java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
+                final java.util.List<String> journalDirs = org.dspace.submit.step.SelectPublicationStep.journalDirs;
                 journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
                 pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 journalStatus = pBean.getStatus();
                 journalName = pBean.getJournalName();
-                if(journalName!=null && !journalName.equals("")) {
-                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-                        journalName += "*";
-                }
+//                if(journalName!=null && !journalName.equals("")) {
+//                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
+//                        journalName += "*";
+//                }
             }catch (Exception e)
             {
                  //invalid journalID
@@ -370,6 +376,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
                 else if(request.getParameter("journalIDStatusInReview")!=null&&!request.getParameter("journalIDStatusInReview").equals("")){
                     selectedJournalId = request.getParameter("journalIDStatusInReview");
+                    if(selectedJournalId!=null)
+                    {
+                        selectedJournalId = selectedJournalId.toLowerCase();
+                    }
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
@@ -545,7 +555,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             String name =  journalNames.get(i);
             String no_asterisk = name;
             if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-                name += "*";
+                //name += "*";
                 journalID.addOption(val.equals(selectedJournalId), no_asterisk, name);
 
         }

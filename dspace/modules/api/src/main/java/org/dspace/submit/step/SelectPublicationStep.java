@@ -111,6 +111,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
 
+		//once we have read the properties from the file, make the journal's name case-insensitive
+		journalType = journalType.toLowerCase();
+		
                 journalVals.add(journalType);
                 journalNames.add(journalDisplay);
                 journalDirs.add(metadataDir);

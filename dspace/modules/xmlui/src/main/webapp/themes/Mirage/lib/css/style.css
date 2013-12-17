@@ -2487,3 +2487,11 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
     width:100% !important;
 }
 
+#unknown-doi-panel span.field-help{
+    color:black !important;
+}
+
+.help-title{
+    color:grey;
+    font-size: 0.5em;
+}
