@@ -417,8 +417,8 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+applied%5C+ecology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Applied%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAPPLcover.gif" alt="Journal of Applied Ecology" /></a>
-		  <!-- gms -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Agms%5C+german%5C+medical%5C+science%5C%7C%5C%7C%5C%7CGMS%5C+German%5C+Medical%5C+Science"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-GMS.png" alt="GMS Medizinische Informatik, Biometrie und Epidemiologie" /></a>
+		  <!-- Elementa -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aelementa%5C%3A%5C+science%5C+of%5C+the%5C+anthropocene%5C%7C%5C%7C%5C%7CElementa%5C%3A%5C+Science%5C+of%5C+the%5C+Anthropocene"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Elementa.png" alt="Elementa: Science of the Anthropocene" /></a>
 		  <!-- ecology letters -->
 		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+letters%5C%7C%5C%7C%5C%7CEcology%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ECOLETScover.gif" alt="Ecology Letters" /></a>
 		  <!-- pala -->
