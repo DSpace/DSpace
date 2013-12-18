@@ -41,7 +41,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
-import org.datadryad.usagelogging.EventLogger;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
