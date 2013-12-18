@@ -29,7 +29,7 @@ public class SearchingTest extends TestCase {
 	public void testSearch() {	    
 		driver.get(baseUrl);
 		driver.findElement(By.name("query")).clear();
-		driver.findElement(By.name("query")).sendKeys("dog* Barua");
+		driver.findElement(By.name("query")).sendKeys("dog* Barua 18pn5");
 		driver.findElement(By.name("submit")).click();
 		Assert.assertTrue("find ecomorph package", sectionContains("div.primary","Arabidopsis thaliana"));
 	}
