@@ -13,7 +13,7 @@ public class EventLogger {
     static Logger log = Logger.getLogger(EventLogger.class);
     public static void log(Context context, String action, String userInfo) {
         try {
-            String message = LogManager.getHeader(context, "action="+action, userInfo);
+            String message = LogManager.getHeader(context, "action="+action, userInfo != null ? userInfo : "");
             // Send to logfile configured for EventLogger
             log.log(Level.INFO, message);
         } catch (Exception ex) {
