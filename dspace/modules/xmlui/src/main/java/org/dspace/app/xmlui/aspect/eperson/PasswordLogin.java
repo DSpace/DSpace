@@ -55,6 +55,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.datadryad.usagelogging.EventLogger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
@@ -303,6 +304,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
                 loginSubmitButton.setValue(T_submit_login);
 
 		login.addPara().addXref("/forgot", T_forgot_link);
+                EventLogger.log(context, "login-form", "previous-email=" + previousEmail != null ? previousEmail : "");
 	}
 
 	// HttpServletRequest  httpRequest  = (HttpServletRequest)  objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
