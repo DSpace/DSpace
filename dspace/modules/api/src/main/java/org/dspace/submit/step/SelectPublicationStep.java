@@ -383,11 +383,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
     private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context,
 				   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
-	log.debug("processing journal ID");
+	journalID = journalID.toLowerCase();
+	
+	log.debug("processing journal ID " + journalID);
 	
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
+		log.debug(journalID + " is not integrated OR manuscript number is null");
                 //Just add the journal title
                 String title= journalID;
                 if(journalVals.indexOf(journalID)!=-1){
@@ -411,6 +414,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 if(journalVals.indexOf(journalID)!=-1){
 
                     String journalPath = journalDirs.get(journalVals.indexOf(journalID));
+		    log.debug("journalPath: " + journalPath);
                     //We have a valid journal
                     // Unescape the manuscriptNumber to get the filename
                     String fileName = DryadJournalSubmissionUtils.unescapeFilename(manuscriptNumber);

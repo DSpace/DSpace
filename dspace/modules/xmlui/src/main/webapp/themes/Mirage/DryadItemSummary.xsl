@@ -1653,6 +1653,23 @@
                          alt="Ecology Letters cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Elementa: Science of the Anthropocene"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.elementascience.org')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/Elementa.png"
+                         alt="Elementa: Science of the Anthropocene cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "eLife"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
