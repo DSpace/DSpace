@@ -2860,7 +2860,7 @@
         </ul>
     </message>
     <message key="xmlui.submit.select.pub.help">
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by supporting journals, societies, and publishers [link to list of journals covered by payment plans].  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals">supporting journals, societies, and publishers</a>.  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
     </message>
     <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
