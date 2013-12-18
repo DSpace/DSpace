@@ -1240,6 +1240,7 @@ parameter that is being used (see variable defined above) -->
         <xsl:apply-templates select="." mode="normalField"/>
     </xsl:template>
 
+
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
       <xsl:call-template name="search_labels" />
     </xsl:template>
@@ -1254,4 +1255,27 @@ parameter that is being used (see variable defined above) -->
         </xsl:comment>
     </xsl:template>
         
+
+    <!-- remove voucher link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-voucher']/dri:xref">
+        <a id="remove-voucher" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeVoucher()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </a>
+    </xsl:template>
+
+
+
+    <!-- remove country link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-country']/dri:xref">
+        <a id="remove-country" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeCountry()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

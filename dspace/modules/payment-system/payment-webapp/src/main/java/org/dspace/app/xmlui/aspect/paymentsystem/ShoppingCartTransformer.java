@@ -29,6 +29,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.Select;
+import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 
 import org.dspace.content.DCValue;
@@ -162,12 +163,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
 //        SubmissionInfo sinfo = FlowUtils.obtainSubmissionInfo(objectModel, String.valueOf(submission.getID()));
 
         //Integer step = (Integer)request.get("step");
-        DCValue[] values= item.getMetadata("prism.publicationName");
-        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
-        if(values!=null&&values.length>0)
-        {
-            generateCountryList(info,manager,transaction);
-        }
+        generateCountryList(info,manager,transaction,item);
 
         generateVoucherForm(info,manager,transaction);
         }catch (Exception e)
@@ -178,20 +174,34 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
 
     }
 
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException{
-        java.util.List<String> countryArray = manager.getSortedCountry();
-        info.addLabel(T_Country);
-        Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-        countryList.addOption("","Select Your Country");
-        for(String temp:countryArray){
-            String[] countryTemp = temp.split(":");
-            if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
-                countryList.addOption(true,countryTemp[0],countryTemp[0]);
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Item item) throws WingException{
+        DCValue[] values= item.getMetadata("prism.publicationName");
+        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
+        if(values!=null&&values.length>0)
+        {
+            java.util.List<String> countryArray = manager.getSortedCountry();
+            info.addLabel(T_Country);
+            Select countryList = info.addItem("country-list", "select-list").addSelect("country");
+            countryList.addOption("","Select Your Country");
+            for(String temp:countryArray){
+                String[] countryTemp = temp.split(":");
+                if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
+                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
+                }
+                else
+                {
+                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
+                }
             }
-            else
-            {
-                countryList.addOption(false,countryTemp[0],countryTemp[0]);
-            }
+        }
+
+        if(shoppingCart.getCountry().length()>0)
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
+        }
+        else
+        {
+            info.addItem("remove-country","remove-country").addXref("#","Remove Country : ");
         }
 
     }
@@ -227,13 +237,18 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
         info.addItem("errorMessage","errorMessage").addContent("");
         info.addLabel(T_Voucher);
         org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
-        if(voucher1==null){
-            voucher.addText("voucher","voucher");
-        }
-        else{
-            voucher.addText("voucher","voucher").setValue(voucher1.getCode());
-        }
-        voucher.addButton("apply","apply");
+
+            Text voucherText = voucher.addText("voucher","voucher");
+            voucher.addButton("apply","apply");
+            if(voucher1!=null){
+                voucherText.setValue(voucher1.getCode());
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : "+voucher1.getCode());
+            }
+            else{
+                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : ");
+            }
+
+
 
     }
 
