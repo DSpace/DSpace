@@ -115,7 +115,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
                 String doi = mintAndRegister(context, (Item) dso, true);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
+                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
                 ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
             }
         } catch (Exception e) {
@@ -130,7 +130,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
                 String doi = mintAndRegister(context, (Item) dso, false);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
+                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
                 ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
             }
         } catch (Exception e) {
