@@ -40,7 +40,7 @@ public class SubmissionTest extends TestCase {
 	loginBox.findElement(By.id("aspect_eperson_PasswordLogin_field_submit")).click();
 	
 	// begin submission with a known manuscript (using the URL interface to set the fields)
-	driver.get(baseUrl + "/submit?journalID=SystBiol&manu=test1");
+	driver.get(baseUrl + "handle/10255/3/submit?journalID=MolEcol&manu=test-accept");
 	driver.findElement(By.name("license_accept")).click();
 	driver.findElement(By.id("aspect_submission_StepTransformer_field_submit_next")).click();
 
