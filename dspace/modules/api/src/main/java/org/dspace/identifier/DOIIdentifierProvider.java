@@ -516,8 +516,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             Version version = history.getVersion(item);
             Version previous = history.getPrevious(version);
             String canonical = DOIIdentifierProvider.getDoiValue(previous.getItem());
+            //process the canonical id to remove the version number
+            canonical = getCanonicalDataPackage(canonical);
             String versionNumber = "" + DOT + (version.getVersionNumber());
-            doi = new DOI(myDoiPrefix,myLocalPartPrefix+ versionNumber, item);
+            doi = new DOI(canonical+ versionNumber, item);
         } else {
             String var = NoidGenerator.buildVar(mySuffixVarLength);
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
