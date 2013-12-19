@@ -582,7 +582,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
             // the item has been modified? if yes: increment version number
             DOI childDOI=null;
-            if(countBitstreams(previous.getItem())!= countBitstreams(item)){
+//            if(countBitstreams(previous.getItem())!= countBitstreams(item)){
 
                 log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified");
 
@@ -593,12 +593,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified -  versionN" + versionN);
 
                 childDOI = new DOI(doiString + "/" + suffixDF.substring(0, suffixDF.lastIndexOf(DOT)) + DOT  + (versionN+1), item);
-            }
-            else{
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  doiString" + doiString);
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  suffixDF" + suffixDF);
-                childDOI = new DOI(doiString + "/" + suffixDF, item);
-            }
+//            }
+//            else{
+//                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  doiString" + doiString);
+//                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  suffixDF" + suffixDF);
+//                childDOI = new DOI(doiString + "/" + suffixDF, item);
+//            }
             log.warn("calculateDOIDataFile() - new version of an existing: " + childDOI);
             return childDOI;
         }
