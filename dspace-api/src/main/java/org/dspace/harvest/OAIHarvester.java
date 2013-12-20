@@ -364,7 +364,9 @@ public class OAIHarvester {
 				else {
 					listRecords = new ListRecords(oaiSource, resumptionToken);
 				}
+                ourContext.turnOffAuthorisationSystem();
 				targetCollection.update();
+                ourContext.restoreAuthSystemState();
 				ourContext.commit();
 			}
 		}
@@ -389,8 +391,10 @@ public class OAIHarvester {
 		}
 		finally {
 			harvestRow.update();
+            ourContext.turnOffAuthorisationSystem();
 			targetCollection.update();
 			ourContext.commit();
+			ourContext.restoreAuthSystemState();
 			ourContext.restoreAuthSystemState();
 		}
 
