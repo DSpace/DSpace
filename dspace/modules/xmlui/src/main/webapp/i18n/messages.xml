@@ -3406,6 +3406,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.country">Fee-waiver country</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.customer">Customer Id</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.customerName">Customer Name</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
     <message key="xmlui.PaymentSystem.shoppingcart.verified"><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></message>
     <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
@@ -3472,6 +3474,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.ManageVoucherMain.search_column4">Create Date</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column5">Explanation</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column7">Batch Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column8">Customer Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column9">Customer Name</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create_link">Create new voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_browse_link">Browse all voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create">Create new voucher</message>
@@ -3479,7 +3483,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.property.ManageVoucherMain.actions_search">Search voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_search">Search voucher</message>
 
-    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its id, code, batch id , status and expiration date(2011-01-01)</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its id, code, batch id , status, customer name,customer id and expiration date(2011-01-01)</message>
     <message key="xmlui.property.ManageVoucherMain.actions_browse_link">Browse All vouchers</message>
     <message key="xmlui.property.ManageVoucherMain.actions_create_link">Create new voucher</message>
 
@@ -3503,7 +3507,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.EditProfile.name2">Voucher Code</message>
     <message key="xmlui.voucher.EditProfile.name3">Voucher Value</message>
     <message key="xmlui.voucher.EditProfile.name4">Create Date</message>
-    <message key="xmlui.voucher.EditProfile.name5">Expire Date</message>
+    <message key="xmlui.voucher.EditProfile.name5">Customer Id</message>
+    <message key="xmlui.voucher.EditProfile.name6">Customer Name</message>
 
 
     <message key="xmlui.Shoppingcart.EditProfile.voucher_null">Can't find the Voucher</message>
@@ -3512,6 +3517,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.AddVoucherForm.head1">Title</message>
     <message key="xmlui.voucher.AddVoucherForm.head2">Voucher Creation</message>
     <message key="xmlui.voucher.AddVoucherForm.customer">Customer ID</message>
+    <message key="xmlui.voucher.AddVoucherForm.customerName">Customer Name</message>
     <message key="xmlui.voucher.AddVoucherForm.number">Number of vouchers (min. of 25)</message>
     <message key="xmlui.voucher.AddVoucherForm.explanation">Explanation for generating vouchers</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column6">Generator</message>

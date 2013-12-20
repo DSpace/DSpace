@@ -85,7 +85,7 @@ public class VoucherValidationImpl implements VoucherValidationService
     }
 
     @Override
-    public Voucher create(Context context,String code,String status,Date creation, String explanation,String customer, Integer generator, String batchId) throws SQLException,AuthorizeException {
+    public Voucher create(Context context,String code,String status,Date creation, String explanation,String customer,String customerName,  Integer generator, String batchId) throws SQLException,AuthorizeException {
 
 
         Voucher newVoucher = Voucher.create(context);
@@ -96,6 +96,7 @@ public class VoucherValidationImpl implements VoucherValidationService
         newVoucher.setExplanation(explanation);
         newVoucher.setGenerator(generator);
         newVoucher.setCustomer(customer);
+        newVoucher.setCustomerName(customerName);
         newVoucher.update();
         return newVoucher;
     }
@@ -119,7 +120,7 @@ public class VoucherValidationImpl implements VoucherValidationService
     }
 
     @Override
-    public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer, Integer generator) throws SQLException,AuthorizeException {
+    public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer,String customerName, Integer generator) throws SQLException,AuthorizeException {
         ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
         int i =0;
         String batchId = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.batchId.length",5));
@@ -127,7 +128,7 @@ public class VoucherValidationImpl implements VoucherValidationService
         {
             Random random = new Random();
             String code = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.code.length",8));
-            vouchers.add(create(context,code,status, creation, explanation,customer,generator,batchId));
+            vouchers.add(create(context,code,status, creation, explanation,customer,customerName,generator,batchId));
             i=i+1;
         }
        return vouchers;
