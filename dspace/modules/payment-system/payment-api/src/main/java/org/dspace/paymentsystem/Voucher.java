@@ -200,11 +200,8 @@ public class Voucher {
     }
 
     public static ArrayList<Voucher> findAll(Context context) throws SQLException{
-
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM voucher ORDER BY voucher_id");
+                "SELECT * FROM voucher ORDER BY voucher_id DESC");
 
         try
         {
@@ -261,8 +258,6 @@ public class Voucher {
 
     public static Voucher findById(Context context,Integer id) throws SQLException{
 
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(context, "voucher", "SELECT * FROM voucher WHERE voucher_id = "+ id+ "limit 1");
 
         try
@@ -308,8 +303,6 @@ public class Voucher {
     }
     public static Voucher findByCode(Context context,String code) throws SQLException{
 
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(context, "voucher", "SELECT * FROM voucher WHERE code = '"+ code+ "' limit 1");
 
         try
@@ -366,7 +359,7 @@ public class Voucher {
         String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
         queryBuf.append("SELECT * FROM voucher WHERE voucher_id = ? OR ");
-        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR LOWER(batch_id) LIKE LOWER(?) OR LOWER(customer) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR  LOWER(explanation) LIKE LOWER(?) OR to_char(creation, 'YYYY-MM-DD') LIKE ? ORDER BY voucher_id ASC ");
+        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR LOWER(batch_id) LIKE LOWER(?) OR LOWER(customer) LIKE LOWER(?) OR LOWER(customer_name) LIKE LOWER(?) OR LOWER(code) LIKE LOWER(?) OR  LOWER(explanation) LIKE LOWER(?) OR to_char(creation, 'YYYY-MM-DD') LIKE ? ORDER BY voucher_id DESC ");
 
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
