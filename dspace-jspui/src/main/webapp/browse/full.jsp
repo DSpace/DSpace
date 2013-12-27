@@ -27,17 +27,35 @@
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
+<c:set var="dspace.layout.head" scope="request">
+<script type="text/javascript">
+function sortBy(idx, ord)
+{
+       jQuery("#ssort_by").val(idx);
+       jQuery("#sorder").val(ord);
+       jQuery("#sortform").submit();
+}
+</script>
+</c:set>
+
 <%
     request.setAttribute("LanguageSwitch", "hide");
 
     String urlFragment = "browse";
     String layoutNavbar = "default";
     boolean withdrawn = false;
+    boolean privateitems = false;
 	if (request.getAttribute("browseWithdrawn") != null)
 	{
 	    layoutNavbar = "admin";
         urlFragment = "dspace-admin/withdrawn";
         withdrawn = true;
+    }
+	else if (request.getAttribute("browsePrivate") != null)
+	{
+	    layoutNavbar = "admin";
+        urlFragment = "dspace-admin/privateitems";
+        privateitems = true;
     }
 
 	// First, get the browse info object
@@ -103,18 +121,18 @@
 	String valueString = "";
 	if (value!=null)
 	{
-		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value);
+		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value, "UTF-8");
 	}
 	
     String sharedLink = linkBase + urlFragment + "?";
 
     if (bix.getName() != null)
-        sharedLink += "type=" + URLEncoder.encode(bix.getName());
+        sharedLink += "type=" + URLEncoder.encode(bix.getName(), "UTF-8");
 
-    sharedLink += "&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber())) +
-				  "&amp;order=" + URLEncoder.encode(direction) +
-				  "&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage())) +
-				  "&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl())) +
+    sharedLink += "&amp;sort_by=" + URLEncoder.encode(Integer.toString(so.getNumber()), "UTF-8") +
+				  "&amp;order=" + URLEncoder.encode(direction, "UTF-8") +
+				  "&amp;rpp=" + URLEncoder.encode(Integer.toString(bi.getResultsPerPage()), "UTF-8") +
+				  "&amp;etal=" + URLEncoder.encode(Integer.toString(bi.getEtAl()), "UTF-8") +
 				  valueString;
 	
 	String next = sharedLink;
@@ -166,16 +184,6 @@
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
 <%@page import="java.util.Set"%>
-<c:set var="dspace.layout.head" scope="request">
-<script type="text/javascript">
-function sortBy(idx, ord)
-{
-	jQuery("#ssort_by").val(idx);
-	jQuery("#sorder").val(ord);
-	jQuery("#sortform").submit();
-}
-</script>
-</c:set>
 <dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
@@ -185,7 +193,42 @@ function sortBy(idx, ord)
 
 	<%-- Include the main navigation for all the browse pages --%>
 	<%-- This first part is where we render the standard bits required by both possibly navigations --%>
-	<div align="center" id="browse_navigation">
+	<div id="browse_navigation" class="well text-center">
+	<form id="sortform" method="get" action="<%= formaction %>">
+<input type="hidden" name="type" value="<%= bix.getName() %>"/>
+<%
+                if (bi.hasAuthority())
+                {
+                %><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+                }
+                else if (bi.hasValue())
+                {
+                        %><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
+                }
+%>
+<%
+        Set<SortOption> setSortOptions = SortOption.getSortOptions();
+        if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
+        {
+%>
+                <input type="hidden" id="ssort_by" name="sort_by"
+<%
+                for (SortOption sortBy : setSortOptions)
+                {
+            if (sortBy.isVisible())
+            {
+                %><%= (sortBy.getName().equals(sortedBy) ? "value=\""+sortBy.getNumber()+"\"" : "") %><%
+            }
+        }
+%>
+                />
+<%
+        }
+%>
+
+                <input type="hidden" id="sorder" name="order" value="<%= direction %>" />
+</form>
+
 	<form method="get" action="<%= formaction %>">
 			<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 			<input type="hidden" name="sort_by" value="<%= so.getNumber() %>"/>
@@ -208,58 +251,40 @@ function sortBy(idx, ord)
 	if (so.isDate() || (bix.isDate() && so.isDefault()))
 	{
 %>
-	<table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browsing by date">
-        <tr>
-            <td>
-                <table border="0" bgcolor="#EEEEEE" cellpadding="2">
-                    <tr>
-                        <td class="browseBar">
-							<span class="browseBarLabel"><fmt:message key="browse.nav.date.jump"/> </span>
-							<select name="year">
-                                <option selected="selected" value="-1"><fmt:message key="browse.nav.year"/></option>
+		<span><fmt:message key="browse.nav.date.jump"/></span>
+		<select name="year">
+	        <option selected="selected" value="-1"><fmt:message key="browse.nav.year"/></option>
 <%
 		int thisYear = DCDate.getCurrent().getYear();
 		for (int i = thisYear; i >= 1990; i--)
 		{
 %>
-                                <option><%= i %></option>
+            <option><%= i %></option>
 <%
 		}
 %>
-                                <option>1985</option>
-                                <option>1980</option>
-                                <option>1975</option>
-                                <option>1970</option>
-                                <option>1960</option>
-                                <option>1950</option>
-                            </select>
-                            <select name="month">
-                                <option selected="selected" value="-1"><fmt:message key="browse.nav.month"/></option>
+            <option>1985</option>
+            <option>1980</option>
+            <option>1975</option>
+            <option>1970</option>
+            <option>1960</option>
+            <option>1950</option>
+        </select>
+        <select name="month">
+            <option selected="selected" value="-1"><fmt:message key="browse.nav.month"/></option>
 <%
 		for (int i = 1; i <= 12; i++)
 		{
 %>
-                                <option value="<%= i %>"><%= DCDate.getMonthName(i, UIUtil.getSessionLocale(request)) %></option>
+	         <option value="<%= i %>"><%= DCDate.getMonthName(i, UIUtil.getSessionLocale(request)) %></option>
 <%
 		}
 %>
-                            </select>
-                        </td>
-                        <td class="browseBar" rowspan="2">
-                            <input type="submit" value="<fmt:message key="browse.nav.go"/>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <%-- HACK:  Shouldn't use align here --%>
-                        <td class="browseBar" align="center">
-                            <span class="browseBarLabel"><fmt:message key="browse.nav.type-year"/></span>
-                            <input type="text" name="starts_with" size="4" maxlength="4"/>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+        </select>
+        <input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
+        <br/>
+        <label for="starts_with"><fmt:message key="browse.nav.type-year"/></label>
+        <input type="text" name="starts_with" size="4" maxlength="4"/>
 <%
 	}
 	
@@ -267,34 +292,18 @@ function sortBy(idx, ord)
 	else
 	{
 %>	
-	<table align="center" border="0" bgcolor="#CCCCCC" cellpadding="0" summary="Browse the respository">
-		<tr>
-	    	<td>
-	        	<table border="0" bgcolor="#EEEEEE" cellpadding="2">
-	            	<tr>
-	                	<td class="browseBar">
-	    					<span class="browseBarLabel"><fmt:message key="browse.nav.jump"/></span>
-	                        <a href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
+		<span><fmt:message key="browse.nav.jump"/></span>
+	                        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=0">0-9</a>
 <%
 	    for (char c = 'A'; c <= 'Z'; c++)
 	    {
 %>
-	                        <a href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
+	                        <a class="label label-default" href="<%= sharedLink %>&amp;starts_with=<%= c %>"><%= c %></a>
 <%
 	    }
-%>
-	                    </td>
-	                </tr>
-	                <tr>
-	                	<td class="browseBar" align="center">
-	    					<span class="browseBarLabel"><fmt:message key="browse.nav.enter"/>&nbsp;</span>
-	    					<input type="text" name="starts_with"/>&nbsp;<input type="submit" value="<fmt:message key="browse.nav.go"/>" />
-	                    </td>
-	                </tr>
-	            </table>
-	        </td>
-	    </tr>
-	</table>
+%><br/>
+	    					<span><fmt:message key="browse.nav.enter"/></span>
+	    					<input type="text" name="starts_with"/>&nbsp;<input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>" />
 <%
 	}
 %>
@@ -303,7 +312,7 @@ function sortBy(idx, ord)
 	<%-- End of Navigation Headers --%>
 
 	<%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
-	<div align="center" id="browse_controls">
+	<div id="browse_controls" class="well text-center">
 	<form method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
@@ -336,7 +345,7 @@ function sortBy(idx, ord)
 	if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
 	{
 %>
-		<fmt:message key="browse.full.sort-by"/>
+		<label for="sort_by"><fmt:message key="browse.full.sort-by"/></label>
 		<select name="sort_by">
 <%
 		for (SortOption sortBy : sortOptions)
@@ -353,14 +362,13 @@ function sortBy(idx, ord)
 <%
 	}
 %>
-		
-		<fmt:message key="browse.full.order"/>
+		<label for="order"><fmt:message key="browse.full.order"/></label>
 		<select name="order">
 			<option value="ASC" <%= ascSelected %>><fmt:message key="browse.order.asc" /></option>
 			<option value="DESC" <%= descSelected %>><fmt:message key="browse.order.desc" /></option>
 		</select>
-		
-		<fmt:message key="browse.full.rpp"/>
+
+		<label for="rpp"><fmt:message key="browse.full.rpp"/></label>
 		<select name="rpp">
 <%
 	for (int i = 5; i <= 100 ; i += 5)
@@ -372,8 +380,8 @@ function sortBy(idx, ord)
 	}
 %>
 		</select>
-		
-		<fmt:message key="browse.full.etal" />
+
+		<label for="etal"><fmt:message key="browse.full.etal" /></label>
 		<select name="etal">
 <%
 	String unlimitedSelect = "";
@@ -425,36 +433,33 @@ function sortBy(idx, ord)
 	}
 %>
 		</select>
-		
-		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
+
+		<input type="submit" class="btn btn-default" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 
 <%
-    if (admin_button && !withdrawn)
+    if (admin_button && !withdrawn && !privateitems)
     {
-        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+        %><input type="submit" class="btn btn-default" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
     }
 %>
 
 	</form>
 	</div>
-
-
+<div class="panel panel-primary">
 	<%-- give us the top report on what we are looking at --%>
-	<div align="center" class="browse_range">
+	<div class="panel-heading text-center">
 		<fmt:message key="browse.full.range">
 			<fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
 		</fmt:message>
-	</div>
 
 	<%--  do the top previous and next page links --%>
-	<div align="center">
 <% 
 	if (bi.hasPrevPage())
 	{
 %>
-	<a href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
+	<a class="pull-left" href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
 <%
 	}
 %>
@@ -463,7 +468,7 @@ function sortBy(idx, ord)
 	if (bi.hasNextPage())
 	{
 %>
-	&nbsp;<a href="<%= next %>"><fmt:message key="browse.full.next"/></a>
+	&nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.full.next"/></a>
 <%
 	}
 %>
@@ -477,7 +482,7 @@ function sortBy(idx, ord)
 	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
     <%
         }
-        else if (request.getAttribute("browseWithdrawn") != null)
+        else if (withdrawn || privateitems)
         {
     %>
     <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" linkToEdit="true" disableCrossLinks="true" />
@@ -491,21 +496,19 @@ function sortBy(idx, ord)
     	}
 	%>
 	<%-- give us the bottom report on what we are looking at --%>
-	<div align="center" class="browse_range">
+	<div class="panel-footer text-center">
 		<fmt:message key="browse.full.range">
 			<fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
 			<fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
 		</fmt:message>
-	</div>
 
 	<%--  do the bottom previous and next page links --%>
-	<div align="center">
 <% 
 	if (bi.hasPrevPage())
 	{
 %>
-	<a href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
+	<a class="pull-left" href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
 <%
 	}
 %>
@@ -514,80 +517,15 @@ function sortBy(idx, ord)
 	if (bi.hasNextPage())
 	{
 %>
-	&nbsp;<a href="<%= next %>"><fmt:message key="browse.full.next"/></a>
+	&nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.full.next"/></a>
 <%
 	}
 %>
 	</div>
-
+</div>
 	<%-- dump the results for debug (uncomment to enable) --%>
 	<%-- 
 	<!-- <%= bi.toString() %> -->
 	--%>
 
-
-
-<form id="sortform" method="get" action="<%= formaction %>">
-<input type="hidden" name="type" value="<%= bix.getName() %>"/>
-<%
-                if (bi.hasAuthority())
-                {
-                %><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
-                }
-                else if (bi.hasValue())
-                {
-                        %><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
-                }
-%>
-<%
-        Set<SortOption> setSortOptions = SortOption.getSortOptions();
-        if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
-        {
-%>
-                <input type="hidden" id="ssort_by" name="sort_by"
-<%
-                for (SortOption sortBy : setSortOptions)
-                {
-            if (sortBy.isVisible())
-            {
-                %><%= (sortBy.getName().equals(sortedBy) ? "value=\""+sortBy.getNumber()+"\"" : "") %><%
-            }
-        }
-%>
-                />
-<%
-        }
-%>
-
-                <input type="hidden" id="sorder" name="order" value="<%= direction %>" />
-</form>
 </dspace:layout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

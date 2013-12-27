@@ -13,9 +13,12 @@
   - Parameters to pass in to this page (from review.jsp)
   -    submission.jump - the step and page number (e.g. stepNum.pageNum) to create a "jump-to" link
   --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@page import="org.dspace.core.ConfigurationManager"%>
+<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.ResourcePolicy"%>
+<%@page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -40,24 +43,30 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+	
+    boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 	//get the step number (for jump-to link)
 	String stepJump = (String) request.getParameter("submission.jump");
 
     Item item = subInfo.getSubmissionItem().getItem();
+	        
+	//is advanced upload embargo step?
+	Object isUploadWithEmbargoB = request.getAttribute("submission.step.uploadwithembargo");
+	boolean isUploadWithEmbargo = false;
+	if(isUploadWithEmbargoB!=null) {
+	    isUploadWithEmbargo = (Boolean)isUploadWithEmbargoB;
+	}
 %>
 
 
 <%-- ====================================================== --%>
 <%--                    UPLOADED_FILES                      --%>
 <%-- ====================================================== --%>
-                    <table width="100%">
-                        <tr>
-                            <td width="100%">
-                                <table>
-                                    <tr>
-                                        <td class="metadataFieldLabel"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></td>
-                                        <td class="metadataFieldValue">
+<div class="col-md-10">
+                                    <div class="row">
+                                        <span class="metadataFieldLabel col-md-4"><%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.upload2")) %></span>
+                                        <span class="metadataFieldValue col-md-8">
 <%
     Bitstream[] bitstreams = item.getNonInternalBitstreams();
 
@@ -87,8 +96,40 @@
 	        case 2:
 	            %><fmt:message key="jsp.submit.review.supported"/><%
 	        }
-%>        
-	                                            <br />
+%>    
+<%
+if(isUploadWithEmbargo) {
+List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
+<% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
+		<% int countPolicies = 0;
+		   //show information about policies setting only in the case of advanced embargo form
+		   if(advanced) {  
+		       countPolicies = rpolicies.size();
+		%>
+			<% if(countPolicies>0) { %>		
+				<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
+			<% } %>
+		<% } else { %>
+				<% for(ResourcePolicy rpolicy : rpolicies) { 
+						if(rpolicy.getStartDate()!=null) {
+						%>
+							<i class="label label-info"><fmt:message key="jsp.submit.review.policies.embargoed"><fmt:param><%= rpolicy.getStartDate() %></fmt:param></fmt:message></i>				    
+						<%
+						}
+						else { 
+						%>
+							<i class="label label-success"><fmt:message key="jsp.submit.review.policies.openaccess"/></i>														    
+					    <%
+						}
+					}
+				%>
+				
+				
+		<% } %>
+<% } 
+}
+%>
+<br />	                                     
 <%
 	    }
 	}
@@ -98,17 +139,16 @@
 <%		
 	}
 %>
-                                        </td>
-                                    </tr>
-                                </table>
-                    </td>
-                            <td valign="middle" align="right">
+                                        </span>
+                                    </div>
+                                </div>    
+                            <div class="col-md-2">
 <%
     // Can't edit files in workflow mode
     if(!subInfo.isInWorkflow())
     {
 %>
-                                    <input type="submit" name="submit_jump_<%=stepJump%>"
+                                    <input class="btn btn-default" type="submit" name="submit_jump_<%=stepJump%>"
                                      value="<%= (subInfo.getSubmissionItem().hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.button.upload2")) %>" />
 <%
     }
@@ -116,12 +156,9 @@
     {
 %>
 
-                                    <input type="submit" name="submit_jump_<%=stepJump%>"
+                                    <input class="btn btn-default" type="submit" name="submit_jump_<%=stepJump%>"
                                      value="<fmt:message key="jsp.submit.review.button.edit"/>" />
 <%
     }
 %>
-                            </td>
-                  </tr>
-                </table>
-
+                  </div>

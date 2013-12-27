@@ -132,121 +132,114 @@
     }
 %>
 
-<dspace:layout titlekey="jsp.tools.edit-collection.title"
+<dspace:layout style="submission" titlekey="jsp.tools.edit-collection.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
                parenttitlekey="jsp.administer"
                nocache="true">
-
+<div class="row">
+<h3 class="col-md-8">
 <%
     if (collection == null)
     {
 %>
-    <h1><fmt:message key="jsp.tools.edit-collection.heading1"/></h1>
+    <fmt:message key="jsp.tools.edit-collection.heading1"/>
 <% } else { %>
-    <h1><fmt:message key="jsp.tools.edit-collection.heading2">
+    <fmt:message key="jsp.tools.edit-collection.heading2">
         <fmt:param><%= collection.getHandle() %></fmt:param>
-        </fmt:message>
-    </h1>
-    
-      <center>
-        <table width="70%">
-          <tr>
-            <td class="standard">
+    </fmt:message>
+<% } %>    
+	<span>
+		<dspace:popup page="/help/site-admin.html#editcollection"><fmt:message key="jsp.help"/></dspace:popup>
+	</span>
+	</h3>    
 <% if(bDeleteButton) { %>
-              <form method="post" action="">
+              <form class="col-md-4" method="post" action="">
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>" />
                 <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                 <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
-                <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
+                <input class="btn btn-danger col-md-12" type="submit" name="submit_delete" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
               </form>
-<% } else { %>
-			&nbsp;
 <% } %>
-            </td>
-            <td align="right" class="standard">
-               <dspace:popup page="/help/site-admin.html#editcollection"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-          </tr>
-        </table>
-      </center>
+</div>
+<div class="row">
+<form class="form-group" method="post" action="<%= request.getContextPath() %>/tools/edit-communities">
+	<div class="col-md-8">
     
-<% } %>
-
-    <form method="post" action="<%= request.getContextPath() %>/tools/edit-communities">
-        <table>
 <%-- ===========================================================
      Basic metadata
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label1"/></td>
-                <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label2"/></td>
-                <td>
-                    <input type="text" name="short_description" value="<%= Utils.addEntities(shortDesc) %>" size="50"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label3"/></td>
-                <td>
-                    <textarea name="introductory_text" rows="6" cols="50"><%= Utils.addEntities(intro) %></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label4"/></td>
-                <td>
-                    <textarea name="copyright_text" rows="6" cols="50"><%= Utils.addEntities(copy) %></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label5"/></td>
-                <td>
-                    <textarea name="side_bar_text" rows="6" cols="50"><%= Utils.addEntities(side) %></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label6"/></td>
-                <td>
-                    <textarea name="license" rows="6" cols="50"><%= Utils.addEntities(license) %></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label7"/></td>
-                <td>
-                    <textarea name="provenance_description" rows="6" cols="50"><%= Utils.addEntities(provenance) %></textarea>
-                </td>
-            </tr>
+     <div class="panel panel-primary">
+     	<div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.basic-metadata" /></div>
+     	<div class="panel-body">
+        	<div class="row">        
+                <label class="col-md-3" for="name"><fmt:message key="jsp.tools.edit-collection.form.label1"/></label>
+                <span class="col-md-9">
+                	<input class="form-control" type="text" name="name" value="<%= Utils.addEntities(name) %>" />
+                </span>
+            </div><br/>    
+            <div class="row">        
+                <label class="col-md-3" for="short_description"><fmt:message key="jsp.tools.edit-collection.form.label2"/></label>
+                <span class="col-md-9">
+                	<input class="form-control" type="text" name="short_description" value="<%= Utils.addEntities(shortDesc) %>" size="50"/>
+                </span>	
+            </div><br/>
+            <div class="row">        
+                <label class="col-md-3" for="introductory_text"><fmt:message key="jsp.tools.edit-collection.form.label3"/></label>
+                <span class="col-md-9">
+                	<textarea class="form-control" name="introductory_text" rows="6" cols="50"><%= Utils.addEntities(intro) %></textarea>
+                </span>
+            </div><br/>
+             <div class="row">
+                <label class="col-md-3" for="copyright_text"><fmt:message key="jsp.tools.edit-collection.form.label4"/></label>
+                <span class="col-md-9">
+                	<textarea class="form-control" name="copyright_text" rows="6" cols="50"><%= Utils.addEntities(copy) %></textarea>
+                </span>
+            </div><br/>
+            <div class="row">
+            	<label class="col-md-3" for="side_bar_text"><fmt:message key="jsp.tools.edit-collection.form.label5"/></label>
+                <span class="col-md-9">
+                	<textarea class="form-control" name="side_bar_text" rows="6" cols="50"><%= Utils.addEntities(side) %></textarea>
+                </span>
+            </div><br/>
+            <div class="row">
+            	<label class="col-md-3" for="license"><fmt:message key="jsp.tools.edit-collection.form.label6"/></label>
+                <span class="col-md-9">
+                	<textarea class="form-control" name="license" rows="6" cols="50"><%= Utils.addEntities(license) %></textarea>
+                </span>
+            </div><br/>
+            <div class="row">
+            	<label class="col-md-3" for="provenance_description"><fmt:message key="jsp.tools.edit-collection.form.label7"/></label>
+                <span class="col-md-9">
+                	<textarea class="form-control" name="provenance_description" rows="6" cols="50"><%= Utils.addEntities(provenance) %></textarea>
+                </span>
+            </div><br/>
 <%-- ===========================================================
      Logo
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label8"/></td>
-                <td>
+            <div class="row">
+                <label class="col-md-3" for=""><fmt:message key="jsp.tools.edit-collection.form.label8"/></label>
+                <div class="col-md-9">
 <%  if (logo != null) { %>
-                    <table>
-                        <tr>
-                            <td>
-                                <img src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" alt="collection logo"/>
-                            </td>
-                            <td>
-                                <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.add-logo"/>" /><br/><br/>
-                                <input type="submit" name="submit_delete_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete-logo"/>" />
-                            </td>
-                        </tr>
-                    </table>
+                                <span class="col-md-6">
+                                <img class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" alt="collection logo"/>
+                                </span>
+                                <input class="btn btn-default col-md-3" type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.add-logo"/>" />
+                                <input class="btn btn-danger col-md-3" type="submit" name="submit_delete_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete-logo"/>" />
 <%  } else { %>
 
-                    <input type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.set-logo"/>" />
+                    <input class="col-md-12 btn btn-success" type="submit" name="submit_set_logo" value="<fmt:message key="jsp.tools.edit-collection.form.button.set-logo"/>" />
 <%  } %>
-                </td>
-            </tr>
-            
-            <tr><td>&nbsp;</td></tr>
+				</div>
+			</div>	
+		</div>
+	</div>	
+</div>
+<div class="col-md-4">
 <% if(bSubmittersButton || bWorkflowsButton || bAdminCreateGroup || (admins != null && bAdminRemoveGroup)) { %>
-            <tr><td colspan="2"><center><h3><fmt:message key="jsp.tools.edit-collection.form.label9"/></h3></center></td></tr>
+            <div class="panel panel-default"><div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.label9"/></div>
+            <div class="panel-body">
 
 <% }
 	
@@ -254,17 +247,17 @@
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label10"/></td>
-                <td>
+            <div class="row">     
+                <label class="col-md-6" for="submit_submitters_create"><fmt:message key="jsp.tools.edit-collection.form.label10"/></label>
+                <span class="col-md-6 btn-group">
 <%  if (submitters == null) {%>
-                    <input type="submit" name="submit_submitters_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_submitters_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
 <%  } else { %>
-                    <input type="submit" name="submit_submitters_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
-                    <input type="submit" name="submit_submitters_delete" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
-<%  } %>                    
-                </td>
-            </tr>   
+                    <input class="btn btn-default col-md-6"  type="submit" name="submit_submitters_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                    <input class="btn btn-danger col-md-6"  type="submit" name="submit_submitters_delete" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
+<%  } %>
+				</span>
+			</div><br/>                
 <%  } %>            
 
 <% if(bWorkflowsButton) { %>
@@ -280,92 +273,101 @@
     };
 
     for (int i = 0; i<3; i++) { %>
-            <tr>
-                <td class="submitFormLabel"><em><%= roleTexts[i] %></em> <fmt:message key="jsp.tools.edit-collection.form.label11"/></td>
-                <td>
+    		<div class="row">  
+                <label class="col-md-6" for="submit_wf_create_<%= i + 1 %>"><em><%= roleTexts[i] %></em> <fmt:message key="jsp.tools.edit-collection.form.label11"/></label>
+                <span class="col-md-6 btn-group">
 <%      if (wfGroups[i] == null) { %>
-                    <input type="submit" name="submit_wf_create_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_wf_create_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
 <%      } else { %>
-                    <input type="submit" name="submit_wf_edit_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
-                    <input type="submit" name="submit_wf_delete_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
+                    <input class="btn btn-default col-md-6" type="submit" name="submit_wf_edit_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                    <input class="btn btn-danger col-md-6" type="submit" name="submit_wf_delete_<%= i + 1 %>" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
 <%      } %>
-                </td>
-            </tr>
+				</span>
+			</div><br/>
 <%  } %>
 <%  } %>        
-            <tr><td>&nbsp;</td></tr>
 <% if(bAdminCreateGroup || (admins != null && bAdminRemoveGroup)) { %>
 <%-- ===========================================================
      Collection Administrators
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label12"/></td>
-                <td>
+            <div class="row">    
+                <label class="col-md-6" for="submit_admins_create"><fmt:message key="jsp.tools.edit-collection.form.label12"/></label>
+                <span class="col-md-6 btn-group">
 <%  if (admins == null) {
 		if (bAdminCreateGroup) {
 %>
-                    <input type="submit" name="submit_admins_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_admins_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
 <%  	} 
 	} 
 	else { 
 		if (bAdminCreateGroup) {
 	%>
-                    <input type="submit" name="submit_admins_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                    <input class="btn btn-default" type="submit" name="submit_admins_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
 	<%  }
 		if (bAdminRemoveGroup) { 
 		%>
-                    <input type="submit" name="submit_admins_delete" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
+                    <input class="btn btn-danger" type="submit" name="submit_admins_delete" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
 <%  	}
-	}	%>                    
-                </td>
-            </tr>   
+	}	%>        
+				</span>
+			</div>
+		</div>
+	</div>
 <% } %>
-
+<div class="panel panel-default">
+	<div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.collection-settings" /></div>
+	<div class="panel-body">
 <% if(bTemplateButton) { %>
+			<div class="row">
 <%-- ===========================================================
      Item template
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label13"/></td>
-                <td>
+                <label class="col-md-6" for="submit_create_template"><fmt:message key="jsp.tools.edit-collection.form.label13"/></label>
+                <span class="col-md-6 btn-group">
 <%  if (template == null) {%>
-                    <input type="submit" name="submit_create_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_create_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
 
 <%  } else { %>
-                    <input type="submit" name="submit_edit_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
-                    <input type="submit" name="submit_delete_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
-<%  } %>                    
-                </td>
-            </tr>
+                    <input class="btn btn-default col-md-6" type="submit" name="submit_edit_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                    <input class="btn btn-default col-md-6" type="submit" name="submit_delete_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
+<%  } %>
+				</span>
+			</div><br/>
 <%  } %>
    
 <% if(bPolicyButton) { %>
 <%-- ===========================================================
      Edit collection's policies
      =========================================================== --%>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label14"/></td>
-                <td>
-                    <input type="submit" name="submit_authorization_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
-                </td>
-            </tr>   
+     		<div class="row">
+                <label class="col-md-6" for="submit_authorization_edit"><fmt:message key="jsp.tools.edit-collection.form.label14"/></label>
+                <span class="col-md-6 btn-group">
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_authorization_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+                </span>
+        	</div><br/>    
 <%  } %>
 
+<% if(bAdminCollection) { %>
+<%-- ===========================================================
+     Curate collection
+     =========================================================== --%>
+            <div class="row">
+                <label class="col-md-6" for=""><fmt:message key="jsp.tools.edit-collection.form.label27"/></label>
+                <span  class="col-md-6 btn-group">
+                    <input class="btn btn-success col-md-12" type="submit" name="submit_curate_collection" value="<fmt:message key="jsp.tools.edit-collection.form.button.curate"/>" />
+				</span>
+			</div>
+<%  } %>
 
-
-
-
-
-
-            
-
+		</div>
+   </div>
 <% if(bAdminCollection) { %>
 <%-- ===========================================================
      Harvesting Settings
      =========================================================== --%>
-     
-     		<tr><td>&nbsp;</td></tr>
-            <tr><td colspan="2"><center><h3><fmt:message key="jsp.tools.edit-collection.form.label15"/></h3></center></td></tr>
+   <div class="panel panel-default">
+       	<div class="panel-heading"><fmt:message key="jsp.tools.edit-collection.form.label15"/></div>
+		<div class="panel-body">
      
      		<%--
      		oaiProviderValue = hc.getOaiSource();
@@ -379,25 +381,31 @@
 				lastHarvestMsg = "none";
 			--%>
      
-     		<tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label16"/></td>
-                <td>
-                	<input type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source"><fmt:message key="jsp.tools.edit-collection.form.label17"/></input><br/>
-                	<input type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source"><fmt:message key="jsp.tools.edit-collection.form.label18"/></input><br/>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label19"/></td>
-                <td><input type="text" name="oai_provider" value="<%= oaiProviderValue %>" size="50" /></td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label20"/></td>
-                <td><input type="text" name="oai_setid" value="<%= oaiSetIdValue %>" size="50" /></td>
-            </tr>   
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label21"/></td>
-                <td>
-                	<select name="metadata_format" >
+                <div class="input-group">	
+                <label class="input-group-addon" for="source_normal"><fmt:message key="jsp.tools.edit-collection.form.label16"/></label>
+                <div class="form-control">
+                	<input class="col-md-1" type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source" />
+                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label17"/></span>
+               		<input class="col-md-1" type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source" />
+                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label18"/></span>
+                </div>
+                </div><br/>
+                <div class="row">
+                	<label class="col-md-3" for="oai_provider"><fmt:message key="jsp.tools.edit-collection.form.label19"/></label>
+                	<span class="col-md-9">
+                		<input class="form-control" type="text" name="oai_provider" value="<%= oaiProviderValue %>" size="50" />
+                	</span>	
+                </div><br/>
+                <div class="row">
+                	<label class="col-md-3" for="oai_setid"><fmt:message key="jsp.tools.edit-collection.form.label20"/></label>
+                	<span class="col-md-9">
+                		<input class="form-control" type="text" name="oai_setid" value="<%= oaiSetIdValue %>" size="50" />
+                	</span>
+                </div><br/>
+                <div class="row">
+                	<label class="col-md-3" for="metadata_format"><fmt:message key="jsp.tools.edit-collection.form.label21"/></label>
+                	<span class="col-md-9">
+                	<select class="form-control" name="metadata_format" >
 	                	<%
 		                // Add an entry for each instance of ingestion crosswalks configured for harvesting 
 			            String metaString = "harvester.oai.metadataformats.";
@@ -423,46 +431,35 @@
 			            }
 		                %>
 					</select>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label22"/></td>
-                <td>
-                	<input type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label23"/></input><br/>
-                	<input type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label24"/></input><br/>
-                	<input type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label25"/></input><br/>
-                </td>
-            </tr>
-            <tr>
-                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label26"/></td>
-                <td><%= lastHarvestMsg %></td>
-            </tr> 
-            <!--
-            <tr>
-                <td class="submitFormLabel">Current Status</td>
-                <td> </td>
-            </tr>
-            --> 
-
-
+					</span>
+				</div><br/>
+				<div class="input-group">	
+                <label class="input-group-addon" for="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label22"/></label>
+                <div class="form-control">
+                	<input class="col-md-1" type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level" />
+                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label23"/></span><br/>
+                	<input class="col-md-1" type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level" />
+                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label24"/></span><br/>
+                	<input class="col-md-1" type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level" />
+                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label25"/></span><br/>
+                </div>
+                </div><br/>	
+                <div class="row">
+                <label class="col-md-6"><fmt:message key="jsp.tools.edit-collection.form.label26"/></label>
+                <span class="col-md-6"><%= lastHarvestMsg %></span>
+                </div>
+		</div>
+	</div>	                
 <%  } %>
-
-
-        </table>
-        
-        <p>&nbsp;</p>
-
-        <center>
-            <table width="70%">
-                <tr>
-                    <td class="standard">
+</div>
+<div class="btn-group col-md-12">
 <%
     if (collection == null)
     {
 %>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                         <input type="hidden" name="create" value="true" />
-                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.create2"/>" />
+                        <input class="btn btn-success col-md-6" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.create2"/>" />
 <%
     }
     else
@@ -471,18 +468,14 @@
                         <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                         <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                         <input type="hidden" name="create" value="false" />
-                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.update"/>" />
+                        <input class="btn btn-success col-md-6" type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.form.button.update"/>" />
 <% 
     }
 %>
-                    </td>
-                    <td>
                         <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_EDIT_COLLECTION %>" /> 
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-collection.form.button.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+                        <input class="btn btn-warning col-md-6" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-collection.form.button.cancel"/>" />
+</div>                        
     </form>
+    </div>
 </dspace:layout>

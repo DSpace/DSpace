@@ -20,50 +20,35 @@
 
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
-    int overallColSpan = 3;
-    if (sidebar == null)
-    {
-        overallColSpan = 2;
-    }
 %>
-                    <%-- End of page content --%>
-                    <p>&nbsp;</p>
-                </td>
 
             <%-- Right-hand side bar if appropriate --%>
 <%
     if (sidebar != null)
     {
 %>
-                <td class="sidebar">
+	</div>
+	<div class="col-md-3">
                     <%= sidebar %>
-                </td>
+    </div>
+    </div>       
 <%
     }
 %>
-            </tr>
-
+</div>
+</main>
             <%-- Page footer --%>
-             <tr class="pageFooterBar">
-                <td colspan="<%= overallColSpan %>" class="pageFootnote">
-                    <table class="pageFooterBar" width="100%">
-                        <tr>
-                            <td>
-                                <a href="http://validator.w3.org/check?uri=referer"><img
-                                    src="<%= request.getContextPath() %>/image/valid-xhtml10.png"
-                                    alt="Valid XHTML 1.0!" height="31" width="88" /></a>
-                            </td>
-                            <td class="pageFootnote">
-                                <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
+             <footer class="navbar navbar-inverse navbar-bottom">
+             <div id="designedby" class="container text-muted">
+             <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it"><img
+                                    src="<%= request.getContextPath() %>/image/logo-cineca-small.png"
+                                    alt="Logo CINECA" /></a>
+			<div id="footer_feedback" class="pull-right">                                    
+                                <p class="text-muted"><fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
                                 <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
-                                <a href="<%= request.getContextPath() %>/htmlmap"></a>
-                            </td>
-                            <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                                <a href="<%= request.getContextPath() %>/htmlmap"></a></p>
+                                </div>
+			</div>
+    </footer>
     </body>
 </html>

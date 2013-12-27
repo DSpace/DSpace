@@ -72,7 +72,7 @@ public class EPersonConsumer implements Consumer
                         try
                         {
                             EPerson eperson = EPerson.find(context, id);
-                            Email adminEmail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
+                            Email adminEmail = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "registration_notify"));
                             adminEmail.addRecipient(notifyRecipient);
 
                             adminEmail.addArgument(ConfigurationManager.getProperty("dspace.name"));
@@ -80,7 +80,7 @@ public class EPersonConsumer implements Consumer
                             adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
                             adminEmail.addArgument(eperson.getEmail());
                             adminEmail.addArgument(new Date());
-                                                
+
                             adminEmail.setReplyTo(eperson.getEmail());
 
                             adminEmail.send();

@@ -7,20 +7,22 @@
  */
 package org.dspace.app.itemimport;
 
-import gr.ekt.transformationengine.core.DataLoader;
-import gr.ekt.transformationengine.core.TransformationEngine;
-import gr.ekt.transformationengine.exceptions.UnimplementedAbstractMethod;
-import gr.ekt.transformationengine.exceptions.UnknownClassifierException;
-import gr.ekt.transformationengine.exceptions.UnknownInputFileType;
-import gr.ekt.transformationengine.exceptions.UnsupportedComparatorMode;
-import gr.ekt.transformationengine.exceptions.UnsupportedCriterion;
+import gr.ekt.bte.core.DataLoader;
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationResult;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.dataloader.FileDataLoader;
+import gr.ekt.bteio.generators.DSpaceOutputGenerator;
+import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
 
+import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,9 +33,11 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
+import org.dspace.app.itemexport.ItemExportException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -41,19 +45,26 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.w3c.dom.Document;
@@ -62,7 +73,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import org.dspace.utils.DSpace;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -206,7 +216,7 @@ public class ItemImport
             
             if (line.hasOption('i'))
             {
-                bteInputType = line.getOptionValue('i');;
+                bteInputType = line.getOptionValue('i');
             }
 
             if (line.hasOption('w'))
@@ -314,13 +324,7 @@ public class ItemImport
             }
             else if ("add-bte".equals(command))
             {
-            	if (sourcedir == null)
-                {
-                    System.out
-                            .println("Error - a source file containing items must be set");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
+            	//Source dir can be null, the user can specify the parameters for his loader in the Spring XML configuration file
             	
                 if (mapfile == null)
                 {
@@ -572,7 +576,7 @@ public class ItemImport
                 }
                 else if ("add-bte".equals(command))
                 {
-                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType);
+                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType, null);
                 }
 
                 // complete all transactions
@@ -631,47 +635,96 @@ public class ItemImport
         System.exit(status);
     }
 
+    /**
+     * In this method, the BTE is instantiated. THe workflow generates the DSpace files
+     * necessary for the upload, and the default item import method is called
+     * @param c The contect
+     * @param mycollections The collections the items are inserted to
+     * @param sourceDir The filepath to the file to read data from
+     * @param mapFile The filepath to mapfile to be generated
+     * @param template
+     * @param inputType The type of the input data (bibtex, csv, etc.)
+     * @param workingDir The path to create temporary files (for command line or UI based)
+     * @throws Exception
+     */
     private void addBTEItems(Context c, Collection[] mycollections,
-            String sourceDir, String mapFile, boolean template, String inputType) throws Exception
+            String sourceDir, String mapFile, boolean template, String inputType, String workingDir) throws Exception
     {
-        TransformationEngine te  = new DSpace().getSingletonService(TransformationEngine.class);
-
-        DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+    	//Determine the folder where BTE will output the results
+    	String outputFolder = null;
+    	if (workingDir == null){ //This indicates a command line import, create a random path
+    		File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
+            if (!importDir.exists()){
+            	boolean success = importDir.mkdir();
+            	if (!success) {
+            		log.info("Cannot create batch import directory!");
+            		throw new Exception("Cannot create batch import directory!");
+            	}
+            }
+            //Get a random folder in case two admins batch import data at the same time
+    		outputFolder = importDir + File.separator + generateRandomFilename(true);
+    	}
+    	else { //This indicates a UI import, working dir is preconfigured
+    		outputFolder = workingDir + File.separator + ".bte_output_dspace";
+    	}
+    	
+        BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
         DataLoader dataLoader = dls.getDataLoaders().get(inputType);
+        Map<String, String> outputMap = dls.getOutputMap();
+        TransformationEngine te = dls.getTransformationEngine();
+        
+        if (dataLoader==null){
+            System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+            return;
+        }
 
+        if (outputMap==null){
+            System.out.println("ERROR: The key used in -i parameter must match a valid outputMapping in the BTE Spring XML configuration file!");
+            return;
+        }
+
+        if (dataLoader instanceof FileDataLoader){
+            FileDataLoader fdl = (FileDataLoader) dataLoader;
+            if (!StringUtils.isBlank(sourceDir)) {
+                System.out.println("INFO: Dataloader will load data from the file specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setFilename(sourceDir);
+            }
+        }
+        else if (dataLoader instanceof OAIPMHDataLoader){
+            OAIPMHDataLoader fdl = (OAIPMHDataLoader) dataLoader;
+            System.out.println(sourceDir);
+            if (!StringUtils.isBlank(sourceDir)){
+                System.out.println("INFO: Dataloader will load data from the address specified in the command prompt (and not from the Spring XML configuration file)");
+                fdl.setServerAddress(sourceDir);
+            }
+        }
         if (dataLoader!=null){
             System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
-            
-            dataLoader.setFileName(sourceDir);
-            te.setDataLoader(dataLoader);
 
-            try {
-                te.transform();
-            } catch (UnknownClassifierException e) {
-                e.printStackTrace();
-            } catch (UnknownInputFileType e) {
-                e.printStackTrace();
-            } catch (UnimplementedAbstractMethod e) {
-                e.printStackTrace();
-            } catch (UnsupportedComparatorMode e) {
-                e.printStackTrace();
-            } catch (UnsupportedCriterion e) {
-                e.printStackTrace();
-            }
+        	te.setDataLoader(dataLoader);
+        	
+        	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
+        	outputGenerator.setOutputDirectory(outputFolder);
+        	
+        	te.setOutputGenerator(outputGenerator);
 
-            ItemImport myloader = new ItemImport();
-            myloader.addItems(c, mycollections, "./bte_output_dspace", mapFile, template);
+        	try {
+        		TransformationResult res = te.transform(new TransformationSpec());
+        		List<String> output = res.getOutput();
+        		outputGenerator.writeOutput(output);
+        	} catch (Exception e) {
+        		System.err.println("Exception");
+        		e.printStackTrace();
+        	}
 
-            //remove files from output generator
-            deleteDirectory(new File("./bte_output_dspace"));
-        }
-        else {
-            System.out.println("Error: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
-            return;
+        	ItemImport myloader = new ItemImport();
+        	myloader.addItems(c, mycollections, outputFolder, mapFile, template);
+
+        	//remove files from output generator
+        	deleteDirectory(new File(outputFolder));
         }
     }
 
-    
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
@@ -1546,7 +1599,7 @@ public class ItemImport
         	// find the bundle
 	        Bundle[] bundles = i.getBundles(newBundleName);
 	        Bundle targetBundle = null;
-	            
+
 	        if( bundles.length < 1 )
 	        {
 	            // not found, create a new one
@@ -1557,19 +1610,19 @@ public class ItemImport
 	            // put bitstreams into first bundle
 	            targetBundle = bundles[0];
 	        }
-	
+
 	        // now add the bitstream
 	        bs = targetBundle.registerBitstream(assetstore, bitstreamPath);
-	
+
 	        // set the name to just the filename
 	        int iLastSlash = bitstreamPath.lastIndexOf('/');
 	        bs.setName(bitstreamPath.substring(iLastSlash + 1));
-	
+
 	        // Identify the format
 	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
 	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
 	        bs.setFormat(bf);
-	
+
 	        bs.update();
         }
     }
@@ -1875,5 +1928,193 @@ public class ItemImport
 
         boolean pathDeleted = path.delete();
         return (pathDeleted);
+    }
+    
+    /**
+     * Generate a random filename based on current time
+     * @param hidden: add . as a prefix to make the file hidden
+     * @return the filename
+     */
+    private static String generateRandomFilename(boolean hidden)
+    {
+    	String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));                        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
+        String datePart = sdf.format(new Date());
+        filename = datePart+"_"+filename;
+        
+        return filename;
+    }
+    
+    /**
+     * Given an uploaded file, this method calls the method to instantiate a BTE instance to 
+     * transform the input data and batch import them to DSpace
+     * @param file The input file to read data from
+     * @param collections The collections the created items will be inserted to
+     * @param bteInputType The input type of the data (bibtex, csv, etc.)
+     * @param context The context
+     * @throws Exception
+     */
+    public static void processUploadableImport(File file, Collection[] collections, 
+    		String bteInputType, Context context) throws Exception
+    {
+        final EPerson eperson = context.getCurrentUser();
+        final File myFile = file;
+        final Collection[] mycollections = collections;
+        final String myBteInputType = bteInputType;
+        
+        // if the file exists
+        if (file.exists())
+        {
+            Thread go = new Thread()
+            {
+                public void run()
+                {
+                    Context context = null;
+                    ItemIterator iitems = null;
+                    try
+                    {
+                        // create a new dspace context
+                        context = new Context();
+                        context.setIgnoreAuthorization(true);
+                        
+                        File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
+                        if (!importDir.exists()){
+                        	boolean success = importDir.mkdir();
+                        	if (!success) {
+                        		log.info("Cannot create batch import directory!");
+                        		throw new Exception();
+                        	}
+                        }
+                        //Generate a random filename for the subdirectory of the specific import in case
+                        //more that one batch imports take place at the same time
+                        String subDirName = generateRandomFilename(false);
+                        String workingDir = importDir.getAbsolutePath() + File.separator + subDirName;
+                        
+                        //Create the import working directory
+                        boolean success = (new File(workingDir)).mkdir();
+                    	if (!success) {
+                    		log.info("Cannot create batch import working directory!");
+                    		throw new Exception();
+                    	}
+                    	
+                        //Create random mapfile;
+                        String mapfile = workingDir + File.separator+ "mapfile";
+                        
+                        ItemImport myloader = new ItemImport();
+                        myloader.addBTEItems(context, mycollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, workingDir);
+                        
+                        // email message letting user know the file is ready for
+                        // download
+                        emailSuccessMessage(context, eperson, mapfile);
+                        
+                        // return to enforcing auths
+                        context.setIgnoreAuthorization(false);
+                    }
+                    catch (Exception e1)
+                    {
+                        try
+                        {
+                            emailErrorMessage(eperson, e1.getMessage());
+                        }
+                        catch (Exception e)
+                        {
+                            // wont throw here
+                        }
+                        throw new IllegalStateException(e1);
+                    }
+                    finally
+                    {
+                        if (iitems != null)
+                        {
+                            iitems.close();
+                        }
+                        
+                        // close the mapfile writer
+                        if (mapOut != null)
+                        {
+                            mapOut.close();
+                        }
+
+                        // Make sure the database connection gets closed in all conditions.
+                    	try {
+							context.complete();
+						} catch (SQLException sqle) {
+							context.abort();
+						}
+                    }
+                }
+
+            };
+
+            go.isDaemon();
+            go.start();
+        }
+        else {
+        	log.error("Unable to find the uploadable file");
+        }
+    }
+    
+    /**
+     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * with calling method about success or failure. We accomplish this
+     * communication with email instead. Send a success email once the batch
+     * import is complete
+     *
+     * @param context
+     *            - the current Context
+     * @param eperson
+     *            - eperson to send the email to
+     * @param fileName
+     *            - the filepath to the mapfile created by the batch import
+     * @throws MessagingException
+     */
+    public static void emailSuccessMessage(Context context, EPerson eperson,
+            String fileName) throws MessagingException
+    {
+        try
+        {
+            Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_success"));
+            email.addRecipient(eperson.getEmail());
+            email.addArgument(fileName);
+           
+            email.send();
+        }
+        catch (Exception e)
+        {
+            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+        }
+    }
+
+    /**
+     * Since the BTE batch import is done in a new thread we are unable to communicate
+     * with calling method about success or failure. We accomplis this
+     * communication with email instead. Send an error email if the batch
+     * import fails
+     *
+     * @param eperson
+     *            - EPerson to send the error message to
+     * @param error
+     *            - the error message
+     * @throws MessagingException
+     */
+    public static void emailErrorMessage(EPerson eperson, String error)
+            throws MessagingException
+    {
+        log.warn("An error occured during item export, the user will be notified. " + error);
+        try
+        {
+            Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
+            email.addRecipient(eperson.getEmail());
+            email.addArgument(error);
+            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
+
+            email.send();
+        }
+        catch (Exception e)
+        {
+            log.warn("error during item export error notification", e);
+        }
     }
 }

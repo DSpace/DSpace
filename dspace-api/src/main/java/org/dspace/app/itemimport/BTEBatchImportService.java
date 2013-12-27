@@ -7,10 +7,11 @@
  */
 package org.dspace.app.itemimport;
 
+import gr.ekt.bte.core.DataLoader;
+import gr.ekt.bte.core.TransformationEngine;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import gr.ekt.transformationengine.core.DataLoader;
 
 
 
@@ -18,15 +19,17 @@ import gr.ekt.transformationengine.core.DataLoader;
 /**
  * This class acts as a Service in the procedure ot batch import using the Biblio-Transformation-Engine
  */
-public class DataLoaderService
+public class BTEBatchImportService
 {
 
+	TransformationEngine transformationEngine;
     Map<String, DataLoader> dataLoaders = new HashMap<String, DataLoader>();
+    Map<String, String> outputMap = new HashMap<String,String>();
     
     /**
      * Default constructor
      */
-    public DataLoaderService()
+    public BTEBatchImportService()
     {
         super();
     }
@@ -48,5 +51,28 @@ public class DataLoaderService
     {
         return dataLoaders;
     }
-    
+
+    /**
+     * 
+     * @return the outputMapping
+     */
+	public Map<String, String> getOutputMap() {
+		return outputMap;
+	}
+
+	/**
+	 * Setter method for the outputMapping
+	 * @param outputMapping
+	 */
+	public void setOutputMap(Map<String, String> outputMap) {
+		this.outputMap = outputMap;
+	}
+
+	public TransformationEngine getTransformationEngine() {
+		return transformationEngine;
+	}
+
+	public void setTransformationEngine(TransformationEngine transformationEngine) {
+		this.transformationEngine = transformationEngine;
+	}
 }

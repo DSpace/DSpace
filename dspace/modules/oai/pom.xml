@@ -96,16 +96,21 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>            
+            <artifactId>solr-core</artifactId>
+            <version>${solr.version}</version>
+            <exclusions>
+				<exclusion>
+					<groupId>jdk.tools</groupId>
+					<artifactId>jdk.tools</artifactId>
+				</exclusion>
+			</exclusions> 
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.5.6</version>
         </dependency>
     </dependencies>
 

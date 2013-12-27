@@ -21,6 +21,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -155,6 +156,7 @@ public class METSManifest
 
     /** <file> elements in "original" file group (bundle) */
     private List<Element> contentFiles = null;
+    private List<Element> bundleFiles = null;
 
     /** builder to use for mdRef streams, inherited from create() */
     private SAXBuilder parser = null;
@@ -319,6 +321,29 @@ public class METSManifest
      *   the item's content.
      * @return a List of <code>Element</code>s.
      */
+    public List<Element> getBundleFiles()
+        throws MetadataValidationException
+    {
+        if (bundleFiles != null)
+        {
+            return bundleFiles;
+        }
+
+        bundleFiles = new ArrayList<Element>();
+        Element fileSec = mets.getChild("fileSec", metsNS);
+
+        if (fileSec != null)
+        {   
+            Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
+            while (fgi.hasNext())
+            {
+                Element fg = (Element)fgi.next();
+                bundleFiles.add(fg);
+            }
+        }
+        return bundleFiles;
+    }
+
     public List<Element> getContentFiles()
         throws MetadataValidationException
     {
@@ -446,7 +471,24 @@ public class METSManifest
     public static String getBundleName(Element file)
         throws MetadataValidationException
     {
-        Element fg = file.getParentElement();
+        return getBundleName(file, true);
+    }
+    
+    /**
+     * Get the DSpace bundle name corresponding to the <code>USE</code>
+     * attribute of the file group enclosing this <code>file</code> element.
+     * 
+     * @return DSpace bundle name
+     * @throws MetadataValidationException when there is no USE attribute on the enclosing fileGrp.
+     */
+    public static String getBundleName(Element file, boolean getParent)
+        throws MetadataValidationException
+    {
+        Element fg = file;
+        if (getParent)
+        {
+            fg = file.getParentElement();
+        }
         String fgUse = fg.getAttributeValue("USE");
         if (fgUse == null)
         {
@@ -1271,9 +1313,52 @@ public class METSManifest
             {
                 crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
             }
+            for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+            }
         }
     }
 
+
+    public void crosswalkBundle(Context context, PackageParameters params,
+                                Bundle bundle,
+                                String fileId, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
+               CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        Element file = getElementByXPath("descendant::mets:fileGrp[@ADMID=\""+fileId+"\"]", false);
+        if (file == null)
+        {
+            throw new MetadataValidationException("Failed in Bitstream crosswalk, Could not find file element with ID=" + fileId);
+        }
+
+        // In DSpace METS SIP spec, admin metadata is only "highly
+        // recommended", not "required", so it is OK if there is no ADMID.
+        String amds = file.getAttributeValue("ADMID");
+        if (amds == null)
+        {
+            log.warn("Got no bitstream ADMID, file@ID="+fileId);
+            return;
+        }
+        String amdID[] = amds.split("\\s+");
+        for (int i = 0; i < amdID.length; ++i)
+        {
+            Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
+            for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+            }
+            for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+            }
+            for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+            }
+        }
+    }
     /**
      * @return root element of METS document.
      */

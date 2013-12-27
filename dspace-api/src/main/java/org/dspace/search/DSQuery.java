@@ -16,10 +16,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.TokenMgrError;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.TokenMgrError;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -221,16 +222,16 @@ public class DSQuery
             if (args.getSortOption() == null)
             {
                 SortField[] sortFields = new SortField[] {
-                        new SortField("search.resourcetype", SortField.INT, true),
-                        new SortField(null, SortField.SCORE, SortOption.ASCENDING.equals(args.getSortOrder()))
+                        new SortField("search.resourcetype", SortField.Type.INT, true),
+                        new SortField(null, SortField.FIELD_SCORE.getType(), SortOption.ASCENDING.equals(args.getSortOrder()))
                     };
                 hits = searcher.search(myquery, max, new Sort(sortFields));
             }
             else
             {
                 SortField[] sortFields = new SortField[] {
-                        new SortField("search.resourcetype", SortField.INT, true),
-                        new SortField("sort_" + args.getSortOption().getName(), SortField.STRING, SortOption.DESCENDING.equals(args.getSortOrder())),
+                        new SortField("search.resourcetype", SortField.Type.INT, true),
+                        new SortField("sort_" + args.getSortOption().getName(), SortField.Type.STRING, SortOption.DESCENDING.equals(args.getSortOrder())),
                         SortField.FIELD_SCORE
                     };
                 hits = searcher.search(myquery, max, new Sort(sortFields));
@@ -396,7 +397,7 @@ public class DSQuery
         {
             try
             {
-                searcher.close();
+                searcher.getIndexReader().close();                
                 searcher = null;
             }
             catch (IOException ioe)
@@ -439,13 +440,13 @@ public class DSQuery
         // If it has, we need to close the existing searcher - we will open a new one later
 
         Directory searchDir = FSDirectory.open(new File(indexDir));
-
-        if (searcher != null && lastModified != IndexReader.getCurrentVersion(searchDir))
+        DirectoryReader reader = DirectoryReader.open(searchDir);
+        if (searcher != null && lastModified != reader.getVersion())
         {
             try
             {
                 // Close the cached IndexSearcher
-                searcher.close();
+                searcher.getIndexReader().close();
             }
             catch (IOException ioe)
             {
@@ -462,30 +463,11 @@ public class DSQuery
         // There is no existing searcher - either this is the first execution,
         // or the index has been updated and we closed the old index.
         if (searcher == null)
-        {
+        {                        
             // So, open a new searcher
-            lastModified = IndexReader.getCurrentVersion(searchDir);
-            String osName = System.getProperty("os.name");
-            if (osName != null && osName.toLowerCase().contains("windows"))
-            {
-                searcher = new IndexSearcher(searchDir){
-                    /*
-                     * TODO: Has Lucene fixed this bug yet?
-                     * Lucene doesn't release read locks in
-                     * windows properly on finalize. Our hack
-                     * extend IndexSearcher to force close().
-                     */
-                    @Override
-                    protected void finalize() throws Throwable {
-                        this.close();
-                        super.finalize();
-                    }
-                };
-            }
-            else
-            {
-                searcher = new IndexSearcher(searchDir);
-            }
+            lastModified = reader.getVersion();         
+            searcher = new IndexSearcher(reader);
+            
         }
 
         return searcher;

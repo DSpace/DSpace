@@ -239,7 +239,7 @@
 				<Value>starts_with</Value>
 			</Parameter>
 			<Parameter key="value">
-				<Value>info:eurepo/grantAgreement/EC/FP</Value>
+				<Value>info:eu-repo/grantAgreement/EC/FP</Value>
 			</Parameter>
 		</Filter>
 	</Filters>

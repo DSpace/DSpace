@@ -37,7 +37,7 @@
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.news-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.news-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -50,7 +50,7 @@
 
  <form action="<%= request.getContextPath() %>/dspace-admin/news-edit" method="post">
 
-    <p>
+    <p class="alert alert-info">
 <% if (position.contains("top"))
    { %>
     <fmt:message key="jsp.dspace-admin.news-edit.text.topbox"/>
@@ -61,24 +61,17 @@
 <% } %>
     </p>
     <%-- <p>You may format the text using HTML tags, but please note that the HTML will not be validated here.</p> --%>
-    <p><fmt:message key="jsp.dspace-admin.news-edit.text3"/></p>
-        <center>
-            <table>
-                <tr>
-                   <%--  <td class="submitFormLabel">News:</td> --%>
-                    <td class="submitFormLabel"><fmt:message key="jsp.dspace-admin.news-edit.news"/></td>
-                    <td><textarea name="news" rows="10" cols="50"><%= news %></textarea></td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                    <input type="hidden" name="position" value='<%= position %>'/>
-                    <%-- <input type="submit" name="submit_save" value="Save"> --%>
-                    <input type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
-                    <%-- <input type="submit" name="cancel" value="Cancel"> --%>
-                    <input type="submit" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+    <p class="alert alert-warning"><fmt:message key="jsp.dspace-admin.news-edit.text3"/></p>
+
+        <%--  <td class="submitFormLabel">News:</td> --%>
+		<span class="col-md-2"><fmt:message key="jsp.dspace-admin.news-edit.news"/></span>
+        <textarea class="form-control" name="news" rows="10" cols="50"><%= news %></textarea>
+
+        <input type="hidden" name="position" value='<%= position %>'/>
+        <%-- <input type="submit" name="submit_save" value="Save"> --%>
+        <input class="btn btn-primary" type="submit" name="submit_save" value="<fmt:message key="jsp.dspace-admin.general.save"/>" />
+        <%-- <input type="submit" name="cancel" value="Cancel"> --%>
+		<input class="btn btn-default" type="submit" name="cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+
     </form>
 </dspace:layout>

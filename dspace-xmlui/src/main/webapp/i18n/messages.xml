@@ -238,10 +238,6 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Feedback sent</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been received.</message>
 
-	<!-- org.dspace.app.xmlui.artifactbrowser.FrontPageSearch.java -->
-	<message key="xmlui.ArtifactBrowser.FrontPageSearch.head">Search DSpace</message>
-	<message key="xmlui.ArtifactBrowser.FrontPageSearch.para1">Enter some text in the box below to search DSpace.</message>
-
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
 	<message key="xmlui.ArtifactBrowser.ItemViewer.trail">View Item</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">This item appears in the following Collection(s)</message>
@@ -313,6 +309,78 @@
 	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
 	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
 
+
+	<!-- REQUEST COPY -->
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.title">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.trail">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.head">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Enter the following information to request a copy of the document from the responsible person</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Your e-mail address</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">This email address is used for sending the document.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail.error">Address is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message.error">Message is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.files">Files</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.allFiles">All files (of this document) in restricted access.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.notAllFiles">Only The requested file.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName.error">Name is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.submit">Request copy</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestSent.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.title">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.trail">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.head">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.para1">Your request has been sent to the author or responsible person.</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseDecisionForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para1">IF YOU ARE THE AUTHOR (OR AN AUTHOR) OF DOCUMENT "{0}" use the buttons to answer the user's request.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para2">This repository will propose an appropriate model reply, which you may edit.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Send copy</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend">Don't send copy</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseTrueForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.para1">This is the text to be sent to the applicant.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject">Subject</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.para1">This is the text to be sent to the applicant (together with the document).</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject">Subject</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.back">Back</message>
+	
+	 <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestChangeStatusForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">You may use this occasion to reconsider the access restrictions on the document (to avoid having to respond to these requests), if there is no reason to keep it restricted. To do so, after inserting your name and e-mail (for authentication), click the button "Change to Open Access".</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">E-mail</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">The name is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">The e-mail address is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen">Change to open access</message>
+	        
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.title">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.trail">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.head">Your request to change permissions has been sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para1">Your request has been sent to the administrator</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para2">Thanks</message>
+	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		                EPerson Aspect
@@ -531,7 +599,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
 	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
 	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
-	<message key="xmlui.Submission.Submissions.head">Submissions &amp; Workflow Tasks</message>
+	<message key="xmlui.Submission.Submissions.head">Submissions &amp; Workflow tasks</message>
 	<message key="xmlui.Submission.Submissions.untitled"><i>Untitled</i></message>
 	<message key="xmlui.Submission.Submissions.email">email: </message>
 	<!-- Same transformer, workflow section -->
@@ -657,20 +725,26 @@
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
     <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>
     <message key="xmlui.Submission.submit.AccessStep.access_settings">Visible to a group of selected users (no selection needed for Anonymous)</message>
-    <message key="xmlui.Submission.submit.AccessStep.open_access">Item will be visible once accepted into archive</message>
-    <message key="xmlui.Submission.submit.AccessStep.embargo">Embargo Access until Specific Date</message>
-    <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Visible/Embargoed</message>
-    <message key="xmlui.Submission.submit.AccessStep.name">Name</message>
+    <message key="xmlui.Submission.submit.AccessStep.open_access">Allow access once item is accepted into archive</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo">Embargo until specific date</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Access for selected group</message>
+    <message key="xmlui.Submission.submit.AccessStep.name">Policy name</message>
+    <message key="xmlui.Submission.submit.AccessStep.name_help">A short, descriptive name for the policy (up to 30 characters). May be shown to end users. Example: "Staff-only". Optional but recommended.</message>
     <message key="xmlui.Submission.submit.AccessStep.description">Description</message>
-    <message key="xmlui.Submission.submit.AccessStep.reason">Reason</message>
+    <message key="xmlui.Submission.submit.AccessStep.reason">Embargo reason</message>
+    <message key="xmlui.Submission.submit.AccessStep.reason_help">The reason for the embargo, typically for internal use only. Optional.</message>
     <message key="xmlui.Submission.submit.AccessStep.submit_add_policy">Confirm Policy &amp; add another</message>
-    <message key="xmlui.Submission.submit.AccessStep.list_assigned_groups">Groups</message>
+    <message key="xmlui.Submission.submit.AccessStep.list_assigned_groups">Group</message>
     <message key="xmlui.Submission.submit.AccessStep.error_format_date">Error format date</message>
     <message key="xmlui.Submission.submit.AccessStep.error_missing_date">When Embargo selected, date is required</message>
     <message key="xmlui.Submission.submit.AccessStep.error_duplicated_policy">An identical policy for this group and this action is already in place.</message>
-    <message key="xmlui.Submission.submit.AccessStep.table_policies">Policies List</message>
-    <message key="xmlui.Submission.submit.AccessStep.private_settings">Private Item</message>
+    <message key="xmlui.Submission.submit.AccessStep.table_policies">Group policies</message>
+    <message key="xmlui.Submission.submit.AccessStep.policies_help">Policies listed in this section override any default policies for the collection you're submitting to. If you wish to set an embargo but the target collection allows access for any user, you must set a policy that allows access for the Anonymous group only from a specific date onwards.</message>
+    <message key="xmlui.Submission.submit.AccessStep.no_policies">No group policies have been set up for this item.</message>
+    <message key="xmlui.Submission.submit.AccessStep.new_policy_head">Embargo</message>
+    <message key="xmlui.Submission.submit.AccessStep.private_settings">Private item</message>
     <message key="xmlui.Submission.submit.AccessStep.private_settings_help">If selected, the item won't be searchable</message>
+    <message key="xmlui.Submission.submit.AccessStep.private_settings_label">Private</message>
     <message key="xmlui.Submission.submit.AccessStep.column0">Name</message>
     <message key="xmlui.Submission.submit.AccessStep.column1">Action</message>
     <message key="xmlui.Submission.submit.AccessStep.column2">Group</message>
@@ -678,7 +752,11 @@
     <message key="xmlui.Submission.submit.AccessStep.column4">End Date</message>
     <message key="xmlui.Submission.submit.AccessStep.table_edit_button">Edit</message>
     <message key="xmlui.Submission.submit.AccessStep.table_delete_button">Remove</message>
-    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_policy_line">Name: {0}; action: {1}, group: {2}, start date: {3}, end date: {4}</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_public_item">The item will be searchable</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_private_item">The item will not be searchable</message>
+
 
 
     <!-- org.dspace.app.xmlui.Submission.submit.EditPolicyStep -->
@@ -757,7 +835,7 @@
 	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.EditBitstreamPolicies -->
-    <message key="xmlui.Submission.submit.EditBitstreamPolicies.head">Edit Bitstream Access</message>
+    <message key="xmlui.Submission.submit.EditBitstreamPolicies.head">Bitstream Access</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
@@ -811,7 +889,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.info1">Actions you may perform on this task:</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_help">Assign this task to yourself.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_submit">Take task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another to take.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another user to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
@@ -1293,7 +1371,7 @@
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.title">Advanced Policy Manager</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.trail">Advanced Authorizations</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_head">Advanced Policy Manager</message>
-	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows wildcard additions to and clearing of policies for types of content within specific collection(s). WARNING - removing READ permissions from items will make them not viewable!</message>
+	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows wildcard additions to and clearing of policies for items or bitstreams within specific collection(s). WARNING - removing READ permissions from items will make them not viewable!</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_groupSentence">For all of the selected groups...</message>
     <message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_actionSentence">...grant the ability to perform the following action...</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_resourceSentence">...for all following object types...</message>
@@ -1992,7 +2070,7 @@
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 
-	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace/Manakin Repository</message>
+	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace Repository</message>
 
 	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
 	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
@@ -2076,6 +2154,8 @@
 
 	<message key="xmlui.dri2xhtml.METS-1.0.header-qdc-elements">Dublin Core elements</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.header-qdc-terms">Dublin Core terms</message>
+
+        <message key="xmlui.dri2xhtml.METS-1.0.blocked">Blocked</message>
 
 
 	<!-- Special pioneer model related text, wherever it might end up -->

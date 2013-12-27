@@ -27,6 +27,7 @@ public class DiscoverResult {
     private int maxResults = -1;
     private int searchTime;
     private Map<String, DSpaceObjectHighlightResult> highlightedResults;
+    private String spellCheckQuery;
 
 
     public DiscoverResult() {
@@ -154,6 +155,14 @@ public class DiscoverResult {
             return authorityKey != null?"authority":
             	asFilterQuery != null?"equals":"notequals";
         }
+    }
+
+    public String getSpellCheckQuery() {
+        return spellCheckQuery;
+    }
+
+    public void setSpellCheckQuery(String spellCheckQuery) {
+        this.spellCheckQuery = spellCheckQuery;
     }
 
     public static final class DSpaceObjectHighlightResult

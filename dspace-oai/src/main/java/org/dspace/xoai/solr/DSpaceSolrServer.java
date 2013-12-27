@@ -29,12 +29,16 @@ public class DSpaceSolrServer
     {
         if (_server == null)
         {
-            
+            try
+            {
                 _server = new HttpSolrServer(
                         ConfigurationManager.getProperty("oai", "solr.url"));
                 log.debug("Solr Server Initialized");
-            
-            
+            }            
+            catch (Exception e)
+            {
+                log.error(e.getMessage(), e);
+            }
         }
         return _server;
     }

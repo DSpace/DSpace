@@ -18,16 +18,13 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
- * Adds a searchbox on the dspace home page
+ * Adds feed links on the DSpace home page
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -39,16 +36,6 @@ public class SiteViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-
-    private static final Message T_head =
-        message("xmlui.ArtifactBrowser.FrontPageSearch.head");
-
-    private static final Message T_para1 =
-        message("xmlui.ArtifactBrowser.FrontPageSearch.para1");
-
-    private static final Message T_go =
-        message("xmlui.general.go");
-
 
     /**
      * Generate the unique caching key.
@@ -96,21 +83,5 @@ public class SiteViewer extends AbstractDSpaceTransformer implements CacheablePr
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
-    }
-
-
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
-    {
-        Division search =
-        	body.addInteractiveDivision("front-page-search",contextPath+"/discover",Division.METHOD_GET,"primary");
-
-        search.setHead(T_head);
-
-        search.addPara(T_para1);
-
-        Para fields = search.addPara();
-        fields.addText("query");
-        fields.addButton("submit").setValue(T_go);
     }
 }

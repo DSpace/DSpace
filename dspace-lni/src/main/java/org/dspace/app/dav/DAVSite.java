@@ -20,6 +20,8 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LicenseManager;
+import org.dspace.core.NewsManager;
 import org.jdom.Element;
 
 
@@ -61,7 +63,7 @@ class DAVSite extends DAVResource
 
     /**
      * Instantiates a new DAV site.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
@@ -76,14 +78,14 @@ class DAVSite extends DAVResource
 
     /**
      * Match resource URI.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
      * @param pathElt the path elt
-     * 
+     *
      * @return the DAV resource
-     * 
+     *
      * @throws DAVStatusException the DAV status exception
      * @throws SQLException the SQL exception
      */
@@ -143,15 +145,15 @@ class DAVSite extends DAVResource
         }
         else if (elementsEqualIsh(property, news_topProperty))
         {
-            value = ConfigurationManager.readNewsFile("news-top.html");
+            value = NewsManager.readNewsFile("news-top.html");
         }
         else if (elementsEqualIsh(property, news_sideProperty))
         {
-            value = ConfigurationManager.readNewsFile("news-side.html");
+            value = NewsManager.readNewsFile("news-side.html");
         }
         else if (elementsEqualIsh(property, default_licenseProperty))
         {
-            value = ConfigurationManager.getDefaultSubmissionLicense();
+            value = LicenseManager.getDefaultSubmissionLicense();
         }
         else
         {
@@ -186,7 +188,7 @@ class DAVSite extends DAVResource
                 throw new DAVStatusException(HttpServletResponse.SC_FORBIDDEN,
                         "Not authorized to modify this property.");
             }
-            ConfigurationManager.writeNewsFile("news-top.html", newValue);
+            NewsManager.writeNewsFile("news-top.html", newValue);
         }
         else if (elementsEqualIsh(prop, news_sideProperty))
         {
@@ -195,7 +197,7 @@ class DAVSite extends DAVResource
                 throw new DAVStatusException(HttpServletResponse.SC_FORBIDDEN,
                         "Not authorized to modify this property.");
             }
-            ConfigurationManager.writeNewsFile("news-side.html", newValue);
+            NewsManager.writeNewsFile("news-side.html", newValue);
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {

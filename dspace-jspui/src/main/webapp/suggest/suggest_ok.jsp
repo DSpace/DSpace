@@ -16,12 +16,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.suggestok.title">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.suggestok.title">
 
     <h1><fmt:message key="jsp.suggestok.heading"/></h1>
 
     <form action="">
-     	<input type="button" name="close" onclick="window.close();" value="<fmt:message key="jsp.suggestok.button.close"/>" />
+     	<input class="btn btn-primary" type="button" name="close" onclick="window.close();" value="<fmt:message key="jsp.suggestok.button.close"/>" />
     </form>
 
 </dspace:layout>

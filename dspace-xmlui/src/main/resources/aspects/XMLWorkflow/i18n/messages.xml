@@ -25,7 +25,7 @@
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Actions you may perform on this task:</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Assign this task to yourself.</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_submit">Take task</message>
-    <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_help">Leave this task in the pool for another to take.</message>
+    <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_help">Leave this task in the pool for another user to take.</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_submit">Leave task</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.back">Back to overview</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.title">Accept/Reject Task</message>

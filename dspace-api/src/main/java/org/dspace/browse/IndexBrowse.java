@@ -344,7 +344,7 @@ public class IndexBrowse
         {
             boolean reqCommunityMappings = false;
             Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-            if (item.isArchived() && !item.isWithdrawn())
+            if (item.isArchived() && item.isDiscoverable())
             {
                 // Try to update an existing record in the item index
                 if (!dao.updateIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap))
@@ -358,30 +358,23 @@ public class IndexBrowse
 
                 reqCommunityMappings = true;
             }
+            else if (!item.isDiscoverable())
+            {
+            	if (!dao.updateIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap)) {
+                    dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
+                    dao.insertIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap);
+                }
+            }
             else if (item.isWithdrawn())
             {
-                // Private items are marked as withdrawn as well. check before if they are private...
-                Item dsoItem = Item.find(context, item.getID());
-                if (!dsoItem.isDiscoverable()){
-                    if (!dao.updateIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap)) {
-                        dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
-                        dao.insertIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap);
-                    }
+                // Try to update an existing record in the withdrawn index
+                if (!dao.updateIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap))
+                {
+                    // Record doesn't exist - ensure that it doesn't exist in the item index,
+                    // and add it to the withdrawn item index
+                    dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
+                    dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
                 }
-                else{
-                    // Try to update an existing record in the withdrawn index
-                    if (!dao.updateIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap))
-                    {
-                        // Record doesn't exist - ensure that it doesn't exist in the item index,
-                        // and add it to the withdrawn item index
-                        dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
-                        dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
-                    }
-                }
-
-
-
-
             }
             else
             {
@@ -1273,5 +1266,21 @@ public class IndexBrowse
             
             return browseItem.isWithdrawn();
         }
+        
+        /**
+         * Is the Item discoverable?
+         * @return
+         */
+        public boolean isDiscoverable()
+        {
+            if (item != null)
+            {
+            	return item.isDiscoverable();
+            }
+            
+            return browseItem.isDiscoverable();
+        }
+        
+        
 	}
 }

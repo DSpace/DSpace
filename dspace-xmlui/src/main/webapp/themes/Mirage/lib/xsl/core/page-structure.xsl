@@ -167,7 +167,7 @@
                 </xsl:if>
               </xsl:attribute>
             </meta>
-            <!-- Add stylsheets -->
+            <!-- Add stylesheets -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
                 <link rel="stylesheet" type="text/css">
                     <xsl:attribute name="media">
@@ -289,7 +289,10 @@
                                 <xsl:text>About This Repository</xsl:text>
                         </xsl:when>
                         <xsl:when test="not($page_title)">
-                                <xsl:text>  </xsl:text>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="$page_title = ''">
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
                                 <xsl:copy-of select="$page_title/node()" />
@@ -324,7 +327,9 @@
                         <xsl:text>/</xsl:text>
                     </xsl:attribute>
                     <span id="ds-header-logo">&#160;</span>
-                    <span id="ds-header-logo-text">mirage</span>
+                    <span id="ds-header-logo-text">
+                       <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
+                    </span>
                 </a>
                 <h1 class="pagetitle visuallyhidden">
                     <xsl:choose>
@@ -339,10 +344,6 @@
                     </xsl:choose>
 
                 </h1>
-                <h2 class="static-pagetitle visuallyhidden">
-                    <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
-                </h2>
-
 
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
@@ -385,11 +386,12 @@
                         </div>
                     </xsl:otherwise>
                 </xsl:choose>
-
+                
+                <xsl:call-template name="languageSelection" />
+                
             </div>
         </div>
     </xsl:template>
-
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->

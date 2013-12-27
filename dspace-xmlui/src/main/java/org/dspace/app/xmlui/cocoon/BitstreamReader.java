@@ -29,6 +29,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.util.ByteRange;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -93,7 +94,12 @@ import org.dspace.core.LogManager;
  *    &lt;map:parameter name="name" value="{2}"/&gt;
  *  &lt;/map:read&gt;
  *
+ * Added request-item support. 
+ * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
+ * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
  * @author Scott Phillips
+ * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 
 public class BitstreamReader extends AbstractReader implements Recyclable
@@ -271,10 +277,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 isAuthorized = false;
                 log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
             }
-
+            // It item-request is enabled to all request we redirect to restricted-resource immediately without login request  
+            String requestItemType = ConfigurationManager.getProperty("request.item.type");
             if (!isAuthorized)
             {
-                if(context.getCurrentUser() != null){
+                if(context.getCurrentUser() != null || StringUtils.equalsIgnoreCase("all", requestItemType)){
                         // A user is logged in, but they are not authorized to read this bitstream,
                         // instead of asking them to login again we'll point them to a friendly error
                         // message that tells them the bitstream is restricted.
@@ -293,7 +300,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         return;
                 }
                 else{
-
+                	if(ConfigurationManager.getProperty("request.item.type")==null||
+                			                			ConfigurationManager.getProperty("request.item.type").equalsIgnoreCase("logged")){
                         // The user does not have read access to this bitstream. Interrupt this current request
                         // and then forward them to the login page so that they can be authenticated. Once that is
                         // successful, their request will be resumed.
@@ -306,6 +314,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                         httpResponse.sendRedirect(redictURL);
                         return;
+                	}
                 }
             }
                 
@@ -570,7 +579,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 {
                         // do nothing
                 }
-                response.setHeader("Content-Disposition", "attachment;filename=" + name);
+                response.setHeader("Content-Disposition", "attachment;filename=" + '"' + name + '"');
         }
 
         ByteRange byteRange = null;

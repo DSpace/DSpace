@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The contents of this file are subject to the license and copyright detailed 
-	in the LICENSE and NOTICE files at the root of the source tree and available 
-	online at http://www.dspace.org/license/ -->
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.0.xsd
@@ -21,6 +28,8 @@
 
 	<alias name="solrServiceResourceIndexPlugin"
 		alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" />
+	
+	<bean id="SolrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
 
 	<!-- Additional indexing plugin to implement the browse system via SOLR -->
 	<bean id="solrBrowseIndexer" scope="prototype"
@@ -176,6 +185,8 @@
 				<property name="metadataSortField" value="dc.date.accessioned" />
 				<property name="type" value="date" />
 				<property name="max" value="5" />
+				<!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+ 				<property name="useAsHomePage" value="false"/>
 			</bean>
 		</property>
 		<!--Default result per page -->
@@ -241,6 +252,8 @@
 				<value>search.resourcetype:[2 TO 11] OR search.resourcetype:[1001 TO 9999]</value>
 			</list>
 		</property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
 	</bean>
 
 	<bean id="dspaceConfiguration"

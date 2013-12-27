@@ -47,7 +47,7 @@
 
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.metadataimport.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.metadataimport.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"

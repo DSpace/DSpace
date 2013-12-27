@@ -30,7 +30,7 @@
     SimpleDateFormat sdfLink = new SimpleDateFormat("yyyy'-'M");
 %>
 
-<dspace:layout navbar="<%= navbar %>" titlekey="jsp.statistics.report.title">
+<dspace:layout style="submission" navbar="<%= navbar %>" titlekey="jsp.statistics.report.title">
 
     <p>
 <%

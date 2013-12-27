@@ -175,9 +175,9 @@ public class XOAI
                 .println("Incremental import. Searching for documents modified after: "
                         + last.toString());
 
-        String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND last_modified > ?";
+        String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE AND last_modified > ?";
         if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND last_modified > ?";
+                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1 AND last_modified > ?";
         }
 
         try
@@ -200,9 +200,9 @@ public class XOAI
         try
         {
 
-            String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE";
+            String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE";
             if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1";
+                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1";
             }
 
             TableRowIterator iterator = DatabaseManager.query(_context,

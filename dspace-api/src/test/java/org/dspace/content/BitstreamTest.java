@@ -58,12 +58,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
         }
         catch (IOException ex) {
             log.error("IO Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 
@@ -128,6 +128,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     {
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream created = Bitstream.create(context, new FileInputStream(f));
+        context.commit();
+        
         //the item created by default has no name nor type set
         assertThat("testCreate 0", created.getFormat().getMIMEType(), equalTo("application/octet-stream"));
         assertThat("testCreate 1", created.getName(), nullValue());

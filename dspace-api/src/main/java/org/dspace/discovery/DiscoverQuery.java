@@ -23,6 +23,7 @@ public class DiscoverQuery
     private List<String> filterQueries;
     private int DSpaceObjectFilter = -1;
     private List<String> fieldPresentQueries;
+    private boolean spellCheck;
 
     private int start = 0;
     private int maxResults = -1;
@@ -344,5 +345,12 @@ public class DiscoverQuery
             return getNamedFacetQueries().get(facetQuery);
         }
         return null;
+
+    public boolean isSpellCheck() {
+        return spellCheck;
+    }
+
+    public void setSpellCheck(boolean spellCheck) {
+        this.spellCheck = spellCheck;
     }
 }

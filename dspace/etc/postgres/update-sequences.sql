@@ -84,6 +84,8 @@ SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
 SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
+SELECT setval('webapp_seq', max(id)) FROM webapp;
+SELECT setval('requestitem_seq', max(requestitem_id)) FROM requestitem;
 
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'

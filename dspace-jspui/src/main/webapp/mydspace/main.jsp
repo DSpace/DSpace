@@ -20,8 +20,6 @@
   -    workflow.pooled   WorkflowItem[] array of pooled tasks
   --%>
 
-<%@page import="org.dspace.services.ConfigurationService"%>
-<%@page import="org.dspace.utils.DSpace"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -44,6 +42,8 @@
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="java.util.List" %>
+<%@page import="org.dspace.services.ConfigurationService"%>
+<%@page import="org.dspace.utils.DSpace"%>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -71,6 +71,7 @@
     // Is the logged in user an admin
     Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
     boolean displayGroupMembership = (displayMembership == null ? false : displayMembership.booleanValue());
+    
     ConfigurationService configurationService = new DSpace().getConfigurationService();
     boolean crisEnabled = configurationService.getPropertyAsType("cris.enabled", false);
 
@@ -80,130 +81,124 @@
 <c:set var="dspace.layout.head.last" scope="request">
     <script type="text/javascript"><!--
 
-		var j = jQuery.noConflict();
-    	var myrpstatus = new Object();
-    	j(document).ready(function(){
-    		j('#cris-rp-change-active').dialog({
-    			autoOpen: false, modal: true, width: 750, minHeight: 350,
-   				buttons: {
-   					"<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>": 
-   						function(){
-   							j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
-   						},
-   					"<fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/>": 
-   						function(){
-	   						myRP('hide');
-	    					j(this).dialog("close");
-   						},
-					"<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>": 
-						function(){
-							myRP('remove');
-	    					j(this).dialog("close");
-   						},
-					"<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-active"/>": 
-						function(){
-	   						j(this).dialog("close");
-	   					}
-   				}
-    		});
-    		j('#cris-rp-change-inactive').dialog({
-    			autoOpen: false, modal: true, width: 750, minHeight: 350,
-   				buttons: {
-   					"<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>": 
-   						function(){
-   							j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
-   						},
-  					"<fmt:message key="jsp.mydspace.cris.rp-status-change.active"/>": 
-  						function(){
-	  						myRP('activate');
-	    					j(this).dialog("close");		
-        				},
-    				"<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>": 
-    					function(){
-	    					myRP('remove');
-	    					j(this).dialog("close");	
-        				},
-    				"<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/>": 
-    					function(){
-        					j(this).dialog("close");
-        				}
-        			} 
-        	});
-    		j('#cris-rp-change-undefined').dialog({
-    			autoOpen: false, modal: true, width: 750, minHeight: 300,
-   				buttons: {
-        			"<fmt:message key="jsp.mydspace.cris.rp-status-change.create"/>": 
-        				function(){
-        					myRP('create');
-        					j(this).dialog("close");
-        				},
-    				"<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/>": 
-    					function(){
-        					j(this).dialog("close");
-        				}
-        		} 
-        	});
-    		
-    		var myRP = function(myaction){
-	    		j.ajax( {
-					url : "<%= request.getContextPath() %>/cris/rp/myRp.json",
-					data: {
-						"action" : myaction
-					},
-					success : function(data) {
-						myrpstatus = data.myrp;
-						if (data.myrp.url != null && data.myrp.active)
-						{
-							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-active" />');
-							j('#cris-rp-status-value').addClass("cris-rp-status-active");
-							j('#cris-rp-changestatus').off('click');
-							j('#cris-rp-changestatus').on('click', function(){
-								j('#cris-rp-change-active').dialog("open");
-							});
-						} 
-						else if (data.myrp.url != null && !data.myrp.active)
-						{
-							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-inactive" />');
-							j('#cris-rp-status-value').addClass("cris-rp-status-inactive");
-							j('#cris-rp-changestatus').off('click');
-							j('#cris-rp-changestatus').on('click', function(){
-								j('#cris-rp-change-inactive').dialog("open");
-							});
-						}
-						else 
-						{
-							j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-undefined" />');
-							j('#cris-rp-status-value').addClass("cris-rp-status-undefined");
-							j('#cris-rp-changestatus').off('click');
-							j('#cris-rp-changestatus').on('click', function(){
-								j('#cris-rp-change-undefined').dialog("open");
-							});
-						}										
-					}
-	    		});
-    		};
-    		
-    		myRP('status');
-    	});
+               var j = jQuery.noConflict();
+       var myrpstatus = new Object();
+       j(document).ready(function(){
+               j('#cris-rp-change-active').dialog({
+                       autoOpen: false, modal: true, width: 750, minHeight: 350,
+                               buttons: {
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
+                                               function(){
+                                                       j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
+                                               },
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/>":
+                                               function(){
+                                                       myRP('hide');
+                                               j(this).dialog("close");
+                                               },
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>":
+                                               function(){
+                                                       myRP('remove');
+                                               j(this).dialog("close");
+                                               },
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-active"/>":
+                                               function(){
+                                                       j(this).dialog("close");
+                                       }
+                               }
+               });
+               j('#cris-rp-change-inactive').dialog({
+                       autoOpen: false, modal: true, width: 750, minHeight: 350,
+                               buttons: {
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
+                                               function(){
+                                                       j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
+                                               },
+                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.active"/>":
+                                               function(){
+                                                       myRP('activate');
+                                               j(this).dialog("close");
+                                       },
+                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>":
+                                       function(){
+                                               myRP('remove');
+                                               j(this).dialog("close");
+                                       },
+                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/>":
+                                       function(){
+                                               j(this).dialog("close");
+                                       }
+                               }
+               });
+               j('#cris-rp-change-undefined').dialog({
+                       autoOpen: false, modal: true, width: 750, minHeight: 300,
+                               buttons: {
+                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.create"/>":
+                                       function(){
+                                               myRP('create');
+                                               j(this).dialog("close");
+                                       },
+                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/>":
+                                       function(){
+                                               j(this).dialog("close");
+                                       }
+                       }
+               });
+
+               var myRP = function(myaction){
+                       j.ajax( {
+                                       url : "<%= request.getContextPath() %>/cris/rp/myRp.json",
+                                       data: {
+                                               "action" : myaction
+                                       },
+                                       success : function(data) {
+                                               myrpstatus = data.myrp;
+                                               if (data.myrp.url != null && data.myrp.active)
+                                               {
+                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-active" />');
+                                                       j('#cris-rp-status-value').addClass("cris-rp-status-active");
+                                                       j('#cris-rp-changestatus').off('click');
+                                                       j('#cris-rp-changestatus').on('click', function(){
+                                                               j('#cris-rp-change-active').dialog("open");
+                                                       });
+                                               }
+                                               else if (data.myrp.url != null && !data.myrp.active)
+                                               {
+                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-inactive" />');
+                                                       j('#cris-rp-status-value').addClass("cris-rp-status-inactive");
+                                                       j('#cris-rp-changestatus').off('click');
+                                                       j('#cris-rp-changestatus').on('click', function(){
+                                                               j('#cris-rp-change-inactive').dialog("open");
+                                                       });
+                                               }
+                                               else
+                                               {
+                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-undefined" />');
+                                                       j('#cris-rp-status-value').addClass("cris-rp-status-undefined");
+                                                       j('#cris-rp-changestatus').off('click');
+                                                       j('#cris-rp-changestatus').on('click', function(){
+                                                               j('#cris-rp-change-undefined').dialog("open");
+                                                       });
+                                               }
+                                       }
+                       });
+               };
+
+               myRP('status');
+       });
     -->
     </script>
-</c:set>    
-<% } %>
-<dspace:layout titlekey="jsp.mydspace" nocache="true">
-
-<table width="100%" border="0">
-        <tr>
-            <td align="left">
-                <h1>
+</c:set>
+<% } %>                                               
+<dspace:layout style="submission" titlekey="jsp.mydspace" nocache="true">
+	<div class="panel panel-primary">
+        <div class="panel-heading">
                     <fmt:message key="jsp.mydspace"/>: <%= Utils.addEntities(user.getFullName()) %>
-                </h1>
-            </td>
-            <td align="right" class="standard">
-                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
-<%
+	                <span class="pull-right"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup></span>
+        </div>         
+
+		<div class="panel-body">
+		<%
     if (crisEnabled)
     {
         %>
@@ -226,20 +221,26 @@
 <%        
 	}
  %>
-
+		    <form action="<%= request.getContextPath() %>/mydspace" method="post">
+		        <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
+                <input class="btn btn-success" type="submit" name="submit_new" value="<fmt:message key="jsp.mydspace.main.start.button"/>" />
+                <input class="btn btn-info" type="submit" name="submit_own" value="<fmt:message key="jsp.mydspace.main.view.button"/>" />
+		    </form>
+		
+		
 <%-- Task list:  Only display if the user has any tasks --%>
 <%
     if (owned.length > 0)
     {
 %>
-    <h2><fmt:message key="jsp.mydspace.main.heading2"/></h2>
+    <h3><fmt:message key="jsp.mydspace.main.heading2"/></h3>
 
     <p class="submitFormHelp">
         <%-- Below are the current tasks that you have chosen to do. --%>
         <fmt:message key="jsp.mydspace.main.text1"/>
     </p>
 
-    <table class="miscTable" align="center" summary="Table listing owned tasks">
+    <table class="table" align="center" summary="Table listing owned tasks">
         <tr>
             <th id="t1" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.task"/></th>
             <th id="t2" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.item"/></th>
@@ -282,8 +283,8 @@
                      <form action="<%= request.getContextPath() %>/mydspace" method="post">
                         <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
                         <input type="hidden" name="workflow_id" value="<%= owned[i].getID() %>" />  
-                        <input type="submit" name="submit_perform" value="<fmt:message key="jsp.mydspace.main.perform.button"/>" />  
-                        <input type="submit" name="submit_return" value="<fmt:message key="jsp.mydspace.main.return.button"/>" />
+                        <input class="btn btn-primary" type="submit" name="submit_perform" value="<fmt:message key="jsp.mydspace.main.perform.button"/>" />  
+                        <input class="btn btn-default" type="submit" name="submit_return" value="<fmt:message key="jsp.mydspace.main.return.button"/>" />
                      </form> 
                 </td>
         </tr>
@@ -299,19 +300,20 @@
     if (pooled.length > 0)
     {
 %>
-    <h2><fmt:message key="jsp.mydspace.main.heading3"/></h2>
+    <h3><fmt:message key="jsp.mydspace.main.heading3"/></h3>
 
     <p class="submitFormHelp">
         <%--Below are tasks in the task pool that have been assigned to you. --%>
         <fmt:message key="jsp.mydspace.main.text2"/>
     </p>
 
-    <table class="miscTable" align="center" summary="Table listing the tasks in the pool">
+    <table class="table" align="center" summary="Table listing the tasks in the pool">
         <tr>
             <th id="t6" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.task"/></th>
             <th id="t7" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.item"/></th>
             <th id="t8" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.subto"/></th>
             <th id="t9" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.subby"/></th>
+            <th class="oddRowOddCol"> </th>
         </tr>
 <%
         // even or odd row:  Starts even since header row is odd (1).  Toggled
@@ -345,7 +347,7 @@
                         <form action="<%= request.getContextPath() %>/mydspace" method="post">
                             <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
                             <input type="hidden" name="workflow_id" value="<%= pooled[i].getID() %>" />
-                            <input type="submit" name="submit_claim" value="<fmt:message key="jsp.mydspace.main.take.button"/>" />
+                            <input class="btn btn-default" type="submit" name="submit_claim" value="<fmt:message key="jsp.mydspace.main.take.button"/>" />
                         </form> 
                     </td>
         </tr>
@@ -356,27 +358,7 @@
     </table>
 <%
     }
-%>
 
-    <form action="<%= request.getContextPath() %>/mydspace" method="post">
-        <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
-        <center>
-            <table border="0" width="70%">
-                <tr>
-                    <td align="left">
-                        <input type="submit" name="submit_new" value="<fmt:message key="jsp.mydspace.main.start.button"/>" />
-                    </td>
-                    <td align="right">
-                        <input type="submit" name="submit_own" value="<fmt:message key="jsp.mydspace.main.view.button"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </form>
-
-    <p align="center"><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.mydspace.main.link"/></a></p>
-
-<%
     // Display workspace items (authoring or supervised), if any
     if (workspaceItems.length > 0 || supervisedItems.length > 0)
     {
@@ -384,11 +366,11 @@
         String row = "even";
 %>
 
-    <h2><fmt:message key="jsp.mydspace.main.heading4"/></h2>
+    <h3><fmt:message key="jsp.mydspace.main.heading4"/></h3>
 
     <p><fmt:message key="jsp.mydspace.main.text4" /></p>
 
-    <table class="miscTable" align="center" summary="Table listing unfinished submissions">
+    <table class="table" align="center" summary="Table listing unfinished submissions">
         <tr>
             <th class="oddRowOddCol">&nbsp;</th>
             <th id="t10" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.subby"/></th>
@@ -421,7 +403,7 @@
             <td class="<%= row %>RowOddCol">
                 <form action="<%= request.getContextPath() %>/workspace" method="post">
                     <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
-                    <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
+                    <input class="btn btn-default" type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
             </td>
             <td headers="t10" class="<%= row %>RowEvenCol">
@@ -433,7 +415,7 @@
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                     <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
+                    <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
                 </form> 
             </td>
         </tr>
@@ -468,7 +450,7 @@
             <td class="<%= row %>RowOddCol">
                 <form action="<%= request.getContextPath() %>/workspace" method="post">
                     <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
-                    <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
+                    <input class="btn btn-default" type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
             </td>
             <td class="<%= row %>RowEvenCol">
@@ -480,7 +462,7 @@
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>
                     <input type="hidden" name="workspace_id" value="<%= supervisedItems[i].getID() %>"/>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
+                    <input class="btn btn-default" type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.general.remove" />"/>
                 </form>  
             </td>
         </tr>
@@ -500,9 +482,9 @@
         // even or odd row:  Starts even since header row is odd (1)
         String row = "even";
 %>
-    <h2><fmt:message key="jsp.mydspace.main.heading5"/></h2>
+    <h3><fmt:message key="jsp.mydspace.main.heading5"/></h3>
 
-    <table class="miscTable" align="center" summary="Table listing submissions in workflow process">
+    <table class="table" align="center" summary="Table listing submissions in workflow process">
         <tr>
             <th id="t14" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.elem1"/></th>
             <th id="t15" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.elem2"/></th>
@@ -536,7 +518,7 @@
   if(displayGroupMembership && groupMemberships.length>0)
   {
 %>
-    <h2><fmt:message key="jsp.mydspace.main.heading6"/></h2>
+    <h3><fmt:message key="jsp.mydspace.main.heading6"/></h3>
     <ul>
 <%
     for(int i=0; i<groupMemberships.length; i++)
@@ -552,11 +534,13 @@
 %>
 
 	<%if(exportsAvailable!=null && exportsAvailable.size()>0){ %>
-	<h2><fmt:message key="jsp.mydspace.main.heading7"/></h2>
+	<h3><fmt:message key="jsp.mydspace.main.heading7"/></h3>
 	<ol class="exportArchives">
 		<%for(String fileName:exportsAvailable){%>
 			<li><a href="<%=request.getContextPath()+"/exportdownload/"+fileName%>" title="<fmt:message key="jsp.mydspace.main.export.archive.title"><fmt:param><%= fileName %></fmt:param></fmt:message>"><%=fileName%></a></li> 
 		<% } %>
 	</ol>
 	<%} %>
+	</div>
+</div>	
 </dspace:layout>

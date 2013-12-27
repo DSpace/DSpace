@@ -37,7 +37,8 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.supervise-confirm-remove.title"
+<dspace:layout style="submission"
+			   titlekey="jsp.dspace-admin.supervise-confirm-remove.title"
                navbar="admin"
                locbar="link"
                parentlink="/dspace-admin"
@@ -45,20 +46,16 @@
 
 <h1><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.heading"/></h1>
 
-<h3><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></h3>
-
-<br/><br/>
-
-<div align="center"/>
+<p class="help-block"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></p>
 
 <%
         DCValue[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = wsItem.getItem().getSubmitter();
 %>
-
-<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.titleheader"/></strong>:
-<br/>
+<div class="row">
+<label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.titleheader"/>:</label>
+<span>
 <%
 		if (titleArray.length > 0)
 		{
@@ -73,24 +70,31 @@
 <%
 		}
 %>
-<br/><br/>
-<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/></strong>:
-<br/>
+</span>
+</div>
+<div class="row">
+<label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/>:</label>
+<span>
 <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
-<br/><br/>
-<strong><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/></strong>:
-<br/>
+</span>
+</div>
+<div class="row">
+<label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.supervisorgroupheader"/>:</label>
+<span>
 <%= group.getName() %>
-<br/><br/>
+</span>
+</div>
+<br/>
+<p class="text-danger lead"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/></p>
 
-<fmt:message key="jsp.dspace-admin.supervise-confirm-remove.confirm"/>
-
+<div class="pull-right">
 <%-- form to request removal of supervisory linking --%>
 <form method="post" action="">
     <input type="hidden" name="gID" value="<%= group.getID() %>"/>
     <input type="hidden" name="siID" value="<%= wsItem.getID() %>"/>
-    <input type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
-    <input type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
+    <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
+    <input class="btn btn-danger" type="submit" name="submit_doremove" value="<fmt:message key="jsp.dspace-admin.general.remove"/>"/>
 </form>
+</div>
 
 </dspace:layout>

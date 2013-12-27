@@ -16,9 +16,10 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-                             
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
+    prefix="fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -26,53 +27,67 @@
 
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.app.util.CollectionDropDown" %>
 <%@page import="org.dspace.app.cris.model.ACrisObject"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.dspace.app.cris.model.VisibilityConstants"%>
 <%@page import="org.dspace.app.cris.util.ResearcherPageUtils"%>
 <%@page import="java.util.List"%>
+
 <%
+    Collection[] availableSubscriptions =
+        (Collection[]) request.getAttribute("availableSubscriptions");
     Collection[] subscriptions =
         (Collection[]) request.getAttribute("subscriptions");
-	Community[] commSubscriptions = (Community[]) request
-	.getAttribute("comm_subscriptions");
-	
-	List<ACrisObject> rpSubscriptions = (List<ACrisObject>) request
-	.getAttribute("crisobject_subscriptions");
-	
     boolean updated =
         ((Boolean) request.getAttribute("updated")).booleanValue();
+    Community[] commSubscriptions = (Community[]) request
+   		 .getAttribute("comm_subscriptions");
+
+    List<ACrisObject> rpSubscriptions = (List<ACrisObject>) request
+   	 	.getAttribute("crisobject_subscriptions");
 %>
 <c:set var="dspace.cris.navbar" scope="request">
-	<c:set var="classcurrent" scope="page">0</c:set>
-	<%@ include file="/dspace-cris/_subscription-right.jsp" %>
+       <c:set var="classcurrent" scope="page">0</c:set>
+       <%@ include file="/dspace-cris/_subscription-right.jsp" %>
 </c:set>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.subscriptions.title">
 
-    <table width="100%" border="0">
-        <tr>
-            <td align="left">
                 <%-- <h1>Your Subscriptions</h1> --%>
-				<h1><fmt:message key="jsp.mydspace.subscriptions.title"/></h1>
-            </td>
-            <td align="right" class="standard">
-		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
- 
+<h1><fmt:message key="jsp.mydspace.subscriptions.title"/>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
+</h1>
 <%
     if (updated)
     {
 %>
 	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     }
 %>
+        <form class="form-group" action="<%= request.getContextPath() %>/subscribe" method="post">
+        	<div class="col-md-6">
+            <select id="available-subscriptions" class="form-control" name="collection">
+                <option value="-1"><fmt:message key="jsp.mydspace.subscriptions.select_collection" /></option>
+<%
+    for (int i = 0; i < availableSubscriptions.length; i++)
+    {
+%>
+                <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
+<%
+    }
+%>
+            </select>
+            </div>
+            <input class="btn btn-success" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
+ 			<input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
+	</form>
+
 <h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.community-head"/></h3>
 <p><fmt:message key="jsp.mydspace.subscriptions.info2-community"/></p>
 <%
@@ -134,68 +149,53 @@ else
 %>
 <br/>
 
-<h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.collection-head"/></h3>
-<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
+<h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.collection-head"/></h3>        
 <%
-if (subscriptions.length > 0)
-{
-%>
-<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
-
-<center>
-    <table class="mydspace-subscriptions" summary="Table displaying your subscriptions">
-	<tr>
-		<th>Collection</th>
-		<th>Identifier</th>
-		<th />
-	</tr>
-<%
-String row = "odd";
-
-    for (int i = 0; i < subscriptions.length; i++)
+    if (subscriptions.length > 0)
     {
 %>
-        <tr>
-            <%--
-              -  HACK: form shouldn't open here, but IE adds a carraige
-              -  return where </form> is placed, breaking our nice layout.
-              --%>
-
-             <td class="<%=row%>RowOddCol"><%=subscriptions[i].getMetadata("name")%></td>
-             <td class="<%=row%>RowEvenCol">
-                  <a href="<%=request.getContextPath()%>/handle/<%=subscriptions[i].getHandle()%>"><%=subscriptions[i].getHandle()%></a>
-             </td>
-             <td class="<%=row%>RowOddCol">
-                <form method="post" action=""> 
-                    <input type="hidden" name="collection" value="<%=subscriptions[i].getID()%>" />
-		<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
-                </form>
-             </td>
-        </tr>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
+    
+        <table class="table" summary="Table displaying your subscriptions">
 <%
-row = (row.equals("even") ? "odd" : "even");
+        String row = "odd";
+
+        for (int i = 0; i < subscriptions.length; i++)
+        {
+%>
+            <tr>
+                <%--
+                  -  HACK: form shouldn't open here, but IE adds a carraige
+                  -  return where </form> is placed, breaking our nice layout.
+                  --%>
+
+                 <td class="<%= row %>RowOddCol">
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= CollectionDropDown.collectionPath(subscriptions[i],0) %></a>
+                 </td>
+                 <td class="<%= row %>RowEvenCol">
+                    <form method="post" action=""> 
+                        <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>" />
+			<input class="btn btn-warning" type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+                    </form>
+                 </td>
+            </tr>
+<%
+            row = (row.equals("even") ? "odd" : "even" );
+        }
+%>
+        </table>
+
+    <br/>
+
+<%
+    }
+    else
+    {
+%>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info4"/></p>
+<%
     }
 %>
-   <tr>
-	<td /><td />
-	<td><form method="post" action=""><input type="submit" name="submit_clear_coll" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" /></form></td>
-   </tr>
-    </table>
-</center>
-
-<br/>
-
-<%
-}
-else
-{
-%>
-<p><fmt:message key="jsp.mydspace.subscriptions.info4"/></p>
-<%
-}
-%>
-
-
 <br/>
 <h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.rp-head"/></h3>
 <p><fmt:message key="jsp.mydspace.subscriptions.info2-rp"/></p>
@@ -260,7 +260,6 @@ else
 <%
 }
 %>
-
 
 <p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/> </a></p>
 
