@@ -49,6 +49,7 @@ public class ResourceIdentifierController {
 
     private static final int STATUS_OK=200;
     private static final int STATUS_FORBIDDEN=400;
+    private static final int STATUS_NOTFOUND=404;
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
     public String processHandle(HttpServletRequest request) {
@@ -159,7 +160,12 @@ public class ResourceIdentifierController {
         response.setStatus(status);
         if(status==STATUS_FORBIDDEN)
             return null;
-
+        if(status==STATUS_NOTFOUND)
+        {
+            response.setStatus(STATUS_NOTFOUND);
+            request.setAttribute("identifier",resourceIdentifier);
+            return new ModelAndView("forward:/identifier-not-found");
+        }
         return new ModelAndView(new DapView());
     }
 
@@ -174,7 +180,12 @@ public class ResourceIdentifierController {
         response.setStatus(status);
         if(status==STATUS_FORBIDDEN)
             return null;
-
+        if(status==STATUS_NOTFOUND)
+        {
+            response.setStatus(STATUS_NOTFOUND);
+            request.setAttribute("identifier",resourceIdentifier);
+            return new ModelAndView("forward:/identifier-not-found");
+        }
         return new ModelAndView(new DapView());
     }
 
@@ -182,14 +193,28 @@ public class ResourceIdentifierController {
     @RequestMapping("/resource/{prefix}/{suffix}/citation/ris")
     public ModelAndView genRisRepresentation(@PathVariable String prefix, @PathVariable String suffix, HttpServletRequest request, HttpServletResponse response) {
         String resourceIdentifier = prefix + "/" + suffix;
-        request.setAttribute(DSPACE_OBJECT, getDSO(request, resourceIdentifier));
+        DSpaceObject dSpaceObject = getDSO(request, resourceIdentifier);
+        if(dSpaceObject==null)
+        {
+            response.setStatus(STATUS_NOTFOUND);
+            request.setAttribute("identifier",resourceIdentifier);
+            return new ModelAndView("forward:/identifier-not-found");
+        }
+        request.setAttribute(DSPACE_OBJECT, dSpaceObject);
         return new ModelAndView(new RisView());
     }
 
     @RequestMapping("/resource/{prefix}/{suffix}/citation/bib")
     public ModelAndView genBibTexRepresentation(@PathVariable String prefix, @PathVariable String suffix, HttpServletRequest request, HttpServletResponse response) {
         String resourceIdentifier = prefix + "/" + suffix;
-        request.setAttribute(DSPACE_OBJECT, getDSO(request, resourceIdentifier) );
+        DSpaceObject dSpaceObject = getDSO(request, resourceIdentifier);
+        if(dSpaceObject==null)
+        {
+            response.setStatus(STATUS_NOTFOUND);
+            request.setAttribute("identifier",resourceIdentifier);
+            return new ModelAndView("forward:/identifier-not-found");
+        }
+        request.setAttribute(DSPACE_OBJECT, dSpaceObject );
         return new ModelAndView(new BibTexView());
     }
 
@@ -225,9 +250,9 @@ public class ResourceIdentifierController {
     private int validate(String doi, HttpServletRequest request){
         String token = request.getParameter("token");
 
-        if(token==null || "".equals(token)) return STATUS_FORBIDDEN;
+        if(token==null || "".equals(token)) return STATUS_NOTFOUND;
 
-        if(doi==null || "".equals(doi)) return STATUS_FORBIDDEN;
+        if(doi==null || "".equals(doi)) return STATUS_NOTFOUND;
 
         // try to resolve DOI
         DSpaceObject dso=null;
@@ -237,6 +262,9 @@ public class ResourceIdentifierController {
             context = new Context();
             context.turnOffAuthorisationSystem();
             dso = identifierService.resolve(context, doi);
+            if(dso==null){
+                return STATUS_NOTFOUND;
+            }
             request.setAttribute(DSPACE_OBJECT, dso);
 
             if(!(dso instanceof Item)) return STATUS_FORBIDDEN;
