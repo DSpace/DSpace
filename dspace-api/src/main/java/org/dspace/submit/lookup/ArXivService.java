@@ -76,124 +76,75 @@ public class ArXivService
     }
 
     private List<Record> search(String query, String arxivid, int max_result)
-            throws IOException, HttpException
-    {
-        List<Record> results = new ArrayList<Record>();
-        if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
-        {
-            GetMethod method = null;
-            try
-            {
-                HttpClient client = new HttpClient();
-                client.setTimeout(timeout);
-                method = new GetMethod("http://export.arxiv.org/api/query");
-                NameValuePair id = new NameValuePair("id_list", arxivid);
-                NameValuePair queryParam = new NameValuePair("search_query",
-                        query);
-                NameValuePair count = new NameValuePair("max_results",
-                        String.valueOf(max_result));
-                method.setQueryString(new NameValuePair[] { id, queryParam,
-                        count });
-                // Execute the method.
-                int statusCode = client.executeMethod(method);
+    		throws IOException, HttpException
+    		{
+    	List<Record> results = new ArrayList<Record>();
+    	GetMethod method = null;
+    	try
+    	{
+    		HttpClient client = new HttpClient();
+    		client.setTimeout(timeout);
+    		method = new GetMethod("http://export.arxiv.org/api/query");
+    		NameValuePair id = new NameValuePair("id_list", arxivid);
+    		NameValuePair queryParam = new NameValuePair("search_query",
+    				query);
+    		NameValuePair count = new NameValuePair("max_results",
+    				String.valueOf(max_result));
+    		method.setQueryString(new NameValuePair[] { id, queryParam,
+    				count });
+    		// Execute the method.
+    		int statusCode = client.executeMethod(method);
 
-                if (statusCode != HttpStatus.SC_OK)
-                {
-                    if (statusCode == HttpStatus.SC_BAD_REQUEST)
-                        throw new RuntimeException("arXiv query is not valid");
-                    else
-                        throw new RuntimeException("Http call failed: "
-                                + method.getStatusLine());
-                }
+    		if (statusCode != HttpStatus.SC_OK)
+    		{
+    			if (statusCode == HttpStatus.SC_BAD_REQUEST)
+    				throw new RuntimeException("arXiv query is not valid");
+    			else
+    				throw new RuntimeException("Http call failed: "
+    						+ method.getStatusLine());
+    		}
 
-                try
-                {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory
-                            .newInstance();
-                    factory.setValidating(false);
-                    factory.setIgnoringComments(true);
-                    factory.setIgnoringElementContentWhitespace(true);
+    		try
+    		{
+    			DocumentBuilderFactory factory = DocumentBuilderFactory
+    					.newInstance();
+    			factory.setValidating(false);
+    			factory.setIgnoringComments(true);
+    			factory.setIgnoringElementContentWhitespace(true);
 
-                    DocumentBuilder db = factory.newDocumentBuilder();
-                    Document inDoc = db.parse(method.getResponseBodyAsStream());
+    			DocumentBuilder db = factory.newDocumentBuilder();
+    			Document inDoc = db.parse(method.getResponseBodyAsStream());
 
-                    Element xmlRoot = inDoc.getDocumentElement();
-                    List<Element> dataRoots = XMLUtils.getElementList(xmlRoot,
-                            "entry");
+    			Element xmlRoot = inDoc.getDocumentElement();
+    			List<Element> dataRoots = XMLUtils.getElementList(xmlRoot,
+    					"entry");
 
-                    for (Element dataRoot : dataRoots)
-                    {
-                        Record crossitem = ArxivUtils
-                                .convertArxixDomToRecord(dataRoot);
-                        if (crossitem != null)
-                        {
-                            results.add(crossitem);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(
-                            "ArXiv identifier is not valid or not exist");
-                }
-            }
-            finally
-            {
-                if (method != null)
-                {
-                    method.releaseConnection();
-                }
-            }
-        }
-        else
-        {
-            InputStream stream = null;
-            try
-            {
-                File file = new File(
-                        ConfigurationManager.getProperty("dspace.dir")
-                                + "/config/crosswalks/demo/arxiv.xml");
-                stream = new FileInputStream(file);
-                try
-                {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory
-                            .newInstance();
-                    factory.setValidating(false);
-                    factory.setIgnoringComments(true);
-                    factory.setIgnoringElementContentWhitespace(true);
-                    DocumentBuilder db = factory.newDocumentBuilder();
-                    Document inDoc = db.parse(stream);
+    			for (Element dataRoot : dataRoots)
+    			{
+    				Record crossitem = ArxivUtils
+    						.convertArxixDomToRecord(dataRoot);
+    				if (crossitem != null)
+    				{
+    					results.add(crossitem);
+    				}
+    			}
+    		}
+    		catch (Exception e)
+    		{
+    			throw new RuntimeException(
+    					"ArXiv identifier is not valid or not exist");
+    		}
+    	}
+    	finally
+    	{
+    		if (method != null)
+    		{
+    			method.releaseConnection();
+    		}
+    	}
 
-                    Element xmlRoot = inDoc.getDocumentElement();
-                    List<Element> dataRoots = XMLUtils.getElementList(xmlRoot,
-                            "entry");
-                    for (Element dataRoot : dataRoots)
-                    {
-                        Record crossitem = ArxivUtils
-                                .convertArxixDomToRecord(dataRoot);
-
-                        if (crossitem != null)
-                        {
-                            results.add(crossitem);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(
-                            "ArXiv identifier is not valid or not exist");
-                }
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.close();
-                }
-            }
-        }
-        return results;
-    }
+    	return results;
+    		}
 
     public Record getByArXivIDs(String raw) throws HttpException, IOException
     {

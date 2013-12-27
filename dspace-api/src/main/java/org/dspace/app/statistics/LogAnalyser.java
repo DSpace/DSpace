@@ -18,17 +18,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.StringTokenizer;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -1031,7 +1023,8 @@ public class LogAnalyser
     public static String unParseDate(Date date)
     {
         // Use SimpleDateFormat
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'hh:mm:ss'Z'");
+	    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
     }
     
@@ -1205,28 +1198,33 @@ public class LogAnalyser
             if (oracle)
             {
                 dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
-                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) > TO_DATE('" +
-                        unParseDate(startDate) + "', 'yyyy-MM-dd') ");
+                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) >= TO_DATE('" +
+                        unParseDate(startDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
             }
             else
             {
-                dateQuery.append(" AND text_value::timestamp > '" +
+                dateQuery.append(" AND text_value::timestamp >= '" +
                         unParseDate(startDate) + "'::timestamp ");
             }
         }
 
         if (endDate != null)
         {
+            // adjust end date to account for timestamp comparison
+            GregorianCalendar realEndDate = new GregorianCalendar();
+            realEndDate.setTime(endDate);
+            realEndDate.add(Calendar.DAY_OF_MONTH, 1);
+            Date queryEndDate = realEndDate.getTime();
             if (oracle)
             {
                 dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
                         "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) < TO_DATE('" +
-                        unParseDate(endDate) + "', 'yyyy-MM-dd') ");
+                        unParseDate(queryEndDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
             }
             else
             {
                 dateQuery.append(" AND text_value::timestamp < '" +
-                        unParseDate(endDate) + "'::timestamp ");
+                        unParseDate(queryEndDate) + "'::timestamp ");
             }
         }
         

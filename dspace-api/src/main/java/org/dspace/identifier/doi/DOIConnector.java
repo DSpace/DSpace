@@ -14,7 +14,12 @@ import org.dspace.core.Context;
 /**
  * A DOIConnector handles all calls to the API of your DOI registry.
  * 
- * Please pay attention to the method {@link #purgeCachedInformation()}!
+ * A DOIConnector should care about rules of the registration agency. For
+ * example, if the registration agency wants us to reserve a DOI before we can
+ * register it, the DOIConnector should check if a DOI is reserved. Use a
+ * {@link DOIIdenfierException} and set its error code in case of any errors.
+ * For the given example you should use
+ * {@code DOIIdentifierException.RESERVER_FIRST} as error code.
  *
  * @author Pascal-Nicolas Becker
  */
@@ -38,14 +43,6 @@ public interface DOIConnector {
      * identifiers they should never be deleted. For example, if you send a HTTP
      * DELETE request to the DataCite Metadata API directly, it will set the DOI
      * to inactive.</p>
-     *
-     * <p>A DOIConnector does not have to check whether the DOI is reserved,
-     * registered or not. It will only send the request and return the answer in
-     * form of a boolean weather the deletion was successful or not. It may even
-     * throw an DOIIdentifierException in case you are not allowed to delete a
-     * DOI, the DOI does not exist, ... So please be sure that the deletion of a
-     * DOI is conform with the rules of the registry and that the DOI is in the
-     * appropriate state (f.e. reserved but not registered).</p>
      * 
      * @param context
      * @param doi
@@ -57,12 +54,11 @@ public interface DOIConnector {
     
     /**
      * Sends a request to the DOI registry to reserve a DOI.
-     *
-     * Please check on your own if the DOI is already reserved or even
-     * registered before you try to reserve it. You can use
-     * {@link isDOIRegistered} and {@link isDOIReserved} for it. The
-     * DOIConnector won't do any tests and throws an DOIIdentifierException in
-     * case of any problems with the DOI you want to reserve.
+     * 
+     * The DOIConnector should check weather this DOI is reserved for another
+     * object already. In this case it should throw an {@link 
+     * DOIIdentifierException} and set the error code to {@code 
+     * DOIIdentifierException.DOI_ALREADY_EXISTS}.
      *
      * @param context
      * @param dso
@@ -75,12 +71,11 @@ public interface DOIConnector {
     /**
      * Sends a request to the DOI registry to register a DOI.
      * 
-     * Please check on your own if the DOI is already reserved or even
-     * registered before you try to register it. You can use the methods
-     * {@code DOIConnector.isDOIRegistered(...)} and
-     * {@code DOIConnector.isDOIReserved(...)} for it. The DOIConnector won't
-     * do any tests and throws an DOIIdentifierException in case of any problems
-     * with the DOI you want to register.
+     * The DOIConnector ensures compliance with the workflow of the registration
+     * agency. For example, if a DOI has to be reserved before it can be
+     * registered the DOIConnector has to check if it is reserved. In this case
+     * you can throw an DOIIdentifierExcpetion and set the error code to 
+     * {@link DOIIdentifierException.RESERVE_FIRST}.
      * 
      * @param context
      * @param dso
@@ -92,9 +87,10 @@ public interface DOIConnector {
             throws DOIIdentifierException;
     
     /**
-     * Sends a request to the DOI registry to update Metadata for a DOI.
-     * The DOIConnector won't do any tests and throws an IdentifierException 
-     * in case of any problems with the DOI you want to update the metadata.
+     * Sends a request to the DOI registry to update metadata for a DOI.
+     * 
+     * The DOIConnector should check weather the DOI is reserved or registered 
+     * for the specified DSpace Object before it sends the metadata update.
      * 
      * @param context
      * @param dso

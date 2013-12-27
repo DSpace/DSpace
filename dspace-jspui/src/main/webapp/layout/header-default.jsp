@@ -136,6 +136,14 @@
             </div>
 <%
     }
+    else
+    {
+    	%>
+        <div class="container">
+            <dspace:include page="/layout/navbar-minimal.jsp" />
+        </div>
+<%    	
+    }
 %>
 </header>
 

@@ -93,7 +93,7 @@ public class PubmedFileDataLoader extends FileDataLoader
                 Record record = null;
                 try
                 {
-                    record = PubmedUtils.convertCrossRefDomToRecord(xmlArticle);
+                    record = PubmedUtils.convertPubmedDomToRecord(xmlArticle);
                     recordSet.addRecord(convertFields(record));
                 }
                 catch (Exception e)
@@ -133,7 +133,10 @@ public class PubmedFileDataLoader extends FileDataLoader
     public RecordSet getRecords(DataLoadingSpec spec)
             throws MalformedSourceException
     {
-
+        if (spec.getOffset() > 0) 
+        {
+            return new RecordSet();
+        }
         return getRecords();
     }
 

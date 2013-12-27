@@ -125,7 +125,7 @@ implements org.dspace.identifier.doi.DOIConnector
         if (!reserved.containsKey(doi))
         {
             throw new DOIIdentifierException("Trying to register an unreserverd "
-                    + "DOI.", DOIIdentifierException.REGISTER_FIRST);
+                    + "DOI.", DOIIdentifierException.RESERVE_FIRST);
         }
         
         if (reserved.get(doi).intValue() != dso.getID())

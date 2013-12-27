@@ -85,8 +85,9 @@ public class CrossRefFileDataLoader extends FileDataLoader
             Document inDoc = db.parse(inputStream);
 
             Element xmlRoot = inDoc.getDocumentElement();
-            Element dataRoot = XMLUtils.getSingleElement(xmlRoot, "query");
-
+            Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
+            Element body        = XMLUtils.getSingleElement(queryResult, "body");
+            Element dataRoot    = XMLUtils.getSingleElement(body, "query");
             Record record = CrossRefUtils.convertCrossRefDomToRecord(dataRoot);
             recordSet.addRecord(convertFields(record));
 
@@ -122,7 +123,10 @@ public class CrossRefFileDataLoader extends FileDataLoader
     public RecordSet getRecords(DataLoadingSpec spec)
             throws MalformedSourceException
     {
-
+        if (spec.getOffset() > 0) 
+        {
+            return new RecordSet();
+        }
         return getRecords();
     }
 

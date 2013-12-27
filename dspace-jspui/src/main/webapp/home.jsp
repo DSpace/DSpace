@@ -188,13 +188,13 @@ if (communities != null && communities.length != 0)
                 <p><fmt:message key="jsp.home.com2"/></p>
 				<div class="list-group">
 <%
-
+	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
     for (int i = 0; i < communities.length; i++)
     {
 %><div class="list-group-item row">
 <%  
 		Bitstream logo = communities[i].getLogo();
-		if (logo != null) { %>
+		if (showLogos && logo != null) { %>
 	<div class="col-md-3">
         <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
 	</div>

@@ -79,7 +79,7 @@
 
         <%-- <h1>Edit EPerson <%= eperson.getEmail() %>:</h1> --%>
         <h1><fmt:message key="jsp.dspace-admin.eperson-edit.heading">
-            <fmt:param><%= eperson.getEmail() %></fmt:param>
+            <fmt:param><%= Utils.addEntities(eperson.getEmail()) %></fmt:param>
         </fmt:message>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#epeople\"%>"><fmt:message key="jsp.help"/></dspace:popup>
         </h1>
@@ -98,7 +98,7 @@
             <label class="col-md-2" for="temail"><fmt:message key="jsp.dspace-admin.eperson-edit.email"/></label>
             <div class="col-md-6">
             	<input type="hidden" name="eperson_id" value="<%=eperson.getID()%>"/>
-            	<input class="form-control" name="email" id="temail" size="24" value="<%=email == null ? "" : email%>"/>
+            	<input class="form-control" name="email" id="temail" size="24" value="<%=email == null ? "" : Utils.addEntities(email) %>"/>
             </div>
         </div>
 

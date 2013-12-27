@@ -94,7 +94,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
             <type>war</type>
-            <version>4.0-rc2-SNAPSHOT</version>
+            <version>4.0</version>
         </dependency>
 
         <dependency>
