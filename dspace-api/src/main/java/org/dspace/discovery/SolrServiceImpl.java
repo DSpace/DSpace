@@ -1901,20 +1901,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                         for (FacetField.Count facetValue : facetValues)
                         {
-                            String displayedValue = transformDisplayedValue(context, facetField.getName(), facetValue.getName());
-                            String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
-                            String authorityValue = transformAuthorityValue(context, facetField.getName(), facetValue.getName());
-                            String sortValue = transformSortValue(context, facetField.getName(), facetValue.getName());
-                            String filterValue = displayedValue;
-                            if (StringUtils.isNotBlank(authorityValue))
-                            {
-                                filterValue = authorityValue;
-                            }
-                            result.addFacetResult(
-                                    field,
-                                    new DiscoverResult.FacetResult(filterValue,
-                                            displayedValue, authorityValue,
-                                            sortValue, facetValue.getCount()));
+                        	String field = transformFacetField(facetFieldConfig, facetField.getName(), true);
+
+                        	DiscoverResult.FacetResult facetResult = getDiscoveryFacet(
+									context, facetField, facetValue);
+                            result.addFacetResult(field, facetResult);
                         }
                     }
                 }
@@ -1960,7 +1951,24 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return result;
     }
 
-    protected static DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
+	public DiscoverResult.FacetResult getDiscoveryFacet(Context context,
+			FacetField facetField, FacetField.Count facetValue)
+			throws SQLException {
+		String displayedValue = transformDisplayedValue(context, facetField.getName(), facetValue.getName());
+		String authorityValue = transformAuthorityValue(context, facetField.getName(), facetValue.getName());
+		String sortValue = transformSortValue(context, facetField.getName(), facetValue.getName());
+		String filterValue = displayedValue;
+		if (StringUtils.isNotBlank(authorityValue))
+		{
+		    filterValue = authorityValue;
+		}
+		DiscoverResult.FacetResult facetResult = new DiscoverResult.FacetResult(filterValue,
+		        displayedValue, authorityValue,
+		        sortValue, facetValue.getCount());
+		return facetResult;
+	}
+
+    protected DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
 
         Integer type = (Integer) doc.getFirstValue("search.resourcetype");
         Integer id = (Integer) doc.getFirstValue("search.resourceid");
