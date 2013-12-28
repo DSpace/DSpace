@@ -20,6 +20,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
+import org.dspace.utils.DSpace;
 
 import java.util.Date;
 import java.util.Map;
@@ -37,6 +38,7 @@ import com.maxmind.geoip.Location;
  * @author ben at atmire.com
  */
 public class StatisticsDataGenerator {
+
 	public static void main(String[] args) throws Exception {
 		CommandLineParser parser = new PosixParser();
 
@@ -180,6 +182,11 @@ public class StatisticsDataGenerator {
             return;
         }
 
+		DSpace dspace = new DSpace();
+
+        SolrLogger statsService = dspace.getServiceManager().getServiceByName(
+                SolrLogger.class.getName(), SolrLogger.class);
+        
 		// Get the max id range
 		long maxIdTotal = Math.max(commEndId, collEndId);
 		maxIdTotal = Math.max(maxIdTotal, itemEndId);
@@ -196,12 +203,7 @@ public class StatisticsDataGenerator {
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
-		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-
 		String prevIp = null;
-		String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-		LookupService cl = new LookupService(dbfile,
-				LookupService.GEOIP_STANDARD);
 		int countryErrors = 0;
 		for (int i = 0; i < nrLogs; i++) {
 			String ip = "";
@@ -223,38 +225,6 @@ public class StatisticsDataGenerator {
 			}
             ip = ipBuilder.toString();
             
-			// 2 Depending on our ip get all the location info
-			Location location;
-			try {
-				location = cl.getLocation(ip);
-			} catch (Exception e) {
-				location = null;
-			}
-			if (location == null) {
-				// If we haven't got a prev ip this is pretty useless so move on
-				// to the next one
-				if (prevIp == null)
-                {
-                    continue;
-                }
-				ip = prevIp;
-				location = cl.getLocation(ip);
-			}
-
-			city = location.city;
-			countryCode = location.countryCode;
-			longitude = location.longitude;
-			latitude = location.latitude;
-			try {
-				continent = LocationUtils.getContinentCode(countryCode);
-			} catch (Exception e) {
-				// We could get an error if our country == Europa this doesn't
-				// matter for generating statistics so ignore it
-				System.out.println("COUNTRY ERROR: " + countryCode);
-				countryErrors++;
-				continue;
-			}
-
 			// 3. Generate a date that the object was visited
 			time = new Date(getRandomNumberInRange(startDate, endDate));
 
@@ -351,12 +321,6 @@ public class StatisticsDataGenerator {
 			doc1.addField("id", dso.getID());
 			doc1.addField("time", DateFormatUtils.format(time,
 					SolrLogger.DATE_FORMAT_8601));
-			doc1.addField("continent", continent);
-			// doc1.addField("country", country);
-			doc1.addField("countryCode", countryCode);
-			doc1.addField("city", city);
-			doc1.addField("latitude", latitude);
-			doc1.addField("longitude", longitude);
 			if (epersonId > 0)
             {
                 doc1.addField("epersonid", epersonId);
@@ -366,25 +330,7 @@ public class StatisticsDataGenerator {
                 doc1.addField("dns", dns.toLowerCase());
             }
 
-			if (dso instanceof Item) {
-				Item item = (Item) dso;
-				// Store the metadata
-                for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
-				{
-					String dcField = entry.getValue();
-
-					DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-							dcField.split("\\.")[1], dcField.split("\\.")[2],
-							Item.ANY);
-					for (DCValue val1 : vals) {
-						String val = val1.value;
-						doc1.addField(entry.getKey(), val);
-						doc1.addField(entry.getKey() + "_search", val.toLowerCase());
-					}
-				}
-			}
-
-			SolrLogger.storeParents(doc1, dso);
+			statsService.storeParents(doc1, dso);
 
 			solr.add(doc1);
 

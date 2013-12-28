@@ -89,7 +89,6 @@ public class StatisticsClient
         else if (line.hasOption('m'))
         {
             statsService.markRobotsByIP();
-            statsService.markRobotsByUserAgent();
         }
         else if(line.hasOption('f'))
         {

@@ -20,6 +20,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
+import org.dspace.utils.DSpace;
 
 import java.text.*;
 import java.io.*;
@@ -42,18 +43,13 @@ public class StatisticsImporter
     /** Date format (for solr) */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    /** Solr server connection */
-    private static HttpSolrServer solr;
-
-    /** GEOIP lookup service */
-    private static LookupService geoipLookup;
-
-    /** Metadata storage information */
-    private static Map<String, String> metadataStorageInfo;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
 
+    /** the SolrLogger **/
+    private static SolrLogger statsService;
+    
     /** Local items */
     private List<Integer> localItems;
 
@@ -170,12 +166,6 @@ public class StatisticsImporter
             String user;
             String ip;
 
-            String continent = "";
-            String country = "";
-            String countryCode = "";
-            float longitude = 0f;
-            float latitude = 0f;
-            String city = "";
             String dns;
 
             DNSCache dnsCache = new DNSCache(2500, 0.75f, 2500);
@@ -238,33 +228,6 @@ public class StatisticsImporter
                     continue;
                 }
 
-                // Get the geo information for the user
-                Location location;
-                try {
-                    location = geoipLookup.getLocation(ip);
-                    city = location.city;
-                    country = location.countryName;
-                    countryCode = location.countryCode;
-                    longitude = location.longitude;
-                    latitude = location.latitude;
-                    if(verbose) {
-                        data += (", country = " + country);
-                        data += (", city = " + city);
-                        System.out.println(data);
-                    }
-                    try {
-                        continent = LocationUtils.getContinentCode(countryCode);
-                    } catch (Exception e) {
-                        if (verbose)
-                        {
-                            System.out.println("Unknown country code: " + countryCode);
-                        }
-                        continue;
-                    }
-                } catch (Exception e) {
-                    // No problem - just can't look them up
-                }
-
                 // Now find our dso
                 int type = 0;
                 if ("view_bitstream".equals(action))
@@ -312,53 +275,9 @@ public class StatisticsImporter
 
                 // Get the eperson details
                 EPerson eperson = EPerson.findByEmail(context, user);
-                int epersonId = 0;
-                if (eperson != null)
-                {
-                    eperson.getID();
-                }
 
                 // Save it in our server
-                SolrInputDocument sid = new SolrInputDocument();
-                sid.addField("ip", ip);
-                sid.addField("type", dso.getType());
-                sid.addField("id", dso.getID());
-                sid.addField("time", DateFormatUtils.format(date, SolrLogger.DATE_FORMAT_8601));
-                sid.addField("continent", continent);
-                sid.addField("country", country);
-                sid.addField("countryCode", countryCode);
-                sid.addField("city", city);
-                sid.addField("latitude", latitude);
-                sid.addField("longitude", longitude);
-                if (epersonId > 0)
-                {
-                    sid.addField("epersonid", epersonId);
-                }
-                if (dns != null)
-                {
-                    sid.addField("dns", dns.toLowerCase());
-                }
-
-                if (dso instanceof Item) {
-                    Item item = (Item) dso;
-                    // Store the metadata
-                    for (String storedField : metadataStorageInfo.keySet()) {
-                        String dcField = metadataStorageInfo.get(storedField);
-
-                        DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                                dcField.split("\\.")[1], dcField.split("\\.")[2],
-                                Item.ANY);
-                        for (DCValue val1 : vals) {
-                            String val = val1.value;
-                            sid.addField(String.valueOf(storedField), val);
-                            sid.addField(String.valueOf(storedField + "_search"),
-                                    val.toLowerCase());
-                        }
-                    }
-                }
-
-                SolrLogger.storeParents(sid, dso);
-                solr.add(sid);
+                statsService.postView(dso, ip, dns, eperson);
                 errors--;
             }
 
@@ -386,23 +305,8 @@ public class StatisticsImporter
             System.out.println(" - " + searchengines + " search engine activity skipped: " + percentage.format(sepercentage) + "%");
             System.out.print("About to commit data to solr...");
 
-            // Commit at the end because it takes a while
-            try
-            {
-                solr.commit();
-            }
-            catch (SolrServerException sse)
-            {
-                System.err.println("Error committing statistics to solr server!");
-                sse.printStackTrace();
-                System.exit(1);
-            }
-            catch (IOException ioe)
-            {
-                System.err.println("Error writing to solr server!");
-                ioe.printStackTrace();
-                System.exit(1);
-            }
+            // Optimize at the end because it takes a while
+            statsService.optimizeSOLR();
         }
         System.out.println(" done!");
 	}
@@ -463,29 +367,10 @@ public class StatisticsImporter
         // Verbose option
         boolean verbose = line.hasOption('v');
 
-        // Find our solr server
-        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
-        if (verbose)
-        {
-            System.out.println("Writing to solr server at: " + sserver);
-        }
-		solr = new HttpSolrServer(sserver);
+        DSpace dspace = new DSpace();
 
-		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-        String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-        try
-        {
-            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
-        }
-        catch (FileNotFoundException fe)
-        {
-            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
-        }
-        catch (IOException e)
-        {
-            log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
-        }
-
+        statsService = dspace.getServiceManager().getServiceByName(
+                SolrLogger.class.getName(), SolrLogger.class);
 
         StatisticsImporter si = new StatisticsImporter(local);
         if (line.hasOption('m'))
