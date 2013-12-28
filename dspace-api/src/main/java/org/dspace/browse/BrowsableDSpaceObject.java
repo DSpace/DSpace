@@ -20,4 +20,6 @@ public interface BrowsableDSpaceObject
             String qualifier, String lang);
 
     public int getID();
+
+	public boolean isDiscoverable();
 }

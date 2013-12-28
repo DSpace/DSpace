@@ -345,7 +345,8 @@ public class DiscoverQuery
             return getNamedFacetQueries().get(facetQuery);
         }
         return null;
-
+    }
+    
     public boolean isSpellCheck() {
         return spellCheck;
     }

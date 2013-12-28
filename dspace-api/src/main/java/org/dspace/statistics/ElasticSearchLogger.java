@@ -67,8 +67,6 @@ public class ElasticSearchLogger {
 
     private static Client client;
 
-    private SpiderDetector spiderDetector;
-    
     public static enum ClientType {
         NODE, LOCAL, TRANSPORT
     }
@@ -269,8 +267,7 @@ public class ElasticSearchLogger {
 
         client = ElasticSearchLogger.getInstance().getClient();
 
-        boolean isSpiderBot = getSpiderDetector().isSpider(request,
-                isUseProxies());
+        boolean isSpiderBot = SpiderDetector.isSpider(request);
 
         try {
             if (isSpiderBot &&
@@ -682,13 +679,4 @@ public class ElasticSearchLogger {
         }
     }
 
-    public void setSpiderDetector(SpiderDetector spiderDetector)
-    {
-        this.spiderDetector = spiderDetector;
-    }
-
-    public SpiderDetector getSpiderDetector()
-    {
-        return spiderDetector;
-    }
 }

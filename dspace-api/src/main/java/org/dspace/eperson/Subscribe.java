@@ -12,10 +12,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import javax.mail.MessagingException;
 
@@ -607,8 +609,6 @@ public class Subscribe
         ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
 
         // Get the start and end dates for yesterday
-        Date thisTimeYesterday = new Date(System.currentTimeMillis()
-                - (24 * 60 * 60 * 1000));
 
         // The date should reflect the timezone as well. Otherwise we stand to lose that information
         // in truncation and roll to an earlier date than intended.
@@ -640,7 +640,7 @@ public class Subscribe
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
 
                 // we harvest all the changed item from yesterday until now
-                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(startDate).toString(), null, 0, // Limit
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(midnightYesterday).toString(), null, 0, // Limit
                                                                                     // and
                                                                                     // offset
                                                                                     // zero,

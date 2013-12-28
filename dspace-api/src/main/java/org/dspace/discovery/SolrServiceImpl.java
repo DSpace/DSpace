@@ -72,12 +72,14 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.crosswalk.IConverter;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
@@ -437,7 +439,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 new RuntimeException("No type known: " + type);
             }
 
-            getSolr().commit();
+            if(getSolr() != null)
+            {
+            	getSolr().commit();
+            }
 
         }
         catch (Exception e)
@@ -457,22 +462,46 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     public void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException {
+    	if (force)
+        {
+            try
+            {
+                getSolr().deleteByQuery("search.resourcetype:[2 TO 4]");
+            }
+            catch (Exception e)
+            {
+                throw new SearchServiceException(e.getMessage(), e);
+            }
+        }
+        else
+        {
+            cleanIndex(false, Constants.ITEM);
+            cleanIndex(false, Constants.COLLECTION);
+            cleanIndex(false, Constants.COMMUNITY);
+        }
+    }
 
+    @Override
+    public void cleanIndex(boolean force, int type) throws IOException,
+            SQLException, SearchServiceException
+    {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
         try
         {
-            if(getSolr() == null)
+        	if(getSolr() == null)
             {
                 return;
             }
             if (force)
             {
-                getSolr().deleteByQuery("search.resourcetype:[2 TO 4]");
-            } else {
+                getSolr().deleteByQuery("search.resourcetype:" + type);
+            }
+            else
+            {
                 SolrQuery query = new SolrQuery();
-                query.setQuery("search.resourcetype:[2 TO 4]");
+                query.setQuery("search.resourcetype:" + type);
                 QueryResponse rsp = getSolr().query(query);
                 SolrDocumentList docs = rsp.getResults();
 
@@ -480,40 +509,38 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 while (iter.hasNext())
                 {
 
-                 SolrDocument doc = (SolrDocument) iter.next();
+                    SolrDocument doc = (SolrDocument) iter.next();
 
-                String handle = (String) doc.getFieldValue("handle");
+                    DSpaceObject o = findDSpaceObject(context, doc);
 
-                DSpaceObject o = HandleManager.resolveToObject(context, handle);
-
-                if (o == null)
-                {
-                    log.info("Deleting: " + handle);
-                    /*
-                          * Use IndexWriter to delete, its easier to manage
-                          * write.lock
-                          */
-                    unIndexContent(context, handle);
-                } else {
-                    context.removeCached(o, o.getID());
-                    log.debug("Keeping: " + handle);
+                    if (o == null)
+                    {
+                        log.info("Deleting: " + o.getHandle());
+                        /*
+                         * Use IndexWriter to delete, its easier to manage
+                         * write.lock
+                         */
+                        unIndexContent(context, o);
+                    }
+                    else
+                    {
+                        context.removeCached(o, o.getID());
+                        log.debug("Keeping: " + o.getHandle());
+                    }
                 }
             }
-            }
-        } catch(Exception e)
+        }
+        catch (Exception e)
         {
-
-            throw new SearchServiceException(e.getMessage(), e);
-        } finally
+            log.error("Error cleaning cris discovery index: " + e.getMessage(),
+                    e);
+        }
+        finally
         {
             context.abort();
         }
-
-
-
-
     }
-
+    
     /**
      * Maintenance to keep a SOLR index efficient.
      * Note: This might take a long time.
@@ -686,6 +713,22 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return locations;
     }
 
+    protected List<String> getCommunityLocations(Community target)
+            throws SQLException
+    {
+        List<String> locations = new Vector<String>();
+        // build list of community ids
+        Community[] communities = target.getAllParents();
+
+        // now put those into strings
+        for (Community community : communities)
+        {
+            locations.add("m" + community.getID());
+        }
+
+        return locations;
+    }    
+    
     /**
      * Write the document to the index under the appropriate handle.
      * @param doc the solr document to be written to the server

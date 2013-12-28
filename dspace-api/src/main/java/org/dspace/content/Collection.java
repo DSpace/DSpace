@@ -1561,6 +1561,10 @@ public class Collection extends DSpaceObject
             return null;
         }
     }
+    
+    public String getTypeText() {
+        return Constants.typeText[Constants.COLLECTION];
+    }
 
     @Override
     public void updateLastModified()
