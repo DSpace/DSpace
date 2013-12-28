@@ -464,7 +464,6 @@
             </exclusions>
         </dependency>
         <dependency>
->>>>>>> dspace/master
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
             <version>1.8</version>
