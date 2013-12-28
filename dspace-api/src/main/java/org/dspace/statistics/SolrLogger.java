@@ -956,8 +956,16 @@ public class SolrLogger
             String filterQuery, int max, String dateType, String dateStart,
             String dateEnd, boolean showTotal) throws SolrServerException
     {
+		return queryFacetDate(query, filterQuery, max, dateType, dateStart,
+				dateEnd, 1, showTotal);
+    }
+    
+    public ObjectCount[] queryFacetDate(String query,
+            String filterQuery, int max, String dateType, String dateStart,
+            String dateEnd, int gap, boolean showTotal) throws SolrServerException
+    {
         QueryResponse queryResponse = query(query, filterQuery, null, 0, max,
-                dateType, dateStart, dateEnd, null, null, false);
+                dateType, dateStart, dateEnd, gap, null, null, false);
         if (queryResponse == null)
         {
             return new ObjectCount[0];
@@ -1071,6 +1079,16 @@ public class SolrLogger
             String dateEnd, List<String> facetQueries, String sort, boolean ascending)
             throws SolrServerException
     {
+    	return query(query, filterQuery,
+            facetField, rows, max, dateType, dateStart,
+            dateEnd, 1, facetQueries, sort, ascending);
+    }
+    
+	public QueryResponse query(String query, String filterQuery,
+	        String facetField, int rows, int max, String dateType, String dateStart,
+	        String dateEnd, int gap, List<String> facetQueries, String sort, boolean ascending)
+	        throws SolrServerException            
+    {
         if (getSolr() == null)
         {
             return null;
@@ -1089,7 +1107,7 @@ public class SolrLogger
                     // EXAMPLE: NOW/MONTH+1MONTH
                     setParam("facet.date.end",
                             "NOW/" + dateType + dateEnd + dateType).setParam(
-                            "facet.date.gap", "+1" + dateType)
+                            "facet.date.gap", "+" + gap + dateType)
                     .
                     // EXAMPLE: NOW/MONTH-" + nbMonths + "MONTHS
                     setParam("facet.date.start",
@@ -1510,5 +1528,10 @@ public class SolrLogger
     public SpiderDetector getSpiderDetector()
     {
         return spiderDetector;
+    }
+    
+    public void deleteByType(int type) throws SolrServerException, IOException
+    {
+        getSolr().deleteByQuery("type:" + type);
     }
 }
