@@ -208,7 +208,7 @@ function sortBy(idx, ord)
 %>
 <%
         Set<SortOption> setSortOptions = SortOption.getSortOptions();
-        if (sortOptions.size() > 1) // && bi.getBrowseLevel() > 0
+        if (setSortOptions.size() > 1) // && bi.getBrowseLevel() > 0
         {
 %>
                 <input type="hidden" id="ssort_by" name="sort_by"
