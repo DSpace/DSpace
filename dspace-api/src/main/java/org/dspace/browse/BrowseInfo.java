@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -514,11 +515,21 @@ public class BrowseInfo
     	try
     	{
     		BrowseItem[] bis = getBrowseItemResults();
-    		Item[] items = new Item[bis.length];
+    		List<Item> itemList = new ArrayList<Item>();
+    		
     		for (int i = 0; i < bis.length; i++)
     		{
-    			items[i] = Item.find(context, bis[i].getID());
+    			if (!(bis[i] instanceof BrowsableDSpaceObject))
+    			{
+    				Item item = Item.find(context, bis[i].getID());
+    				if (item != null)
+    				{
+    					itemList.add(item);
+    				}
+    			}
     		}
+    		Item[] items = new Item[itemList.size()];
+    		items = itemList.toArray(items);
     		return items;
     	}
     	catch (SQLException e)
