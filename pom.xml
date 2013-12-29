@@ -6,7 +6,7 @@
    <packaging>pom</packaging>
    <version>CRIS-4.0.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>https://github.com/CILEA/DSpace</url>
+   <url>https://github.com/Cineca/DSpace</url>
    <description>
    	DSpace open source software is a turnkey institutional repository application. The DSpace-CRIS addon add the missing features to allow you to track all research entities!
    </description>
@@ -1484,6 +1484,42 @@
    
    </repositories>
    
+   <pluginRepositories>
+        <pluginRepository>
+            <id>cineca-repo</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</snapshots>
+        </pluginRepository>
+        
+        <pluginRepository>
+            <id>cineca-repo-snapshot</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</snapshots>
+        </pluginRepository>
+        
+        <pluginRepository>
+            <id>sonatype-releases</id>
+	         <name>Sonatype Releases Repository</name>
+	         <url>http://oss.sonatype.org/content/repositories/releases/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
     <!--
         Distribution Management is currently used by the Continuum
         server to update snapshots it generates. This will also be used
