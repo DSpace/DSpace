@@ -88,7 +88,7 @@ public class UsageEvent extends Event {
             throw new IllegalStateException("object cannot be null");
         }else
         if(object != null){
-            String objText = Constants.typeText[object.getType()].toLowerCase();
+        	String objText = object.getTypeText().toLowerCase();
             eventName.append(objText).append(":");
         }
         eventName.append(action.text());
@@ -120,7 +120,7 @@ public class UsageEvent extends Event {
             throw new IllegalStateException("object cannot be null");
         }else
         if(object != null){
-            String objText = Constants.typeText[object.getType()].toLowerCase();
+        	String objText = object.getTypeText().toLowerCase();
             eventName.append(objText).append(":");
         }
         eventName.append(action.text());
@@ -135,8 +135,8 @@ public class UsageEvent extends Event {
 		super(checkParams(action, request, context, object));
 		
 		this.action = action;
-	
-		this.setResourceReference(object != null ? Constants.typeText[object.getType()].toLowerCase() + ":" + object.getID() : null);
+
+		this.setResourceReference(object != null ? object.getTypeText().toLowerCase() + ":" + object.getID() : null);
 		
 		switch(action)
 		{
@@ -170,7 +170,7 @@ public class UsageEvent extends Event {
 		
 		this.action = action;
 	
-		this.setResourceReference(object != null ? Constants.typeText[object.getType()].toLowerCase() + ":" + object.getID() : null);
+		this.setResourceReference(object != null ? object.getTypeText().toLowerCase() + ":" + object.getID() : null);
 		
 		switch(action)
 		{
