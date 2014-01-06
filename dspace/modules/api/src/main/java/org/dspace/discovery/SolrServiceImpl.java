@@ -11,6 +11,8 @@
 package org.dspace.discovery;
 
 import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -37,7 +39,14 @@ import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -540,7 +549,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Is stale checks the lastModified time stamp in the database and the index
      * to determine if the index is stale.
      *
-     * @param handle
+
      * @param lastModified
      * @return
      * @throws java.sql.SQLException
@@ -892,7 +901,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         //Also add the metadata for all our data files
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
+        Integer maxDownload = 0;
         for (Item dataFile : dataFiles) {
+
+            //caculate the most download item file
+            String totalFileDownload = getTotalFileDownload(dataFile);
+
+            if(totalFileDownload !=null&&Integer.parseInt(totalFileDownload)>maxDownload)
+            {
+               maxDownload = Integer.parseInt(totalFileDownload);
+            }
+
             DCValue[] mydc = dataFile.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (int i = 0; i < mydc.length; i++) {
                 DCValue meta = mydc[i];
@@ -965,8 +984,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
         }
-
-
+        if(dataFiles!=null&&dataFiles.length>0)
+        {
+            doc.addField("popularity",maxDownload);
+        }
         log.debug("  Added Metadata");
         doc.addField("archived", item.isArchived());
 
@@ -1277,6 +1298,50 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 			e.printStackTrace();
             return new ArrayList<DSpaceObject>(0);
 		}
+    }
+
+    String getTotalFileDownload(Item item)
+    {
+        String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
+        String DOWN_COUNTER = "//result/@numFound";
+        String solr = ConfigurationManager.getProperty("solr.search.server");
+        String totalFileDownload = null ;
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            GetMethod get = new GetMethod(solr.replace("search","statistics") + query);
+
+
+            switch (new HttpClient().executeMethod(get)) {
+                case 200:
+                case 201:
+                case 202:
+                    Document docs = db.parse(get.getResponseBodyAsStream());
+                    docs.getDocumentElement().normalize();
+
+                    XPathFactory xpf = XPathFactory.newInstance();
+                    XPath xpath = xpf.newXPath();
+                    String xpathResult = xpath.evaluate(DOWN_COUNTER, docs);
+
+                    totalFileDownload = xpathResult;
+                    break;
+                default:
+                    log.error("Solr search failed to respond as expected when build solr search index for total download datafiles");
+            }
+
+            get.releaseConnection();
+        }
+        catch (ParserConfigurationException details) {
+            log.error(details.getMessage(), details);
+        }
+        catch (XPathExpressionException details) {
+            log.error(details.getMessage(), details);
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(),e);
+        }
+        return totalFileDownload;
     }
 
 }

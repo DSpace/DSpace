@@ -110,9 +110,9 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
-        queryArgs.setRows(1000);
+        queryArgs.setRows(10);
 
-        String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
+        String sortField = SearchUtils.getConfig().getString("total.download.sort-option");
         if(sortField != null){
             queryArgs.setSortField(
                     sortField,
@@ -127,17 +127,6 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
     }
 
-    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
-        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
-        for (Item i : datafiles) {
-            String lift = ConfigurationManager.getProperty("embargo.field.lift");
-            DCValue[] values = i.getMetadata(lift);
-            if (values == null || values.length == 0)
-                return true;
-
-        }
-        return false;
-    }
     private void addDisplayListing(Division mainDiv, StatisticsListing display)
             throws SAXException, WingException, SQLException,
             SolrServerException, IOException, ParseException {
@@ -201,7 +190,7 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
             statListing.setId("list1");
 
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-            dsoAxis.addDsoChild(Constants.BITSTREAM, -1, false, -1);
+            dsoAxis.addDsoChild(Constants.ITEM, -1, false, -1);
 
 
             statListing.addDatasetGenerator(dsoAxis);
@@ -223,66 +212,17 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
         java.util.List<String[]> values = new ArrayList<String[]>();
         java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
         int i=0;
-        Map<Integer,Integer> downloadCount = new HashMap<Integer,Integer>();
         for (Map<String, String> map : urls)
         {
             String itemId= map.get("item");
-            if(itemId!=null){
-                DSpaceObject dso = Item.find(context,Constants.ITEM,Integer.parseInt(itemId));
-
-                int totalDownload = 0;
-                if(dso instanceof Item)
-                {
-                    Item item = (Item)dso;
-                    Item dataPackage = item;
-                    if(item.getOwningCollection()!=null){
-                        if (!item.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-                            dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-                        }
-                        if(dataPackage!=null){
-
-                            DCValue[] vals = dataPackage.getMetadata("dc", "title", null, Item.ANY);
-
-                            if(vals != null && 0 < vals.length)
-                            {
-                                if(downloadCount.get(dataPackage.getID())!=null){
-                                    totalDownload=Integer.parseInt(strings[i])+downloadCount.get(dataPackage.getID()).intValue();
-                                }
-                                else
-                                {
-                                    totalDownload=Integer.parseInt(strings[i]);
-                                }
-                                downloadCount.put(dataPackage.getID(),totalDownload);
-
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    String bitstreamId = map.get("bitstream");
-                }
-            }
-            i++;
-        }
-        ArrayList<Integer> arrayList = new ArrayList<Integer>();
-        for(Integer id : downloadCount.keySet()){
-            arrayList.add(downloadCount.get(id));
-        }
-
-        Collections.sort(arrayList);
-        int topItemCount=0;
-        if(downloadCount.size()>2){
-            topItemCount = arrayList.get(2);
-        }
-
-        for(Integer id : downloadCount.keySet()){
-            if(downloadCount.get(id)>=topItemCount){
+            if(itemId!=null&&strings[i]!=null)
+            {
                 String[] temp=new String[2];
-                temp[0]=Integer.toString(id);
-                temp[1]=downloadCount.get(id).toString();
+                temp[0]=itemId;
+                temp[1]=strings[i];
                 values.add(temp);
             }
+            i++;
         }
         return values;
     }
