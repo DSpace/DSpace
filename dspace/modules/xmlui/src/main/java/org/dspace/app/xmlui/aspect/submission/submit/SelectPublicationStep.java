@@ -493,33 +493,31 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(selectedCountry==null)
         {
             try{
-                SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
-                org.dspace.content.Item item = null;
-                if(submissionInfo==null)
-                    {
-                                String workflowId = request.getParameter("workflowID");
-                    if(workflowId==null) {
-                            // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
-                                    return;
-                        }
-                    WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
-                    item = workflowItem.getItem();
+            SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
+            org.dspace.content.Item item = null;
+            if(submissionInfo==null)
+            {
+                String workflowId = request.getParameter("workflowID");
+                if(workflowId==null) {
+                    // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
+                    return;
                 }
-                else
-                {
-                            item = submissionInfo.getSubmissionItem().getItem();
-                }
-                ShoppingCart shoppingCart = ShoppingCart.findAllByItem(context,item.getID()).get(0);
-                if(shoppingCart!=null){
-                        selectedCountry = shoppingCart.getCountry();
-                    }
-                }catch (Exception e)
-                {
+                WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
+                item = workflowItem.getItem();
+            }
+            else
+            {
+                item = submissionInfo.getSubmissionItem().getItem();
+            }
+            ShoppingCart shoppingCart = ShoppingCart.findAllByItem(context,item.getID()).get(0);
+            if(shoppingCart!=null){
+                selectedCountry = shoppingCart.getCountry();
+            }
+            }catch (Exception e)
+            {
 
-                }
+            }
         }
-
-
 
         for(String temp:countryArray){
             {

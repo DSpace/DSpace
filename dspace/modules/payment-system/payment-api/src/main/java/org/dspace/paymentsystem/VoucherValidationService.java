@@ -28,7 +28,7 @@ public interface VoucherValidationService {
 
       public boolean voucherUsed(Context context,String voucherCode);
 
-      public Voucher create(Context context,String code,String status,Date creation,String explanation,String customer, Integer generator, String batchId)throws SQLException,AuthorizeException;
+      public Voucher create(Context context,String code,String status,Date creation,String explanation,String customer,String customerName, Integer generator, String batchId)throws SQLException,AuthorizeException;
 
       public Voucher findById(Context context,Integer voucherId)throws SQLException;
 
@@ -36,5 +36,5 @@ public interface VoucherValidationService {
 
       public Voucher findByCode(Context context, String code) throws SQLException;
 
-      public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer, Integer generator) throws SQLException,AuthorizeException;
+      public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer,String customerName, Integer generator) throws SQLException,AuthorizeException;
 }

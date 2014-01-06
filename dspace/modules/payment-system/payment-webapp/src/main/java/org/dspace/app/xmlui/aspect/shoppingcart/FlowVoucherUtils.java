@@ -73,6 +73,7 @@ public class FlowVoucherUtils {
         String status = Voucher.STATUS_OPEN;
         Date creation = new Date();
         String customer = request.getParameter("customerCode").trim();
+        String customerName = request.getParameter("customerName").trim();
         EPerson generator =context.getCurrentUser();
 
         VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
@@ -85,7 +86,7 @@ public class FlowVoucherUtils {
         if (result.getErrors() == null) {
             // No errors, so we try to create the voucher from the data provided
 
-            ArrayList<Voucher> newVoucher = voucherValidationService.createVouchers(context, status,creation,Integer.parseInt(totalNumber),explanation, customer, generator.getID());
+            ArrayList<Voucher> newVoucher = voucherValidationService.createVouchers(context, status,creation,Integer.parseInt(totalNumber),explanation, customer,customerName, generator.getID());
             context.commit();
             // success
             result.setContinue(true);

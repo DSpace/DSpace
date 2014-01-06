@@ -56,7 +56,7 @@ public class LastModifiedDate extends AbstractConfigurableAction implements Thre
                 Item item = (Item) dso;
                 Date lastModified = item.getLastModified();
                 /* Get the current time and output as the last modified header */
-                value =  lastModified.toString();
+                value = this.formatter.format(lastModified);
             }
             response.setHeader("Last-Modified", value);
             values.put("last-modified",  value);
