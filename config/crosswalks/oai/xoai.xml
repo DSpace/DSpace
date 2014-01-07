@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+	Developed by DSpace @ Lyncode <dspace@lyncode.com>
+ -->
+<Configuration xmlns="http://www.lyncode.com/XOAIConfiguration"
+	identation="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
+	maxListSetsSize="100" stylesheet="static/style.xsl">
+
+	<Contexts>
+		<Context baseurl="request">
+			<Format refid="oaidc" />
+			<Format refid="mets" />
+			<Format refid="xoai" />
+			<Format refid="didl" />
+			<Format refid="dim" />
+			<Format refid="ore" />
+			<Format refid="rdf" />
+			<Format refid="etdms" />
+			<Format refid="mods" />
+			<Format refid="qdc" />
+			<Format refid="marc" />
+			<Format refid="uketd_dc" />
+		</Context> 
+		
+		<!--
+			Driver Guidelines:
+		 
+			- http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
+			
+			Page 57 - 58
+		 -->
+		<Context baseurl="driver">
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="driverTransformer"/>
+			<!-- Title : Mandatory -->
+			<Filter refid="titleexistsFilter" />
+			<!-- Author : Mandatory -->
+			<Filter refid="authorexistsFilter"/>
+			<!-- Possible Document Type -->
+			<Filter refid="driverdocumenttypeFilter"/>
+			<!-- dc.rights must contain openAccess token -->
+			<Filter refid="driveraccessFilter"/>
+			<!-- Open Access (Downloadable) -->
+			<Filter refid="bitstreamaccessFilter"/>
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="driverSet" />
+			<!-- Metadata Formats -->
+			<Format refid="oaidc"/>
+			<Format refid="mets" />
+			<Format refid="didl" />
+		</Context>
+		
+		<!-- 
+			OpenAIRE Guidelines 1.1:
+			
+			- http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en
+			
+			There is a limitation over the embargoedEndDate parameter:
+			
+			- Predefined DSpace fields don't allow to set this up with a default.
+		 -->
+		<Context baseurl="openaire">
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="openaireTransformer" />
+			<!-- Title : Mandatory -->
+			<Filter refid="titleexistsFilter" />
+			<!-- Author : Mandatory -->
+			<Filter refid="authorexistsFilter"/>
+			<!-- Possible Document Type (same as Driver)-->
+			<Filter refid="driverdocumenttypeFilter"/>
+			<!-- dc.relation must has the specified prefix -->
+			<Filter refid="openairerelationFilter" />
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="openaireSet" />
+			<!-- Metadata Formats -->
+			<Format refid="oaidc" />
+			<Format refid="mets" />
+		</Context>
+	</Contexts>
+	
+	
+	<Formats>
+		<Format id="oaidc">
+			<Prefix>oai_dc</Prefix>
+			<XSLT>metadataFormats/oai_dc.xsl</XSLT>
+			<Namespace>http://www.openarchives.org/OAI/2.0/oai_dc/</Namespace>
+			<SchemaLocation>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</SchemaLocation>
+		</Format>
+		<Format id="mets">
+			<Prefix>mets</Prefix>
+			<XSLT>metadataFormats/mets.xsl</XSLT>
+			<Namespace>http://www.loc.gov/METS/</Namespace>
+			<SchemaLocation>http://www.loc.gov/standards/mets/mets.xsd</SchemaLocation>
+		</Format>
+		<!-- Shows the XOAI internal generated XML -->
+		<Format id="xoai">
+			<Prefix>xoai</Prefix>
+			<XSLT>metadataFormats/xoai.xsl</XSLT>
+			<Namespace>http://www.lyncode.com/xoai</Namespace>
+			<SchemaLocation>http://www.lyncode.com/schemas/xoai.xsd</SchemaLocation>
+		</Format>
+		<Format id="didl">
+			<Prefix>didl</Prefix>
+			<XSLT>metadataFormats/didl.xsl</XSLT>
+			<Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
+			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
+		</Format>
+		<Format id="dim">
+			<Prefix>dim</Prefix>
+			<XSLT>metadataFormats/dim.xsl</XSLT>
+			<Namespace>http://www.dspace.org/xmlns/dspace/dim</Namespace>
+			<SchemaLocation>http://www.dspace.org/schema/dim.xsd</SchemaLocation>
+		</Format>
+		<Format id="ore">
+			<Prefix>ore</Prefix>
+			<XSLT>metadataFormats/ore.xsl</XSLT>
+			<Namespace>http://www.w3.org/2005/Atom</Namespace>
+			<SchemaLocation>http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch</SchemaLocation>
+		</Format>
+		<Format id="rdf">
+			<Prefix>rdf</Prefix>
+			<XSLT>metadataFormats/rdf.xsl</XSLT>
+			<Namespace>http://www.openarchives.org/OAI/2.0/rdf/</Namespace>
+			<SchemaLocation>http://www.openarchives.org/OAI/2.0/rdf.xsd</SchemaLocation>
+		</Format>
+		<Format id="etdms">
+			<Prefix>etdms</Prefix>
+			<XSLT>metadataFormats/etdms.xsl</XSLT>
+			<Namespace>http://www.ndltd.org/standards/metadata/etdms/1.0/</Namespace>
+			<SchemaLocation>http://www.ndltd.org/standards/metadata/etdms/1.0/etdms.xsd</SchemaLocation>
+		</Format>
+		<Format id="mods">
+			<Prefix>mods</Prefix>
+			<XSLT>metadataFormats/mods.xsl</XSLT>
+			<Namespace>http://www.loc.gov/mods/v3</Namespace>
+			<SchemaLocation>http://www.loc.gov/standards/mods/v3/mods-3-1.xsd</SchemaLocation>
+		</Format>
+		<Format id="qdc">
+			<Prefix>qdc</Prefix>
+			<XSLT>metadataFormats/qdc.xsl</XSLT>
+			<Namespace>http://purl.org/dc/terms/</Namespace>
+			<SchemaLocation>http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd</SchemaLocation>
+		</Format>
+		<Format id="marc">
+			<Prefix>marc</Prefix>
+			<XSLT>metadataFormats/marc.xsl</XSLT>
+			<Namespace>http://www.loc.gov/MARC21/slim</Namespace>
+			<SchemaLocation>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</SchemaLocation>
+		</Format>
+		<Format id="uketd_dc">
+			<Prefix>uketd_dc</Prefix>
+			<XSLT>metadataFormats/uketd_dc.xsl</XSLT>
+			<Namespace>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/</Namespace>
+			<SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
+			<Filter refid="thesisFilter" />
+		</Format>
+	</Formats>
+	
+	<Transformers>
+		<Transformer id="driverTransformer">
+			<XSLT>transformers/driver.xsl</XSLT>
+		</Transformer>
+		<Transformer id="openaireTransformer">
+			<XSLT>transformers/openaire.xsl</XSLT>
+		</Transformer>
+	</Transformers>
+	
+
+	<Filters>
+		<Filter id="authorexistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>dc.contributor.author</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="titleexistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>dc.title</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="driverdocumenttypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>ends_with</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>article</Value>
+				<Value>bachelorThesis</Value>
+				<Value>masterThesis</Value>
+				<Value>doctoralThesis</Value>
+				<Value>book</Value>
+				<Value>bookPart</Value>
+				<Value>review</Value>
+				<Value>conferenceObject</Value>
+				<Value>lecture</Value>
+				<Value>workingPaper</Value>
+				<Value>preprint</Value>
+				<Value>report</Value>
+				<Value>annotation</Value>
+				<Value>contributionToPeriodical</Value>
+				<Value>patent</Value>
+				<Value>other</Value>
+			</Parameter>
+		</Filter>
+		<Filter id="driveraccessFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.rights</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>contains</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>open access</Value>
+				<Value>openAccess</Value>
+			</Parameter>
+		</Filter>
+		<Filter id="bitstreamaccessFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAuthorizationFilter</Class>
+		</Filter>
+		<Filter id="openairerelationFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.relation</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>starts_with</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>info:eu-repo/grantAgreement/EC/FP</Value>
+			</Parameter>
+		</Filter>
+		<Filter id="thesisFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>contains</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Thesis</Value>
+			</Parameter>
+		</Filter>
+	</Filters>
+	
+	<Sets>
+		<Set id="driverSet">
+			<Pattern>driver</Pattern>
+			<Name>Open Access DRIVERset</Name>
+			<!-- Just an alias -->
+		</Set>
+		<Set id="openaireSet">
+			<Pattern>ec_fundedresources</Pattern>
+			<Name>EC_fundedresources set</Name>
+			<!-- Just an alias -->
+		</Set>
+	</Sets>
+</Configuration>

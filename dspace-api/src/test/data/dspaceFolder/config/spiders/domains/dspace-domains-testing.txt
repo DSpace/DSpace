@@ -1,1 +1,0 @@
-^baiduspider-.*\.crawl\.baidu\.com

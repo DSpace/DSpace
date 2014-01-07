@@ -1,2 +1,0 @@
-language: java
-script: "mvn clean package license:check -Dmaven.test.skip=false"

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://www.dspace.org/license
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.IdentifierService"
+          class="org.dspace.identifier.IdentifierServiceImpl"
+          autowire="byType"
+          scope="singleton"/>
+
+   <!-- provider for using the versioned handle identifier instead of the default one. -->
+    <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
+          <!--scope="singleton">-->
+        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
+    <!--</bean>-->
+
+    <!-- provider to mint and register DOIs with DSpace.
+         To mint DOIs you need a registration agency. The DOIIdentifierProvider
+         maintains the doi database table and handling of DSpaceObject. It uses
+         a DOIConnector that handle all API calls to your DOI registration
+         agency. Please configure a DOIConnector as well!-->
+
+    <!-- To mint DOIs with DSpace get an agreement with a DOI registration
+         agency,  take a look into dspace.cfg, and remove this comment
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService"
+            ref="org.dspace.services.ConfigurationService" />
+        <property name="DOIConnector"
+            ref="org.dspace.identifier.doi.DOIConnector" />
+    </bean>
+    -->
+    
+    <!-- The DOIConnector will handle the API calls to your DOI registration
+         agency for the DOIIdentifierProvider. If your registration agency
+         tells you to use DataCites API directly you can use the
+         DataCiteConnector. If your registration agency is not part of DataCite
+         or provides their own API you have to implement a DOIConnector.
+         EZID f.e. is part of DataCite but provides their own APIs. The following
+         DataCiteConnector won't work if EZID is your registration agency.
+    -->
+    <!-- Remove this comment to use DataCite API directly as DOIConnector.
+    <bean id="org.dspace.identifier.doi.DOIConnector"
+        class="org.dspace.identifier.doi.DataCiteConnector"
+        scope="singleton">
+        <property name='DATACITE_SCHEME' value='https'/>
+        <property name='DATACITE_HOST' value='test.datacite.org'/>
+        <property name='DATACITE_DOI_PATH' value='/mds/doi/' />
+        <property name='DATACITE_METADATA_PATH' value='/mds/metadata/' />
+        <property name='disseminationCrosswalkName' value="DataCite" />
+    </bean>
+    -->
+
+    <!-- Provider to mint and register DOIs using EZID as the registrar.
+    -->
+    <!-- Uncomment to enable DOI using EZID
+    <bean id="org.dspace.identifier.EZIDIdentifierProvider"
+          class="org.dspace.identifier.EZIDIdentifierProvider"
+          scope='singleton'>
+        <description>Uses the EZID service to provide DOI identifiers from DataCite</description>
+        <property name="configurationService"
+                      ref="org.dspace.services.ConfigurationService"/>
+        <property name='requestFactory'>
+            <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
+                <property name='EZID_SCHEME' value='https'/>
+                <property name='EZID_HOST' value='n2t.net'/>
+            </bean>
+        </property>
+        <property name='crosswalk'>
+            <map>
+                <entry key='datacite.creator' value='dc.contributor.author'/>
+                <entry key='datacite.title' value='dc.title'/>
+                <entry key='datacite.publisher' value='dc.publisher'/>
+                <entry key='datacite.publicationyear' value='dc.date.issued'/>
+            </map>
+        </property>
+        <property name='crosswalkTransform'>
+            <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
+            <map>
+                <entry key='datacite.publicationyear'>
+                    <bean class='org.dspace.identifier.ezid.DateToYear'/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    -->
+
+</beans>

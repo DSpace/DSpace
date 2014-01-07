@@ -1,0 +1,56 @@
+<!-- DSpace Custom Submit input form definition language -->
+
+
+ <!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >
+
+ <!ELEMENT form-map (name-map)* >
+ <!ELEMENT name-map EMPTY >
+ <!ATTLIST name-map 
+           collection-handle CDATA #REQUIRED
+           form-name NMTOKEN #REQUIRED>
+
+ <!ELEMENT form-definitions (form)+ >
+ <!ELEMENT form (page)+ >
+ <!ATTLIST form name NMTOKEN #REQUIRED>
+ <!ELEMENT page (field)+ >
+ <!ATTLIST page number NMTOKEN #REQUIRED>
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?) >
+ <!ELEMENT dc-schema (#PCDATA) >
+ <!ELEMENT dc-element (#PCDATA) >
+ <!ELEMENT dc-qualifier (#PCDATA) >
+ <!ELEMENT type-bind (#PCDATA) >
+ 
+ <!ELEMENT repeatable (#PCDATA) >
+ <!ELEMENT label (#PCDATA) >
+ <!ELEMENT input-type (#PCDATA)>
+  
+ <!ELEMENT hint (#PCDATA) >
+ <!ELEMENT required (#PCDATA)>
+
+ <!ELEMENT form-value-pairs (value-pairs)* >
+ <!ELEMENT value-pairs (pair)+ >
+
+ <!-- ***
+        To assign a particular 'value-pairs' list to a particular dropdown 'input-type'
+        field, as found on a particular form, put:
+        - value-pairs/@value-pairs-name string into
+           form/page/field/input-type/@value-pairs-name
+        - form/page/field/@DCelement + '_' + form/field/DCqualifier into
+           value-pairs/@dc-term
+             (e.g. 'language_iso')
+  -->
+ <!ATTLIST value-pairs value-pairs-name CDATA #REQUIRED
+                            dc-term   CDATA #REQUIRED
+ >
+  
+ <!ELEMENT pair (displayed-value,stored-value) >
+ <!ELEMENT displayed-value (#PCDATA)>
+ <!ELEMENT stored-value (#PCDATA)>
+
+ <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
+
+ <!ELEMENT vocabulary (#PCDATA) >
+
+ <!ATTLIST vocabulary closed (true|false) "false"> 
+
+ <!ELEMENT visibility (#PCDATA) >

@@ -1,0 +1,20 @@
+# E-mail sent to designated address when a harvest process fails
+#
+# Parameters: {0} Collection id
+#             {1} Date & time
+#             {2} Status flag
+#             {3} Exception message
+#             {4} Exception stack trace
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: DSpace: Harvesting Error
+Collection {0} failed on harvest:
+
+Date:       	{1}
+Status Flag: 	{2}
+
+{3}
+
+Exception:
+{4}

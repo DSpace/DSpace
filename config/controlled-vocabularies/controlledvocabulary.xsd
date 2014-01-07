@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This Schema was created by the University of Minho <http://www.uminho.pt>, Department of Information Systems <http://www.dsi.uminho.pt> 
+for the Controlled-vocabulary Add-on of the HP/MIT's DSpace <http://www.dspace.org>. 
+
+For more information regarding this schema, please contact the authors: 
+Miguel Ferreira <mferreira@dsi.uminho.pt> and Ana Alice Baptista <analice@dsi.uminho.pt>; 
+or refer to the Web site http://dspace-dev.dsi.uminho.pt. 
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="node">
+		<xs:annotation>
+			<xs:documentation>Element that describes a concept</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="isComposedBy" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Contains the children of this node.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="node" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="isRelatedTo" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>A list of related terms</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="node" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Link to an existing node</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="id" type="xs:IDREF" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="hasNote" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>A note related to this term</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="type" type="xs:string"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+			<xs:attribute name="id" type="xs:ID" use="optional"/>
+			<xs:attribute name="label" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

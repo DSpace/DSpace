@@ -1,0 +1,737 @@
+<?xml version="1.0"?>
+
+<!--
+  - bitstream-formats.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - Initial contents for bitstream format registry.  Once the registry has
+  - been loaded, this file becomes obsolete; the current version of the
+  - registry must be read from the database.  Use
+  - org.dspace.content.BitstreamFormat.
+  -
+  - valid support_levels:  0 = unknown,  1 = known,  2 = supported
+  - internal:  specify true for internal types of bitstream (i.e. used
+  -            by the system, not for distribution to users)
+  - extensions:  Typical filename extensions, used for identifying incoming
+  -              files.  Can have multiple extensions, as shown in the example
+  -              below.  "internal" formats shouldn't have these.
+  -
+  - <dspace-bitstream-types>
+  -   <bitstream-type>
+  -     <mimetype>mime/type</mimetype>
+  -     <short_description>Thing v1</short_description>
+  -     <description>Thing Version 1 Document Format</description>
+  -     <support_level>1</support_level>
+  -     <internal>false</internal>
+  -     <extension>thingdoc</extension>
+  -     <extension>thd</extension>
+  -   </bitstream-type>
+  -  
+  -    ...
+  - </dspace-bitstream-types>
+  -->
+
+
+
+<dspace-bitstream-types>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>application/octet-stream</mimetype>
+    <short_description>Unknown</short_description>
+    <description>Unknown data format</description>
+    <support_level>0</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>text/plain; charset=utf-8</mimetype>
+    <short_description>License</short_description>
+    <description>Item-specific license agreed upon to submission</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+  </bitstream-type>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>text/html; charset=utf-8</mimetype>
+    <short_description>CC License</short_description>
+    <description>Item-specific Creative Commons license agreed upon to submission</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/pdf</mimetype>
+    <short_description>Adobe PDF</short_description>
+    <description>Adobe Portable Document Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>pdf</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/xml</mimetype>
+    <short_description>XML</short_description>
+    <description>Extensible Markup Language</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>xml</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/plain</mimetype>
+    <short_description>Text</short_description>
+    <description>Plain Text</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>txt</extension>
+    <extension>asc</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/html</mimetype>
+    <short_description>HTML</short_description>
+    <description>Hypertext Markup Language</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>htm</extension>
+    <extension>html</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/css</mimetype>
+    <short_description>CSS</short_description>
+    <description>Cascading Style Sheets</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>css</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/msword</mimetype>
+    <short_description>Microsoft Word</short_description>
+    <description>Microsoft Word</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>doc</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mimetype>
+    <short_description>Microsoft Word XML</short_description>
+    <description>Microsoft Word XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>docx</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.ms-powerpoint</mimetype>
+    <short_description>Microsoft Powerpoint</short_description>
+    <description>Microsoft Powerpoint</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>ppt</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.presentationml.presentation</mimetype>
+    <short_description>Microsoft Powerpoint XML</short_description>
+    <description>Microsoft Powerpoint XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>pptx</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.ms-excel</mimetype>
+    <short_description>Microsoft Excel</short_description>
+    <description>Microsoft Excel</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>xls</extension>
+  </bitstream-type>
+
+
+  <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mimetype>
+    <short_description>Microsoft Excel XML</short_description>
+    <description>Microsoft Excel XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>xlsx</extension>
+  </bitstream-type>
+
+
+  <bitstream-type>
+    <mimetype>application/marc</mimetype>
+    <short_description>MARC</short_description>
+    <description>Machine-Readable Cataloging records</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/jpeg</mimetype>
+    <short_description>JPEG</short_description>
+    <description>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>jpeg</extension>
+    <extension>jpg</extension>
+  </bitstream-type>
+  
+  <bitstream-type>
+    <mimetype>image/gif</mimetype>
+    <short_description>GIF</short_description>
+    <description>Graphics Interchange Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>gif</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/png</mimetype>
+    <short_description>image/png</short_description>
+    <description>Portable Network Graphics</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>png</extension>
+  </bitstream-type>
+     
+  <bitstream-type>
+    <mimetype>image/tiff</mimetype>
+    <short_description>TIFF</short_description>
+    <description>Tag Image File Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>tiff</extension>
+    <extension>tif</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>audio/x-aiff</mimetype>
+    <short_description>AIFF</short_description>
+    <description>Audio Interchange File Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>aiff</extension>
+    <extension>aif</extension>
+    <extension>aifc</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>audio/basic</mimetype>
+    <short_description>audio/basic</short_description>
+    <description>Basic Audio</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>au</extension>
+    <extension>snd</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>audio/x-wav</mimetype>
+    <short_description>WAV</short_description>
+    <description>Broadcase Wave Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>wav</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>video/mpeg</mimetype>
+    <short_description>MPEG</short_description>
+    <description>Moving Picture Experts Group</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>mpeg</extension>
+    <extension>mpg</extension>
+    <extension>mpe</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>text/richtext</mimetype>
+    <short_description>RTF</short_description>
+    <description>Rich Text Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>rtf</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.visio</mimetype>
+    <short_description>Microsoft Visio</short_description>
+    <description>Microsoft Visio</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>vsd</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/x-filemaker</mimetype>
+    <short_description>FMP3</short_description>
+    <description>Filemaker Pro</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>fm</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/x-ms-bmp</mimetype>
+    <short_description>BMP</short_description>
+    <description>Microsoft Windows bitmap</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>bmp</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/x-photoshop</mimetype>
+    <short_description>Photoshop</short_description>
+    <description>Photoshop</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>psd</extension>
+    <extension>pdd</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/postscript</mimetype>
+    <short_description>Postscript</short_description>
+    <description>Postscript Files</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>ps</extension>
+    <extension>eps</extension>
+    <extension>ai</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>video/quicktime</mimetype>
+    <short_description>Video Quicktime</short_description>
+    <description>Video Quicktime</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>mov</extension>
+    <extension>qt</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>audio/x-mpeg</mimetype>
+    <short_description>MPEG Audio</short_description>
+    <description>MPEG Audio</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>mpa</extension>
+    <extension>abs</extension>
+    <extension>mpega</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.ms-project</mimetype>
+    <short_description>Microsoft Project</short_description>
+    <description>Microsoft Project</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>mpp</extension>
+    <extension>mpx</extension>
+    <extension>mpd</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/mathematica</mimetype>
+    <short_description>Mathematica</short_description>
+    <description>Mathematica Notebook</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>ma</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/x-latex</mimetype>
+    <short_description>LateX</short_description>
+    <description>LaTeX document</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>latex</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/x-tex</mimetype>
+    <short_description>TeX</short_description>
+    <description>Tex/LateX document</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>tex</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/x-dvi</mimetype>
+    <short_description>TeX dvi</short_description>
+    <description>TeX dvi format </description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>dvi</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/sgml</mimetype>
+    <short_description>SGML</short_description>
+    <description>SGML application (RFC 1874)</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>sgm</extension>
+    <extension>sgml</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/wordperfect5.1</mimetype>
+    <short_description>WordPerfect</short_description>
+    <description>WordPerfect 5.1 document</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>wpd</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>audio/x-pn-realaudio</mimetype>
+    <short_description>RealAudio</short_description>
+    <description>RealAudio file</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>ra</extension>
+    <extension>ram</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>image/x-photo-cd</mimetype>
+    <short_description>Photo CD</short_description>
+    <description>Kodak Photo CD image</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>pcd</extension>
+  </bitstream-type>
+
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.text</mimetype>
+	  <short_description>OpenDocument Text</short_description>
+	  <description>OpenDocument Text</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odt</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.text-template</mimetype>
+	  <short_description>OpenDocument Text Template</short_description>
+	  <description>OpenDocument Text Template</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>ott</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.text-web</mimetype>
+	  <short_description>OpenDocument HTML Template</short_description>
+	  <description>OpenDocument HTML Template</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>oth</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.text-master</mimetype>
+	  <short_description>OpenDocument Master Document</short_description>
+	  <description>OpenDocument Master Document</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odm</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.graphics</mimetype>
+	  <short_description>OpenDocument Drawing</short_description>
+	  <description>OpenDocument Drawing</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odg</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.graphics-template</mimetype>
+	  <short_description>OpenDocument Drawing Template</short_description>
+	  <description>OpenDocument Drawing Template</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>otg</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.presentation</mimetype>
+	  <short_description>OpenDocument Presentation</short_description>
+	  <description>OpenDocument Presentation</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odp</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.presentation-template</mimetype>
+	  <short_description>OpenDocument Presentation Template</short_description>
+	  <description>OpenDocument Presentation Template</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>otp</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.spreadsheet</mimetype>
+	  <short_description>OpenDocument Spreadsheet</short_description>
+	  <description>OpenDocument Spreadsheet</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>ods</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.spreadsheet-template</mimetype>
+	  <short_description>OpenDocument Spreadsheet Template</short_description>
+	  <description>OpenDocument Spreadsheet Template</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>ots</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.chart</mimetype>
+	  <short_description>OpenDocument Chart</short_description>
+	  <description>OpenDocument Chart</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odc</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.formula</mimetype>
+	  <short_description>OpenDocument Formula</short_description>
+	  <description>OpenDocument Formula</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odf</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.database</mimetype>
+	  <short_description>OpenDocument Database</short_description>
+	  <description>OpenDocument Database</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odb</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.oasis.opendocument.image</mimetype>
+	  <short_description>OpenDocument Image</short_description>
+	  <description>OpenDocument Image</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>odi</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.openofficeorg.extension</mimetype>
+	  <short_description>OpenOffice.org extension</short_description>
+	  <description>OpenOffice.org extension (since OOo 2.1)</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>oxt</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.writer</mimetype>
+	  <short_description>Writer 6.0 documents</short_description>
+	  <description>Writer 6.0 documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxw</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.writer.template</mimetype>
+	  <short_description>Writer 6.0 templates</short_description>
+	  <description>Writer 6.0 templates</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>stw</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.calc</mimetype>
+	  <short_description>Calc 6.0 spreadsheets</short_description>
+	  <description>Calc 6.0 spreadsheets</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxc</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.calc.template</mimetype>
+	  <short_description>Calc 6.0 templates</short_description>
+	  <description>Calc 6.0 templates</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>stc</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.draw</mimetype>
+	  <short_description>Draw 6.0 documents</short_description>
+	  <description>Draw 6.0 documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxd</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.draw.template</mimetype>
+	  <short_description>Draw 6.0 templates</short_description>
+	  <description>Draw 6.0 templates</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>std</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.impress</mimetype>
+	  <short_description>Impress 6.0 presentations</short_description>
+	  <description>Impress 6.0 presentations</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxi</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.impress.template</mimetype>
+	  <short_description>Impress 6.0 templates</short_description>
+	  <description>Impress 6.0 templates</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sti</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.writer.global</mimetype>
+	  <short_description>Writer 6.0 global documents</short_description>
+	  <description>Writer 6.0 global documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxg</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.sun.xml.math</mimetype>
+	  <short_description>Math 6.0 documents</short_description>
+	  <description>Math 6.0 documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sxm</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.writer</mimetype>
+	  <short_description>StarWriter 5.x documents</short_description>
+	  <description>StarWriter 5.x documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sdw</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.writer-global</mimetype>
+	  <short_description>StarWriter 5.x global documents</short_description>
+	  <description>StarWriter 5.x global documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sgl</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.calc</mimetype>
+	  <short_description>StarCalc 5.x spreadsheets</short_description>
+	  <description>StarCalc 5.x spreadsheets</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sdc</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.draw</mimetype>
+	  <short_description>StarDraw 5.x documents</short_description>
+	  <description>StarDraw 5.x documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sda</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.impress</mimetype>
+	  <short_description>StarImpress 5.x presentations</short_description>
+	  <description>StarImpress 5.x presentations</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sdd</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.impress-packed</mimetype>
+	  <short_description>StarImpress Packed 5.x files</short_description>
+	  <description>StarImpress Packed 5.x files</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sdp</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.math</mimetype>
+	  <short_description>StarMath 5.x documents</short_description>
+	  <description>StarMath 5.x documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>smf</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.chart</mimetype>
+	  <short_description>StarChart 5.x documents</short_description>
+	  <description>StarChart 5.x documents</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sds</extension>
+	</bitstream-type>
+	
+	<bitstream-type>
+	  <mimetype>application/vnd.stardivision.mail</mimetype>
+	  <short_description>StarMail 5.x mail files</short_description>
+	  <description>StarMail 5.x mail files</description>
+	  <support_level>1</support_level>
+	  <internal>false</internal>
+	  <extension>sdm</extension>
+	</bitstream-type>
+
+    <bitstream-type>
+      <mimetype>application/rdf+xml; charset=utf-8</mimetype>
+      <short_description>RDF XML</short_description>
+      <description>RDF serialized in XML</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>rdf</extension>
+    </bitstream-type>
+
+
+</dspace-bitstream-types>
