@@ -147,6 +147,18 @@
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='source']/doc:element/doc:element/doc:field[@name='value']">
 				<dc:source><xsl:value-of select="." /></dc:source>
 			</xsl:for-each>
+                        <!-- Adding audience -->
+                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='audience']/doc:element/doc:field[@name='value']">
+				<dc:audience><xsl:value-of select="." /></dc:audience>
+			</xsl:for-each>
+                        <!-- Adding pubplace -->
+                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='pubplace']/doc:element/doc:field[@name='value']">
+				<dc:pubplace><xsl:value-of select="." /></dc:pubplace>
+			</xsl:for-each>
+                        <!-- Adding citation -->
+                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='citation']/doc:element/doc:field[@name='value']">
+				<dc:citation><xsl:value-of select="." /></dc:citation>
+			</xsl:for-each>
 		</oai_dc:dc>
 	</xsl:template>
 </xsl:stylesheet>
