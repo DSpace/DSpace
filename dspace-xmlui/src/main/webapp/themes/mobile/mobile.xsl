@@ -694,7 +694,7 @@
                            </xsl:attribute>
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
-                                <xsl:text>themes/mobile/lib/images/mobile-default-thumbnail.png</xsl:text>
+                                <xsl:text>themes/mobile/lib/images/default-thumbnail.png</xsl:text>
                                 </xsl:attribute>
                             </img>
                         </a>
