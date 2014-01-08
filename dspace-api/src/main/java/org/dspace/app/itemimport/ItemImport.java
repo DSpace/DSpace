@@ -715,6 +715,7 @@ public class ItemImport
         	} catch (Exception e) {
         		System.err.println("Exception");
         		e.printStackTrace();
+        		throw e;
         	}
 
         	ItemImport myloader = new ItemImport();
