@@ -4,399 +4,2796 @@
 
 <input-forms>
 
- <!-- The form-map maps collection handles to forms. DSpace does not       -->
- <!-- require a collection name to be unique, not even within a community. -->
- <!-- DSpace does however ensure that each collection's handle is unique.  -->
- <!-- Form-map provides the means to associate a unique collection name    -->
- <!-- with a form. The form-map also provides the special handle "default" -->
- <!-- (which is never a collection), here mapped to "traditional". Any     -->
- <!-- collection which does not appear in this map will be associated with -->
- <!-- the mapping for handle "default".                                    -->
+    <!-- The form-map maps collection handles to forms. DSpace does not       -->
+    <!-- require a collection name to be unique, not even within a community. -->
+    <!-- DSpace does however ensure that each collection's handle is unique.  -->
+    <!-- Form-map provides the means to associate a unique collection name    -->
+    <!-- with a form. The form-map also provides the special handle "default" -->
+    <!-- (which is never a collection), here mapped to "traditional". Any     -->
+    <!-- collection which does not appear in this map will be associated with -->
+    <!-- the mapping for handle "default".                                    -->
 
- <form-map>
-   <name-map collection-handle="default" form-name="traditional" />
- </form-map>
+    <form-map>
+        <!--<name-map collection-handle="default" form-name="traditional" />-->
+        <name-map collection-handle="default" form-name="general" />
+        
+        <!-- Collections that apply the Jurnal and articles form -->
+        <name-map collection-handle="10906/3883" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3892" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3900" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3901" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3909" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3938" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3943" form-name="seriadas-art" />
+        <name-map collection-handle="10906/3982" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4005" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4014" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4044" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4086" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4199" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4214" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4377" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4571" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4627" form-name="seriadas-art" />
+        <name-map collection-handle="10906/4643" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5189" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5263" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5279" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5299" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5305" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5324" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5336" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5566" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5572" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5591" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5604" form-name="seriadas-art" />
+        <name-map collection-handle="10906/5652" form-name="seriadas-art" />
+        <name-map collection-handle="10906/64659" form-name="seriadas-art" />
+        <name-map collection-handle="10906/64943" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65138" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65358" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65359" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65360" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65361" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65375" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65495" form-name="seriadas-art" />
+        <name-map collection-handle="10906/65991" form-name="seriadas-art" />
+        <name-map collection-handle="10906/66223" form-name="seriadas-art" />
+        <name-map collection-handle="10906/66287" form-name="seriadas-art" />
+        <name-map collection-handle="10906/67006" form-name="seriadas-art" />
+        <name-map collection-handle="10906/67930" form-name="seriadas-art" />
+        <name-map collection-handle="10906/67966" form-name="seriadas-art" />
+        <name-map collection-handle="10906/67968" form-name="seriadas-art" />
+        <name-map collection-handle="10906/67971" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68100" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68331" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68514" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68516" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68517" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68520" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68559" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68613" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68614" form-name="seriadas-art" />
+        <name-map collection-handle="10906/68829" form-name="seriadas-art" />
+        <name-map collection-handle="10906/69544" form-name="seriadas-art" />
+
+        
+        <!-- Collections that apply the Thesis form -->
+        <name-map collection-handle="10906/2278" form-name="tesis" />
+        <name-map collection-handle="10906/2704" form-name="tesis" />
+        <name-map collection-handle="10906/3765" form-name="tesis" />
+        <name-map collection-handle="10906/3927" form-name="tesis" />
+        <name-map collection-handle="10906/5364" form-name="tesis" />
+        <name-map collection-handle="10906/5370" form-name="tesis" />
+        <name-map collection-handle="10906/5396" form-name="tesis" />
+        <name-map collection-handle="10906/5427" form-name="tesis" />
+        <name-map collection-handle="10906/5445" form-name="tesis" />
+        <name-map collection-handle="10906/5496" form-name="tesis" />
+        <name-map collection-handle="10906/5505" form-name="tesis" />
+        <name-map collection-handle="10906/5516" form-name="tesis" />
+        <name-map collection-handle="10906/5612" form-name="tesis" />
+        <name-map collection-handle="10906/5616" form-name="tesis" />
+        <name-map collection-handle="10906/66639" form-name="tesis" />
+        <name-map collection-handle="10906/67128" form-name="tesis" />
+        <name-map collection-handle="10906/67132" form-name="tesis" />
+        <name-map collection-handle="10906/67134" form-name="tesis" />
+        <name-map collection-handle="10906/67527" form-name="tesis" />
+        <name-map collection-handle="10906/67550" form-name="tesis" />
+        <name-map collection-handle="10906/67645" form-name="tesis" />
+        <name-map collection-handle="10906/67657" form-name="tesis" />
+        <name-map collection-handle="10906/67797" form-name="tesis" />
+        <name-map collection-handle="10906/67886" form-name="tesis" />
+        <name-map collection-handle="10906/66794" form-name="tesis" />
+        <name-map collection-handle="10906/66921" form-name="tesis" />
+        <name-map collection-handle="10906/66922" form-name="tesis" />
+        <name-map collection-handle="10906/66933" form-name="tesis" />
+        <name-map collection-handle="10906/68753" form-name="tesis" />
+        
+        <!-- Collections that apply the Historical form -->
+        <name-map collection-handle="10906/5701" form-name="historico" />
+        <name-map collection-handle="10906/5702" form-name="historico" />
+        <name-map collection-handle="10906/5703" form-name="historico" />
+        <name-map collection-handle="10906/5704" form-name="historico" />
+        <name-map collection-handle="10906/5705" form-name="historico" />
+        <name-map collection-handle="10906/5706" form-name="historico" />
+        <name-map collection-handle="10906/5707" form-name="historico" />
+        <name-map collection-handle="10906/5708" form-name="historico" />
+        <name-map collection-handle="10906/5709" form-name="historico" />
+        <name-map collection-handle="10906/5711" form-name="historico" />
+        <name-map collection-handle="10906/5712" form-name="historico" />
+        <name-map collection-handle="10906/5713" form-name="historico" />
+        <name-map collection-handle="10906/5714" form-name="historico" />
+        <name-map collection-handle="10906/5715" form-name="historico" />
+        <name-map collection-handle="10906/5716" form-name="historico" />
+        <name-map collection-handle="10906/5718" form-name="historico" />
+        <name-map collection-handle="10906/5719" form-name="historico" />
+        <name-map collection-handle="10906/5720" form-name="historico" />
+        <name-map collection-handle="10906/5721" form-name="historico" />
+        <name-map collection-handle="10906/5723" form-name="historico" />
+        <name-map collection-handle="10906/5724" form-name="historico" />
+        <name-map collection-handle="10906/5725" form-name="historico" />
+        <name-map collection-handle="10906/5726" form-name="historico" />
+        <name-map collection-handle="10906/5727" form-name="historico" />
+        <name-map collection-handle="10906/5728" form-name="historico" />
+        <name-map collection-handle="10906/5730" form-name="historico" />
+        <name-map collection-handle="10906/5731" form-name="historico" />
+        <name-map collection-handle="10906/5732" form-name="historico" />
+        <name-map collection-handle="10906/5733" form-name="historico" />
+        <name-map collection-handle="10906/5734" form-name="historico" />
+        <name-map collection-handle="10906/5735" form-name="historico" />
+        <name-map collection-handle="10906/5736" form-name="historico" />
+        <name-map collection-handle="10906/5737" form-name="historico" />
+        <name-map collection-handle="10906/5738" form-name="historico" />
+        <name-map collection-handle="10906/5739" form-name="historico" />
+        <name-map collection-handle="10906/5741" form-name="historico" />
+        <name-map collection-handle="10906/5742" form-name="historico" />
+        <name-map collection-handle="10906/5743" form-name="historico" />
+        <name-map collection-handle="10906/5744" form-name="historico" />
+        <name-map collection-handle="10906/5745" form-name="historico" />
+        <name-map collection-handle="10906/5747" form-name="historico" />
+        <name-map collection-handle="10906/5748" form-name="historico" />
+        <name-map collection-handle="10906/5749" form-name="historico" />
+        <name-map collection-handle="10906/5750" form-name="historico" />
+        <name-map collection-handle="10906/5751" form-name="historico" />
+        <name-map collection-handle="10906/5752" form-name="historico" />
+        <name-map collection-handle="10906/5754" form-name="historico" />
+        <name-map collection-handle="10906/5755" form-name="historico" />
+        <name-map collection-handle="10906/5756" form-name="historico" />
+        <name-map collection-handle="10906/5757" form-name="historico" />
+        <name-map collection-handle="10906/5758" form-name="historico" />
+        <name-map collection-handle="10906/5759" form-name="historico" />
+        <name-map collection-handle="10906/5761" form-name="historico" />
+        <name-map collection-handle="10906/5762" form-name="historico" />
+        <name-map collection-handle="10906/5763" form-name="historico" />
+        <name-map collection-handle="10906/5764" form-name="historico" />
+        <name-map collection-handle="10906/5765" form-name="historico" />
+        <name-map collection-handle="10906/5767" form-name="historico" />
+        <name-map collection-handle="10906/5768" form-name="historico" />
+        <name-map collection-handle="10906/5769" form-name="historico" />
+        <name-map collection-handle="10906/5771" form-name="historico" />
+        <name-map collection-handle="10906/5772" form-name="historico" />
+        <name-map collection-handle="10906/5773" form-name="historico" />
+        <name-map collection-handle="10906/5775" form-name="historico" />
+        <name-map collection-handle="10906/5777" form-name="historico" />
+        <name-map collection-handle="10906/5778" form-name="historico" />
+        <name-map collection-handle="10906/5779" form-name="historico" />
+        <name-map collection-handle="10906/5780" form-name="historico" />
+        <name-map collection-handle="10906/5781" form-name="historico" />
+        <name-map collection-handle="10906/5782" form-name="historico" />
+        <name-map collection-handle="10906/5783" form-name="historico" />
+        <name-map collection-handle="10906/5784" form-name="historico" />
+        <name-map collection-handle="10906/5785" form-name="historico" />
+        <name-map collection-handle="10906/5786" form-name="historico" />
+        <name-map collection-handle="10906/5787" form-name="historico" />
+        <name-map collection-handle="10906/5788" form-name="historico" />
+        <name-map collection-handle="10906/5789" form-name="historico" />
+        <name-map collection-handle="10906/5790" form-name="historico" />
+        <name-map collection-handle="10906/5791" form-name="historico" />
+        <name-map collection-handle="10906/5792" form-name="historico" />
+        <name-map collection-handle="10906/5793" form-name="historico" />
+        <name-map collection-handle="10906/5794" form-name="historico" />
+        <name-map collection-handle="10906/5795" form-name="historico" />
+        <name-map collection-handle="10906/5796" form-name="historico" />
+        <name-map collection-handle="10906/5797" form-name="historico" />
+        <name-map collection-handle="10906/5798" form-name="historico" />
+        <name-map collection-handle="10906/5799" form-name="historico" />
+        <name-map collection-handle="10906/5800" form-name="historico" />
+        <name-map collection-handle="10906/5801" form-name="historico" />
+        <name-map collection-handle="10906/5802" form-name="historico" />
+        <name-map collection-handle="10906/5803" form-name="historico" />
+        <name-map collection-handle="10906/5804" form-name="historico" />
+        <name-map collection-handle="10906/5805" form-name="historico" />
+        <name-map collection-handle="10906/64623" form-name="historico" />
+        <name-map collection-handle="10906/65286" form-name="historico" />
+        <name-map collection-handle="10906/65288" form-name="historico" />
+        <name-map collection-handle="10906/65432" form-name="historico" />
+        <name-map collection-handle="10906/65433" form-name="historico" />
+        <name-map collection-handle="10906/65434" form-name="historico" />
+        <name-map collection-handle="10906/65435" form-name="historico" />
+        <name-map collection-handle="10906/65436" form-name="historico" />
+        <name-map collection-handle="10906/65437" form-name="historico" />
+        <name-map collection-handle="10906/65438" form-name="historico" />
+        <name-map collection-handle="10906/65439" form-name="historico" />
+        <name-map collection-handle="10906/65440" form-name="historico" />
+        <name-map collection-handle="10906/65441" form-name="historico" />
+        <name-map collection-handle="10906/65442" form-name="historico" />
+        <name-map collection-handle="10906/65443" form-name="historico" />
+        <name-map collection-handle="10906/65445" form-name="historico" />
+        <name-map collection-handle="10906/65447" form-name="historico" />
+        <name-map collection-handle="10906/65449" form-name="historico" />
+        <name-map collection-handle="10906/65451" form-name="historico" />
+        <name-map collection-handle="10906/65453" form-name="historico" />
+        <name-map collection-handle="10906/65454" form-name="historico" />
+        <name-map collection-handle="10906/65455" form-name="historico" />
+        <name-map collection-handle="10906/65456" form-name="historico" />
+
+        <!-- Collections that apply the Audiovisual form -->
+        <name-map collection-handle="10906/2702" form-name="audiovisual" />
+        <name-map collection-handle="10906/5221" form-name="audiovisual" />
+        <name-map collection-handle="10906/65290" form-name="audiovisual" />
+        <name-map collection-handle="10906/67811" form-name="audiovisual" />
+        <name-map collection-handle="10906/68643" form-name="audiovisual" />
+        <name-map collection-handle="10906/68743" form-name="audiovisual" />
+        <name-map collection-handle="10906/68768" form-name="audiovisual" />
+        <name-map collection-handle="10906/68776" form-name="audiovisual" />
+        <name-map collection-handle="10906/68008" form-name="audiovisual" />
+        <name-map collection-handle="10906/68009" form-name="audiovisual" />
+        <name-map collection-handle="10906/68010" form-name="audiovisual" />
+    </form-map>
 
 
- <!-- The form-definitions map lays out the detailed definition of all the -->
- <!-- submission forms. Each separate form set has a unique name as an     -->
- <!-- attribute. This name matches one of the names in the form-map. One   -->
- <!-- named form set has the name "traditional"; as this name suggests,    -->
- <!-- it is the old style and is also the default, which gets used when    -->
- <!-- the specified collection has no correspondingly-named form set.      -->
- <!--                                                                      -->
- <!-- Each form set contains an ordered set of pages; each page defines    -->
- <!-- one submission metadata entry screen. Each page has an ordered list  -->
- <!-- of field definitions, Each field definition corresponds to one       -->
- <!-- metatdata entry (a so-called row), which has a DC element name, a    -->
- <!-- displayed label, a text string prompt which is called a hint, and    -->
- <!-- an input-type. Each field also may hold optional elements: DC        -->
- <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
- <!-- serves as a 'this field is required' flag.                           -->
+    <!-- The form-definitions map lays out the detailed definition of all the -->
+    <!-- submission forms. Each separate form set has a unique name as an     -->
+    <!-- attribute. This name matches one of the names in the form-map. One   -->
+    <!-- named form set has the name "traditional"; as this name suggests,    -->
+    <!-- it is the old style and is also the default, which gets used when    -->
+    <!-- the specified collection has no correspondingly-named form set.      -->
+    <!--                                                                      -->
+    <!-- Each form set contains an ordered set of pages; each page defines    -->
+    <!-- one submission metadata entry screen. Each page has an ordered list  -->
+    <!-- of field definitions, Each field definition corresponds to one       -->
+    <!-- metatdata entry (a so-called row), which has a DC element name, a    -->
+    <!-- displayed label, a text string prompt which is called a hint, and    -->
+    <!-- an input-type. Each field also may hold optional elements: DC        -->
+    <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+    <!-- serves as a 'this field is required' flag.                           -->
 
- <form-definitions>
+    <form-definitions>
+        <!-- General monographic forms -->
+        <form name="general">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Autor(es)*</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre del autor principal de este ítem</hint>
+                    <required>Debe ingresar al menos 1 autor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Correo Autor(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Correo electrónico del autor</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Colaborador(es)</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre de los colaboradores de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Título *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el títlo pricipal del ítem.</hint>
+                    <required>Debe ingresar el título del item</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título alternativo *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Si el ítem tiene títulos alternativos, por favor escríbalos.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (BDCOL)*</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>spa</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (Español)*</label>
+                    <input-type value-pairs-name="common_types_spa">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Acceso *</label>
+                    <input-type value-pairs-name="common_access_types">dropdown</input-type>
+                    <hint> Ingrese la información de acceso. </hint>
+                    <required>Debe Ingresar la información de acceso.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Formato *</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el fortato del archivo puede usar la siguiente url como ayuda: &lt;a href="http://www.iana.org/assignments/media-types/" target="_blank"&gt; http://www.iana.org/assignments/media-types/ &lt;/a&gt;</hint>
+                    <required>Debe ingresar el fortato del archivo</required>
+                </field>       
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>extent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Extensión</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el número de páginas o rango del documento, si es audio o video ingrese la duración duración en minutos</hint>
+                    <required>Debe ingresar la extensión del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>medium</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Medio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Medio en el que es ingresado el ítem</hint>
+                    <required>Debe ingresar el medio del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Otros Identificadores</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>Si el ítem tiene algún número o código de identificación, por favor seleccione su tipo e ingréselo.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Fecha de publicación *</label>
+                    <input-type>date</input-type>
+                    <hint>Por favor ingrese la fecha de la publicación previa o la distribución pública del ítem.
+                        Puede dejar en blanco el día y/o el mes si no aplican.
+                    </hint>
+                    <required>Debe escribir por lo menos el año.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>pubplace</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lugar de publicación *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ciudad en la que es o fue publicado el ítem</hint>
+                    <required>Debe Ingresar el lugar de publicación del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>volume</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Volumen</label>
+                    <input-type>onebox</input-type>
+                    <hint>Volumen de la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>issue</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Número</label>
+                    <input-type>onebox</input-type>
+                    <hint>Número de la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>spage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Inicial</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página inicial del artículo en la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>epage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Final</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página final del artículo en la revista</hint>
+                    <required></required>
+                </field>
+            </page>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Descripción</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese cualquier otra descripción o comentarios. </hint>
+                    <required>Debe ingresar las descripción del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resumen (Abstract)</label>
+                    <input-type>textarea</input-type>
+                    <hint> Ingrese el resumen del ítem. </hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fuente</label>
+                    <input-type>onebox</input-type>
+                    <hint>Signatura topográfica o fuente de donde se extrajo el ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>bibliography</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Bibliografía en el documento</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese la tabla de bibliografía en el documento</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Idioma</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Seleccione el lenguaje del contenido principal del ítem. Si el idioma no aparece en la lista, 
+                        por favor seleccione 'Otro'. Si el contenido no tiene un idioma (por ejemplo si es una imagen) seleccione 'N/A'.
+                    </hint>
+                    <required>Debe seleccionar el lenguaje del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Materias/Palabras claves</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba las materias o palabras clave. </hint>
+                    <required>Debe escribir al menos 1 materia o palabra clave</required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>ddc</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Clasificación OLIB (Dewey)</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba el número de clasificación Dewey + Cutter. </hint>
+                    <required></required>
+                    <vocabulary>ddc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>faculty</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Facultad</label>
+                    <input-type value-pairs-name="common_faculties">dropdown</input-type>
+                    <hint>Ingrese la facultad que publica el ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>program</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Programa</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el programa académico al que pertenece el autor del ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>department</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Departamento</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el departamento al que pertenece el autor ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Seriada/Publicación No.</label>
+                    <input-type>series</input-type>
+                    <hint>Escriba el nombre del encabezado de la seriada y el número asignado a este ítem.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Relaciónes</label>
+                    <input-type value-pairs-name="common_relations">qualdrop_value</input-type>
+                    <hint>Ingrese los elementos relacionados con este ítem y la forma en que se relacionan.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>hasversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versión</label>
+                    <input-type value-pairs-name="common_relation_versions">dropdown</input-type>
+                    <hint>Ingrese la versión del documento</hint>
+                    <required>Debe ingresar la versión del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cobertura</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba la ubicación geográfica que corresponde al ítem.</hint>
+                    <required>Debe ingresar la cobertural del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Patrocinadores</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba los nombres de los patrocinadores y/o los códigos de financiación.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cita</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+        
+        <!-- Journal and journal articles form -->
+        <form name="seriadas-art">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Autor(es)*</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre del autor principal de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Correo Autor(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Correo electrónico del autor</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Colaborador(es)</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre de los colaboradores de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Título *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el títlo pricipal del ítem.</hint>
+                    <required>Debe ingresar el título del item</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título alternativo *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Si el ítem tiene títulos alternativos, por favor escríbalos.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (BDCOL)*</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>spa</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (Español)*</label>
+                    <input-type value-pairs-name="common_types_spa">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Acceso *</label>
+                    <input-type value-pairs-name="common_access_types">dropdown</input-type>
+                    <hint> Ingrese la información de acceso. </hint>
+                    <required>Debe Ingresar la información de acceso.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Formato *</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el fortato del archivo puede usar la siguiente url como ayuda: &lt;a href="http://www.iana.org/assignments/media-types/" target="_blank"&gt; http://www.iana.org/assignments/media-types/ &lt;/a&gt;</hint>
+                    <required>Debe ingresar el fortato del archivo</required>
+                </field>       
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>extent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Extensión</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el número de páginas o rango del documento, si es audio o video ingrese la duración duración en minutos</hint>
+                    <required>Debe ingresar la extensión del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>medium</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Medio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Medio en el que es ingresado el ítem</hint>
+                    <required>Debe ingresar el medio del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Otros Identificadores</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>Si el ítem tiene algún número o código de identificación, por favor seleccione su tipo e ingréselo.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Fecha de publicación *</label>
+                    <input-type>date</input-type>
+                    <hint>Por favor ingrese la fecha de la publicación previa o la distribución pública del ítem.
+                        Puede dejar en blanco el día y/o el mes si no aplican.
+                    </hint>
+                    <required>Debe escribir por lo menos el año.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>pubplace</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lugar de publicación *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ciudad en la que es o fue publicado el ítem</hint>
+                    <required>Debe Ingresar el lugar de publicación del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>volume</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Volumen</label>
+                    <input-type>onebox</input-type>
+                    <hint>Volumen de la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>issue</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Número</label>
+                    <input-type>onebox</input-type>
+                    <hint>Número de la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>spage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Inicial *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página inicial del artículo en la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>epage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Final *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página final del artículo en la revista</hint>
+                    <required></required>
+                </field>
+            </page>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Descripción</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese cualquier otra descripción o comentarios. </hint>
+                    <required>Debe ingresar las descripción del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resumen (Abstract)</label>
+                    <input-type>textarea</input-type>
+                    <hint> Ingrese el resumen del ítem. </hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fuente</label>
+                    <input-type>onebox</input-type>
+                    <hint>Signatura topográfica o fuente de donde se extrajo el ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>bibliography</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Bibliografía en el documento</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese la tabla de bibliografía en el documento</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Idioma</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Seleccione el lenguaje del contenido principal del ítem. Si el idioma no aparece en la lista, 
+                        por favor seleccione 'Otro'. Si el contenido no tiene un idioma (por ejemplo si es una imagen) seleccione 'N/A'.
+                    </hint>
+                    <required>Debe seleccionar el lenguaje del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Materias/Palabras claves</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba las materias o palabras clave. </hint>
+                    <required>Debe escribir al menos 1 materia o palabra clave</required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Seriada/Publicación No.</label>
+                    <input-type>series</input-type>
+                    <hint>Escriba el nombre del encabezado de la seriada y el número asignado a este ítem.</hint>
+                    <required>Debe escribir la Seriada/Publicación</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Relaciónes</label>
+                    <input-type value-pairs-name="common_relations">qualdrop_value</input-type>
+                    <hint>Ingrese los elementos relacionados con este ítem y la forma en que se relacionan.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>hasversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versión</label>
+                    <input-type value-pairs-name="common_relation_versions">dropdown</input-type>
+                    <hint>Ingrese la versión del documento</hint>
+                    <required>Debe ingresar la versión del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cobertura</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba la ubicación geográfica que corresponde al ítem.</hint>
+                    <required>Debe ingresar la cobertural del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Patrocinadores</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba los nombres de los patrocinadores y/o los códigos de financiación.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cita</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+        
+        <!-- Thesis form -->
+        <form name="tesis">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Autor(es)*</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre del autor principal de este ítem</hint>
+                    <required>Debe ingresar al menos 1 autor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>degree</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título Académico Autor(es) *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el título que recibe el autor del trabajo de grado, disertación o tesis</hint>
+                    <required>Debe Ingresar al menos el título que recibe el autor principal de este ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Correo Autor(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Correo electrónico del autor</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Colaborador(es)</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre de los colaboradores de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>role</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Rol del Colaborador(es)*</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese los roles de los colaboradores de este ítem</hint>
+                    <required>Debe ingresar el rol de almenos uno de los colaboradores de este ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Título *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el títlo pricipal del ítem.</hint>
+                    <required>Debe ingresar el título del item</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título alternativo *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Si el ítem tiene títulos alternativos, por favor escríbalos.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (BDCOL)*</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>spa</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (Español)*</label>
+                    <input-type value-pairs-name="common_types_spa">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Acceso *</label>
+                    <input-type value-pairs-name="common_access_types">dropdown</input-type>
+                    <hint> Ingrese la información de acceso. </hint>
+                    <required>Debe Ingresar la información de acceso.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Formato *</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el fortato del archivo puede usar la siguiente url como ayuda: &lt;a href="http://www.iana.org/assignments/media-types/" target="_blank"&gt; http://www.iana.org/assignments/media-types/ &lt;/a&gt;</hint>
+                    <required>Debe ingresar el fortato del archivo</required>
+                </field>       
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>extent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Extensión</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el número de páginas o rango del documento, si es audio o video ingrese la duración duración en minutos</hint>
+                    <required>Debe ingresar la extensión del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>medium</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Medio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Medio en el que es ingresado el ítem</hint>
+                    <required>Debe ingresar el medio del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Otros Identificadores</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>Si el ítem tiene algún número o código de identificación, por favor seleccione su tipo e ingréselo.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Fecha de publicación *</label>
+                    <input-type>date</input-type>
+                    <hint>Por favor ingrese la fecha de la publicación previa o la distribución pública del ítem.
+                        Puede dejar en blanco el día y/o el mes si no aplican.
+                    </hint>
+                    <required>Debe escribir por lo menos el año.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>pubplace</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lugar de publicación *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ciudad en la que es o fue publicado el ítem</hint>
+                    <required>Debe Ingresar el lugar de publicación del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>spage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Inicial *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página inicial del artículo en la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>epage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Final *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página final del artículo en la revista</hint>
+                    <required></required>
+                </field>
+            </page>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Descripción</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese cualquier otra descripción o comentarios. </hint>
+                    <required>Debe ingresar las descripción del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resumen (Abstract)</label>
+                    <input-type>textarea</input-type>
+                    <hint> Ingrese el resumen del ítem. </hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fuente</label>
+                    <input-type>onebox</input-type>
+                    <hint>Signatura topográfica o fuente de donde se extrajo el ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>bibliography</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Bibliografía en el documento</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese la tabla de bibliografía en el documento</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Idioma</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Seleccione el lenguaje del contenido principal del ítem. Si el idioma no aparece en la lista, 
+                        por favor seleccione 'Otro'. Si el contenido no tiene un idioma (por ejemplo si es una imagen) seleccione 'N/A'.
+                    </hint>
+                    <required>Debe seleccionar el lenguaje del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Materias/Palabras claves</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba las materias o palabras clave. </hint>
+                    <required>Debe escribir al menos 1 materia o palabra clave</required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>ddc</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Clasificación OLIB (Dewey)</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba el número de clasificación Dewey + Cutter. </hint>
+                    <required></required>
+                    <vocabulary>ddc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>faculty</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Facultad</label>
+                    <input-type value-pairs-name="common_faculties">dropdown</input-type>
+                    <hint>Ingrese la facultad que publica el ítem</hint>
+                    <required>Debe ingresar la facultad que publica el ítem</required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>program</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Programa</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el programa académico al que pertenece el autor del ítem</hint>
+                    <required>Debe ingresar el programa</required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>department</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Departamento</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el departamento al que pertenece el autor ítem</hint>
+                    <required>Debe ingresar el departamento</required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Seriada/Publicación No.</label>
+                    <input-type>series</input-type>
+                    <hint>Escriba el nombre del encabezado de la seriada y el número asignado a este ítem.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Relaciónes</label>
+                    <input-type value-pairs-name="common_relations">qualdrop_value</input-type>
+                    <hint>Ingrese los elementos relacionados con este ítem y la forma en que se relacionan.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>hasversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versión</label>
+                    <input-type value-pairs-name="common_relation_versions">dropdown</input-type>
+                    <hint>Ingrese la versión del documento</hint>
+                    <required>Debe ingresar la versión del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cobertura</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba la ubicación geográfica que corresponde al ítem.</hint>
+                    <required>Debe ingresar la cobertural del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Patrocinadores</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba los nombres de los patrocinadores y/o los códigos de financiación.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cita</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+        
+        <!-- Historical documents form -->
+        <form name="historico">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Autor(es)*</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre del autor principal de este ítem</hint>
+                    <required>Debe ingresar al menos 1 autor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Correo Autor(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Correo electrónico del autor</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Colaborador(es)</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre de los colaboradores de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (BDCOL)*</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>spa</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (Español)*</label>
+                    <input-type value-pairs-name="common_types_spa">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Acceso *</label>
+                    <input-type value-pairs-name="common_access_types">dropdown</input-type>
+                    <hint> Ingrese la información de acceso. </hint>
+                    <required>Debe Ingresar la información de acceso.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Formato *</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el fortato del archivo puede usar la siguiente url como ayuda: &lt;a href="http://www.iana.org/assignments/media-types/" target="_blank"&gt; http://www.iana.org/assignments/media-types/ &lt;/a&gt;</hint>
+                    <required>Debe ingresar el fortato del archivo</required>
+                </field>       
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>extent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Extensión</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el número de páginas o rango del documento, si es audio o video ingrese la duración duración en minutos</hint>
+                    <required>Debe ingresar la extensión del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>medium</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Medio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Medio en el que es ingresado el ítem</hint>
+                    <required>Debe ingresar el medio del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Otros Identificadores</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>Si el ítem tiene algún número o código de identificación, por favor seleccione su tipo e ingréselo.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Fecha de publicación *</label>
+                    <input-type>date</input-type>
+                    <hint>Por favor ingrese la fecha de la publicación previa o la distribución pública del ítem.
+                        Puede dejar en blanco el día y/o el mes si no aplican.
+                    </hint>
+                    <required>Debe escribir por lo menos el año.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>pubplace</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lugar de publicación *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ciudad en la que es o fue publicado el ítem</hint>
+                    <required>Debe Ingresar el lugar de publicación del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>spage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Inicial *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página inicial del artículo en la revista</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>citation</dc-element>
+                    <dc-qualifier>epage</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Página Final *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Página final del artículo en la revista</hint>
+                    <required></required>
+                </field>
+            </page>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Descripción</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese cualquier otra descripción o comentarios. </hint>
+                    <required>Debe ingresar las descripción del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resumen (Abstract)</label>
+                    <input-type>textarea</input-type>
+                    <hint> Ingrese el resumen del ítem. </hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fuente</label>
+                    <input-type>onebox</input-type>
+                    <hint>Signatura topográfica o fuente de donde se extrajo el ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>bibliography</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Bibliografía en el documento</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese la tabla de bibliografía en el documento</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Idioma</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Seleccione el lenguaje del contenido principal del ítem. Si el idioma no aparece en la lista, 
+                        por favor seleccione 'Otro'. Si el contenido no tiene un idioma (por ejemplo si es una imagen) seleccione 'N/A'.
+                    </hint>
+                    <required>Debe seleccionar el lenguaje del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Materias/Palabras claves</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba las materias o palabras clave. </hint>
+                    <required>Debe escribir al menos 1 materia o palabra clave</required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>ddc</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Clasificación OLIB (Dewey)</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba el número de clasificación Dewey + Cutter. </hint>
+                    <required></required>
+                    <vocabulary>ddc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>faculty</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Facultad</label>
+                    <input-type value-pairs-name="common_faculties">dropdown</input-type>
+                    <hint>Ingrese la facultad que publica el ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>program</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Programa</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el programa académico al que pertenece el autor del ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>department</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Departamento</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el departamento al que pertenece el autor ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Seriada/Publicación No.</label>
+                    <input-type>series</input-type>
+                    <hint>Escriba el nombre del encabezado de la seriada y el número asignado a este ítem.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Relaciónes</label>
+                    <input-type value-pairs-name="common_relations">qualdrop_value</input-type>
+                    <hint>Ingrese los elementos relacionados con este ítem y la forma en que se relacionan.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>hasversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versión</label>
+                    <input-type value-pairs-name="common_relation_versions">dropdown</input-type>
+                    <hint>Ingrese la versión del documento</hint>
+                    <required>Debe ingresar la versión del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cobertura</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba la ubicación geográfica que corresponde al ítem.</hint>
+                    <required>Debe ingresar la cobertural del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Patrocinadores</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba los nombres de los patrocinadores y/o los códigos de financiación.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cita</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+        
+        <!-- Audiovisual items form -->
+        <form name="audiovisual">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Autor(es)*</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre del autor principal de este ítem</hint>
+                    <required>Debe ingresar al menos 1 autor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>creator</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Correo Autor(es)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Correo electrónico del autor</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Colaborador(es)</label>
+                    <input-type>name</input-type>
+                    <hint>Ingrese el nombre de los colaboradores de este ítem</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Título *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el títlo pricipal del ítem.</hint>
+                    <required>Debe ingresar el título del item</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título alternativo *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Si el ítem tiene títulos alternativos, por favor escríbalos.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (BDCOL)*</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier>spa</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Tipo (Español)*</label>
+                    <input-type value-pairs-name="common_types_spa">dropdown</input-type>
+                    <hint> Seleccione el(los) tipo(s) de contenido del ítem. Para seleccionar más de un tipo, mantenga presionada 
+                        la tecla "CTRL" o "Shift" mientras selecciona los tipos con el ratón.
+                    </hint>
+                    <required>Debe Ingresar el tipo de item que va a registrar</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>accessRights</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Acceso *</label>
+                    <input-type value-pairs-name="common_access_types">dropdown</input-type>
+                    <hint> Ingrese la información de acceso. </hint>
+                    <required>Debe Ingresar la información de acceso.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Formato *</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el fortato del archivo puede usar la siguiente url como ayuda: &lt;a href="http://www.iana.org/assignments/media-types/" target="_blank"&gt; http://www.iana.org/assignments/media-types/ &lt;/a&gt;</hint>
+                    <required>Debe ingresar el fortato del archivo</required>
+                </field>       
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>extent</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Extensión</label>
+                    <input-type>onebox</input-type>
+                    <hint> Ingrese el número de páginas o rango del documento, si es audio o video ingrese la duración duración en minutos</hint>
+                    <required>Debe ingresar la extensión del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>format</dc-element>
+                    <dc-qualifier>medium</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Medio</label>
+                    <input-type>onebox</input-type>
+                    <hint>Medio en el que es ingresado el ítem</hint>
+                    <required>Debe ingresar el medio del archivo</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Otros Identificadores</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>Si el ítem tiene algún número o código de identificación, por favor seleccione su tipo e ingréselo.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Fecha de publicación *</label>
+                    <input-type>date</input-type>
+                    <hint>Por favor ingrese la fecha de la publicación previa o la distribución pública del ítem.
+                        Puede dejar en blanco el día y/o el mes si no aplican.
+                    </hint>
+                    <required>Debe escribir por lo menos el año.</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>pubplace</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lugar de publicación *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ciudad en la que es o fue publicado el ítem</hint>
+                    <required>Debe Ingresar el lugar de publicación del ítem</required>
+                </field>
+            </page>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Descripción</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ingrese cualquier otra descripción o comentarios. </hint>
+                    <required>Debe ingresar las descripción del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Resumen (Abstract)</label>
+                    <input-type>textarea</input-type>
+                    <hint> Ingrese el resumen del ítem. </hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fuente</label>
+                    <input-type>onebox</input-type>
+                    <hint>Signatura topográfica o fuente de donde se extrajo el ítem</hint>
+                    <required></required>
+                </field>
+                                                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Idioma</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Seleccione el lenguaje del contenido principal del ítem. Si el idioma no aparece en la lista, 
+                        por favor seleccione 'Otro'. Si el contenido no tiene un idioma (por ejemplo si es una imagen) seleccione 'N/A'.
+                    </hint>
+                    <required>Debe seleccionar el lenguaje del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Materias/Palabras claves</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba las materias o palabras clave. </hint>
+                    <required>Debe escribir al menos 1 materia o palabra clave</required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>ddc</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Clasificación OLIB (Dewey)</label>
+                    <input-type>twobox</input-type>
+                    <hint> Escriba el número de clasificación Dewey + Cutter. </hint>
+                    <required></required>
+                    <vocabulary>ddc</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Editorial/Editor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Escriba el nombre de la editorial o el editor de la publicación previa de este ítem.</hint>
+                    <required>Debe escribir la Editorial/Editor</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>faculty</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Facultad</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la facultad que publica el ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>faculty</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Facultad</label>
+                    <input-type value-pairs-name="common_faculties">dropdown</input-type>
+                    <hint>Ingrese la facultad que publica el ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>program</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Programa</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el programa académico al que pertenece el autor del ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier>department</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Departamento</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el departamento al que pertenece el autor ítem</hint>
+                    <required></required>                    
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Seriada/Publicación No.</label>
+                    <input-type>series</input-type>
+                    <hint>Escriba el nombre del encabezado de la seriada y el número asignado a este ítem.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Relaciónes</label>
+                    <input-type value-pairs-name="common_relations">qualdrop_value</input-type>
+                    <hint>Ingrese los elementos relacionados con este ítem y la forma en que se relacionan.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>hasversion</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versión</label>
+                    <input-type value-pairs-name="common_relation_versions">dropdown</input-type>
+                    <hint>Ingrese la versión del documento</hint>
+                    <required>Debe ingresar la versión del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cobertura</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba la ubicación geográfica que corresponde al ítem.</hint>
+                    <required>Debe ingresar la cobertural del ítem</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Patrocinadores</label>
+                    <input-type>textarea</input-type>
+                    <hint>Escriba los nombres de los patrocinadores y/o los códigos de financiación.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Cita</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
 
-   <form name="traditional">
-     <page number="1">
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>author</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Authors</label>
-         <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item below.</hint>
-         <required></required>
-       </field>
+        <!-- DSpace default form (it is not used) -->
+        <form name="traditional">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Authors</label>
+                    <input-type>name</input-type>
+                    <hint>Enter the names of the authors of this item below.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Title</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the main title of the item.</hint>
-         <required>You must enter a main title for this item.</required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required>You must enter a main title for this item.</required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier>alternative</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Other Titles</label>
-         <input-type>onebox</input-type>
-         <hint>If the item has any alternative titles, please enter them below.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Other Titles</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has any alternative titles, please enter them below.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>date</dc-element>
-         <dc-qualifier>issued</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Date of Issue</label>
-         <input-type>date</input-type>
-         <hint>Please give the date of previous publication or public distribution
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Date of Issue</label>
+                    <input-type>date</input-type>
+                    <hint>Please give the date of previous publication or public distribution
                         below.  You can leave out the day and/or month if they aren't
                         applicable.</hint>
-         <required>You must enter at least the year.</required>
-       </field>
+                    <required>You must enter at least the year.</required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>publisher</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Publisher</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publisher</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier>citation</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Citation</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the standard citation for the previously issued instance of this item.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Citation</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>relation</dc-element>
-         <dc-qualifier>ispartofseries</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Series/Report No.</label>
-         <input-type>series</input-type>
-         <hint>Enter the series and number assigned to this item by your community.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Series/Report No.</label>
+                    <input-type>series</input-type>
+                    <hint>Enter the series and number assigned to this item by your community.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
-         <repeatable>true</repeatable>
-         <label>Identifiers</label>
-         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-         <hint>If the item has any identification numbers or codes associated with
-it, please enter the types and the actual numbers or codes below.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Identifiers</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>If the item has any identification numbers or codes associated with
+                        it, please enter the types and the actual numbers or codes below.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>type</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Type</label>
-         <input-type value-pairs-name="common_types">dropdown</input-type>
-         <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>language</dc-element>
-         <dc-qualifier>iso</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Language</label>
-         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
-         <required></required>
-       </field>
-     </page>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+                    <required></required>
+                </field>
+            </page>
 
-     <page number="2">
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>subject</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <!-- An input-type of twobox MUST be marked as repeatable -->
-         <repeatable>true</repeatable>
-         <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
-         <hint>Enter appropriate subject keywords or phrases below. </hint>
-         <required></required>
-         <vocabulary>srsc</vocabulary>
-       </field>
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Subject Keywords</label>
+                    <input-type>twobox</input-type>
+                    <hint>Enter appropriate subject keywords or phrases below. </hint>
+                    <required></required>
+                    <vocabulary>srsc</vocabulary>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>abstract</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Abstract</label>
-         <input-type>textarea</input-type>
-         <hint>Enter the abstract of the item below. </hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Abstract</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter the abstract of the item below. </hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>sponsorship</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Sponsors</label>
-         <input-type>textarea</input-type>
-         <hint>Enter the names of any sponsors and/or funding codes in the box below. </hint>
-         <required></required>
-       </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sponsors</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter the names of any sponsors and/or funding codes in the box below. </hint>
+                    <required></required>
+                </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Description</label>
-         <input-type>textarea</input-type>
-         <hint>Enter any other description or comments in this box. </hint>
-         <required></required>
-       </field>
-     </page>
-   </form>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Description</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter any other description or comments in this box. </hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
 
-   <form name="one">
-     <page number="1">
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>author</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>One: Authors</label>
-         <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item below.</hint>
-         <required></required>
-       </field>
-      </page>
-    </form>
- </form-definitions>
+        <form name="one">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>One: Authors</label>
+                    <input-type>name</input-type>
+                    <hint>Enter the names of the authors of this item below.</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+    </form-definitions>
 
 
- <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
- <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
- <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
- <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
- <!-- Term this set of value-pairs applies.                                 -->
- <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
- <!--     language_iso-pairs. The name attribute matches a name             -->
- <!--     in the form-map, above.                                           -->
- <!-- A value-pair contains one 'pair' for each value displayed in the list -->
- <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
- <!-- element. A UI list displays the displayed-values, but the program     -->
- <!-- stores the associated stored-values in the database.                  -->
+    <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+    <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+    <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+    <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+    <!-- Term this set of value-pairs applies.                                 -->
+    <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+    <!--     language_iso-pairs. The name attribute matches a name             -->
+    <!--     in the form-map, above.                                           -->
+    <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+    <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+    <!-- element. A UI list displays the displayed-values, but the program     -->
+    <!-- stores the associated stored-values in the database.                  -->
 
- <form-value-pairs>
-   <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
-     <pair>
-       <displayed-value>ISSN</displayed-value>
-       <stored-value>issn</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Other</displayed-value>
-       <stored-value>other</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>ISMN</displayed-value>
-       <stored-value>ismn</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Gov't Doc #</displayed-value>
-       <stored-value>govdoc</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>URI</displayed-value>
-       <stored-value>uri</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>ISBN</displayed-value>
-       <stored-value>isbn</stored-value>
-     </pair>
-   </value-pairs>
+    <form-value-pairs>
+        <!-- Possible identifier types -->
+        <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+            <pair>
+                <displayed-value>Documento Gubernamental #</displayed-value>
+                <stored-value>govdoc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>DOI</displayed-value>
+                <stored-value>doi</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Identificador OLIB</displayed-value>
+                <stored-value>OLIB</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISBN</displayed-value>
+                <stored-value>isbn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISMN</displayed-value>
+                <stored-value>ismn</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>ISSN</displayed-value>
+                <stored-value>issn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>SICI</displayed-value>
+                <stored-value>sici</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>SLUG</displayed-value>
+                <stored-value>slug</stored-value>
+            </pair>     
+            <pair>
+                <displayed-value>URI</displayed-value>
+                <stored-value>uri</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Otro</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
 
-   <value-pairs value-pairs-name="common_types" dc-term="type">
-     <pair>
-       <displayed-value>Animation</displayed-value>
-       <stored-value>Animation</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Article</displayed-value>
-       <stored-value>Article</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Book</displayed-value>
-       <stored-value>Book</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Book chapter</displayed-value>
-       <stored-value>Book chapter</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Dataset</displayed-value>
-       <stored-value>Dataset</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Learning Object</displayed-value>
-       <stored-value>Learning Object</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Image</displayed-value>
-       <stored-value>Image</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Image, 3-D</displayed-value>
-       <stored-value>Image, 3-D</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Map</displayed-value>
-       <stored-value>Map</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Musical Score</displayed-value>
-       <stored-value>Musical Score</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Plan or blueprint</displayed-value>
-       <stored-value>Plan or blueprint</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Preprint</displayed-value>
-       <stored-value>Preprint</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Presentation</displayed-value>
-       <stored-value>Presentation</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Recording, acoustical</displayed-value>
-       <stored-value>Recording, acoustical</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Recording, musical</displayed-value>
-       <stored-value>Recording, musical</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Recording, oral</displayed-value>
-       <stored-value>Recording, oral</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Software</displayed-value>
-       <stored-value>Software</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Technical Report</displayed-value>
-       <stored-value>Technical Report</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Thesis</displayed-value>
-       <stored-value>Thesis</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Video</displayed-value>
-       <stored-value>Video</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Working Paper</displayed-value>
-       <stored-value>Working Paper</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Other</displayed-value>
-       <stored-value>Other</stored-value>
-     </pair>
-   </value-pairs>
+        <!-- type possible values -->
+        <value-pairs value-pairs-name="common_types" dc-term="type">
+            <pair>
+                <displayed-value>Anotación jurisprudencial</displayed-value>
+                <stored-value>annotation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Artículo</displayed-value>
+                <stored-value>article</stored-value>
+            </pair>                        
+            <pair>
+                <displayed-value>Capítulo de libro</displayed-value>
+                <stored-value>bookChapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Cartel de conferencia</displayed-value>
+                <stored-value>conferencePoster</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <stored-value>dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Diario</displayed-value>
+                <stored-value>newspaper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento de conferencia</displayed-value>
+                <stored-value>conferencePaper</stored-value>
+            </pair>            
+            <pair>
+                <displayed-value>Documento de trabajo</displayed-value>
+                <stored-value>workingPaper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento Institucional</displayed-value>
+                <stored-value>institutionalDocument</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento Histórico</displayed-value>
+                <stored-value>historicalDocument</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Imagen</displayed-value>
+                <stored-value>image</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Libro</displayed-value>
+                <stored-value>book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Mapa</displayed-value>
+                <stored-value>map</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Objeto de aprendizaje (LOM)</displayed-value>
+                <stored-value>learningObject</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Parte de Libro</displayed-value>
+                <stored-value>bookPart</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Patente</displayed-value>
+                <stored-value>patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Pre-impresión</displayed-value>
+                <stored-value>preprint</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Presentación</displayed-value>
+                <stored-value>presentation</stored-value>
+            </pair>     
+            <pair>
+                <displayed-value>Reporte</displayed-value>
+                <stored-value>report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Reporte técnico</displayed-value>
+                <stored-value>technicalReport</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Revisión</displayed-value>
+                <stored-value>review</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Revista</displayed-value>
+                <stored-value>journal</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Simulación</displayed-value>
+                <stored-value>simulation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Sonido</displayed-value>
+                <stored-value>sound</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tesis Doctoral</displayed-value>
+                <stored-value>doctoralThesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tesis Maestría</displayed-value>
+                <stored-value>masterThesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Trabajo de Grado</displayed-value>
+                <stored-value>bachelorThesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Video</displayed-value>
+                <stored-value>video</stored-value>
+            </pair>     
+            <pair>
+                <displayed-value>Otro</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
+        
+        <!-- type.spa possible values -->
+        <value-pairs value-pairs-name="common_types_spa" dc-term="type.spa">
+            <pair>
+                <displayed-value>Anotación jurisprudencial</displayed-value>
+                <stored-value>Anotación jurisprudencial</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Artículo</displayed-value>
+                <stored-value>Artículo</stored-value>
+            </pair>                        
+            <pair>
+                <displayed-value>Capítulo de libro</displayed-value>
+                <stored-value>Capítulo de libro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Cartel de conferencia</displayed-value>
+                <stored-value>Cartel de conferencia</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Diario</displayed-value>
+                <stored-value>Diario</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento de conferencia</displayed-value>
+                <stored-value>Documento de conferencia</stored-value>
+            </pair>            
+            <pair>
+                <displayed-value>Documento de trabajo</displayed-value>
+                <stored-value>Documento de trabajo</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento Institucional</displayed-value>
+                <stored-value>Documento Institucional</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Documento Histórico</displayed-value>
+                <stored-value>Documento Histórico</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Imagen</displayed-value>
+                <stored-value>Imagen</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Libro</displayed-value>
+                <stored-value>Libro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Mapa</displayed-value>
+                <stored-value>Mapa</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Objeto de aprendizaje (LOM)</displayed-value>
+                <stored-value>Objeto de aprendizaje (LOM)</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Parte de Libro</displayed-value>
+                <stored-value>Parte de Libro</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Patente</displayed-value>
+                <stored-value>Patente</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Pre-impresión</displayed-value>
+                <stored-value>Pre-impresión</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Presentación</displayed-value>
+                <stored-value>Presentación</stored-value>
+            </pair>     
+            <pair>
+                <displayed-value>Reporte</displayed-value>
+                <stored-value>Reporte</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Reporte técnico</displayed-value>
+                <stored-value>Reporte técnico</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Revisión</displayed-value>
+                <stored-value>Revisión</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Revista</displayed-value>
+                <stored-value>Revista</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Simulación</displayed-value>
+                <stored-value>Simulación</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Sonido</displayed-value>
+                <stored-value>Sonido</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tesis Doctoral</displayed-value>
+                <stored-value>Tesis Doctoral</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tesis Maestría</displayed-value>
+                <stored-value>Tesis Maestría</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Trabajo de Grado</displayed-value>
+                <stored-value>Trabajo de Grado</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Video</displayed-value>
+                <stored-value>Video</stored-value>
+            </pair>     
+            <pair>
+                <displayed-value>Otro</displayed-value>
+                <stored-value>Otro</stored-value>
+            </pair>
+        </value-pairs>
 
-   <!-- default language order: (from dspace 1.2.1)
-        "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
-     -->
-   <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
-     <pair>
-       <displayed-value>N/A</displayed-value>
-       <stored-value></stored-value>
-     </pair>
-     <pair>
-       <displayed-value>English (United States)</displayed-value>
-       <stored-value>en_US</stored-value>
-      </pair>
-     <pair>
-       <displayed-value>English</displayed-value>
-       <stored-value>en</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Spanish</displayed-value>
-       <stored-value>es</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>German</displayed-value>
-       <stored-value>de</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>French</displayed-value>
-       <stored-value>fr</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Italian</displayed-value>
-       <stored-value>it</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Japanese</displayed-value>
-       <stored-value>ja</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Chinese</displayed-value>
-       <stored-value>zh</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>(Other)</displayed-value>
-       <stored-value>other</stored-value>
-     </pair>
-   </value-pairs>
-
+        <!-- default language order: (from dspace 1.2.1)
+           "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
+        -->
+        <!-- Because of BDCOL (and driver) rules it must be used ISO_639-3 for language representation.
+            The order used here is based on our reposotory's items the nature.
+        -->
+        <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+            <pair>
+                <displayed-value>N/A</displayed-value>
+                <stored-value></stored-value>
+            </pair>            
+            <pair>
+                <displayed-value>Inglés</displayed-value>
+                <stored-value>eng</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Español</displayed-value>
+                <stored-value>spa</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Alemán</displayed-value>
+                <stored-value>deu</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Francés</displayed-value>
+                <stored-value>fra</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Italiano</displayed-value>
+                <stored-value>ita</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Japones</displayed-value>
+                <stored-value>jpn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Chino/Mandarin</displayed-value>
+                <stored-value>cmn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>(Otro)</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
+        
+        <!-- rights.accessRights possible values -->
+        <value-pairs value-pairs-name="common_access_types" dc-term="rights.accessRights">
+            <pair>
+                <displayed-value>Acceso Abierto</displayed-value>
+                <stored-value>openAccess</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Restringido</displayed-value>
+                <stored-value>RestrictedAccess</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Embargo</displayed-value>
+                <stored-value>embargoedAccess</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Cerrado</displayed-value>
+                <stored-value>ClosedAccess</stored-value>
+            </pair> 
+        </value-pairs>
+        
+        <!-- relation.hasversion possible values -->
+        <value-pairs value-pairs-name="common_relation_versions" dc-term="relation.hasversion">
+            <pair>
+                <displayed-value>Trabajo en curso</displayed-value>
+                <stored-value>draft</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Enviado a una revista para revisión por pares</displayed-value>
+                <stored-value>submittedVersion</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Aceptada para publicación</displayed-value>
+                <stored-value>acceptedVersion</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Publicada</displayed-value>
+                <stored-value>publishedVersion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Actualizada desde la publicación</displayed-value>
+                <stored-value>updatedVersion</stored-value>
+            </pair>            
+        </value-pairs>
+        
+        <!-- Possible relations -->
+        <value-pairs value-pairs-name="common_relations" dc-term="relation">
+            <pair>
+                <displayed-value>Basado en</displayed-value>
+                <stored-value>isbasedon</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>Es formato de</displayed-value>
+                <stored-value>isformatof</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Es parte de</displayed-value>
+                <stored-value>ispartof</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Es referenciado por</displayed-value>
+                <stored-value>isreferencedby</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Fue reemplzado por</displayed-value>
+                <stored-value>isreplacedby</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Es versión de </displayed-value>
+                <stored-value>isversionof</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Reemplaza a</displayed-value>
+                <stored-value>replaces</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Requiere</displayed-value>
+                <stored-value>requires</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tiene parte de</displayed-value>
+                <stored-value>haspart</stored-value>
+            </pair> 
+            <pair>
+                <displayed-value>URL</displayed-value>
+                <stored-value>uri</stored-value>
+            </pair>
+        </value-pairs>
+        
+        <!-- Possible publisher.faculty values-->
+        <value-pairs value-pairs-name="common_faculties" dc-term="relation">
+            <pair>
+                <displayed-value>Facultad de Ciencias Administrativas y Económicas</displayed-value>
+                <stored-value>Facultad de Ciencias Administrativas y Económicas</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Facultad de Ingeniería</displayed-value>
+                <stored-value>Facultad de Ingeniería</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Facultad de Derecho y Ciencias Sociales</displayed-value>
+                <stored-value>Facultad de Derecho y Ciencias Sociales</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Facultad de Ciencias Naturales</displayed-value>
+                <stored-value>Facultad de Ciencias Naturales</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Facultad de Ciencias de la Salud</displayed-value>
+                <stored-value>Facultad de Ciencias de la Salud</stored-value>
+            </pair>
+        </value-pairs>
     </form-value-pairs>
 
 </input-forms>
