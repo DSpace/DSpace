@@ -694,7 +694,8 @@
                            </xsl:attribute>
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
-                                <xsl:text>themes/mobile/lib/images/default-thumbnail.png</xsl:text>
+                                <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'])"/>
+                                <xsl:text>/themes/mobile/lib/images/default-thumbnail.png</xsl:text>
                                 </xsl:attribute>
                             </img>
                         </a>
