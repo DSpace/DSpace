@@ -26,9 +26,7 @@
     </parent> -->
     
     <!--Force UTF-8 encoding during build on all platforms-->
-    <properties>
-		<lucene.version>3.5.0</lucene.version>
-		<solr.version>4.0.0</solr.version>
+    <properties>		
 		<!-- Warning hibernate core many pom point to 3.3.2.GA to be compliant with hibernate-annotation 3.4.0.GA (required by spring ORM 3.1.1.RELEASE)-->
 		<org.hibernate.version>3.6.10.Final</org.hibernate.version>
 		<org.jdyna.version>4.3-SNAPSHOT</org.jdyna.version>		
@@ -76,7 +74,7 @@
 				But, because of a Maven bug, we must force a specific version:
 				http://jira.codehaus.org/browse/MNG-2742
 				Once the bug is fixed, we should put open-ended range in dspace-pom -->
-                <version>2.1.1</version>
+                <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <archive>
@@ -112,7 +110,7 @@
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.9.0</version>
-             </plugin>
+             </plugin>           
           </plugins>
       </pluginManagement>
       <!-- These plugin settings only apply to this single POM and are not inherited
