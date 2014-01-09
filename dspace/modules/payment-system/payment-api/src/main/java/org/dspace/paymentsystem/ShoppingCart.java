@@ -421,13 +421,8 @@ public class ShoppingCart {
     public static ArrayList<ShoppingCart> findAllByEpeople(Context context, int epeopleId)
             throws SQLException
     {
-
-        String   s = "cart_id";
-
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM shoppingcart WHERE depositor = "+ epeopleId+ " ORDER BY "+s);
+                "SELECT * FROM shoppingcart WHERE depositor = "+ epeopleId+ " ORDER BY cart_id DESC");
 
         try
         {
@@ -469,11 +464,7 @@ public class ShoppingCart {
             throws SQLException
     {
 
-        String   s = "cart_id";
-
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.queryTable(context, "shoppingcart", "SELECT * FROM shoppingcart WHERE item = "+ itemId+ " ORDER BY "+s);
+        TableRowIterator rows = DatabaseManager.queryTable(context, "shoppingcart", "SELECT * FROM shoppingcart WHERE item = "+ itemId+ " ORDER BY cart_id DESC");
 
         try
         {
@@ -514,10 +505,6 @@ public class ShoppingCart {
             throws SQLException
     {
 
-        String   s = "cart_id";
-
-        // NOTE: The use of 's' in the order by clause can not cause an SQL
-        // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(context, "shoppingcart", "SELECT * FROM shoppingcart WHERE cart_id = "+ cartId+ "limit 1");
 
         try
@@ -672,7 +659,7 @@ public class ShoppingCart {
     {
 
         TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM shoppingcart order by cart_id");
+                "SELECT * FROM shoppingcart order by cart_id DESC");
 
         try
         {
@@ -720,7 +707,7 @@ public class ShoppingCart {
         String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
         queryBuf.append("SELECT * FROM shoppingcart WHERE cart_id = ? OR ");
-        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) OR LOWER(country) LIKE LOWER(?) ORDER BY cart_id ASC ");
+        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) OR LOWER(country) LIKE LOWER(?) ORDER BY cart_id DESC ");
 
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
