@@ -7,16 +7,15 @@ import static org.junit.Assert.*;
 import org.openqa.selenium.*;
 
 public class SubmissionFileTest {
-  private WebDriver driver;
-  private String baseUrl;
-  private String uploadFile;
-  private boolean acceptNextAlert = true;
-  private StringBuffer verificationErrors = new StringBuffer();
+    private WebDriver driver;
+    private String baseUrl = System.getProperty("selenium_test_url");
+    private String uploadFile;
+    private boolean acceptNextAlert = true;
+    private StringBuffer verificationErrors = new StringBuffer();
 
   @Before
   public void setUp() throws Exception {
     driver = new SilentHtmlUnitDriver();
-    baseUrl = "https://datadryad.org/";
     uploadFile = "/opt/dryad/config/workflow.xml";
     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
   }

@@ -16,7 +16,8 @@ import org.openqa.selenium.support.ui.Select;
 
 public class HomePageTest extends TestCase {
     private WebDriver driver;
-    private String baseUrl="http://datadryad.org";
+    
+    private String baseUrl = System.getProperty("selenium_test_url"); 
     private StringBuffer verificationErrors = new StringBuffer();
 
 
