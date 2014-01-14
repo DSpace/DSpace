@@ -35,17 +35,22 @@
       
 
 	    <!-- ********** Creators ************* -->
-            <xsl:if test="dspace:field[@element ='contributor' and @qualifier='author']">
-                <creators>
-                    <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
-                        <creator>
-                            <creatorName>
-                                <xsl:value-of select="."/>
-                            </creatorName>
-                        </creator>
-                    </xsl:for-each>
-                </creators>
-            </xsl:if>
+	    <creators>
+	        <xsl:choose>
+            <xsl:when test="dspace:field[@element ='contributor' and @qualifier='author']">
+                  <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
+                      <creator>
+                          <creatorName>
+                              <xsl:value-of select="."/>
+                          </creatorName>
+                      </creator>
+                  </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <creator><creatorName>(:unav)</creatorName></creator>
+            </xsl:otherwise>
+          </xsl:choose>
+      </creators>
 
 	    <!-- ********* Title *************** -->
             <xsl:if test="dspace:field[@element ='title']">
