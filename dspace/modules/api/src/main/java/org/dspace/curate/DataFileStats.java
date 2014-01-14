@@ -90,7 +90,7 @@ public class DataFileStats extends AbstractCurationTask {
 	log.info("initializing journal settings from property file " + journalPropFile);
         Properties properties = new Properties();
 	try {
-	    properties.load(new FileInputStream(journalPropFile));
+	    properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
 	    String journalTypes = properties.getProperty("journal.order");
 	    for (int i = 0; i < journalTypes.split(",").length; i++) {
 		String journalType = journalTypes.split(",")[i].trim();
