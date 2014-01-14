@@ -373,7 +373,7 @@
             <artifactId>poi-ooxml</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.java.dev.rome</groupId>
+            <groupId>rome</groupId>
             <artifactId>rome</artifactId>
         </dependency>
         <dependency>
