@@ -19,6 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.*;
 import java.sql.SQLException;
@@ -69,7 +70,7 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
         String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(journalPropFile));
+            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
             String journalTypes = properties.getProperty("journal.order");
 
             for (int i = 0; i < journalTypes.split(",").length; i++) {

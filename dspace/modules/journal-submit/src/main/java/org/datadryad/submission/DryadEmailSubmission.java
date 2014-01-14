@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -269,7 +270,7 @@ public class DryadEmailSubmission extends HttpServlet {
         // If we're running in the Jetty/Maven plugin we set properties here
         if ((propFileName = System.getProperty(PROPERTIES_PROPERTY)) != null) {
             try {
-                props.load(new FileReader(new File(propFileName)));
+                props.load(new InputStreamReader(new FileInputStream(propFileName), "UTF-8"));
             }
             catch (IOException details) {
                 throw new SubmissionException(details);
@@ -300,7 +301,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             try {
-                props.load(new FileReader(propFile));
+                props.load(new InputStreamReader(new FileInputStream(propFile), "UTF-8"));
             }
             catch (IOException details) {
                 throw new SubmissionException(details);

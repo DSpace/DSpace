@@ -34,6 +34,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -98,7 +99,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         Properties properties = new Properties();
 	
         try {
-            properties.load(new FileInputStream(journalPropFile));
+            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
             String journalTypes = properties.getProperty("journal.order");
             for (int i = 0; i < journalTypes.split(",").length; i++) {
                 String journalType = journalTypes.split(",")[i].trim();
