@@ -41,6 +41,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
@@ -227,6 +228,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                 queryResults.getResults().getNumFound() > 0) {
 
             SolrDocumentList solrResults = queryResults.getResults();
+            // Usage Logging
+            EventLogger.log(context, "search-results", "results-size=" + solrResults.size());
 
             if(solrResults.size()==1){
                 HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
@@ -247,6 +250,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                                 buildURL = baseURL+"/handle/"+item.getHandle();
                         }
                         if(buildURL!=null) {
+                            // Usage Logging
+                            EventLogger.log(context, "search-result-single", "redirect=" + buildURL);
                             httpResponse.sendRedirect(buildURL);
                             return;
                         }
@@ -394,6 +399,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         //DSpaceObject scope = getScope();
 
         int page = getParameterPage();
+        // Usage Logging
+        EventLogger.log(context, "search-query", "page=" + page + ",query=" + query);
 
         List<String> filterQueries = new ArrayList<String>();
         //remove the old collection and community filter so we can use solr to collect all the collection information
