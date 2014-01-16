@@ -17,6 +17,7 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowEmailManager;
 import org.dspace.workflow.WorkflowManager;
 
 /**
@@ -43,9 +44,18 @@ public class RegisterPendingPublicationAction extends ProcessingAction{
             for (Item dataFile : dataFiles) {
                 service.register(c, dataFile);
             }
+            notifyOfBlackout(c, wfi);
         } catch (IdentifierException e) {
             throw new IOException(e);
         }
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_REGISTERED);
+    }
+
+    private void notifyOfBlackout(Context c, WorkflowItem wfi) {
+        try {
+            WorkflowEmailManager.notifyOfBlackout(c, wfi.getItem());
+        } catch (Exception e) {
+            log.error("Problem with notification on send to blackout", e);
+        }
     }
 }
