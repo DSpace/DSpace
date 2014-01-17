@@ -1,4 +1,3 @@
-
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
     var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
@@ -370,7 +369,7 @@ function updateOrder(){
             jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
             jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
             jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);;
+            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
             if(obj.voucher=='')
             {
                 jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();

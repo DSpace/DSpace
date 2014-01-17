@@ -2478,6 +2478,11 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
     width:100% !important;
 }
 
+/* add style for shopping cart in checkout page*/
+
+ul#aspect_submission_submit_CheckoutStep_list_transaction{
+    display: none;
+}
 #unknown-doi-panel span.field-help{
     color:black !important;
 }
