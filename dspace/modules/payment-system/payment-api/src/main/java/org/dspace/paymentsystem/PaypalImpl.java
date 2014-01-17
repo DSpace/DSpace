@@ -451,7 +451,7 @@ public class PaypalImpl implements PaypalService{
         }
         if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
         {
-            finDiv.addPara("data-label", "bold").addContent("Your card has been charged.");
+            finDiv.addPara("data-label", "bold").addContent("You have already paid for this submission.");
         }
         else if(shoppingCart.getTotal()==0)
         {
