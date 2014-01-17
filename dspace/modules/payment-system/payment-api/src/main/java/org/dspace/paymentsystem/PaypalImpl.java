@@ -88,10 +88,12 @@ public class PaypalImpl implements PaypalService{
             get.addParameter("TENDER", "C");
             get.addParameter("TRXTYPE", type);
             if(type.equals("S")){
+                //generate reauthorization form
                 get.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
             }
             else
             {
+                //generate reference transaction form for a later charge
                 get.addParameter("AMT", "0.00");
             }
             //TODO:add currency from shopping cart
@@ -140,6 +142,10 @@ public class PaypalImpl implements PaypalService{
         try{
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
+            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)){
+                //this shopping cart has already been charged
+                return true;
+            }
             Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
 
 	    // check whether we're using the special voucher that simulates "payment failed"
@@ -307,6 +313,13 @@ public class PaypalImpl implements PaypalService{
             log.debug("transaction id absent, cannot change card");
             return false;
         }
+        if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
+        {
+
+            //all ready changed
+            return true;
+        }
+
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
         try {
 
@@ -490,6 +503,13 @@ public class PaypalImpl implements PaypalService{
             String previous_email = request.getParameter("login_email");
             EPerson eperson = EPerson.findByEmail(context,previous_email);
             ShoppingCart shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
+            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
+            {
+                  //shopping cart already paid, not need to generate a form
+                paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
+            }
+            else{
+
             VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
             String voucherCode = "";
             if(request.getParameter("submit-voucher")!=null)
@@ -542,7 +562,7 @@ public class PaypalImpl implements PaypalService{
 
             }
 
-
+            }
         }catch (Exception e)
         {
             //TODO: handle the exceptions
