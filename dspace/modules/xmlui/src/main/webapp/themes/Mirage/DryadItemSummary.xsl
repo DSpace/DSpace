@@ -889,21 +889,17 @@
                         <xsl:when test="$treebase_url!=''">
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:call-template name="checkURL">
-                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                    </xsl:call-template>
+                                  <xsl:value-of select="$treebase_url"/>
                                 </xsl:attribute>
-                                <xsl:value-of select="$treebase_url"/>
+                              <xsl:value-of select="$treebase_url"/>
                             </a>
                         </xsl:when>
                         <xsl:when test="$knb_url!=''">
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:call-template name="checkURL">
-                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                    </xsl:call-template>
+                                  <xsl:value-of select="$knb_url"/>
                                 </xsl:attribute>
-                                <xsl:value-of select="$knb_url"/>
+                              <xsl:value-of select="$knb_url"/>
                             </a>
                         </xsl:when>
                         <xsl:when test="$my_doi">
