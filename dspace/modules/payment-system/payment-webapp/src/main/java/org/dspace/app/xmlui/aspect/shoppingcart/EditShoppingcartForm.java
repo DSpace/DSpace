@@ -14,6 +14,7 @@ import java.util.Properties;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -28,8 +29,11 @@ import org.dspace.paymentsystem.*;
 import org.dspace.utils.DSpace;
 
 
+
 public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 {
+    private static final Logger log = Logger.getLogger(EditShoppingcartForm.class);
+    
     /** Language Strings */
     private static final Message T_dspace_home =
             message("xmlui.general.dspace_home");
@@ -127,6 +131,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             for (String error : errorString.split(","))
             {
                 errors.add(error);
+                log.debug("Error listed in parameter: " + error);
             }
         }
 
