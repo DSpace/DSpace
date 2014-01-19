@@ -18,7 +18,7 @@
         <root.basedir>${basedir}/..</root.basedir>
         <spring.version>3.2.3.RELEASE</spring.version>
         <xoai.version>3.2.5</xoai.version>
-        <jtwig.version>1.0.2</jtwig.version>
+        <jtwig.version>2.0.0</jtwig.version>
     </properties>
 
     <build>
@@ -114,7 +114,7 @@
         <!-- Templating Engine -->
         <dependency>
             <groupId>com.lyncode</groupId>
-            <artifactId>jtwig</artifactId>
+            <artifactId>jtwig-spring</artifactId>
             <version>${jtwig.version}</version>
         </dependency>
 
