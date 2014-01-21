@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -80,6 +81,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
+        EventLogger.log(context, "submission-describe-dataset", "button_pressed=" + buttonPressed);
 
         // get the item and current page
         Item item = subInfo.getSubmissionItem().getItem();
@@ -88,6 +90,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
 
         // CANCEL: remove dataFile and redirect to the Overview Step...
         if(buttonPressed.equals("submit_cancel")){
+            EventLogger.log(context, "submission-describe-dataset", "status=cancelled");
             Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
             WorkspaceItem wi = WorkspaceItem.findByItem(context, publication);
             ((WorkspaceItem)subInfo.getSubmissionItem()).deleteAll();
@@ -299,9 +302,14 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                     datasetFileSuccess = processUploadFile(context, request, subInfo, "dataset-file", false);
                 }
                 else
-                if("identifier".equals(request.getParameter("datafile_type")))
+                if("identifier".equals(request.getParameter("datafile_type"))) {
                     datasetFileSuccess = processExternalUrl(request, subInfo);
-                else
+                    if(datasetFileSuccess == FILE_UPLOAD_OK) {
+                        EventLogger.log(context, "submission-describe-dataset", "subaction=external_file");
+                    } else {
+                        EventLogger.log(context, "submission-describe-dataset", "subaction=external_file,error=external_failed");
+                    }
+                } else
                     //We are not uploading anything
                     datasetFileSuccess = FILE_UPLOAD_OK;
             }else
@@ -327,18 +335,22 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
 
         if (moreInput)
         {
+            EventLogger.log(context, "submission-describe-dataset", "error=more_input_requested");
             return STATUS_MORE_INPUT_REQUESTED;
         }
         // if one or more fields errored out, return
         else if (getErrorFields(request) != null && getErrorFields(request).size() > 0)
         {
+            EventLogger.log(context, "submission-describe-dataset", "error=missing_requred_fields");
             return STATUS_MISSING_REQUIRED_FIELDS;
         }
         else if(Util.getBoolParameter(request, "processonly")){
+            EventLogger.log(context, "submission-describe-dataset", "status=uploading_file");
             return STATUS_FILE_UPLOAD_ONLY;
         }
         
         // completed without errors
+        EventLogger.log(context, "submission-describe-dataset", "status=complete");
         return STATUS_COMPLETE;
     }
 
@@ -429,8 +441,10 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
 
                 // if information wasn't passed by User Interface, we had a problem
                 // with the upload
-                if (filePath == null || fileInputStream == null)
+                if (filePath == null || fileInputStream == null) {
+                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=missing_file");
                     return FILE_UPLOAD_ERROR;
+                }
 
                 if (subInfo != null) {
                     // Create the bitstream
@@ -505,6 +519,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                 else {
                     // In any event, if we don't have the submission info, the request
                     // was malformed
+                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=malformed_request");
                     return FILE_UPLOAD_ERROR;
                 }
 
@@ -516,6 +531,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
                     // save this bitstream to the submission info, as the
                     // bitstream we're currently working with
                     subInfo.setBitstream(b);
+                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,size=" + b.getSize() + ",status=uploaded");
 
                     return FILE_UPLOAD_OK;
                     //if format was not identified
@@ -526,6 +542,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
 //                    }
                 } else {
                     // if we get here there was a problem uploading the file!
+                    EventLogger.log(context, "submission-describe-dataset", "subaction=file_upload,error=unknown");
                     return FILE_UPLOAD_ERROR;
                 }
             }//end if attribute ends with "-path"
