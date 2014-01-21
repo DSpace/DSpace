@@ -185,7 +185,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     public Double calculateShoppingCartTotal(Context context,ShoppingCart shoppingcart,String journal) throws SQLException{
-
+        log.debug("recalculating shopping cart total");
 
         Double price = new Double(0);
 
@@ -206,7 +206,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
-
         Item item =Item.find(context, shoppingcart.getItem());
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
         Long allowedSizeT=PaymentSystemConfigurationManager.getMaxFileSize();
@@ -274,7 +273,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     public double getNoIntegrateFee(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
-
         Double totalPrice = new Double(0);
         if(journal==null){
             Item item = Item.find(context,shoppingcart.getItem()) ;
@@ -334,10 +332,14 @@ public class PaymentSystemImpl implements PaymentSystemService {
             Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
+                log.debug("subscription has been paid by journal/country/voucher");
                 return true;
             }
+
+            log.debug("submitter is responsible for payment");
             return false;
         }
+
     public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
         Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
@@ -354,10 +356,12 @@ public class PaymentSystemImpl implements PaymentSystemService {
         }
         return ShoppingCart.NO_WAIVER;
     }
+    
     public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Properties countryArray = manager.getAllCountryProperty();
-        if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0)
+
+        if(shoppingCart.getCountry() != null && shoppingCart.getCountry().length()>0)
         {
             return countryArray.get(shoppingCart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
         }
