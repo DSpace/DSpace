@@ -80,10 +80,10 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 
 		String baseURL = contextPath + "/admin/community?administrative-continue=" + knot.getId();
 
-	    String short_description_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("short_description"));
-	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("introductory_text"));
-	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("copyright_text"));
-	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("side_bar_text"));
+	    String short_description_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadataSingleValue("short_description"));
+	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadataSingleValue("introductory_text"));
+	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadataSingleValue("copyright_text"));
+	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadataSingleValue("side_bar_text"));
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
@@ -101,12 +101,12 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
-	    name.setValue(thisCommunity.getMetadata("name"));
+	    name.setValue(thisCommunity.getMetadataSingleValue("name"));
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);
 	    Text short_description = metadataList.addItem().addText("short_description");
-	    short_description.setValue(thisCommunity.getMetadata("short_description"));
+	    short_description.setValue(thisCommunity.getMetadataSingleValue("short_description"));
 	    short_description.setSize(40);
 	    if (short_description_error != null)
         {
@@ -116,7 +116,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
-	    introductory_text.setValue(thisCommunity.getMetadata("introductory_text"));
+	    introductory_text.setValue(thisCommunity.getMetadataSingleValue("introductory_text"));
 	    introductory_text.setSize(6, 40);
 	    if (introductory_text_error != null)
         {
@@ -126,7 +126,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
-	    copyright_text.setValue(thisCommunity.getMetadata("copyright_text"));
+	    copyright_text.setValue(thisCommunity.getMetadataSingleValue("copyright_text"));
 	    copyright_text.setSize(6, 40);
 	    if (copyright_text_error != null)
         {
@@ -136,7 +136,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
-	    side_bar_text.setValue(thisCommunity.getMetadata("side_bar_text"));
+	    side_bar_text.setValue(thisCommunity.getMetadataSingleValue("side_bar_text"));
 	    side_bar_text.setSize(6, 40);
 	    if (side_bar_text_error != null)
         {

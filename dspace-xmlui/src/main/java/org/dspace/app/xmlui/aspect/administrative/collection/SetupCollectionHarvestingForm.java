@@ -143,7 +143,7 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-harvesting-setup",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getMetadata("name")));   
+	    main.setHead(T_main_head.parameterize(thisCollection.getMetadataSingleValue("name")));   
 	    
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);

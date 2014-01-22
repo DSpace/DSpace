@@ -230,7 +230,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 String url = contextPath+"/submit?workspaceID="+workspaceItemID;
                 String submitterName = submitterEPerson.getFullName();
                 String submitterEmail = submitterEPerson.getEmail();
-                String collectionName = workspaceItem.getCollection().getMetadata("name");
+                String collectionName = workspaceItem.getCollection().getMetadataSingleValue("name");
 
                 Row row = table.addRow(Row.ROLE_DATA);
                 CheckBox remove = row.addCell().addCheckBox("workspaceID");
@@ -274,7 +274,7 @@ public class Submissions extends AbstractDSpaceTransformer
             String url = contextPath+"/submit?workspaceID="+workspaceItemID;
             String submitterName = submitterEPerson.getFullName();
             String submitterEmail = submitterEPerson.getEmail();
-            String collectionName = workspaceItem.getCollection().getMetadata("name");
+            String collectionName = workspaceItem.getCollection().getMetadataSingleValue("name");
 
             Row row = table.addRow(Row.ROLE_DATA);
             CheckBox selected = row.addCell().addCheckBox("workspaceID");
@@ -387,7 +387,7 @@ public class Submissions extends AbstractDSpaceTransformer
             String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
             String itemUrl = contextPath+"/handle/"+published.getHandle();
             DCValue[] titles = published.getMetadata("dc", "title", null, Item.ANY);
-            String collectionName = published.getOwningCollection().getMetadata("name");
+            String collectionName = published.getOwningCollection().getMetadataSingleValue("name");
             DCValue[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
 
             Row row = table.addRow();

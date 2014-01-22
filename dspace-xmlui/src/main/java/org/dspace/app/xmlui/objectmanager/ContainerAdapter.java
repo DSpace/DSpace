@@ -255,14 +255,14 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Collection collection = (Collection) dso;
                 
-                String description = collection.getMetadata("introductory_text");
-                String description_abstract = collection.getMetadata("short_description");
-                String description_table = collection.getMetadata("side_bar_text");
+                String description = collection.getMetadataSingleValue("introductory_text");
+                String description_abstract = collection.getMetadataSingleValue("short_description");
+                String description_table = collection.getMetadataSingleValue("side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
-                String provenance = collection.getMetadata("provenance_description");
-                String rights = collection.getMetadata("copyright_text");
-                String rights_license = collection.getMetadata("license");
-                String title = collection.getMetadata("name");
+                String provenance = collection.getMetadataSingleValue("provenance_description");
+                String rights = collection.getMetadataSingleValue("copyright_text");
+                String rights_license = collection.getMetadataSingleValue("license");
+                String title = collection.getMetadataSingleValue("name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);
@@ -292,12 +292,12 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Community community = (Community) dso;
                 
-                String description = community.getMetadata("introductory_text");
-                String description_abstract = community.getMetadata("short_description");
-                String description_table = community.getMetadata("side_bar_text");
+                String description = community.getMetadataSingleValue("introductory_text");
+                String description_abstract = community.getMetadataSingleValue("short_description");
+                String description_table = community.getMetadataSingleValue("side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
-                String rights = community.getMetadata("copyright_text");
-                String title = community.getMetadata("name");
+                String rights = community.getMetadataSingleValue("copyright_text");
+                String title = community.getMetadataSingleValue("name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);

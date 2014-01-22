@@ -106,7 +106,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			Collection owningCollection = item.getOwningCollection();
 			String owning = "unknown";
 			if (owningCollection != null)
-				owning = owningCollection.getMetadata("name");
+				owning = owningCollection.getMetadataSingleValue("name");
 			String author = "unknown";
 			DCValue[] dcCreators = item.getDC("creator",Item.ANY,Item.ANY);
 			if (dcCreators != null && dcCreators.length >= 1)

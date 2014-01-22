@@ -743,7 +743,7 @@ public class ItemTag extends TagSupport
                 out.print("/handle/");
                 out.print(collections[i].getHandle());
                 out.print("\">");
-                out.print(collections[i].getMetadata("name"));
+                out.print(collections[i].getMetadataSingleValue("name"));
                 out.print("</a><br/>");
             }
 

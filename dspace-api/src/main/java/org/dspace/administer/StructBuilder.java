@@ -433,34 +433,34 @@ public class StructBuilder
             element.setAttribute("identifier", community.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(community.getMetadata("name"));
+            nameElement.setText(community.getMetadataSingleValue("name"));
             element.addContent(nameElement);
             
-            if (community.getMetadata("short_description") != null)
+            if (community.getMetadataSingleValue("short_description") != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(community.getMetadata("short_description"));
+                descriptionElement.setText(community.getMetadataSingleValue("short_description"));
                 element.addContent(descriptionElement);
             }
             
-            if (community.getMetadata("introductory_text") != null)
+            if (community.getMetadataSingleValue("introductory_text") != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(community.getMetadata("introductory_text"));
+                introElement.setText(community.getMetadataSingleValue("introductory_text"));
                 element.addContent(introElement);
             }
             
-            if (community.getMetadata("copyright_text") != null)
+            if (community.getMetadataSingleValue("copyright_text") != null)
             {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(community.getMetadata("copyright_text"));
+                copyrightElement.setText(community.getMetadataSingleValue("copyright_text"));
                 element.addContent(copyrightElement);
             }
             
-            if (community.getMetadata("side_bar_text") != null)
+            if (community.getMetadataSingleValue("side_bar_text") != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(community.getMetadata("side_bar_text"));
+                sidebarElement.setText(community.getMetadataSingleValue("side_bar_text"));
                 element.addContent(sidebarElement);
             }
             
@@ -527,48 +527,48 @@ public class StructBuilder
             element.setAttribute("identifier", collection.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(collection.getMetadata("name"));
+            nameElement.setText(collection.getMetadataSingleValue("name"));
             element.addContent(nameElement);
             
-            if (collection.getMetadata("short_description") != null)
+            if (collection.getMetadataSingleValue("short_description") != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(collection.getMetadata("short_description"));
+                descriptionElement.setText(collection.getMetadataSingleValue("short_description"));
                 element.addContent(descriptionElement);
             }
             
-            if (collection.getMetadata("introductory_text") != null)
+            if (collection.getMetadataSingleValue("introductory_text") != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(collection.getMetadata("introductory_text"));
+                introElement.setText(collection.getMetadataSingleValue("introductory_text"));
                 element.addContent(introElement);
             }
             
-            if (collection.getMetadata("copyright_text") != null)
+            if (collection.getMetadataSingleValue("copyright_text") != null)
             {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(collection.getMetadata("copyright_text"));
+                copyrightElement.setText(collection.getMetadataSingleValue("copyright_text"));
                 element.addContent(copyrightElement);
             }
             
-            if (collection.getMetadata("side_bar_text") != null)
+            if (collection.getMetadataSingleValue("side_bar_text") != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(collection.getMetadata("side_bar_text"));
+                sidebarElement.setText(collection.getMetadataSingleValue("side_bar_text"));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadata("license") != null)
+            if (collection.getMetadataSingleValue("license") != null)
             {
                 Element sidebarElement = new Element("license");
-                sidebarElement.setText(collection.getMetadata("license"));
+                sidebarElement.setText(collection.getMetadataSingleValue("license"));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadata("provenance_description") != null)
+            if (collection.getMetadataSingleValue("provenance_description") != null)
             {
                 Element sidebarElement = new Element("provenance");
-                sidebarElement.setText(collection.getMetadata("provenance_description"));
+                sidebarElement.setText(collection.getMetadataSingleValue("provenance_description"));
                 element.addContent(sidebarElement);
             }
             

@@ -56,10 +56,10 @@ public class Community extends DSpaceObject{
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        this.setCopyrightText(community.getMetadata(org.dspace.content.Community.COPYRIGHT_TEXT));
-        this.setIntroductoryText(community.getMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT));
-        this.setShortDescription(community.getMetadata(org.dspace.content.Community.SHORT_DESCRIPTION));
-        this.setSidebarText(community.getMetadata(org.dspace.content.Community.SIDEBAR_TEXT));
+        this.setCopyrightText(community.getMetadataSingleValue(org.dspace.content.Community.COPYRIGHT_TEXT));
+        this.setIntroductoryText(community.getMetadataSingleValue(org.dspace.content.Community.INTRODUCTORY_TEXT));
+        this.setShortDescription(community.getMetadataSingleValue(org.dspace.content.Community.SHORT_DESCRIPTION));
+        this.setSidebarText(community.getMetadataSingleValue(org.dspace.content.Community.SIDEBAR_TEXT));
         this.setCountItems(community.countItems());
 
         if(expandFields.contains("parentCommunity") || expandFields.contains("all")) {

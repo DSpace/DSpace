@@ -55,13 +55,13 @@ import java.util.MissingResourceException;
 public class Collection extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Collection.class);
+    private static final Logger log = Logger.getLogger(Collection.class);
 
     /** Our context */
-    private Context ourContext;
+    private final Context ourContext;
 
     /** The table row corresponding to this item */
-    private TableRow collectionRow;
+    private final TableRow collectionRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -82,7 +82,7 @@ public class Collection extends DSpaceObject
      * Groups corresponding to workflow steps - NOTE these start from one, so
      * workflowGroups[0] corresponds to workflow_step_1.
      */
-    private Group[] workflowGroup;
+    private final Group[] workflowGroup;
 
     /** The default group of submitters */
     private Group submitters;
@@ -453,6 +453,7 @@ public class Collection extends DSpaceObject
      *
      * @return the internal identifier
      */
+    @Override
     public int getID()
     {
         return collectionRow.getIntColumn("collection_id");
@@ -461,6 +462,7 @@ public class Collection extends DSpaceObject
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
      */
+    @Override
     public String getHandle()
     {
         if(handle == null) {
@@ -485,7 +487,7 @@ public class Collection extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
-    public String getMetadata(String field)
+    public String getMetadataSingleValue(String field)
     {
     	String metadata = collectionRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
@@ -536,9 +538,10 @@ public class Collection extends DSpaceObject
         addDetails(field);
     }
 
+    @Override
     public String getName()
     {
-        return getMetadata("name");
+        return getMetadataSingleValue("name");
     }
 
     /**
@@ -851,7 +854,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicense()
     {
-        String license = getMetadata("license");
+        String license = getMetadataSingleValue("license");
 
         if (license == null || license.trim().equals(""))
         {
@@ -870,7 +873,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicenseCollection()
     {
-        return getMetadata("license");
+        return getMetadataSingleValue("license");
     }
 
     /**
@@ -880,7 +883,7 @@ public class Collection extends DSpaceObject
      */
     public boolean hasCustomLicense()
     {
-        String license = getMetadata("license");
+        String license = getMetadataSingleValue("license");
 
         return !( license == null || license.trim().equals("") );
     }
@@ -1048,6 +1051,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -1416,6 +1420,7 @@ public class Collection extends DSpaceObject
      *
      * @return int Constants.COLLECTION
      */
+    @Override
     public int getType()
     {
         return Constants.COLLECTION;
@@ -1512,6 +1517,7 @@ public class Collection extends DSpaceObject
         return itemcount;
      }
 
+    @Override
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;

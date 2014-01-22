@@ -506,7 +506,7 @@ public class ItemImport
                     }
 
                     System.out.println(owningPrefix + " Collection: "
-                            + mycollections[i].getMetadata("name"));
+                            + mycollections[i].getMetadataSingleValue("name"));
                 }
             } // end of validating collections
 

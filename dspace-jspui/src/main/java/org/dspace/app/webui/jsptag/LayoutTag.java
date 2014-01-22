@@ -192,7 +192,7 @@ public class LayoutTag extends BodyTagSupport
                 {
                     for (int i = 0; i < comms.length; i++)
                     {
-                        parents.add(comms[i].getMetadata("name"));
+                        parents.add(comms[i].getMetadataSingleValue("name"));
                         parentLinks.add("/handle/" + comms[i].getHandle());
                     }
                 }
@@ -220,13 +220,13 @@ public class LayoutTag extends BodyTagSupport
                 {
                     for (int i = 0; i < comms.length; i++)
                     {
-                        parents.add(comms[i].getMetadata("name"));
+                        parents.add(comms[i].getMetadataSingleValue("name"));
                         parentLinks.add("/handle/" + comms[i].getHandle());
                     }
 
                     if (col != null)
                     {
-                        parents.add(col.getMetadata("name"));
+                        parents.add(col.getMetadataSingleValue("name"));
                         parentLinks.add("/handle/" + col.getHandle());
                     }
                 }

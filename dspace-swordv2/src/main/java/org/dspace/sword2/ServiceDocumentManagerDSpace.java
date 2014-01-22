@@ -149,7 +149,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 			{
 				Community community = (Community) dso;
 				SwordWorkspace workspace = new SwordWorkspace();
-				workspace.setTitle(community.getMetadata("name"));
+				workspace.setTitle(community.getMetadataSingleValue("name"));
 
 				List<Collection> collections = swordAuth.getAllowedCollections(context, community);
 				for (Collection collection : collections)

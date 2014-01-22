@@ -58,10 +58,10 @@ public class Collection extends DSpaceObject {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        this.setCopyrightText(collection.getMetadata(org.dspace.content.Collection.COPYRIGHT_TEXT));
-        this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
-        this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
-        this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
+        this.setCopyrightText(collection.getMetadataSingleValue(org.dspace.content.Collection.COPYRIGHT_TEXT));
+        this.setIntroductoryText(collection.getMetadataSingleValue(org.dspace.content.Collection.INTRODUCTORY_TEXT));
+        this.setShortDescription(collection.getMetadataSingleValue(org.dspace.content.Collection.SHORT_DESCRIPTION));
+        this.setSidebarText(collection.getMetadataSingleValue(org.dspace.content.Collection.SIDEBAR_TEXT));
         
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();

@@ -1886,7 +1886,7 @@ public class Item extends DSpaceObject
 
         for (int i = 0; i < colls.length; i++)
         {
-            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
+            prov.append(colls[i].getMetadataSingleValue("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -1941,7 +1941,7 @@ public class Item extends DSpaceObject
 
         for (int i = 0; i < colls.length; i++)
         {
-            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
+            prov.append(colls[i].getMetadataSingleValue("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
         
         // Clear withdrawn flag

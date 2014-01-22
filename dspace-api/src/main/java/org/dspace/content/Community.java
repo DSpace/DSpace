@@ -47,13 +47,13 @@ import java.util.MissingResourceException;
 public class Community extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Community.class);
+    private static final Logger log = Logger.getLogger(Community.class);
 
     /** Our context */
-    private Context ourContext;
+    private final Context ourContext;
 
     /** The table row corresponding to this item */
-    private TableRow communityRow;
+    private final TableRow communityRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -358,6 +358,7 @@ public class Community extends DSpaceObject
      * 
      * @return the internal identifier
      */
+    @Override
     public int getID()
     {
         return communityRow.getIntColumn("community_id");
@@ -366,6 +367,7 @@ public class Community extends DSpaceObject
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
      */
+    @Override
     public String getHandle()
     {
         if(handle == null) {
@@ -390,7 +392,7 @@ public class Community extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
-    public String getMetadata(String field)
+    public String getMetadataSingleValue(String field)
     {
     	String metadata = communityRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
@@ -441,9 +443,10 @@ public class Community extends DSpaceObject
         addDetails(field);
     }
 
+    @Override
     public String getName()
     {
-        return getMetadata("name");
+        return getMetadataSingleValue("name");
     }
 
     /**
@@ -515,6 +518,7 @@ public class Community extends DSpaceObject
     /**
      * Update the community metadata (including logo) to the database.
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -1181,6 +1185,7 @@ public class Community extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same
      *         community as this object
      */
+    @Override
     public boolean equals(Object other)
     {
         if (!(other instanceof Community))
@@ -1191,6 +1196,7 @@ public class Community extends DSpaceObject
         return (getID() == ((Community) other).getID());
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder().append(getID()).toHashCode();
@@ -1218,6 +1224,7 @@ public class Community extends DSpaceObject
     /**
      * return type found in Constants
      */
+    @Override
     public int getType()
     {
         return Constants.COMMUNITY;
@@ -1287,6 +1294,7 @@ public class Community extends DSpaceObject
         return total;
     }
     
+    @Override
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
@@ -1318,6 +1326,7 @@ public class Community extends DSpaceObject
         return adminObject;
     }
     
+    @Override
     public DSpaceObject getParentObject() throws SQLException
     {
         Community pCommunity = getParentCommunity();

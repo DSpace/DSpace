@@ -47,7 +47,7 @@ public class FixDefaultPolicies
         {
             Collection t = collections[i];
 
-            System.out.println("Collection " + t + " " + t.getMetadata("name"));
+            System.out.println("Collection " + t + " " + t.getMetadataSingleValue("name"));
 
             // check for READ
             if (checkForPolicy(c, t, Constants.READ))
@@ -90,7 +90,7 @@ public class FixDefaultPolicies
         {
             Community t = communities[i];
 
-            System.out.println("Community " + t + " " + t.getMetadata("name"));
+            System.out.println("Community " + t + " " + t.getMetadataSingleValue("name"));
 
             // check for READ
             if (checkForPolicy(c, t, Constants.READ))

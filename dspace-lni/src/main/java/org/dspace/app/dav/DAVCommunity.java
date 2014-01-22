@@ -199,7 +199,7 @@ class DAVCommunity extends DAVDSpaceObject
     {
         try
         {
-            return this.community.getMetadata(mdname);
+            return this.community.getMetadataSingleValue(mdname);
         }
         catch (IllegalArgumentException e)
         {

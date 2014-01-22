@@ -334,12 +334,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     public void testGetMetadata()
     {
         //by default all empty values will return ""
-        assertThat("testGetMetadata 0",c.getMetadata("name"), equalTo(""));
-        assertThat("testGetMetadata 1",c.getMetadata("short_description"), equalTo(""));
-        assertThat("testGetMetadata 2",c.getMetadata("introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(""));
-        assertThat("testGetMetadata 4",c.getMetadata("copyright_text"), equalTo(""));
-        assertThat("testGetMetadata 5",c.getMetadata("side_bar_text"), equalTo(""));
+        assertThat("testGetMetadata 0",c.getMetadataSingleValue("name"), equalTo(""));
+        assertThat("testGetMetadata 1",c.getMetadataSingleValue("short_description"), equalTo(""));
+        assertThat("testGetMetadata 2",c.getMetadataSingleValue("introductory_text"), equalTo(""));
+        assertThat("testGetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(""));
+        assertThat("testGetMetadata 4",c.getMetadataSingleValue("copyright_text"), equalTo(""));
+        assertThat("testGetMetadata 5",c.getMetadataSingleValue("side_bar_text"), equalTo(""));
     }
 
     /**
@@ -362,12 +362,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         c.setMetadata("copyright_text", copy);
         c.setMetadata("side_bar_text", sidebar);
 
-        assertThat("testSetMetadata 0",c.getMetadata("name"), equalTo(name));
-        assertThat("testSetMetadata 1",c.getMetadata("short_description"), equalTo(sdesc));
-        assertThat("testSetMetadata 2",c.getMetadata("introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(logo));
-        assertThat("testSetMetadata 4",c.getMetadata("copyright_text"), equalTo(copy));
-        assertThat("testSetMetadata 5",c.getMetadata("side_bar_text"), equalTo(sidebar));
+        assertThat("testSetMetadata 0",c.getMetadataSingleValue("name"), equalTo(name));
+        assertThat("testSetMetadata 1",c.getMetadataSingleValue("short_description"), equalTo(sdesc));
+        assertThat("testSetMetadata 2",c.getMetadataSingleValue("introductory_text"), equalTo(itext));
+        assertThat("testSetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(logo));
+        assertThat("testSetMetadata 4",c.getMetadataSingleValue("copyright_text"), equalTo(copy));
+        assertThat("testSetMetadata 5",c.getMetadataSingleValue("side_bar_text"), equalTo(sidebar));
     }
 
     /**

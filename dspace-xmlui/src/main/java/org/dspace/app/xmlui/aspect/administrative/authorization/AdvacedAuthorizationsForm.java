@@ -185,9 +185,9 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         for (Collection collection : Collection.findAll(context))
         {
             if(wasElementSelected(collection.getID(), collectionIDs)){
-                collectionsSelect.addOption(true, collection.getID(), collection.getMetadata("name"));
+                collectionsSelect.addOption(true, collection.getID(), collection.getMetadataSingleValue("name"));
             }else{
-                collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+                collectionsSelect.addOption(false, collection.getID(), collection.getMetadataSingleValue("name"));
             }
         }
 

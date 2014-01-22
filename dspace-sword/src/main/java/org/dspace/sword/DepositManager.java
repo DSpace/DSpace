@@ -67,7 +67,7 @@ public class DepositManager
 		if (dso instanceof Collection)
 		{
 			swordService.message("Location resolves to collection with handle: " + dso.getHandle() +
-				" and name: " + ((Collection) dso).getMetadata("name"));
+				" and name: " + ((Collection) dso).getMetadataSingleValue("name"));
 		}
 		else if (dso instanceof Item)
 		{

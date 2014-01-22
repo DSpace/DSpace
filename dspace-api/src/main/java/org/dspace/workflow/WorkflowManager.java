@@ -765,7 +765,7 @@ public class WorkflowManager
 
             email.addRecipient(ep.getEmail());
             email.addArgument(title);
-            email.addArgument(coll.getMetadata("name"));
+            email.addArgument(coll.getMetadataSingleValue("name"));
             email.addArgument(HandleManager.getCanonicalForm(handle));
 
             email.send();
@@ -924,7 +924,7 @@ public class WorkflowManager
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
                                                                                   "flowtask_notify"));
                 email.addArgument(title);
-                email.addArgument(coll.getMetadata("name"));
+                email.addArgument(coll.getMetadataSingleValue("name"));
                 email.addArgument(submitter);
                 email.addArgument(taskName);
                 email.addArgument(message);
@@ -973,7 +973,7 @@ public class WorkflowManager
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
-                    email.addArgument(coll.getMetadata("name"));
+                    email.addArgument(coll.getMetadataSingleValue("name"));
                     email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
@@ -1034,7 +1034,7 @@ public class WorkflowManager
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);
-            email.addArgument(coll.getMetadata("name"));
+            email.addArgument(coll.getMetadataSingleValue("name"));
             email.addArgument(rejector);
             email.addArgument(reason);
             email.addArgument(getMyDSpaceLink());

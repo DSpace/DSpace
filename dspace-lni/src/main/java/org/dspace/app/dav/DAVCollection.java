@@ -258,7 +258,7 @@ class DAVCollection extends DAVDSpaceObject
     {
         try
         {
-            return this.collection.getMetadata(mdname);
+            return this.collection.getMetadataSingleValue(mdname);
         }
         catch (IllegalArgumentException e)
         {

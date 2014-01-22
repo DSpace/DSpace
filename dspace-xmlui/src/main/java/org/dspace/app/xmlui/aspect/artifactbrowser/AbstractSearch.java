@@ -243,13 +243,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             if (searchScope instanceof Community)
             {
                 Community community = (Community) searchScope;
-                String communityName = community.getMetadata("name");
+                String communityName = community.getMetadataSingleValue("name");
                 results.setHead(T_head1_community.parameterize(communityName));
             }
             else if (searchScope instanceof Collection)
             {
                 Collection collection = (Collection) searchScope;
-                String collectionName = collection.getMetadata("name");
+                String collectionName = collection.getMetadataSingleValue("name");
                 results.setHead(T_head1_collection.parameterize(collectionName));
             }
             else
@@ -367,7 +367,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             scope.setOptionSelected("/");
             for (Community community : Community.findAllTop(context))
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getMetadataSingleValue("name"));
             }
         }
         else if (scopeDSO instanceof Community)
@@ -376,12 +376,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(community.getHandle(),community.getMetadata("name"));
+            scope.addOption(community.getHandle(),community.getMetadataSingleValue("name"));
             scope.setOptionSelected(community.getHandle());
 
             for (Collection collection : community.getCollections())
             {
-                scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+                scope.addOption(collection.getHandle(),collection.getMetadataSingleValue("name"));
             }
         }
         else if (scopeDSO instanceof Collection)
@@ -389,14 +389,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+            scope.addOption(collection.getHandle(),collection.getMetadataSingleValue("name"));
             scope.setOptionSelected(collection.getHandle());
             
             Community[] communities = collection.getCommunities()[0]
                     .getAllParents();
             for (Community community : communities)
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getMetadataSingleValue("name"));
             }
         }
     }

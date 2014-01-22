@@ -315,7 +315,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI implements Co
 		this.verboseDescription.append("Performing deposit using deposit URL: " + depositUrl);
 
         this.verboseDescription.append("Location resolves to collection with handle: " + collection.getHandle() +
-					" and name: " + collection.getMetadata("name"));
+					" and name: " + collection.getMetadataSingleValue("name"));
 
 		return collection;
 	}
