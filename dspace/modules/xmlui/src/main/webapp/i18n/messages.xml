@@ -1011,7 +1011,7 @@
 		for another to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help">If you have reviewed the
-		item and it is suitable for archival, select 'Approve'.</message>
+		item and it is suitable for archiving, select 'Approve'.</message>
 	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve</message>
 	<message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.blackout_help">If you have reviewed the
 		item and it should be archived when the related publication becomes published, select 'Approve with Blackout'
