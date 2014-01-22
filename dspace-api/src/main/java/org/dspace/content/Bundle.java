@@ -40,13 +40,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Bundle extends DSpaceObject
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Bundle.class);
-
-    /** Our context */
-    private Context ourContext;
-
-    /** The table row corresponding to this bundle */
-    private TableRow bundleRow;
+    private static final Logger log = Logger.getLogger(Bundle.class);
 
     /** The bitstreams in this bundle */
     private List<Bitstream> bitstreams;
@@ -67,8 +61,7 @@ public class Bundle extends DSpaceObject
      */
     Bundle(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
-        bundleRow = row;
+        super(context, row);
         bitstreams = new ArrayList<Bitstream>();
         String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
         String bitstreamOrderingDirection   = ConfigurationManager.getProperty("webui.bitstream.order.direction");
@@ -96,7 +89,7 @@ public class Bundle extends DSpaceObject
         TableRowIterator tri = DatabaseManager.query(
                 ourContext,
                 query.toString(),
-                bundleRow.getIntColumn("bundle_id"));
+                ourRow.getIntColumn("bundle_id"));
 
         try
         {
@@ -211,9 +204,10 @@ public class Bundle extends DSpaceObject
      * 
      * @return the internal identifier
      */
+    @Override
     public int getID()
     {
-        return bundleRow.getIntColumn("bundle_id");
+        return ourRow.getIntColumn("bundle_id");
     }
 
     /**
@@ -221,9 +215,10 @@ public class Bundle extends DSpaceObject
      * 
      * @return name of the bundle (ORIGINAL, TEXT, THUMBNAIL) or NULL if not set
      */
+    @Override
     public String getName()
     {
-        return bundleRow.getStringColumn("name");
+        return ourRow.getStringColumn("name");
     }
 
     /**
@@ -235,7 +230,7 @@ public class Bundle extends DSpaceObject
      */
     public void setName(String name)
     {
-        bundleRow.setColumn("name", name);
+        ourRow.setColumn("name", name);
         modifiedMetadata = true;
     }
 
@@ -246,7 +241,7 @@ public class Bundle extends DSpaceObject
      */
     public int getPrimaryBitstreamID()
     {
-        return bundleRow.getIntColumn("primary_bitstream_id");
+        return ourRow.getIntColumn("primary_bitstream_id");
     }
 
     /**
@@ -257,7 +252,7 @@ public class Bundle extends DSpaceObject
      */
     public void setPrimaryBitstreamID(int bitstreamID)
     {
-        bundleRow.setColumn("primary_bitstream_id", bitstreamID);
+        ourRow.setColumn("primary_bitstream_id", bitstreamID);
         modified = true;
     }
 
@@ -266,9 +261,10 @@ public class Bundle extends DSpaceObject
      */
     public void unsetPrimaryBitstreamID()
     {
-    	bundleRow.setColumnNull("primary_bitstream_id");
+    	ourRow.setColumnNull("primary_bitstream_id");
     }
     
+    @Override
     public String getHandle()
     {
         // No Handles for bundles
@@ -330,7 +326,7 @@ public class Bundle extends DSpaceObject
                 "SELECT item.* FROM item, item2bundle WHERE " +
                 "item2bundle.item_id=item.item_id AND " +
                 "item2bundle.bundle_id= ? ",
-                bundleRow.getIntColumn("bundle_id"));
+                ourRow.getIntColumn("bundle_id"));
 
         try
         {
@@ -597,6 +593,7 @@ public class Bundle extends DSpaceObject
     /**
      * Update the bundle metadata
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -615,7 +612,7 @@ public class Bundle extends DSpaceObject
             modifiedMetadata = false;
         }
 
-        DatabaseManager.update(ourContext, bundleRow);
+        DatabaseManager.update(ourContext, ourRow);
     }
 
     /**
@@ -645,12 +642,13 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // Remove ourself
-        DatabaseManager.delete(ourContext, bundleRow);
+        DatabaseManager.delete(ourContext, ourRow);
     }
 
     /**
      * return type found in Constants
      */
+    @Override
     public int getType()
     {
         return Constants.BUNDLE;
@@ -737,6 +735,7 @@ public class Bundle extends DSpaceObject
         return list;
     }
     
+    @Override
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
@@ -798,6 +797,7 @@ public class Bundle extends DSpaceObject
         return adminObject;
     }
     
+    @Override
     public DSpaceObject getParentObject() throws SQLException
     {
         Item[] items = getItems();

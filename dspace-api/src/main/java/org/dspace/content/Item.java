@@ -70,12 +70,6 @@ public class Item extends DSpaceObject
     /** log4j category */
     private static final Logger log = Logger.getLogger(Item.class);
 
-    /** Our context */
-    private final Context ourContext;
-
-    /** The table row corresponding to this item */
-    private final TableRow itemRow;
-
     /** The e-person who submitted this item */
     private EPerson submitter;
 
@@ -111,8 +105,7 @@ public class Item extends DSpaceObject
      */
     Item(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
-        itemRow = row;
+        super(context, row);
         dublinCoreChanged = false;
         modified = false;
         clearDetails();
@@ -128,7 +121,7 @@ public class Item extends DSpaceObject
     {
         return DatabaseManager.queryTable(ourContext, "MetadataValue",
                 "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
-                itemRow.getIntColumn("item_id"));
+                ourRow.getIntColumn("item_id"));
     }
 
     /**
@@ -275,7 +268,7 @@ public class Item extends DSpaceObject
     @Override
     public int getID()
     {
-        return itemRow.getIntColumn("item_id");
+        return ourRow.getIntColumn("item_id");
     }
 
 
@@ -307,7 +300,7 @@ public class Item extends DSpaceObject
      */
     public boolean isArchived()
     {
-        return itemRow.getBooleanColumn("in_archive");
+        return ourRow.getBooleanColumn("in_archive");
     }
 
     /**
@@ -317,7 +310,7 @@ public class Item extends DSpaceObject
      */
     public boolean isWithdrawn()
     {
-        return itemRow.getBooleanColumn("withdrawn");
+        return ourRow.getBooleanColumn("withdrawn");
     }
 
     /**
@@ -327,7 +320,7 @@ public class Item extends DSpaceObject
      */
     public boolean isDiscoverable()
     {
-        return itemRow.getBooleanColumn("discoverable");
+        return ourRow.getBooleanColumn("discoverable");
     }
 
     /**
@@ -339,7 +332,7 @@ public class Item extends DSpaceObject
      */
     public Date getLastModified()
     {
-        Date myDate = itemRow.getDateColumn("last_modified");
+        Date myDate = ourRow.getDateColumn("last_modified");
 
         if (myDate == null)
         {
@@ -357,7 +350,7 @@ public class Item extends DSpaceObject
     {
         try {
             Date lastModified = new Timestamp(new Date().getTime());
-            itemRow.setColumn("last_modified", lastModified);
+            ourRow.setColumn("last_modified", lastModified);
             DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
             //Also fire a modified event since the item HAS been modified
             ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
@@ -375,7 +368,7 @@ public class Item extends DSpaceObject
      */
     public void setArchived(boolean isArchived)
     {
-        itemRow.setColumn("in_archive", isArchived);
+        ourRow.setColumn("in_archive", isArchived);
         modified = true;
     }
 
@@ -387,7 +380,7 @@ public class Item extends DSpaceObject
      */
     public void setDiscoverable(boolean discoverable)
     {
-        itemRow.setColumn("discoverable", discoverable);
+        ourRow.setColumn("discoverable", discoverable);
         modified = true;
     }
 
@@ -399,7 +392,7 @@ public class Item extends DSpaceObject
      */
     public void setOwningCollection(Collection c)
     {
-        itemRow.setColumn("owning_collection", c.getID());
+        ourRow.setColumn("owning_collection", c.getID());
         modified = true;
     }
 
@@ -414,7 +407,7 @@ public class Item extends DSpaceObject
         Collection myCollection = null;
 
         // get the collection ID
-        int cid = itemRow.getIntColumn("owning_collection");
+        int cid = ourRow.getIntColumn("owning_collection");
 
         myCollection = Collection.find(ourContext, cid);
 
@@ -424,7 +417,7 @@ public class Item extends DSpaceObject
         // just get the collection ID for internal use
     private int getOwningCollectionID()
     {
-        return itemRow.getIntColumn("owning_collection");
+        return ourRow.getIntColumn("owning_collection");
     }
 
     /**
@@ -1001,9 +994,9 @@ public class Item extends DSpaceObject
      */
     public EPerson getSubmitter() throws SQLException
     {
-        if (submitter == null && !itemRow.isColumnNull("submitter_id"))
+        if (submitter == null && !ourRow.isColumnNull("submitter_id"))
         {
-            submitter = EPerson.find(ourContext, itemRow
+            submitter = EPerson.find(ourContext, ourRow
                     .getIntColumn("submitter_id"));
         }
         return submitter;
@@ -1024,11 +1017,11 @@ public class Item extends DSpaceObject
 
         if (submitter != null)
         {
-            itemRow.setColumn("submitter_id", submitter.getID());
+            ourRow.setColumn("submitter_id", submitter.getID());
         }
         else
         {
-            itemRow.setColumnNull("submitter_id");
+            ourRow.setColumnNull("submitter_id");
         }
         modified = true;
     }
@@ -1045,7 +1038,7 @@ public class Item extends DSpaceObject
                 "SELECT COUNT(*) AS count" +
                 " FROM collection2item" +
                 " WHERE collection_id = ? AND item_id = ?",
-                collection.getID(), itemRow.getIntColumn("item_id"));
+                collection.getID(), ourRow.getIntColumn("item_id"));
         return tr.getLongColumn("count") > 0;
     }
 
@@ -1064,7 +1057,7 @@ public class Item extends DSpaceObject
                         "SELECT collection.* FROM collection, collection2item WHERE " +
                         "collection2item.collection_id=collection.collection_id AND " +
                         "collection2item.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
+                        ourRow.getIntColumn("item_id"));
 
         try
         {
@@ -1118,7 +1111,7 @@ public class Item extends DSpaceObject
                         "SELECT community.* FROM community, community2item " +
                         "WHERE community2item.community_id=community.community_id " +
                         "AND community2item.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
+                        ourRow.getIntColumn("item_id"));
 
         try
         {
@@ -1172,7 +1165,7 @@ public class Item extends DSpaceObject
                                         "SELECT bundle.* FROM bundle, item2bundle WHERE " +
                                         "item2bundle.bundle_id=bundle.bundle_id AND " +
                                         "item2bundle.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
+                        ourRow.getIntColumn("item_id"));
 
             try
             {
@@ -1786,26 +1779,26 @@ public class Item extends DSpaceObject
         if (dublinCoreChanged || modified)
         {
             // Set the last modified date
-            itemRow.setColumn("last_modified", new Date());
+            ourRow.setColumn("last_modified", new Date());
 
             // Make sure that withdrawn and in_archive are non-null
-            if (itemRow.isColumnNull("in_archive"))
+            if (ourRow.isColumnNull("in_archive"))
             {
-                itemRow.setColumn("in_archive", false);
+                ourRow.setColumn("in_archive", false);
             }
 
-            if (itemRow.isColumnNull("withdrawn"))
+            if (ourRow.isColumnNull("withdrawn"))
             {
-                itemRow.setColumn("withdrawn", false);
+                ourRow.setColumn("withdrawn", false);
             }
 
-            if (itemRow.isColumnNull("discoverable"))
+            if (ourRow.isColumnNull("discoverable"))
             {
-                itemRow.setColumn("discoverable", false);
+                ourRow.setColumn("discoverable", false);
             }
 
 
-            DatabaseManager.update(ourContext, itemRow);
+            DatabaseManager.update(ourContext, ourRow);
 
             if (dublinCoreChanged)
             {
@@ -1894,10 +1887,10 @@ public class Item extends DSpaceObject
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
-        itemRow.setColumn("withdrawn", true);
+        ourRow.setColumn("withdrawn", true);
 
         // in_archive flag is now false
-        itemRow.setColumn("in_archive", false);
+        ourRow.setColumn("in_archive", false);
 
         prov.append(InstallItem.getBitstreamProvenanceMessage(this));
 
@@ -1949,10 +1942,10 @@ public class Item extends DSpaceObject
         }
         
         // Clear withdrawn flag
-        itemRow.setColumn("withdrawn", false);
+        ourRow.setColumn("withdrawn", false);
 
         // in_archive flag is now true
-        itemRow.setColumn("in_archive", true);
+        ourRow.setColumn("in_archive", true);
 
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
@@ -2052,7 +2045,7 @@ public class Item extends DSpaceObject
 
 
         // Finally remove item row
-        DatabaseManager.delete(ourContext, itemRow);
+        DatabaseManager.delete(ourContext, ourRow);
     }
     
     private void removeVersion() throws AuthorizeException, SQLException
@@ -2137,7 +2130,7 @@ public class Item extends DSpaceObject
      public int hashCode()
      {
          int hash = 5;
-         hash = 71 * hash + (this.itemRow != null ? this.itemRow.hashCode() : 0);
+         hash = 71 * hash + (this.ourRow != null ? this.ourRow.hashCode() : 0);
          return hash;
      }
 
@@ -2153,7 +2146,7 @@ public class Item extends DSpaceObject
      */
     public boolean isOwningCollection(Collection c)
     {
-        int owner_id = itemRow.getIntColumn("owning_collection");
+        int owner_id = ourRow.getIntColumn("owning_collection");
 
         if (c.getID() == owner_id)
         {

@@ -57,12 +57,6 @@ public class Collection extends DSpaceObject
     /** log4j category */
     private static final Logger log = Logger.getLogger(Collection.class);
 
-    /** Our context */
-    private final Context ourContext;
-
-    /** The table row corresponding to this item */
-    private final TableRow collectionRow;
-
     /** The logo bitstream */
     private Bitstream logo;
 
@@ -108,28 +102,27 @@ public class Collection extends DSpaceObject
      */
     Collection(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
-        collectionRow = row;
+        super(context, row);
 
         // Get the logo bitstream
-        if (collectionRow.isColumnNull("logo_bitstream_id"))
+        if (ourRow.isColumnNull("logo_bitstream_id"))
         {
             logo = null;
         }
         else
         {
-            logo = Bitstream.find(ourContext, collectionRow
+            logo = Bitstream.find(ourContext, ourRow
                     .getIntColumn("logo_bitstream_id"));
         }
 
         // Get the template item
-        if (collectionRow.isColumnNull("template_item_id"))
+        if (ourRow.isColumnNull("template_item_id"))
         {
             template = null;
         }
         else
         {
-            template = Item.find(ourContext, collectionRow
+            template = Item.find(ourContext, ourRow
                     .getIntColumn("template_item_id"));
         }
 
@@ -456,7 +449,7 @@ public class Collection extends DSpaceObject
     @Override
     public int getID()
     {
-        return collectionRow.getIntColumn("collection_id");
+        return ourRow.getIntColumn("collection_id");
     }
 
     /**
@@ -489,7 +482,7 @@ public class Collection extends DSpaceObject
      */
     public String getMetadataSingleValue(String field)
     {
-    	String metadata = collectionRow.getStringColumn(field);
+    	String metadata = ourRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
     }
 
@@ -527,11 +520,11 @@ public class Collection extends DSpaceObject
          */
 		if(value == null)
         {
-            collectionRow.setColumnNull(field);
+            ourRow.setColumnNull(field);
         }
         else
         {
-            collectionRow.setColumn(field, value.trim());
+            ourRow.setColumn(field, value.trim());
         }
 
         modifiedMetadata = true;
@@ -584,14 +577,14 @@ public class Collection extends DSpaceObject
         }
 
         // First, delete any existing logo
-        if (!collectionRow.isColumnNull("logo_bitstream_id"))
+        if (!ourRow.isColumnNull("logo_bitstream_id"))
         {
             logo.delete();
         }
 
         if (is == null)
         {
-            collectionRow.setColumnNull("logo_bitstream_id");
+            ourRow.setColumnNull("logo_bitstream_id");
             logo = null;
 
             log.info(LogManager.getHeader(ourContext, "remove_logo",
@@ -600,7 +593,7 @@ public class Collection extends DSpaceObject
         else
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
-            collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
+            ourRow.setColumn("logo_bitstream_id", newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream
@@ -670,11 +663,11 @@ public class Collection extends DSpaceObject
 
         if (g == null)
         {
-            collectionRow.setColumnNull("workflow_step_" + step);
+            ourRow.setColumnNull("workflow_step_" + step);
         }
         else
         {
-            collectionRow.setColumn("workflow_step_" + step, g.getID());
+            ourRow.setColumn("workflow_step_" + step, g.getID());
         }
         modified = true;
     }
@@ -721,7 +714,7 @@ public class Collection extends DSpaceObject
         }
 
         // register this as the submitter group
-        collectionRow.setColumn("submitter", submitters.getID());
+        ourRow.setColumn("submitter", submitters.getID());
 
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
 
@@ -747,7 +740,7 @@ public class Collection extends DSpaceObject
         }
 
         // Remove the link to the collection table.
-        collectionRow.setColumnNull("submitter");
+        ourRow.setColumnNull("submitter");
         submitters = null;
 
         modified = true;
@@ -799,7 +792,7 @@ public class Collection extends DSpaceObject
                 Constants.ADMIN, admins);
 
         // register this as the admin group
-        collectionRow.setColumn("admin", admins.getID());
+        ourRow.setColumn("admin", admins.getID());
 
         modified = true;
         return admins;
@@ -823,7 +816,7 @@ public class Collection extends DSpaceObject
         }
 
         // Remove the link to the collection table.
-        collectionRow.setColumnNull("admin");
+        ourRow.setColumnNull("admin");
         admins = null;
 
         modified = true;
@@ -930,7 +923,7 @@ public class Collection extends DSpaceObject
         if (template == null)
         {
             template = Item.create(ourContext);
-            collectionRow.setColumn("template_item_id", template.getID());
+            ourRow.setColumn("template_item_id", template.getID());
 
             log.info(LogManager.getHeader(ourContext, "create_template_item",
                     "collection_id=" + getID() + ",template_item_id="
@@ -956,8 +949,8 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
 
-        collectionRow.setColumnNull("template_item_id");
-        DatabaseManager.update(ourContext, collectionRow);
+        ourRow.setColumnNull("template_item_id");
+        DatabaseManager.update(ourContext, ourRow);
 
         if (template != null)
         {
@@ -1060,7 +1053,7 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_collection",
                 "collection_id=" + getID()));
 
-        DatabaseManager.update(ourContext, collectionRow);
+        DatabaseManager.update(ourContext, ourRow);
 
         if (modified)
         {
@@ -1259,7 +1252,7 @@ public class Collection extends DSpaceObject
         }
 
         // Delete collection row
-        DatabaseManager.delete(ourContext, collectionRow);
+        DatabaseManager.delete(ourContext, ourRow);
 
         // Remove any workflow groups - must happen after deleting collection
         Group g = null;
@@ -1391,7 +1384,7 @@ public class Collection extends DSpaceObject
      public int hashCode()
      {
          int hash = 7;
-         hash = 89 * hash + (this.collectionRow != null ? this.collectionRow.hashCode() : 0);
+         hash = 89 * hash + (this.ourRow != null ? this.ourRow.hashCode() : 0);
          return hash;
      }
 
@@ -1407,12 +1400,12 @@ public class Collection extends DSpaceObject
      */
     private Group groupFromColumn(String col) throws SQLException
     {
-        if (collectionRow.isColumnNull(col))
+        if (ourRow.isColumnNull(col))
         {
             return null;
         }
 
-        return Group.find(ourContext, collectionRow.getIntColumn(col));
+        return Group.find(ourContext, ourRow.getIntColumn(col));
     }
 
     /**

@@ -30,11 +30,17 @@ public class Site extends DSpaceObject
 
     private static Site theSite = null;
 
+    public Site()
+    {
+        super(null, null);
+    }
+
     /**
      * Get the type of this object, found in Constants
      *
      * @return type of the object
      */
+    @Override
     public int getType()
     {
         return Constants.SITE;
@@ -45,6 +51,7 @@ public class Site extends DSpaceObject
      *
      * @return internal ID of object
      */
+    @Override
     public int getID()
     {
         return SITE_ID;
@@ -56,6 +63,7 @@ public class Site extends DSpaceObject
      * @return Handle of the object, or <code>null</code> if it doesn't have
      *         one
      */
+    @Override
     public String getHandle()
     {
         return getSiteHandle();
@@ -95,11 +103,13 @@ public class Site extends DSpaceObject
     {
     }
 
+    @Override
     public void update()
         throws SQLException, AuthorizeException
     {
     }
 
+    @Override
     public String getName()
     {
         return ConfigurationManager.getProperty("dspace.name");

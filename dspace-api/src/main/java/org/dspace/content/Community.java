@@ -49,12 +49,6 @@ public class Community extends DSpaceObject
     /** log4j category */
     private static final Logger log = Logger.getLogger(Community.class);
 
-    /** Our context */
-    private final Context ourContext;
-
-    /** The table row corresponding to this item */
-    private final TableRow communityRow;
-
     /** The logo bitstream */
     private Bitstream logo;
 
@@ -86,17 +80,16 @@ public class Community extends DSpaceObject
      */
     Community(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
-        communityRow = row;
+        super(context, row);
 
         // Get the logo bitstream
-        if (communityRow.isColumnNull("logo_bitstream_id"))
+        if (ourRow.isColumnNull("logo_bitstream_id"))
         {
             logo = null;
         }
         else
         {
-            logo = Bitstream.find(ourContext, communityRow
+            logo = Bitstream.find(ourContext, ourRow
                     .getIntColumn("logo_bitstream_id"));
         }
 
@@ -361,7 +354,7 @@ public class Community extends DSpaceObject
     @Override
     public int getID()
     {
-        return communityRow.getIntColumn("community_id");
+        return ourRow.getIntColumn("community_id");
     }
 
     /**
@@ -394,7 +387,7 @@ public class Community extends DSpaceObject
      */
     public String getMetadataSingleValue(String field)
     {
-    	String metadata = communityRow.getStringColumn(field);
+    	String metadata = ourRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
     }
 
@@ -432,11 +425,11 @@ public class Community extends DSpaceObject
          */
         if(value == null)
         {
-            communityRow.setColumnNull(field);
+            ourRow.setColumnNull(field);
         }
         else
         {
-            communityRow.setColumn(field, value.trim());
+            ourRow.setColumn(field, value.trim());
         }
         
         modifiedMetadata = true;
@@ -490,7 +483,7 @@ public class Community extends DSpaceObject
         {
             log.info(LogManager.getHeader(ourContext, "remove_logo",
                     "community_id=" + getID()));
-            communityRow.setColumnNull("logo_bitstream_id");
+            ourRow.setColumnNull("logo_bitstream_id");
             logo.delete();
             logo = null;
         }
@@ -498,7 +491,7 @@ public class Community extends DSpaceObject
         if (is != null)
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
-            communityRow.setColumn("logo_bitstream_id", newLogo.getID());
+            ourRow.setColumn("logo_bitstream_id", newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream
@@ -527,7 +520,7 @@ public class Community extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_community",
                 "community_id=" + getID()));
 
-        DatabaseManager.update(ourContext, communityRow);
+        DatabaseManager.update(ourContext, ourRow);
 
         if (modified)
         {
@@ -570,7 +563,7 @@ public class Community extends DSpaceObject
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADMIN, admins);
         
         // register this as the admin group
-        communityRow.setColumn("admin", admins.getID());
+        ourRow.setColumn("admin", admins.getID());
         
         modified = true;
         return admins;
@@ -594,7 +587,7 @@ public class Community extends DSpaceObject
         }
 
         // Remove the link to the community table.
-        communityRow.setColumnNull("admin");
+        ourRow.setColumnNull("admin");
         admins = null;
        
         modified = true;
@@ -1164,7 +1157,7 @@ public class Community extends DSpaceObject
         HandleManager.unbindHandle(ourContext, this);
 
         // Delete community row
-        DatabaseManager.delete(ourContext, communityRow);
+        DatabaseManager.delete(ourContext, ourRow);
 
         // Remove administrators group - must happen after deleting community
         Group g = getAdministrators();
@@ -1213,12 +1206,12 @@ public class Community extends DSpaceObject
      */
     private Group groupFromColumn(String col) throws SQLException
     {
-        if (communityRow.isColumnNull(col))
+        if (ourRow.isColumnNull(col))
         {
             return null;
         }
 
-        return Group.find(ourContext, communityRow.getIntColumn(col));
+        return Group.find(ourContext, ourRow.getIntColumn(col));
     }
 
     /**

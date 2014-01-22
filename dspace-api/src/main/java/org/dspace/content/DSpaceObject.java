@@ -14,12 +14,31 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.storage.rdbms.TableRow;
 
 /**
  * Abstract base class for DSpace objects
  */
 public abstract class DSpaceObject
 {
+    /** Our context */
+    protected final Context ourContext;
+
+    /** The table row corresponding to this object */
+    protected final TableRow ourRow;
+
+    private DSpaceObject()
+    {
+        ourContext = null;
+        ourRow = null;
+    }
+
+    protected DSpaceObject(Context context, TableRow row)
+    {
+        ourContext = context;
+        ourRow = row;
+    }
+
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     private StringBuffer eventDetails = null;
