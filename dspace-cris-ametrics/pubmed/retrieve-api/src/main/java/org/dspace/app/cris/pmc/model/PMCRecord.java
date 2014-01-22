@@ -12,13 +12,13 @@ import it.cilea.osd.common.model.Identifiable;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -55,11 +55,11 @@ public class PMCRecord implements Identifiable
         this.handles = handles;
     }
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
     private List<Integer> pubmedIDs;
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
     private List<String> handles;
 

@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,9 +26,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+
 
 @Entity
 @Table(name = "cris_pmc_citation")
@@ -42,7 +43,7 @@ public class PMCCitation implements Identifiable, HasTimeStampInfo
 
     private int numCitations;
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
     private List<Integer> itemIDs;
 
