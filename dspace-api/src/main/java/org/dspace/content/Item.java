@@ -71,10 +71,10 @@ public class Item extends DSpaceObject
     private static final Logger log = Logger.getLogger(Item.class);
 
     /** Our context */
-    private Context ourContext;
+    private final Context ourContext;
 
     /** The table row corresponding to this item */
-    private TableRow itemRow;
+    private final TableRow itemRow;
 
     /** The e-person who submitted this item */
     private EPerson submitter;
@@ -272,6 +272,7 @@ public class Item extends DSpaceObject
      *
      * @return the internal identifier
      */
+    @Override
     public int getID()
     {
         return itemRow.getIntColumn("item_id");
@@ -285,6 +286,7 @@ public class Item extends DSpaceObject
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
      */
+    @Override
     public String getHandle()
     {
         if(handle == null) {
@@ -350,6 +352,7 @@ public class Item extends DSpaceObject
     /**
      * Method that updates the last modified date of the item
      */
+    @Override
     public void updateLastModified()
     {
         try {
@@ -1532,6 +1535,7 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -2178,6 +2182,7 @@ public class Item extends DSpaceObject
      *
      * @return int Constants.ITEM
      */
+    @Override
     public int getType()
     {
         return Constants.ITEM;
@@ -2517,6 +2522,7 @@ public class Item extends DSpaceObject
         return false;
     }
     
+    @Override
     public String getName()
     {
         DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
@@ -2567,6 +2573,7 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
      }
     
+    @Override
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
@@ -2681,6 +2688,7 @@ public class Item extends DSpaceObject
         return adminObject;
     }
     
+    @Override
     public DSpaceObject getParentObject() throws SQLException
     {
         Collection ownCollection = getOwningCollection();
