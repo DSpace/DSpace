@@ -85,7 +85,7 @@ public class BrowseItem extends DSpaceObject
 	 * @return			array of matching values
 	 * @throws SQLException
 	 */
-	public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
+	public DCValue[] getMetadataValues(String schema, String element, String qualifier, String lang)
 		throws SQLException
 	{
         try
@@ -378,7 +378,7 @@ public class BrowseItem extends DSpaceObject
         // FIXME: there is an exception handling problem here
 		try
 		{
-			DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
+			DCValue t[] = getMetadataValues("dc", "title", null, Item.ANY);
 			return (t.length >= 1) ? t[0].value : null;
 		}
 		catch (SQLException sqle)

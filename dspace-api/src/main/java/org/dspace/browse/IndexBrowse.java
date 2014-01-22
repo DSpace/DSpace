@@ -1226,7 +1226,7 @@ public class IndexBrowse
 	            return item.getMetadata(schema, element, qualifier, lang);
 	        }
 	        
-	        return browseItem.getMetadata(schema, element, qualifier, lang);
+	        return browseItem.getMetadataValues(schema, element, qualifier, lang);
 	    }
 	    
 	    public int getID()

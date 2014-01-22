@@ -835,7 +835,7 @@ public class EPerson extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
-    public String getMetadata(String field)
+    public String getMetadataSingleValue(String field)
     {
         return ourRow.getStringColumn(field);
     }

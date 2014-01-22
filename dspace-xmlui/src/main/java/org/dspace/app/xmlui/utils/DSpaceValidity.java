@@ -261,7 +261,7 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(collection.getMetadataSingleValue("provenance_description"));
             validityKey.append(collection.getMetadataSingleValue("copyright_text"));
             validityKey.append(collection.getMetadataSingleValue("license"));
-            validityKey.append(collection.getMetadataSingleValue("name")); 
+            validityKey.append(collection.getMetadataSingleValue("name"));
             
             // Add the logo also;
             this.add(collection.getLogo());
@@ -298,7 +298,7 @@ public class DSpaceValidity implements SourceValidity
         	
         	validityKey.append("BrowseItem:");
         	validityKey.append(browseItem.getHandle());
-        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        	DCValue[] dcvs = browseItem.getMetadataValues(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (DCValue dcv : dcvs)
             {
                 validityKey.append(dcv.schema).append(".");

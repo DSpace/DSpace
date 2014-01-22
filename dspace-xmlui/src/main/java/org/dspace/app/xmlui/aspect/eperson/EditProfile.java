@@ -246,7 +246,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
             defaultFirstName = eperson.getFirstName();
             defaultLastName = eperson.getLastName();
-            defaultPhone = eperson.getMetadata("phone");
+            defaultPhone = eperson.getMetadataSingleValue("phone");
             defaultLanguage = eperson.getLanguage();
        }
        
