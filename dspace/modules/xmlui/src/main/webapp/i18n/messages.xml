@@ -3291,6 +3291,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_pool">In Curation: Unclaimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_claimed">In Journal Review: Claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_pool">In Journal Review: Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.registerPendingPublicationStep_pool">Publication Blackout - DOI Registration: Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.registerPendingPublicationStep_claimed">Publication Blackout - DOI Registration: Claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_pool">Publication Blackout: Unclaimed</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_claimed">Publication Blackout: Claimed</message>
 
@@ -3415,6 +3417,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep">Payment information must be reauthorized</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_pool">Reauthorize payment : Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep">Publication Blackout: Payment information must be reauthorized</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_claimed">Publication Blackout: Reauthorize payment : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_pool">Publication Blackout: Reauthorize payment : Unclaimed</message>
     <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
 
     <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>
