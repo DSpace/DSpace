@@ -1044,9 +1044,9 @@
 
   <message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.head">Perform task: Exit Publication Blackout</message>
 	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_help">This item is currently 
-	in Publication Blackout.  Once the associated article has been published, select 'Exit Publication Blackout and Archive' to move the
+	in Publication Blackout.  Once the associated article has been published, select 'Approve - Exit Blackout' to move the
 	item out of Publication Blackout and into the Archive</message>
-	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_submit">Exit Publication Blackout and Archive</message>
+	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_submit">Approve - Exit Blackout</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
 	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for

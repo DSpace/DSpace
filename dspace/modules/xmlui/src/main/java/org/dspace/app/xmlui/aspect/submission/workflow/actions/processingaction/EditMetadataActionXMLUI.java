@@ -26,7 +26,6 @@ import org.dspace.versioning.VersionHistory;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.dspace.doi.DryadDOIRegistrationHelper;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 /**
@@ -165,7 +164,7 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         div.addHidden("submission-continue").setValue(knot.getId());
     }
 
-    private void renderMainPage(Division div) throws WingException {
+    protected void renderMainPage(Division div) throws WingException {
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
 
