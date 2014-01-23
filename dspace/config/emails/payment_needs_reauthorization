@@ -1,0 +1,15 @@
+# Failed payment needs reauthorization message
+#
+# {0}  Title of submission
+# {1}  Submitter's name
+#
+Subject: Dryad: Payment needs reauthorization
+
+Dryad submission: {0}
+Submitter: {1}
+
+This submission has been curated and approved, but the final payment collection was unsuccessful.
+Please contact the submitter to finalize payment, so that the item can be archived.
+
+The Dryad Team
+datadryad.org
