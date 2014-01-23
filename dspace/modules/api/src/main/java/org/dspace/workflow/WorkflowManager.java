@@ -612,6 +612,13 @@ public class WorkflowManager {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
     }
 
+    // Classes that are not customized by Dryad call this, so it remains for
+    // compatibility
+    public static void notifyOfCuration(Context c, WorkflowItem wi, EPerson[] epa,
+           String taskName, String action, String message) throws SQLException, IOException {
+        WorkflowEmailManager.notifyOfCuration(c, wi, epa, taskName, action, message);
+    }
+
     /**
      * get the title of the item in this workflow
      *
