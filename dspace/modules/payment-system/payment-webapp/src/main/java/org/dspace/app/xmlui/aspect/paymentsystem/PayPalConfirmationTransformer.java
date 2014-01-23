@@ -150,29 +150,29 @@ public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-            PostMethod get = new PostMethod(requestUrl);
+            PostMethod post = new PostMethod(requestUrl);
 
-            get.addParameter("SECURETOKENID",secureTokenId);
-            get.addParameter("CREATESECURETOKEN","Y");
-            get.addParameter("SILENTTRAN","TRUE");
-            get.addParameter("MODE","TEST");
+            post.addParameter("SECURETOKENID",secureTokenId);
+            post.addParameter("CREATESECURETOKEN","Y");
+            post.addParameter("SILENTTRAN","TRUE");
+            post.addParameter("MODE","TEST");
 
-            get.addParameter("PARTNER","PayPal");
-            get.addParameter("VENDOR",ConfigurationManager.getProperty("paypal.vendor"));
-            get.addParameter("USER",ConfigurationManager.getProperty("paypal.user"));
-            get.addParameter("PWD", ConfigurationManager.getProperty("paypal.pwd"));
+            post.addParameter("PARTNER","PayPal");
+            post.addParameter("VENDOR",ConfigurationManager.getProperty("paypal.vendor"));
+            post.addParameter("USER",ConfigurationManager.getProperty("paypal.user"));
+            post.addParameter("PWD", ConfigurationManager.getProperty("paypal.pwd"));
 
-            get.addParameter("TENDER", "C");
+            post.addParameter("TENDER", "C");
             //setup the reference transaction
-            get.addParameter("TRXTYPE", "A");
-            get.addParameter("AMT", "0");
+            post.addParameter("TRXTYPE", "A");
+            post.addParameter("AMT", "0");
             //TODO:add currency from shopping cart
-            get.addParameter("CURRENCY", "USD");
-            switch (new HttpClient().executeMethod(get)) {
+            post.addParameter("CURRENCY", "USD");
+            switch (new HttpClient().executeMethod(post)) {
                 case 200:
                 case 201:
                 case 202:
-                    String string = get.getResponseBodyAsString();
+                    String string = post.getResponseBodyAsString();
                     String[] results = string.split("&");
                     for(String temp:results)
                     {
@@ -181,7 +181,7 @@ public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
                         {
                             //failed to get a secure token
                             log.error("Failed to get a secure token from paypal:"+string);
-                            log.error("Failed to get a secure token from paypal:"+get);
+                            log.error("Failed to get a secure token from paypal:"+post);
                             break;
                         }
                         if(result[0].equals("SECURETOKEN"))
@@ -196,7 +196,7 @@ public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
                     log.error("get paypal secure token error");
             }
 
-            get.releaseConnection();
+            post.releaseConnection();
         }
         catch (Exception e) {
             log.error("get paypal secure token error:"+e);
