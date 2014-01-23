@@ -399,9 +399,19 @@
                          -->
                   </map:match>
                 </map:pipeline>
-
-
-
+            <map:pipeline type="noncaching">
+            <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
+            <map:match pattern="htmlmap">
+                <map:read type="SitemapReader">
+                    <map:parameter name="type" value="html"/>
+                </map:read>
+            </map:match>
+            <map:match pattern="sitemap">
+                <map:read type="SitemapReader">
+                    <map:parameter name="type" value="sitemaps.org"/>
+                </map:read>
+            </map:match>
+              </map:pipeline>
 
                 <!-- non-bitstream pipeline -->
                 <map:pipeline>
@@ -504,17 +514,7 @@
                         </map:match>
                     </map:match>
 
-                    <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
-                    <map:match pattern="htmlmap">
-                        <map:read type="SitemapReader">
-                            <map:parameter name="type" value="html"/>
-                        </map:read>
-                    </map:match>
-                    <map:match pattern="sitemap">
-                        <map:read type="SitemapReader">
-                            <map:parameter name="type" value="sitemaps.org"/>
-                        </map:read>
-                    </map:match>
+
 
                     <map:match pattern="loadJQuery.js">
                         <map:read type="JQueryLoaderReader"/>
