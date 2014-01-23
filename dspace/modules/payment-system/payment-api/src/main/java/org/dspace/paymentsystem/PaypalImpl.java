@@ -304,14 +304,13 @@ public class PaypalImpl implements PaypalService{
         //this method should get the reference code and submit it to paypal to do the actural charge process
 
         if(shoppingCart.getTransactionId()==null){
-            log.debug("transaction id absent, cannot change card");
+            String transactionIdAbsentError = "transaction id absent, cannot charge card";
+            log.debug(transactionIdAbsentError);
+            sendPaymentErrorEmail(c, wfi, shoppingCart, transactionIdAbsentError);
             return false;
         }
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
         try {
-
-
-
             PostMethod get = new PostMethod(requestUrl);
 
             //setup the reference transaction
@@ -375,7 +374,8 @@ public class PaypalImpl implements PaypalService{
             sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction: " + e.getMessage());
             return false;
         }
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        sendPaymentErrorEmail(c, wfi, shoppingCart, "chargeCard failed");
+        return false;
     }
 
     public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type,Context context) throws WingException,SQLException {
