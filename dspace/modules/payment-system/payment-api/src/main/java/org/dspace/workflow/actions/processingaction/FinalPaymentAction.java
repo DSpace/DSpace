@@ -95,6 +95,7 @@ public class FinalPaymentAction extends ProcessingAction {
 
         //Send us to the re authorization of paypal payment
 	log.info("no payment processded for Item " + itemID + ", sending to revalidation step");
+        WorkflowEmailManager.notifyOfReAuthorizationPayment(c, wfi);
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
 
     }
