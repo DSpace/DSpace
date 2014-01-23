@@ -214,7 +214,7 @@
            <h3>
                <i18n:text>xmlui.mobile.search_all</i18n:text>
            </h3>
-           <form id="search" class="ds-interactive-div primary" action="search" method="get">
+           <form id="search" class="ds-interactive-div primary" action="{/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search' and @qualifier='advancedURL']}" method="get">
                <fieldset>
                <input id="search-basic" name="query" type="search" value="" />
                <input id="search" name="submit" type="submit" value="Go" />
