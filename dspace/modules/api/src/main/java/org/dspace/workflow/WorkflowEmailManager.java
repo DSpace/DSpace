@@ -4,6 +4,9 @@ package org.dspace.workflow;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -19,6 +22,7 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
@@ -230,6 +234,53 @@ public class WorkflowEmailManager {
         catch (MessagingException e)
         {
             log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
+                                          " of workflow_item_id" + wi.getID()));
+        }
+    }
+
+    private static List<EPerson> getCurators(Context c, Collection coll) throws IOException, SQLException {
+        List<EPerson> curators = new ArrayList<EPerson>();
+        Role role = null;
+        try {
+            role = WorkflowUtils.getCollectionRoles(coll).get("curator");
+        } catch (WorkflowConfigurationException e) {
+            log.error("Unable to get curator role for collection " + coll, e);
+        }
+        if(role != null) {
+            Group curatorsGroup = WorkflowUtils.getRoleGroup(c, coll.getID(), role);
+            if(curatorsGroup != null) {
+                curators = Arrays.asList(curatorsGroup.getMembers());
+            }
+        }
+        return curators;
+    }
+
+    public static void notifyOfReAuthorizationPayment(Context c, WorkflowItem wi)
+    throws SQLException, IOException {
+        try
+        {
+            List<EPerson> curators = getCurators(c, wi.getCollection());
+
+            // Get the item title
+            String title = WorkflowManager.getItemTitle(wi);
+
+            // Get the submitter's name
+            String submitter = WorkflowManager.getSubmitterName(wi);
+
+            // Get the collection
+            Collection coll = wi.getCollection();
+            for(EPerson curator : curators) {
+                Locale supportedLocale = I18nUtil.getEPersonLocale(curator);
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "payment_needs_reauthorization"));
+                email.addArgument(title);
+                email.addArgument(submitter);
+                email.addRecipient(curator.getEmail());
+                email.send();
+            }
+        }
+        catch (MessagingException e)
+        {
+            log.warn(LogManager.getHeader(c, "notifyOfReAuthorizationPayment", "cannot email users" +
                                           " of workflow_item_id" + wi.getID()));
         }
     }
