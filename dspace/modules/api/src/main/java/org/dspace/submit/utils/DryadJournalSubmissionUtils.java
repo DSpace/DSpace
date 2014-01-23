@@ -56,6 +56,10 @@ public class DryadJournalSubmissionUtils {
                 String journalType = journalTypes.split(",")[i].trim();
 
                 String str = "journal." + journalType + ".";
+                
+                log.debug("reading config for journal " + journalType);
+                log.debug("fullname " + properties.getProperty(str + FULLNAME));
+                log.debug("subscription? " + properties.getProperty(str + SUBSCRIPTION_PAID));
 
                 Map<String, String> map = new HashMap<String, String>();
                 map.put(FULLNAME, properties.getProperty(str + FULLNAME));

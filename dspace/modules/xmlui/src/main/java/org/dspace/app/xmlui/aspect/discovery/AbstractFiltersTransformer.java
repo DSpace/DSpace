@@ -180,7 +180,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             Item item = (Item) resultDSO;
                             DCValue[] value = item.getMetadata("dc", "identifier", null, Item.ANY);
                             String buildURL = null;
-                            if (value != null && value.length > 0) {
+                            if (value != null && value.length > 0 && value[0].value != null && value[0].value.startsWith("doi:")) {
                                 String doi = value[0].value;
                                 buildURL = baseURL + "/resource/" + doi;
                             } else {

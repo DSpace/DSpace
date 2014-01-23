@@ -1,4 +1,3 @@
-
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
     var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
@@ -12,28 +11,7 @@ jQuery(document).ready(function() {
 
     jQuery('.label-mark').tooltip();
     if(jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').length>0){
-    if(jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html().length==0&&jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val().length==0)
-    {
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val('');
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html('');
-    }
-    else
-    {
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').hide();
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').show();
-    }
-    if(jQuery(':input[name="country"]').val()==0)
-    {
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
-    }
-    else
-    {
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').hide();
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').show();
-    }
+        shoeShoppingCartWaiver(null);
     }
     jQuery('#aspect_submission_workflow_WorkflowTransformer_field_skip_payment').css('display','none');
     jQuery('#aspect_submission_submit_CheckoutStep_field_skip_payment').css('display','none');
@@ -367,45 +345,8 @@ function updateOrder(){
         }
     }).done(function ( data ) {
             obj = jQuery.parseJSON(data);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);;
-            if(obj.voucher=='')
-            {
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('');
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html('');
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val('');
-            }
-            else
-            {
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').hide();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').show();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove Voucher : '+obj.voucher);
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html(obj.voucher);
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val(obj.voucher);
-            }
-
-            if(obj.country=='')
-            {
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove Country : ');
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_country').val('');
-            }
-            else
-            {
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').hide();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').show();
-                jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove Country : '+obj.country);
-            }
-
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_errorMessage').html(obj.errorMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info').html(obj.waiverMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_payer div').html(obj.payer);
-
+            showShoppingCartMessage(obj);
+            shoeShoppingCartWaiver(obj);
         });
 }
 
@@ -558,18 +499,8 @@ function removeVoucher(){
     }).done(function ( data ) {
             obj = jQuery.parseJSON(data);
 
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_errorMessage').html(obj.errorMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info').html(obj.waiverMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_payer div').html(obj.payer);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove Voucher : ');
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val('');
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html('');
+            showShoppingCartMessage(obj);
+            shoeShoppingCartWaiver(obj);
 
 
         });
@@ -596,19 +527,122 @@ function removeCountry(){
     }).done(function ( data ) {
             obj = jQuery.parseJSON(data);
 
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_errorMessage').html(obj.errorMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info').html(obj.waiverMessage);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_payer div').html(obj.payer);
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
-            jQuery(':input[name="country"]').val('');
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove Country : ');
-            jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
-
+            showShoppingCartMessage(obj);
+            shoeShoppingCartWaiver(obj);
 
         });
 }
+function showShoppingCartMessage(obj){
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_price div').html(obj.price);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_total div').html(obj.total);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_surcharge div').html(obj.surcharge);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_no-integret div').html(obj.noIntegrateFee);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_errorMessage').html(obj.errorMessage);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info').html(obj.waiverMessage);
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_payer div').html(obj.payer);
+}
+function shoeShoppingCartWaiver(obj){
+    if(obj==null)
+    {
+        //initial
+        if(jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html().length==0&&jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val().length==0&&jQuery(':input[name="country"]').val()==0)
+        {
+            showEmptyVoucher();
+            showEmptyCountry();
+        }
+        else
+        {
+            if(jQuery(':input[name="country"]').val()!=null)
+            {
+                hideVoucher();
+                showRemoveCountry(null);
+            }
+            if(jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html().length!=0||jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val().length!=0)
+            {
+                hideCountry();
+                showRemoveVoucher(null);
+            }
+        }
+    }
+    else
+    {
+        if(obj.voucher==''&&obj.country=='')
+        {
 
+            showEmptyVoucher();
+            showEmptyCountry();
+
+        }
+        else
+        {
+            if(obj.voucher!='')
+            {
+                showRemoveVoucher(obj);
+            }
+            else
+            {
+                hideVoucher();
+            }
+            if(obj.country!='')
+            {
+                showRemoveCountry(obj);
+            }
+            else
+            {
+                hideCountry();
+            }
+
+        }
+    }
+}
+
+function showEmptyCountry(){
+    console.log("show empty country");
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list').show();
+    jQuery(':input[name="country"]').show();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
+    jQuery(':input[name="country"]').val('');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove Country : ');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
+}
+function showEmptyVoucher(){
+    console.log("show empty voucher");
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').show();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove Voucher : ');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val('');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html('');
+}
+function showRemoveCountry(obj){
+    console.log("show country");
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list').show();
+    jQuery(':input[name="country"]').show();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').hide();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').show();
+    if(obj!=null)
+    {
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove Country : '+obj.country);
+    }
+
+}
+function showRemoveVoucher(obj){
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').show();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').hide();
+    jQuery(':input[name="country"]').hide();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').show();
+    if(obj!=null){
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove Voucher : '+obj.voucher);
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html(obj.voucher);
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val(obj.voucher);
+    }
+}
+function hideCountry(){
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list').hide();
+    jQuery(':input[name="country"]').hide();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
+}
+function hideVoucher(){
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').hide();
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
+}
