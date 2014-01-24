@@ -416,17 +416,17 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-		  <!-- Elementa -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aelementa%5C%3A%5C+science%5C+of%5C+the%5C+anthropocene%5C%7C%5C%7C%5C%7CElementa%5C%3A%5C+Science%5C+of%5C+the%5C+Anthropocene"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Elementa.png" alt="Elementa: Science of the Anthropocene" /></a>
-		  <!-- ecology letters -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+letters%5C%7C%5C%7C%5C%7CEcology%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ECOLETScover.gif" alt="Ecology Letters" /></a>
-		  <!-- pala -->
- <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apalaeontology%5C%7C%5C%7C%5C%7CPalaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PALA.gif" alt="Palaeontology" /></a>
-		  <!-- Ecology and Evolution -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7C
-		  Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcologyEvolution.png" alt="Ecology and Evolution" /></a>		  </div>
-                </div>
-            </div>
+        <!-- GMS German Plastic, Reconstructive and Aesthetic Surgery -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Agms%5C+german%5C+plastic,%5C+reconstructive%5C+and%5C+aesthetic%5C+surgery%5C%7C%5C%7C%5C%7CGMS German Plastic, Reconstructive and Aesthetic Surgery"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-logo_gpras.png" alt="GMS German Plastic, Reconstructive and Aesthetic Surgery" /></a>
+        <!-- GMS Infectious Diseases -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Agms%5C+infectious%5C+diseases%5C%7C%5C%7C%5C%7CGMS Infectious Diseases"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-logo_id.png" alt="GMS Infectious Diseases" /></a>
+        <!-- GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Agms%5C+interdisciplinary%5C+plastic%5C+and%5C+reconstructive%5C+surgery%5C+dgpw%5C%7C%5C%7C%5C%7CGMS Interdisciplinary Plastic and Reconstructive Surgery DGPW"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-logo_iprs_klein.png" alt="GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW" /></a>
+        <!-- GMS Onkologische Rehabilitation und Sozialmedizin -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Agms%5C+onkologische%5C+rehabilitation%5C+und%5C+sozialmedizin%5C%7C%5C%7C%5C%7CGMS Onkologische Rehabilitation und Sozialmedizin"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-logo_dgho.png" alt="GMS Onkologische Rehabilitation und Sozialmedizin" /></a>
+		  </div>
+	  </div>
+	</div>
 
 
             <!-- START STATISTICS -->
