@@ -77,17 +77,18 @@ public class DryadReviewAction extends ProcessingAction {
             if(journal!=null){
                 Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
                 if(properties!=null){
-                String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
-		log.debug("reviewers for journal " + journal + " are " + emails);
-                String[] emails_=emails.split(",");
-                for(String email : emails_){
-                    if(!mailsSent.contains(email)){
-			sendReviewerEmail(c, email, wf, uuid.toString());
-                        mailsSent.add(email);
+                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+                    log.debug("reviewers for journal " + journal + " are " + emails);
+                    if(emails != null) {
+                        String[] emails_=emails.split(",");
+                        for(String email : emails_){
+                            if(!mailsSent.contains(email)){
+                                sendReviewerEmail(c, email, wf, uuid.toString());
+                                mailsSent.add(email);
+                            }
+                        }
                     }
                 }
-                }
-
             }
         }
     }
@@ -163,6 +164,7 @@ public class DryadReviewAction extends ProcessingAction {
 
     private void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
 	log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
+        try {
         String template;
         boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
         if(isDataPackage)
@@ -190,7 +192,9 @@ public class DryadReviewAction extends ProcessingAction {
         }else{
             //Get the data package
             Item dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
-            email.addArgument(dataPackage.getName());
+            if(dataPackage!=null){
+                email.addArgument(dataPackage.getName());
+            }
             //TODO: DECENT URL !
             email.addArgument(HandleManager.resolveToURL(c, dataPackage.getHandle()));
         }
@@ -215,9 +219,9 @@ public class DryadReviewAction extends ProcessingAction {
 	email.addArgument(manuScriptIdentifier);
 
 	
-        try {
+
             email.send();
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error(LogManager.getHeader(c, "Error while email reviewer", "WorkflowItemId: " + wf.getID()), e);
         }
     }

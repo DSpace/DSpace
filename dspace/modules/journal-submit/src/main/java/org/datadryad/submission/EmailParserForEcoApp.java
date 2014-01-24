@@ -185,7 +185,7 @@ public class EmailParserForEcoApp extends EmailParser {
 	        else if ("Manuscript".equalsIgnoreCase(name)) {
                     Matcher m = Pattern4MS_Dryad_ID.matcher(aValue.trim());
                     if(m.matches()) {
-                        myManuscriptID = aValue.trim();
+                        myManuscriptID = m.group(1);
                     }
                     return ""; // we don't build xml element yet
 	        }

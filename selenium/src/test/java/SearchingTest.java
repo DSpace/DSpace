@@ -11,25 +11,25 @@ import junit.framework.TestCase;
 
 import org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 
 public class SearchingTest extends TestCase {
-	private WebDriver driver;
-	private StringBuffer verificationErrors = new StringBuffer();
+    private WebDriver driver;
+    private String baseUrl = System.getProperty("selenium_test_url"); 
+    private StringBuffer verificationErrors = new StringBuffer();
 
         @Before
 	public void setUp() throws Exception {
-	    driver = new HtmlUnitDriver();
+	    driver = new SilentHtmlUnitDriver();
 	    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
 	@Test
 	public void testSearch() {	    
-		driver.get("http://datadryad.org");
+		driver.get(baseUrl);
 		driver.findElement(By.name("query")).clear();
-		driver.findElement(By.name("query")).sendKeys("dog* Barua");
+		driver.findElement(By.name("query")).sendKeys("dog* Barua 18pn5");
 		driver.findElement(By.name("submit")).click();
 		Assert.assertTrue("find ecomorph package", sectionContains("div.primary","Arabidopsis thaliana"));
 	}
@@ -37,7 +37,7 @@ public class SearchingTest extends TestCase {
 
 	@Test
 	public void testSearchRedirect() {	    
-		driver.get("http://datadryad.org");
+		driver.get(baseUrl);
 		driver.findElement(By.name("query")).clear();
 		driver.findElement(By.name("query")).sendKeys("dog ecomorph");
 		driver.findElement(By.name("submit")).click();

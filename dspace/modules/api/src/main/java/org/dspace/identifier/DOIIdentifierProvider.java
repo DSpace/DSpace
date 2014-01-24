@@ -1,9 +1,11 @@
 package org.dspace.identifier;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.doi.CDLDataCiteService;
@@ -113,7 +115,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
                 String doi = mintAndRegister(context, (Item) dso, true);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
+                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
                 ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
             }
         } catch (Exception e) {
@@ -128,7 +130,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
                 String doi = mintAndRegister(context, (Item) dso, false);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
+                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
                 ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
             }
         } catch (Exception e) {
@@ -524,7 +526,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             String versionNumber = "" + DOT + (version.getVersionNumber());
             doi = new DOI(canonical + versionNumber, item);
         } else {
-            String var = buildVar();
+            String var = NoidGenerator.buildVar(mySuffixVarLength);
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
 
             if (existsIdDOI(doi.toString()))

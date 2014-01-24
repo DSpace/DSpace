@@ -416,14 +416,15 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+open%5C+public%5C+health%5C+data%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Open%5C+Public%5C+Health%5C+Data"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-jophdCover.png" alt="Journal of Open Public Health Data" /></a>
-
-        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Aplos%5C+genetics%5C%7C%5C%7C%5C%7CPLoS%5C+Genetics"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PLOS-Genetics.png" alt="PLOS Genetics" /></a>
-
-        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+ecology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JECOLcover.gif" alt="Journal of Ecology" /></a>
-
-        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;fq=location:l2&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+applied%5C+ecology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Applied%5C+Ecology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAPPLcover.gif" alt="Journal of Applied Ecology" /></a>
-		  </div>
+		  <!-- Elementa -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aelementa%5C%3A%5C+science%5C+of%5C+the%5C+anthropocene%5C%7C%5C%7C%5C%7CElementa%5C%3A%5C+Science%5C+of%5C+the%5C+Anthropocene"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Elementa.png" alt="Elementa: Science of the Anthropocene" /></a>
+		  <!-- ecology letters -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+letters%5C%7C%5C%7C%5C%7CEcology%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ECOLETScover.gif" alt="Ecology Letters" /></a>
+		  <!-- pala -->
+ <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apalaeontology%5C%7C%5C%7C%5C%7CPalaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PALA.gif" alt="Palaeontology" /></a>
+		  <!-- Ecology and Evolution -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7C
+		  Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcologyEvolution.png" alt="Ecology and Evolution" /></a>		  </div>
                 </div>
             </div>
 
@@ -1145,8 +1146,35 @@ parameter that is being used (see variable defined above) -->
         </input>
     </xsl:template>
 
+     <!--add attribute placeholder and title for other repository-->
+    <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field/dri:field[@id='aspect.submission.StepTransformer.field.other_repo_name']" mode="normalField">
+        <input>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:attribute name="placeholder">
+                <xsl:text>Repository name</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="title">
+                <xsl:text>Repository name</xsl:text>
+            </xsl:attribute>
+            <xsl:attribute name="value">
+                <xsl:choose>
+                    <xsl:when test="./dri:value[@type='raw']">
+                        <xsl:value-of select="./dri:value[@type='raw']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="dri:value/i18n:text">
+                <xsl:attribute name="i18n:attr">value</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates />
+        </input>
+    </xsl:template>
+
     <!--payment-->
-    <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country' or @id ='aspect.submission.StepTransformer.field.country']">
+    <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country']">
     <select onchange="javascript:updateOrder()">
             <xsl:attribute name="name">
                 <xsl:value-of select="@n"/>
@@ -1154,7 +1182,14 @@ parameter that is being used (see variable defined above) -->
             <xsl:apply-templates select="*"/>
         </select>
     </xsl:template>
-
+    <xsl:template match="//dri:field[@id='aspect.submission.StepTransformer.field.country']">
+        <select onchange="javascript:updateCountry()">
+            <xsl:attribute name="name">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="*"/>
+        </select>
+    </xsl:template>
     <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.apply']">
         <button onclick="javascript:updateOrder()" class="ds-button-field">
             <xsl:attribute name="name">
@@ -1213,6 +1248,7 @@ parameter that is being used (see variable defined above) -->
         <xsl:apply-templates select="." mode="normalField"/>
     </xsl:template>
 
+
     <xsl:template match="dri:table[@id='aspect.discovery.SimpleSearch.table.search-controls']/dri:row/dri:cell/dri:field[@type='select']">
       <xsl:call-template name="search_labels" />
     </xsl:template>
@@ -1227,4 +1263,27 @@ parameter that is being used (see variable defined above) -->
         </xsl:comment>
     </xsl:template>
         
+
+    <!-- remove voucher link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-voucher']/dri:xref">
+        <a id="remove-voucher" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeVoucher()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>&#160;
+        </a>
+    </xsl:template>
+
+
+
+    <!-- remove country link -->
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.remove-country']/dri:xref">
+        <a id="remove-country" href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:removeCountry()</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select="."/>&#160;
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

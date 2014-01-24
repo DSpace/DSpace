@@ -237,6 +237,7 @@ public class EmailParserForAmNat extends EmailParser {
 									+ fieldValue);
 						}
 						else {
+							fieldValue = mi.group(1);
 							LOGGER.trace("ID is valid");
 						}
 					}

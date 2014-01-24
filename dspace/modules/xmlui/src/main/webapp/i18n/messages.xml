@@ -404,6 +404,7 @@
 	<message key="xmlui.Discovery.AbstractSearch.type_dc.date.issued.year_filter">Refine by: Date published</message>
 	<message key="xmlui.discovery.SearchFacetFilter.no-results">No refinement values found</message>
 	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine Search</message>
+	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.empty">No results to refine.  Try a different search.</message>
 
 	<message key="xmlui.Discovery.SimpleSearch.filter_help"> </message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Refinements</message>
@@ -411,6 +412,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.all">In any field</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.date.issued.year">Publication date</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.subject_filter">Subject</message>
+	<message key="xmlui.Discovery.SimpleSearch.filter_text"><span class="accessibly-hidden">Filter Text</span></message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">At the request of the author, this item
@@ -2858,7 +2860,7 @@
         </ul>
     </message>
     <message key="xmlui.submit.select.pub.help">
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by supporting journals, societies, and publishers [link to list of journals covered by payment plans].  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals">supporting journals, societies, and publishers</a>.  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
     </message>
     <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
@@ -3046,7 +3048,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
             </ul>
         </div>
     </message>
-    <message key="xmlui.Submission.submit.Checkout.help"><div>Your card will not be charged untill your submission is approved by Dyrad. Your card information will NOT be stored By Dryad.</div>
+    <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></div>
     </message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
@@ -3297,7 +3299,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
-    <message key="xmlui.submit.publication.unknown_doi">&#160; This article has been published in the journal I will name, but I do not know the DOI or PubMedID for it.</message>
+    <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my article. It was published in the journal:</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select Your Article Status</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.  
     <strong>Did you receive an email from your journal with a link to Dryad?  Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
@@ -3404,6 +3406,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.country">Fee-waiver country</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.total">Your total</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.voucher">Voucher code</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.customer">Customer Id</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.order.customerName">Customer Name</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
     <message key="xmlui.PaymentSystem.shoppingcart.verified"><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></message>
     <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
@@ -3469,6 +3473,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.ManageVoucherMain.search_column3">Value</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column4">Create Date</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column5">Explanation</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column7">Batch Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column8">Customer Id</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_column9">Customer Name</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create_link">Create new voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_browse_link">Browse all voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_create">Create new voucher</message>
@@ -3476,7 +3483,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.property.ManageVoucherMain.actions_search">Search voucher</message>
     <message key="xmlui.voucher.ManageVoucherMain.actions_search">Search voucher</message>
 
-    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its code, value and expiration date</message>
+    <message key="xmlui.voucher.ManageVoucherMain.search_help">Search voucher by its id, code, batch id , status, customer name,customer id and expiration date(2011-01-01)</message>
     <message key="xmlui.property.ManageVoucherMain.actions_browse_link">Browse All vouchers</message>
     <message key="xmlui.property.ManageVoucherMain.actions_create_link">Create new voucher</message>
 
@@ -3500,7 +3507,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.EditProfile.name2">Voucher Code</message>
     <message key="xmlui.voucher.EditProfile.name3">Voucher Value</message>
     <message key="xmlui.voucher.EditProfile.name4">Create Date</message>
-    <message key="xmlui.voucher.EditProfile.name5">Expire Date</message>
+    <message key="xmlui.voucher.EditProfile.name5">Customer Id</message>
+    <message key="xmlui.voucher.EditProfile.name6">Customer Name</message>
 
 
     <message key="xmlui.Shoppingcart.EditProfile.voucher_null">Can't find the Voucher</message>
@@ -3509,6 +3517,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.voucher.AddVoucherForm.head1">Title</message>
     <message key="xmlui.voucher.AddVoucherForm.head2">Voucher Creation</message>
     <message key="xmlui.voucher.AddVoucherForm.customer">Customer ID</message>
+    <message key="xmlui.voucher.AddVoucherForm.customerName">Customer Name</message>
     <message key="xmlui.voucher.AddVoucherForm.number">Number of vouchers (min. of 25)</message>
     <message key="xmlui.voucher.AddVoucherForm.explanation">Explanation for generating vouchers</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column6">Generator</message>

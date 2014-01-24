@@ -203,11 +203,15 @@
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:if test="string-length($help)>0">
-                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
-                            <xsl:attribute name="title">
-                                <xsl:value-of select="$help"/>
-                            </xsl:attribute>
-                        </img>
+                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                    <xsl:attribute name="title">
+                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                    </xsl:attribute>
+                                </img>
+                            </xsl:if>
+                        </div>
                     </xsl:if>
                 </label>
             </xsl:when>
@@ -243,11 +247,15 @@
                                         </xsl:choose>
                                     <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
                                     <xsl:if test="string-length($help)>0">
+                                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                                            <xsl:if test="string-length(substring-after($help,'.'))>0">
                                         <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                             <xsl:attribute name="title">
-                                                <xsl:value-of select="$help"/>
+                                                <xsl:value-of select="substring-after($help,'.')"/>
                                             </xsl:attribute>
                                         </img>
+                                            </xsl:if>
+                                        </div>
                                     </xsl:if>
                                 </label>
                             </xsl:when>
@@ -284,11 +292,15 @@
         </xsl:choose>
         <xsl:apply-templates />
         <xsl:if test="string-length($help)>0">
-            <img class="label-mark" src="/themes/Mirage/images/help.jpg">
-                <xsl:attribute name="title">
-                    <xsl:value-of select="$help"/>
-                </xsl:attribute>
-            </img>
+            <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                <xsl:if test="string-length(substring-after($help,'.'))>0">
+                    <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                        <xsl:attribute name="title">
+                            <xsl:value-of select="substring-after($help,'.')"/>
+                        </xsl:attribute>
+                    </img>
+                </xsl:if>
+            </div>
         </xsl:if>
     </xsl:template>
 

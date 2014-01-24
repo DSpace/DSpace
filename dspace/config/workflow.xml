@@ -43,7 +43,7 @@
             </alternativeOutcome>
         </step>
         
-        <step id="reAuthorizationPaymentStep" userSelectionMethod="claimAction" role="curator">
+        <step id="reAuthorizationPaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
         </step>
         
@@ -55,7 +55,7 @@
             </alternativeOutcome>
         </step>
 
-        <step id="pendingPublicationReAuthorizationPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+        <step id="pendingPublicationReAuthorizationPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
         </step>
 

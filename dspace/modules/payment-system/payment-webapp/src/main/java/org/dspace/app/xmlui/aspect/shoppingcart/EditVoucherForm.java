@@ -75,7 +75,10 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
     private static final Message T_name4 =
             message("xmlui.voucher.EditProfile.name4");
 
-
+    private static final Message T_name5 =
+            message("xmlui.voucher.EditProfile.name5");
+    private static final Message T_name6 =
+            message("xmlui.voucher.EditProfile.name6");
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -156,6 +159,18 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
             identity.addLabel(T_name4);
             identity.addItem(creation);
 
+            identity.addLabel(T_name5);
+            if(voucher.getCustomer()!=null)
+            identity.addItem(voucher.getCustomer());
+            else
+            identity.addItem().addContent("");
+
+            identity.addLabel(T_name6);
+            if(voucher.getCustomerName()!=null)
+            identity.addItem(voucher.getCustomerName());
+            else
+                identity.addItem().addContent("");
+
         }
         else
         {
@@ -166,6 +181,16 @@ public class EditVoucherForm  extends AbstractDSpaceTransformer
             identity.addLabel(T_name4);
             identity.addItem(creation);
 
+            identity.addLabel(T_name5);
+            if(voucher.getCustomer()!=null)
+            identity.addItem(voucher.getCustomer());
+            else
+                identity.addItem().addContent("");
+            identity.addLabel(T_name6);
+            if(voucher.getCustomerName()!=null)
+            identity.addItem(voucher.getCustomerName());
+            else
+                identity.addItem().addContent("");
         }
         Item buttons = identity.addItem();
         buttons.addButton("submit_cancel").setValue(T_submit_cancel);

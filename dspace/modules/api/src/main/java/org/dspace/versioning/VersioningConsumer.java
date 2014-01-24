@@ -84,14 +84,11 @@ public class VersioningConsumer implements Consumer {
                 }
                 break;
             }
+            ctx.complete();
         }
         catch (Exception e) {
             ctx.abort();
         }
-        finally {
-            ctx.complete();
-        }
-
     }
 
     private void upgradeDOIDataFile(Context ctx, Item item) throws AuthorizeException, SQLException, IdentifierException

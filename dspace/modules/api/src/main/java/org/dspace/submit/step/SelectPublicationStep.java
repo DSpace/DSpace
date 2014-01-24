@@ -34,11 +34,13 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -55,6 +57,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_INVALID_JOURNAL = 4;
     public static final int ERROR_PUBMED_DOI = 8;
     public static final int ERROR_GENERIC = 9;
+    public static final int ERROR_PUBMED_NAME = 11;
+
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -96,7 +100,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         Properties properties = new Properties();
 	
         try {
-            properties.load(new FileInputStream(journalPropFile));
+            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
             String journalTypes = properties.getProperty("journal.order");
             for (int i = 0; i < journalTypes.split(",").length; i++) {
                 String journalType = journalTypes.split(",")[i].trim();
@@ -109,6 +113,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
 
+		//once we have read the properties from the file, make the journal's name case-insensitive
+		journalType = journalType.toLowerCase();
+		
                 journalVals.add(journalType);
                 journalNames.add(journalDisplay);
                 journalDirs.add(metadataDir);
@@ -187,24 +194,60 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 }
             }
 
+            EventLogger.log(context, "submission-select-publication", "journalID=" + journalID +
+                    ",articleStatus=" + articleStatus + ",manuscriptNumber=" + manuscriptNumber);
 
             //First of all check if we have accepted our license
-            if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept")))
+            if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept"))) {
+                EventLogger.log(context, "submission-select-publication", "error=failed_license_accept");
                 return STATUS_LICENSE_NOT_ACCEPTED;
-
-
+            }
 	    // attempt to process a DOI or PMID entered in the UI
             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
                 String identifier = request.getParameter("article_doi");
+                String journal = request.getParameter("unknown_doi");
                 if(identifier!=null && !identifier.equals("")){
 
                     if(identifier.indexOf('/')!=-1){
-                        if(!processDOI(context, item, identifier))
+                        if(!processDOI(context, item, identifier)) {
+                            EventLogger.log(context, "submission-select-publication", "doi=" + identifier + ",error=failed_doi_lookup");
                             return ERROR_PUBMED_DOI;
+                        } else {
+                            EventLogger.log(context, "submission-select-publication", "doi=" + identifier);
+                        }
                     }
                     else{
-                       if(!processPubMed(context, item, identifier))
+                       if(!processPubMed(context, item, identifier)) {
+                           EventLogger.log(context, "submission-select-publication", "pmid=" + identifier + ",error=failed_pubmed_lookup");
                             return ERROR_PUBMED_DOI;
+                       } else {
+                           EventLogger.log(context, "submission-select-publication", "pmid=" + identifier);
+                       }
+                    }
+                }
+                else
+                {
+                    if(journal==null||journal.length()==0)
+                    {
+                        EventLogger.log(context, "submission-select-publication", "error=no_journal_name");
+                        return ERROR_PUBMED_NAME;
+                    }
+                    else{
+                        journal=journal.replace("*", "");
+                        journal=journal.trim();
+                        journalID = DryadJournalSubmissionUtils.findKeyByFullname(journal);
+                        if(journalID==null) journalID=journal;
+                        if(journalID==null||journalID.equals("")){
+                            EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
+                            return ERROR_INVALID_JOURNAL;
+                        }
+                        else if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
+
+                            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
+
+                            EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
+                            return ERROR_SELECT_JOURNAL;
+                        }
                     }
                 }
 
@@ -213,20 +256,24 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
             else{
                 if(journalID==null||journalID.equals("")){
+                    EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                     return ERROR_INVALID_JOURNAL;
                 }
                 else if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
                     if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
+                    EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                     return ERROR_SELECT_JOURNAL;
                 }
             }
+            EventLogger.log(context, "submission-select-publication", "status=complete");
 
             return STATUS_COMPLETE;
         }catch(Exception e){
             log.error(e);
         }
+        EventLogger.log(context, "submission-select-publication", "error=exception_reselect_journal");
         return ERROR_SELECT_JOURNAL;
     }
 
@@ -355,11 +402,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
     private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context,
 				   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
-	log.debug("processing journal ID");
+	journalID = journalID.toLowerCase();
+	
+	log.debug("processing journal ID " + journalID);
 	
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
+		log.debug(journalID + " is not integrated OR manuscript number is null");
                 //Just add the journal title
                 String title= journalID;
                 if(journalVals.indexOf(journalID)!=-1){
@@ -383,6 +433,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 if(journalVals.indexOf(journalID)!=-1){
 
                     String journalPath = journalDirs.get(journalVals.indexOf(journalID));
+		    log.debug("journalPath: " + journalPath);
                     //We have a valid journal
                     // Unescape the manuscriptNumber to get the filename
                     String fileName = DryadJournalSubmissionUtils.unescapeFilename(manuscriptNumber);
@@ -472,6 +523,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         } else { // Assume Regular
             addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
         }
+        String userInfo = "journal_id=" + pBean.getJournalID() + ",ms=" + pBean.getManuscriptNumber() + "";
+        EventLogger.log(context, "submission-import-metadata", userInfo);
     }
 
 

@@ -33,7 +33,7 @@ public abstract class EmailParser {
          * / (slash, but only if followed by alphanumeric)
          */
         
-        protected static Pattern Pattern4MS_Dryad_ID = Pattern.compile("(([a-zA-Z0-9-._:]|(/[a-zA-Z0-9]))+)");
+        protected static Pattern Pattern4MS_Dryad_ID = Pattern.compile("(([a-zA-Z0-9-._:]|(/[a-zA-Z0-9]))+)(\\s*)(.*)");
 
 	public abstract ParsingResult parseMessage(List<String> aMessage);
 

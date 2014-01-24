@@ -343,7 +343,10 @@ public class Item extends DSpaceObject
 
         // get the collection ID
         int cid = itemRow.getIntColumn("owning_collection");
-
+        if(cid==-1)
+        {
+            return null;
+        }
         myCollection = Collection.find(ourContext, cid);
 
         return myCollection;

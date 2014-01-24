@@ -66,16 +66,10 @@ public class PartiallyInstalledDataFiles extends AbstractCurationTask {
         "    ) order by wfi.item_id asc";
 
     private Map<Integer, String> partiallyInstalledFiles;
-    private Context dspaceContext;
     private PreparedStatement statement;
     @Override
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
-        try {
-            dspaceContext = new Context();
-        } catch (SQLException ex) {
-            log.error("Exception instantiating context", ex);
-        }
     }
 
     @Override
@@ -105,32 +99,45 @@ public class PartiallyInstalledDataFiles extends AbstractCurationTask {
 
     @Override
     protected void performItem(Item item) throws SQLException, IOException {
-        statement = dspaceContext.getDBConnection().prepareStatement(WORKFLOW_IDS_QUERY);
         findPartiallyInstalledDataFiles(item);
-        statement.close();
     }
 
 
     private void findPartiallyInstalledDataFiles(Item dataPackage) throws IOException, SQLException {
-        Connection dbConnection = dspaceContext.getDBConnection();
-        statement.setInt(1, dataPackage.getID());
-        ResultSet rs = statement.executeQuery();
-        while(rs.next()) {
-            String fileDOI = rs.getString("file_doi");
-            Integer workflowId = rs.getInt("workflow_id");
-            partiallyInstalledFiles.put(workflowId, fileDOI);
+        Context context = new Context();
+        try {
+            statement = context.getDBConnection().prepareStatement(WORKFLOW_IDS_QUERY);
+            statement.setInt(1, dataPackage.getID());
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                String fileDOI = rs.getString("file_doi");
+                Integer workflowId = rs.getInt("workflow_id");
+                partiallyInstalledFiles.put(workflowId, fileDOI);
+            }
+            rs.close();
+            statement.close();
+        } finally {
+            context.abort();
         }
-        rs.close();
     }
 
     private void installPartiallyInstalledDataFiles() throws IOException, SQLException, WorkflowConfigurationException, AuthorizeException {
-        dspaceContext.turnOffAuthorisationSystem();
-        for(Integer workflowId : partiallyInstalledFiles.keySet()) {
-            WorkflowItem wfi = WorkflowItem.find(dspaceContext, workflowId);
-            WorkflowManager.archive(dspaceContext, wfi, false);
+        Context context = new Context();
+        try {
+            context.turnOffAuthorisationSystem();
+            for(Integer workflowId : partiallyInstalledFiles.keySet()) {
+                try {
+                    WorkflowItem wfi = WorkflowItem.find(context, workflowId);
+                    WorkflowManager.archive(context, wfi, false);
+                } catch (Exception ex) {
+                    log.error("Exception installing item with workflowId: " + workflowId, ex);
+                }
+            }
+            context.restoreAuthSystemState();
+            context.commit();
+        } finally {
+            context.abort();
         }
-        dspaceContext.restoreAuthSystemState();
-        dspaceContext.commit();
     }
 
     private void formatResults() {

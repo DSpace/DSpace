@@ -456,6 +456,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/integratedJournals">Look up your journal</a>
                                 </li>
                                 <li>
+                                  <a href="/pages/institutionalSponsors">Institutional sponsors</a>
+                                </li>
+                                <li>
                                     <a href="/pages/policies">Terms of service</a>
                                 </li>                            
                             </ul>

@@ -84,78 +84,98 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 	}
 
 	public boolean put(DOI aDOI) {
-		boolean put;
-
+		boolean put = false;
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
-        put = ((DatabaseRoot) myStorage.getRoot()).put(aDOI);
-
-		if (put) {
-			myStorage.endThreadTransaction();
-		}
-		else {
-			myStorage.rollbackThreadTransaction();
-		}
-
+                try {
+                    put = ((DatabaseRoot) myStorage.getRoot()).put(aDOI);
+                } catch (AssertionError details) {
+                    LOG.error("Assertion Error: ", details);
+                } catch (Exception ex) {
+                    LOG.error("Unable to put DOI: ", ex);
+                } finally {
+                    if(put) {
+                        myStorage.endThreadTransaction();
+                    } else {
+                        myStorage.rollbackThreadTransaction();
+                    }
+                }
 		return put;
 	}
 
 	public DOI set(DOI aDOI) {
-		DOI doi;
-
+		DOI doi = null;
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
-
-		try {
-			doi = ((DatabaseRoot) myStorage.getRoot()).set(aDOI);
-		}
-		catch (AssertionError details) {
-			myStorage.rollbackThreadTransaction();
-			throw details;
-		}
-
-		myStorage.endThreadTransaction();
-
+                try {
+                    doi = ((DatabaseRoot) myStorage.getRoot()).set(aDOI);
+                } catch (AssertionError details) {
+                    LOG.error("Assertion Error: ", details);
+                } catch (Exception ex) {
+                    LOG.error("Unable to set DOI: ", ex);
+                } finally {
+                    if(doi != null) {
+                        myStorage.endThreadTransaction();
+                    } else {
+                        myStorage.rollbackThreadTransaction();
+                    }
+                }
 		return doi;
 	}
 
 	public boolean remove(DOI aDOI) {
-		boolean result;
+		boolean result = false;
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
-
 		try {
-			result = ((DatabaseRoot) myStorage.getRoot()).remove(aDOI);
-		}
-		catch (AssertionError details) {
-			myStorage.rollbackThreadTransaction();
-			throw details;
-		}
-
-		myStorage.endThreadTransaction();
+                    result = ((DatabaseRoot) myStorage.getRoot()).remove(aDOI);
+		} catch (AssertionError details) {
+                    LOG.error("Assertion Error: ", details);
+                } catch (Exception ex) {
+                    LOG.error("Unable to remove DOI: ", ex);
+		} finally {
+                    if(result) {
+                        myStorage.endThreadTransaction();
+                    } else {
+                        myStorage.rollbackThreadTransaction();
+                    }
+                }
 		return result;
 	}
 
 	public DOI getByDOI(String aDOIKey) {
-		DOI doi;
-
+		DOI doi = null;
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		doi = ((DatabaseRoot) myStorage.getRoot()).getByDOI(aDOIKey);
-		myStorage.endThreadTransaction();
-
+                try {
+                    doi = ((DatabaseRoot) myStorage.getRoot()).getByDOI(aDOIKey);
+                } catch (Exception ex) {
+                    LOG.error("Unable to get DOI by key " + aDOIKey, ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 		return doi;
 	}
 
     public Set<DOI> getByURL(String aURLKey) {
 		Set<DOI> dois=null;
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-        dois=((DatabaseRoot) myStorage.getRoot()).getByURL(aURLKey);
-		myStorage.endThreadTransaction();
+                try {
+                    dois =((DatabaseRoot) myStorage.getRoot()).getByURL(aURLKey);
+                } catch (Exception ex) {
+                    LOG.error("Unable to get DOIs by URL" + aURLKey, ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 		return dois;
 	}
 
     public Set<DOI> getALL() {
-        Set<DOI> dois=null;
+                Set<DOI> dois=null;
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		dois= ((DatabaseRoot) myStorage.getRoot()).getAll();
-		myStorage.endThreadTransaction();
+                try {
+                    dois = ((DatabaseRoot) myStorage.getRoot()).getAll();
+                } catch (Exception ex) {
+                    LOG.error("Unable to get all DOIs", ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 		return dois;
 	}
 
@@ -172,34 +192,52 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 //	}
 
 	public boolean contains(DOI aDOI) {
-		boolean found;
+		boolean found = false;
 
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		found = ((DatabaseRoot) myStorage.getRoot()).contains(aDOI);
-		myStorage.endThreadTransaction();
-
+                try {
+                    found = ((DatabaseRoot) myStorage.getRoot()).contains(aDOI);
+                } catch (Exception ex) {
+                    LOG.error("Exception finding DOI:" + aDOI.toString(), ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 		return found;
 	}
 
 	public void dumpTo(FileWriter aFileWriter) throws IOException {
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		((DatabaseRoot) myStorage.getRoot()).dumpTo(aFileWriter);
-		myStorage.endThreadTransaction();
+                try {
+                    ((DatabaseRoot) myStorage.getRoot()).dumpTo(aFileWriter);
+                } catch (Exception ex) {
+                    LOG.error("Unable to dump DOIs to file", ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 	}
 
 	public void dump(OutputStream aOut) throws IOException {
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		((DatabaseRoot) myStorage.getRoot()).dump(aOut);
-		myStorage.endThreadTransaction();
+                try {
+                    ((DatabaseRoot) myStorage.getRoot()).dump(aOut);
+                } catch (Exception ex) {
+                    LOG.error("Unable to dump DOIs to output stream", ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 	}
 
 	public int size() {
-		int size;
+		int size = 0;
 
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
-		size = ((DatabaseRoot) myStorage.getRoot()).size();
-		myStorage.endThreadTransaction();
-
+                try {
+                    size = ((DatabaseRoot) myStorage.getRoot()).size();
+                } catch (Exception ex) {
+                    LOG.error("Unable to get size of DOI Database", ex);
+                } finally {
+                    myStorage.endThreadTransaction();
+                }
 		return size;
 	}
 

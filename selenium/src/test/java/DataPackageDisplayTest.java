@@ -11,17 +11,16 @@ import junit.framework.TestCase;
 
 import org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.Select;
 
 public class DataPackageDisplayTest extends TestCase {
     private WebDriver driver;
-    private String baseUrl="http://datadryad.org";
+    private String baseUrl = System.getProperty("selenium_test_url"); 
     private StringBuffer verificationErrors = new StringBuffer();
 
     @Before
     public void setUp() throws Exception {
-	driver = new HtmlUnitDriver();
+	driver = new SilentHtmlUnitDriver();
 	driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
     

@@ -147,6 +147,8 @@ public class OAIDCCrosswalk extends Crosswalk
            isAuthorized = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            context.abort();
         }
 
         StringBuffer metadata = new StringBuffer();

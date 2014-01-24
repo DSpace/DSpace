@@ -49,7 +49,12 @@ import org.jdom.input.SAXBuilder;
 public class ObjectManager implements Constants {
     
     private static final Logger log = Logger.getLogger(ObjectManager.class);
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ") {
+        public StringBuffer format(Date date, StringBuffer toAppendTo, java.text.FieldPosition pos) {
+            StringBuffer toFix = super.format(date, toAppendTo, pos);
+            return toFix.insert(toFix.length()-2, ':');
+        }
+    };
     public static final int DEFAULT_START = 0;
     public static final int DEFAULT_COUNT = 20;
     
@@ -617,7 +622,7 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  md.place = 1 AND "); 
         queryBuilder.append("  bun.name = ? AND ");
         bindParameters.add(org.dspace.core.Constants.DEFAULT_BUNDLE_NAME);
-        queryBuilder.append("  bit.description NOT LIKE 'dc_readme' AND ");
+        queryBuilder.append("  bit.description IS DISTINCT FROM 'dc_readme' AND ");
         if(objFormat != null) {
             // limit bundle format to the provided objFormat
             log.info("Requested objFormat: " + objFormat);
@@ -978,10 +983,14 @@ public class ObjectManager implements Constants {
 	    List<Identifier> dataIds = new ArrayList<Identifier>();
 	    for(int i=0; i < dataFiles.length; i++) {
 		String dataFileIdString  = normalizeDoi(dataFiles[i].value);
+                Item fileItem = getDSpaceItem(dataFileIdString);
+                // Do not include files that are embargoed (dc.date.available not present)
+                if(fileItem.getMetadata("dc.date.available").length == 0) {
+                    continue;
+                }
 		String dataFileTimestamp = "";
 		if(idTimestamp.length() > 0) {
 		    // get the timestamp for this file
-		    Item fileItem = getDSpaceItem(dataFileIdString);
 		    Date fileModDate = fileItem.getLastModified();
 		    String fileModString = dateFormatter.format(fileModDate);
 		    dataFileTimestamp = "?ver=" + fileModString;

@@ -70,6 +70,9 @@ public class AddVoucherForm extends AbstractDSpaceTransformer
     private static final Message T_customer =
             message("xmlui.voucher.AddVoucherForm.customer");
 
+    private static final Message T_customerName =
+            message("xmlui.voucher.AddVoucherForm.customerName");
+
     private static final Message T_expiration =
             message("xmlui.voucher.AddVoucherForm.explanation");
 
@@ -102,13 +105,8 @@ public class AddVoucherForm extends AbstractDSpaceTransformer
         add = body.addInteractiveDivision("voucher-add",contextPath+"/admin/voucher",Division.METHOD_MULTIPART,"primary administrative voucher");
 
 
-        String customerCode  = request.getParameter("customerCode");
-        String customerName = null;
-        if(customerCode!=null){
-
-            //todo:find the customer
-            customerName = "customer";
-        }
+        String customerId  = request.getParameter("customerCode");
+        String customerName  = request.getParameter("customerName");
 
         add.setHead(T_head1);
 
@@ -117,8 +115,11 @@ public class AddVoucherForm extends AbstractDSpaceTransformer
 
         identity.addLabel(T_customer);
         Text codeField = identity.addItem().addText("customerCode");
-        codeField.setValue(customerCode);
-        codeField.setHelp(customerName);
+        codeField.setValue(customerId);
+        identity.addLabel(T_customerName);
+        Text customerField = identity.addItem().addText("customerName");
+        customerField.setValue(customerName);
+
 
         identity.addLabel(T_number);
         Text totalNumberField = identity.addItem().addText("totalNumber");

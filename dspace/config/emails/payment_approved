@@ -1,4 +1,3 @@
-
 # Approved email message
 #
 # {0}  Title of submission
@@ -7,14 +6,21 @@
 #
 Subject: Dryad: Payment Receipt
 
-This is your receipt for data archiving with Dryad.
+Receipt for Data Publishing Charges
+Dryad Digital Repository
+datadryad.org
+
+Thank you for your online payment of the Dryad Data Publishing Charge for the data submission described below:
+
+Received from: {1}
 
 Dryad submission: {0}
-Submitter: {1}
 
-Shopping Cart Contents
+Payment details:
 
 {2}
+
+Your data are now securely and permanently archived at datadryad.org.  
 
 The Dryad Team
 datadryad.org

@@ -59,39 +59,38 @@ public class EmailParserForManuscriptCentral extends EmailParser {
     
     static {
     	
-        fieldToXMLTagTable.put("Journal Name","Journal");
-        fieldToXMLTagTable.put("Journal Code","Journal_Code");
-	fieldToXMLTagTable.put("Print ISSN","ISSN");
-	fieldToXMLTagTable.put("Online ISSN","Online_ISSN");
-	fieldToXMLTagTable.put("Journal Admin Email","Journal_Admin_Email");
-	fieldToXMLTagTable.put("Journal Editor","Journal_Editor");
-	fieldToXMLTagTable.put("Journal Editor Email", "Journal_Editor_Email");
-	fieldToXMLTagTable.put("Journal Embargo Period", "Journal_Embargo_Period");
-	fieldToXMLTagTable.put("MS Dryad ID","Manuscript");
-	fieldToXMLTagTable.put("MS Reference Number","Manuscript");
-	fieldToXMLTagTable.put("MS reference Number","Manuscript");
-	fieldToXMLTagTable.put("MS Title","Article_Title");
-	fieldToXMLTagTable.put("MS Authors","Authors");
-	fieldToXMLTagTable.put("Contact Author","Corresponding_Author");
-	fieldToXMLTagTable.put("Contact Author Email","Email");
-	fieldToXMLTagTable.put("Contact Author Address 1","Address_Line_1");
-	fieldToXMLTagTable.put("Contact Author Address 2","Address_Line_2");
-	fieldToXMLTagTable.put("Contact Author Address 3","Address_Line_3");
-	fieldToXMLTagTable.put("Contact Author City","City");
-	fieldToXMLTagTable.put("Contact Author State","State");
-	fieldToXMLTagTable.put("Contact Author Country","Country");
-	fieldToXMLTagTable.put("Contact Author ZIP/Postal Code","Zip");
-	fieldToXMLTagTable.put("Keywords","Classification");
-	fieldToXMLTagTable.put("Abstract","Abstract");
-	fieldToXMLTagTable.put("Article Status","Article_Status");
+        fieldToXMLTagTable.put("journal name","Journal");
+        fieldToXMLTagTable.put("journal code","Journal_Code");
+	fieldToXMLTagTable.put("print issn","ISSN");
+	fieldToXMLTagTable.put("online issn","Online_ISSN");
+	fieldToXMLTagTable.put("journal admin email","Journal_Admin_Email");
+	fieldToXMLTagTable.put("journal editor","Journal_Editor");
+	fieldToXMLTagTable.put("journal editor email", "Journal_Editor_Email");
+	fieldToXMLTagTable.put("journal embargo period", "Journal_Embargo_Period");
+	fieldToXMLTagTable.put("ms dryad id","Manuscript");
+	fieldToXMLTagTable.put("ms reference number","Manuscript");
+	fieldToXMLTagTable.put("ms title","Article_Title");
+	fieldToXMLTagTable.put("ms authors","Authors");
+	fieldToXMLTagTable.put("contact author","Corresponding_Author");
+	fieldToXMLTagTable.put("contact author email","Email");
+	fieldToXMLTagTable.put("contact author address 1","Address_Line_1");
+	fieldToXMLTagTable.put("contact author address 2","Address_Line_2");
+	fieldToXMLTagTable.put("contact author address 3","Address_Line_3");
+	fieldToXMLTagTable.put("contact author city","City");
+	fieldToXMLTagTable.put("contact author state","State");
+	fieldToXMLTagTable.put("contact author country","Country");
+	fieldToXMLTagTable.put("contact author zip/postal code","Zip");
+	fieldToXMLTagTable.put("keywords","Classification");
+	fieldToXMLTagTable.put("abstract","Abstract");
+	fieldToXMLTagTable.put("article status","Article_Status");
 	
 	// New fields for MolEcol resources GR Note
-	fieldToXMLTagTable.put("Article Type", "Article_Type");
-	fieldToXMLTagTable.put("MS Citation Title", "Citation_Title");
-	fieldToXMLTagTable.put("MS Citation Authors", "Citation_Authors");
+	fieldToXMLTagTable.put("article type", "Article_Type");
+	fieldToXMLTagTable.put("ms citation title", "Citation_Title");
+	fieldToXMLTagTable.put("ms citation authors", "Citation_Authors");
 
         // Accept 'Article type' for PLoS Biology
-	fieldToXMLTagTable.put("Article type", "Article_Type");
+	fieldToXMLTagTable.put("article type", "Article_Type");
 
         xmlTagNameAuthorSubList= Arrays.asList(
             "Corresponding_Author",
@@ -108,8 +107,8 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 "Article_Title");
                 
         tagsTobeExcluded = Arrays.asList(
-            "MS Reference Number",
-            "Dryad author url"
+            "ms reference number",
+            "dryad author url"
         );
         
         tagsTobeExcludedSet = new LinkedHashSet<String>(tagsTobeExcluded);
@@ -159,7 +158,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 
                 // remove the separator (":") from this field
                 int colonPosition = matchedField.indexOf(":");
-                fieldName = matchedField.substring(0, colonPosition);
+                fieldName = matchedField.substring(0, colonPosition).toLowerCase();
 
                 // get the value of this field excluding ":"
                 // and removing any nbsp
@@ -173,7 +172,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 
                 // processing block applicable only for the first line of
                 // a new e-mail message
-                if (fieldName.equalsIgnoreCase("From")){
+                if (fieldName.equals("from")){
                     Matcher me =
                         Pattern4SenderEmailAddress.matcher(fieldValue);
                     if (me.find()){
@@ -208,7 +207,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                         // field before
                         // save these store lines for the last field
                         if (fieldToXMLTagTable.containsKey(previousField)){
-                        	if (previousField.equals("MS Authors")) {
+                        	if (previousField.equals("ms authors")) {
                         		String prevName = fieldToXMLTagTable.get(previousField);
                         		
                        			if (dataForXml.containsKey(prevName)) {
@@ -231,7 +230,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                         StoredLines = "";
                     }
                     
-                    if (fieldName.equalsIgnoreCase("Abstract")) {
+                    if (fieldName.equals("abstract")) {
                         LOGGER.trace("reached last parsing field: " + fieldName);
                     }
                
@@ -240,10 +239,10 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     
                     // if the field is an ID field assign it as the ID for the result object
                     // (the last ID processed will be the ID of the parsed item)
-                    if (fieldName.equalsIgnoreCase("MS Dryad ID") || fieldName.equalsIgnoreCase("MS Reference Number")){
+                    if (fieldName.equals("ms dryad id") || fieldName.equals("ms reference number")){
                         Matcher mid = Pattern4MS_Dryad_ID.matcher(fieldValue);
                         if (mid.find()){
-                            result.setSubmissionId(mid.group(0));
+                            result.setSubmissionId(mid.group(1));
                             LOGGER.trace("submissionId="+result.getSubmissionId());
                             
                             if (fieldValue.equals(result.getSubmissionId())){
@@ -283,13 +282,13 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                             LOGGER.trace("separator line was found; ignore this.");
                             
                             if ((fieldName != null)
-                                && (fieldName.equalsIgnoreCase("Abstract"))) {
+                                && (fieldName.equals("abstract"))) {
                                 StoredLines = StoredLines + "\n" + line;   //save the line and preserve the original formatting   
                                 LOGGER.trace("StoredLines=" + StoredLines);
                                 break parsingBlock;
                             }
                         } else {
-                        	if (previousField != null && previousField.equals("MS Authors")) {
+                        	if (previousField != null && previousField.equals("ms authors")) {
                         		StoredLines = StoredLines + ";" + line;
                         	}
                         	else {
@@ -298,7 +297,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                             LOGGER.trace("StoredLines=" + StoredLines);
                         }
                     } else {
-                    	if (previousField != null && previousField.equals("MS Authors")) {
+                    	if (previousField != null && previousField.equals("ms authors")) {
                     		StoredLines += (";" + line);
                     	}
                     	else {
@@ -314,8 +313,8 @@ public class EmailParserForManuscriptCentral extends EmailParser {
         
         // Exit-processing: if the last matched field is ABSTRACT, 
         // its data are not saved and they must be saved here
-        if (previousField.equalsIgnoreCase("Abstract")){
-            dataForXml.put(fieldToXMLTagTable.get("Abstract"), 
+        if (previousField.equals("abstract")){
+            dataForXml.put(fieldToXMLTagTable.get("abstract"), 
                 StoredLines);
         }
         

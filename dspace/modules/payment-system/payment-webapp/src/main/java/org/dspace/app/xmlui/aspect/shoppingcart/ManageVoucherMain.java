@@ -107,9 +107,14 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
             message("xmlui.voucher.ManageVoucherMain.search_column6");
 
 
+    private static final Message T_search_column7 =
+            message("xmlui.voucher.ManageVoucherMain.search_column7");
 
+    private static final Message T_search_column8 =
+            message("xmlui.voucher.ManageVoucherMain.search_column8");
 
-
+    private static final Message T_search_column9 =
+            message("xmlui.voucher.ManageVoucherMain.search_column9");
     private static final Message T_no_results =
             message("xmlui.property.ManageVoucherMain.no_results");
 
@@ -216,6 +221,9 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
 
         header.addCell().addContent(T_search_column5);
         header.addCell().addContent(T_search_column6);
+        header.addCell().addContent(T_search_column7);
+        header.addCell().addContent(T_search_column8);
+        header.addCell().addContent(T_search_column9);
         CheckBox selectVoucherService;
         for (Voucher voucher : vouchers)
         {
@@ -263,6 +271,22 @@ public class ManageVoucherMain extends AbstractDSpaceTransformer {
                 row.addCell().addContent("");
             }
 
+            row.addCell().addContent(voucher.getBatchId());
+            if(voucher.getCustomer()!=null){
+                row.addCell().addContent(voucher.getCustomer());
+            }
+            else
+            {
+                row.addCell().addContent("");
+            }
+            if(voucher.getCustomerName()!=null)
+            {
+                row.addCell().addContent(voucher.getCustomerName());
+            }
+            else
+            {
+                row.addCell().addContent("");
+            }
 
         }
 

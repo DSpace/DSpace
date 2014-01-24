@@ -175,6 +175,21 @@ public class EmbargoManager
         log.debug("Lifting embargo on Item:  "  + item.getID());
 
         item.update();
+
+        // Lifting an embargo on a Dryad Data File causes the item to be included
+        // in the DataONE Resource Map (5b11ec3bd86d699023ea475c266cd21d0e203d92)
+        // so the data package's date modified must be updated
+
+        // Get the data package item
+        DCValue[] packageIdentifiers = item.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY);
+        if(packageIdentifiers.length > 0) {
+            ItemIterator iterator = Item.findByMetadataField(context, MetadataSchema.DC_SCHEMA, "identifier", null, packageIdentifiers[0].value);
+            if(iterator.hasNext()) {
+                Item dataPackageItem = iterator.next();
+                dataPackageItem.touch();
+                dataPackageItem.update();
+            }
+        }
     }
 
     /**

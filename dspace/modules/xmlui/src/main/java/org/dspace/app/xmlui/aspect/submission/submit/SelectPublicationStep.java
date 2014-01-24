@@ -2,6 +2,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
@@ -20,10 +21,13 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
+import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 import org.apache.log4j.Logger;
 
@@ -129,30 +133,31 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
+        if(selectedJournalId!=null)
+        {
+            selectedJournalId = selectedJournalId.toLowerCase();
+        }
         String manuscriptNumber = request.getParameter("manu");
 	log.debug("initializing submission UI for journal " + selectedJournalId + ", manu " + manuscriptNumber);
         PublicationBean pBean = null;
-
-
+	
         // get journal status and name
         String journalStatus = null;
         String journalName = null;
         if(selectedJournalId!=null){
             String journalPath = "";
             try{
+                final java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
+                final java.util.List<String> journalDirs = org.dspace.submit.step.SelectPublicationStep.journalDirs;
                 journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
                 pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 journalStatus = pBean.getStatus();
                 journalName = pBean.getJournalName();
-                if(journalName!=null && !journalName.equals("")) {
-                    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-                        journalName += "*";
-                }
             }catch (Exception e)
             {
                  //invalid journalID
                 this.errorFlag = org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL;
-
+		log.error("Error getting parameters for invalid JournalID: " + selectedJournalId, e);
             }
         }
 
@@ -211,11 +216,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
         doi.addItem().addContent("OR");
-        CheckBox cb = doi.addItem().addCheckBox("unknown_doi");
-        cb.addOption(String.valueOf(Boolean.TRUE), T_unknown_doi);
+        Text cb = doi.addItem().addText("unknown_doi");
+        cb.setHelp(T_unknown_doi);
+
 
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
             textArticleDOI.addError("Invalid Identifier.");
+        }
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
+            textArticleDOI.addError("No journal name.");
         }
 
 
@@ -348,8 +357,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         for (int i = 0; i < journalVals.size(); i++){
             String val =  journalVals.get(i);
             String name =  journalNames.get(i);
-//            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-//                name += "*";
 
             // add only journal with allowReviewWorkflow=true;
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
@@ -364,6 +371,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
                 else if(request.getParameter("journalIDStatusInReview")!=null&&!request.getParameter("journalIDStatusInReview").equals("")){
                     selectedJournalId = request.getParameter("journalIDStatusInReview");
+                    if(selectedJournalId!=null)
+                    {
+                        selectedJournalId = selectedJournalId.toLowerCase();
+                    }
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
@@ -473,7 +484,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         java.util.List<String> countryArray = manager.getSortedCountry();
-
+        try{
 	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
 	countryItem.addContent(T_Country_head);
 	countryItem.addContent(T_Country_help);
@@ -481,6 +492,43 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Select countryList = countryItem.addSelect("country");
         countryList.addOption("","Select a fee-waiver country");
         String selectedCountry = request.getParameter("country");
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
+        org.dspace.content.Item item = null;
+
+        if(submissionInfo==null)
+        {
+            String workflowId = request.getParameter("workflowID");
+            if(workflowId==null) {
+                // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
+                return;
+            }
+            WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
+            item = workflowItem.getItem();
+        }
+        else
+        {
+            item = submissionInfo.getSubmissionItem().getItem();
+        }
+        ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+        org.dspace.app.xmlui.wing.element.List hiddenList = info.addList("transaction");
+        hiddenList.addItem().addHidden("transactionId").setValue(Integer.toString(shoppingCart.getID()));
+        hiddenList.addItem().addHidden("baseUrl").setValue(request.getContextPath());
+
+
+        if(selectedCountry==null)
+        {
+            if(shoppingCart!=null){
+                selectedCountry = shoppingCart.getCountry();
+            }
+        }
+            else
+        {
+            if(shoppingCart!=null)
+            {
+                shoppingCart.setCountry(selectedCountry);
+            }
+        }
         for(String temp:countryArray){
             {
                 String[] countryTemp = temp.split(":");
@@ -494,7 +542,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
             }
         }
-
+        }catch (Exception e)
+        {}
     }
 
     private void addJournalSelectStatusIntegrated(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException {
@@ -508,7 +557,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             String name =  journalNames.get(i);
             String no_asterisk = name;
             if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-                name += "*";
+                //name += "*";
                 journalID.addOption(val.equals(selectedJournalId), no_asterisk, name);
 
         }

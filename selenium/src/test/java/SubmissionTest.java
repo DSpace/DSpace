@@ -11,19 +11,18 @@ import junit.framework.TestCase;
 
 import org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import org.openqa.selenium.support.ui.Select;
 
 public class SubmissionTest extends TestCase {
     private WebDriver driver;
-    private String baseUrl="http://datadryad.org";
+    private String baseUrl = System.getProperty("selenium_test_url"); 
     private StringBuffer verificationErrors = new StringBuffer();
     
     @Before
     public void setUp() throws Exception {
-	driver = new HtmlUnitDriver();
+	driver = new SilentHtmlUnitDriver();
 	driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
     
@@ -32,7 +31,7 @@ public class SubmissionTest extends TestCase {
 
 	// login
 	driver.get(baseUrl+ "/");
-	driver.findElement(By.linkText("Login")).click();
+	driver.findElement(By.id("login-item")).click();
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_email")).clear();
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_email")).sendKeys("seleniumtest@datadryad.org");
 	driver.findElement(By.id("aspect_eperson_PasswordLogin_field_login_password")).clear();
@@ -41,12 +40,12 @@ public class SubmissionTest extends TestCase {
 	loginBox.findElement(By.id("aspect_eperson_PasswordLogin_field_submit")).click();
 	
 	// begin submission with a known manuscript (using the URL interface to set the fields)
-	driver.get(baseUrl + "/submit?journalID=SystBiol&manu=test1");
+	driver.get(baseUrl + "/handle/10255/3/submit?journalID=MolEcol&manu=test-accept");
 	driver.findElement(By.name("license_accept")).click();
 	driver.findElement(By.id("aspect_submission_StepTransformer_field_submit_next")).click();
 
 	// assert the the page is correct and the correct manuscript metadata was imported
-	assertEquals("Dryad Submission", driver.getTitle());
+	assertEquals("Dryad Submission - Dryad", driver.getTitle());
 	assertTrue("imported keywords contain Nummulites", idContains("aspect_submission_StepTransformer_div_submit-describe-publication", "Nummulites"));
 		
 	// remove the partial submission

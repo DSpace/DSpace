@@ -230,7 +230,7 @@ public class EmailParserForBmcEvoBio extends EmailParser {
                     if (fieldName.equalsIgnoreCase("MS Dryad ID") || fieldName.equalsIgnoreCase("MS Reference Number")){
                         Matcher mid = Pattern4MS_Dryad_ID.matcher(fieldValue);
                         if (mid.find()){
-                            result.setSubmissionId(mid.group(0));
+                            result.setSubmissionId(mid.group(1));
                             LOGGER.info("submissionId="+result.getSubmissionId());
                             
                             if (fieldValue.equals(result.getSubmissionId())){

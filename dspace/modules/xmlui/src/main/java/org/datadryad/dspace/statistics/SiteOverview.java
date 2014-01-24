@@ -72,8 +72,8 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 
 
-    private static final String DOWN_SEARCH_30DAY = "/select/?q=*%3A*&fq=type%3A2&fq=time:%5BNOW-30DAY%20TO%20NOW%5D";
-    private static final String DOWN_SEARCH = "/select/?q=*%3A*&fq=type%3A2";
+    private static final String DOWN_SEARCH_30DAY = "/select/?q=*%3A*&fq=type%3A0&fq=time:%5BNOW-30DAY%20TO%20NOW%5D";
+    private static final String DOWN_SEARCH = "/select/?q=*%3A*&fq=type%3A0";
 
     private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
     private static final String AUTH_COUNTER = "count(//lst[@name='dc.contributor.author_filter']/int[.!='0'])";

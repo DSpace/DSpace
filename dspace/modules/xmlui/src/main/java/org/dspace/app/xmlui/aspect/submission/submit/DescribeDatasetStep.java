@@ -174,7 +174,7 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             if(errorFields.contains("dataset-file-url")){
                 dataComp.addError(T_FORM_DATA_FILE_REPO_ERROR);
             }
-            Text repoNameTxt = dataComp.addText("other_repo_name", "hidden");
+            Text repoNameTxt = dataComp.addText("other_repo_name");
             repoNameTxt.setHelp(T_FORM_REPO_NAME_HELP);
         }
 

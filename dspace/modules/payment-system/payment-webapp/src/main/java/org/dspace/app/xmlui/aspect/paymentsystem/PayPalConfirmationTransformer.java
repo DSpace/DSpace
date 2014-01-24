@@ -51,11 +51,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 public class PayPalConfirmationTransformer extends AbstractDSpaceTransformer{
 
-    private static final Logger log = Logger.getLogger(AbstractDSpaceTransformer.class);
-
-//    protected static final Message T_Header=
-//            message("xmlui.PaymentSystem.shoppingcart.order.header");
-
+    private static final Logger log = Logger.getLogger(PayPalConfirmationTransformer.class);
 
     public void addOptions(Options options) throws SAXException, org.dspace.app.xmlui.wing.WingException,
             UIException, SQLException, IOException, AuthorizeException {

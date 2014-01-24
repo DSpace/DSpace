@@ -84,6 +84,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * This is a utility class to aid in the submission flow scripts.
@@ -736,7 +737,8 @@ public class FlowUtils {
 
             //using the checkout step next button
             if(workItem instanceof WorkspaceItem){
-                   return request.getContextPath() + "/submit-checkout?workspaceID=" + workItem.getID();
+                EventLogger.log(context, "submission-overview", "button=checkout");
+                return request.getContextPath() + "/submit-checkout?workspaceID=" + workItem.getID();
             } else {
                 //We have a workflow item & have finished editing, redir to the overview page
                 ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(context, workItem.getID(), context.getCurrentUser().getID());
@@ -744,6 +746,7 @@ public class FlowUtils {
                 url += "workflowID=" + workItem.getID();
                 url += "&stepID=" + task.getStepID();
                 url += "&actionID=" + task.getActionID();
+                EventLogger.log(context, "submission-overview", "claimed_task_redirect=" + url);
                 return url;
             }
 
@@ -754,13 +757,16 @@ public class FlowUtils {
 
 
 
+            EventLogger.log(context, "submission-overview", "button=voucher");
         }
         else
         if(request.getParameter("submit_adddataset") != null){
+            EventLogger.log(context, "submission-overview", "button=add_dataset");
             return addDataset(context, request, publication, (workItem instanceof WorkflowItem));
         }
         else
         if(request.getParameter("submit_edit_publication") != null){
+            EventLogger.log(context, "submission-overview", "button=edit_publication");
             //Make sure that we go to our edit of our publication
             InProgressSubmission publicationSubmission = WorkflowItem.findByItemId(context, publication.getID());
             //Check for a workspace item if we haven't found a workflowitem
@@ -773,10 +779,12 @@ public class FlowUtils {
             doDeleteDataset(context, deleteWorkspaceId, (workItem instanceof WorkspaceItem));
             //Check if we are deleting our dataset, if so redir to the publication overview page
             if(submitButton.startsWith("submit_delete_datapack_")){
+                EventLogger.log(context, "submission-overview", "button=delete_datapack");
                 //We are deleting our entire data package, redir to the submissions page
                 return request.getContextPath() + "/submissions";
             }else
             if(dataset != null && deleteWorkspaceId == dataset.getID()){
+                EventLogger.log(context, "submission-overview", "button=delete_dataset");
                 if(publication.isArchived())
                     return request.getContextPath() + "/submissions";
                 else
@@ -789,10 +797,12 @@ public class FlowUtils {
 
         }else
         if(submitButton.startsWith("submit_edit_dataset_")){
+            EventLogger.log(context, "submission-overview", "button=edit_dataset");
             int toEditWorkspaceId = Integer.parseInt(submitButton.substring(submitButton.lastIndexOf("_") + 1, submitButton.length()));
             return editDataset(context, request, response, toEditWorkspaceId, (workItem instanceof WorkspaceItem));
         }else
         if(submitButton.equals("submit_cancel")){
+            EventLogger.log(context, "submission-overview", "button=cancel");
             //Send em back to the task
             WorkflowItem wf = WorkflowItem.findByItemId(context, publication.getID());
 
@@ -800,6 +810,7 @@ public class FlowUtils {
             return request.getContextPath() + "/handle/" + publication.getHandle() + "/workflow?workflowID=" + wf.getID() + "&stepID=" + task.getStepID() + "&actionID=" + task.getActionID();
         }else
         if(submitButton.startsWith("submit_edit_metadata_")){
+            EventLogger.log(context, "submission-overview", "button=edit_metadata");
             int toEditWorkflowId = Integer.parseInt(submitButton.substring(submitButton.lastIndexOf("_") + 1, submitButton.length()));
             return request.getContextPath() + "/submit-edit-metadata?wfItemID=" + toEditWorkflowId;
         }
@@ -830,6 +841,7 @@ public class FlowUtils {
 
         if(request.getParameter(AbstractProcessingStep.NEXT_BUTTON) != null||request.getParameter("skip_payment") != null){
             if(workItem instanceof WorkspaceItem){
+                EventLogger.log(context, "submission-checkout", "button=done");
                 finishSubmission(request, context, publication);
                 return request.getContextPath() + "/deposit-confirmed?itemID=" + publication.getID();
             } else {
@@ -1211,6 +1223,7 @@ public class FlowUtils {
                 //For each repo name we have to call the packager once
                 for(String repoName : reponameToHandles.keySet()){
                     List<String> handles = reponameToHandles.get(repoName);
+                    Context context = null;
                     try{
                         //We start of by copying the starting arguments
                         ArrayList<String> args = (ArrayList<String>) startingArgs.clone();
@@ -1234,7 +1247,7 @@ public class FlowUtils {
                         args.add("-");
 
                         log.info("Calling the packager (for thread: " + threadId + ") with arguments: " + Arrays.toString(args.toArray(new String[args.size()])));
-                        Context context = new Context();
+                        context = new Context();
                         PackageParameters pkgParams = new PackageParameters();
                         //-d option
                         //-i option
@@ -1283,6 +1296,11 @@ public class FlowUtils {
                     } catch (Exception e){
                         log.error("Error an unknown exception occurred when posting a handle in the export handles thread, logdata: [" + getLogData() + " repoName:" + repoName + " handlesToPost:" + Arrays.toString(handles.toArray(new String[handles.size()])) +  " ]");
 
+                    } finally {
+                        if(context != null)
+                        {
+                            context.abort();
+                        }
                     }
                 }
             }catch (Exception e){

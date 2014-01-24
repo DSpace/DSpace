@@ -516,7 +516,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
 
         if (item.getMetadata("dc.relation.haspart").length > 0) {
-            dataFiles = new ArrayList<Item>();
+            dataFiles.clear();
             for (DCValue value : item.getMetadata("dc.relation.haspart")) {
 
                 DSpaceObject obj = null;
@@ -647,6 +647,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
      */
     public void recycle() {
         this.validity = null;
+        dataFiles.clear();
         super.recycle();
     }
 

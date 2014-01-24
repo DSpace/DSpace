@@ -82,6 +82,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
      */
     protected SourceValidity validity;
     private static final Message T_FILTER_HEAD = message("xmlui.discovery.AbstractFiltersTransformer.filters.head");
+    private static final Message T_FILTER_EMPTY = message("xmlui.discovery.AbstractFiltersTransformer.filters.empty");
     private static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
 
     protected SearchService getSearchService()
@@ -179,7 +180,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             Item item = (Item) resultDSO;
                             DCValue[] value = item.getMetadata("dc", "identifier", null, Item.ANY);
                             String buildURL = null;
-                            if (value != null && value.length > 0) {
+                            if (value != null && value.length > 0 && value[0].value != null && value[0].value.startsWith("doi:")) {
                                 String doi = value[0].value;
                                 buildURL = baseURL + "/resource/" + doi;
                             } else {
@@ -438,6 +439,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
             if (facets != null && 0 < facets.length) {
 
                 List browse = options.addList("discovery");
+                Boolean empty = true;
 
                 browse.setHead(T_FILTER_HEAD);
 
@@ -501,6 +503,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                         Iterator<FilterDisplayValue> iter = values.iterator();
 
                         List filterValsList = browse.addList(field.getFacetField());
+                        empty = false;
 
                         filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getFacetField().replace("_lc", "")));
 
@@ -549,6 +552,10 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             }
                         }
                     }
+                }
+
+                if(empty) {
+                    browse.addItem(T_FILTER_EMPTY);
                 }
             }
         }

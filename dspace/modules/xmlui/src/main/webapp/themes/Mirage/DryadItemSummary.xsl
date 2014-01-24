@@ -889,21 +889,17 @@
                         <xsl:when test="$treebase_url!=''">
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:call-template name="checkURL">
-                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                    </xsl:call-template>
+                                  <xsl:value-of select="$treebase_url"/>
                                 </xsl:attribute>
-                                <xsl:value-of select="$treebase_url"/>
+                              <xsl:value-of select="$treebase_url"/>
                             </a>
                         </xsl:when>
                         <xsl:when test="$knb_url!=''">
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:call-template name="checkURL">
-                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                    </xsl:call-template>
+                                  <xsl:value-of select="$knb_url"/>
                                 </xsl:attribute>
-                                <xsl:value-of select="$knb_url"/>
+                              <xsl:value-of select="$knb_url"/>
                             </a>
                         </xsl:when>
                         <xsl:when test="$my_doi">
@@ -1636,6 +1632,23 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Ecology and Evolution"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://onlinelibrary.wiley.com/journal/10.1002/(ISSN)2045-7758')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EcologyEvolution.png"
+                         alt="Ecology and Evolution cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Ecology Letters"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -1651,6 +1664,23 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ECOLETScover.gif"
                          alt="Ecology Letters cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Elementa: Science of the Anthropocene"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.elementascience.org')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/Elementa.png"
+                         alt="Elementa: Science of the Anthropocene cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "eLife"'>
@@ -2051,6 +2081,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/paleobiology.png"
                          alt="Paleobiology cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Palaeontology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://onlinelibrary.wiley.com/journal/10.1111/(ISSN)1475-4983')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PALA.gif"
+                         alt="Palaeontology cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PhytoKeys"'>

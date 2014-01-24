@@ -8,7 +8,9 @@
 package org.dspace.paymentsystem;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
@@ -83,16 +85,18 @@ public class VoucherValidationImpl implements VoucherValidationService
     }
 
     @Override
-    public Voucher create(Context context,String code,String status,Date creation, String explanation,String customer, Integer generator) throws SQLException,AuthorizeException {
+    public Voucher create(Context context,String code,String status,Date creation, String explanation,String customer,String customerName,  Integer generator, String batchId) throws SQLException,AuthorizeException {
 
 
         Voucher newVoucher = Voucher.create(context);
         newVoucher.setCode(code);
+        newVoucher.setBatchId(batchId);
         newVoucher.setStatus(status);
         newVoucher.setCreation(creation);
         newVoucher.setExplanation(explanation);
         newVoucher.setGenerator(generator);
         newVoucher.setCustomer(customer);
+        newVoucher.setCustomerName(customerName);
         newVoucher.update();
         return newVoucher;
     }
@@ -116,14 +120,15 @@ public class VoucherValidationImpl implements VoucherValidationService
     }
 
     @Override
-    public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer, Integer generator) throws SQLException,AuthorizeException {
+    public ArrayList<Voucher> createVouchers(Context context,String status,Date creation,int totalNumber,String explanation,String customer,String customerName, Integer generator) throws SQLException,AuthorizeException {
         ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
         int i =0;
+        String batchId = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.batchId.length",5));
         while(i < totalNumber)
         {
             Random random = new Random();
-            String code = RandomStringUtils.random(8, true, true);
-            vouchers.add(create(context,code,status, creation, explanation,customer,generator));
+            String code = NoidGenerator.buildVar(ConfigurationManager.getIntProperty("payment-system","noid.code.length",8));
+            vouchers.add(create(context,code,status, creation, explanation,customer,customerName,generator,batchId));
             i=i+1;
         }
        return vouchers;

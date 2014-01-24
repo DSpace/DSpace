@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -28,130 +29,143 @@ import org.dspace.utils.DSpace;
  * @author Lantian Gai, lantian at atmire.com
  */
 public class FlowShoppingcartUtils {
-
+    private static final Logger log = Logger.getLogger(FlowShoppingcartUtils.class);
+    
     private static final Message T_edit_shoppingcart_success_notice =
             new Message("default", "xmlui.administrative.FlowShoppingcartUtils.add_shoppingcart_success_notice");
 
 
     public static FlowResult processEditShoppingcart(Context context,
-                                                       Request request, Map ObjectModel, int shoppingcartID)
-            throws SQLException, AuthorizeException {
-
+                                                     Request request, Map ObjectModel, int shoppingcartID) {
         FlowResult result = new FlowResult();
-        result.setContinue(false); // default to failure
-        // Get all our request parameters
-        String voucherCode = request.getParameter("voucher");
-        String country = request.getParameter("country");
-        String currency = request.getParameter("currency");
-        String basicFee = request.getParameter("basicFee");
-        String noInteg = request.getParameter("noInteg");
-        String surCharge = request.getParameter("surCharge");
-        String transactionId = request.getParameter("transactionId");
-        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-        VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-        Voucher voucher = null;
-        if (!StringUtils.isEmpty(voucherCode)) {
-            voucher = Voucher.findByCode(context,voucherCode);
-        }
-
-
-        ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
-
-        String countryOriginal = shoppingCart.getCountry();
-        String currencyOriginal = shoppingCart.getCurrency();
-        String transactionIdOriginal = shoppingCart.getTransactionId();
-
-
-        // If we have errors, the form needs to be resubmitted to fix those problems
-        // currency and country should be null
-        if (StringUtils.isEmpty(country)) {
-            result.addError("country");
-        }
-        if (StringUtils.isEmpty(currency)) {
-            result.addError("currency");
-        }
-        if (!StringUtils.isEmpty(voucherCode)) {
-           if(voucher==null)
-           {
-               result.addError("voucher_null");
-           }
-            else
-           {
-               if(!voucherValidationService.validate(context,voucher.getID(),shoppingCart))
-               {
-                   result.addError("voucher_used");
-               }
-           }
-        }
-
-
-        if (result.getErrors() == null) {
-
+        try {
+            result.setContinue(false); // default to failure
+            // Get all our request parameters
+            String voucherCode = request.getParameter("voucher");
+            String country = request.getParameter("country");
+            String currency = request.getParameter("currency");
+            String basicFee = request.getParameter("basicFee");
+            String noInteg = request.getParameter("noInteg");
+            String surCharge = request.getParameter("surCharge");
+            String transactionId = request.getParameter("transactionId");
+            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+            VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+            Voucher voucher = null;
             if (!StringUtils.isEmpty(voucherCode)) {
-
-                if(!voucherValidationService.voucherUsed(context,voucherCode))
-                {
-                    shoppingCart.setVoucher(voucher.getID());
-                }
-
+                voucher = Voucher.findByCode(context,voucherCode);
+            }
+            
+            
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
+            
+            String countryOriginal = shoppingCart.getCountry();
+            String currencyOriginal = shoppingCart.getCurrency();
+            String transactionIdOriginal = shoppingCart.getTransactionId();
+            
+            // If we have errors, the form needs to be resubmitted to fix those problems
+            // currency should not be null
+            if (StringUtils.isEmpty(currency)) {
+                result.addError("currency");
+            }
+            if (!StringUtils.isEmpty(voucherCode)) {
+                if(voucher==null)
+                    {
+                        result.addError("voucher_null");
+                    }
+                else
+                    {
+                        if(!voucherValidationService.validate(context,voucher.getID(),shoppingCart))
+                            {
+                                result.addError("voucher_used");
+                            }
+                    }
+            }
+            
+            String note = request.getParameter("note");
+            if (!StringUtils.isEmpty(note)){
+                shoppingCart.setNote(note);
             }
             else
-            {
-                //delete the voucher
-                shoppingCart.setVoucher(null);
-            }
-
-            if (country != null && countryOriginal!=null && countryOriginal.length()>0 && !countryOriginal.equals(country)) {
-                shoppingCart.setCountry(country);
-            }
-            if (currency != null && !currencyOriginal.equals(currency)) {
-                paymentSystemService.setCurrency(shoppingCart,currency);
-            }
-            else{
-                //only when the currency doesn't change then change the individual rate
-                if (surCharge != null && surCharge.length()>0 && Double.parseDouble(surCharge)>0) {
-                    shoppingCart.setSurcharge(Double.parseDouble(surCharge));
+                {
+                    shoppingCart.setNote(null);
+                }
+            
+            if (result.getErrors() == null) {
+                if (!StringUtils.isEmpty(voucherCode)) {
+                    
+                    if(!voucherValidationService.voucherUsed(context,voucherCode))
+                        {
+                            shoppingCart.setVoucher(voucher.getID());
+                        }
                 }
                 else
-                {
-                    shoppingCart.setSurcharge(new Double(0.0));
-                }
-                if (noInteg != null && noInteg.length()>0 && Double.parseDouble(noInteg)>0) {
-                    shoppingCart.setNoInteg(Double.parseDouble(noInteg));
-                }
-                else
-                {
-                    shoppingCart.setNoInteg(new Double(0.0));
-                }
-                if (basicFee != null && basicFee.length()>0 && Double.parseDouble(basicFee)>0) {
-                    shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+                    {
+                        //delete the voucher
+                        shoppingCart.setVoucher(null);
+                    }
+                
+                if (country != null &&!country.equals(countryOriginal)) {
+                    shoppingCart.setCountry(country);
                 }
                 else
-                {
-                    shoppingCart.setBasicFee(new Double(0.0));
+                    {
+                        if(country!=null&&country.length()==0)
+                            {
+                                shoppingCart.setCountry(null);
+                            }
+                    }
+                
+                if (currency != null && !currency.equals(currencyOriginal)) {
+                    paymentSystemService.setCurrency(shoppingCart,currency);
                 }
-            }
-
-
-            if (StringUtils.isEmpty(transactionId)){
-                shoppingCart.setTransactionId(null);
-            }
-            else
-            {
-                if(!transactionId.equals(transactionIdOriginal)) {
-                    shoppingCart.setTransactionId(transactionId);
+                else{
+                    //only when the currency doesn't change then change the individual rate
+                    if (surCharge != null && surCharge.length()>0 && Double.parseDouble(surCharge)>0) {
+                        shoppingCart.setSurcharge(Double.parseDouble(surCharge));
+                    }
+                    else
+                        {
+                            shoppingCart.setSurcharge(new Double(0.0));
+                        }
+                    if (noInteg != null && noInteg.length()>0 && Double.parseDouble(noInteg)>0) {
+                        shoppingCart.setNoInteg(Double.parseDouble(noInteg));
+                    }
+                    else
+                        {
+                            shoppingCart.setNoInteg(new Double(0.0));
+                        }
+                    if (basicFee != null && basicFee.length()>0 && Double.parseDouble(basicFee)>0) {
+                        shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+                    }
+                    else
+                        {
+                            shoppingCart.setBasicFee(new Double(0.0));
+                        }
                 }
+                
+                if (StringUtils.isEmpty(transactionId)){
+                    shoppingCart.setTransactionId(null);
+                }
+                else
+                    {
+                        if(!transactionId.equals(transactionIdOriginal)) {
+                            shoppingCart.setTransactionId(transactionId);
+                        }
+                    }
+                
+                paymentSystemService.updateTotal(context,shoppingCart,null);
+                context.commit();
+                
+                result.setContinue(true);
+                result.setOutcome(true);
+                
+                result.setMessage(T_edit_shoppingcart_success_notice);
             }
-
-            paymentSystemService.updateTotal(context,shoppingCart,null);
-            context.commit();
-
-            result.setContinue(true);
-            result.setOutcome(true);
-            // FIXME: rename this message
-            result.setMessage(T_edit_shoppingcart_success_notice);
+        } catch (Exception e) {
+            // catch and log all exceptions, otherwise they will go off to the javascript layer
+            log.error("Unable to update shopping cart", e);
+            result.addError("Exception occurred during update");
         }
-
         // Everything was fine
         return result;
     }
