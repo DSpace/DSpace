@@ -61,10 +61,6 @@ import org.dspace.versioning.VersioningService;
  */
 public class Item extends DSpaceObject
 {
-    /**
-     * Wild card for Dublin Core metadata qualifiers/languages
-     */
-    public static final String ANY = "*";
 
     /** log4j category */
     private static final Logger log = Logger.getLogger(Item.class);

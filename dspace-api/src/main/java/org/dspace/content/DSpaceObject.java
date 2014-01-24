@@ -32,6 +32,11 @@ public abstract class DSpaceObject
     /** log4j category */
     private static final Logger log = Logger.getLogger(DSpaceObject.class);
 
+    /**
+     * Wild card for Dublin Core metadata qualifiers/languages
+     */
+    public static final String ANY = "*";
+
     /** Our context */
     protected final Context ourContext;
 
@@ -335,7 +340,7 @@ public abstract class DSpaceObject
     public void addMetadata(String schema, String element, String qualifier, String lang,
             String[] values, String authorities[], int confidences[])
     {
-        List<DCValue> metadata = getMetadata();
+        List<DCValue> metadata = getMetadata(); // XXX NB this refers to cache manager internals!
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
@@ -397,7 +402,7 @@ public abstract class DSpaceObject
             {
                 dcv.value = null;
             }
-            metadata.add(dcv);
+            metadata.add(dcv); // XXX NB this modifies an internal field of DublinCore!
             addDetails(fieldName);
         }
 
@@ -408,26 +413,26 @@ public abstract class DSpaceObject
     }
 
     /**
-     * Clear metadata values. As with <code>getDC</code> above,
+     * Clear metadata values. As with {@link getMetadata} below,
      * passing in <code>null</code> only matches fields where the qualifier or
-     * language is actually <code>null</code>.<code>Item.ANY</code> will
+     * language is actually <code>null</code>.  <code>DSpaceObject.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
-     * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
-     * remove all Dublin Core metadata associated with an item.
+     * Thus, <code>object.clearMetadata(DSpaceObject.ANY, DSpaceObject.ANY, DSpaceObject.ANY)</code> will
+     * remove all Dublin Core metadata associated with an object.
      *
      * @param schema
      *            the schema for the metadata field. <em>Must</em> match
      *            the <code>name</code> of an existing metadata schema.
      * @param element
-     *            the Dublin Core element to remove, or <code>Item.ANY</code>
+     *            the Dublin Core element to remove, or <code>DSpaceObject.ANY</code>
      * @param qualifier
      *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
+     *            <code>DSpaceObject.ANY</code> means any qualifier (including
      *            unqualified.)
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
      *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are removed, and <code>Item.ANY</code>
+     *            values with no language are removed, and <code>DSpaceObject.ANY</code>
      *            means values with any country code or no country code are
      *            removed.
      */
@@ -455,7 +460,7 @@ public abstract class DSpaceObject
      * Passing in a <code>null</code> value for <code>qualifier</code>
      * or <code>lang</code> only matches metadata fields where that
      * qualifier or languages is actually <code>null</code>.
-     * Passing in <code>Item.ANY</code>
+     * Passing in <code>DSpaceObject.ANY</code>
      * retrieves all metadata fields with any value for the qualifier or
      * language, including <code>null</code>
      * <P>
@@ -464,12 +469,12 @@ public abstract class DSpaceObject
      * Return values of the unqualified "title" field, in any language.
      * Qualified title fields (e.g. "title.uniform") are NOT returned:
      * <P>
-     * <code>item.getMetadata("dc", "title", null, Item.ANY );</code>
+     * <code>item.getMetadata("dc", "title", null, DSpaceObject.ANY );</code>
      * <P>
      * Return all US English values of the "title" element, with any qualifier
      * (including unqualified):
      * <P>
-     * <code>item.getMetadata("dc, "title", Item.ANY, "en_US" );</code>
+     * <code>item.getMetadata("dc, "title", DSpaceObject.ANY, "en_US" );</code>
      * <P>
      * The ordering of values of a particular element/qualifier/language
      * combination is significant. When retrieving with wildcards, values of a
@@ -480,18 +485,18 @@ public abstract class DSpaceObject
      *            the schema for the metadata field. <em>Must</em> match
      *            the <code>name</code> of an existing metadata schema.
      * @param element
-     *            the element name. <code>Item.ANY</code> matches any
+     *            the element name. <code>DSpaceObject.ANY</code> matches any
      *            element. <code>null</code> doesn't really make sense as all
      *            metadata must have an element.
      * @param qualifier
      *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
+     *            <code>DSpaceObject.ANY</code> means any qualifier (including
      *            unqualified.)
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
      *            and the ISO3166 country code. <code>null</code> means only
      *            values with no language are returned, and
-     *            <code>Item.ANY</code> means values with any country code or
+     *            <code>DSpaceObject.ANY</code> means values with any country code or
      *            no country code are returned.
      * @return metadata fields that match the parameters
      */
@@ -550,20 +555,25 @@ public abstract class DSpaceObject
         DCValue[] values;
         if ("*".equals(qualifier))
         {
-            values = getMetadata(schema, element, Item.ANY, Item.ANY);
+            values = getMetadata(schema, element, ANY, ANY);
         }
         else if ("".equals(qualifier))
         {
-            values = getMetadata(schema, element, null, Item.ANY);
+            values = getMetadata(schema, element, null, ANY);
         }
         else
         {
-            values = getMetadata(schema, element, qualifier, Item.ANY);
+            values = getMetadata(schema, element, qualifier, ANY);
         }
 
         return values;
     }
 
+    /**
+     * Get all metadata for this object.
+     *
+     * @return an empty list if the metadata could not be loaded.
+     */
     protected List<DCValue> getMetadata()
     {
         try
@@ -572,7 +582,7 @@ public abstract class DSpaceObject
         }
         catch (SQLException e)
         {
-            log.error("Loading item - cannot load metadata");
+            log.error("Loading object - cannot load metadata");
         }
 
         return new ArrayList<DCValue>();
@@ -590,17 +600,17 @@ public abstract class DSpaceObject
      * element, qualifier and language match the schema, element,
      * qualifier and language of the <code>DCValue</code> object passed
      * in.  Any or all of the element, qualifier and language passed
-     * in can be the <code>Item.ANY</code> wildcard.
+     * in can be the <code>DSpaceObject.ANY</code> wildcard.
      *
      * @param schema
      *            the schema for the metadata field. <em>Must</em> match
      *            the <code>name</code> of an existing metadata schema.
      * @param element
-     *            the element to match, or <code>Item.ANY</code>
+     *            the element to match, or <code>DSpaceObject.ANY</code>
      * @param qualifier
-     *            the qualifier to match, or <code>Item.ANY</code>
+     *            the qualifier to match, or <code>DSpaceObject.ANY</code>
      * @param language
-     *            the language to match, or <code>Item.ANY</code>
+     *            the language to match, or <code>DSpaceObject.ANY</code>
      * @param dcv
      *            the Dublin Core value
      * @return <code>true</code> if there is a match
@@ -609,7 +619,7 @@ public abstract class DSpaceObject
             String language, DCValue dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
-        if (!element.equals(Item.ANY) && !element.equals(dcv.element))
+        if (!element.equals(ANY) && !element.equals(dcv.element))
         {
             // Elements do not match, no wildcard
             return false;
@@ -624,7 +634,7 @@ public abstract class DSpaceObject
                 return false;
             }
         }
-        else if (!qualifier.equals(Item.ANY))
+        else if (!qualifier.equals(ANY))
         {
             // Not a wildcard, so qualifier must match exactly
             if (!qualifier.equals(dcv.qualifier))
@@ -642,7 +652,7 @@ public abstract class DSpaceObject
                 return false;
             }
         }
-        else if (!language.equals(Item.ANY))
+        else if (!language.equals(ANY))
         {
             // Not a wildcard, so language must match exactly
             if (!language.equals(dcv.language))
@@ -651,7 +661,7 @@ public abstract class DSpaceObject
             }
         }
 
-        if (!schema.equals(Item.ANY))
+        if (!schema.equals(ANY))
         {
             if (dcv.schema != null && !dcv.schema.equals(schema))
             {
@@ -664,18 +674,31 @@ public abstract class DSpaceObject
         return true;
     }
 
+    /**
+     * Cache all metadata on this object from the database.
+     */
     protected class MetadataCache
     {
         List<DCValue> metadata = null;
 
-        List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
+        /**
+         * Return reference to the cache of all metadata for a given object ID,
+         * loading them from the database as needed.
+         *
+         * @param c
+         * @param objectId
+         * @param log
+         * @return
+         * @throws SQLException
+         */
+        List<DCValue> get(Context c, int objectId, Logger log) throws SQLException
         {
             if (metadata == null)
             {
                 metadata = new ArrayList<DCValue>();
 
                 // Get Dublin Core metadata
-                TableRowIterator tri = retrieveMetadata(itemId);
+                TableRowIterator tri = retrieveMetadata(objectId);
 
                 if (tri != null)
                 {
@@ -691,14 +714,14 @@ public abstract class DSpaceObject
 
                             if (field == null)
                             {
-                                log.error("Loading item - cannot find metadata field " + fieldID);
+                                log.error("Loading object - cannot find metadata field " + fieldID);
                             }
                             else
                             {
                                 MetadataSchema schema = MetadataSchema.find(c, field.getSchemaID());
                                 if (schema == null)
                                 {
-                                    log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
+                                    log.error("Loading object - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
                                 }
                                 else
                                 {
@@ -733,18 +756,30 @@ public abstract class DSpaceObject
             return metadata;
         }
 
+        /**
+         * Replace the cache content.
+         *
+         * @param m new metadata to cache.
+         */
         void set(List<DCValue> m)
         {
             metadata = m;
         }
 
-        TableRowIterator retrieveMetadata(int itemId) throws SQLException
+        /**
+         * Select from the database all metadata of a given object.
+         *
+         * @param objectId
+         * @return iterator over the given object's metadata, or null if objectId = 0.
+         * @throws SQLException
+         */
+        TableRowIterator retrieveMetadata(int objectId) throws SQLException
         {
-            if (itemId > 0)
+            if (objectId > 0)
             {
                 return DatabaseManager.queryTable(ourContext, "MetadataValue",
                         "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
-                        itemId);
+                        objectId); // FIXME item_id -> object_id and add object_type
             }
 
             return null;
