@@ -646,3 +646,20 @@ function hideVoucher(){
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').hide();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
 }
+
+function updateCountry(){
+    var transactionId = document.getElementsByName("transactionId")[0].value;
+    var country =document.getElementsByName("country")[0].value;
+
+    var voucher = jQuery("#aspect_paymentsystem_ShoppingCartTransformer_field_voucher").val();
+    var baseUrl = document.getElementsByName("baseUrl")[0].value;
+    var searchUrl =baseUrl+"/JSON/transaction/shoppingcart?country="+country+"&transactionId="+transactionId;
+    jQuery.ajax({
+        url: searchUrl,
+        beforeSend: function ( xhr ) {
+            xhr.overrideMimeType("text/plain; charset=x-user-defined");
+        }
+    }).done(function ( data ) {
+            obj = jQuery.parseJSON(data);
+        });
+}

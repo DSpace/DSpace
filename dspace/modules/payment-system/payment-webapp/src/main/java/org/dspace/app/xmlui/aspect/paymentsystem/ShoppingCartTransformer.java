@@ -97,7 +97,18 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             {
                 item = submissionInfo.getSubmissionItem().getItem();
             }
-
+            boolean initalPage=true;
+            Item dataPackage = DryadWorkflowUtils.getDataPackage(context,item);
+            if(dataPackage==null){
+                dataPackage=item;
+            }
+            DCValue[] value = dataPackage.getMetadata("prism.publicationName");
+            if(value!=null&&value.length>0)
+            {
+                //only when the select journal we will remove the country list
+                initalPage = false;
+            }
+            if(!initalPage){
             //DryadJournalSubmissionUtils.journalProperties.get("");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = null;
@@ -106,34 +117,24 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             paymentSystemService.updateTotal(context,shoppingCart,null);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)
+
             List info = options.addList("Payment",List.TYPE_FORM,"paymentsystem");
 
             //todo:find a better way to detect the step we are in
 
-            boolean selectCountry=false;
-            Item dataPackage = DryadWorkflowUtils.getDataPackage(context,item);
-            if(dataPackage==null){
-                dataPackage=item;
-            }
-            DCValue[] value = dataPackage.getMetadata("prism.publicationName");
-            if(value!=null&&value.length>0)
-                {
-                    //only when the select journal we will remove the country list
-                    selectCountry = true;
-                }
-
             if(request.getRequestURI().contains("deposit-confirmed"))
             {
-                paymentSystemService.generateNoEditableShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),selectCountry,messages);
+                paymentSystemService.generateNoEditableShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),messages);
             }
             else {
-                paymentSystemService.generateShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),selectCountry,messages);
+                paymentSystemService.generateShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),messages);
 
             }
 
 
             org.dspace.app.xmlui.wing.element.Item help = options.addList("need-help").addItem();
             help.addContent(T_CartHelp);
+            }
         }catch (Exception pe)
         {
             log.error("Exception: ShoppingCart:", pe);

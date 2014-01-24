@@ -489,7 +489,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
 
-    public void generateShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,PaymentSystemConfigurationManager manager,String baseUrl,boolean selectCountry,Map<String,String> messages) throws WingException,SQLException
+    public void generateShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart shoppingCart,PaymentSystemConfigurationManager manager,String baseUrl,Map<String,String> messages) throws WingException,SQLException
     {
 
              Item item = Item.find(context,shoppingCart.getItem());
@@ -508,7 +508,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
                 generatePrice(context,info,manager,shoppingCart);
-                generateCountryList(info,manager,shoppingCart,item,selectCountry);
+                generateCountryList(info,manager,shoppingCart,item);
                 generateVoucherForm(context,info,manager,shoppingCart,messages);
             }catch (Exception e)
             {
@@ -519,7 +519,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
-    public void generateNoEditableShoppingCart(Context context, org.dspace.app.xmlui.wing.element.List info, ShoppingCart transaction, PaymentSystemConfigurationManager manager, String baseUrl, boolean selectCountry, Map<String, String> messages) throws WingException, SQLException
+    public void generateNoEditableShoppingCart(Context context, org.dspace.app.xmlui.wing.element.List info, ShoppingCart transaction, PaymentSystemConfigurationManager manager, String baseUrl,  Map<String, String> messages) throws WingException, SQLException
 
     {
 
@@ -574,10 +574,9 @@ public class PaymentSystemImpl implements PaymentSystemService {
         info.addItem().addContent(voucher1.getCode());
     }
 
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Item item,Boolean selectCountry) throws WingException{
+    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Item item) throws WingException{
         //only generate country selection list when it is not on the publication select page, to do this we need to check the publication is not empty
-        if(selectCountry)
-        {
+
             java.util.List<String> countryArray = manager.getSortedCountry();
             info.addLabel(T_Country);
             Select countryList = info.addItem("country-list", "select-list").addSelect("country");
@@ -592,7 +591,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                     countryList.addOption(false,countryTemp[0],countryTemp[0]);
                 }
             }
-        }
+
 
         if(shoppingCart.getCountry().length()>0)
         {
