@@ -72,38 +72,38 @@ public class PaypalImpl implements PaypalService{
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-            PostMethod get = new PostMethod(requestUrl);
+            PostMethod post = new PostMethod(requestUrl);
 
-            get.addParameter("SECURETOKENID",secureTokenId);
-            get.addParameter("CREATESECURETOKEN","Y");
-            get.addParameter("MODE",ConfigurationManager.getProperty("payment-system","paypal.mode"));
-            get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
+            post.addParameter("SECURETOKENID",secureTokenId);
+            post.addParameter("CREATESECURETOKEN","Y");
+            post.addParameter("MODE",ConfigurationManager.getProperty("payment-system","paypal.mode"));
+            post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
 
-            get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-            get.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
-            get.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
+            post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
+            post.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
+            post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
             //get.addParameter("RETURNURL", URLEncoder.encode("http://us.atmire.com:8080/submit-paypal-checkout"));
             if(ConfigurationManager.getProperty("payment-system","paypal.returnurl").length()>0)
-            get.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
-            get.addParameter("TENDER", "C");
-            get.addParameter("TRXTYPE", type);
+            post.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
+            post.addParameter("TENDER", "C");
+            post.addParameter("TRXTYPE", type);
             if(type.equals("S")){
                 //generate reauthorization form
-                get.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
+                post.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
             }
             else
             {
                 //generate reference transaction form for a later charge
-                get.addParameter("AMT", "0.00");
+                post.addParameter("AMT", "0.00");
             }
             //TODO:add currency from shopping cart
-            get.addParameter("CURRENCY", shoppingCart.getCurrency());
-	    log.debug("paypal request URL " + get);
-            switch (new HttpClient().executeMethod(get)) {
+            post.addParameter("CURRENCY", shoppingCart.getCurrency());
+	    log.debug("paypal request URL " + post);
+            switch (new HttpClient().executeMethod(post)) {
                 case 200:
                 case 201:
                 case 202:
-                    String string = get.getResponseBodyAsString();
+                    String string = post.getResponseBodyAsString();
                     String[] results = string.split("&");
                     for(String temp:results)
                     {
@@ -112,7 +112,7 @@ public class PaypalImpl implements PaypalService{
                         {
                             //failed to get a secure token
                             log.error("Failed to get a secure token from paypal:"+string);
-                            log.error("Failed to get a secure token from paypal:"+get);
+                            log.error("Failed to get a secure token from paypal:"+post);
                             break;
                         }
                         if(result[0].equals("SECURETOKEN"))
@@ -127,7 +127,7 @@ public class PaypalImpl implements PaypalService{
                     log.error("get paypal secure token error");
             }
 
-            get.releaseConnection();
+            post.releaseConnection();
         }
         catch (Exception e) {
             log.error("get paypal secure token error:",e);
@@ -223,43 +223,43 @@ public class PaypalImpl implements PaypalService{
             if(secureToken!=null&&secureTokenId!=null&&shoppingCart!=null){
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-                PostMethod get = new PostMethod(requestUrl);
+                PostMethod post = new PostMethod(requestUrl);
 
-                get.addParameter("SECURETOKENID",secureTokenId);
-                get.addParameter("SECURETOKEN",secureToken);
+                post.addParameter("SECURETOKENID",secureTokenId);
+                post.addParameter("SECURETOKEN",secureToken);
 
-                get.addParameter("SILENTTRAN",ConfigurationManager.getProperty("payment-system","paypal.slienttran"));
+                post.addParameter("SILENTTRAN",ConfigurationManager.getProperty("payment-system","paypal.slienttran"));
 
-                get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
-                get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-                get.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
-                get.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
+                post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
+                post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
+                post.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
+                post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
                 //setup the reference transaction
-                get.addParameter("TENDER", "C");
-                get.addParameter("TRXTYPE", "A");
-                get.addParameter("VERBOSITY", ConfigurationManager.getProperty("payment-system","paypal.verbosity"));
-                get.addParameter("AMT", "0.00");
-                get.addParameter("CREDITCARD",cardNumber);
-                get.addParameter("CVV2",CVV2);
-                get.addParameter("EXPDATE",expDate);
-                get.addParameter("BILLTOFIRSTNAME",firstName);
-                get.addParameter("BILLTOLASTNAME",lastName);
-                get.addParameter("BILLTOSTREET",street);
-                get.addParameter("BILLTOSTATE",state);
-                get.addParameter("BILLTOCITY",city);
-                get.addParameter("BILLTOCOUNTRY",country);
-                get.addParameter("BILLTOZIP",zip);
+                post.addParameter("TENDER", "C");
+                post.addParameter("TRXTYPE", "A");
+                post.addParameter("VERBOSITY", ConfigurationManager.getProperty("payment-system","paypal.verbosity"));
+                post.addParameter("AMT", "0.00");
+                post.addParameter("CREDITCARD",cardNumber);
+                post.addParameter("CVV2",CVV2);
+                post.addParameter("EXPDATE",expDate);
+                post.addParameter("BILLTOFIRSTNAME",firstName);
+                post.addParameter("BILLTOLASTNAME",lastName);
+                post.addParameter("BILLTOSTREET",street);
+                post.addParameter("BILLTOSTATE",state);
+                post.addParameter("BILLTOCITY",city);
+                post.addParameter("BILLTOCOUNTRY",country);
+                post.addParameter("BILLTOZIP",zip);
 
 
                 //TODO:add currency from shopping cart
-                get.addParameter("CURRENCY", shoppingCart.getCurrency());
-		log.debug("paypal transaction url " + get);
-		int httpStatus = new HttpClient().executeMethod(get);
+                post.addParameter("CURRENCY", shoppingCart.getCurrency());
+		log.debug("paypal transaction url " + post);
+		int httpStatus = new HttpClient().executeMethod(post);
                 switch (httpStatus) {
                     case 200:
                     case 201:
                     case 202:
-                        String string = get.getResponseBodyAsString();
+                        String string = post.getResponseBodyAsString();
 			log.debug("paypal response = " + string);
                         String[] results = string.split("&");
                         for(String temp:results)
@@ -285,11 +285,11 @@ public class PaypalImpl implements PaypalService{
                         }
                         break;
                     default:
-                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + get.getResponseBodyAsString() );
+                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + post.getResponseBodyAsString() );
                         return false;
                 }
 
-                get.releaseConnection();
+                post.releaseConnection();
             }
             else{
                 log.error("get paypal reference transaction error or shopping cart error:"+secureToken+secureTokenId+shoppingCart);
@@ -310,7 +310,9 @@ public class PaypalImpl implements PaypalService{
         //this method should get the reference code and submit it to paypal to do the actural charge process
 
         if(shoppingCart.getTransactionId()==null){
-            log.debug("transaction id absent, cannot change card");
+            String transactionIdAbsentError = "transaction id absent, cannot charge card";
+            log.debug(transactionIdAbsentError);
+            sendPaymentErrorEmail(c, wfi, shoppingCart, transactionIdAbsentError);
             return false;
         }
         if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
@@ -322,29 +324,26 @@ public class PaypalImpl implements PaypalService{
 
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
         try {
-
-
-
-            PostMethod get = new PostMethod(requestUrl);
+            PostMethod post = new PostMethod(requestUrl);
 
             //setup the reference transaction
-            get.addParameter("TENDER", "C");
-            get.addParameter("TRXTYPE", "S");
-            get.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
-            get.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
-            get.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-            get.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
-            get.addParameter("USER", ConfigurationManager.getProperty("payment-system","paypal.user"));
-            get.addParameter("ORIGID", shoppingCart.getTransactionId());
+            post.addParameter("TENDER", "C");
+            post.addParameter("TRXTYPE", "S");
+            post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
+            post.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
+            post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
+            post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
+            post.addParameter("USER", ConfigurationManager.getProperty("payment-system","paypal.user"));
+            post.addParameter("ORIGID", shoppingCart.getTransactionId());
 
             //TODO:add currency from shopping cart
-            get.addParameter("CURRENCY", shoppingCart.getCurrency());
-	    log.debug("paypal sale transaction url " + get);
-            switch (new HttpClient().executeMethod(get)) {
+            post.addParameter("CURRENCY", shoppingCart.getCurrency());
+	    log.debug("paypal sale transaction url " + post);
+            switch (new HttpClient().executeMethod(post)) {
                 case 200:
                 case 201:
                 case 202:
-                    String string = get.getResponseBodyAsString();
+                    String string = post.getResponseBodyAsString();
                     String[] results = string.split("&");
                     for(String temp:results)
                     {
@@ -375,20 +374,21 @@ public class PaypalImpl implements PaypalService{
                     break;
                 default:
                     String result = "Paypal Reference Transaction Failure: "
-                            + get.getStatusCode() +  ": " + get.getResponseBodyAsString();
+                            + post.getStatusCode() +  ": " + post.getResponseBodyAsString();
                     log.error(result);
                     sendPaymentRejectedEmail(c, wfi, shoppingCart);
                     return false;
             }
 
-            get.releaseConnection();
+            post.releaseConnection();
         }
         catch (Exception e) {
             log.error("error when submit paypal reference transaction: "+e.getMessage(), e);
             sendPaymentErrorEmail(c, wfi, null, "exception when submit reference transaction: " + e.getMessage());
             return false;
         }
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        sendPaymentErrorEmail(c, wfi, shoppingCart, "chargeCard failed");
+        return false;
     }
 
     public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type,Context context) throws WingException,SQLException {

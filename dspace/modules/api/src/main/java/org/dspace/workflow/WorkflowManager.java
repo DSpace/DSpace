@@ -7,11 +7,9 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
-import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.actions.Action;
 import org.dspace.workflow.actions.ActionResult;
 import org.dspace.workflow.actions.WorkflowActionConfig;
@@ -24,8 +22,6 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.dspace.curate.WorkflowCurator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -266,7 +262,7 @@ public class WorkflowManager {
 
         if(notify){
             //Notify
-            notifyOfArchive(c, item, collection);
+            WorkflowEmailManager.notifyOfArchive(c, item);
         }
 
         //Clear any remaining workflow metadata
@@ -278,96 +274,6 @@ public class WorkflowManager {
 
         return item;
     }
-    //TODO: nakijken  - altijd submitter mailen of config optie?
-
-    /**
-     * notify the submitter that the item is archived
-     */
-    private static void notifyOfArchive(Context c, Item i, Collection coll)
-            throws SQLException, IOException {
-        try {
-            // Get submitter
-            EPerson ep = i.getSubmitter();
-            // Get the Locale
-            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-
-            // If the item went through publication blackout,
-            //   use "submit_datapackage_blackout_archive"
-            // otherwise, use "submit_datapackage_archive"
-            String emailFilename = itemWasBlackedOut(c, i, coll) ? "submit_datapackage_blackout_archive" : "submit_datapackage_archive";
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailFilename));
-
-            // Get the item handle to email to user
-//            String handle = HandleManager.findHandle(c, i);
-
-            // Get title
-            DCValue[] titles = i.getDC("title", null, Item.ANY);
-            String title = "";
-            try {
-                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            }
-            catch (MissingResourceException e) {
-                title = "Untitled";
-            }
-            if (titles.length > 0) {
-                title = titles[0].value;
-            }
-            String dataFileTitles = "";
-            String dataFilesDoi = "";
-            String datapackageDoi = "";
-            DCValue doiMetadataField = DOIIdentifierProvider.getIdentifierMetadata();
-            //Ensure that our doi metadata field is read in !
-            if(doiMetadataField.element != null){
-                DCValue[] doiVals = i.getMetadata(doiMetadataField.schema, doiMetadataField.element, doiMetadataField.qualifier, Item.ANY);
-                if(doiVals != null && 0 < doiVals.length){
-                    datapackageDoi = doiVals[0].value;
-                }
-
-                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, i);
-                for (Item dataFile : dataFiles) {
-                    dataFileTitles += dataFile.getName() + "\n";
-                    doiVals = dataFile.getMetadata(doiMetadataField.schema, doiMetadataField.element, doiMetadataField.qualifier, Item.ANY);
-                    if(doiVals != null && 0 < doiVals.length){
-                        dataFilesDoi += doiVals[0].value + "\n";
-                    }
-                }
-            }
-
-
-            email.addRecipient(ep.getEmail());
-
-            addJournalNotifyOnArchive(i, email);
-
-
-            email.addArgument(title);
-            email.addArgument(datapackageDoi);
-            email.addArgument(dataFileTitles);
-            email.addArgument(dataFilesDoi);
-            if(i.getSubmitter() != null){
-                email.addArgument(i.getSubmitter().getFullName());
-            }else{
-                email.addArgument("");
-            }
-            String manuScriptIdentifier = "";
-            DCValue[] manuScripIdentifiers = i.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
-            if(0 < manuScripIdentifiers.length){
-                manuScriptIdentifier = manuScripIdentifiers[0].value;
-            }
-
-	    if(manuScriptIdentifier.length() == 0) {
-		manuScriptIdentifier = "none available";
-	    }
-	    
-            email.addArgument(manuScriptIdentifier);
-
-            email.send();
-        }
-        catch (MessagingException e) {
-            log.warn(LogManager.getHeader(c, "notifyOfArchive",
-                    "cannot email user" + " item_id=" + i.getID()));
-        }
-    }
-
     /***********************************
      * WORKFLOW TASK MANAGEMENT
      **********************************/
@@ -603,7 +509,7 @@ public class WorkflowManager {
 
         if(sendMail){
             // notify that it's been rejected
-            notifyOfReject(c, wi, e, rejection_message);
+            WorkflowEmailManager.notifyOfReject(c, wi, e, rejection_message);
         }
 
         log.info(LogManager.getHeader(c, "reject_workflow", "workflow_item_id="
@@ -701,93 +607,16 @@ public class WorkflowManager {
         myitem.update();
     }
 
-    private static void notifyOfReject(Context c, WorkflowItem wi, EPerson e,
-        String reason)
-    {
-        try
-        {
-            // Get the item title
-            String title = wi.getItem().getName();
-            String dataFileTitles = "";
-            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wi.getItem());
-            for (Item dataFile : dataFiles) {
-                dataFileTitles += dataFile.getName() + "\n";
-            }
-
-            // Get rejector's name
-            String rejector = e == null ? "" : getEPersonName(e);
-            Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_datapackage_reject"));
-
-            email.addRecipient(wi.getSubmitter().getEmail());
-
-            email.addArgument(title);
-            email.addArgument(dataFileTitles);
-            email.addArgument(rejector);
-            email.addArgument(reason);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");
-
-            email.send();
-        }
-        catch (RuntimeException re)
-        {
-            // log this email error
-            log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
-
-            throw re;
-        }
-        catch (Exception ex)
-        {
-            // log this email error
-            log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
-        }
-    }
 
     public static String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
     }
 
-        // send notices of curation activity
+    // Classes that are not customized by Dryad call this, so it remains for
+    // compatibility
     public static void notifyOfCuration(Context c, WorkflowItem wi, EPerson[] epa,
-           String taskName, String action, String message) throws SQLException, IOException
-    {
-        try
-        {
-            // Get the item title
-            String title = getItemTitle(wi);
-
-            // Get the submitter's name
-            String submitter = getSubmitterName(wi);
-
-            // Get the collection
-            Collection coll = wi.getCollection();
-
-            for (int i = 0; i < epa.length; i++)
-            {
-                Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,
-                                                                                  "flowtask_notify"));
-                email.addArgument(title);
-                email.addArgument(coll.getMetadata("name"));
-                email.addArgument(submitter);
-                email.addArgument(taskName);
-                email.addArgument(message);
-                email.addArgument(action);
-                email.addRecipient(epa[i].getEmail());
-                email.send();
-            }
-        }
-        catch (MessagingException e)
-        {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
-                                          " of workflow_item_id" + wi.getID()));
-        }
+           String taskName, String action, String message) throws SQLException, IOException {
+        WorkflowEmailManager.notifyOfCuration(c, wi, epa, taskName, action, message);
     }
 
     /**
@@ -821,38 +650,5 @@ public class WorkflowManager {
         EPerson e = wi.getSubmitter();
 
         return getEPersonName(e);
-    }
-
-
-    private static void addJournalNotifyOnArchive(Item item, Email email)
-    {
-        DCValue[] values=item.getMetadata("prism.publicationName");
-        if(values!=null && values.length> 0){
-            String journal = values[0].value;
-            if(journal!=null){
-                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
-                if(properties != null) {
-                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
-                    if(emails != null) {
-                        String[] emails_=emails.split(",");
-                        for(String emailAddr : emails_){
-                            email.addRecipient(emailAddr);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private static Boolean itemWasBlackedOut(Context c, Item item, Collection coll) {
-        DCValue provenance[] =  item.getMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en");
-        Boolean wasBlackedOut = false;
-        for(DCValue dcValue : provenance) {
-            if(dcValue.value != null)
-                if(dcValue.value.contains("Entered publication blackout")) {
-                    wasBlackedOut = true;
-                }
-            }
-        return wasBlackedOut;
     }
 }
