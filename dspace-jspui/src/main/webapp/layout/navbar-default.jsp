@@ -71,13 +71,9 @@
     			browseCurrent = bix.getName();
         }
     }
-
  // get the locale languages
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     Locale sessionLocale = UIUtil.getSessionLocale(request);
-
-
-
 %>
 
 
@@ -118,51 +114,37 @@
           </li>
           <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
        </ul>
-
-
-             
-             
+           
  <% if (supportedLocales != null && supportedLocales.length > 1)
-{
-%>
-       
-       <div class="nav navbar-nav navbar-right">
-		<ul class="nav navbar-nav navbar-right">
-        
-<li class="dropdown">
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-LANG<b class="caret"></b></a>
-             <ul class="dropdown-menu">
-             
-<%
-for (int i = supportedLocales.length-1; i >= 0; i--)
-{
-%>
- <li>
- <a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
+     {
+ %>
+    <div class="nav navbar-nav navbar-right">
+	 <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+       <a href="#" class="dropdown-toggle" data-toggle="dropdown">LANG<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+ <%
+    for (int i = supportedLocales.length-1; i >= 0; i--)
+     {
+ %>
+      <li>
+        <a onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
                   document.repost.submit();" href="<%= request.getContextPath() %>?locale=<%=supportedLocales[i].toString()%>">
- <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
- </a></li>
+         <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
+       </a>
+      </li>
+ <%
+     }
+ %>
+     </ul>
+    </li>
+    </ul>
+  </div>
+ <%
+   }
+ %>
  
- 
-<%
-}
-%>
-  </ul>
- </li>
- </ul>
-</div>
-
-<%
-}
-             
-             
-%>
-                       
-				
-
-
-       <div class="nav navbar-nav navbar-right">
+        <div class="nav navbar-nav navbar-right">
 		<ul class="nav navbar-nav navbar-right">
          <li class="dropdown">
          <%
