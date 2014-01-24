@@ -1789,6 +1789,114 @@
                          alt="Cover of GMS Medizinische Informatik, Biometrie und Epidemiologie"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "GMS German Plastic, Reconstructive and Aesthetic Surgery"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/de/journals/gpras/index.htm')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gpras.png"
+                         alt="GMS German Plastic, Reconstructive and Aesthetic Surgery cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Infectious Diseases"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/en/journals/id/index.htm')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_id.png"
+                         alt="GMS Infectious Diseases cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/en/journals/iprs/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_iprs_klein.png"
+                         alt="GMS Interdisciplinary Plastic and Reconstructive Surgery DGPW cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Onkologische Rehabilitation und Sozialmedizin"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/en/journals/ors/index.htm')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_dgho.png"
+                         alt="GMS Onkologische Rehabilitation und Sozialmedizin cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Zeitschrift für Medizinische Ausbildung"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/en/journals/zma/index.htm')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_gma_klein.png"
+                         alt="GMS Zeitschrift für Medizinische Ausbildung cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "GMS Zeitschrift zur Förderung der Qualitätssicherung in medizinischen Laboratorien"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.egms.de/dynamic/en/journals/lab/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/logo_lab.png"
+                         alt="GMS Zeitschrift zur Förderung der Qualitätssicherung in medizinischen Laboratorien cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Heredity"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
