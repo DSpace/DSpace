@@ -65,8 +65,10 @@ public abstract class DSpaceObject
         dublinCoreChanged = false;
     }
 
-    // accumulate information to add to "detail" element of content Event,
-    // e.g. to document metadata fields touched, etc.
+    /**
+     * Accumulates information to add to "detail" element of content Event.
+     * E.g. to document metadata fields touched, etc.
+     */
     private StringBuffer eventDetails = null;
 
     /**
@@ -217,8 +219,18 @@ public abstract class DSpaceObject
         return null;
     }
 
+    /**
+     * Update the item "in archive" flag and Dublin Core metadata in the
+     * database.
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public abstract void update() throws SQLException, AuthorizeException;
 
+    /**
+     * Update the last-modified date of the object.
+     */
     public abstract void updateLastModified();
 
     /**
@@ -456,7 +468,7 @@ public abstract class DSpaceObject
 
     /**
      * Get metadata for the item in a chosen schema.
-     * See <code>MetadataSchema</code> for more information about schemas.
+     * See {@link MetadataSchema} for more information about schemas.
      * Passing in a <code>null</code> value for <code>qualifier</code>
      * or <code>lang</code> only matches metadata fields where that
      * qualifier or languages is actually <code>null</code>.
@@ -588,6 +600,11 @@ public abstract class DSpaceObject
         return new ArrayList<DCValue>();
     }
 
+    /**
+     * Replace the cached metadata.
+     *
+     * @param metadata new cache content.
+     */
     protected void setMetadata(List<DCValue> metadata)
     {
         dublinCore.set(metadata);
@@ -679,6 +696,7 @@ public abstract class DSpaceObject
      */
     protected class MetadataCache
     {
+        /** The cached metadata */
         List<DCValue> metadata = null;
 
         /**

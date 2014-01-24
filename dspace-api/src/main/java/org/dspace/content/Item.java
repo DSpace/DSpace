@@ -328,7 +328,7 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Method that updates the last modified date of the item
+     * Method that updates the last modified date of the item.
      */
     @Override
     public void updateLastModified()
@@ -1110,7 +1110,7 @@ public class Item extends DSpaceObject
 
     /**
      * Update the item "in archive" flag and Dublin Core metadata in the
-     * database
+     * database.
      *
      * @throws SQLException
      * @throws AuthorizeException
