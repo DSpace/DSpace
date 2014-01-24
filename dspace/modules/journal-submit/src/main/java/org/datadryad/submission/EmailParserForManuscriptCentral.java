@@ -242,7 +242,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                     if (fieldName.equals("ms dryad id") || fieldName.equals("ms reference number")){
                         Matcher mid = Pattern4MS_Dryad_ID.matcher(fieldValue);
                         if (mid.find()){
-                            result.setSubmissionId(mid.group(0));
+                            result.setSubmissionId(mid.group(1));
                             LOGGER.trace("submissionId="+result.getSubmissionId());
                             
                             if (fieldValue.equals(result.getSubmissionId())){
