@@ -54,7 +54,7 @@
             <xsl:if test="$knb_url_raw!=''">
                 <xsl:value-of
                         select="substring($knb_url_raw,0,string-length($knb_url_raw)-2)"/>
-                lter
+                <xsl:text>lter</xsl:text>
             </xsl:if>
         </xsl:variable>
 
