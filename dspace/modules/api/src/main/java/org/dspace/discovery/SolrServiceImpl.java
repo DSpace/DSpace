@@ -32,6 +32,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
+import org.dspace.statistics.SolrLogger;
+import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.PoolTask;
@@ -1302,46 +1304,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     String getTotalFileDownload(Item item)
     {
-        String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
-        String DOWN_COUNTER = "//result/@numFound";
-        String solr = ConfigurationManager.getProperty("solr.search.server");
-        String totalFileDownload = null ;
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            GetMethod get = new GetMethod(solr.replace("search","statistics") + query);
-
-
-            switch (new HttpClient().executeMethod(get)) {
-                case 200:
-                case 201:
-                case 202:
-                    Document docs = db.parse(get.getResponseBodyAsStream());
-                    docs.getDocumentElement().normalize();
-
-                    XPathFactory xpf = XPathFactory.newInstance();
-                    XPath xpath = xpf.newXPath();
-                    String xpathResult = xpath.evaluate(DOWN_COUNTER, docs);
-
-                    totalFileDownload = xpathResult;
-                    break;
-                default:
-                    log.error("Solr search failed to respond as expected when build solr search index for total download datafiles");
-            }
-
-            get.releaseConnection();
-        }
-        catch (ParserConfigurationException details) {
-            log.error(details.getMessage(), details);
-        }
-        catch (XPathExpressionException details) {
-            log.error(details.getMessage(), details);
-        }
-        catch (Exception e)
+        //String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
+        try{
+            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", "id: " + item.getID() + " AND type:"+ Constants.ITEM).getCount() ;
+            return Long.toString(totalFileDownload);
+        }catch (Exception e)
         {
-            log.error(e.getMessage(),e);
+            return "0";
         }
-        return totalFileDownload;
+
     }
 
 }
