@@ -10,6 +10,7 @@ import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -48,13 +49,17 @@ public class DryadJournalSubmissionUtils {
         String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(journalPropFile));
+            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
             String journalTypes = properties.getProperty("journal.order");
 
             for (int i = 0; i < journalTypes.split(",").length; i++) {
                 String journalType = journalTypes.split(",")[i].trim();
 
                 String str = "journal." + journalType + ".";
+                
+                log.debug("reading config for journal " + journalType);
+                log.debug("fullname " + properties.getProperty(str + FULLNAME));
+                log.debug("subscription? " + properties.getProperty(str + SUBSCRIPTION_PAID));
 
                 Map<String, String> map = new HashMap<String, String>();
                 map.put(FULLNAME, properties.getProperty(str + FULLNAME));

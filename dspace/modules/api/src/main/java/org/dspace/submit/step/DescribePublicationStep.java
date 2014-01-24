@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Enumeration;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -267,15 +268,18 @@ public class DescribePublicationStep extends AbstractProcessingStep {
 
         if (moreInput)
         {
+            EventLogger.log(context, "submission-describe-publication", "error=more_input_requested");
             return STATUS_MORE_INPUT_REQUESTED;
         }
         // if one or more fields errored out, return
         else if (getErrorFields(request) != null && getErrorFields(request).size() > 0)
         {
+            EventLogger.log(context, "submission-describe-publication", "error=missing_required_fields");
             return STATUS_MISSING_REQUIRED_FIELDS;
         }
 
         // completed without errors
+        EventLogger.log(context, "submission-describe-publication", "status=complete");
         return STATUS_COMPLETE;
 
     }

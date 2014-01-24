@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -92,6 +93,7 @@ public class CompletedDatastep extends AbstractProcessingStep {
         //Commit our changes before redirect
         context.commit();
 
+        EventLogger.log(context, "submission-completed-dataset", "status=complete,redirectUrl=" + redirectUrl);
         //Redirect us to an overview page of our completed dataset !
         response.sendRedirect(redirectUrl);
 

@@ -1,4 +1,3 @@
-
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
@@ -35,6 +34,7 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
@@ -43,6 +43,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
 import org.dspace.workflow.ClaimedTask;
+import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 import org.dspace.utils.DSpace;
@@ -67,10 +68,13 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             SQLException, IOException, AuthorizeException {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
+
         String shoppingCartExist =  request.getParameter("shopping-cart-exist");
+
         if(shoppingCartExist==null||!shoppingCartExist.equals("true")){
-            Map<String,String> messages = new HashMap<String,String>();
-            //shoppingcart doesn't exist then add one in the option section
+
+        Map<String,String> messages = new HashMap<String,String>();
+
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Enumeration s = request.getParameterNames();
         Enumeration v = request.getAttributeNames();
@@ -93,184 +97,49 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             {
                 item = submissionInfo.getSubmissionItem().getItem();
             }
-
+            boolean initalPage=true;
+            Item dataPackage = DryadWorkflowUtils.getDataPackage(context,item);
+            if(dataPackage==null){
+                dataPackage=item;
+            }
+            DCValue[] value = dataPackage.getMetadata("prism.publicationName");
+            if(value!=null&&value.length>0)
+            {
+                //only when the select journal we will remove the country list
+                initalPage = false;
+            }
+            if(!initalPage){
             //DryadJournalSubmissionUtils.journalProperties.get("");
-            PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = null;
             //create new transaction or update transaction id with item
-            shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
-            payementSystemService.updateTotal(context,shoppingCart,null);
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            paymentSystemService.updateTotal(context,shoppingCart,null);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)
+
             List info = options.addList("Payment",List.TYPE_FORM,"paymentsystem");
+
             //todo:find a better way to detect the step we are in
-            boolean selectCountry=false;
-            DCValue[] values= item.getMetadata("prism.publicationName");
-            if(values!=null&&values.length>0)
+
+            if(request.getRequestURI().contains("deposit-confirmed"))
             {
-             selectCountry = true;
+                paymentSystemService.generateNoEditableShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),messages);
             }
-            payementSystemService.generateShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),selectCountry,messages);
+            else {
+                paymentSystemService.generateShoppingCart(context,info,shoppingCart,manager,request.getContextPath(),messages);
+
+            }
+
 
             org.dspace.app.xmlui.wing.element.Item help = options.addList("need-help").addItem();
             help.addContent(T_CartHelp);
+            }
         }catch (Exception pe)
         {
             log.error("Exception: ShoppingCart:", pe);
         }
     }
-
-    private ShoppingCart getTransaction(Item item, PaymentSystemService payementSystemService) throws AuthorizeException, SQLException, PaymentSystemException, IOException {
-        ShoppingCart shoppingCart=null;
-        if(item!=null){
-            shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
-        }
-        return shoppingCart;
     }
-
-    private void generateOrderFrom(org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,PaymentSystemService paymentSystemService,String baseUrl) throws WingException,SQLException{
-        Item item = Item.find(context,transaction.getItem());
-        Long totalSize = new Long(0);
-        String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(transaction.getCurrency());
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
-        List hiddenList = info.addList("transaction");
-        hiddenList.addItem().addHidden("transactionId").setValue(Integer.toString(transaction.getID()));
-        hiddenList.addItem().addHidden("baseUrl").setValue(baseUrl);
-        try{
-
-            //add selected currency section
-        info.addLabel(T_Header);
-        generateCurrencyList(info,manager,transaction);
-        generatePayer(request,info,transaction,paymentSystemService,item);
-
-
-
-            generatePrice(info,manager,transaction,paymentSystemService);
-
-        //if(!request.getRequestURI().endsWith("submit"))
-
-//        WorkspaceItem submission=WorkspaceItem.find(context, item.getID());
-//
-//        SubmissionInfo sinfo = FlowUtils.obtainSubmissionInfo(objectModel, String.valueOf(submission.getID()));
-
-        //Integer step = (Integer)request.get("step");
-        generateCountryList(info,manager,transaction,item);
-
-        generateVoucherForm(info,manager,transaction);
-        }catch (Exception e)
-        {
-
-            info.addLabel("Errors when generate the shopping cart form");
-        }
-
-    }
-
-    private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,Item item) throws WingException{
-        DCValue[] values= item.getMetadata("prism.publicationName");
-        //SubmissionStepConfig cfg = sinfo.getSubmissionConfig().getStep(step);
-        if(values!=null&&values.length>0)
-        {
-            java.util.List<String> countryArray = manager.getSortedCountry();
-            info.addLabel(T_Country);
-            Select countryList = info.addItem("country-list", "select-list").addSelect("country");
-            countryList.addOption("","Select Your Country");
-            for(String temp:countryArray){
-                String[] countryTemp = temp.split(":");
-                if(shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
-                    countryList.addOption(true,countryTemp[0],countryTemp[0]);
-                }
-                else
-                {
-                    countryList.addOption(false,countryTemp[0],countryTemp[0]);
-                }
-            }
-        }
-
-        if(shoppingCart.getCountry().length()>0)
-        {
-            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
-        }
-        else
-        {
-            info.addItem("remove-country","remove-country").addXref("#","Remove Country : ");
-        }
-
-    }
-    private void generateSurchargeFeeForm(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,PaymentSystemService paymentSystemService) throws WingException,SQLException{
-        //add the large file surcharge section
-        String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
-        info.addLabel(T_Surcharge);
-        info.addItem("surcharge","surcharge").addContent(String.format("%s%.0f", symbol, paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart)));
-
-    }
-
-    private void generateCurrencyList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException,SQLException{
-        org.dspace.app.xmlui.wing.element.Item currency = info.addItem("currency-list", "select-list");
-        Select currencyList = currency.addSelect("currency");
-        Properties currencyArray = manager.getAllCurrencyProperty();
-
-        for(String currencyTemp: currencyArray.stringPropertyNames())
-        {
-            if(shoppingCart.getCurrency().equals(currencyTemp))
-            {
-                currencyList.addOption(true, currencyTemp, currencyTemp);
-            }
-            else
-            {
-                currencyList.addOption(false, currencyTemp, currencyTemp);
-            }
-        }
-
-    }
-
-    private void generateVoucherForm(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException,SQLException{
-        Voucher voucher1 = Voucher.findById(context,shoppingCart.getVoucher());
-        info.addItem("errorMessage","errorMessage").addContent("");
-        info.addLabel(T_Voucher);
-        org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
-
-            Text voucherText = voucher.addText("voucher","voucher");
-            voucher.addButton("apply","apply");
-            if(voucher1!=null){
-                voucherText.setValue(voucher1.getCode());
-                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : "+voucher1.getCode());
-            }
-            else{
-                info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : ");
-            }
-
-
-
-    }
-
-    private void generatePrice(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart,PaymentSystemService paymentSystemService) throws WingException,SQLException{
-        String waiverMessage = "";
-        String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
-        switch (paymentSystemService.getWaiver(context,shoppingCart,""))
-        {
-	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + "."; break;
-	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Data Publishing Charges are covered for all submissions to " + shoppingCart.getJournal() + "."; break;
-	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
-	}
-        info.addLabel(T_Price);
-        if(paymentSystemService.hasDiscount(context,shoppingCart,null))
-        {
-            info.addItem("price","price").addContent(symbol+"0");
-        }
-        else
-        {
-            info.addItem("price","price").addContent(String.format("%s%.0f", symbol, shoppingCart.getBasicFee()));
-        }
-        Double noIntegrateFee =  paymentSystemService.getNoIntegrateFee(context,shoppingCart,null);
-
-        //add the no integrate fee if it is not 0
-        info.addLabel(T_noInteg);
-        if(!paymentSystemService.hasDiscount(context,shoppingCart,null)&&noIntegrateFee>0&&!paymentSystemService.hasDiscount(context,shoppingCart,null))
-        {
-            info.addItem("no-integret","no-integret").addContent(String.format("%s%.0f", symbol, noIntegrateFee));
-        }
-    }
-
 
 }

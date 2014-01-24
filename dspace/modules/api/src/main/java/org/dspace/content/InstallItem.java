@@ -271,6 +271,8 @@ public class InstallItem
 
         // remove the item's policies and replace them with
         // the defaults from the collection
+
+        // TODO: move embargo and policies to top, next time this code is altered.
         item.inheritCollectionDefaultPolicies(is.getCollection());
 
         // set embargo lift date and take away read access if indicated.

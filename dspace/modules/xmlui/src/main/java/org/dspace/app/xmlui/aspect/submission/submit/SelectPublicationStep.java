@@ -21,10 +21,12 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
+import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 import org.apache.log4j.Logger;
@@ -482,7 +484,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         java.util.List<String> countryArray = manager.getSortedCountry();
-
+        try{
 	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
 	countryItem.addContent(T_Country_head);
 	countryItem.addContent(T_Country_help);
@@ -490,32 +492,41 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Select countryList = countryItem.addSelect("country");
         countryList.addOption("","Select a fee-waiver country");
         String selectedCountry = request.getParameter("country");
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
+        org.dspace.content.Item item = null;
+
+        if(submissionInfo==null)
+        {
+            String workflowId = request.getParameter("workflowID");
+            if(workflowId==null) {
+                // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
+                return;
+            }
+            WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
+            item = workflowItem.getItem();
+        }
+        else
+        {
+            item = submissionInfo.getSubmissionItem().getItem();
+        }
+        ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+        org.dspace.app.xmlui.wing.element.List hiddenList = info.addList("transaction");
+        hiddenList.addItem().addHidden("transactionId").setValue(Integer.toString(shoppingCart.getID()));
+        hiddenList.addItem().addHidden("baseUrl").setValue(request.getContextPath());
+
+
         if(selectedCountry==null)
         {
-            try{
-            SubmissionInfo submissionInfo=(SubmissionInfo)request.getAttribute("dspace.submission.info");
-            org.dspace.content.Item item = null;
-            if(submissionInfo==null)
-            {
-                String workflowId = request.getParameter("workflowID");
-                if(workflowId==null) {
-                    // item is no longer in submission OR workflow, probably archived, so we don't need shopping cart info
-                    return;
-                }
-                WorkflowItem workflowItem = WorkflowItem.find(context,Integer.parseInt(workflowId));
-                item = workflowItem.getItem();
-            }
-            else
-            {
-                item = submissionInfo.getSubmissionItem().getItem();
-            }
-            ShoppingCart shoppingCart = ShoppingCart.findAllByItem(context,item.getID()).get(0);
             if(shoppingCart!=null){
                 selectedCountry = shoppingCart.getCountry();
             }
-            }catch (Exception e)
+        }
+            else
+        {
+            if(shoppingCart!=null)
             {
-
+                shoppingCart.setCountry(selectedCountry);
             }
         }
 
@@ -532,7 +543,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 }
             }
         }
-
+        }catch (Exception e)
+        {}
     }
 
     private void addJournalSelectStatusIntegrated(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException {

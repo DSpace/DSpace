@@ -58,6 +58,7 @@ import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.handle.HandleManager;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * This is the class which defines what happens once a submission completes!
@@ -159,6 +160,7 @@ public class CompleteStep extends AbstractProcessingStep
             else
                 context.getDBConnection().rollback();
         }
+        EventLogger.log(context, "submission-complete", "status=complete");
         return STATUS_COMPLETE;
     }
 

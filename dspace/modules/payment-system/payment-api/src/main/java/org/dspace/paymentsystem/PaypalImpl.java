@@ -22,6 +22,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Item;
 import org.dspace.core.*;
@@ -86,10 +87,12 @@ public class PaypalImpl implements PaypalService{
             get.addParameter("TENDER", "C");
             get.addParameter("TRXTYPE", type);
             if(type.equals("S")){
+                //generate reauthorization form
                 get.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
             }
             else
             {
+                //generate reference transaction form for a later charge
                 get.addParameter("AMT", "0.00");
             }
             //TODO:add currency from shopping cart
@@ -138,6 +141,10 @@ public class PaypalImpl implements PaypalService{
         try{
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,wfi.getItem().getID());
+            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)){
+                //this shopping cart has already been charged
+                return true;
+            }
             Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
 
 	    // check whether we're using the special voucher that simulates "payment failed"
@@ -305,6 +312,13 @@ public class PaypalImpl implements PaypalService{
             log.debug("transaction id absent, cannot change card");
             return false;
         }
+        if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
+        {
+
+            //all ready changed
+            return true;
+        }
+
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
         try {
 
@@ -376,15 +390,33 @@ public class PaypalImpl implements PaypalService{
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type) throws WingException,SQLException {
+    public void generatePaypalForm(Division maindiv,ShoppingCart shoppingCart,String actionURL,String type,Context context) throws WingException,SQLException {
 
         //return false if there is error in loading from paypal
         String secureTokenId = getSecureTokenId();
         String secureToken = generateSecureToken(shoppingCart,secureTokenId,Integer.toString(shoppingCart.getItem()),type);
-
+        WorkspaceItem workspaceItem=null;
         if(secureToken==null){
-            showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
-	    log.error("PayPal Secure Token is null");
+            EPerson ePerson = context.getCurrentUser();
+            try{
+                workspaceItem=WorkspaceItem.findByItemId(context,shoppingCart.getItem());
+            }
+            catch (Exception e)
+            {
+                log.error("couldn't find the item in the workspace, so block peopele other than admmin"+e);
+            }
+            if(workspaceItem!=null||AuthorizeManager.isAdmin(context,ePerson))
+            {
+                showSkipPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please continue, and we will contact you regarding payment. Error code: Secure-null");
+
+            }
+            else
+            {
+                //don't show the skip button if item is not in workspace steps and not admin users
+                showHelpPaymentButton(maindiv,"Unfortunately, Dryad has encountered a problem communicating with our payment processor. Please contact administrator regarding payment. Error code: Secure-null");
+
+            }
+            log.error("PayPal Secure Token is null");
 
         }
         else{
@@ -418,7 +450,7 @@ public class PaypalImpl implements PaypalService{
         }
         if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
         {
-            finDiv.addPara("data-label", "bold").addContent("Your card has been charged.");
+            finDiv.addPara("data-label", "bold").addContent("You have already paid for this submission.");
         }
         else if(shoppingCart.getTotal()==0)
         {
@@ -443,6 +475,12 @@ public class PaypalImpl implements PaypalService{
         error.addHidden("show_button").setValue("Skip payment and submit");
     }
 
+    public void showHelpPaymentButton(Division mainDiv,String message)throws WingException{
+        Division error = mainDiv.addDivision("error");
+        error.addPara(message);
+        //error.addHidden("show_button").setValue("Skip payment and submit");
+    }
+
     public void addButtons(Division mainDiv)throws WingException{
         List buttons = mainDiv.addList("paypal-form-buttons");
         Button skipButton = buttons.addItem().addButton("skip_payment");
@@ -465,8 +503,36 @@ public class PaypalImpl implements PaypalService{
             String previous_email = request.getParameter("login_email");
             EPerson eperson = EPerson.findByEmail(context,previous_email);
             ShoppingCart shoppingCart = payementSystemService.getShoppingCartByItemId(context,item.getID());
-            List info = mainDiv.addList("Payment",List.TYPE_FORM,"paymentsystem");
-            payementSystemService.generateShoppingCart(context,info,shoppingCart,manager,"",true,messages);
+            if(shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
+            {
+                  //shopping cart already paid, not need to generate a form
+                paypalService.generateNoCostForm(mainDiv, shoppingCart,item, manager, payementSystemService);
+            }
+            else{
+
+            VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+            String voucherCode = "";
+            if(request.getParameter("submit-voucher")!=null)
+            {    //user is using the voucher code
+                voucherCode = request.getParameter("voucher");
+                if(voucherCode!=null&&voucherCode.length()>0){
+                    if(!voucherValidationService.voucherUsed(context,voucherCode)) {
+                        Voucher voucher = Voucher.findByCode(context,voucherCode);
+                        shoppingCart.setVoucher(voucher.getID());
+                        payementSystemService.updateTotal(context,shoppingCart,null);
+                    }
+                    else
+                    {
+                        errorMessage = "The voucher code is not valid:can't find the voucher code or the voucher code has been used";
+                    }
+                }
+                else
+                {
+                    shoppingCart.setVoucher(null);
+                    payementSystemService.updateTotal(context,shoppingCart,null);
+                }
+
+            }
 
             if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||!shoppingCart.getCurrency().equals("USD"))
             {
@@ -489,11 +555,11 @@ public class PaypalImpl implements PaypalService{
                     paypalService.generateVoucherForm(voucher,null,actionURL,knotId);
                 }
                 Division creditcard = mainDiv.addDivision("creditcard");
-                paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type);
+                paypalService.generatePaypalForm(creditcard,shoppingCart,actionURL,type,context);
 
             }
 
-
+            }
         }catch (Exception e)
         {
             //TODO: handle the exceptions

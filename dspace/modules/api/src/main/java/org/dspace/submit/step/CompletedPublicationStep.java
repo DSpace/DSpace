@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.SQLException;
+import org.dspace.usagelogging.EventLogger;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -134,6 +135,7 @@ public class CompletedPublicationStep extends AbstractProcessingStep
             else
                 context.getDBConnection().rollback();
         }
+        EventLogger.log(context, "submission-completed-publication", "status=complete,redirectUrl=" + redirectUrl);
         if(redirectUrl != null){
             response.sendRedirect(redirectUrl);
         }

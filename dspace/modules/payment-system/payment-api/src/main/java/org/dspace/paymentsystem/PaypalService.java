@@ -52,7 +52,7 @@ public interface PaypalService
 
     public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart);
 
-    public void generatePaypalForm(Division mandiv, ShoppingCart shoppingCart, String actionURL, String type) throws WingException, SQLException;
+    public void generatePaypalForm(Division mandiv, ShoppingCart shoppingCart, String actionURL, String type,Context context) throws WingException, SQLException;
 
     public void generateVoucherForm(Division form, String voucherCode, String actionURL, String knotId) throws WingException;
 
