@@ -43,28 +43,6 @@ import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
  */
 public class PaymentSystemImpl implements PaymentSystemService {
 
-
-    protected static final Message T_Header=
-            message("xmlui.PaymentSystem.shoppingcart.order.header");
-
-    protected static final Message T_Payer=
-            message("xmlui.PaymentSystem.shoppingcart.order.payer");
-    protected static final Message T_Price=
-            message("xmlui.PaymentSystem.shoppingcart.order.price");
-    protected static final Message T_Surcharge=
-            message("xmlui.PaymentSystem.shoppingcart.order.surcharge");
-    protected static final Message T_Total=
-            message("xmlui.PaymentSystem.shoppingcart.order.total");
-    protected static final Message T_noInteg=
-            message("xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee");
-    protected static final Message T_Country=
-            message("xmlui.PaymentSystem.shoppingcart.order.country");
-    protected static final Message T_Voucher=
-            message("xmlui.PaymentSystem.shoppingcart.order.voucher");
-    protected static final Message T_Apply=
-            message("xmlui.PaymentSystem.shoppingcart.order.apply");
-
-
     /** log4j log */
     private static Logger log = Logger.getLogger(PaymentSystemImpl.class);
     protected static final Message T_Header=
