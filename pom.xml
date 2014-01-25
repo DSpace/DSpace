@@ -908,9 +908,9 @@
             <version>3.6</version>
          </dependency>
          <dependency>
-            <groupId>net.java.dev.rome</groupId>
+            <groupId>rome</groupId>
             <artifactId>rome</artifactId>
-            <version>1.0.0</version>
+            <version>1.0</version>
          </dependency>
          <dependency>
             <groupId>rome</groupId>
