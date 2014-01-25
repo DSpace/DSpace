@@ -9,7 +9,7 @@
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
-create table cris_do (id int4 not null, crisID varchar(255) unique, sourceID varchar(255) unique, sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, typo_id int4, primary key (id));
+create table cris_do (id int4 not null, crisID varchar(255) unique, sourceID varchar(255), sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, typo_id int4, primary key (id), unique (sourceID, sourceRef));
 create table cris_do_box (id int4 not null, collapsed bool not null, externalJSP varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, typeDef_id int4, primary key (id));
 create table cris_do_box2con (cris_do_box_id int4 not null, jdyna_containable_id int4 not null);
 create table cris_do_etab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, displayTab_id int4, typeDef_id int4, primary key (id));
@@ -28,7 +28,7 @@ create table cris_do_tp2notp (cris_do_tp_id int4 not null, cris_do_no_tp_id int4
 create table cris_do_tp2pdef (cris_do_tp_id int4 not null, cris_do_pdef_id int4 not null);
 create table cris_do_wfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, widgetSize int4, useInStatistics bool not null, primary key (id));
 create table cris_do_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), urlPath varchar(255), filterExtended text, primary key (id));
-create table cris_orgunit (id int4 not null, crisID varchar(255) unique, sourceID varchar(255) unique, sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
+create table cris_orgunit (id int4 not null, crisID varchar(255) unique, sourceID varchar(255), sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id), unique (sourceID, sourceRef));
 create table cris_ou_box (id int4 not null, collapsed bool not null, externalJSP varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_ou_box2con (cris_ou_box_id int4 not null, jdyna_containable_id int4 not null);
 create table cris_ou_etab (id int4 not null, ext varchar(255), mandatory bool not null, mime varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), visibility int4, displayTab_id int4, primary key (id));
@@ -59,7 +59,7 @@ create table cris_pj_tab (id int4 not null, ext varchar(255), mandatory bool not
 create table cris_pj_tab2box (cris_pj_tab_id int4 not null, cris_pj_box_id int4 not null);
 create table cris_pj_wfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, widgetSize int4, useInStatistics bool not null, primary key (id));
 create table cris_pj_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), urlPath varchar(255), primary key (id));
-create table cris_project (id int4 not null, crisID varchar(255) unique, sourceID varchar(255) unique, sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
+create table cris_project (id int4 not null, crisID varchar(255) unique, sourceID varchar(255), sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id), unique (sourceID, sourceRef));
 create table cris_relpref (id int4 not null, itemID int4, priority int4 not null, relationType varchar(255), sourceUUID varchar(255), status varchar(255), targetUUID varchar(255), primary key (id));
 create table cris_rp_box (id int4 not null, collapsed bool not null, externalJSP varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_rp_box2con (cris_rp_box_id int4 not null, jdyna_containable_id int4 not null);
@@ -76,7 +76,7 @@ create table cris_rp_tab (id int4 not null, ext varchar(255), mandatory bool not
 create table cris_rp_tab2box (cris_rp_tab_id int4 not null, cris_rp_box_id int4 not null);
 create table cris_rp_wfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, widgetSize int4, useInStatistics bool not null, primary key (id));
 create table cris_rp_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), urlPath varchar(255), primary key (id));
-create table cris_rpage (id int4 not null, crisID varchar(255) unique, sourceID varchar(255) unique, sourceRef varchar(255), status bool, uuid varchar(255) not null unique, epersonID int4 unique, namesTimestampLastModified timestamp, timestampCreated timestamp, timestampLastModified timestamp, primary key (id));
+create table cris_rpage (id int4 not null, crisID varchar(255) unique, sourceID varchar(255), sourceRef varchar(255), status bool, uuid varchar(255) not null unique, epersonID int4 unique, namesTimestampLastModified timestamp, timestampCreated timestamp, timestampLastModified timestamp, primary key (id), unique (sourceID, sourceRef));
 create table cris_statsubscription (id int4 not null, epersonID int4 not null, freq int4 not null, typeDef int4, handle_or_uuid varchar(255), primary key (id));
 create table cris_subscription (id int4 not null, epersonID int4 not null, typeDef int4, uuid varchar(255), primary key (id));
 create table cris_ws_criteria (id int4 not null, criteria varchar(255), enabled bool not null, filter varchar(255), primary key (id));
