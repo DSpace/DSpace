@@ -469,18 +469,18 @@
             <version>1.8</version>
         </dependency>
         <dependency>
-            <groupId>org.dspace.dependencies</groupId>
-            <artifactId>dspace-geoip</artifactId>
-            <version>1.2.3</version>
+            <groupId>com.maxmind.geoip</groupId>
+            <artifactId>geoip-api</artifactId>
+            <version>1.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dspace.dnsjava</groupId>
+            <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>2.0.6</version>
+            <version>2.1.1</version>
         </dependency>
 
         <dependency>
