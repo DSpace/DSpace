@@ -105,7 +105,7 @@ public class Item extends DSpaceObject
     private TableRowIterator retrieveMetadata() throws SQLException
     {
         return DatabaseManager.queryTable(ourContext, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
+                "SELECT * FROM MetadataValue WHERE object_id= ? ORDER BY metadata_field_id, place",
                 ourRow.getIntColumn("item_id"));
     }
 
@@ -1753,7 +1753,7 @@ public class Item extends DSpaceObject
     private void removeMetadataFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM MetadataValue WHERE item_id= ? ",
+                "DELETE FROM MetadataValue WHERE object_id= ? ",
                 getID());
     }
 
@@ -2139,7 +2139,7 @@ public class Item extends DSpaceObject
         }
         
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-                       "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+                       "AND item.item_id = metadatavalue.object_id AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(value))
         {
@@ -2319,7 +2319,7 @@ public class Item extends DSpaceObject
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item",
             "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-            "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ? AND authority = ?",
+            "AND item.item_id = metadatavalue.object_id AND metadata_field_id = ? AND authority = ?",
             mdf.getFieldID(), value);
         return new ItemIterator(context, rows);
     }
