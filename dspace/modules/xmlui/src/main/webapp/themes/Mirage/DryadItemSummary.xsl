@@ -2031,6 +2031,24 @@
                          alt="Journal of Heredity cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Journal of Hymenoptera Research"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.pensoft.net/journals/jhr/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JHymenopRes.png"
+                         alt="Journal of Hymenoptera Research cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Journal of Open Public Health Data"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2369,6 +2387,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PLOS-Pathogens.png"
                          alt="PLOS Pathogens logo"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Subterranean Biology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.pensoft.net/journals/subtbiol/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/SubterraneanBiol.png"
+                         alt="Subterranean Biology cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Systematic Biology"'>
