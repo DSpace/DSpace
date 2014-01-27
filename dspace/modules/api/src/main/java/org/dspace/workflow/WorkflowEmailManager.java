@@ -259,7 +259,9 @@ public class WorkflowEmailManager {
     throws SQLException, IOException {
         try
         {
-            List<EPerson> curators = getCurators(c, wi.getCollection());
+            // Notify curators and submitter
+            List<EPerson> recipients = getCurators(c, wi.getCollection());
+            recipients.add(wi.getSubmitter());
 
             // Get the item title
             String title = WorkflowManager.getItemTitle(wi);
@@ -269,12 +271,12 @@ public class WorkflowEmailManager {
 
             // Get the collection
             Collection coll = wi.getCollection();
-            for(EPerson curator : curators) {
-                Locale supportedLocale = I18nUtil.getEPersonLocale(curator);
+            for(EPerson recipient : recipients) {
+                Locale supportedLocale = I18nUtil.getEPersonLocale(recipient);
                 Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "payment_needs_reauthorization"));
                 email.addArgument(title);
                 email.addArgument(submitter);
-                email.addRecipient(curator.getEmail());
+                email.addRecipient(recipient.getEmail());
                 email.send();
             }
         }
