@@ -844,13 +844,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
             Element mfile = mi.next();
 
-            String mfileGrp = mfile.getAttributeValue("ADMID");
-            if (mfileGrp == null)
-            {
-                throw new PackageValidationException(
-                        "Invalid METS Manifest: file element without ID attribute.");
-            }
-
             String bundleName = METSManifest.getBundleName(mfile, false);
 
             Bundle bundle;
@@ -864,7 +857,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 bundle = item.createBundle(bundleName);
             }
 
-            manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
+	        String mfileGrp = mfile.getAttributeValue("ADMID");
+	        if (mfileGrp != null)
+	        {
+		        manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
+	        }
+	        else
+	        {
+		        if (log.isDebugEnabled())
+		        {
+		            log.debug("Ingesting bundle with no ADMID, not crosswalking bundle metadata");
+		        }
+	        }
 
             bundle.update();
         }// end for each manifest file
