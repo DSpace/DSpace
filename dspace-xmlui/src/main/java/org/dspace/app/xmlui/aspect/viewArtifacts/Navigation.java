@@ -133,13 +133,22 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             if (dso instanceof Item)
             {
+                pageMeta.addMetadata("focus","containerType").addContent("type:item");
                 pageMeta.addMetadata("focus","object").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
             }
-
-            if (dso instanceof Collection || dso instanceof Community)
+            
+            if (dso instanceof Collection)
             {
+                pageMeta.addMetadata("focus","containerType").addContent("type:collection");
+                pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
+                this.getObjectManager().manageObject(dso);
+            }
+            
+            if (dso instanceof Community)
+            {
+                pageMeta.addMetadata("focus","containerType").addContent("type:community");
                 pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
             }
