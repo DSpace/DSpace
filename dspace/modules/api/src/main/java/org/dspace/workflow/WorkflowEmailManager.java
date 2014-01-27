@@ -249,7 +249,7 @@ public class WorkflowEmailManager {
         if(role != null) {
             Group curatorsGroup = WorkflowUtils.getRoleGroup(c, coll.getID(), role);
             if(curatorsGroup != null) {
-                curators = Arrays.asList(curatorsGroup.getMembers());
+                curators.addAll(Arrays.asList(curatorsGroup.getMembers()));
             }
         }
         return curators;
