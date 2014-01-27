@@ -21,6 +21,6 @@
 -- Generalize metadata value table       --
 -------------------------------------------
 
-ALTER TABLE MetadataValue ALTER COLUMN item_id RENAME TO object_id;
+ALTER TABLE MetadataValue RENAME COLUMN item_id TO object_id;
 ALTER INDEX metadatavalue_item_idx RENAME TO metadatavalue_object_idx;
 ALTER INDEX metadatavalue_item_idx2 RENAME TO metadatavalue_object_idx2;
