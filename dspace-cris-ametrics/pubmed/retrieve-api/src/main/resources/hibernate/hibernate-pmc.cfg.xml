@@ -40,11 +40,6 @@
 
 		<property name="hibernate.search.autoregister_listeners">false</property>
 
-		<!-- configuration pool via c3p0--> 
-		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property> 
-		<property name="hibernate.c3p0.max_statements">0</property> 		
-		<property name="hibernate.c3p0.timeout">100</property> <!-- seconds -->
-
 
 		<mapping class="it.cilea.osd.common.core.TimeStampInfo" />
 		<mapping class="it.cilea.osd.common.core.SingleTimeStampInfo" />
