@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,6 +29,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -312,15 +314,16 @@ public class OdinsHamr extends AbstractCurationTask {
     
     /**
        Retrieve a list of names associated with this DOI in ORCID.
+       The DOI may represent a Dryad item, or any other work.
     **/
-    private List<OrcidName> retrieveOrcidNames(String itemDOI) {
+    private List<OrcidName> retrieveOrcidNames(String aDOI) {
 	List<OrcidName> orcidNames = new ArrayList<OrcidName>();
 
-	if(itemDOI.startsWith("doi:")) {
-	    itemDOI = itemDOI.substring("doi:".length());
+	if(aDOI.startsWith("doi:")) {
+	    aDOI = aDOI.substring("doi:".length());
 	}
 	try {
-	    URL orcidQuery = new URL(ORCID_QUERY_BASE + "%22" + itemDOI + "%22");
+	    URL orcidQuery = new URL(ORCID_QUERY_BASE + "%22" + aDOI + "%22");
 	    Document orcidDoc = docb.parse(orcidQuery.openStream());
 	    NodeList nl = orcidDoc.getElementsByTagName("orcid-profile");
 	    // for each returned ORCID profile...
@@ -332,11 +335,11 @@ public class OdinsHamr extends AbstractCurationTask {
 		orcidNames.add(new OrcidName(theOrcid, familyName +  ", " + givenName));
 	    }
 	} catch (MalformedURLException e) {
-	    log.error("cannot make a valid URL for itemDOI="  + itemDOI, e);
+	    log.error("cannot make a valid URL for aDOI="  + aDOI, e);
 	} catch (IOException e) {
-	    log.error("IO problem for itemDOI="  + itemDOI, e);
+	    log.error("IO problem for aDOI="  + aDOI, e);
 	} catch (SAXException e) {
-	    log.error("error processing XML for itemDOI="  + itemDOI, e);
+	    log.error("error processing XML for aDOI="  + aDOI, e);
 	}
 
 	return orcidNames;
