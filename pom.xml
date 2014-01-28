@@ -112,19 +112,20 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
+         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
          <plugin>
            <artifactId>maven-antrun-plugin</artifactId>
            <version>1.7</version>
-           <configuration>
-             <target>
-	       <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
-               <native2ascii encoding="UTF8" src="${basedir}" dest="${basedir}/target" includes="*.properties" />
-             </target>
-           </configuration>
            <executions>
              <execution>
                <id>native2ascii-utf8</id>
                <phase>generate-resources</phase>
+               <configuration>
+                 <target name="Encode any UTF-8 chars in [src]/*.properties">
+                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
+                 </target>
+               </configuration>
                <goals>
                  <goal>run</goal>
                </goals>
