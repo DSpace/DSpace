@@ -8,17 +8,11 @@
 package org.dspace.curate;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Properties;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -26,23 +20,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
-import org.dspace.handle.HandleManager;
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.crosswalk.MetadataValidationException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.identifier.IdentifierNotFoundException;
@@ -359,13 +343,6 @@ public class OdinsHamr extends AbstractCurationTask {
     }
 
     
-    /**
-       An XML utility method that returns the text content of a node.
-    **/
-    private String getNodeText(Node aNode) {
-	return aNode.getChildNodes().item(0).getNodeValue();
-    }
-
     private Item getDSpaceItem(String itemID) {
 	Item dspaceItem = null;
 	try {
