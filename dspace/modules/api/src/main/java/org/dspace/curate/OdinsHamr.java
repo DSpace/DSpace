@@ -346,19 +346,6 @@ public class OdinsHamr extends AbstractCurationTask {
     }
 
     
-    private Item getDSpaceItem(String itemID) {
-	Item dspaceItem = null;
-	try {
-	    dspaceItem = (Item)identifierService.resolve(context, itemID);  
-        } catch (IdentifierNotFoundException e) {
-	    log.fatal("Unable to get DSpace Item for " + itemID, e);
-	} catch (IdentifierNotResolvableException e) {
-	    log.fatal("Unable to get DSpace Item for " + itemID, e);
-	}
-
-	return dspaceItem;
-    }
-
     class OrcidName extends Object {
 	private String orcid = "";
 	private String name = "";
