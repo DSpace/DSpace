@@ -23,34 +23,22 @@ import org.dspace.workflow.actions.ActionResult;
  *
  * @author dan.leehr@nescent.org
  */
-public class AfterPublicationAction extends ProcessingAction {
+public class AfterPublicationAction extends EditMetadataAction {
 
     @Override
-    public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+    public ActionResult processMainPage(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         if(request.getParameter("after_blackout_submit") != null) {
             addApprovedProvenance(c, wfi);
-
-            // if(embargo is "untilArticleAppears"): Remove it!
-            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-            for(Item i : dataFiles){
-                DCValue[] values = i.getMetadata("dc.type.embargo");
-                if(values!=null && values.length > 0){
-                    if(values[0].value.equals("untilArticleAppears")){
-                        i.clearMetadata("dc", "type", "embargo", Item.ANY);
-                        i.addMetadata("dc", "type", "embargo", "en", "none");
-                    }
-                }
-                i.update();
-            }
+            removeEmbargoIfUntilArticleAppears(c, wfi);
             // Finished, archive
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         } else {
-            //We pressed the leave button so return to our submissions page
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+            // User did not click "after_blackout_submit",  defer to base implementation for processing.
+            return super.processMainPage(c, wfi, step, request);
         }
     }
 
-    // Copied from EditMetadataAction
+    // Derived from EditMetadataAction
     private void addApprovedProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
         //Add the provenance for the accept
         String now = DCDate.getCurrent().toString();
@@ -64,5 +52,20 @@ public class AfterPublicationAction extends ProcessingAction {
         // Add to item as a DC field
         wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         wfi.getItem().update();
+    }
+
+    private void removeEmbargoIfUntilArticleAppears(Context c, WorkflowItem wfi)
+    throws SQLException, AuthorizeException, IOException {
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+        for(Item i : dataFiles){
+            DCValue[] values = i.getMetadata("dc.type.embargo");
+            if(values!=null && values.length > 0){
+                if(values[0].value.equals("untilArticleAppears")){
+                    i.clearMetadata("dc", "type", "embargo", Item.ANY);
+                    i.addMetadata("dc", "type", "embargo", "en", "none");
+                }
+            }
+            i.update();
+        }
     }
 }

@@ -474,7 +474,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 	        case ShoppingCart.VOUCHER_WAIVER: format("Waiver Details", "Voucher code applied to Data Publishing Charge."); break;
 	    }
 
-            if(shoppingCart.getTransactionId() == null && "".equals(shoppingCart.getTransactionId().trim()))
+            if(shoppingCart.getTransactionId() != null && "".equals(shoppingCart.getTransactionId().trim()))
             {
                 format("Transaction ID", shoppingCart.getTransactionId());
             }
