@@ -484,8 +484,8 @@ public class SolrLogger
             }
             //Store the scope
             if(scope != null){
-                solrDoc.addField("scopeId", scope.getType());
-                solrDoc.addField("scopeType", scope.getID());
+                solrDoc.addField("scopeId", scope.getID());
+                solrDoc.addField("scopeType", scope.getType());
             }
 
             if(rpp != -1){
