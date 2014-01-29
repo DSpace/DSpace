@@ -64,6 +64,7 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/bootstrap/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
