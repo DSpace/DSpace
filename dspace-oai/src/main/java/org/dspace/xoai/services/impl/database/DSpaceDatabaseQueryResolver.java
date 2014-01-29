@@ -53,8 +53,11 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
         countParameters.addAll(parameters);
 
         if (!where.equals("")) {
-            query += " WHERE " + where;
-            countQuery += " WHERE " + where;
+            query += " WHERE i.in_archive=true AND " + where;
+            countQuery += " WHERE i.in_archive=true AND " + where;
+        } else {
+            query += " WHERE i.in_archive=true";
+            countQuery += " WHERE i.in_archive=true";
         }
 
         query += " ORDER BY i.item_id";

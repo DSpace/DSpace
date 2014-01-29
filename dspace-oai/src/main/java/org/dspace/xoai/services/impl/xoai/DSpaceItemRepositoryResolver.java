@@ -9,6 +9,7 @@ package org.dspace.xoai.services.impl.xoai;
 
 import com.lyncode.xoai.dataprovider.services.api.ItemRepository;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
@@ -35,8 +36,11 @@ public class DSpaceItemRepositoryResolver implements ItemRepositoryResolver {
     CollectionsService collectionsService;
     @Autowired
     private HandleResolver handleResolver;
+    @Autowired
+    private XOAIItemCacheService cacheService;
 
     private ItemRepository itemRepository;
+
 
     @Override
     public ItemRepository getItemRepository() throws ContextServiceException {
@@ -49,7 +53,7 @@ public class DSpaceItemRepositoryResolver implements ItemRepositoryResolver {
                     throw new ContextServiceException(e.getMessage(), e);
                 }
             } else
-                itemRepository = new DSpaceItemDatabaseRepository(collectionsService, handleResolver, databaseQueryResolver, contextService.getContext());
+                itemRepository = new DSpaceItemDatabaseRepository(configurationService, collectionsService, handleResolver, cacheService, databaseQueryResolver, contextService);
         }
 
         return itemRepository;

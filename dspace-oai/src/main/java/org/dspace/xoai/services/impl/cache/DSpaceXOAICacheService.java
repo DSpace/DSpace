@@ -72,7 +72,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
 
     @Override
     public boolean isActive() {
-        return configurationService.getBooleanProperty("xoai", "cache", true);
+        return configurationService.getBooleanProperty("oai", "cache", true);
     }
 
     @Override

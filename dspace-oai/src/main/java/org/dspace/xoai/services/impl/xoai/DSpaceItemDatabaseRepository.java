@@ -22,16 +22,16 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceSet;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
+import org.dspace.xoai.services.api.config.ConfigurationService;
+import org.dspace.xoai.services.api.context.ContextService;
+import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.database.*;
-import org.dspace.xoai.services.impl.cache.DSpaceXOAIItemCacheService;
 import org.dspace.xoai.util.ItemUtils;
 
 import java.io.IOException;
@@ -49,20 +49,23 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
 {
 
     private static Logger log = LogManager.getLogger(DSpaceItemDatabaseRepository.class);
+
     private XOAIItemCacheService cacheService;
     private boolean useCache;
     private DatabaseQueryResolver queryResolver;
-    private Context context;
+    private ContextService context;
     private CollectionsService collectionsService;
+    private ConfigurationService configurationService;
 
-    public DSpaceItemDatabaseRepository(CollectionsService collectionsService, HandleResolver handleResolver, DatabaseQueryResolver queryResolver, Context context)
+    public DSpaceItemDatabaseRepository(ConfigurationService configurationService, CollectionsService collectionsService, HandleResolver handleResolver, XOAIItemCacheService cacheService, DatabaseQueryResolver queryResolver, ContextService context)
     {
         super(collectionsService, handleResolver);
+        this.configurationService = configurationService;
         this.collectionsService = collectionsService;
+        this.cacheService = cacheService;
         this.queryResolver = queryResolver;
         this.context = context;
-        cacheService = new DSpaceXOAIItemCacheService();
-        useCache = ConfigurationManager.getBooleanProperty("oai", "cache.enabled", true);
+        this.useCache = configurationService.getBooleanProperty("oai", "cache.enabled", true);
     }
     
     private Metadata getMetadata (org.dspace.content.Item item) throws IOException {
@@ -110,7 +113,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             String parts[] = id.split(Pattern.quote(":"));
             if (parts.length == 3)
             {
-                DSpaceObject obj = HandleManager.resolveToObject(context,
+                DSpaceObject obj = HandleManager.resolveToObject(context.getContext(),
                         parts[2]);
                 if (obj == null)
                     throw new IdDoesNotExistException();
@@ -131,6 +134,8 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             throw new OAIException(e);
         } catch (IOException e) {
             throw new OAIException(e);
+        } catch (ContextServiceException e) {
+            throw new OAIException(e);
         }
         throw new IdDoesNotExistException();
     }
@@ -144,9 +149,9 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         try
         {
             DatabaseQuery databaseQuery = queryResolver.buildQuery(filters, offset, length);
-            TableRowIterator rowIterator = DatabaseManager.queryTable(context, "item",
+            TableRowIterator rowIterator = DatabaseManager.queryTable(context.getContext(), "item",
                     databaseQuery.getQuery(), databaseQuery.getParameters().toArray());
-            ItemIterator iterator = new ItemIterator(context, rowIterator);
+            ItemIterator iterator = new ItemIterator(context.getContext(), rowIterator);
             int i = 0;
             while (iterator.hasNext() && i < length)
             {
@@ -163,6 +168,8 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             log.error(e.getMessage(), e);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
+        } catch (ContextServiceException e) {
+            log.error(e.getMessage(), e);
         }
         return new ListItemsResults(false, list, 0);
     }
@@ -176,9 +183,9 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         try
         {
             DatabaseQuery databaseQuery = queryResolver.buildQuery(filters, offset, length);
-            TableRowIterator rowIterator = DatabaseManager.queryTable(context, "item",
+            TableRowIterator rowIterator = DatabaseManager.queryTable(context.getContext(), "item",
                     databaseQuery.getQuery(), databaseQuery.getParameters().toArray());
-            ItemIterator iterator = new ItemIterator(context, rowIterator);
+            ItemIterator iterator = new ItemIterator(context.getContext(), rowIterator);
             int i = 0;
             while (iterator.hasNext() && i < length)
             {
@@ -194,6 +201,8 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         } catch (DatabaseQueryException e) {
             log.error(e.getMessage(), e);
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } catch (ContextServiceException e) {
             log.error(e.getMessage(), e);
         }
         return new ListItemIdentifiersResult(false, list, 0);

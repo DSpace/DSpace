@@ -59,7 +59,7 @@ public class DatabaseQuery {
         if (total == null) {
             try
             {
-                total = DatabaseManager.querySingle(context, query, parameters).getIntColumn("count");
+                total = DatabaseManager.querySingle(context, countQuery, countParameters).getIntColumn("count");
             }
             catch (SQLException e1)
             {

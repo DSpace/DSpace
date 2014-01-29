@@ -5,9 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.tests.integration;
+package org.dspace.xoai.tests.integration.xoai;
 
-import com.lyncode.xoai.builders.MapBuilder;
+import com.lyncode.builder.MapBuilder;
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.Configuration;

@@ -7,7 +7,8 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
-import com.lyncode.xoai.builders.ListBuilder;
+import com.google.common.base.Function;
+import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.core.ListItemIdentifiersResult;
 import com.lyncode.xoai.dataprovider.core.ListItemsResults;
 import com.lyncode.xoai.dataprovider.data.Item;
@@ -77,9 +78,9 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
             QueryResult queryResult = retrieveItems(filters, offset, length);
             List<ItemIdentifier> identifierList = new ListBuilder<Item>()
                     .add(queryResult.getResults())
-                    .build(new ListBuilder.Transformer<Item, ItemIdentifier>() {
+                    .build(new Function<Item, ItemIdentifier>() {
                         @Override
-                        public ItemIdentifier transform(Item elem) {
+                        public ItemIdentifier apply(Item elem) {
                             return elem;
                         }
                     });

@@ -7,7 +7,7 @@
  */
 package org.dspace.xoai.services.impl;
 
-import com.lyncode.xoai.builders.MapBuilder;
+import com.lyncode.builder.MapBuilder;
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import org.dspace.xoai.services.api.ServiceResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;

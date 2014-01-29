@@ -7,7 +7,7 @@
  */
 package org.dspace.xoai.tests.unit.services.impl;
 
-import com.lyncode.xoai.builders.DateBuilder;
+import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.xoai.services.api.database.CollectionsService;

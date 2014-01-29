@@ -7,7 +7,7 @@
  */
 package org.dspace.xoai.tests.unit.services.impl.database;
 
-import com.lyncode.xoai.builders.DateBuilder;
+import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.data.Filter;
 import com.lyncode.xoai.dataprovider.filter.Scope;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;

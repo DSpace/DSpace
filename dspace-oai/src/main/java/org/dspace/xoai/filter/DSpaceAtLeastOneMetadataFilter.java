@@ -8,7 +8,8 @@
 
 package org.dspace.xoai.filter;
 
-import com.lyncode.xoai.builders.ListBuilder;
+import com.google.common.base.Function;
+import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
@@ -66,9 +67,9 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
             } else if (parameterValue instanceof ParameterList) {
                 values = new ListBuilder<ParameterValue>()
                         .add(parameterValue.asParameterList().getValues())
-                        .build(new ListBuilder.Transformer<ParameterValue, String>() {
+                        .build(new Function<ParameterValue, String>() {
                             @Override
-                            public String transform(ParameterValue elem) {
+                            public String apply(ParameterValue elem) {
                                 return elem.asSimpleType().asString();
                             }
                         });

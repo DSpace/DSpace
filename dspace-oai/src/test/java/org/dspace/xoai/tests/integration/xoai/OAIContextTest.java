@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.tests.integration;
+package org.dspace.xoai.tests.integration.xoai;
 
 import org.junit.Test;
 
