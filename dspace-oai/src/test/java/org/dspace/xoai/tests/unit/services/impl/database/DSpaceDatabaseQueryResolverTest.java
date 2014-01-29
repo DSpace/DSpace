@@ -62,7 +62,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE (i.last_modified >= ?) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND (i.last_modified >= ?) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((java.sql.Date)result.getParameters().get(0)).getTime(), is(fromDate(DATE).getTime()));
         assertThat((Integer) result.getParameters().get(1), is(START));
         assertThat((Integer) result.getParameters().get(2), is(LENGTH));
@@ -88,7 +88,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE ((i.last_modified >= ?) AND (i.last_modified <= ?)) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((i.last_modified >= ?) AND (i.last_modified <= ?)) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((java.sql.Date)result.getParameters().get(0)).getTime(), is(fromDate(DATE).getTime()));
         assertThat(((java.sql.Date)result.getParameters().get(1)).getTime(), is(untilDate(DATE).getTime()));
         assertThat((Integer) result.getParameters().get(2), is(START));
@@ -110,7 +110,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((Integer) result.getParameters().get(0)), is(1));
         assertThat((Integer) result.getParameters().get(1), is(START));
         assertThat((Integer) result.getParameters().get(2), is(LENGTH));
@@ -134,7 +134,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?) OR EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?) OR EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((Integer) result.getParameters().get(0)), is(1));
         assertThat(((Integer) result.getParameters().get(1)), is(2));
         assertThat((Integer) result.getParameters().get(2), is(START));
@@ -153,7 +153,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE (item.deleted:true OR (i.last_modified >= ?)) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND (item.deleted:true OR (i.last_modified >= ?)) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((java.sql.Date)result.getParameters().get(0)).getTime(), is(fromDate(DATE).getTime()));
         assertThat((Integer) result.getParameters().get(1), is(START));
         assertThat((Integer) result.getParameters().get(2), is(LENGTH));
@@ -177,7 +177,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE (i.last_modified >= ?) AND true ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND (i.last_modified >= ?) AND true ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((java.sql.Date)result.getParameters().get(0)).getTime(), is(fromDate(DATE).getTime()));
         assertThat((Integer) result.getParameters().get(1), is(START));
         assertThat((Integer) result.getParameters().get(2), is(LENGTH));
