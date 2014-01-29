@@ -55,7 +55,7 @@
             <Format ref="mets"/>
             <Format ref="didl"/>
             <Description>
-                This contexts complains with Driver rules.
+                This contexts complies with Driver rules.
             </Description>
         </Context>
 
@@ -79,7 +79,7 @@
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Description>
-                This contexts complains with OpenAIRE rules.
+                This contexts complies with OpenAIRE rules.
             </Description>
         </Context>
     </Contexts>
