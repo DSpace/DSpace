@@ -40,6 +40,7 @@
                          this assembly builds a directory, setting this to "true"
                          (default value) will just result in a WARNING message.-->
                     <attach>false</attach>
+                    <finalName>${artifactId}</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
