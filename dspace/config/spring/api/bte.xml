@@ -284,13 +284,13 @@
 	<bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
 		<property name="fieldMap">
 			<map>
-				<entry key="1" value="title" />
-				<entry key="0" value="authors" />
+				<entry key="0" value="title" />
+				<entry key="1" value="authors" />
 				<entry key="2" value="issued" />
 				<entry key="3" value="journal" />
-				<entry key="14" value="abstract" />
-				<entry key="31" value="jissn" />
-				<entry key="38" value="subtype" />
+				<entry key="4" value="abstract" />
+				<entry key="5" value="jissn" />
+				<entry key="6" value="subtype" />
 			</map>
 		</property>
 		<property name="skipLines" value="1" />
@@ -302,13 +302,13 @@
 	<bean id="tsvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
 		<property name="fieldMap">
 			<map>
-				<entry key="7" value="Title" />
-				<entry key="1" value="Author" />
-				<entry key="37" value="Year" />
-				<entry key="8" value="Journal" />
-				<entry key="19" value="Abstract" />
-				<entry key="31" value="ISSN" />
-				<entry key="0" value="Type" />
+				<entry key="0" value="title" />
+				<entry key="1" value="authors" />
+				<entry key="2" value="issued" />
+				<entry key="3" value="journal" />
+				<entry key="4" value="abstract" />
+				<entry key="5" value="jissn" />
+				<entry key="6" value="subtype" />
 			</map>
 		</property>
 		<!-- This makes the CSV data loader able to load TSV data -->
