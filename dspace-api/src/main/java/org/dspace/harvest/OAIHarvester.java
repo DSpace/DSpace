@@ -139,13 +139,9 @@ public class OAIHarvester {
         // Set the ORE options
 		Namespace ORESerializationNamespace = OAIHarvester.getORENamespace();
 
-        if (ORESerializationNamespace == null) {
-        	log.error("No ORE serialization namespace declared; see dspace.cfg option \"harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}\"");
-        	throw new HarvestingException("No ORE serialization namespace specified");
-        } else {
-        	ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
-        	ORESerialKey = ORESerializationNamespace.getPrefix();
-        }
+        //No need to worry about ORESerializationNamespace, this can never be null
+        ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
+        ORESerialKey = ORESerializationNamespace.getPrefix();
 
         // Set the metadata options
         metadataKey = harvestRow.getHarvestMetadataConfig();
@@ -932,7 +928,7 @@ public class OAIHarvester {
         String DMDOAIPrefix = null;
 
         try {
-            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
+            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, getORENamespace().getURI());
             DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
     	}
     	catch (Exception ex) {
