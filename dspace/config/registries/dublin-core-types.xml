@@ -3,9 +3,9 @@
 <!--
   - dublin-core-types.xml
   -
-  - Version:  $Revision$
+  - Version:  $Revision: 3705 $
   -
-  - Date:     $Date$
+  - Date:     $Date: 2009-04-11 12:02:24 -0500 (Sat, 11 Apr 2009) $
   -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
@@ -33,8 +33,8 @@
     <contributor.author>Joan Kolias</contributor.author>
     <contributor.author>Rebecca Lubas</contributor.author>
     <contributor.author>Sarah Mitchell</contributor.author>
-    <contributor.editor>$Author$</contributor.editor>
-    <date.created>$Date$</date.created>
+    <contributor.editor>$Author: mdiggory $</contributor.editor>
+    <date.created>$Date: 2009-04-11 12:02:24 -0500 (Sat, 11 Apr 2009) $</date.created>
     <description>
       $Log$
       Revision 1.5  2006/10/18 15:38:34  cjuergen
@@ -80,7 +80,7 @@
       (hopefully) fixed cvs keyword Log to expand in tags properly.
 
     </description>
-    <description.version>$Revision$</description.version>
+    <description.version>$Revision: 3705 $</description.version>
   </dspace-header>
 
   <dc-schema>
@@ -584,4 +584,31 @@
     <scope_note>Nature or genre of content.</scope_note>
   </dc-type>
 
+  <!-- Create a "Princeton" schema for University-specific data. -->
+  <dc-schema>
+          <name>pu</name>
+          <namespace>http://www.princeton.edu/</namespace>
+  </dc-schema>
+  
+    <dc-type>
+	<schema>pu</schema>
+    <element>projectgrantnumber</element>
+    <!-- unqualified -->
+    <scope_note>Princeton project grant code to be charged for item submission.</scope_note>
+  </dc-type>
+  
+  <dc-type>
+	<schema>pu</schema>
+    <element>embargo</element>
+    <qualifier>lift</qualifier>
+    <scope_note>The date on which embargo should be lifted.</scope_note>
+  </dc-type>
+  
+    <dc-type>
+	<schema>pu</schema>
+    <element>embargo</element>
+    <qualifier>terms</qualifier>
+    <scope_note>Terms that can be translated to embargo lift dates.</scope_note>
+  </dc-type>
+  
 </dspace-dc-types>

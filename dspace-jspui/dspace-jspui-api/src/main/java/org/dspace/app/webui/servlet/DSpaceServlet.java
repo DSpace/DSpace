@@ -20,6 +20,7 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.PUIPAuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -45,7 +46,7 @@ import org.dspace.core.LogManager;
  * @see org.dspace.core.Context
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 5845 $
  */
 public class DSpaceServlet extends HttpServlet
 {
@@ -131,6 +132,12 @@ public class DSpaceServlet extends HttpServlet
 
             JSPManager.showInternalError(request, response);
         }
+// Mark Ratliff:  Special case for handling Princeton campus network authentication
+catch (PUIPAuthorizeException puipae)
+{
+log.info("YOU ARE NOT ON THE CAMPUS NETWORK!!!!!");
+JSPManager.showPUIPAuthorizeError(request, response, puipae);
+}
         catch (AuthorizeException ae)
         {
             /*

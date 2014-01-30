@@ -23,6 +23,7 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.ark.ArkManager;
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -35,7 +36,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * </p>
  * 
  * @author Peter Breton
- * @version $Revision$
+ * @version $Revision: 5844 $
  */
 public class HandleManager
 {
@@ -138,21 +139,32 @@ public class HandleManager
     public static String createHandle(Context context, DSpaceObject dso)
             throws SQLException
     {
-        TableRow handle = DatabaseManager.create(context, "Handle");
-        String handleId = createId(handle.getIntColumn("handle_id"));
-
-        handle.setColumn("handle", handleId);
-        handle.setColumn("resource_type_id", dso.getType());
-        handle.setColumn("resource_id", dso.getID());
-        DatabaseManager.update(context, handle);
-
-        if (log.isDebugEnabled())
-        {
-            log.debug("Created new handle for "
-                    + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + handleId );
-        }
-
-        return handleId;
+//        TableRow handle = DatabaseManager.create(context, "Handle");
+//        String handleId = createId(handle.getIntColumn("handle_id"));
+//
+//        handle.setColumn("handle", handleId);
+//        handle.setColumn("resource_type_id", dso.getType());
+//        handle.setColumn("resource_id", dso.getID());
+//        DatabaseManager.update(context, handle);
+//
+//        if (log.isDebugEnabled())
+//        {
+//            log.debug("Created new handle for "
+//                    + Constants.typeText[dso.getType()] + " " + handleId);
+//        }
+//    	
+//		  return handleID;
+    	
+    	// Retrieve an ARK identifier and pass it to the overloaded createHandle
+    	// method below.
+    	
+    	// Request ARK ID
+    	
+		String arkId = ArkManager.createArkID();
+		
+    	HandleManager.createHandle(context, dso, arkId);
+    	
+        return arkId;
     }
 
     /**

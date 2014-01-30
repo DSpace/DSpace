@@ -35,7 +35,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * removing bitstreams has instant effect in the database.
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 6948 $
  */
 public class Bundle extends DSpaceObject
 {
@@ -810,5 +810,80 @@ public class Bundle extends DSpaceObject
         {
             return null;
         }
+    }
+    
+    /**
+     * This method determines whether or not the bundle is currently restricted from public access due to embargo.
+     *  -- Mark Ratliff
+     * @return
+     */
+    
+    public boolean isEmbargoed() throws SQLException
+    {
+    	int ANONYMOUS_GROUP_ID = 0;
+    	int action_id, group_id;
+
+	// Embargo doesn't apply if the user is an admin for this DSpace object
+
+	if (AuthorizeManager.isAdmin(ourContext, this))
+	{
+	  return false;
+	}
+    	
+    	// First, if the Anonymous group (group_id = 0) can READ, then it's not embargoed.
+    	
+    	if (ourContext != null)
+    	{
+    		List policies = AuthorizeManager.getPolicies(ourContext, this);
+    		Iterator<ResourcePolicy> i = policies.iterator();
+    		
+    		while (i.hasNext())
+    		{
+    		
+    			ResourcePolicy rp = (ResourcePolicy) i.next();
+    			
+    			group_id = rp.getGroupID();
+    			action_id = rp.getAction();
+    		
+    			if (group_id == ANONYMOUS_GROUP_ID && 
+				            action_id == Constants.READ)
+			{
+				return false;	
+			}
+    		}
+    		
+    	// Second, if Anonymous cannot READ, then check the 
+        // embargo.field.lift field (pu.embargo.lift) to see if embargo is
+        //   the reason
+
+                // Get the name of the embargo.field.lift field
+
+		String embargofieldname = 
+                         ConfigurationManager.getProperty("embargo.field.lift");
+    		
+    		// Get the parent Item, retrieve the value of appropriate
+                //  embargo field.  If a value is set, return true.
+    		
+    		Item parentItem = (Item) getParentObject();
+    		
+    		if (parentItem == null) return false;
+    		
+    		DCValue[] dcvalues = parentItem.getMetadata(embargofieldname);
+    		
+    		if (dcvalues == null || dcvalues.length == 0)
+    		{
+    			// The embargo metadata field is not set
+    			return false;
+    		}
+    		else
+    		{
+    			// The embargo metadata field is set
+    			return true;
+    		}	
+    		
+    	}
+
+    		// If we have no context, then just return false, because I don't know what else to do.
+    		return false;
     }
 }

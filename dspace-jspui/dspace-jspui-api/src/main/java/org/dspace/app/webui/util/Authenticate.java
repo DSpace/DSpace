@@ -33,7 +33,7 @@ import org.dspace.eperson.EPerson;
  * the <code>org.dspace.eperson.AuthenticationMethod</code> interface.
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 6873 $
  */
 public class Authenticate
 {
@@ -158,8 +158,9 @@ public class Authenticate
          * 2. if those fail, redirect to enter credentials.
          *    return false.
          */
-        if (AuthenticationManager.authenticateImplicit(context, null, null,
-                null, request) == AuthenticationMethod.SUCCESS)
+        int auth_result = AuthenticationManager.authenticateImplicit(context,
+                null, null, null, request);
+        if (auth_result == AuthenticationMethod.SUCCESS)
         {
             loggedIn(context, request, context.getCurrentUser());
             log.info(LogManager.getHeader(context, "login", "type=implicit"));

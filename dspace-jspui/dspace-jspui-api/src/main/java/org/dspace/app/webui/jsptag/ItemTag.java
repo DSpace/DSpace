@@ -172,7 +172,7 @@ import org.dspace.core.Utils;
  * </PRE>
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 5845 $
  */
 public class ItemTag extends TagSupport
 {
@@ -738,6 +738,17 @@ public class ItemTag extends TagSupport
         				+ LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.files.no")
                             + "</p>");
+        	}
+        	else if (bundles[0].isEmbargoed())
+        	{
+        	     // If the first ORIGINAL bundle is embargoed, then
+                     //   display a simple notice. -- Mark Ratliff
+
+        		out.println("<p>"+
+                            LocaleSupport.getLocalizedMessage(pageContext, "browse.embargo.message")+
+                            " <a href=\"mailto:dspadmin@princeton.edu?subject=Request to access item "+
+                            item.getHandle()+
+                            "\">DataSpace Administrator</a>.</p>");
         	}
         	else
         	{

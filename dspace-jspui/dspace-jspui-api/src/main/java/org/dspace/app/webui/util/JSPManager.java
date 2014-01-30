@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.PUIPAuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -23,7 +24,7 @@ import org.dspace.core.LogManager;
  * Methods for displaying UI pages to the user.
  * 
  * @author Robert Tansley
- * @version $Revision$
+ * @version $Revision: 6151 $
  */
 public class JSPManager
 {
@@ -107,10 +108,22 @@ public class JSPManager
             HttpServletResponse response, AuthorizeException exception)
             throws ServletException, IOException
     {
+log.info("Called with AuthorizeException");
         // FIXME: Need to work out which error message to display?
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         showJSP(request, response, "/error/authorize.jsp");
     }
+
+    public static void showPUIPAuthorizeError(HttpServletRequest request,
+            HttpServletResponse response, PUIPAuthorizeException exception)
+            throws ServletException, IOException
+    {
+log.info("Called with PUAuthorizeException");
+        // FIXME: Need to work out which error message to display?
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        showJSP(request, response, "/error/puipauthorize.jsp");
+    }
+
 
     /**
      * Display an "invalid ID" error message. Passing in information about the
