@@ -53,6 +53,7 @@ import org.dspace.statistics.content.StatisticsListing;
  */
 public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
+
     private static final Logger log = Logger.getLogger(SiteRecentSubmissions.class);
 
     private static final String T_head_view_count = "xmlui.statistics.view.count";
@@ -66,24 +67,53 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException {
 
-        //Try to find our dspace object
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
-        try
-        {
-            if(dso != null)
-            {
-                renderViewer(body, dso);
-            }
-            else
-            {
-                renderHome(body);
-            }
-
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
+        try {
+            performSearch(null);
+        } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
+        }
+
+        boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
+        int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
+
+        Division home = body.addDivision("home", "primary repository");
+        Division mostPopular =  home.addDivision("stats", "secondary stats");
+
+        mostPopular.setHead(message(T_head_view_title));
+        Division items = mostPopular.addDivision("items");
+        Division count = mostPopular.addDivision("count");
+        ReferenceSet referenceSet = items.addReferenceSet(
+                "most-viewed-items", ReferenceSet.TYPE_SUMMARY_LIST,
+                null, "most-viewed");
+        org.dspace.app.xmlui.wing.element.List list = count.addList(
+                "most-viewed-count",
+                org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
+
+        items.setHead(message(T_head_view_title));
+
+        count.setHead(message(T_head_view_count));
+
+
+        int numberOfItemsAdded=0;
+        if (queryResults != null)  {
+            String searchUrl="discover?sort_by=popularity&order=DESC&submit=Go";
+            mostPopular.addList("most_popular").addItemXref(searchUrl,"View more");
+            for (SolrDocument doc : queryResults.getResults()) {
+                DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
+                if(obj != null)
+                {
+                    // filter out Items that are not world-readable
+                    if (!includeRestrictedItems) {
+                        if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                            referenceSet.addReference(obj);
+                            list.addItem().addContent(doc.getFieldValue(SearchUtils.getConfig().getString("total.download.sort-option")).toString());
+                            numberOfItemsAdded++;
+                            if(numberOfItemsAdded==numberOfItemsToShow)
+                                return;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -91,7 +121,6 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     {
         return "site";
     }
-    String solr=  ConfigurationManager.getBooleanProperty("solr.log.server")+"/select/?q=type%3A2&facet=on&rows=10&facet.limit=-1&facet.field=id" ;
 
     /**
      * facet.limit=11&wt=javabin&rows=5&sort=dateaccessioned+asc&facet=true&facet.mincount=1&q=search.resourcetype:2&version=1
@@ -127,131 +156,19 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
     }
 
-    private void addDisplayListing(Division mainDiv, StatisticsListing display)
-            throws SAXException, WingException, SQLException,
-            SolrServerException, IOException, ParseException {
-
-        String title = display.getTitle();
-
-        Dataset dataset = display.getDataset();
-
-        if (dataset == null) {
-            /** activate dataset query */
-            dataset = display.getDataset(context);
-        }
-
-        if (dataset != null)
-        {
-            String[][] matrix = dataset.getMatrixFormatted();
-
-            java.util.List<String[]> values = retrieveResultList(title, dataset, matrix[0]);
-            if (title != null)
-            {
-                mainDiv.setHead(message(title));
-            }
-            Division items = mainDiv.addDivision("items");
-            Division count = mainDiv.addDivision("count");
-
-            ReferenceSet referenceSet = items.addReferenceSet(
-                    "most-viewed-items", ReferenceSet.TYPE_SUMMARY_LIST,
-                    null, "most-viewed");
-            org.dspace.app.xmlui.wing.element.List list = count.addList(
-                    "most-viewed-count",
-                    org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
-
-            items.setHead(message(T_head_view_title));
-
-            count.setHead(message(T_head_view_count));
-
-            for (String[] temp : values){
-                DSpaceObject dso = Item.find(context,Constants.ITEM,Integer.parseInt(temp[0]));
-                referenceSet.addReference(dso);
-                list.addItem().addContent(temp[1]);
-
-            }
-            if(!this.sitemapURI.contains("most_viewed_items")){
-                mainDiv.addList("link-to-button").addItemXref("/most_viewed_items","View More");
-            }
+    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
+        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
+        for (Item i : datafiles) {
+            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            DCValue[] values = i.getMetadata(lift);
+            if (values == null || values.length == 0)
+                return true;
 
         }
+        return false;
     }
-    public void renderHome(Body body) throws WingException {
 
-        Division home = body.addDivision("home", "primary repository");
-        Division division = home.addDivision("stats", "secondary stats");
-        // division.setHead(T_head_title);
-
-        try {
-            /** List of the top 10 items for the entire repository **/
-            StatisticsListing statListing = new StatisticsListing(
-                    new StatisticsDataVisits());
-
-            statListing.setTitle(T_head_viewed_item);
-            statListing.setId("list1");
-
-            DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-            dsoAxis.addDsoChild(Constants.ITEM, -1, false, -1);
-
-
-            statListing.addDatasetGenerator(dsoAxis);
-
-            //Render the list as a table
-            addDisplayListing(division, statListing);
-
-        } catch (Exception e) {
-            log.error("Error occurred while creating statistics for home page", e);
-        }
-
-    }
-    public void renderViewer(Body body, DSpaceObject dso) throws WingException {
-
-
-    }
-    private java.util.List<String[]> retrieveResultList(String title, Dataset dataset, String[] strings) throws SQLException {
-
-
-        java.util.List<String[]> values = new ArrayList<String[]>();
-        java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
-        int j=0;
-        int i=0;
-        for (Map<String, String> map : urls)
-        {
-            for (Map.Entry<String, String> entry : map.entrySet())
-            {
-                if(i>10)
-                {
-                    break;
-                }
-                String url= entry.getValue();
-                String suffix = url.substring(url.lastIndexOf("/handle/"));
-                suffix=suffix.replace("/handle/","");
-                String partOfURL = url.substring(0,url.lastIndexOf('/'));
-                String prefix = ConfigurationManager.getProperty("dspace.url");
-
-
-                DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
-                if(dso instanceof Item)
-                {
-                    if(dso!=null){
-
-                        DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
-
-                        if(vals != null && 0 < vals.length)
-                        {
-                            String[] temp = new String[3];
-                            temp[0] = Integer.toString(dso.getID());
-                            temp[1]= strings[j];
-                            values.add(temp);
-                            i++;
-                        }
-                    }
-                    j++;
-
-                }
-
-
-            }
-        }
-        return values;
-    }
 }
+
+
+

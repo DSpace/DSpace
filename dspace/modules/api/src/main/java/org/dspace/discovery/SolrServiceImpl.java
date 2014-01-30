@@ -1306,7 +1306,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         //String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
         try{
-            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", "id: " + item.getID() + " AND type:"+ Constants.ITEM).getCount() ;
+//            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " AND owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
+            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
             return Long.toString(totalFileDownload);
         }catch (Exception e)
         {
