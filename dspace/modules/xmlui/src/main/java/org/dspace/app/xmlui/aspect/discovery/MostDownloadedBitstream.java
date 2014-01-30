@@ -91,7 +91,7 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     {
         return "site";
     }
-    String solr=  ConfigurationManager.getBooleanProperty("solr.log.server")+"/select/?q=type%3A2&facet=on&rows=0&facet.limit=-1&facet.field=id" ;
+    String solr=  ConfigurationManager.getBooleanProperty("solr.log.server")+"/select/?q=type%3A2&facet=on&rows=10&facet.limit=-1&facet.field=id" ;
 
     /**
      * facet.limit=11&wt=javabin&rows=5&sort=dateaccessioned+asc&facet=true&facet.mincount=1&q=search.resourcetype:2&version=1
@@ -209,20 +209,48 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     }
     private java.util.List<String[]> retrieveResultList(String title, Dataset dataset, String[] strings) throws SQLException {
 
+
         java.util.List<String[]> values = new ArrayList<String[]>();
         java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
+        int j=0;
         int i=0;
         for (Map<String, String> map : urls)
         {
-            String itemId= map.get("item");
-            if(itemId!=null&&strings[i]!=null)
+            for (Map.Entry<String, String> entry : map.entrySet())
             {
-                String[] temp=new String[2];
-                temp[0]=itemId;
-                temp[1]=strings[i];
-                values.add(temp);
+                if(i>10)
+                {
+                    break;
+                }
+                String url= entry.getValue();
+                String suffix = url.substring(url.lastIndexOf("/handle/"));
+                suffix=suffix.replace("/handle/","");
+                String partOfURL = url.substring(0,url.lastIndexOf('/'));
+                String prefix = ConfigurationManager.getProperty("dspace.url");
+
+
+                DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
+                if(dso instanceof Item)
+                {
+                    if(dso!=null){
+
+                        DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
+
+                        if(vals != null && 0 < vals.length)
+                        {
+                            String[] temp = new String[3];
+                            temp[0] = Integer.toString(dso.getID());
+                            temp[1]= strings[j];
+                            values.add(temp);
+                            i++;
+                        }
+                    }
+                    j++;
+
+                }
+
+
             }
-            i++;
         }
         return values;
     }
