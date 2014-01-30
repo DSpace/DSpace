@@ -58,37 +58,20 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.browse.ItemCounter" %>
 
 <%
-    Community[] communities = (Community[]) request.getAttribute("communities");
-
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     Locale sessionLocale = UIUtil.getSessionLocale(request);
     Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
-    String topNews = ConfigurationManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
-    String sideNews = ConfigurationManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
-
-    boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
-    String feedData = "NONE";
-    if (feedEnabled)
-    {
-        feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
-    }
-    
-    ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
-<dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
+<dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="">
 
     <table  width="95%" align="center">
       <tr align="right">
-        <td align="right">						
-<% if (supportedLocales != null && supportedLocales.length > 1)
-{
-%>
+        <td align="right">
+<% if (supportedLocales != null && supportedLocales.length > 1){%>
         <form method="get" name="repost" action="">
           <input type ="hidden" name ="locale"/>
         </form>
@@ -97,6 +80,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
 {
 %>
         <a class ="langChangeOn"
+
                   onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
                   document.repost.submit();">
                  <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
@@ -108,100 +92,80 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
         </td>
       </tr>
       <tr>
-            <td class="oddRowEvenCol"><%= topNews %></td>
+            <h2>Purpose of the DataSpace Repository</h2>
+<p>
+DataSpace is a digital repository meant for both archiving and publicly disseminating digital data that are the result of research, academic, or administrative work performed by members of the Princeton University community. DataSpace will promote awareness of the contents of the repository and help to ensure their long-term accessibility.
+</p>
+
+<p>
+Benefits of using DataSpace to publish and archive your data include:
+</p>
+
+<ul>
+<li>One-time charge for long-term storage of digital data</li>
+<li>Persistent URLs pointing to each submission will continue to work for years to come, even if the underlying data is migrated to another system</li>
+<li>Increases the visibility of your work</li>
+<li>Makes worldwide dissemination of your work easy</li>
+</ul>
+
+<p>
+Types of data that are well suited for storage in DataSpace include:
+
+<ul>
+<li>Research datasets that are to be independently or to which other print publications make reference</li>
+<li>Student projects and reports</li>
+<li>Conference and workshop proceedings</li>
+<li>Technical reports</li>
+<li>Digital collections of images, videos, or other digital assets created by members of the University</li>
+</ul>
+</p>
+
+            <h2>Open Access to Content</h2>
+<p>Content stored in DataSpace will be made openly available to the public via the DataSpace website.  DataSpace content will be organized into “Communities” which ty
+pically represent collections of content from academic and administrative departments at the University.  Users can browse the collections within these communities
+ by title, author, subject, or date of content submission.  Users can also search the content within and across collections.
+</p>
+<p>
+Users can subscribe to news feeds that deliver notifications of new submissions to Communities within DataSpace.  The feeds are delivered using the popular RSS pro
+tocol.  Internet Explorer, FireFox, or other popular RSS readers can then be used to review the list of recent submissions.
+</p>
+<p>
+In the future we plan to register the repository with various online directories to which help promote awareness.  We also plan to make the repository metadata ava
+ilable to services such as OAIster.org which can be used to search the records of repositories around the world.
+</p>
+
+            <h2>Submitting Your Content</h2>
+
+<p>
+Any member of the University may submit appropriate content to DataSpace.  The content must:
+
+<ul>
+<li>Be intended for public access</li>
+<li>Be a completed work</li>
+<li>Have potential long-term value (e.g. beyond 10 years)</li>
+<li>Be the result of work performed at or related to Princeton University</li>
+</ul>
+</p>
+
+<p>Before submitting your content, you must be a member of a Community defined in DataSpace.  Communities correspond roughly to administrative departments, academic departments, or other long-lived organizational units at Princeton.  The department or organizational unit must identify an administrator who will be responsible for reviewing content submissions for the Community.  Once the Community is established, you must request a DataSpace user account in order to submit content.  Your account will then enable you to submit content at any time for review and acceptance to the repository.
+</p>
+
+<p>
+You must accept a licensing agreement which will allow Princeton University the non-exclusive right to preserve and disseminate your submitted work.
+</p>
+
+<p>
+A one-time charge will be assessed for each submission.  The cost is calculated based on the amount of storage consumed by the submission.  Current (as of 7/1/2009) charges are $0.006 per Megabyte with a $0.60 minimum charge per submission.  As part of the submission process you must supply a valid project grant code to which the charges will be applied.
+</p>
+
+            <h2>Policies &amp; Guidelines</h2>
+
+<p>A more complete description of policies and guidelines governing the DataSpace service are available as a PDF document:  <a href="DataSpacePnG.pdf">DataSpace Policies and Guidelines</a>.</p>
+
         </tr>
     </table>
-    <br/>
-    <form action="<%= request.getContextPath() %>/simple-search" method="get">
-        <table class="miscTable" width="95%" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                  <h3><fmt:message key="jsp.home.search1"/></h3>
-                      <p><label for="tquery"><fmt:message key="jsp.home.search2"/></label></p>
-                      <p><input type="text" name="query" size="20" id="tquery" />&nbsp;
-                         <input type="submit" name="submit" value="<fmt:message key="jsp.general.search.button"/>" /></p>
-                </td>
-            </tr>
-        </table>
-    </form>
-    <table class="miscTable" width="95%" align="center">
-        <tr>
-            <td class="oddRowEvenCol">
-               <h3><fmt:message key="jsp.home.com1"/></h3>
-                <p><fmt:message key="jsp.home.com2"/></p>
 
-
-<%
- if (communities.length != 0)
- {
-%>
-    <table border="0" cellpadding="2">
-<% 	                 
-
-    for (int i = 0; i < communities.length; i++)
-    {
-%>                  <tr>
-                        <td class="standard">
-                            <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
-<%
-        if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
-        {
-%>
-            [<%= ic.getCount(communities[i]) %>]
-<%
-        }
-
-%>
-                        </td>
-                    </tr>
-<%
-    }
-%>
-    </table>
-<%                
- }
-%>  
-
-            </td>
-        </tr>
-    </table>
     <dspace:sidebar>
-    <%= sideNews %>
-    <%
-    if(feedEnabled)
-    {
-	%>
-	    <center>
-	    <h4><fmt:message key="jsp.home.feeds"/></h4>
-	<%
-	    	String[] fmts = feedData.substring(feedData.indexOf(':')+1).split(",");
-	    	String icon = null;
-	    	int width = 0;
-	    	for (int j = 0; j < fmts.length; j++)
-	    	{
-	    		if ("rss_1.0".equals(fmts[j]))
-	    		{
-	    		   icon = "rss1.gif";
-	    		   width = 80;
-	    		}
-	    		else if ("rss_2.0".equals(fmts[j]))
-	    		{
-	    		   icon = "rss2.gif";
-	    		   width = 80;
-	    		}
-	    		else
-	    	    {
-	    	       icon = "rss.gif";
-	    	       width = 36;
-	    	    }
-	%>
-	    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
-	<%
-	    	}
-	%>
-	    </center>
-	<%
-	    }
-	%>
+
     </dspace:sidebar>
 </dspace:layout>
