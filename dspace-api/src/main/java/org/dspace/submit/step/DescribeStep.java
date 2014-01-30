@@ -117,6 +117,10 @@ public class DescribeStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        if(!request.getParameterNames().hasMoreElements()){
+            //In case of an empty request do NOT just remove all metadata, just return to the submission page
+            return STATUS_MORE_INPUT_REQUESTED;
+        }
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
