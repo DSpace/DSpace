@@ -745,7 +745,7 @@ public class ItemTag extends TagSupport
                      //   display a simple notice. -- Mark Ratliff
 
         		out.println("<p>"+
-                            LocaleSupport.getLocalizedMessage(pageContext, "browse.embargo.message")+
+                            LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.embargo")+
                             " <a href=\"mailto:dspadmin@princeton.edu?subject=Request to access item "+
                             item.getHandle()+
                             "\">DataSpace Administrator</a>.</p>");
