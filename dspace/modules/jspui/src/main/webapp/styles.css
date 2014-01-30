@@ -7,7 +7,7 @@
  */
 A { color: #336699 }
 
-BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
+BODY { 
        font-size: 10pt;
        font-style: normal;
        color: #000000;
@@ -24,28 +24,24 @@ H1 { margin-left: 10px;
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
-     font-family: "verdana", "Arial", "Helvetica", sans-serif;
      color: #336699 }
 
 H2 { margin-left: 10px;
      margin-right: 10px;
      font-size: 14pt;
      font-style: normal;
-     font-family: "verdana", "Arial", "Helvetica", sans-serif;
      color: #336699 }
 
 H3 { margin-left: 10px;
      margin-right: 10px;
      font-size: 12pt;
      font-weight: bold;
-     font-family: "verdana", "Arial", "Helvetica", sans-serif;
      color: black }
 
 object { display: inline; }
 
 p {  margin-left: 10px;
      margin-right: 10px;
-     font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 10pt }
      
 /* This class is here so that a "DIV" by default acts as a "P".
@@ -54,16 +50,14 @@ p {  margin-left: 10px;
 DIV { margin-left: 10px;
       margin-right: 10px;
       margin-bottom: 15px;
-      font-family: "verdana", "Arial", "Helvetica", sans-serif;
       font-size: 10pt;}
 
-UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+UL {
      font-size: 10pt }
 
 /* This class is here so the standard style from "P" above can be applied to anything else. */
 .standard { margin-left: 10px;
             margin-right: 10px;
-            font-family: "verdana", "Arial", "Helvetica", sans-serif;
             font-size: 10pt }
 
 .langChangeOff { text-decoration: none;
@@ -106,7 +100,6 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
           color: #ffffff }
 
 .locationBar { font-size: 10pt;
-               font-family: "verdana", "Arial", "Helvetica", sans-serif;
                text-align: left }
 
 .centralPane { margin: 1px;
@@ -131,7 +124,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      margin: 2px;
                      border: 0 }
 
-.navigationBar { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.navigationBar {
                  font-size: 10pt;
                  font-style: normal;
                  font-weight: bold;
@@ -139,7 +132,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  text-decoration: none;
                  background: white }
 
-.navigationBarSublabel{  font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.navigationBarSublabel{ 
                          font-size: 12pt;
                          font-style: normal;
                          font-weight: bold;
@@ -151,7 +144,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 /* HACK: Shouldn't have to repeat font information and colour here, it
        should be inherited from the parent, but isn't in Netscape 4.x,
        IE or Opera.  (Only Mozilla functions correctly.) */
-.navigationBarItem { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.navigationBarItem {
                      font-size: 10pt;
                      font-style: normal;
                      font-weight: normal;
@@ -161,7 +154,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      vertical-align: middle;
                      white-space: nowrap }
 
-.loggedIn { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.loggedIn {
             font-size: 8pt;
             font-style: normal;
             font-weight: normal;
@@ -176,7 +169,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  color: #000000;
                  vertical-align: middle }
 
-.pageFootnote { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.pageFootnote {
                 font-size: 10pt;
                 font-style: normal;
                 font-weight: normal;
@@ -191,36 +184,36 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .sidebar { background: #ffffff;
            color: #000000 }
 
-.communityLink { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.communityLink {
                  font-size: 14pt;
                  font-weight: bold }
 
 .communityStrength {
-                                font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                               
                  font-size: 12pt;
                  font-weight: normal }
 
 .communityDescription { margin-left: 20px;
                         margin-right: 10px;
-                        font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                       
                         font-size: 10pt;
                         font-weight: normal;
                         list-style-type: none }
 
-.collectionListItem { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.collectionListItem {
                       font-size: 12pt;
                       font-weight: normal }
 
 .collectionDescription { margin-left: 20px;
                      margin-right: 10px;
-                     font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                    
                      font-size: 10pt;
                          font-weight: normal;
                      list-style-type: none }
 
 .miscListItem { margin-left: 20px;
                 margin-right: 10px;
-                font-family: "verdana", "Arial", "Helvetica", sans-serif;
+               
                 font-size: 12pt;
                 list-style-type: none }
 
@@ -228,11 +221,11 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  margin-right: 20px;
                  text-align: center;
                  font-style: italic;
-                 font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                
                  font-size: 10pt;
                  list-style-type: none }
 
-.browseBarLabel { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.browseBarLabel {
                   font-size: 10pt;
                   font-style: normal;
                   font-weight: bold;
@@ -241,7 +234,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   vertical-align: middle;
                   text-decoration: none }
 
-.browseBar { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.browseBar {
              font-size: 12pt;
              font-style: normal;
              font-weight: bold;
@@ -250,7 +243,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              vertical-align: middle;
              text-decoration: none }
 
-.itemListCellOdd { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.itemListCellOdd {
                    font-size: 12pt;
                    font-style: normal;
                    font-weight: normal;
@@ -260,7 +253,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    background: #ffffff }
 
 
-.itemListCellEven { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.itemListCellEven {
                     font-size: 12pt;
                     font-style: normal;
                     font-weight: normal;
@@ -269,7 +262,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                     text-decoration: none;
                     background: #eeeeee }
 
-.itemListCellHilight { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.itemListCellHilight {
                        font-size: 12pt;
                        font-style: normal;
                        font-weight: normal;
@@ -280,13 +273,11 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 
 .topNavLink { margin-left: 10px;
           margin-right: 10px;
-          font-family: "verdana", "Arial", "Helvetica", sans-serif;
           font-size: 10pt;
           text-align: center }
 
 .submitFormLabel { margin-left: 10px;
            margin-right: 10px;
-           font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    font-weight: bold;
            font-size: 10pt;
            text-align: right;
@@ -294,14 +285,12 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 
 .submitFormHelp {  margin-left: 10px;
            margin-right: 10px;
-           font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt;
            text-align: center }
            
 
 .submitFormWarn {  margin-left: 10px;
            margin-right: 10px;
-           font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-weight: bold;
            font-size: 12pt;
            color: #ff6600;
@@ -309,13 +298,11 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 
 .uploadHelp { margin-left: 20px;
               margin-right: 20px;
-              font-family: "verdana", "Arial", "Helvetica", sans-serif;
               font-size: 10pt;
               text-align: left }
 
 .submitFormDateLabel {  margin-left: 10px;
                         margin-right: 10px;
-                        font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-size: 10pt;
                         font-style: italic;
                         text-align: center;
@@ -357,7 +344,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            color: black;
                            background-repeat: no-repeat; }
 
-.miscTable { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.miscTable {
              font-size: 12pt;
              font-style: normal;
              font-weight: normal;
@@ -366,7 +353,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              text-decoration: none;
              background: #cccccc }
 
-.miscTableNoColor { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.miscTableNoColor {
              font-size: 12pt;
              font-style: normal;
              font-weight: normal;
@@ -375,7 +362,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              text-decoration: none;
              background: #ffffff }
 
-.oddRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.oddRowOddCol{
                font-size: 12pt;
                font-style: normal;
                font-weight: normal;
@@ -384,7 +371,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                text-decoration: none;
                background: #ffffff }
 
-.evenRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.evenRowOddCol{
                 font-size: 12pt;
                 font-style: normal;
                 font-weight: normal;
@@ -393,7 +380,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 text-decoration: none;
                 background: #eeeeee }
 
-.oddRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.oddRowEvenCol{
                 font-size: 12pt;
                 font-style: normal;
                 font-weight: normal;
@@ -402,7 +389,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 text-decoration: none;
                 background: #eeeeee }
 
-.evenRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.evenRowEvenCol{
                  font-size: 12pt;
                  font-style: normal;
                  font-weight: normal;
@@ -411,7 +398,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  text-decoration: none;
                  background: #dddddd }
 
-.highlightRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.highlightRowOddCol{
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: normal;
@@ -420,7 +407,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      text-decoration: none;
                      background: #ccccee }
 
-.highlightRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.highlightRowEvenCol{
                       font-size: 12pt;
                       font-style: normal;
                       font-weight: normal;
@@ -433,7 +420,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                    border: 0;
                    color: #000000 }
 
-.metadataFieldLabel{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.metadataFieldLabel{
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: bold;
@@ -443,7 +430,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      text-decoration: none;
                      white-space: nowrap }
 
-.metadataFieldValue{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.metadataFieldValue{
                      font-size: 12pt;
                      font-style: normal;
                      font-weight: normal;
@@ -454,10 +441,9 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 
 .recentItem { margin-left: 10px;
               margin-right: 10px;
-              font-family: "verdana", "Arial", "Helvetica", sans-serif;
               font-size: 10pt }
 
-.searchBox { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.searchBox {
              font-size: 10pt;
              font-style: normal;
              font-weight: bold;
@@ -469,7 +455,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              border: 0;
              margin: 0 }
 
-.searchBoxLabel { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.searchBoxLabel {
                   font-size: 10pt;
                   font-style: normal;
                   font-weight: bold;
@@ -478,7 +464,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
-.searchBoxLabelSmall { font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.searchBoxLabelSmall {
                   font-size: 8pt;
                   font-style: normal;
                   font-weight: bold;
@@ -503,7 +489,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
     text-align: center;
 }
 
-.help {font-family: "verdana", "Arial", "Helvetica", sans-serif;
+.help {
         background: #ffffff;
         margin-left:10px;}
 
@@ -559,12 +545,10 @@ img.controlledvocabulary {
 .submitFormHelpControlledVocabularies {
                    margin-left: 10px;
            margin-right: 10px;
-           font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt;
            text-align: left; }
 
 .controlledVocabularyLink {
-           font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt; }
            
 .browse_buttons
@@ -706,7 +690,7 @@ input.ds-authority-lock.is-unlocked
 .standard10 {
     margin-left: 10px;
     margin-right: 10px;
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+   
     font-size: 10pt;
     padding-left: 10px;
 }
@@ -735,7 +719,7 @@ input.ds-authority-lock.is-unlocked
 .curate
 {
     padding: 20px 10px 0px 10px;
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+   
     color: black;
     font-size: 10pt;
 }
@@ -770,7 +754,6 @@ textarea#reason {
 }
 th.accessOdd {
     width: 20%;
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -782,7 +765,6 @@ th.accessOdd {
 }
 th.accessEven { 
     width: 20%;
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -793,7 +775,6 @@ th.accessEven {
     background: #dddddd;
 }
 td.accessOdd{ 
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -803,7 +784,6 @@ td.accessOdd{
     background: #ffffff; 
 }
 td.accessEven{ 
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -813,7 +793,6 @@ td.accessEven{
     background: #eeeeee; 
 }
 th.accessHeadOdd {
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -824,7 +803,6 @@ th.accessHeadOdd {
     background: #eeeeee;
 }
 th.accessHeadEven { 
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
@@ -836,7 +814,6 @@ th.accessHeadEven {
 }
 
 .accessButton{ 
-    font-family: "verdana", "Arial", "Helvetica", sans-serif;
     font-size: 12pt;
     font-style: normal;
     font-weight: normal;
