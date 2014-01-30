@@ -10,6 +10,7 @@ package org.dspace.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
 
 import java.io.File;
 import java.util.Locale;
@@ -69,6 +70,13 @@ public class I18nUtil
 
         return defaultLocale;
     }
+    
+//    public static Locale getSprinBean()
+//    {
+//    	DSpace dspace= 	new DSpace();
+//    	//E qui  recupero il servizio di spring.
+//    	dspace.getServiceManager().getServiceByName(name, type)
+//    }
 
     // Translate a string locale specification (e.g. "en_US.UTF-8") into Locale
     // This is needed because Locale constructor expects args for
