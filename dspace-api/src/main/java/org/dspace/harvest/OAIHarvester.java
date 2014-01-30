@@ -365,8 +365,12 @@ public class OAIHarvester {
 					listRecords = new ListRecords(oaiSource, resumptionToken);
 				}
                 ourContext.turnOffAuthorisationSystem();
-				targetCollection.update();
-                ourContext.restoreAuthSystemState();
+                try {
+                    targetCollection.update();
+                } finally {
+                    //In case of an exception, make sure to restore our authentication state to the previous state
+                    ourContext.restoreAuthSystemState();
+                }
 				ourContext.commit();
 			}
 		}
@@ -394,7 +398,6 @@ public class OAIHarvester {
             ourContext.turnOffAuthorisationSystem();
 			targetCollection.update();
 			ourContext.commit();
-			ourContext.restoreAuthSystemState();
 			ourContext.restoreAuthSystemState();
 		}
 
