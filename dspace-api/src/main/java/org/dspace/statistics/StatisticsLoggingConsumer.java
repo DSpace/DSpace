@@ -37,6 +37,7 @@ public class StatisticsLoggingConsumer implements Consumer
 
     private Set<String> toRemoveQueries = null;
 
+    @Override
     public void initialize() throws Exception
     {
 
@@ -45,6 +46,7 @@ public class StatisticsLoggingConsumer implements Consumer
     // TODO: checkout whether moving of collections, communities and bitstreams works
     // TODO: use async threaded consumer as this might require some processing time
     // TODO: we might be able to improve the performance: changing the collection will trigger 4 update commands
+    @Override
     public void consume(Context ctx, Event event) throws Exception
     {
         if (toRemoveQueries == null)
@@ -78,44 +80,8 @@ public class StatisticsLoggingConsumer implements Consumer
                     updateQuery, null, null);
 
             // Get all the metadata
-            Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
             List<String> storageFieldList = new ArrayList<String>();
             List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
-
-            for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
-            {
-                String[] metadataFieldInfo = entry.getValue().split("\\.");
-
-                List<Object> values = new ArrayList<Object>();
-                List<Object> valuesLow = new ArrayList<Object>();
-                for (int i = 0; i < item.getMetadata(metadataFieldInfo[0],
-                        metadataFieldInfo[1], metadataFieldInfo[2], Item.ANY).length; i++)
-                {
-                    values.add(item.getMetadata(metadataFieldInfo[0],
-                            metadataFieldInfo[1], metadataFieldInfo[2],
-                            Item.ANY)[i].value);
-                    
-                    valuesLow.add(item.getMetadata(metadataFieldInfo[0],
-                            metadataFieldInfo[1], metadataFieldInfo[2],
-                            Item.ANY)[i].value.toLowerCase());
-                }
-
-                List<String> indexedVals = indexedValues.get(entry.getKey());
-
-                boolean update = true;
-                if (values.size() == indexedVals.size() && values.containsAll(indexedVals))
-                {
-                    update = false;
-                }
-
-                if (update)
-                {
-                    storageFieldList.add(entry.getKey());
-                    storageFieldList.add(entry.getKey() + "_search");
-                    storageValuesList.add(values);
-                    storageValuesList.add(valuesLow);
-                }
-            }
 
             SolrLogger.update(updateQuery, "replace", storageFieldList,
                     storageValuesList);
@@ -202,6 +168,7 @@ public class StatisticsLoggingConsumer implements Consumer
         findComms(comm.getParentCommunity(), parentComms);
     }
 
+    @Override
     public void end(Context ctx) throws Exception
     {
         if (toRemoveQueries != null)
@@ -215,6 +182,7 @@ public class StatisticsLoggingConsumer implements Consumer
         toRemoveQueries = null;
     }
 
+    @Override
     public void finish(Context ctx) throws Exception
     {
     }
