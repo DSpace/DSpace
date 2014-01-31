@@ -18,6 +18,56 @@
  <!-- for handle "default".                                                -->
  <submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
+<!-- ======================================== -->
+<!-- Map submission process for senior theses -->
+<!-- ======================================== -->
+   <name-map collection-handle="88435/dsp015m60qr96c" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp011v53jx03j" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01x346d4232" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01sf268516n" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01np1939243" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01hx11xf31p" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01d504rk39g" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp018c97kq479" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp014m90dv552" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp010v8380632" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01w66343685" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01rf55z7763" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01mp48sc83w" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01gx41mh91n" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01c534fn99f" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp017d278t078" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp013n203z151" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp0100000007x" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01v692t627b" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01qf85nb35s" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01kp78gg437" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01fx719m510" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01b5644r59s" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp016d56zw67q" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp012r36tx59n" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01z029p4795" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01t722h887x" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01pg15bd95c" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01jq085k036" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01dz010q11z" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp019593tv19m" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp015h73pw11m" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp011r66j119j" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01x059c739h" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01s7526c478" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01ng451h55q" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01hq37vn649" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01cz30ps722" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp018910jt63r" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp014j03cz716" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp010r967379h" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01w0892999g" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01r781wg073" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01mg74qm166" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01gq67jr24n" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01c247ds15b" submission-name="seniortheses" />
+   <name-map collection-handle="88435/dsp0179407x233" submission-name="seniortheses" />
  </submission-map>
 
 
@@ -241,6 +291,53 @@
 
 
      
+   </submission-process>
+
+<!-- ================================================================================================= -->
+<!-- This "seniortheses" process defines the item submission process for senior theses                 -->
+<!-- The license step is removed                                                                       -->
+<!-- ================================================================================================= -->
+   <submission-process name="seniortheses">
+
+     <!--Uncommment to display the SAMPLE step as your first step-->
+     <!--<step id="sample"/>-->
+
+     <!--Step 1 will be to gather initial information-->
+          <step>
+            <heading>submit.progressbar.initial-questions</heading>
+                <processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
+                <jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>
+                <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
+            <workflow-editable>true</workflow-editable>
+          </step>
+
+      <!--Step 2 will be to Describe the item.-->
+      <step>
+        <heading>submit.progressbar.describe</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+                <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step 3 will be to Upload the item-->
+      <step>
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+                <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+
+          <!--Step 4 will be to Verify/Review everything -->
+          <step>
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+            <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+                <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+                <workflow-editable>true</workflow-editable>
+      </step>
+
    </submission-process>
 
  </submission-definitions>

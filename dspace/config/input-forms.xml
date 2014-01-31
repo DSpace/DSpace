@@ -15,10 +15,111 @@
 
  <form-map>
    <name-map collection-handle="default" form-name="traditional" />
-   <name-map collection-handle="88435/dsp016q182k13h" form-name="pubergen"/>
-   <name-map collection-handle="88435/ktrb6z5" form-name="purpds"/>
-   <name-map collection-handle="88435/ktpk093" form-name="seniortheses" />
+<!-- ============================================= -->
+<!-- Departmental Collections for Senior Theses    -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp015m60qr96c" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp011v53jx03j" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01x346d4232" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01sf268516n" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01np1939243" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01hx11xf31p" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01d504rk39g" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp018c97kq479" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp014m90dv552" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp010v8380632" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01w66343685" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01rf55z7763" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01mp48sc83w" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01gx41mh91n" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01c534fn99f" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp017d278t078" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp013n203z151" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp0100000007x" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01v692t627b" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01qf85nb35s" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01kp78gg437" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01fx719m510" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01b5644r59s" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp016d56zw67q" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp012r36tx59n" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01z029p4795" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01t722h887x" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01pg15bd95c" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01jq085k036" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01dz010q11z" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp019593tv19m" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp015h73pw11m" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp011r66j119j" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01x059c739h" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01s7526c478" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01ng451h55q" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01hq37vn649" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01cz30ps722" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp018910jt63r" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp014j03cz716" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp010r967379h" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01w0892999g" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01r781wg073" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01mg74qm166" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01gq67jr24n" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp01c247ds15b" form-name="seniortheses" />
+   <name-map collection-handle="88435/dsp0179407x233" form-name="seniortheses" />
+<!-- ============================================= -->
+<!-- Research Data                                 -->
+<!-- ============================================= -->
    <name-map collection-handle="88435/dsp01vd66vz894" form-name="researchdata" />
+<!-- ============================================= -->
+<!-- CEE Department: Princeton-Bergen Series on Carbon Storage -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp016q182k13h" form-name="pubergen"/>
+<!-- ============================================= -->
+<!-- Astrophysics: Research Data Sets              -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp01ff365529x" form-name="researchdata" />
+<!-- ============================================= -->
+<!-- IRS Data Sets Collection                      -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp01g445cd15f" form-name="researchdata" />
+<!-- ============================================= -->
+<!-- Library Digital Publications                  -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp01bg257f09p" form-name="digpubs_monographs"/>
+   <name-map collection-handle="88435/dsp016q182k16g" form-name="digpubs_monographs"/>
+   <name-map collection-handle="88435/dsp012z10wq24q" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01z603qx45b" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01nc580m70k" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01cv43nw866" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01hm50tr78r" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01pv63g030v" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp015q47rn79w" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01k643b124h" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp018c97kq48z" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01dn39x161s" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01n583xv05p" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01hd76s014b" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01br86b365k" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp017m01bk81x" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp013t945q89p" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01gx41mh97k" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01z029p4855" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01tb09j578r" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01pk02c986h" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01js956f94b" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01mk61rh06p" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01gt54kn144" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01zp38wc747" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01tx31qh820" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01q811kj74b" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01kh04dp82s" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01rv042t18r" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01qj72p727k" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01kw52j8207" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01bc386j35t" form-name="digpubs_serials"/>
+<!-- ============================================= -->
+<!-- Pushkin Prokofiev Collection                  -->
+<!-- ============================================= -->
+   <name-map collection-handle="88435/dsp01x633f1086" form-name="prokofiev"/>
  </form-map>
 
 
@@ -219,6 +320,374 @@ it, please enter the types and the actual numbers or codes below.</hint>
      </page>
 
    </form>
+
+    <form name="digpubs_serials">
+      <page number="1">
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>depositor</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Depositor</label>
+          <input-type>name</input-type>
+          <hint>Enter the names of the person entering this record.</hint>
+          <required>You must enter the name of the person depositing this record.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Authors</label>
+          <input-type>name</input-type>
+          <hint>Enter the names of the authors of this item below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Title</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the main title of the item.</hint>
+          <required>You must enter a main title for this item.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier>alternative</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Other Titles</label>
+          <input-type>onebox</input-type>
+          <hint>If the item has any alternative titles, please enter them below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>issued</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Date of Issue</label>
+          <input-type>date</input-type>
+          <hint>Enter the date of publication or public distribution. Omit day and/or month if not applicable.</hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>ispartofseries</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Serial/Series Title, Year, Volume, Number</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the series title, year, volume, number (as applicable)</hint>
+          <required>You must enter at least the series title.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier>iso</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Language</label>
+          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+          <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+          <required></required>
+        </field>
+        
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>citation</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Citation</label>
+          <input-type>onebox</input-type>
+          <hint>Ignore this field.  Leave blank.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier>place</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Place of Publication</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the location where the item was published.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Publisher (old field)</label>
+          <input-type>onebox</input-type>
+          <hint>DO NOT fill in a value for this field.  This field is an artifact that we will be getting rid of.</hint>
+          <required></required>
+        </field>
+        
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier>corporate</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Publisher</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the name of the publisher or agency that produced this work.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Source URL</label>
+          <input-type>onebox</input-type>
+          <hint>If the Source of the file is a website, enter the URL of the file at the website or the website itself.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier/>
+          <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+          <repeatable>true</repeatable>
+          <label>Identifiers</label>
+          <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+          <hint>If the item has any identification numbers or codes associated with it, please enter
+            the types and the actual numbers or codes below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier/>
+          <!-- An input-type of twobox MUST be marked as repeatable -->
+          <repeatable>true</repeatable>
+          <label>Subject Keywords</label>
+          <input-type>twobox</input-type>
+          <hint>Enter appropriate subject or geographic keywords or phrases below.</hint>
+          <required/>
+          <vocabulary>srsc</vocabulary>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Descriptive notes</label>
+          <input-type>textarea</input-type>
+          <hint> Enter any other description or comments in this box. </hint>
+          <required/>
+
+        </field>
+
+      </page>
+
+      <page number="2">
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>projectgrantnumber</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Princeton Project Grant Number</label>
+          <input-type>onebox</input-type>
+          <hint> Enter the number for the Princeton project grant number that should be charged for
+            this submission. </hint>
+          <required> You must enter a project grant number for billing purposes. </required>
+        </field>
+      </page>
+
+    </form>
+
+    <form name="digpubs_monographs">
+      <page number="1">
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>depositor</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Depositor</label>
+          <input-type>name</input-type>
+          <hint>Enter the names of the person entering this record.</hint>
+          <required>You must enter the name of the person depositing this record.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Authors</label>
+          <input-type>name</input-type>
+          <hint>Enter the names of the authors of this item below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Title</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the main title of the item.</hint>
+          <required>You must enter a main title for this item.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier>alternative</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Other Titles</label>
+          <input-type>onebox</input-type>
+          <hint>If the item has any alternative titles, please enter them below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>issued</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Date of Issue</label>
+          <input-type>date</input-type>
+          <hint>Enter the date of publication or public distribution. Omit day and/or month if not applicable.</hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier>iso</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Language</label>
+          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+          <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+          <required></required>
+        </field>
+        
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>citation</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Citation</label>
+          <input-type>onebox</input-type>
+          <hint>Ignore this field.  Leave blank.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier>place</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Place of Publication</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the location where the item was published.</hint>
+          <required/>
+        </field>
+        
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Publisher (old field)</label>
+          <input-type>onebox</input-type>
+          <hint>DO NOT fill in a value for this field.  This field is an artifact that we will be getting rid of.</hint>
+          <required></required>
+        </field>
+        
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>publisher</dc-element>
+          <dc-qualifier>corporate</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Publisher</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the name of the publisher or agency that produced this work.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Source URL</label>
+          <input-type>onebox</input-type>
+          <hint>If the Source of the file is a website, enter the URL of the file at the website or the website itself.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier/>
+          <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+          <repeatable>true</repeatable>
+          <label>Identifiers</label>
+          <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+          <hint>If the item has any identification numbers or codes associated with it, please enter
+            the types and the actual numbers or codes below.</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier/>
+          <!-- An input-type of twobox MUST be marked as repeatable -->
+          <repeatable>true</repeatable>
+          <label>Subject Keywords</label>
+          <input-type>twobox</input-type>
+          <hint>Enter appropriate subject or geographic keywords or phrases below.</hint>
+          <required/>
+          <vocabulary>srsc</vocabulary>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Descriptive notes</label>
+          <input-type>textarea</input-type>
+          <hint> Enter any other description or comments in this box. </hint>
+          <required/>
+        </field>
+
+      </page>
+
+      <page number="2">
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>projectgrantnumber</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Princeton Project Grant Number</label>
+          <input-type>onebox</input-type>
+          <hint> Enter the number for the Princeton project grant number that should be charged for
+            this submission. </hint>
+          <required> You must enter a project grant number for billing purposes. </required>
+        </field>
+      </page>
+
+    </form>
 
    <form name="purpds">
      <page number="1">
@@ -967,89 +1436,398 @@ contents information.
 
    </form>
 
+    <!-- BEGIN SENIOR THESES -->
+
     <form name="seniortheses">
-     <page number="1">
+      <page number="1">
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Author</label>
+          <input-type>name</input-type>
+          <hint>Enter the student's name.</hint>
+          <required>You must enter the student's name.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>advisor</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Primary advisor</label>
+          <input-type>name</input-type>
+          <hint>Enter name(s) of the primary advisor(s).</hint>
+          <required>You must enter the primary advisor's name.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Secondary advisors</label>
+          <input-type>name</input-type>
+          <hint>Enter name(s) of the secondary advisor.</hint>
+          <required/>
+        </field>
+
        <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>author</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Author</label>
-         <input-type>name</input-type>
-         <hint>Enter the student's name.</hint>
-         <required>You must enter the student's name.</required>
-       </field>
-       
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>advisor</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Advisors</label>
-         <input-type>name</input-type>
-         <hint>Enter the advisors' names.</hint>
-         <required></required>
-       </field>       
-       
-       <field>
-		 <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Title</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the main title of the item.</hint>
-         <required>You must enter title for the thesis.</required>
-       </field>
-       
-       <field>
-		 <dc-schema>dc</dc-schema>
-         <dc-element>format</dc-element>
-         <dc-qualifier>extent</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Number of pages</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the number of pages in the thesis.</hint>
-         <required>You must enter the number of pages in the thesis.</required>
-       </field>
-       
-       <field>
-		 <dc-schema>dc</dc-schema>
-         <dc-element>date</dc-element>
-         <dc-qualifier>created</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Date the thesis was created/submitted.</label>
-         <input-type>date</input-type>
-         <hint>Enter the date this thesis was created/submitted</hint>
-         <required>You must enter the creation date of the thesis.</required>
-       </field>      
-       
-       <field>
-		 <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>abstract</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Abstract</label>
-         <input-type>textarea</input-type>
-         <hint> Enter the abstract of the thesis.</hint>
-         <required></required>
-       </field>
-       
-       <field>
-		 <dc-schema>dc</dc-schema>
-         <dc-element>subject</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <!-- An input-type of twobox MUST be marked as repeatable -->
-         <repeatable>true</repeatable>
-         <label>Subject Keywords</label>
-         <input-type>twobox</input-type>
-         <hint> Enter appropriate subject keywords or phrases below. </hint>
-         <required></required>
-         <vocabulary>srsc</vocabulary>
-       </field>
-       
+          <dc-schema>pu</dc-schema>
+          <dc-element>department</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Department name</label>
+          <input-type value-pairs-name="seniorthesisdept">dropdown</input-type>
+          <hint>Enter the name/s of the student's department/s. (In some cases, a student may have more than one deparment, for
+                instance Creative Writing and English.)  If a student has two departments,
+                select the first department, hold down the “Ctrl” key on a Windows PC or the "Command" key on an Apple PC,
+                and then scroll to and select the second department.  Both departments should then appear highlighted.
+         </hint>
+          <required>You must enter the student's department name/s.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Title</label>
+          <input-type>textarea</input-type>
+          <hint>Enter the title of the thesis.</hint>
+          <required>You must enter title for the thesis.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>format</dc-element>
+          <dc-qualifier>extent</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Number of pages</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the number of pages in the PDF file. Only enter the number of pages without any additional text, e.g. 96</hint>
+          <required>You must enter the number of pages in the thesis.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>created</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Date the thesis was created</label>
+          <input-type>date</input-type>
+          <hint>Enter the date this thesis was created/submitted (use date of submission if creation date is not
+                available).</hint>
+          <required>You must enter the creation (or submission) date of the thesis.</required>
+        </field>
+
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>graduation</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Graduation Year</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the four digit year (e.g. 2010) in which the student graduated.</hint>
+          <required>You must enter the student's graduation year.</required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>abstract</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Abstract</label>
+          <input-type>textarea</input-type>
+          <hint> Enter the abstract of the thesis (if available).</hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier>iso</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Language</label>
+          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+          <hint>Select the language in which the thesis is written.</hint>
+          <required>You must select the language.</required>
+        </field>
+
       </page>
     </form>
+
+    <!-- END SENIOR THESES -->
+
+    <!-- BEGIN PROKOFIEV -->
+
+    <form name="prokofiev">
+
+      <page number="1">
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Authors</label>
+          <input-type>name</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>editor</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Editors</label>
+          <input-type>name</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>illustrator</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Illustrators</label>
+          <input-type>name</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>translator</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Translators</label>
+          <input-type>name</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>other</dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Other Contributors</label>
+          <input-type>name</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>created</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Date of Creation</label>
+          <input-type>date</input-type>
+          <hint>Please give the date on which this item was created.</hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>copyright</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Date of Copyright</label>
+          <input-type>date</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>General Description</label>
+          <input-type>onebox</input-type>
+          <hint> Describe this item. </hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>sponsorship</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Sponsorship</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>URI</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>format</dc-element>
+          <dc-qualifier>medium</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Medium</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>govdoc</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Goverment Document Identifier</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>isan</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>ISAN</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>isbn</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>ISBN</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>ismn</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>ISMN</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>other</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Other Identifier</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>true</repeatable>
+          <label>Language</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>rights</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Rights</label>
+          <input-type>textarea</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>rights</dc-element>
+          <dc-qualifier>holder</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Rights Holder</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>rights</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Rights URI</label>
+          <input-type>onebox</input-type>
+          <hint></hint>
+          <required/>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>subject</dc-element>
+          <dc-qualifier/>
+          <!-- An input-type of twobox MUST be marked as repeatable -->
+          <repeatable>true</repeatable>
+          <label>Subject Keywords</label>
+          <input-type>twobox</input-type>
+          <hint> Enter appropriate subject keywords or phrases below. </hint>
+          <required></required>
+        </field>
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Title</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the main title of the item.</hint>
+          <required>You must enter a main title for this item.</required>
+        </field>
+
+      </page>
+
+      <page number="2">
+        <field>
+          <dc-schema>pu</dc-schema>
+          <dc-element>projectgrantnumber</dc-element>
+          <dc-qualifier/>
+          <repeatable>false</repeatable>
+          <label>Princeton Project Grant Number</label>
+          <input-type>onebox</input-type>
+          <hint> Enter the number for the Princeton project grant number that should be charged for
+            this submission. </hint>
+          <required>You must enter a project grant number for billing purposes. </required>
+        </field>
+      </page>
+
+    </form>
+
+    <!-- END PROKOFIEV -->
+
 
  </form-definitions>
 
@@ -1271,6 +2049,198 @@ contents information.
        <stored-value></stored-value>
      </pair>
    </value-pairs>
+
+    <!-- List of departments that can be selected when submitting a senior thesis. -->
+<value-pairs value-pairs-name="seniorthesisdept" dc-term="contributor.other">
+   <pair>
+      <displayed-value>Aeronautical Engineering</displayed-value>
+      <stored-value>Aeronautical Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Anthropology</displayed-value>
+      <stored-value>Anthropology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Architecture School</displayed-value>
+      <stored-value>Architecture School</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Art and Archaeology</displayed-value>
+      <stored-value>Art and Archaeology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Astrophysical Sciences</displayed-value>
+      <stored-value>Astrophysical Sciences</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Biology</displayed-value>
+      <stored-value>Biology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Chemical and Biological Engineering</displayed-value>
+      <stored-value>Chemical and Biological Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Chemistry</displayed-value>
+      <stored-value>Chemistry</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Civil and Environmental Engineering</displayed-value>
+      <stored-value>Civil and Environmental Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Civil Engineering and Operations Research</displayed-value>
+      <stored-value>Civil Engineering and Operations Research</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Classics</displayed-value>
+      <stored-value>Classics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Comparative Literature</displayed-value>
+      <stored-value>Comparative Literature</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Computer Science</displayed-value>
+      <stored-value>Computer Science</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Creative Writing Program</displayed-value>
+      <stored-value>Creative Writing Program</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>East Asian Studies</displayed-value>
+      <stored-value>East Asian Studies</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Ecology and Evolutionary Biology</displayed-value>
+      <stored-value>Ecology and Evolutionary Biology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Economics</displayed-value>
+      <stored-value>Economics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Electrical Engineering</displayed-value>
+      <stored-value>Electrical Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Engineering and Applied Science</displayed-value>
+      <stored-value>Engineering and Applied Science</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>English</displayed-value>
+      <stored-value>English</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>French and Italian</displayed-value>
+      <stored-value>French and Italian</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Geosciences</displayed-value>
+      <stored-value>Geosciences</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>German</displayed-value>
+      <stored-value>German</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>History</displayed-value>
+      <stored-value>History</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Independent Concentration</displayed-value>
+      <stored-value>Independent Concentration</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Mathematics</displayed-value>
+      <stored-value>Mathematics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Mechanical and Aerospace Engineering</displayed-value>
+      <stored-value>Mechanical and Aerospace Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Medieval Studies</displayed-value>
+      <stored-value>Medieval Studies</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Modern Languages</displayed-value>
+      <stored-value>Modern Languages</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Molecular Biology</displayed-value>
+      <stored-value>Molecular Biology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Music</displayed-value>
+      <stored-value>Music</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Near Eastern Studies</displayed-value>
+      <stored-value>Near Eastern Studies</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Operations Research and Financial Engineering</displayed-value>
+      <stored-value>Operations Research and Financial Engineering</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Oriental Studies</displayed-value>
+      <stored-value>Oriental Studies</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Philosophy</displayed-value>
+      <stored-value>Philosophy</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Physics</displayed-value>
+      <stored-value>Physics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Politics</displayed-value>
+      <stored-value>Politics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Psychology</displayed-value>
+      <stored-value>Psychology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Religion</displayed-value>
+      <stored-value>Religion</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Romance Languages and Literatures</displayed-value>
+      <stored-value>Romance Languages and Literatures</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Slavic Languages and Literature</displayed-value>
+      <stored-value>Slavic Languages and Literature</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Sociology</displayed-value>
+      <stored-value>Sociology</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Spanish and Portuguese Languages and Cultures</displayed-value>
+      <stored-value>Spanish and Portuguese Languages and Cultures</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Special Program in Humanities</displayed-value>
+      <stored-value>Special Program in Humanities</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Statistics</displayed-value>
+      <stored-value>Statistics</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Theatre</displayed-value>
+      <stored-value>Theatre</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Woodrow Wilson School</displayed-value>
+      <stored-value>Woodrow Wilson School</stored-value>
+   </pair>
+</value-pairs>
 
     </form-value-pairs>
 

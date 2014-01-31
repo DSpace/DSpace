@@ -3,9 +3,9 @@
 <!--
   - dublin-core-types.xml
   -
-  - Version:  $Revision: 3705 $
+  - Version:  $Revision: 2125 $
   -
-  - Date:     $Date: 2009-04-11 12:02:24 -0500 (Sat, 11 Apr 2009) $
+  - Date:     $Date: 2007-08-08 04:34:59 -0700 (Wed, 08 Aug 2007) $
   -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
@@ -33,8 +33,8 @@
     <contributor.author>Joan Kolias</contributor.author>
     <contributor.author>Rebecca Lubas</contributor.author>
     <contributor.author>Sarah Mitchell</contributor.author>
-    <contributor.editor>$Author: mdiggory $</contributor.editor>
-    <date.created>$Date: 2009-04-11 12:02:24 -0500 (Sat, 11 Apr 2009) $</date.created>
+    <contributor.editor>$Author: grahamtriggs $</contributor.editor>
+    <date.created>$Date: 2007-08-08 04:34:59 -0700 (Wed, 08 Aug 2007) $</date.created>
     <description>
       $Log$
       Revision 1.5  2006/10/18 15:38:34  cjuergen
@@ -80,7 +80,7 @@
       (hopefully) fixed cvs keyword Log to expand in tags properly.
 
     </description>
-    <description.version>$Revision: 3705 $</description.version>
+    <description.version>$Revision: 2125 $</description.version>
   </dspace-header>
 
   <dc-schema>
@@ -595,20 +595,6 @@
     <element>projectgrantnumber</element>
     <!-- unqualified -->
     <scope_note>Princeton project grant code to be charged for item submission.</scope_note>
-  </dc-type>
-  
-  <dc-type>
-	<schema>pu</schema>
-    <element>embargo</element>
-    <qualifier>lift</qualifier>
-    <scope_note>The date on which embargo should be lifted.</scope_note>
-  </dc-type>
-  
-    <dc-type>
-	<schema>pu</schema>
-    <element>embargo</element>
-    <qualifier>terms</qualifier>
-    <scope_note>Terms that can be translated to embargo lift dates.</scope_note>
   </dc-type>
   
 </dspace-dc-types>
