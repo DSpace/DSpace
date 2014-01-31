@@ -48,9 +48,6 @@ public class StatisticsImporter
     /** GEOIP lookup service */
     private static LookupService geoipLookup;
 
-    /** Metadata storage information */
-    private static Map<String, String> metadataStorageInfo;
-
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
 
@@ -339,24 +336,6 @@ public class StatisticsImporter
                     sid.addField("dns", dns.toLowerCase());
                 }
 
-                if (dso instanceof Item) {
-                    Item item = (Item) dso;
-                    // Store the metadata
-                    for (String storedField : metadataStorageInfo.keySet()) {
-                        String dcField = metadataStorageInfo.get(storedField);
-
-                        DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                                dcField.split("\\.")[1], dcField.split("\\.")[2],
-                                Item.ANY);
-                        for (DCValue val1 : vals) {
-                            String val = val1.value;
-                            sid.addField(String.valueOf(storedField), val);
-                            sid.addField(String.valueOf(storedField + "_search"),
-                                    val.toLowerCase());
-                        }
-                    }
-                }
-
                 SolrLogger.storeParents(sid, dso);
                 solr.add(sid);
                 errors--;
@@ -471,7 +450,6 @@ public class StatisticsImporter
         }
 		solr = new HttpSolrServer(sserver);
 
-		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {

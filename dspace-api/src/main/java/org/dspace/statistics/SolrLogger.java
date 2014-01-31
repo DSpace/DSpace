@@ -7,7 +7,6 @@
  */
 package org.dspace.statistics;
 
-import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.maxmind.geoip.Location;
@@ -77,8 +76,6 @@ public class SolrLogger
     public static final String DATE_FORMAT_DCDATE = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private static final LookupService locationService;
-
-    private static Map<String, String> metadataStorageInfo;
 
     private static final boolean useProxies;
 
@@ -563,11 +560,6 @@ public class SolrLogger
 
     }
 
-    public static Map<String, String> getMetadataStorageInfo()
-    {
-        return metadataStorageInfo;
-    }
-
     /**
      * Method just used to log the parents.
      * <ul>
@@ -676,18 +668,6 @@ public class SolrLogger
 
             // We have at least one document good
             SolrDocument document = response.getResults().get(0);
-            for (Object storedField : metadataStorageInfo.keySet())
-            {
-                // For each of these fields that are stored we are to create a
-                // list of the values it holds now
-                java.util.Collection collection = document
-                        .getFieldValues((String) storedField);
-                List<String> storedVals = new ArrayList<String>();
-                storedVals.addAll(collection);
-                // Now add it to our hashmap
-                currentValsStored.put((String) storedField, storedVals);
-            }
-
             // System.out.println("HERE");
             // Get the info we need
         }
