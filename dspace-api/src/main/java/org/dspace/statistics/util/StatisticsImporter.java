@@ -29,7 +29,7 @@ import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.Location;
 
 /**
- * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Solr
+ * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
  *
  * @see ClassicDSpaceLogConverter
  *
@@ -40,7 +40,7 @@ public class StatisticsImporter
     private static final Logger log = Logger.getLogger(StatisticsImporter.class);
 
     /** Date format (for solr) */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** Solr server connection */
     private static HttpSolrServer solr;
@@ -67,7 +67,7 @@ public class StatisticsImporter
     private List<Integer> localBitstreams;
 
     /** Whether or not to replace item IDs with local values (for testing) */
-    private boolean useLocal;
+    private final boolean useLocal;
 
     /**
      * Constructor. Optionally loads local data to replace foreign data
@@ -495,6 +495,7 @@ public class StatisticsImporter
             File dir = sample.getParentFile();
             FilenameFilter filter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.startsWith(sample.getName());
@@ -522,7 +523,7 @@ public class StatisticsImporter
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {
-        private int maxCapacity;
+        private final int maxCapacity;
 
         public DNSCache(int initialCapacity, float loadFactor, int maxCapacity)
         {
