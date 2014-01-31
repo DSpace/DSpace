@@ -235,6 +235,8 @@
                 <property name="useAsHomePage" value="false"/>
             </bean>
         </property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
     </bean>
 
     <!--Search filter configuration beans-->
