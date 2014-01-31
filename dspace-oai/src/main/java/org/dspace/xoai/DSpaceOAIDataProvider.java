@@ -158,6 +158,11 @@ public class DSpaceOAIDataProvider extends HttpServlet
                     "Requested OAI context \""
                     + request.getPathInfo().replace("/", "")
                     + "\" does not exist");
+        } finally {
+            if(context != null && context.isValid())
+            {
+                context.abort();
+            }
         }
 
     }
