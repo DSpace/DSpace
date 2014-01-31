@@ -3020,7 +3020,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Describe publication:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Add and describe data files:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Finalize submission:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
@@ -3031,7 +3031,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
 		submission until at least one data file is attached to the publication.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you have added all data
-		files for this publication, press the button below to finish the submission. A Dryad curator
+		files for this publication, press the button below to checkout and finish the submission. A Dryad curator
 		will review the submission to ensure the descriptions are complete and the files are not
 		corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>

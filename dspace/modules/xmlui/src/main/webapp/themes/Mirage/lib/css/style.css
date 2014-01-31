@@ -2491,3 +2491,14 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
     color:grey;
     font-size: 0.5em;
 }
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview{
+    border: 0px;
+    -moz-box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+    -webkit-box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+    box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+}
+
+#aspect_submission_submit_OverviewStep_div_finalizedivision{
+    padding-top: 6px;
+}
