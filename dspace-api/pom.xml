@@ -407,6 +407,12 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
+            <exclusions>
+            	<exclusion>
+                	<groupId>net.sf.ehcache</groupId>
+            		<artifactId>ehcache-core</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
