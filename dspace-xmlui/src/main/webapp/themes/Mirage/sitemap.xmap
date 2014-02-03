@@ -8,8 +8,7 @@
     http://www.dspace.org/license/
 
 -->
-<!-- 
-HOW A DSPACE THEME IS PROCESSED IN 5 STEPS:
+<!-- HOW A DSPACE THEME IS PROCESSED IN 5 STEPS:
           
           1: Generate the DRI (XML) page
 
