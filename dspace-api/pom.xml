@@ -264,7 +264,7 @@
          <version>10.2.0.2.0</version>
       </dependency>
       <dependency>
-         <groupId>edu.yale</groupId>
+         <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
          <version>2.0.11</version>
       </dependency>
