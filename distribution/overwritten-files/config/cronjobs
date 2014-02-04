@@ -29,6 +29,9 @@
 #Backup en AIP una vez por semana
 5 22 * * sun  date && ./dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 /var/dspace/backups/aip/aip-site.zip && date
 
+#GZip de logs viejos los lunes a las 5AM
+0 5 * * mon find /var/dspace/log -maxdepth 1 -name "dspace.log.*" -type f -mtime +30 -exec gzip {} \; -exec mv {}.gz /var/dspace/log/old-logs/ \;
+
 # ########## STATS ######################
 0 1 * * * /var/dspace/bin/dspace stat-general
 0 1 * * * /var/dspace/bin/dspace stat-monthly
