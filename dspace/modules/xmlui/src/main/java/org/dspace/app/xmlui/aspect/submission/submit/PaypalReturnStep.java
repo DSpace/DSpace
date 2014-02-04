@@ -70,7 +70,7 @@ public class PaypalReturnStep extends AbstractStep {
                     //find the correct shopping cart based on the secrue token
                     ShoppingCart shoppingCart = ShoppingCart.findBySecureToken(context,secureToken);
                     if(shoppingCart!=null){
-                        if("0".equals(result) || "4".equals(result))
+                        if("0".equals(result))
                         {
                             //successful transaction
                             shoppingCart.setTransactionId(reference);
@@ -80,18 +80,12 @@ public class PaypalReturnStep extends AbstractStep {
                             Item item = Item.find(context,itemId);
                             if(item!=null)
                             {
-                                 if(message.equals("Verified")){
+                                 if(message.startsWith("Verified")){
                                      //authorization
                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
                                      Date now = new Date();
                                      shoppingCart.setOrderDate(now);
                                  }
-				 else if ("4".equals(result)) {
-				     //authorization, but paypal isn't supporting our zero-dollar transaction
-                                    shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
-                                     Date now = new Date();
-                                     shoppingCart.setOrderDate(now);
-				 }
 				 else
                                  {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
