@@ -128,7 +128,7 @@ public class IndexClient {
             Integer itemId = Integer.valueOf(line.getOptionValue("i"));
             DSpaceObject dso = Item.find(context, itemId);
             log.info("Reindexing Object:" + dso);
-            indexer.reIndexContent(context, dso);
+            indexer.indexContent(context, dso, true);
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
