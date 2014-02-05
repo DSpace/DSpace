@@ -186,7 +186,7 @@ public class DailyReportEmailer
                 .withArgName("emailadr")
                 .hasArgs(1)
                 .withDescription(
-                        "Send report to given email instead of default mail.admin");
+                        "Send report to given email instead of default mail.admin; if adr is '-' print report to stdout");
         options.addOption(emailadr.create("t"));
         try
         {
