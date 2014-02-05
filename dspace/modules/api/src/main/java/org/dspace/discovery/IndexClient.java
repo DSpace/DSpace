@@ -14,6 +14,8 @@ import org.dspace.utils.DSpace;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 
 /**
  * Class used to reindex dspace communities/collections/items into discovery
@@ -21,6 +23,7 @@ import java.sql.SQLException;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Dan Leehr (dan.leehr@nescent.org)
  */
 public class IndexClient {
 
@@ -42,7 +45,7 @@ public class IndexClient {
         Context context = new Context();
         context.setIgnoreAuthorization(true);
 
-        String usage = "org.dspace.discovery.IndexClient [-cbhf[r <item handle>]] or nothing to update/clean an existing index.";
+        String usage = "org.dspace.discovery.IndexClient [-cbhf[r <item handle>][i <item id>]] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -79,6 +82,12 @@ public class IndexClient {
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "optimize search solr core").create("o"));
+        options.addOption(OptionBuilder
+                        .withArgName("item id")
+                        .hasArg(true)
+                        .withDescription(
+                                "re-index an Item, based on its internal item_id")
+                        .create("i"));
 
         try {
             line = new PosixParser().parse(options, args);
@@ -115,6 +124,11 @@ public class IndexClient {
         } else if (line.hasOption("o")) {
             log.info("Optimizing search core.");
             indexer.optimize();
+        } else if (line.hasOption("i")) {
+            Integer itemId = Integer.valueOf(line.getOptionValue("i"));
+            DSpaceObject dso = Item.find(context, itemId);
+            log.info("Reindexing Object:" + dso);
+            indexer.reIndexContent(context, dso);
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));
