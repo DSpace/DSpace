@@ -333,7 +333,7 @@ public class XOAI {
         }
     }
 
-    private static void cleanCache(XOAIItemCacheService xoaiItemCacheService,  XOAICacheService xoaiCacheService) {
+    private static void cleanCache(XOAIItemCacheService xoaiItemCacheService,  XOAICacheService xoaiCacheService) throws IOException {
         System.out.println("Purging cached OAI responses.");
         xoaiItemCacheService.deleteAll();
         xoaiCacheService.deleteAll();
@@ -438,7 +438,7 @@ public class XOAI {
         }
     }
 
-    private static void cleanCompiledItems(XOAIItemCacheService itemCacheService) {
+    private static void cleanCompiledItems(XOAIItemCacheService itemCacheService) throws IOException {
         System.out.println("Purging compiled items");
         itemCacheService.deleteAll();
     }

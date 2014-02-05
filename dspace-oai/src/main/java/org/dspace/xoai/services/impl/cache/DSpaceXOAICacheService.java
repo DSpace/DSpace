@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.Date;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.apache.commons.io.IOUtils.write;
 
@@ -115,12 +116,12 @@ public class DSpaceXOAICacheService implements XOAICacheService {
 
     @Override
     public void delete(String requestID) {
-        FileUtils.deleteQuietly(this.getCacheFile(requestID));
+        this.getCacheFile(requestID).delete();
     }
 
     @Override
-    public void deleteAll() {
-        FileUtils.deleteQuietly(new File(getBaseDir()));
+    public void deleteAll() throws IOException {
+        deleteDirectory(new File(getBaseDir()));
     }
 
 }

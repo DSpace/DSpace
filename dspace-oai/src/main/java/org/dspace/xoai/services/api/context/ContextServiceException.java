@@ -22,8 +22,4 @@ public class ContextServiceException extends Exception {
     public ContextServiceException(Throwable cause) {
         super(cause);
     }
-
-    public ContextServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

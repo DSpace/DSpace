@@ -24,7 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 
 public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
@@ -104,13 +104,13 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
 
     @Override
     public void delete(Item item) {
-        deleteQuietly(this.getMetadataCache(item));
+        this.getMetadataCache(item).delete();
     }
 
 
     @Override
-    public void deleteAll() {
-        deleteQuietly(new File(getBaseDir()));
+    public void deleteAll() throws IOException {
+        deleteDirectory(new File(getBaseDir()));
     }
 
 }

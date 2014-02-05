@@ -17,7 +17,6 @@
 
     <xsl:template match="/">
         <junii2
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 version="3.0">
             <!-- title:none = title -->
             <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element/doc:field">

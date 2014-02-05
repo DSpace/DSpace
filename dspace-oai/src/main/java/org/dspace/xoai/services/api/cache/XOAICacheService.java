@@ -19,5 +19,5 @@ public interface XOAICacheService {
     void handle (String requestID, OutputStream out) throws IOException;
     void store (String requestID, OAIPMH response) throws IOException;
     void delete (String requestID);
-    void deleteAll ();
+    void deleteAll () throws IOException;
 }

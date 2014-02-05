@@ -18,5 +18,5 @@ public interface XOAIItemCacheService {
     Metadata get (Item item) throws IOException;
     void put (Item item, Metadata metadata) throws IOException;
     void delete (Item item);
-    void deleteAll();
+    void deleteAll() throws IOException;
 }

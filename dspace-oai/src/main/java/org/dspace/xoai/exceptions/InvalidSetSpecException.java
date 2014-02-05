@@ -16,5 +16,19 @@
 
 package org.dspace.xoai.exceptions;
 
-public class InvalidSetSpecException {
+public class InvalidSetSpecException extends Exception {
+    public InvalidSetSpecException() {
+    }
+
+    public InvalidSetSpecException(String message) {
+        super(message);
+    }
+
+    public InvalidSetSpecException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidSetSpecException(Throwable cause) {
+        super(cause);
+    }
 }
