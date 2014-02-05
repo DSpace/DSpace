@@ -8,10 +8,6 @@
 
 package org.dspace.xoai.filter;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -22,6 +18,12 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.filter.results.DatabaseFilterResult;
+import org.dspace.xoai.filter.results.SolrFilterResult;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -29,11 +31,15 @@ import org.dspace.xoai.data.DSpaceItem;
  */
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {
-    private static Logger log = LogManager
-            .getLogger(DSpaceAuthorizationFilter.class);
+    private static Logger log = LogManager.getLogger(DSpaceAuthorizationFilter.class);
+    private Context context;
+
+    public DSpaceAuthorizationFilter (Context context) {
+        this.context = context;
+    }
 
     @Override
-    public DatabaseFilterResult getWhere(Context context)
+    public DatabaseFilterResult buildDatabaseQuery(Context context)
     {
         List<Object> params = new ArrayList<Object>();
         return new DatabaseFilterResult("EXISTS (SELECT p.action_id FROM "
@@ -50,32 +56,31 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     {
         try
         {
-            Context ctx = super.getContext();
             String handle = DSpaceItem.parseHandle(item.getIdentifier());
             if (handle == null) return false;
-            Item dsitem = (Item) HandleManager.resolveToObject(ctx, handle);
-            AuthorizeManager.authorizeAction(ctx, dsitem, Constants.READ);
-            for (Bundle b : dsitem.getBundles())
-                AuthorizeManager.authorizeAction(ctx, b, Constants.READ);
+            Item dspaceItem = (Item) HandleManager.resolveToObject(context, handle);
+            AuthorizeManager.authorizeAction(context, dspaceItem, Constants.READ);
+            for (Bundle b : dspaceItem.getBundles())
+                AuthorizeManager.authorizeAction(context, b, Constants.READ);
             return true;
         }
         catch (AuthorizeException ex)
         {
-            log.debug(ex.getMessage());
+            log.error(ex.getMessage(), ex);
         }
         catch (SQLException ex)
         {
-            log.error(ex.getMessage());
+            log.error(ex.getMessage(), ex);
         }
         catch (Exception ex)
         {
-            log.error(ex.getMessage());
+            log.error(ex.getMessage(), ex);
         }
         return false;
     }
 
     @Override
-    public SolrFilterResult getQuery()
+    public SolrFilterResult buildSolrQuery()
     {
         return new SolrFilterResult("item.public:true");
     }
