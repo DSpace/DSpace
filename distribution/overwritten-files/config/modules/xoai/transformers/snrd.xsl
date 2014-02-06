@@ -313,25 +313,28 @@
 			<xsl:when test="$subtype='Documento de trabajo'">
 				documento de trabajo
 			</xsl:when>
+			<!-- No se exporta
 			<xsl:when test="$subtype='Preprint'">
 				artículo
-			</xsl:when>
+			</xsl:when> -->
 			<xsl:when test="$subtype='Articulo'">
 				artículo
 			</xsl:when>
+			<!-- No se exporta
 			<xsl:when test="$subtype='Comunicacion'">
 				artículo
-			</xsl:when>
+			</xsl:when> -->
 			<xsl:when test="$subtype='Revision'">
 				reseña artículo
 			</xsl:when>
+			<!-- No se exporta
 			<xsl:when test="$subtype='Contribucion a revista'">
 				artículo
-			</xsl:when>
+			</xsl:when> -->
 			<xsl:when test="$subtype='Informe tecnico'">
 				informe técnico
 			</xsl:when>
-			<xsl:when test="$subtype='patente'">
+			<xsl:when test="$subtype='Patente'">
 				patente
 			</xsl:when>
 			<xsl:when test="$subtype='Tesis de doctorado'">
@@ -358,6 +361,7 @@
 			<xsl:when test="$subtype='Objeto de conferencia'">
 				documento de conferencia
 			</xsl:when>
+			<!-- No se exportan
 			<xsl:when test="$subtype='Documento institucional'">
 				otros
 			</xsl:when>
@@ -372,7 +376,7 @@
 			</xsl:when>
  			<xsl:when test="$subtype='Audio'">
 				otros
-			</xsl:when>
+			</xsl:when> -->
 			<xsl:otherwise>
 				otros
 			</xsl:otherwise>
@@ -411,7 +415,7 @@
 		<xsl:variable name="valueLanguage">
 			<xsl:choose>
 				<xsl:when test="$language='es'">
-					esp
+					spa
 				</xsl:when>
 				<xsl:when test="$language='en'">
 					eng
