@@ -67,7 +67,6 @@
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <form action="<%= request.getContextPath()%>/simple-search" method="get">
-            <h3 class="hidden-sm"><fmt:message key="jsp.home.search1"/></h3>
             <div class="input-group">
                 <input type="text" class="form-control" name="query" id="tquery" placeholder="<fmt:message key="jsp.home.search2"/>"/>
                 <span class="input-group-btn">
@@ -75,13 +74,23 @@
                 </span>
             </div>
         </form>
+        <%
+        if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+        {
+        %>        
+        <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
+        <%
+        }
+        %>
     </div>
-</div>                   
+</div>
+<!--                
 <div class="row">
-<div class="col-md-4">
-    <%= sideNews %>
+    <div class="col-md-4">
+        <%= sideNews %>
+    </div>
 </div>
-</div>
+-->
 <div class="container row">
 <%
 if (communities != null && communities.length != 0)
