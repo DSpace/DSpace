@@ -48,6 +48,11 @@ public class BibTexView implements View {
 
         OutputStream aOutputStream = response.getOutputStream();
         aOutputStream.close();
+        Context context = (Context) request.getAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        if(context != null) {
+            context.abort();
+            request.removeAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        }
 
     }
 
