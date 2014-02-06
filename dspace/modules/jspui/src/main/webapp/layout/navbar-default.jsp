@@ -29,6 +29,14 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="java.util.Map" %>
+
+<%-- damanzano: It was added to enable internationalization on all pages --%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 <%
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
@@ -69,96 +77,154 @@
     			browseCurrent = bix.getName();
         }
     }
+    
+    // damanzano it was added to enable internationalization on all pages
+    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
+    Locale sessionLocale = UIUtil.getSessionLocale(request);
+    Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
 %>
 
 
        <div class="navbar-header">
-         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-           <span class="icon-bar"></span>
-           <span class="icon-bar"></span>
-           <span class="icon-bar"></span>
+         <a class="navbar-brand" href="<%= request.getContextPath() %>/">
+             <img height="25px" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
+             Biblioteca Digital
+         </a>
+         
+         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".default-navigation">
+             <span class="sr-only">Toggle navigation</span>
+             <span class="fa fa-bars">
          </button>
-         <a class="navbar-brand" href="<%= request.getContextPath() %>/"><img height="25px" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" /></a>
        </div>
-       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-         <ul class="nav navbar-nav">
-           <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a></li>
-                
-           <li class="dropdown">
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.browse"/> <b class="caret"></b></a>
-             <ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
-				<li class="divider"></li>
-				<li class="dropdown-header">Browse Items by:</li>
-				<%-- Insert the dynamic browse indices here --%>
-				
-				<%
-					for (int i = 0; i < bis.length; i++)
-					{
-						BrowseIndex bix = bis[i];
-						String key = "browse.menu." + bix.getName();
-					%>
-				      			<li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
-					<%	
-					}
-				%>
-				    
-				<%-- End of dynamic browse indices --%>
+         
+       <!-- navbar collapsible browse content -->
+       <nav class="navbar-collapse collapse default-navigation" role="navigation">
+           <ul class="nav navbar-nav">
+               <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>">
+                   <a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a>
+               </li>
+               <li class="dropdown">
+                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                       <span class="icesiicon icesiicon-menu"></span><fmt:message key="jsp.layout.navbar-default.browse"/> <span class="caret"></span>
+                   </a>
+                   <ul class="dropdown-menu">
+                       <li class="navigationBarItem <%= (currentPage.endsWith("/community-list") ? "active" : "")%>">
+                           <a href="<%= request.getContextPath()%>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a>
+                       </li>
+                       <li class="divider"></li>
+                       <%-- Insert the dynamic browse indices here --%>
+                       <%
+                           for (int i = 0; i < bis.length; i++) {
+                               BrowseIndex bix = bis[i];
+                               String key = "browse.menu." + bix.getName();
+                       %>
+                       <li class="navigationBarItem <%= (browseCurrent.equals(bix.getName()) ? "active" : "")%>">
+                           <a href="<%= request.getContextPath()%>/browse?type=<%= bix.getName()%>"><fmt:message key="<%= key%>"/></a>
+                       </li>
+                       <%
+                           }
+                       %>
+                       <%-- End of dynamic browse indices --%>
+                   </ul>    
+               </li>
+               <%
+               if (supportedLocales != null && supportedLocales.length > 1) {
+               %>
+               <li class="dropdown">
+                   <form method="get" name="repost" action="">
+                    <input type ="hidden" name ="locale"/>
+                   </form>
+                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                       <span class="icesiicon icesiicon-language"></span><fmt:message key="jsp.layout.navbar-default.languages"/> <span class="caret"></span>
+                   </a>
+                   <ul class="dropdown-menu">
+                       <%
+                           for (int i = supportedLocales.length - 1; i >= 0; i--) {
+                       %>
+                       <li>
+                           <a class ="langChangeOn"
+                              onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';document.repost.submit();">
+                               <img src="<%= request.getContextPath()%>/image/flags/<%=supportedLocales[i].toString()%>.png" 
+                                    alt="<%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>" 
+                                    title="<%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>"/> 
+                               <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
 
-            </ul>
-          </li>
-          <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
-       </ul>
-       <div class="nav navbar-nav navbar-right">
-		<ul class="nav navbar-nav navbar-right">
-         <li class="dropdown">
-         <%
-    if (user != null)
-    {
-		%>
-		<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
+                           </a>
+                       </li>
+                       <%
+                           }
+                       %>
+                   </ul>
+               </li>
+           
+               <%
+               }
+               %>
+               <li class="dropdown">
+               <%
+               if (user != null)
+               {
+               %>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
 		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20) %></fmt:param>
-		  </fmt:message> <b class="caret"></b></a>
+		  </fmt:message> <b class="caret"></b>
+                </a>
 		<%
-    } else {
+                } else {
 		%>
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
-	<% } %>             
-             <ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
+                <% } %>             
+                <ul class="dropdown-menu">
+                    <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
 
-		<%
-		  if (isAdmin)
-		  {
-		%>
-			   <li class="divider"></li>  
-               <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
-		<%
-		  }
-		  if (user != null) {
-		%>
-		<li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
-		<% } %>
-             </ul>
-           </li>
-          </ul>
-          
-	<%-- Search Box --%>
-	<form method="get" action="<%= request.getContextPath() %>/simple-search" class="navbar-form navbar-right" scope="search">
-	    <div class="form-group">
-          <input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25"/>
-        </div>
-        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
-<%--               <br/><a href="<%= request.getContextPath() %>/advanced-search"><fmt:message key="jsp.layout.navbar-default.advanced"/></a>
-<%
-			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
-			{
-%>        
-              <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
-<%
+                    <%
+                    if (isAdmin)
+                    {
+                    %>
+                    <li class="divider"></li>  
+                    <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
+                    <%
+                    }
+                    if (user != null) {
+                    %>
+                    <li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
+                    <% } %>
+                </ul>
+               </li>
+               <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
+           </ul>
+           <div class="nav navbar-nav navbar-right">
+            <%-- Search Box --%>
+            <form method="get" action="<%= request.getContextPath()%>/simple-search" class="navbar-form navbar-right" scope="search">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="query" id="tequery"  placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>"/>
+                    <!--
+                    <span class="input-group-btn">
+                        <buttom type="submit" name="submit" class="btn btn-default" value="">
+                            <span class="fa fa-search fa-flip-horizontal"></span> <fmt:message key="jsp.layout.navbar-default.go"/>
+                        </buttom>
+                    </span>
+                    -->
+
+                </div>
+                <button type="submit" class="btn btn-primary"><span class="fa fa-search fa-flip-horizontal"></span></button>
+            </form>
+            <%--               <br/><a href="<%= request.getContextPath() %>/advanced-search"><fmt:message key="jsp.layout.navbar-default.advanced"/></a>
+            <%
+                        if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+                        {
+            %>        
+            <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
+            <%
             }
-%> --%>
-	</form></div>
-    </nav>
+            %>
+            --%>
+           </div>
+           
+       </nav><!--/.navbar-collapse -->
+       
+       
+       
