@@ -51,6 +51,7 @@
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.app.util.Util" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
@@ -69,6 +70,14 @@
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
+    String uaCode =  null;
+    String uaDomain =  null;
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+    Boolean doAnalytics = (user == null);
+    if (doAnalytics) {
+        uaCode =  ConfigurationManager.getProperty("jspui.google.analytics.key");
+        uaDomain =  ConfigurationManager.getProperty("jspui.google.analytics.domain");
+    }
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -106,6 +115,7 @@
 %>
         
     <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/google-analytics.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
@@ -152,6 +162,20 @@
 
             <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
             <tr valign="top">
+
+<%-- fire off google analytics if nobody is logged in --%>
+<%
+    if (doAnalytics)
+    {
+%>
+<script>
+     googleAnalytics('<%= uaCode %>', '<%= uaDomain %>' );
+</script>
+
+<%
+    }
+%>
+
 
             <%-- Navigation bar --%>
 <%
