@@ -413,8 +413,8 @@ public class XOAI
                         Context ctx = new Context();
                         XOAI indexer = new XOAI(ctx,
                                 line.hasOption('o'), 
-                                line.hasOption('c'), 
-                                line.hasOption('v'));
+                                line.hasOption('v'), 
+                                line.hasOption('c'));
 
                         indexer.index();
                         
