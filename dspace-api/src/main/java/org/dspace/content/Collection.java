@@ -1041,6 +1041,34 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Remove an item reference from all collections.
+     *
+     * @param item item to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void removeItemFromAllCollections(Item item) throws SQLException, AuthorizeException,
+            IOException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
+
+        log.info(LogManager.getHeader(ourContext, "remove_item", ",item_id=" + item.getID()));
+
+        DatabaseManager.updateQuery(ourContext,
+                "DELETE FROM collection2item WHERE "+
+                "item_id= ? ",
+                 item.getID());
+
+        DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
+
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
+    }
+
+
+    /**
      * Update the collection metadata (including logo and workflow groups) to
      * the database. Inserts if this is a new collection.
      *
