@@ -91,7 +91,6 @@ public class ResultsLogger implements ChecksumResultsCollector
     {
         LOG.info("******************************************************");
         LOG.info(msg("bitstream-id") + ": " + info.getBitstreamId());
-        LOG.info(msg("bitstream-info-found") + ": " + info.getInfoFound());
         LOG.info(msg("bitstream-marked-deleted") + ": " + info.getDeleted());
         LOG.info(msg("bitstream-found") + ": " + info.getBitstreamFound());
         LOG.info(msg("to-be-processed") + ": " + info.getToBeProcessed());
