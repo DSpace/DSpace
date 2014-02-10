@@ -908,6 +908,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             //caculate the most download item file
             String totalFileDownload = getTotalFileDownload(dataFile);
+            log.info("total file download (item :"+item.getID()+")"+dataFile.getID()+":"+totalFileDownload);
 
             if(totalFileDownload !=null&&Integer.parseInt(totalFileDownload)>maxDownload)
             {
