@@ -903,16 +903,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         //Also add the metadata for all our data files
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
-        Integer maxDownload = 0;
+        Long maxDownload = new Long(0);
         for (Item dataFile : dataFiles) {
 
             //caculate the most download item file
-            String totalFileDownload = getTotalFileDownload(dataFile);
+            Long totalFileDownload = getTotalFileDownload(dataFile);
             log.info("total file download (item :"+item.getID()+")"+dataFile.getID()+":"+totalFileDownload);
 
-            if(totalFileDownload !=null&&Integer.parseInt(totalFileDownload)>maxDownload)
+            if(totalFileDownload !=null&&totalFileDownload>maxDownload)
             {
-               maxDownload = Integer.parseInt(totalFileDownload);
+               maxDownload = totalFileDownload;
             }
 
             DCValue[] mydc = dataFile.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -1303,16 +1303,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		}
     }
 
-    String getTotalFileDownload(Item item)
+    private Long getTotalFileDownload(Item item)
     {
         //String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
         try{
 //            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " AND owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
             Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
-            return Long.toString(totalFileDownload);
+            return totalFileDownload;
         }catch (Exception e)
         {
-            return "0";
+            return new Long(0);
         }
 
     }
