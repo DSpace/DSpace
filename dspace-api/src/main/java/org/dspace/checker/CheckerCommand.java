@@ -265,7 +265,6 @@ public final class CheckerCommand
      */
     private void processNullInfoBitstream(BitstreamInfo info)
     {
-        info.setInfoFound(false);
         info.setProcessStartDate(new Date());
         info.setProcessEndDate(new Date());
         info

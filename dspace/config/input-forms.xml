@@ -116,6 +116,7 @@
    <name-map collection-handle="88435/dsp01qj72p727k" form-name="digpubs_serials"/>
    <name-map collection-handle="88435/dsp01kw52j8207" form-name="digpubs_serials"/>
    <name-map collection-handle="88435/dsp01bc386j35t" form-name="digpubs_serials"/>
+   <name-map collection-handle="88435/dsp01vx021f236" form-name="digpubs_serials"/>
 <!-- ============================================= -->
 <!-- Pushkin Prokofiev Collection                  -->
 <!-- ============================================= -->
@@ -243,7 +244,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
          <hint> Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
-         <required></required>
+         <required>You must indicate the type of content included in this submission.</required>
        </field>
 
        <field>
@@ -320,6 +321,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
      </page>
 
    </form>
+
 
     <form name="digpubs_serials">
       <page number="1">
@@ -688,6 +690,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
       </page>
 
     </form>
+
 
    <form name="purpds">
      <page number="1">
@@ -1828,7 +1831,6 @@ contents information.
 
     <!-- END PROKOFIEV -->
 
-
  </form-definitions>
 
 
@@ -2006,7 +2008,411 @@ contents information.
    <!-- default language order: (from dspace 1.2.1)
         "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
      -->
-   <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+   <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">   
+     <pair>
+       <displayed-value>English (United States)</displayed-value>
+       <stored-value>en_US</stored-value>
+     </pair>   
+     <pair>
+      <displayed-value>English</displayed-value>
+      <stored-value>en</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>French</displayed-value>
+      <stored-value>fr</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Spanish / Castilian</displayed-value>
+      <stored-value>es</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>German</displayed-value>
+      <stored-value>de</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Italian</displayed-value>
+      <stored-value>it</stored-value>
+   </pair>
+     <pair>
+       <displayed-value>Japanese</displayed-value>
+       <stored-value>ja</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Chinese</displayed-value>
+       <stored-value>zh</stored-value>
+     </pair>
+   <pair>
+      <displayed-value>Arabic</displayed-value>
+      <stored-value>ar</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Azerbaijani</displayed-value>
+      <stored-value>az</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Belarusian</displayed-value>
+      <stored-value>be</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Bulgarian</displayed-value>
+      <stored-value>bg</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Tibetan</displayed-value>
+      <stored-value>bo</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Catalan / Valencian</displayed-value>
+      <stored-value>ca</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Czech</displayed-value>
+      <stored-value>cs</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Danish</displayed-value>
+      <stored-value>da</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Greek</displayed-value>
+      <stored-value>el</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Persian</displayed-value>
+      <stored-value>fa</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Hebrew</displayed-value>
+      <stored-value>he</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Hindi</displayed-value>
+      <stored-value>hi</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Georgian</displayed-value>
+      <stored-value>ka</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Korean</displayed-value>
+      <stored-value>ko</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Dutch</displayed-value>
+      <stored-value>nl</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Norwegian</displayed-value>
+      <stored-value>no</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Polish</displayed-value>
+      <stored-value>pl</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Portuguese</displayed-value>
+      <stored-value>pt</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Romanian</displayed-value>
+      <stored-value>ro</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Russian</displayed-value>
+      <stored-value>ru</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Slovak</displayed-value>
+      <stored-value>sk</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Slovenian</displayed-value>
+      <stored-value>sl</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Serbian</displayed-value>
+      <stored-value>sr</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Swedish</displayed-value>
+      <stored-value>sv</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Turkish</displayed-value>
+      <stored-value>tr</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Ukrainian</displayed-value>
+      <stored-value>uk</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Urdu</displayed-value>
+      <stored-value>ur</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Uzbek</displayed-value>
+      <stored-value>uz</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Vietnamese</displayed-value>
+      <stored-value>vi</stored-value>
+   </pair>
+
+     <pair>
+       <displayed-value>(Other)</displayed-value>
+       <stored-value>other</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>N/A</displayed-value>
+       <stored-value></stored-value>
+     </pair>
+   
+   <!-- Save these for adding in the future
+      
+   <pair>
+      <displayed-value>Finnish</displayed-value>
+      <stored-value>fi</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Abkhazian</displayed-value>
+      <stored-value>ab</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Afrikaans</displayed-value>
+      <stored-value>af</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Aragonese</displayed-value>
+      <stored-value>an</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Assamese</displayed-value>
+      <stored-value>as</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Bengali</displayed-value>
+      <stored-value>bn</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Breton</displayed-value>
+      <stored-value>br</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Bosnian</displayed-value>
+      <stored-value>bs</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Chechen</displayed-value>
+      <stored-value>ce</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Corsican</displayed-value>
+      <stored-value>co</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Church Slavic</displayed-value>
+      <stored-value>cu</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Welsh</displayed-value>
+      <stored-value>cy</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Esperanto</displayed-value>
+      <stored-value>eo</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Estonian</displayed-value>
+      <stored-value>et</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Basque</displayed-value>
+      <stored-value>eu</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Fijian</displayed-value>
+      <stored-value>fj</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Faroese</displayed-value>
+      <stored-value>fo</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Western Frisian</displayed-value>
+      <stored-value>fy</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Irish</displayed-value>
+      <stored-value>ga</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Gaelic / Scottish Gaelic</displayed-value>
+      <stored-value>gd</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Galician</displayed-value>
+      <stored-value>gl</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Manx</displayed-value>
+      <stored-value>gv</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Croatian</displayed-value>
+      <stored-value>hr</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Haitian; Haitian Creole</displayed-value>
+      <stored-value>ht</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Hungarian</displayed-value>
+      <stored-value>hu</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Armenian</displayed-value>
+      <stored-value>hy</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Indonesian</displayed-value>
+      <stored-value>id</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Icelandic</displayed-value>
+      <stored-value>is</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Javanese</displayed-value>
+      <stored-value>jv</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Kongo</displayed-value>
+      <stored-value>kg</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Kurdish</displayed-value>
+      <stored-value>ku</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Cornish</displayed-value>
+      <stored-value>kw</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Kirghiz</displayed-value>
+      <stored-value>ky</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Latin</displayed-value>
+      <stored-value>la</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Luxembourgish; Letzeburgesch</displayed-value>
+      <stored-value>lb</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Limburgan; Limburger;Limburgish</displayed-value>
+      <stored-value>li</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Lingala</displayed-value>
+      <stored-value>ln</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Lithuanian</displayed-value>
+      <stored-value>lt</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Latvian</displayed-value>
+      <stored-value>lv</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Malagasy</displayed-value>
+      <stored-value>mg</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Macedonian</displayed-value>
+      <stored-value>mk</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Mongolian</displayed-value>
+      <stored-value>mn</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Moldavian</displayed-value>
+      <stored-value>mo</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Malay</displayed-value>
+      <stored-value>ms</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Maltese</displayed-value>
+      <stored-value>mt</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Burmese</displayed-value>
+      <stored-value>my</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Norwegian (Bokmål)</displayed-value>
+      <stored-value>nb</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Nepali</displayed-value>
+      <stored-value>ne</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Norwegian (Nynorsk)</displayed-value>
+      <stored-value>nn</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Occitan (post 1500); Provençal</displayed-value>
+      <stored-value>oc</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Raeto-Romance</displayed-value>
+      <stored-value>rm</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Sardinian</displayed-value>
+      <stored-value>sc</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Northern Sami</displayed-value>
+      <stored-value>se</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Somali</displayed-value>
+      <stored-value>so</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Albanian</displayed-value>
+      <stored-value>sq</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Swahili</displayed-value>
+      <stored-value>sw</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Turkmen</displayed-value>
+      <stored-value>tk</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Tahitian</displayed-value>
+      <stored-value>ty</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Volapük</displayed-value>
+      <stored-value>vo</stored-value>
+   </pair>
+   <pair>
+      <displayed-value>Yiddish</displayed-value>
+      <stored-value>yi</stored-value>
+   </pair>
+   
+   -->
+     
+     <!-- Old pairs
      <pair>
        <displayed-value>English (United States)
        </displayed-value>
@@ -2048,6 +2454,9 @@ contents information.
        <displayed-value>N/A</displayed-value>
        <stored-value></stored-value>
      </pair>
+     
+     -->
+     
    </value-pairs>
 
     <!-- List of departments that can be selected when submitting a senior thesis. -->

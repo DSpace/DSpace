@@ -28,13 +28,6 @@ public final class BitstreamInfo
     /** dspace bitstream information */
     private DSpaceBitstreamInfo dspaceBitstream;
 
-    /**
-     * Indicates the bitstream info (metadata) was found in the database.
-     * 
-     * @todo Is this actually used for anything?
-     */
-    private boolean infoFound;
-
     /** indicates the bitstream was found in the database. */
     private boolean bitstreamFound;
 
@@ -71,10 +64,6 @@ public final class BitstreamInfo
         deleted = false;
 
         dspaceBitstream = new DSpaceBitstreamInfo(bid);
-
-        // set default to true since it's the
-        // case for most bitstreams
-        infoFound = true;
         bitstreamFound = false;
         calculatedChecksum = null;
         processEndDate = null;
@@ -127,7 +116,6 @@ public final class BitstreamInfo
         this.processEndDate = (processEndDate == null ? null : new Date(procEndDate.getTime()));
         this.toBeProcessed = toBeProc;
         this.processStartDate = (processStartDate == null ? null : new Date(procStartDate.getTime()));
-        this.infoFound = true;
     }
 
     /**
@@ -371,26 +359,6 @@ public final class BitstreamInfo
         this.calculatedChecksum = calculatedChecksum;
     }
 
-    /**
-     * infoFound accessor.
-     * 
-     * @return Returns infoFound.
-     */
-    public boolean getInfoFound()
-    {
-        return this.infoFound;
-    }
-
-    /**
-     * infoFound accessor.
-     * 
-     * @param found
-     *            sets infoFound.
-     */
-    public void setInfoFound(boolean found)
-    {
-        this.infoFound = found;
-    }
 
     /**
      * bitstreamFound accessor.
