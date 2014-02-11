@@ -240,6 +240,48 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
+
+   /**
+    * Clean item indices and remove bundles
+    */
+   public void cleanItem() throws SQLException, AuthorizeException, IOException
+    {
+        // Check authorisation here. If we don't, it may happen that we remove the
+        // metadata but when getting to the point of removing the bundles we get an exception
+        // leaving the database in an inconsistent state
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+
+        log.info(LogManager.getHeader(ourContext, "clean_item", "item_id=" + getID()));
+
+        // Remove from cache 
+        ourContext.removeCached(this, getID());
+
+         try
+        {
+            // Remove from indices and we will index the new data later
+            IndexBrowse ib = new IndexBrowse(ourContext);
+            ib.itemRemoved(this);
+        }
+        catch (BrowseException e)
+        {
+            log.error("caught exception: ", e);
+            throw new SQLException(e.getMessage(), e);
+        }
+
+        // Delete the metadata (in memory; will write to db when update is called)
+        List<DCValue> values = new ArrayList<DCValue>();
+        setMetadata(values);
+
+        // Remove bundles
+        Bundle[] bunds = getBundles();
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            removeBundle(bunds[i]);
+        }
+   }
+
+
     /**
      * Get the internal ID of this item. In general, this shouldn't be exposed
      * to users
