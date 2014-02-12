@@ -249,11 +249,11 @@ public class I18nUtil
     {
         try {
             String message = getMessage(key.trim(), DEFAULTLOCALE);
+            return message;
         } catch (java.util.MissingResourceException e) {
             log.error(e.getClassName() + " for key)");
             return key;
         }
-        return message;
     }
     
     /**
