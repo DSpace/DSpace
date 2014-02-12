@@ -155,7 +155,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                border: 0;
                margin: 0 }
 
-.stripe { background: #336699 url(<%= imageUrl %>stripe-orange.gif) repeat-x;
+.stripe { background: #336699 url(<%= imageUrl %>stripe.gif) repeat-x;
           vertical-align: top;
           border: 0;
           padding: 0;
