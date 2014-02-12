@@ -71,7 +71,7 @@ public class DailyReportEmailer
      * @param attachment
      *            the file containing the report
      * @param numberOfBitstreams
-     *            the number of bitstreams reported
+     *            number of bitstreams with potential problems
      * @param toAdr
      *            where to send the email
      * @throws IOException
@@ -79,7 +79,7 @@ public class DailyReportEmailer
      * @throws javax.mail.MessagingException
      *             if message cannot be sent.
      */
-    public void sendReport(File attachment, int numberOfBitstreams, String toAdr)
+    public void sendReport(File attachment, int numberOfBitstreams,  String toAdr)
             throws IOException, javax.mail.MessagingException
     {
         InternetAddress to = null;
@@ -105,9 +105,7 @@ public class DailyReportEmailer
         // create the first part of the email
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart
-                .setText("This is the checksum checker report see attachment for details \n"
-                        + numberOfBitstreams
-                        + " Bitstreams found with POSSIBLE issues");
+                .setText("This is the checksum checker report see attachment for details");
         multipart.addBodyPart(messageBodyPart);
 
         // add the file
@@ -186,7 +184,7 @@ public class DailyReportEmailer
                 .hasArgs(1)
                 .withDescription(
                         "Send report to given email instead of default mail.admin; if adr is '-' print report to stdout");
-        options.addOption(emailadr.create("t"));
+        options.addOption(OptionBuilder.create("t"));
         try
         {
             line = parser.parse(options, args);
@@ -220,8 +218,7 @@ public class DailyReportEmailer
             System.exit(0);
         }
 
-        // create a new simple reporter
-        SimpleReporter reporter = new SimpleReporterImpl();
+
 
         DailyReportEmailer emailer = new DailyReportEmailer();
 
@@ -247,8 +244,6 @@ public class DailyReportEmailer
                 toAdr = ConfigurationManager.getProperty("mail.admin");
             }
             log.info(String.format("DailyReportEmailer toAdr = '%s'", toAdr));
-            // the number of bitstreams in report
-            int numBitstreams = 0;
 
             if (toAdr.equals("-")) {// use stdout
                 writer = new OutputStreamWriter(System.out);
@@ -275,95 +270,47 @@ public class DailyReportEmailer
                 writer = fileWriter;
             }
 
-            if ((line.hasOption("a")) || (line.getOptions().length == 0))
+            // create a new simple reporter that uses writer for output
+            SimpleReporter reporter = new SimpleReporter(new ReportWriter(writer));
+            Boolean all = (line.hasOption("a")) || (line.getOptions().length == 0);
+            // the number of bitstreams in report
+            int numBitstreams = 0;
+
+            if (all || line.hasOption('d'))
             {
-                writer
-                        .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                numBitstreams += reporter.getDeletedBitstreamReport(yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getChangedChecksumReport(yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getBitstreamNotFoundReport(yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getUncheckedBitstreamsReport(writer);
-                writer
-                        .write("\n--------------------------------- End Report ---------------------------\n\n");
-                writer.flush();
-                writer.close();
-                if (toAdr != null)
-                    emailer.sendReport(report, numBitstreams, toAdr);
+                numBitstreams += reporter.deletedBitstreamReport(yesterday, tomorrow);
+                writer.write("\n\n");
+            }
+            if (all || line.hasOption('d'))
+            {
+                numBitstreams += reporter.bitstreamNotFoundReport(yesterday, tomorrow);
+                writer.write("\n\n");
+            }
+            if (all || line.hasOption('c'))
+            {
+                numBitstreams += reporter.changedChecksumReport(yesterday, tomorrow);
+                writer.write("\n\n");
+            }
+            if (all || line.hasOption("n"))
+            {
+                numBitstreams += reporter.notToBeProcessedReport(yesterday, tomorrow);
+                writer.write("\n\n");
+            }
+            if (all || line.hasOption("u"))
+            {
+                numBitstreams += reporter.uncheckedBitstreamsReport();
+                writer.write("\n\n");
+            }
+            writer.flush();
+            writer.close();
+            if (toAdr != null)
+            {
+                emailer.sendReport(report, numBitstreams, toAdr);
             }
             else
             {
-                if (line.hasOption("d"))
-                {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getDeletedBitstreamReport(
-                            yesterday, tomorrow, writer);
-                    writer.flush();
-                    writer.close();
-                    if (toAdr != null)
-                        emailer.sendReport(report, numBitstreams, toAdr);
-                }
-
-                if (line.hasOption("m"))
-                {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getBitstreamNotFoundReport(
-                            yesterday, tomorrow, writer);
-                    writer.flush();
-                    writer.close();
-                    if (toAdr != null)
-                        emailer.sendReport(report, numBitstreams, toAdr);
-                }
-
-                if (line.hasOption("c"))
-                {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getChangedChecksumReport(
-                            yesterday, tomorrow, writer);
-                    writer.flush();
-                    writer.close();
-                    if (toAdr != null)
-                        emailer.sendReport(report, numBitstreams, toAdr);
-                }
-
-                if (line.hasOption("n"))
-                {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getNotToBeProcessedReport(
-                            yesterday, tomorrow, writer);
-                    writer.flush();
-                    writer.close();
-                    if (toAdr != null)
-                        emailer.sendReport(report, numBitstreams, toAdr);
-                }
-
-                if (line.hasOption("u"))
-                {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter
-                            .getUncheckedBitstreamsReport(writer);
-                    writer.flush();
-                    writer.close();
-                    if (toAdr != null)
-                        emailer.sendReport(report, numBitstreams, toAdr);
-                }
+                writer.write("Summary:  - " + numBitstreams
+                        + " Bitstreams found with POSSIBLE issues");
             }
         }
         catch (MessagingException e)
