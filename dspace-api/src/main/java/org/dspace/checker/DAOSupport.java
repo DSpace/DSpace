@@ -50,12 +50,10 @@ public class DAOSupport
      * 
      * @param stmt
      *            A prepared statement to close.
-     * @param conn
-     *            Corresponding connection to close.
      * @param rs
      *            Result set to close
      */
-    protected void cleanup(Statement stmt, Connection conn, ResultSet rs)
+    protected void cleanup(Statement stmt, ResultSet rs)
     {
         if (rs != null)
         {
@@ -69,11 +67,6 @@ public class DAOSupport
             }
         }
         cleanup(stmt);
-
-        if (conn != null)
-        {
-            DatabaseManager.freeConnection(conn);
-        }
     }
 
     protected void cleanup(Statement stmt)

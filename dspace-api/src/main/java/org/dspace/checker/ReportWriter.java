@@ -35,6 +35,11 @@ public class ReportWriter
     }
 
     public static String dateRange(Date startDate, Date endDate) {
+        if (startDate == null) {
+            assert(endDate == null);
+            return String.format("%s %s", msg("date-range-to"),
+                    applyDateFormatShort(new Date()));
+        }
         return String.format("%s %s %s", applyDateFormatShort(startDate),
                 msg("date-range-to"),
                 applyDateFormatShort(endDate));
