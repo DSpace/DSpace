@@ -82,7 +82,8 @@ public final class ChecksumResultDAO extends DAOSupport
         }
         finally
         {
-            cleanup(stmt, conn, rs);
+            cleanup(stmt, rs);
+            cleanup(conn);
         }
 
         return description;
@@ -119,7 +120,8 @@ public final class ChecksumResultDAO extends DAOSupport
         }
         finally
         {
-            cleanup(stmt, conn, rs);
+            cleanup(stmt, rs);
+            cleanup(conn);
         }
     }
 }
