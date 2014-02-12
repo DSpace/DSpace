@@ -216,9 +216,6 @@ public class I18nUtil
     }
 
 
-
-
-
     /**
      * Get the appropriate localized version of input-forms.xml according to language settings
      *
@@ -250,9 +247,12 @@ public class I18nUtil
      */
     public static String getMessage(String key) throws MissingResourceException
     {
-        
-        String message = getMessage(key.trim(), DEFAULTLOCALE);
-      
+        try {
+            String message = getMessage(key.trim(), DEFAULTLOCALE);
+        } catch (java.util.MissingResourceException e) {
+            log.error(e.getClassName() + " for key)");
+            return key;
+        }
         return message;
     }
     
