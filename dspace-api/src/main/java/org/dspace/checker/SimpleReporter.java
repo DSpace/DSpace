@@ -45,7 +45,7 @@ public class SimpleReporter {
             history = reporter.getChecksumHistoryReport(ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
         }
 
-        writer.writeHeader(ReportWriter.msg("deleted-bitstream-intro") + " " + ReportWriter.dateRange(startDate, endDate));
+        writer.writeHeaderChecksumHistory(ReportWriter.msg("deleted-bitstream-intro") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
         return history.size();
@@ -69,7 +69,7 @@ public class SimpleReporter {
             history = reporter.getChecksumHistoryReport(ChecksumCheckResults.CHECKSUM_NO_MATCH);
         }
 
-        writer.writeHeader(ReportWriter.msg("checksum-did-not-match") + " " + ReportWriter.dateRange(startDate, endDate));
+        writer.writeHeaderChecksumHistory(ReportWriter.msg("checksum-did-not-match") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
         return history.size();
@@ -92,7 +92,7 @@ public class SimpleReporter {
         } else {
             history = reporter.getChecksumHistoryReport(ChecksumCheckResults.BITSTREAM_NOT_FOUND);
         }
-        writer.writeHeader(ReportWriter.msg("bitstream-not-found-report") + " " + ReportWriter.dateRange(startDate, endDate));
+        writer.writeHeaderChecksumHistory(ReportWriter.msg("bitstream-not-found-report") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
         return history.size();
@@ -112,7 +112,7 @@ public class SimpleReporter {
         // get all the bitstreams marked deleted for today
         List<ChecksumHistory> history = reporter.getNotProcessedBitstreamsReport(startDate,
                 endDate);
-        writer.writeHeader(ReportWriter.msg("bitstream-will-no-longer-be-processed") + " " + ReportWriter.dateRange(startDate, endDate));
+        writer.writeHeaderChecksumHistory(ReportWriter.msg("bitstream-will-no-longer-be-processed") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
         return history.size();
@@ -127,7 +127,7 @@ public class SimpleReporter {
             throws IOException {
         // get all the bitstreams marked deleted for today
         List<DSpaceBitstreamInfo> bitstreams = reporter.getUnknownBitstreams();
-        writer.writeHeader(ReportWriter.msg("unchecked-bitstream-report") + " " +
+        writer.writeHeaderBitstreamInfo(ReportWriter.msg("unchecked-bitstream-report") + " " +
                 ReportWriter.applyDateFormatShort(new Date()));
         writer.writeBodyBitstreamInfo(bitstreams);
         writer.writeFooter();
