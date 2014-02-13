@@ -7,6 +7,9 @@
  */
 package org.dspace.checker;
 
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
 import java.io.IOException;
@@ -29,6 +32,8 @@ import java.util.List;
  */
 public class ReportWriter
 {
+    private static final Logger log = Logger.getLogger(ReportWriter.class);
+
     private static  SimpleDateFormat detailedDateFormat =  new SimpleDateFormat("yyyy-mm-dd HH:mm:ss.SSS");
 
     public static String msg(String key)
@@ -61,6 +66,15 @@ public class ReportWriter
     {
         return detailedDateFormat.format(thisDate);
     }
+
+    public static String getHandle(DSpaceObject obj) {
+        String hdl = null;
+        if (obj != null) {
+            hdl = obj.getHandle();
+        }
+        if (hdl == null) return "";
+        return hdl;
+    }
     /**
      * header given in writeHeader; the default implementations repeats the header in writeFooter
      */
@@ -77,15 +91,23 @@ public class ReportWriter
     protected int verbosityLevel;
 
     /**
+     * Context to be used for data rertieval
+     */
+    protected Context context;
+
+    /**
      * Main Constructor.
      * @param osw
      *      destination for report output; should not be null
      */
-    public ReportWriter(OutputStreamWriter osw, int vLevel)
+    public ReportWriter(OutputStreamWriter osw, int vLevel, Context ctxt)
     {
         assert( osw != null);
         outputStreamWriter = osw;
         verbosityLevel = vLevel;
+        context = ctxt;
+        if (log.isDebugEnabled())
+            log.info(String.format("Create %s verbosityLevel=%d", this.getClass().getName(), verbosityLevel));
     }
 
     /**
@@ -161,6 +183,14 @@ public class ReportWriter
                 outputStreamWriter.write(
                         String.format("%s = %s\n", msg("result"),
                                 historyInfo.getResultLong()));
+                if (verbosityLevel > 0) {
+                    outputStreamWriter.write(
+                        String.format("org.dspace.content.Item = %s\n", getHandle(historyInfo.getItem(context))));
+                    outputStreamWriter.write(
+                        String.format("org.dspace.content.Collection = %s\n", getHandle(historyInfo.getCollection(context))));
+                    outputStreamWriter.write(
+                        String.format("org.dspace.content.Community = %s\n", getHandle(historyInfo.getCommunity(context))));
+                }
                 outputStreamWriter.write("------------------------------------------------ \n");
             }
         }

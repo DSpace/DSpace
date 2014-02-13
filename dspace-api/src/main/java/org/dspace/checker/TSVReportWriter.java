@@ -1,5 +1,7 @@
 package org.dspace.checker;
 
+import org.dspace.core.Context;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
@@ -10,8 +12,8 @@ import java.util.List;
  */
 public class TSVReportWriter extends ReportWriter {
 
-    public TSVReportWriter(OutputStreamWriter writer, int vLevel) {
-        super(writer, vLevel);
+    public TSVReportWriter(OutputStreamWriter writer, int vLevel, Context ctxt) {
+        super(writer, vLevel, ctxt);
     }
 
     /**
@@ -25,11 +27,19 @@ public class TSVReportWriter extends ReportWriter {
         header = hdr;
         outputStreamWriter.write("# " + hdr + "\n");
         outputStreamWriter.write("bitstream-id\t");
-        outputStreamWriter.write("process-start-date\t");
+        if (verbosityLevel > 0) {
+            outputStreamWriter.write("process-start-date\t");
+        }
         outputStreamWriter.write("process-end-date\t");
         outputStreamWriter.write("checksum-expected\t");
         outputStreamWriter.write("checksum-calculated\t");
         outputStreamWriter.write("result");
+        if (verbosityLevel > 0) {
+            outputStreamWriter.write(",");
+            outputStreamWriter.write("Item,");
+            outputStreamWriter.write("Collection,");
+            outputStreamWriter.write("Community");
+        }
         outputStreamWriter.write("\n");
     }
 
@@ -76,8 +86,10 @@ public class TSVReportWriter extends ReportWriter {
             while (iter.hasNext()) {
                 ChecksumHistory historyInfo = iter.next();
                 outputStreamWriter.write(String.valueOf(historyInfo.getBitstreamId()));
-                outputStreamWriter.write("\t");
-                outputStreamWriter.write(applyDateFormatDetailed(historyInfo.getProcessStartDate()));
+                if (verbosityLevel > 0) {
+                    outputStreamWriter.write("\t");
+                    outputStreamWriter.write(applyDateFormatDetailed(historyInfo.getProcessStartDate()));
+                }
                 outputStreamWriter.write("\t");
                 outputStreamWriter.write(applyDateFormatDetailed(historyInfo.getProcessEndDate()));
                 outputStreamWriter.write("\t");
@@ -86,6 +98,14 @@ public class TSVReportWriter extends ReportWriter {
                 outputStreamWriter.write(historyInfo.getChecksumCalculated());
                 outputStreamWriter.write("\t");
                 outputStreamWriter.write(historyInfo.getResultCode());
+                if (verbosityLevel > 0) {
+                    outputStreamWriter.write("\t");
+                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getItem(context)));
+                    outputStreamWriter.write("\t");
+                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCollection(context)));
+                    outputStreamWriter.write("\t");
+                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCommunity(context)));
+                }
                 outputStreamWriter.write("\n");
             }
         }
