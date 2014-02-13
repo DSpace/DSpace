@@ -7,6 +7,8 @@
  */
 package org.dspace.checker;
 
+import org.dspace.core.Context;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -19,12 +21,13 @@ import java.util.List;
 public class SimpleReporter {
     private ReporterDAO reporter;
     private ReportWriter writer;
+    private Context context;
 
     /**
      * Main Constructor.
      */
-    public SimpleReporter(ReportWriter rw) {
-        reporter = new ReporterDAO();
+    public SimpleReporter(ReportWriter rw, Context ctxt) {
+        reporter = new ReporterDAO(ctxt);
         writer = rw;
     }
 
