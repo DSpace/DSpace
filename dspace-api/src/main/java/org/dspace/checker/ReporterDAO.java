@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -127,11 +127,21 @@ public class ReporterDAO extends DAOSupport
      */
     private static final Logger LOG = Logger.getLogger(ReporterDAO.class);
 
+
     /**
-     * Default constructor
+     * Context/DB-Connections shared across all request
      */
-    public ReporterDAO()
+    private Context context = null;
+
+    /**
+     * Context/DB-Connections shared across all request
+     */
+    private Connection conn = null;
+
+    public ReporterDAO(Context ctxt)
     {
+        this.context = ctxt;
+        this.conn = this.context.getDBConnection();
     }
 
     /**
@@ -150,13 +160,9 @@ public class ReporterDAO extends DAOSupport
     public List<ChecksumHistory> getChecksumHistoryReportForDateRange(Date startDate, Date endDate,
                                                                       String resultCode) {
         List<ChecksumHistory> history = null;
-        Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         try {
-            // create the connection and execute the statement
-            conn = DatabaseManager.getConnection();
-
             prepStmt = conn.prepareStatement(DATE_RANGE_BITSTREAMS);
             if (log.isDebugEnabled())
                 log.debug("Running query \"" + DATE_RANGE_BITSTREAMS + "\"");
@@ -167,8 +173,6 @@ public class ReporterDAO extends DAOSupport
             history = getChecksumHistory(prepStmt,resultCode);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-        } finally {
-            cleanup(conn);
         }
         return history;
     }
@@ -183,11 +187,9 @@ public class ReporterDAO extends DAOSupport
      */
     public List<ChecksumHistory> getChecksumHistoryReport(String resultCode) {
         List<ChecksumHistory> history = null;
-        Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         try {
-            conn = DatabaseManager.getConnection();
             prepStmt = conn.prepareStatement(NO_DATE_RANGE_BITSTREAMS);
             if (log.isDebugEnabled())
                 log.debug("Running query \"" + NO_DATE_RANGE_BITSTREAMS + "\"");
@@ -195,8 +197,6 @@ public class ReporterDAO extends DAOSupport
             history = getChecksumHistory(prepStmt, resultCode);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-        } finally {
-            cleanup(conn);
         }
         return history;
     }
@@ -212,13 +212,10 @@ public class ReporterDAO extends DAOSupport
     public List<ChecksumHistory> getNotProcessedBitstreamsReport(Date startDate, Date endDate) {
         List<ChecksumHistory> history = null;
 
-        Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         assert (startDate == null || endDate != null);
         try {
-            // create the connection and execute the statement
-            conn = DatabaseManager.getConnection();
             String sqlStmt = null;
             if (DatabaseManager.isOracle()) {
                 sqlStmt = (startDate == null) ? NOT_PROCESSED_BITSTREAMS_ORACLE : DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE;
@@ -235,8 +232,6 @@ public class ReporterDAO extends DAOSupport
             history = getChecksumHistory(prepStmt, null);
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
-        } finally {
-            cleanup(conn);
         }
 
         return history;
@@ -251,15 +246,11 @@ public class ReporterDAO extends DAOSupport
     {
         List<DSpaceBitstreamInfo> unknownBitstreams = new LinkedList<DSpaceBitstreamInfo>();
 
-        Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
 
         try
         {
-            // create the connection and execute the statement
-            conn = DatabaseManager.getConnection();
-
             prepStmt = conn.prepareStatement(FIND_UNKNOWN_BITSTREAMS);
             if (log.isDebugEnabled())
                 log.debug("Running query \"" + FIND_UNKNOWN_BITSTREAMS + "\"");
@@ -288,7 +279,6 @@ public class ReporterDAO extends DAOSupport
         finally
         {
             cleanup(prepStmt,rs);
-            cleanup(conn);
         }
 
         return unknownBitstreams;
