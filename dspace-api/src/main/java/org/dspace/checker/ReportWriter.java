@@ -12,6 +12,7 @@ import org.dspace.core.I18nUtil;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 public class ReportWriter
 {
+    private static  SimpleDateFormat detailedDateFormat =  new SimpleDateFormat("yyyy-mm-dd HH:mm:ss.SSS");
 
     public static String msg(String key)
     {
@@ -55,11 +57,14 @@ public class ReportWriter
         return DateFormat.getDateInstance(DateFormat.SHORT).format(thisDate);
     }
 
-
+    public static String applyDateFormatDetailed(Date thisDate)
+    {
+        return detailedDateFormat.format(thisDate);
+    }
     /**
      * header given in writeHeader; the default implementations repeats the header in writeFooter
      */
-    private String header;
+    protected String header;
 
     /**
      * destination for report output
@@ -85,11 +90,22 @@ public class ReportWriter
      *
      * @throws IOException
      */
-    public void writeHeader(String hdr) throws IOException {
+    public void writeHeaderChecksumHistory(String hdr) throws IOException {
         header = hdr;
         outputStreamWriter.write("---------------------------\n");
         outputStreamWriter.write(msg("start") + " "  + hdr + "\n");
         outputStreamWriter.write("---------------------------\n");
+    }
+
+    /**
+     * prints report header to outputStreamWriter
+     *
+     * @param hdr    report header
+     *
+     * @throws IOException
+     */
+    public void writeHeaderBitstreamInfo(String hdr) throws IOException {
+        writeHeaderChecksumHistory(hdr);
     }
 
     /**
@@ -101,6 +117,7 @@ public class ReportWriter
         outputStreamWriter.write("---------------------------\n");
         outputStreamWriter.write(msg("end") + " "  + header + "\n");
         outputStreamWriter.write("---------------------------\n");
+        outputStreamWriter.flush();
     }
 
     /**
@@ -118,7 +135,7 @@ public class ReportWriter
                 ChecksumHistory historyInfo = iter.next();
                 outputStreamWriter.write("------------------------------------------------ \n");
                 outputStreamWriter.write(
-                        String.format("%s = %s\n",
+                        String.format("%s = %d\n",
                                 msg("bitstream-id"), historyInfo.getBitstreamId()));
                 outputStreamWriter.write(
                         String.format("%s = %s\n",
@@ -138,7 +155,7 @@ public class ReportWriter
                                 historyInfo.getChecksumCalculated()));
                 outputStreamWriter.write(
                         String.format("%s = %s\n", msg("result"),
-                                historyInfo.getResult()));
+                                historyInfo.getResultLong()));
                 outputStreamWriter.write("------------------------------------------------ \n");
             }
         }
@@ -150,6 +167,7 @@ public class ReportWriter
      * @param bitstreams DSpaceBitstreamInfo objects to be written
      * @return  bitstreams.size()
      * @throws IOException
+     *
      */
     public int writeBodyBitstreamInfo(List<DSpaceBitstreamInfo> bitstreams) throws IOException {
         int n = bitstreams.size();
