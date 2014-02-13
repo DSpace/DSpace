@@ -822,7 +822,7 @@ CREATE TABLE Webapp
 (
     webapp_id INTEGER NOT NULL PRIMARY KEY,
     AppName VARCHAR(32),
-    URL VARCHAR,
+    URL VARCHAR(1000),
     Started TIMESTAMP,
     isUI INTEGER
 );
