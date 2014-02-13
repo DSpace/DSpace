@@ -60,9 +60,9 @@
 	}
 	if (brefine) {
 %>
-<div class="col-md-<%= discovery_panel_cols %>">
+<div class="col-md-<%= discovery_panel_cols %> home-discovery-panel">
 <h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
-<div id="facets" class="facetsBox row panel">
+<div id="facets" class="facetsBox row">
 <%
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	{

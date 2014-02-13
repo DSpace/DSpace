@@ -67,7 +67,7 @@
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <form action="<%= request.getContextPath()%>/simple-search" method="get">
-            <div class="input-group">
+            <div class="input-group input-group-lg">
                 <input type="text" class="form-control" name="query" id="tquery" placeholder="<fmt:message key="jsp.home.search2"/>"/>
                 <span class="input-group-btn">
                     <button type="submit" class="btn btn-default" name="submit"><span class="fa fa-search fa-flip-horizontal"></span> <fmt:message key="jsp.general.search.button"/></button>
@@ -91,48 +91,55 @@
     </div>
 </div>
 -->
-<div class="container row">
+<div class="container row home-browse-panel">
+    <div class="well">
+        <div class="row">
 <%
 if (communities != null && communities.length != 0)
 {
 %>
-	<div class="col-md-4">		
-               <h3><fmt:message key="jsp.home.com1"/></h3>
-                <p><fmt:message key="jsp.home.com2"/></p>
-				<div class="list-group">
+	<div class="col-md-4 home-communities-panel">
+            <h3><fmt:message key="jsp.home.com1"/></h3>
+            <p><fmt:message key="jsp.home.com2"/></p>
+            <div class="list-group">
 <%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
+    boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
     for (int i = 0; i < communities.length; i++)
     {
-%><div class="list-group-item row">
+%>
+                <div class="list-group-item row">
 <%  
-		Bitstream logo = communities[i].getLogo();
-		if (showLogos && logo != null) { %>
-	<div class="col-md-3">
-        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
-	</div>
-	<div class="col-md-9">
-<% } else { %>
-	<div class="col-md-12">
-<% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
+        Bitstream logo = communities[i].getLogo();
+        String md_cols = "col-md-12";
+        if (showLogos && logo != null) {
+            md_cols="col-md-9";
+%>
+                    <div class="col-md-3">
+                        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
+                    </div>
+               
+<%      } %>
+                    <div class="<%=md_cols%>">
+	
+                        <h4 class="list-group-item-heading">
+                            <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-		<span class="badge pull-right"><%= ic.getCount(communities[i]) %></span>
+                            <span class="badge pull-right"><%= ic.getCount(communities[i]) %></span>
 <%
         }
 
 %>
-		</h4>
-		<p><%= communities[i].getMetadata("short_description") %></p>
-    </div>
-</div>                            
+                        </h4>
+                        <p><%= communities[i].getMetadata("short_description") %></p>
+                    </div>
+                </div>                            
 <%
     }
 %>
-	</div>
+            </div>
 	</div>
 <%
 }
@@ -142,5 +149,7 @@ if (communities != null && communities.length != 0)
     	int discovery_facet_cols = 4;
     %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+    </div>
+    </div>
 </div>
 </dspace:layout>
