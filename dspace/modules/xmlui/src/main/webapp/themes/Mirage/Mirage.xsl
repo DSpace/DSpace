@@ -449,7 +449,12 @@
             <div class="home-col-2">
                 <xsl:apply-templates select="dri:div[@id='aspect.dryadinfo.DryadBlogFeed.div.dryad-info-home']"/> 
             </div>
-
+            <div id="SpiderTrap">
+                <p>
+                    <a href="/spider">Spider.
+                    </a>
+                </p>
+            </div>
         </div>
 
         <xsl:apply-templates select="dri:div[@id='aspect.eperson.TermsOfService.div.background']"/>
