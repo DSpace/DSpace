@@ -262,18 +262,20 @@ public class DailyReportEmailer
                 writer = fileWriter;
             }
 
+
+            Context ctxt = new Context();
+
             // create a new simple reporter that uses writer for output
             ReportWriter rw = null;
             int verbose = line.hasOption('V') ? 1 : 0;
             if (line.hasOption('T')) {
-                rw = new TSVReportWriter(writer, verbose);
+                rw = new TSVReportWriter(writer, verbose, ctxt);
             }
             else
             {
                 // default ASCII text writer
-                rw = new ReportWriter(writer, verbose);
+                rw = new ReportWriter(writer, verbose, ctxt);
             }
-            Context ctxt = new Context();
 
             SimpleReporter reporter = new SimpleReporter(rw, ctxt);
 
