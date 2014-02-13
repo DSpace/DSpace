@@ -99,27 +99,44 @@
 
 
 //
-// Navbar
+// Navbars
 // --------------------------------------------------
+.navbar {
+
+  @media (min-width: @grid-float-breakpoint) {
+    border-radius: 0;
+  }
+}
+
+// Navbar nav links
+.navbar-nav{
+  
+  // Uncollapse the nav
+  @media (min-width: @grid-float-breakpoint) {
+    margin: 10px 0;
+  }
+}
 
 // Default navbar
 .navbar-default {
-  #gradient > .vertical(@start-color: lighten(@navbar-default-bg, 10%); @end-color: @navbar-default-bg);
-  .reset-filter(); // Remove gradient in IE<10 to fix bug where dropdowns don't get triggered
-  border-radius: @navbar-border-radius;
   @shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 5px rgba(0,0,0,.075);
   .box-shadow(@shadow);
 
-  .navbar-nav > .active > a {
-    #gradient > .vertical(@start-color: darken(@navbar-default-bg, 5%); @end-color: darken(@navbar-default-bg, 2%));
-    .box-shadow(inset 0 3px 9px rgba(0,0,0,.075));
+  .navbar-nav > .active > a, 
+  .navbar-nav > .active > a:hover,
+  .navbar-nav > li > a:hover {
+    /*.box-shadow(inset 0 3px 9px rgba(0,0,0,.075));*/
+    background:none;
+    color:@gray;
+  }
+  
+  .navbar-brand,
+  .navbar-nav > li > a {
+    text-shadow: 0 1px 0 rgba(255,255,255,.25);
+    color:@gray-darker;
   }
 }
-.navbar-brand,
-.navbar-nav > li > a {
-  text-shadow: 0 1px 0 rgba(255,255,255,.25);
-}
-
+    
 // Inverted navbar
 .navbar-inverse {
   #gradient > .vertical(@start-color: lighten(@navbar-inverse-bg, 10%); @end-color: @navbar-inverse-bg);
@@ -135,6 +152,8 @@
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
   }
 }
+
+
 
 // Undo rounded corners in static and fixed navbars
 .navbar-static-top,
@@ -261,5 +280,18 @@
 //-----------------------------------------------------
 .simple-search{
     margin-bottom:10px;
+}
+
+.wave{
+    background:
+    radial-gradient(ellipse at 25% 100%, transparent 23%, rgba(255,255,255,0.1) 24%, rgba(255,255,255,0.1) 24%, transparent 24%, transparent) 0 50px,
+    radial-gradient(ellipse at 25% 0, transparent 23%, rgba(255,255,255,0.1) 24%, rgba(255,255,255,0.1) 24%, transparent 24%, transparent) 200px 50px;
+    background-color: @gray-darker;
+    background-size: 400px 50px;
+    /*    background: 
+    radial-gradient(circle at 100% 50%, transparent 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, transparent 35%, transparent),
+    radial-gradient(circle at 0% 50%, transparent 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, transparent 35%, transparent) 0 -50px;
+    background-color: @gray-darker;
+    background-size:75px 100px;*/
 }
 

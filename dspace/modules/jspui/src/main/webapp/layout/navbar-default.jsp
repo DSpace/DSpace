@@ -87,8 +87,7 @@
 
        <div class="navbar-header">
          <a class="navbar-brand" href="<%= request.getContextPath() %>/">
-             <img height="25px" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
-             Biblioteca Digital
+             <img height="25px" src="<%= request.getContextPath() %>/image/icesi-logo.svg" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
          </a>
          
          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".default-navigation">

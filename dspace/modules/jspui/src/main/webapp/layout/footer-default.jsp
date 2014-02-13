@@ -36,6 +36,7 @@
 %>
             </div>
         </main>
+</div>
         <%-- Page footer --%>
         <footer class="navbar navbar-inverse navbar-bottom">
             <div id="designedby" class="container text-muted">
