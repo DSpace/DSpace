@@ -1349,7 +1349,8 @@ public class Item extends DSpaceObject
 
                     // Write DCValue
                     MetadataValue metadata = new MetadataValue();
-                    metadata.setItemId(getID());
+                    metadata.setObjectType(Constants.ITEM);
+                    metadata.setObjectId(getID());
                     metadata.setFieldId(dcFields[dcIdx].getFieldID());
                     metadata.setValue(dcv.value);
                     metadata.setLanguage(dcv.language);

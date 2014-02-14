@@ -256,6 +256,9 @@ CREATE TABLE MetadataSchemaRegistry
   short_id           VARCHAR(32) UNIQUE
 );
 
+-- Create the DC schema
+INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dcmi-terms/','dc');
+
 CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY,
@@ -268,7 +271,8 @@ CREATE TABLE MetadataFieldRegistry
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY,
-  object_id       INTEGER REFERENCES Item(item_id),
+  object_type        INTEGER NOT NULL,
+  object_id          INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value CLOB,
   text_lang  VARCHAR(24),
@@ -276,9 +280,6 @@ CREATE TABLE MetadataValue
   authority VARCHAR(100),
   confidence INTEGER DEFAULT -1
 );
-
--- Create the DC schema
-INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dcmi-terms/','dc');
 
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
@@ -292,8 +293,8 @@ CREATE VIEW dcvalue AS
 -- An index for object_id - almost all access is based on
 -- instantiating the object, which grabs all values
 -- related to itself
-CREATE INDEX metadatavalue_object_idx ON MetadataValue(object_id);
-CREATE INDEX metadatavalue_object_idx2 ON MetadataValue(object_id,metadata_field_id);
+CREATE INDEX metadatavalue_object_idx ON MetadataValue(object_type, object_id);
+CREATE INDEX metadatavalue_object_idx2 ON MetadataValue(object_type, object_id,metadata_field_id);
 CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 

@@ -20,11 +20,12 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
- * Database access class representing a Dublin Core metadata value.
- * It represents a value of a given <code>MetadataField</code> on an Item.
- * (The Item can have many values of the same field.)  It contains                                           element, qualifier, value and language.
- * the field (which names the schema, element, and qualifier), language,
- * and a value.
+ * Database access class representing a metadata value.
+ * It represents a value of a given {@link MetadataField} on a {@link DSpaceObject}.
+ * (The object can have many values of the same field.)  It contains the name of
+ * the field (which is comprised of the schema, element, and qualifier),
+ * language, a single value.  It may also express a position within an ordered
+ * set of values, and an authority and confidence level for the value.
  *
  * @author Martin Hald
  * @see org.dspace.content.MetadataSchema
@@ -38,8 +39,11 @@ public class MetadataValue
     /** The primary key for the metadata value */
     private int valueId = 0;
 
-    /** The reference to the DSpace item */
-    private int itemId;
+    /** Type of object represented. */
+    private int objectType;
+
+    /** The reference to the DSpaceObject. */
+    private int objectId;
 
     /** The value of the field */
     public String value;
@@ -53,11 +57,11 @@ public class MetadataValue
     /** Authority key, if any */
     public String authority = null;
 
-    /** Authority confidence value -- see Choices class for values */
+    /** Authority confidence value -- see {@link org.dspace.content.authority.Choices} class for values. */
     public int confidence = 0;
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataValue.class);
+    private static final Logger log = Logger.getLogger(MetadataValue.class);
 
     /** The row in the table representing this type */
     private TableRow row;
@@ -73,7 +77,8 @@ public class MetadataValue
         {
             fieldId = row.getIntColumn("metadata_field_id");
             valueId = row.getIntColumn("metadata_value_id");
-            itemId = row.getIntColumn("item_id");
+            objectType = row.getIntColumn("object_type");
+            objectId = row.getIntColumn("object_id");
             value = row.getStringColumn("text_value");
             language = row.getStringColumn("text_lang");
             place = row.getIntColumn("place");
@@ -121,23 +126,45 @@ public class MetadataValue
     }
 
     /**
-     * Get the item ID.
+     * Get the type of the object represented.
+     * @see org.dspace.core.Constants
      *
-     * @return item ID
+     * @return object type code.
      */
-    public int getItemId()
+    public int getObjectType()
     {
-        return itemId;
+        return objectType;
     }
 
     /**
-     * Set the item ID.
+     * Set the type of the object represented.
+     * @see org.dspace.core.Constants
      *
-     * @param itemId new item ID
+     * @param objectType type code for the object.
      */
-    public void setItemId(int itemId)
+    public void setObjectType(int objectType)
     {
-        this.itemId = itemId;
+        this.objectType = objectType;
+    }
+
+    /**
+     * Get the object ID.
+     *
+     * @return object ID
+     */
+    public int getObjectId()
+    {
+        return objectId;
+    }
+
+    /**
+     * Set the object ID.
+     *
+     * @param objectId new object ID
+     */
+    public void setObjectId(int objectId)
+    {
+        this.objectId = objectId;
     }
 
     /**
@@ -262,7 +289,8 @@ public class MetadataValue
     {
         // Create a table row and update it with the values
         row = DatabaseManager.row("MetadataValue");
-        row.setColumn("item_id", itemId);
+        row.setColumn("object_type", objectType);
+        row.setColumn("object_id", objectId);
         row.setColumn("metadata_field_id", fieldId);
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
@@ -372,7 +400,8 @@ public class MetadataValue
      */
     public void update(Context context) throws SQLException, AuthorizeException
     {
-        row.setColumn("item_id", itemId);
+        row.setColumn("object_type", objectType);
+        row.setColumn("object_id", objectId);
         row.setColumn("metadata_field_id", fieldId);
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
@@ -429,7 +458,7 @@ public class MetadataValue
         {
             return false;
         }
-        if (this.itemId != other.itemId)
+        if ((this.objectType != other.objectType) || (this.objectId != other.objectId))
         {
             return false;
         }
@@ -442,7 +471,8 @@ public class MetadataValue
         int hash = 7;
         hash = 47 * hash + this.fieldId;
         hash = 47 * hash + this.valueId;
-        hash = 47 * hash + this.itemId;
+        hash = 47 * hash + this.objectType;
+        hash = 47 * hash + this.objectId;
         return hash;
     }
 }

@@ -8,12 +8,12 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -41,12 +41,12 @@ public class MetadataValueTest extends AbstractUnitTest
     /**
      * Element of the metadata element
      */
-    private String element = "contributor";
+    private static final String element = "contributor";
 
     /**
      * Qualifier of the metadata element
      */
-    private String qualifier = "author";
+    private static final String qualifier = "author";
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -66,7 +66,8 @@ public class MetadataValueTest extends AbstractUnitTest
             this.mf = MetadataField.findByElement(context,
                     MetadataSchema.DC_SCHEMA_ID, element, qualifier);
             this.mv = new MetadataValue(mf);
-            this.mv.setItemId(Item.create(context).getID());
+            this.mv.setObjectType(Constants.ITEM);
+            this.mv.setObjectId(Item.create(context).getID());
             context.commit();
             context.restoreAuthSystemState();
         }
@@ -125,20 +126,41 @@ public class MetadataValueTest extends AbstractUnitTest
      * Test of getItemId method, of class MetadataValue.
      */
     @Test
-    public void testGetItemId() 
+    public void testGetObjectType()
     {
-        assertTrue("testGetItemId 0", mv.getItemId() >= 0);
+        assertTrue("testGetObjectType 0", mv.getObjectType() == Constants.ITEM);
     }
 
     /**
      * Test of setItemId method, of class MetadataValue.
      */
     @Test
-    public void testSetItemId()
+    public void testSetObjectType()
+    {
+        int objectType = Constants.BITSTREAM;
+        mv.setObjectType(objectType);
+        assertThat("testSetItemId 0", mv.getObjectId(), equalTo(objectType));
+        mv.setObjectType(Constants.ITEM); // Repair damage from this test.
+    }
+
+    /**
+     * Test of getObjectId method, of class MetadataValue.
+     */
+    @Test
+    public void testGetObjectId()
+    {
+        assertTrue("testGetObjectId 0", mv.getObjectId() >= 0);
+    }
+
+    /**
+     * Test of setObjectId method, of class MetadataValue.
+     */
+    @Test
+    public void testSetObjectId()
     {
         int itemId = 55;
-        mv.setItemId(itemId);
-        assertThat("testSetItemId 0", mv.getItemId(), equalTo(itemId));
+        mv.setObjectId(itemId);
+        assertThat("testSetObjectId 0", mv.getObjectId(), equalTo(itemId));
     }
 
     /**

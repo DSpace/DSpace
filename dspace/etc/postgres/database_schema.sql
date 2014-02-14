@@ -311,6 +311,7 @@ CREATE TABLE MetadataFieldRegistry
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
+  object_type        INTEGER NOT NULL,
   object_id          INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
@@ -332,8 +333,8 @@ CREATE VIEW dcvalue AS
 -- An index for object_id - almost all access is based on
 -- instantiating the object, which grabs all values
 -- related to itself.
-CREATE INDEX metadatavalue_object_idx ON MetadataValue(object_id);
-CREATE INDEX metadatavalue_object_idx2 ON MetadataValue(object_id,metadata_field_id);
+CREATE INDEX metadatavalue_object_idx ON MetadataValue(object_type,object_id);
+CREATE INDEX metadatavalue_object_idx2 ON MetadataValue(object_type,object_id,metadata_field_id);
 CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
   

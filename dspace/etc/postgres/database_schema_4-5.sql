@@ -22,5 +22,12 @@
 -------------------------------------------
 
 ALTER TABLE MetadataValue RENAME COLUMN item_id TO object_id;
-ALTER INDEX metadatavalue_item_idx RENAME TO metadatavalue_object_idx;
-ALTER INDEX metadatavalue_item_idx2 RENAME TO metadatavalue_object_idx2;
+
+ALTER TABLE MetadataValue ADD COLUMN object_type INTEGER NOT NULL DEFAULT 2; -- all existing objects are Item
+ALTER TABLE MetadataValue ALTER COLUMN object_type DROP DEFAULT;
+
+DROP INDEX metadatavalue_item_idx;
+CREATE INDEX metadatavalue_object_idx ON MetadataValue(object_type, object_id);
+
+DROP INDEX metadatavalue_item_idx2;
+CREATE INDEX metadatavalue_object_idx2 ON MetadataValue(object_type, object_id,metadata_field_id);
