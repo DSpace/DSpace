@@ -8,6 +8,7 @@
 package org.dspace.checker;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -75,6 +76,26 @@ public class ReportWriter
         if (hdl == null) return "";
         return hdl;
     }
+
+    public static String getInternalId(Bitstream bitstream) {
+        String internal = null;
+        if (bitstream != null)
+            internal = bitstream.getInternalId();
+        if (internal == null)
+            internal = "";
+        return internal;
+    }
+
+
+    public static String getSource(Bitstream bitstream) {
+        String source = null;
+        if (bitstream != null)
+            source = bitstream.getSource();
+        if (source == null)
+            source = "";
+        return source;
+    }
+
     /**
      * header given in writeHeader; the default implementations repeats the header in writeFooter
      */
@@ -185,11 +206,17 @@ public class ReportWriter
                                 historyInfo.getResultLong()));
                 if (verbosityLevel > 0) {
                     outputStreamWriter.write(
-                        String.format("org.dspace.content.Item = %s\n", getHandle(historyInfo.getItem(context))));
+                            String.format("%s = %s",
+                                    msg("internal-id"), getInternalId(historyInfo.getBitstream(context))));
                     outputStreamWriter.write(
-                        String.format("org.dspace.content.Collection = %s\n", getHandle(historyInfo.getCollection(context))));
+                            String.format("item-handle = %s\n", getHandle(historyInfo.getItem(context))));
                     outputStreamWriter.write(
-                        String.format("org.dspace.content.Community = %s\n", getHandle(historyInfo.getCommunity(context))));
+                            String.format("collection-handle = %s\n", getHandle(historyInfo.getCollection(context))));
+                    outputStreamWriter.write(
+                            String.format("community-handle = %s\n", getHandle(historyInfo.getCommunity(context))));
+                    outputStreamWriter.write(String.format("%s = %s\n",
+                            msg("source"), getSource(historyInfo.getBitstream(context))));
+
                 }
                 outputStreamWriter.write("------------------------------------------------ \n");
             }

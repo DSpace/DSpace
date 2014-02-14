@@ -36,9 +36,11 @@ public class TSVReportWriter extends ReportWriter {
         outputStreamWriter.write("result");
         if (verbosityLevel > 0) {
             outputStreamWriter.write(",");
-            outputStreamWriter.write("Item,");
-            outputStreamWriter.write("Collection,");
-            outputStreamWriter.write("Community");
+            outputStreamWriter.write("internal-id,");
+            outputStreamWriter.write("item,");
+            outputStreamWriter.write("collection,");
+            outputStreamWriter.write("community,");
+            outputStreamWriter.write("source");
         }
         outputStreamWriter.write("\n");
     }
@@ -100,11 +102,15 @@ public class TSVReportWriter extends ReportWriter {
                 outputStreamWriter.write(historyInfo.getResultCode());
                 if (verbosityLevel > 0) {
                     outputStreamWriter.write("\t");
+                    outputStreamWriter.write(ReportWriter.getInternalId(historyInfo.getBitstream(context)));
+                    outputStreamWriter.write("\t");
                     outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getItem(context)));
                     outputStreamWriter.write("\t");
                     outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCollection(context)));
                     outputStreamWriter.write("\t");
                     outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCommunity(context)));
+                    outputStreamWriter.write("\t");
+                    outputStreamWriter.write(ReportWriter.getSource(historyInfo.getBitstream(context)));
                 }
                 outputStreamWriter.write("\n");
             }
@@ -142,7 +148,6 @@ public class TSVReportWriter extends ReportWriter {
             outputStreamWriter.write(String.valueOf(bitstreamInfo.getStoreNumber()));
             outputStreamWriter.write("\t");
             outputStreamWriter.write(bitstreamInfo.getSource());
-            outputStreamWriter.write("\t");
             outputStreamWriter.write("\n");
         }
 
