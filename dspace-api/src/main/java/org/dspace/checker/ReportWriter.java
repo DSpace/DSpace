@@ -90,6 +90,19 @@ public class ReportWriter
     protected Context context;
 
     /**
+     * string formatted bistreamId used as  prefix when writing to outputStreamWriter
+     */
+    private String bitstreamId;
+
+    /**
+     *  outputStreamWriter.write(bitstreamId + " : " + info + "\n")
+     */
+    private void writeBitstreamInfo(String info) throws IOException {
+        outputStreamWriter.write(bitstreamId + " : " );
+        outputStreamWriter.write(info + "\n");
+    }
+
+    /**
      * Main Constructor.
      * @param osw
      *      destination for report output; should not be null
@@ -157,40 +170,41 @@ public class ReportWriter
             iter = history.iterator();
             while (iter.hasNext()) {
                 ChecksumHistory historyInfo = iter.next();
+                bitstreamId = String.valueOf(historyInfo.getBitstreamId());
                 outputStreamWriter.write("------------------------------------------------ \n");
-                outputStreamWriter.write(
-                        String.format("%s = %d\n",
-                                msg("bitstream-id"), historyInfo.getBitstreamId()));
-                outputStreamWriter.write(
-                        String.format("%s = %s\n",
+                writeBitstreamInfo(
+                        String.format("%s = %s",
+                                msg("bitstream-id"), bitstreamId));
+                writeBitstreamInfo(
+                        String.format("%s = %s",
                                 msg("process-start-date"),
                                 applyDateFormatLong(historyInfo.getProcessStartDate())));
-                outputStreamWriter.write(
-                        String.format("%s = %s\n",
+                writeBitstreamInfo(
+                        String.format("%s = %s",
                                 msg("process-end-date"),
                                 applyDateFormatLong(historyInfo.getProcessEndDate())));
-                outputStreamWriter.write(
-                        String.format("%s = %s\n",
+                writeBitstreamInfo(
+                        String.format("%s = %s",
                                 msg("checksum-expected"),
                                 historyInfo.getChecksumExpected()));
-                outputStreamWriter.write(
-                        String.format("%s = %s\n",
+                writeBitstreamInfo(
+                        String.format("%s = %s",
                                 msg("checksum-calculated"),
                                 historyInfo.getChecksumCalculated()));
-                outputStreamWriter.write(
-                        String.format("%s = %s\n", msg("result"),
+                writeBitstreamInfo(
+                        String.format("%s = %s", msg("result"),
                                 historyInfo.getResultLong()));
                 if (verbosityLevel > 0) {
-                    outputStreamWriter.write(
+                    writeBitstreamInfo(
                             String.format("%s = %s",
                                     msg("internal-id"), CheckerInfo.getInternalId(historyInfo.getBitstream(context))));
-                    outputStreamWriter.write(
-                            String.format("item-handle = %s\n", CheckerInfo.getHandle(historyInfo.getItem(context))));
-                    outputStreamWriter.write(
-                            String.format("collection-handle = %s\n", CheckerInfo.getHandle(historyInfo.getCollection(context))));
-                    outputStreamWriter.write(
-                            String.format("community-handle = %s\n", CheckerInfo.getHandle(historyInfo.getCommunity(context))));
-                    outputStreamWriter.write(String.format("%s = %s\n",
+                    writeBitstreamInfo(
+                            String.format("item-handle = %s", CheckerInfo.getHandle(historyInfo.getItem(context))));
+                    writeBitstreamInfo(
+                            String.format("collection-handle = %s", CheckerInfo.getHandle(historyInfo.getCollection(context))));
+                    writeBitstreamInfo(
+                            String.format("community-handle = %s", CheckerInfo.getHandle(historyInfo.getCommunity(context))));
+                    writeBitstreamInfo(String.format("%s = %s",
                             msg("source"), CheckerInfo.getSource(historyInfo.getBitstream(context))));
 
                 }
@@ -216,32 +230,35 @@ public class ReportWriter
             outputStreamWriter.write("\n\n");
 
             for (DSpaceBitstreamInfo bitstreamInfo : bitstreams) {
-                StringBuilder buf = new StringBuilder(1000);
-                buf.append("------------------------------------------------ \n");
-                buf.append(msg("format-id")).append(" =  ").append(
-                        bitstreamInfo.getBitstreamFormatId()).append("\n");
-                buf.append(msg("deleted")).append(" = ").append(bitstreamInfo.getDeleted())
-                        .append("\n");
-                buf.append(msg("bitstream-id")).append(" = ").append(
-                        bitstreamInfo.getBitstreamId()).append("\n");
-                buf.append(msg("checksum-algorithm")).append(" = ").append(
-                        bitstreamInfo.getChecksumAlgorithm()).append("\n");
-                buf.append(msg("internal-id")).append(" = ").append(
-                        bitstreamInfo.getInternalId()).append("\n");
-                buf.append(msg("name")).append(" = ").append(bitstreamInfo.getName())
-                        .append("\n");
-                buf.append(msg("size")).append(" = ").append(bitstreamInfo.getSize())
-                        .append("\n");
-                buf.append(msg("source")).append(" = ").append(CheckerInfo.getSource(bitstreamInfo.getBitstream(context)))
-                        .append("\n");
-                buf.append(msg("checksum")).append(" = ").append(
-                        bitstreamInfo.getStoredChecksum()).append("\n");
-                buf.append(msg("store-number")).append(" = ").append(
-                        bitstreamInfo.getStoreNumber()).append("\n");
-                buf.append(msg("description")).append(" = ").append(
-                        bitstreamInfo.getUserFormatDescription()).append("\n");
-                buf.append("----------------------------------------------- \n\n");
-                outputStreamWriter.write(buf.toString());
+                outputStreamWriter.write("----------------------------------------------- \n");
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("format-id"), bitstreamInfo.getBitstreamFormatId()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("deleted"), String.valueOf(bitstreamInfo.getDeleted())));
+                writeBitstreamInfo(String.format("%s = %s", ("bitstream-id"), bitstreamId));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("format-id"), bitstreamInfo.getBitstreamFormatId()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("format-id"), bitstreamInfo.getBitstreamFormatId()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("format-id"), bitstreamInfo.getBitstreamFormatId()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("checksum-algorithm"), bitstreamInfo.getChecksumAlgorithm()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("internal-id"), bitstreamInfo.getInternalId()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("name"), bitstreamInfo.getName()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("size"), bitstreamInfo.getSize()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("source"), CheckerInfo.getSource(bitstreamInfo.getBitstream(context))));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("checksum"), bitstreamInfo.getStoredChecksum()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("store - number"), bitstreamInfo.getStoreNumber()));
+                writeBitstreamInfo(String.format("%s = %s",
+                        msg("description"), bitstreamInfo.getUserFormatDescription()));
+                outputStreamWriter.write("----------------------------------------------- \n\n");
             }
         }
         return n;
