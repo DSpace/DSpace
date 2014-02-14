@@ -467,7 +467,7 @@ public abstract class DSpaceObject
     }
 
     /**
-     * Get metadata for the item in a chosen schema.
+     * Get metadata for the object in a chosen schema.
      * See {@link MetadataSchema} for more information about schemas.
      * Passing in a <code>null</code> value for <code>qualifier</code>
      * or <code>lang</code> only matches metadata fields where that
@@ -590,7 +590,7 @@ public abstract class DSpaceObject
     {
         try
         {
-            return dublinCore.get(ourContext, getID(), log);
+            return dublinCore.get(ourContext, getType(), getID(), log);
         }
         catch (SQLException e)
         {
@@ -704,19 +704,21 @@ public abstract class DSpaceObject
          * loading them from the database as needed.
          *
          * @param c
+         * @param objectType
          * @param objectId
          * @param log
          * @return
          * @throws SQLException
          */
-        List<DCValue> get(Context c, int objectId, Logger log) throws SQLException
+        List<DCValue> get(Context c, int objectType, int objectId, Logger log)
+                throws SQLException
         {
             if (metadata == null)
             {
                 metadata = new ArrayList<DCValue>();
 
                 // Get Dublin Core metadata
-                TableRowIterator tri = retrieveMetadata(objectId);
+                TableRowIterator tri = retrieveMetadata(objectType, objectId);
 
                 if (tri != null)
                 {
@@ -787,17 +789,21 @@ public abstract class DSpaceObject
         /**
          * Select from the database all metadata of a given object.
          *
+         * @param objectType
          * @param objectId
          * @return iterator over the given object's metadata, or null if objectId = 0.
          * @throws SQLException
          */
-        TableRowIterator retrieveMetadata(int objectId) throws SQLException
+        TableRowIterator retrieveMetadata(int objectType, int objectId)
+                throws SQLException
         {
             if (objectId > 0)
             {
                 return DatabaseManager.queryTable(ourContext, "MetadataValue",
-                        "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
-                        objectId); // FIXME item_id -> object_id and add object_type
+                        "SELECT * FROM MetadataValue" +
+                        " WHERE object_type = ? AND object_id= ?" +
+                        " ORDER BY metadata_field_id, place",
+                        objectType, objectId);
             }
 
             return null;
