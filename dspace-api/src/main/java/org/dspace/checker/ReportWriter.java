@@ -10,6 +10,7 @@ package org.dspace.checker;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
@@ -114,6 +115,9 @@ public class ReportWriter
         header = hdr;
         outputStreamWriter.write("---------------------------\n");
         outputStreamWriter.write(msg("start") + " "  + hdr + "\n");
+        outputStreamWriter.write("\tdspace.name: " + ConfigurationManager.getProperty("dspace.name") + "\n");
+        outputStreamWriter.write("\tassetstore.dir: " + ConfigurationManager.getProperty("assetstore.dir") + "\n");
+        outputStreamWriter.write("\tdb.url: " + ConfigurationManager.getProperty("db.url") + "\n");
         outputStreamWriter.write("---------------------------\n");
     }
 
