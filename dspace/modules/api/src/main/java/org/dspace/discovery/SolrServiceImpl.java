@@ -11,6 +11,8 @@
 package org.dspace.discovery;
 
 import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -30,6 +32,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
+import org.dspace.statistics.SolrLogger;
+import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.PoolTask;
@@ -37,7 +41,14 @@ import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -540,7 +551,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Is stale checks the lastModified time stamp in the database and the index
      * to determine if the index is stale.
      *
-     * @param handle
+
      * @param lastModified
      * @return
      * @throws java.sql.SQLException
@@ -892,7 +903,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         //Also add the metadata for all our data files
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
+        Long maxDownload = new Long(0);
         for (Item dataFile : dataFiles) {
+
+            //caculate the most download item file
+            Long totalFileDownload = getTotalFileDownload(dataFile);
+            log.info("total file download (item :"+item.getID()+")"+dataFile.getID()+":"+totalFileDownload);
+
+            if(totalFileDownload !=null&&totalFileDownload>maxDownload)
+            {
+               maxDownload = totalFileDownload;
+            }
+
             DCValue[] mydc = dataFile.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (int i = 0; i < mydc.length; i++) {
                 DCValue meta = mydc[i];
@@ -965,8 +987,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
         }
-
-
+        if(dataFiles!=null&&dataFiles.length>0)
+        {
+            doc.addField("popularity",maxDownload);
+        }
         log.debug("  Added Metadata");
         doc.addField("archived", item.isArchived());
 
@@ -1277,6 +1301,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 			e.printStackTrace();
             return new ArrayList<DSpaceObject>(0);
 		}
+    }
+
+    private Long getTotalFileDownload(Item item)
+    {
+        //String query = "/select/?q=-isBot:true&fq=type%3A2&fq=id%3A"+item.getID();
+        try{
+//            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " AND owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
+            Long totalFileDownload = SolrLogger.queryTotal("-isBot:true", " owningItem:" + item.getID() + " AND type:"+ Constants.BITSTREAM).getCount() ;
+            return totalFileDownload;
+        }catch (Exception e)
+        {
+            return new Long(0);
+        }
+
     }
 
 }
