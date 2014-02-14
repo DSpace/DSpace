@@ -343,7 +343,7 @@ public class Context
             DatabaseManager.freeConnection(connection);
             connection = null;
             clearCache();
-        }
+            log.error("Context.complete()", new Exception());        }
     }
 
     /**
@@ -505,9 +505,11 @@ public class Context
         {
             try
             {
-                // Free the DB connection
-                // If connection is closed or null, this is a no-op
-                DatabaseManager.freeConnection(connection);
+                if (!connection.isClosed())
+                {
+                    DatabaseManager.freeConnection(connection);
+                    log.error("Context free db connection", new Exception());
+                }
             }
             catch (Exception ex)
             {
