@@ -200,6 +200,10 @@
             <list>
                 <value>sedici.creator.person</value>
                 <value>sedici.creator.corporate</value>
+                <value>sedici.contributor.translator</value>
+                <value>sedici.contributor.compiler</value>
+                <value>sedici.contributor.editor</value>
+                <value>sedici.creator.interprete</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
