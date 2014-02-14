@@ -1,5 +1,6 @@
 package org.dspace.checker;
 
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class TSVReportWriter extends ReportWriter {
     public void writeHeaderChecksumHistory(String hdr) throws IOException {
         header = hdr;
         outputStreamWriter.write("# " + hdr + "\n");
+        writeInstanceInfo();
         outputStreamWriter.write("bitstream-id\t");
         if (verbosityLevel > 0) {
             outputStreamWriter.write("process-start-date\t");
@@ -55,6 +57,7 @@ public class TSVReportWriter extends ReportWriter {
     public void writeHeaderBitstreamInfo(String hdr) throws IOException {
         header = hdr;
         outputStreamWriter.write("# " + hdr + "\n");
+        writeInstanceInfo();
         outputStreamWriter.write("bitstream-id\t");
         outputStreamWriter.write("format-id\t");
         outputStreamWriter.write("deleted\t");
@@ -71,6 +74,12 @@ public class TSVReportWriter extends ReportWriter {
         outputStreamWriter.write("source");
 
         outputStreamWriter.write("\n");
+    }
+
+    private void writeInstanceInfo() throws IOException {
+        outputStreamWriter.write("# dspace.name: " + ConfigurationManager.getProperty("dspace.name") + "\n");
+        outputStreamWriter.write("# assetstore.dir: " + ConfigurationManager.getProperty("assetstore.dir") + "\n");
+        outputStreamWriter.write("# db.url: " + ConfigurationManager.getProperty("db.url") + "\n");
     }
 
     @Override
