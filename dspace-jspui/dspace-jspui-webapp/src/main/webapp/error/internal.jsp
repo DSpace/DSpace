@@ -38,7 +38,6 @@
         <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
         <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
     </p>
-        <!--
     <%
     Throwable ex = (Throwable) request.getAttribute("javax.servlet.error.exception");
     if(ex == null) out.println("No stack trace available<br/>");
@@ -52,5 +51,4 @@
                 }
         }
         %>
-      -->
 </dspace:layout>
