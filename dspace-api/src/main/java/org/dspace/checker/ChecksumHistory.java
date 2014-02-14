@@ -179,7 +179,7 @@ public class ChecksumHistory {
         return resultLong == null ? "" : resultLong;
     }
 
-    private void filleme(Context ctxt) {
+    private void fillme(Context ctxt) {
         if (!filledIn) {
             try {
                 bitstream = Bitstream.find(ctxt, bitstreamId);
@@ -206,18 +206,23 @@ public class ChecksumHistory {
         }
     }
 
+    public Bitstream getBitstream(Context ctxt) {
+        fillme(ctxt);
+        return bitstream;
+    }
+
     public Item getItem(Context ctxt) {
-        filleme(ctxt);
+        fillme(ctxt);
         return item;
     }
 
     public Collection getCollection(Context ctxt) {
-        filleme(ctxt);
+        fillme(ctxt);
         return collection;
     }
 
     public Community getCommunity(Context ctxt) {
-        filleme(ctxt);
+        fillme(ctxt);
         return community;
     }
 
