@@ -68,34 +68,6 @@ public class ReportWriter
         return detailedDateFormat.format(thisDate);
     }
 
-    public static String getHandle(DSpaceObject obj) {
-        String hdl = null;
-        if (obj != null) {
-            hdl = obj.getHandle();
-        }
-        if (hdl == null) return "";
-        return hdl;
-    }
-
-    public static String getInternalId(Bitstream bitstream) {
-        String internal = null;
-        if (bitstream != null)
-            internal = bitstream.getInternalId();
-        if (internal == null)
-            internal = "";
-        return internal;
-    }
-
-
-    public static String getSource(Bitstream bitstream) {
-        String source = null;
-        if (bitstream != null)
-            source = bitstream.getSource();
-        if (source == null)
-            source = "";
-        return source;
-    }
-
     /**
      * header given in writeHeader; the default implementations repeats the header in writeFooter
      */
@@ -207,15 +179,15 @@ public class ReportWriter
                 if (verbosityLevel > 0) {
                     outputStreamWriter.write(
                             String.format("%s = %s",
-                                    msg("internal-id"), getInternalId(historyInfo.getBitstream(context))));
+                                    msg("internal-id"), CheckerInfo.getInternalId(historyInfo.getBitstream(context))));
                     outputStreamWriter.write(
-                            String.format("item-handle = %s\n", getHandle(historyInfo.getItem(context))));
+                            String.format("item-handle = %s\n", CheckerInfo.getHandle(historyInfo.getItem(context))));
                     outputStreamWriter.write(
-                            String.format("collection-handle = %s\n", getHandle(historyInfo.getCollection(context))));
+                            String.format("collection-handle = %s\n", CheckerInfo.getHandle(historyInfo.getCollection(context))));
                     outputStreamWriter.write(
-                            String.format("community-handle = %s\n", getHandle(historyInfo.getCommunity(context))));
+                            String.format("community-handle = %s\n", CheckerInfo.getHandle(historyInfo.getCommunity(context))));
                     outputStreamWriter.write(String.format("%s = %s\n",
-                            msg("source"), getSource(historyInfo.getBitstream(context))));
+                            msg("source"), CheckerInfo.getSource(historyInfo.getBitstream(context))));
 
                 }
                 outputStreamWriter.write("------------------------------------------------ \n");
@@ -256,7 +228,7 @@ public class ReportWriter
                         .append("\n");
                 buf.append(msg("size")).append(" = ").append(bitstreamInfo.getSize())
                         .append("\n");
-                buf.append(msg("source")).append(" = ").append(bitstreamInfo.getSource())
+                buf.append(msg("source")).append(" = ").append(CheckerInfo.getSource(bitstreamInfo.getBitstream(context)))
                         .append("\n");
                 buf.append(msg("checksum")).append(" = ").append(
                         bitstreamInfo.getStoredChecksum()).append("\n");
