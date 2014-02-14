@@ -67,7 +67,7 @@ public class ReporterDAO extends DAOSupport
     public static final String DATE_RANGE_NOT_PROCESSED_BITSTREAMS = "select most_recent_checksum.bitstream_id, "
             + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
             + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-            + "result_description "
+            + "most_recent_checksum.result, result_description "
             + "from checksum_results, most_recent_checksum "
             + "where most_recent_checksum.to_be_processed = false "
             + "and most_recent_checksum.result = checksum_results.result_code "
@@ -78,7 +78,7 @@ public class ReporterDAO extends DAOSupport
     public static final String DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE = "select most_recent_checksum.bitstream_id, "
             + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
             + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-            + "result_description "
+            + "most_recent_checksum.result, result_description "
             + "from checksum_results, most_recent_checksum "
             + "where most_recent_checksum.to_be_processed = 0 "
             + "and most_recent_checksum.result = checksum_results.result_code "
@@ -94,7 +94,7 @@ public class ReporterDAO extends DAOSupport
     public static final String NOT_PROCESSED_BITSTREAMS = "select most_recent_checksum.bitstream_id, "
             + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
             + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-            + "result_description "
+            + "most_recent_checksum.result, result_description "
             + "from checksum_results, most_recent_checksum "
             + "where most_recent_checksum.to_be_processed = false "
             + "and most_recent_checksum.result = checksum_results.result_code "
@@ -103,7 +103,7 @@ public class ReporterDAO extends DAOSupport
     public static final String NOT_PROCESSED_BITSTREAMS_ORACLE = "select most_recent_checksum.bitstream_id, "
             + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
             + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-            + "result_description "
+            + "most_recent_checksum.result, result_description "
             + "from checksum_results, most_recent_checksum "
             + "where most_recent_checksum.to_be_processed = 0 "
             + "and most_recent_checksum.result = checksum_results.result_code "
@@ -294,6 +294,10 @@ public class ReporterDAO extends DAOSupport
         try {
             rs = prepStmt.executeQuery();
             while (rs.next()) {
+                if (resultCode == null) {
+                    // take result from query
+                    resultCode = rs.getString("result");
+                }
                 history.add(new ChecksumHistory(rs
                         .getInt("bitstream_id"), rs
                         .getTimestamp("last_process_start_date"), rs
@@ -303,7 +307,6 @@ public class ReporterDAO extends DAOSupport
                         .getString("result_description"),
                         resultCode));
             }
-
         } catch (SQLException e) {
             LOG.warn("Bitstream history could not be found for specified type "
                     + e.getMessage(), e);
