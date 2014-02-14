@@ -16,11 +16,8 @@ package org.dspace.checker;
  * @author Nathan Sarr
  * 
  */
-public final class DSpaceBitstreamInfo
+public final class DSpaceBitstreamInfo extends CheckerInfo
 {
-    /** database bitstream id. */
-    private int bitstreamId;
-
     /** format */
     private String bitstreamFormat;
 
@@ -51,12 +48,6 @@ public final class DSpaceBitstreamInfo
     /** store number. */
     private int storeNumber;
 
-    /**
-     * Blanked off no-op default constructor.
-     */
-    private DSpaceBitstreamInfo()
-    {
-    }
 
     /**
      * Minimal constructor.
@@ -66,6 +57,7 @@ public final class DSpaceBitstreamInfo
      */
     public DSpaceBitstreamInfo(int bid)
     {
+        super(bid);
         deleted = false;
         storeNumber = -1;
         size = -1;
@@ -76,7 +68,6 @@ public final class DSpaceBitstreamInfo
         checksumAlgorithm = null;
         storedChecksum = null;
         name = null;
-        this.bitstreamId = bid;
     }
 
     /**
@@ -112,6 +103,7 @@ public final class DSpaceBitstreamInfo
             String intrnlId, String src, String chksumAlgorthm, String chksum,
             String nm, String desc)
     {
+        super(bitstrmId);
         this.deleted = del;
         this.storeNumber = storeNo;
         this.size = sz;

@@ -35,11 +35,11 @@ public class TSVReportWriter extends ReportWriter {
         outputStreamWriter.write("checksum-calculated\t");
         outputStreamWriter.write("result");
         if (verbosityLevel > 0) {
-            outputStreamWriter.write(",");
-            outputStreamWriter.write("internal-id,");
-            outputStreamWriter.write("item,");
-            outputStreamWriter.write("collection,");
-            outputStreamWriter.write("community,");
+            outputStreamWriter.write("\t");
+            outputStreamWriter.write("internal-id\t");
+            outputStreamWriter.write("item\t");
+            outputStreamWriter.write("collection\t");
+            outputStreamWriter.write("community\t");
             outputStreamWriter.write("source");
         }
         outputStreamWriter.write("\n");
@@ -63,7 +63,13 @@ public class TSVReportWriter extends ReportWriter {
         outputStreamWriter.write("checksum-algorithm\t");
         outputStreamWriter.write("checksum\t");
         outputStreamWriter.write("store-number\t");
+        if (verbosityLevel > 0) {
+            outputStreamWriter.write("item\t");
+            outputStreamWriter.write("collection\t");
+            outputStreamWriter.write("community\t");
+        }
         outputStreamWriter.write("source");
+
         outputStreamWriter.write("\n");
     }
 
@@ -83,34 +89,31 @@ public class TSVReportWriter extends ReportWriter {
     public int writeBodyChecksumHistory(List<ChecksumHistory> history) throws IOException {
         int n = history.size();
         if (n > 0) {
-            Iterator<ChecksumHistory> iter;
-            iter = history.iterator();
-            while (iter.hasNext()) {
-                ChecksumHistory historyInfo = iter.next();
-                outputStreamWriter.write(String.valueOf(historyInfo.getBitstreamId()));
+            for (ChecksumHistory info : history) {
+                outputStreamWriter.write(String.valueOf(info.getBitstreamId()));
                 if (verbosityLevel > 0) {
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(applyDateFormatDetailed(historyInfo.getProcessStartDate()));
+                    outputStreamWriter.write(applyDateFormatDetailed(info.getProcessStartDate()));
                 }
                 outputStreamWriter.write("\t");
-                outputStreamWriter.write(applyDateFormatDetailed(historyInfo.getProcessEndDate()));
+                outputStreamWriter.write(applyDateFormatDetailed(info.getProcessEndDate()));
                 outputStreamWriter.write("\t");
-                outputStreamWriter.write(historyInfo.getChecksumExpected());
+                outputStreamWriter.write(info.getChecksumExpected());
                 outputStreamWriter.write("\t");
-                outputStreamWriter.write(historyInfo.getChecksumCalculated());
+                outputStreamWriter.write(info.getChecksumCalculated());
                 outputStreamWriter.write("\t");
-                outputStreamWriter.write(historyInfo.getResultCode());
+                outputStreamWriter.write(info.getResultCode());
                 if (verbosityLevel > 0) {
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(ReportWriter.getInternalId(historyInfo.getBitstream(context)));
+                    outputStreamWriter.write(CheckerInfo.getInternalId(info.getBitstream(context)));
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getItem(context)));
+                    outputStreamWriter.write(CheckerInfo.getHandle(info.getItem(context)));
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCollection(context)));
+                    outputStreamWriter.write(CheckerInfo.getHandle(info.getCollection(context)));
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(ReportWriter.getHandle(historyInfo.getCommunity(context)));
+                    outputStreamWriter.write(CheckerInfo.getHandle(info.getCommunity(context)));
                     outputStreamWriter.write("\t");
-                    outputStreamWriter.write(ReportWriter.getSource(historyInfo.getBitstream(context)));
+                    outputStreamWriter.write(CheckerInfo.getSource(info.getBitstream(context)));
                 }
                 outputStreamWriter.write("\n");
             }
@@ -130,24 +133,32 @@ public class TSVReportWriter extends ReportWriter {
     public int writeBodyBitstreamInfo(List<DSpaceBitstreamInfo> bitstreams) throws IOException {
         int n = bitstreams.size();
 
-        for (DSpaceBitstreamInfo bitstreamInfo : bitstreams) {
-            outputStreamWriter.write(String.valueOf(bitstreamInfo.getBitstreamId()));
+        for (DSpaceBitstreamInfo info : bitstreams) {
+            outputStreamWriter.write(String.valueOf(info.getBitstreamId()));
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(bitstreamInfo.getBitstreamFormatId());
+            outputStreamWriter.write(info.getBitstreamFormatId());
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(String.valueOf(bitstreamInfo.getDeleted()));
+            outputStreamWriter.write(String.valueOf(info.getDeleted()));
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(bitstreamInfo.getInternalId());
+            outputStreamWriter.write(info.getInternalId());
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(String.valueOf(bitstreamInfo.getSize()));
+            outputStreamWriter.write(String.valueOf(info.getSize()));
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(bitstreamInfo.getChecksumAlgorithm());
+            outputStreamWriter.write(info.getChecksumAlgorithm());
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(bitstreamInfo.getStoredChecksum());
+            outputStreamWriter.write(info.getStoredChecksum());
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(String.valueOf(bitstreamInfo.getStoreNumber()));
+            outputStreamWriter.write(String.valueOf(info.getStoreNumber()));
             outputStreamWriter.write("\t");
-            outputStreamWriter.write(bitstreamInfo.getSource());
+            if (verbosityLevel > 0) {
+                outputStreamWriter.write(CheckerInfo.getHandle(info.getItem(context)));
+                outputStreamWriter.write("\t");
+                outputStreamWriter.write(CheckerInfo.getHandle(info.getCollection(context)));
+                outputStreamWriter.write("\t");
+                outputStreamWriter.write(CheckerInfo.getHandle(info.getCommunity(context)));
+                outputStreamWriter.write("\t");
+            }
+            outputStreamWriter.write(CheckerInfo.getSource(info.getBitstream(context)));
             outputStreamWriter.write("\n");
         }
 
