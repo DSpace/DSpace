@@ -149,17 +149,16 @@ public class DailyReportEmailer
 
         options.addOption("h", "help", false, "Help");
 
+        options.addOption("a", "All", false, "Generate all reports (default)");
         options.addOption("d", "Deleted", false,
-                        "Send E-mail report for all bitstreams set as deleted");
+                        "Generate report for all bitstreams set as deleted");
         options.addOption("m", "Missing", false,
-                "Send E-mail report for all bitstreams not found in assetstore");
+                "Generate report for all bitstreams not found in assetstore");
         options.addOption("c", "Changed", false,
-                "Send E-mail report for all bitstreams where checksum has been changed");
-        options.addOption("a", "All", false, "Send all E-mail reports");
-        options.addOption("u", "Unchecked", false,
-                "Send the Unchecked bitstream report");
+                "Generate report for all bitstreams where checksum has been changed");
+        options.addOption("u", "Unchecked", false,  "Generate Unchecked bitstream report");
         options.addOption("n", "Not Processed", false,
-                "Send E-mail report for all bitstreams set to longer be processed for today");
+                "Generate report for all bitstreams set to longer be processed for today");
 
         options.addOption("e", "Eternity", false, "Include all checksum info not just the ones from today");
 
@@ -168,12 +167,12 @@ public class DailyReportEmailer
 
         options.addOption("V", "verbose", false, "Chatty data output");
 
-
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
                 .hasArgs(1)
                 .withDescription(
-                        "Send report to given email instead of default mail.admin; if adr is '-' print report to stdout");
+                        "Send report to given email instead of default mail.admin; " +
+                        "if adr is '-' print report to stdout");
         options.addOption(OptionBuilder.create("t"));
         try
         {
@@ -192,19 +191,8 @@ public class DailyReportEmailer
 
             myhelp.printHelp("Checksum Reporter\n", options);
             System.out
-                    .println("Send Deleted bitstream email report: DailyReportEmailer -d");
-            System.out
-                    .println("Send Missing bitstreams email report: DailyReportEmailer -m");
-            System.out
-                    .println("Send Checksum Changed email report: DailyReportEmailer -c");
-
-            System.out
-                    .println("Send bitstream not to be processed email report: DailyReportEmailer -n");
-
-            System.out
-                    .println("Send Un-checked bitstream report: DailyReportEmailer -u");
-
-            System.out.println("Send All email reports: DailyReportEmailer");
+                    .println("Generate requested reports and email to address specified in \n" +
+                            "mail.admin property, unless -t option specifies otherwise");
             System.exit(0);
         }
 
