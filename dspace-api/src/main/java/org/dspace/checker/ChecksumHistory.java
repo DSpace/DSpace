@@ -23,14 +23,9 @@ import java.util.Date;
  * @author Grace Carpenter
  * @author Nathan Sarr
  */
-public class ChecksumHistory {
+public class ChecksumHistory extends CheckerInfo {
 
     private static final Logger log = Logger.getLogger(ChecksumHistory.class);
-
-    /**
-     * Unique bitstream id.
-     */
-    private int bitstreamId;
 
     /**
      * Date the process started.
@@ -63,40 +58,12 @@ public class ChecksumHistory {
     private String resultCode;
 
     /**
-     * filled in on demand only
-     */
-    private Item item;
-
-    /**
-     * filled in on demand only
-     */
-    private Bitstream bitstream;
-
-    /**
-     * filled in on demand only
-     */
-    private Collection collection;
-
-    /**
-     * filled in on demand only
-     */
-    private Community community;
-
-    /**
-     * have filled data
-     */
-    Boolean filledIn = false;
-
-    public ChecksumHistory() {
-    }
-
-    /**
      * Minimal Constructor.
      *
      * @param bitstreamId bitstream id in the database
      */
     public ChecksumHistory(int bitstreamId) {
-        this.bitstreamId = bitstreamId;
+        super(bitstreamId);
     }
 
     /**
@@ -110,8 +77,10 @@ public class ChecksumHistory {
      * @param resultLong     result information
      */
     public ChecksumHistory(int bitstrmId, Date startDate, Date endDate,
-                           String checksumExpted, String checksumCalc, String resultLong, String resultCode) {
-        this.bitstreamId = bitstrmId;
+                           String checksumExpted, String checksumCalc,
+                           String resultLong,
+                           String resultCode) {
+        super(bitstrmId);
         this.processStartDate = (startDate == null ? null : new Date(startDate.getTime()));
         this.processEndDate = (endDate == null ? null : new Date(endDate.getTime()));
         this.checksumExpected = checksumExpted;
@@ -177,53 +146,6 @@ public class ChecksumHistory {
      */
     public String getResultLong() {
         return resultLong == null ? "" : resultLong;
-    }
-
-    private void fillme(Context ctxt) {
-        if (!filledIn) {
-            try {
-                bitstream = Bitstream.find(ctxt, bitstreamId);
-
-                DSpaceObject parent;
-                if (bitstream != null) {
-                    parent = bitstream.getParentObject();
-                    while (parent != null) {
-                        if (parent instanceof Item) {
-                            item = (Item) parent;
-                        } else if (parent instanceof Collection) {
-                            collection = (Collection) parent;
-                        } else if (parent instanceof Community) {
-                            community = (Community) parent;
-                        }
-                        parent = parent.getParentObject();
-                    }
-                }
-            } catch (SQLException e) {
-                log.error(e.getMessage());
-            } finally {
-                filledIn = true;
-            }
-        }
-    }
-
-    public Bitstream getBitstream(Context ctxt) {
-        fillme(ctxt);
-        return bitstream;
-    }
-
-    public Item getItem(Context ctxt) {
-        fillme(ctxt);
-        return item;
-    }
-
-    public Collection getCollection(Context ctxt) {
-        fillme(ctxt);
-        return collection;
-    }
-
-    public Community getCommunity(Context ctxt) {
-        fillme(ctxt);
-        return community;
     }
 
 }
