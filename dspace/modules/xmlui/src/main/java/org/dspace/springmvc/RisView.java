@@ -50,8 +50,6 @@ public class RisView implements View {
             request.removeAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
         }
         write(response, ris, fileName);
-        OutputStream aOutputStream = response.getOutputStream();
-        aOutputStream.close();
     }
 
     private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException {

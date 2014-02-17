@@ -52,8 +52,6 @@ public class BibTexView implements View {
             request.removeAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
         }
         write(response, bibTex, fileName);
-        OutputStream aOutputStream = response.getOutputStream();
-        aOutputStream.close();
     }
 
     private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException {
