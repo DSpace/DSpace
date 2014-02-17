@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 
 <!--
-  - Initial contents for Dublin Core type registry.  Once the registry has
+  - Initial contents for DSpace native type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
   - registry must be read from the database.
   - Use org.dspace.content.MetadataSchema, org.dspace.content.MetadataField, org.dspace.content.MetadataValue instead.

@@ -1052,19 +1052,9 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_collection",
                 "collection_id=" + getID()));
 
-        DatabaseManager.update(ourContext, ourRow);
+        updateMetadata();
 
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
-            modifiedMetadata = false;
-            clearDetails();
-        }
+        super.update();
     }
 
     public boolean canEditBoolean() throws java.sql.SQLException

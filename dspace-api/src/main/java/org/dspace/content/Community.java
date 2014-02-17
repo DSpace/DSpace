@@ -519,19 +519,9 @@ public class Community extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_community",
                 "community_id=" + getID()));
 
-        DatabaseManager.update(ourContext, ourRow);
+        updateMetadata();
 
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COMMUNITY, getID(), getDetails()));
-            modifiedMetadata = false;
-            clearDetails();
-        }
+        super.update();
     }
 
     /**

@@ -601,18 +601,9 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_bundle", "bundle_id="
                 + getID()));
 
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
-            modifiedMetadata = false;
-        }
+        updateMetadata();
 
-        DatabaseManager.update(ourContext, ourRow);
+        super.update();
     }
 
     /**

@@ -501,19 +501,9 @@ public class Bitstream extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_bitstream",
                 "bitstream_id=" + getID()));
 
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
-            modifiedMetadata = false;
-            clearDetails();
-        }
+        updateMetadata();
 
-        DatabaseManager.update(ourContext, ourRow);
+        super.update();
     }
 
     /**
