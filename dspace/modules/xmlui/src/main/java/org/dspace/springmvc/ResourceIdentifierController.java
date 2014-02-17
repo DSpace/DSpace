@@ -43,7 +43,6 @@ import java.sql.SQLException;
 public class ResourceIdentifierController {
 
     public static final String DSPACE_OBJECT = "dspace.object";
-    public static final String DSPACE_CONTEXT = "dspace.context";
     private static final String RESOURCE = "/resource";
     private static final String METS = "mets";
     private static final String DRI = "DRI";
@@ -229,7 +228,7 @@ public class ResourceIdentifierController {
             context.turnOffAuthorisationSystem();
             dso = identifierService.resolve(context, resourceIdentifier);
             if(dso==null) throw new RuntimeException("Invalid DOI! " + resourceIdentifier);
-            request.setAttribute(DSPACE_CONTEXT, context);
+
             return dso;
         }catch (IdentifierNotFoundException e) {
             throw new RuntimeException(e);
@@ -240,9 +239,7 @@ public class ResourceIdentifierController {
             throw new RuntimeException(e);
 
         } finally {
-            // Do not abort context when returning a dso
-            // If context is aborted, dso becomes invalid
-            if(context != null && dso == null)
+            if(context != null)
             {
                 context.abort();
             }
@@ -269,7 +266,6 @@ public class ResourceIdentifierController {
                 return STATUS_NOTFOUND;
             }
             request.setAttribute(DSPACE_OBJECT, dso);
-            request.setAttribute(DSPACE_CONTEXT, context);
 
             if(!(dso instanceof Item)) return STATUS_FORBIDDEN;
 
@@ -302,7 +298,7 @@ public class ResourceIdentifierController {
         } catch (IdentifierNotResolvableException e) {
             return STATUS_FORBIDDEN;
         } finally {
-            if(context != null && dso == null)
+            if(context != null)
             {
                 context.abort();
             }
