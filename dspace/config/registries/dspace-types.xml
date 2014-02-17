@@ -1,0 +1,66 @@
+<?xml version='1.0'?>
+
+<!--
+  - Initial contents for Dublin Core type registry.  Once the registry has
+  - been loaded, this file becomes obsolete; the current version of the
+  - registry must be read from the database.
+  - Use org.dspace.content.MetadataSchema, org.dspace.content.MetadataField, org.dspace.content.MetadataValue instead.
+  - Omit <qualifier> tags for unqualified elements
+  -
+  - <dc-type>
+  -   <schema></schema>
+  -   <element></element>
+  -   <qualifier></qualifier>
+  -   <scope_note></scope_note>
+  - </dc-type>
+  -->
+
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace Native Types Registry</title>
+    <contributor.author>Mark Wood</contributor.author>
+    <date.created>17-Feb-2014</date.created>
+    <description>
+        Metadata types specific to DSpace.
+    </description>
+    <description.version>1.0</description.version>
+  </dspace-header>
+
+  <dc-schema>
+      <name>dspace</name>
+      <namespace>http://duraspace.org/namespaces/dspace-types/</namespace>
+  </dc-schema>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>copyright</element>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>introduction</element>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>description</element>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>sidebar</element>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>provenance</element>
+      <qualifier></qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+</dspace-dc-types>
