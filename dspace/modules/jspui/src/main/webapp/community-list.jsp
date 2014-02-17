@@ -123,7 +123,7 @@
 %>
 
 <dspace:layout titlekey="jsp.community-list.title">
-
+    <div class="well">
 <%
     if (admin_button)
     {
@@ -163,4 +163,5 @@
  
 <% }
 %>
+    </div>
 </dspace:layout>
