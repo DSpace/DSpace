@@ -35,14 +35,13 @@ import java.util.List;
 import java.util.MissingResourceException;
 
 /**
- * Class representing a community
+ * Class representing a community.
  * <P>
- * The community's metadata (name, introductory text etc.) is loaded into'
- * memory. Changes to this metadata are only reflected in the database after
- * <code>update</code> is called.
+ * The community's metadata (name, introductory text etc.) is loaded into
+ * memory. Changes to these metadata are only reflected in the database after
+ * {@link #update} is called.
  * 
  * @author Robert Tansley
- * @version $Revision$
  */
 public class Community extends DSpaceObject
 {

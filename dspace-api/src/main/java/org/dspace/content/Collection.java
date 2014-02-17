@@ -43,14 +43,13 @@ import java.util.MissingResourceException;
  * <P>
  * The collection's metadata (name, introductory text etc), workflow groups, and
  * default group of submitters are loaded into memory. Changes to metadata are
- * not written to the database until <code>update</code> is called. If you
+ * not written to the database until {@link #update} is called. If you
  * create or remove a workflow group, the change is only reflected in the
- * database after calling <code>update</code>. The default group of
+ * database after calling {@link #update}. The default group of
  * submitters is slightly different - creating or removing this has instant
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class Collection extends DSpaceObject
 {

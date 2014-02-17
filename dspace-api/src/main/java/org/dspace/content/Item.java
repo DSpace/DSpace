@@ -57,7 +57,6 @@ import org.dspace.versioning.VersioningService;
  *
  * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision$
  */
 public class Item extends DSpaceObject
 {
@@ -2139,8 +2138,9 @@ public class Item extends DSpaceObject
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
         
-        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-                       "AND item.item_id = metadatavalue.object_id AND metadata_field_id = ?";
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1'"+
+                " AND metadatavalue.object_type = " + Constants.ITEM +
+                " AND item.item_id = metadatavalue.object_id AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(value))
         {
