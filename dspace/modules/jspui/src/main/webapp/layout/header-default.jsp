@@ -87,7 +87,7 @@
         }
 %>
     <!-- All scripts were sent to the end of body -->    
-        
+    <script src="<%= request.getContextPath() %>/static/js/modernizr/modernizr-2.6.2.min.js"></script>    
 
     <%--Gooogle Analytics recording.--%>
     <%
