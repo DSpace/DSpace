@@ -47,7 +47,7 @@ CREATE TABLE Webapp
 (
     webapp_id INTEGER NOT NULL PRIMARY KEY,
     AppName VARCHAR2(32),
-    URL VARCHAR2,
+    URL VARCHAR2(1000),
     Started TIMESTAMP,
     isUI NUMBER(1)
 );
