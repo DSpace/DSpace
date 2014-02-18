@@ -42,11 +42,14 @@ public class RisView implements View {
 
         String doi = DOIIdentifierProvider.getDoiValue((Item) item);
         String fileName = doi.substring(doi.lastIndexOf('/') +1).replace('.', '_') + ".ris";
-        write(response, getRIS((Item) item, doi), fileName);
-
-        OutputStream aOutputStream = response.getOutputStream();
-        aOutputStream.close();
-
+        String ris = getRIS((Item) item, doi);
+        // Close the context before writing the response and closing the stream
+        Context context = (Context) request.getAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        if(context != null) {
+            context.abort();
+            request.removeAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        }
+        write(response, ris, fileName);
     }
 
     private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException {
