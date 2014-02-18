@@ -47,13 +47,14 @@
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
+    boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-list.logos", true);
 %>
 
 <%!
     void showCommunity(Community c, JspWriter out, HttpServletRequest request, ItemCounter ic,
-    		Map collectionMap, Map subcommunityMap) throws ItemCountException, IOException, SQLException
+    		Map collectionMap, Map subcommunityMap, boolean showLogos) throws ItemCountException, IOException, SQLException
     {
-		boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-list.logos", true);
+		
         out.println( "<li class=\"media well\">" );
         Bitstream logo = c.getLogo();
         if (showLogos && logo != null)
@@ -156,7 +157,7 @@
 <%
         for (int i = 0; i < communities.length; i++)
         {
-            showCommunity(communities[i], out, request, ic, collectionMap, subcommunityMap);
+            showCommunity(communities[i], out, request, ic, collectionMap, subcommunityMap, showLogos);
         }
 %>
     </ul>
