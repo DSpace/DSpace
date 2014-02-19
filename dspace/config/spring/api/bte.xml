@@ -107,7 +107,7 @@
 	    <property name="dataloadersMap">
 	        <map>
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
-	            	Dataloades must either extend the "NetworkSubmissionLookupDataLoader" abstract class
+	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
@@ -146,7 +146,7 @@
 	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 	    <property name="fieldKeys">
 	        <list>
-	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
+	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
 	        	<value>arxivCategory</value>
 	        </list>
 	    </property>
@@ -160,7 +160,7 @@
 	    <property name="defaultValue" value="Subjected to Journal"/>
 	    <property name="fieldKeys">
 	        <list>
-	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
+	            <!-- Specify the internal BTE keys that this modifier needs to be applied for -->
 	        	<value>publicationStatus</value>
 	        </list>
 	    </property>
@@ -268,11 +268,11 @@
 	<!-- Each entry in a CSV is a row, and each column represents the same data 
 		in each entry. For example the first column might record the item title, 
 		the second the authors etc. The key of the field map is this number. Note 
-		that the first column is number 0. The CSV data loader has these extra parameters 
+		that the first column is number 0. The CSV data loader has the following extra parameters 
 		that configure its behaviour: - skipLines: a number that instructs the reader 
 		to ignore the first lines in the input file. Default value: 0 - separator: 
 		a character that signifies how the values are separated. Default value ',' 
-		-quoteChar: individual valued could include the separator character. For 
+		-quoteChar: individual values could include the separator character. For 
 		example if the separator is ',' and there is an abstract, there is a high 
 		probability that it will contain commas. If the value is quoted using the 
 		quoteChar then separator characters inside it will be ignored. Default value 
@@ -316,7 +316,7 @@
 		<property name="skipLines" value="1" />
 	</bean>
 
-	<!-- The map for the RIS data loader has to have as keys the RIS tags that 
+	<!-- The keys in the RIS data loader map have to be the RIS tags that 
 		need to be loaded. -->
 	<bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
 		<property name="fieldMap">
@@ -526,7 +526,7 @@
 	<!-- **************************************************************************************************** -->
 
 	<!-- The output generator needs a configuration on how to map internal records 
-		to the DSpace metadata fields. The following map specifies this relationship. 
+		to DSpace metadata fields. The following map specifies this relationship. 
 		The value needs to be the label that the record internally associates with 
 		the specific data and it is specified in the data loader beans. The key is 
 		in the format of <schema>.<element>[.<qualifier>] and specified the dspace 

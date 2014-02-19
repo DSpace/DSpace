@@ -790,7 +790,7 @@
 </xsl:template>
 
 <!-- ds-options -->
-<!-- the browse section is being implemented in the front page custoization -->
+<!-- the browse section is being implemented in the front page customization -->
 <xsl:template match="dri:options">&#160;
 </xsl:template>
 
