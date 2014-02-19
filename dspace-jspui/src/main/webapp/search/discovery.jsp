@@ -431,16 +431,16 @@ else if( qResults != null)
     long pageFirst   = ((Long)request.getAttribute("pagefirst"  )).longValue();
     
     // create the URLs accessing the previous and next search result pages
-    String baseURL =  request.getContextPath()
-                    + searchScope
-                    + "/simple-search?query="
-                    + URLEncoder.encode(query,"UTF-8")
-                    + httpFilters
-                    + "&amp;sort_by=" + sortedBy
-                    + "&amp;order=" + order
-                    + "&amp;rpp=" + rpp
-                    + "&amp;etal=" + etAl
-                    + "&amp;start=";
+    String baseURL = request.getContextPath()
+            + (searchScope != "" ? "/handle/" + searchScope : "")
+            + "/simple-search?query="
+            + URLEncoder.encode(query,"UTF-8")
+            + httpFilters
+            + "&amp;sort_by=" + sortedBy
+            + "&amp;order=" + order
+            + "&amp;rpp=" + rpp
+            + "&amp;etal=" + etAl
+            + "&amp;start=";
 
     String nextURL = baseURL;
     String firstURL = baseURL;
