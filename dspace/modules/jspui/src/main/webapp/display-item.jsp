@@ -30,6 +30,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.content.DSpaceObject" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -44,6 +45,16 @@
     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
+
+    String agree_to_view_bitstreams = null;
+    String agree_cookie = null;
+    Collection owner = item.getOwningCollection();
+    if (owner != null) {
+         DSpaceObject obj = owner.getParentObject();  // assuming this is the owning community 
+         agree_cookie = obj.getHandle();
+         agree_to_view_bitstreams = ConfigurationManager.getProperty(agree_cookie + ".bitstream_view_agreement");
+    }
+
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
@@ -76,31 +87,23 @@
 			title = "Item " + handle;
 		}
 	}
-
-    // Princeton University customization -- 
-    //    Get dc.type so that we know whether or not this is a thesis
-    String dctype = null;
-    DCValue[] dctypeValue = item.getDC("type", null, Item.ANY);
-    if (dctypeValue.length != 0)
-    {
-      dctype = dctypeValue[0].value;
-    }
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
+<% 
+if (agree_to_view_bitstreams != null) {
+%>
 
-<!-- Princeton University customization -->
-<%
-    // If dc.type is a senior theses, then include javascript for popup copyright notification
-    if (dctype != null && dctype.equals("Princeton University Senior Theses"))
-    {
+<script type="text/javascript" >
+window.onload = function() {
+  must_agree_to_view_bitstreams('<%= agree_cookie %>', '<%= agree_to_view_bitstreams %>');
+}
+</script>
+<% 
+} 
 %>
-    <!-- Princeton University customization for generating popup for terms of use for senior theses -->
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/senior-theses-popup.js"> </script>
-<%
-    }
-%>
+
 
 <%
     if (handle != null)
