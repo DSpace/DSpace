@@ -16,6 +16,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -65,7 +66,7 @@ public class PaypalImpl implements PaypalService{
     }
 
     //generate a secure token from paypal
-    public String generateSecureToken(ShoppingCart shoppingCart,String secureTokenId,String itemID, String type){
+    public String generateSecureToken(ShoppingCart shoppingCart,String secureTokenId, String type,Context context){
         String secureToken=null;
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
 
@@ -98,6 +99,43 @@ public class PaypalImpl implements PaypalService{
             }
             //TODO:add currency from shopping cart
             post.addParameter("CURRENCY", shoppingCart.getCurrency());
+
+            Item item = Item.find(context,shoppingCart.getItem());
+
+            String userFirstName = "";
+
+            String userLastName = "";
+
+            String userEmail = "";
+
+            String userName = "";
+
+            try{
+                    userFirstName = item.getSubmitter().getFirstName();
+
+                    userLastName = item.getSubmitter().getLastName();
+
+                    userEmail = item.getSubmitter().getEmail();
+
+                    userName = item.getSubmitter().getFullName();
+
+                }catch (Exception e)
+
+            {
+
+                log.error("cant get submitter's user name for paypal transaction");
+
+            }
+
+            post.addParameter("FIRSTNAME",userFirstName);
+
+            post.addParameter("LASTNAME",userLastName);
+
+            post.addParameter("COMMENT1","Submitter's name :"+userName);
+
+            post.addParameter("COMMENT2","Submitter's email :"+userEmail);
+
+
 	    log.debug("paypal request URL " + post);
             switch (new HttpClient().executeMethod(post)) {
                 case 200:
@@ -170,7 +208,8 @@ public class PaypalImpl implements PaypalService{
             else
             {
                 log.debug("charging card");
-                return chargeCard(c, wfi, request,shoppingCart);
+                Context context = ContextUtil.obtainContext(request);
+                return chargeCard(c, wfi, request,shoppingCart,context);
             }
 
         }catch (Exception e)
@@ -181,132 +220,8 @@ public class PaypalImpl implements PaypalService{
         return false;
     }
 
-    public boolean getReferenceTransaction(Context context,WorkflowItem workItem,HttpServletRequest request){
-        //return verifyCreditCard
-        verifyCreditCard(context,workItem.getItem(),request);
-        //todo:debug to be true
-        return true;
-    }
-    public boolean getReferenceTransaction(Context context,WorkspaceItem workItem,HttpServletRequest request){
-        //return verifyCreditCard
-        verifyCreditCard(context,workItem.getItem(),request);
-        //todo:debug to be true
-        return true;
-    }
-
-    //generate a reference transaction from paypal
-    public boolean verifyCreditCard(Context context,Item item, HttpServletRequest request){
-
-
-        ShoppingCart shoppingCart=null;
-
-        String referenceId=null;
-        String cardNumber = request.getParameter("CREDITCARD");
-        String CVV2 = request.getParameter("CVV2");
-        String expDate = request.getParameter("EXPDATE");
-        String firstName = request.getParameter("BILLTOFIRSTNAME");
-        String lastName = request.getParameter("BILLTOLASTNAME");
-        String street = request.getParameter("BILLTOSTREET");
-        String city = request.getParameter("BILLTOCITY");
-        String country = request.getParameter("BILLTOCOUNTRY");
-        String state = request.getParameter("BILLTOSTATE");
-        String zip = request.getParameter("BILLTOZIP");
-
-        String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.link");
-        try {
-            String secureToken=request.getParameter("SECURETOKEN");
-            String secureTokenId=request.getParameter("SECURETOKENID");
-            PaymentSystemService paymentSystemService =  new DSpace().getSingletonService(PaymentSystemService.class);
-            shoppingCart= paymentSystemService.getShoppingCartByItemId(context,item.getID());
-
-
-            if(secureToken!=null&&secureTokenId!=null&&shoppingCart!=null){
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-                PostMethod post = new PostMethod(requestUrl);
-
-                post.addParameter("SECURETOKENID",secureTokenId);
-                post.addParameter("SECURETOKEN",secureToken);
-
-                post.addParameter("SILENTTRAN",ConfigurationManager.getProperty("payment-system","paypal.slienttran"));
-
-                post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
-                post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-                post.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
-                post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
-                //setup the reference transaction
-                post.addParameter("TENDER", "C");
-                post.addParameter("TRXTYPE", "A");
-                post.addParameter("VERBOSITY", ConfigurationManager.getProperty("payment-system","paypal.verbosity"));
-                post.addParameter("AMT", "0.00");
-                post.addParameter("CREDITCARD",cardNumber);
-                post.addParameter("CVV2",CVV2);
-                post.addParameter("EXPDATE",expDate);
-                post.addParameter("BILLTOFIRSTNAME",firstName);
-                post.addParameter("BILLTOLASTNAME",lastName);
-                post.addParameter("BILLTOSTREET",street);
-                post.addParameter("BILLTOSTATE",state);
-                post.addParameter("BILLTOCITY",city);
-                post.addParameter("BILLTOCOUNTRY",country);
-                post.addParameter("BILLTOZIP",zip);
-
-
-                //TODO:add currency from shopping cart
-                post.addParameter("CURRENCY", shoppingCart.getCurrency());
-		log.debug("paypal transaction url " + post);
-		int httpStatus = new HttpClient().executeMethod(post);
-                switch (httpStatus) {
-                    case 200:
-                    case 201:
-                    case 202:
-                        String string = post.getResponseBodyAsString();
-			log.debug("paypal response = " + string);
-                        String[] results = string.split("&");
-                        for(String temp:results)
-                        {
-                            String[] result = temp.split("=");
-                            //TODO: ignore the error from paypal server, add the error check after
-                            //figure out the correct way to process the credit card info
-//                        if(result[0].contains("RESULT")&&!result[1].equals("0"))
-//                        {
-                            //failed to pass the credit card authorization check
-//                            log.error("Failed to get a reference transaction from paypal:"+string);
-//                            log.error("Failed to get a reference transaction from paypal:"+get);
-//                            return false;
-//                        }
-                            //always return true so we can go through the workflow
-                            if(result[0].contains("PNREF"))
-                            {
-                                shoppingCart.setTransactionId(result[1]);
-                                shoppingCart.update();
-
-                                return true;
-                            }
-                        }
-                        break;
-                    default:
-                        log.error("unexpected code getting paypal reference transaction: " + httpStatus + ", " + post.getResponseBodyAsString() );
-                        return false;
-                }
-
-                post.releaseConnection();
-            }
-            else{
-                log.error("get paypal reference transaction error or shopping cart error:"+secureToken+secureTokenId+shoppingCart);
-                return false;
-            }
-        }
-        catch (Exception e) {
-            log.error("get paypal reference transaction:", e);
-            return false;
-        }
-        return false;
-    }
-
-
-
     @Override
-    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart) {
+    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart,Context context) {
         //this method should get the reference code and submit it to paypal to do the actural charge process
 
         if(shoppingCart.getTransactionId()==null){
@@ -338,7 +253,46 @@ public class PaypalImpl implements PaypalService{
 
             //TODO:add currency from shopping cart
             post.addParameter("CURRENCY", shoppingCart.getCurrency());
-	    log.debug("paypal sale transaction url " + post);
+
+            Item item = Item.find(context,shoppingCart.getItem());
+
+            String userFirstName = "";
+
+            String userLastName = "";
+
+            String userEmail = "";
+
+            String userName = "";
+
+            try{
+                userFirstName = item.getSubmitter().getFirstName();
+
+                userLastName = item.getSubmitter().getLastName();
+
+                userEmail = item.getSubmitter().getEmail();
+
+                userName = item.getSubmitter().getFullName();
+
+            }catch (Exception e)
+
+            {
+
+                log.error("cant get submitter's user name for paypal transaction");
+
+            }
+
+            post.addParameter("FIRSTNAME",userFirstName);
+
+            post.addParameter("LASTNAME",userLastName);
+
+            post.addParameter("COMMENT1","Submitter's name :"+userName);
+
+            post.addParameter("COMMENT2","Submitter's email :"+userEmail);
+
+
+
+
+            log.debug("paypal sale transaction url " + post);
             switch (new HttpClient().executeMethod(post)) {
                 case 200:
                 case 201:
@@ -395,7 +349,7 @@ public class PaypalImpl implements PaypalService{
 
         //return false if there is error in loading from paypal
         String secureTokenId = getSecureTokenId();
-        String secureToken = generateSecureToken(shoppingCart,secureTokenId,Integer.toString(shoppingCart.getItem()),type);
+        String secureToken = generateSecureToken(shoppingCart,secureTokenId,type,context);
         WorkspaceItem workspaceItem=null;
         if(secureToken==null){
             EPerson ePerson = context.getCurrentUser();
