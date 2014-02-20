@@ -77,6 +77,7 @@
     if (doAnalytics) {
         uaCode =  ConfigurationManager.getProperty("jspui.google.analytics.key");
         uaDomain =  ConfigurationManager.getProperty("jspui.google.analytics.domain");
+        doAnalytics =  (uaCode != null || uaDomain != null); 
     }
 %>
 
@@ -115,7 +116,7 @@
 %>
         
     <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/google-analytics.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/custom_pu.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
