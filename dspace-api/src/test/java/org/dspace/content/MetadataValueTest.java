@@ -139,7 +139,7 @@ public class MetadataValueTest extends AbstractUnitTest
     {
         int objectType = Constants.BITSTREAM;
         mv.setObjectType(objectType);
-        assertThat("testSetItemId 0", mv.getObjectId(), equalTo(objectType));
+        assertThat("testSetItemId 0", mv.getObjectType(), equalTo(objectType));
         mv.setObjectType(Constants.ITEM); // Repair damage from this test.
     }
 
