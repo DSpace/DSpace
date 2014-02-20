@@ -931,7 +931,7 @@ public abstract class DSpaceObject
     {
         return DatabaseManager.queryTable(ourContext, "MetadataValue",
                 "SELECT * FROM MetadataValue WHERE object_type = ? AND object_id= ? ORDER BY metadata_field_id, place",
-                getType(), ourRow.getIntColumn("item_id"));
+                getType(), getID());
     }
 
     protected MetadataField getMetadataField(DCValue dcv)
