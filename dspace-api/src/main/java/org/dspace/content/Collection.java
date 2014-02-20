@@ -65,9 +65,6 @@ public class Collection extends DSpaceObject
     /** Our Handle */
     private String handle;
 
-    /** Flag set when data is modified, for events */
-    private boolean modified;
-
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 

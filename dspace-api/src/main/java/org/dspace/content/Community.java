@@ -54,9 +54,6 @@ public class Community extends DSpaceObject
     /** Handle, if any */
     private String handle;
 
-    /** Flag set when data is modified, for events */
-    private boolean modified;
-
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 

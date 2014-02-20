@@ -14,11 +14,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -441,7 +437,7 @@ public class Item extends DSpaceObject
 
     /**
      * Add Dublin Core metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use {@link #clearMetadata} to remove values. The ordering of values
      * passed in is maintained.
      *
      * @param element
@@ -465,7 +461,7 @@ public class Item extends DSpaceObject
 
     /**
      * Add a single Dublin Core metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
+     * values. Use {@link #clearMetadata} to remove values.
      *
      * @param element
      *            the Dublin Core element
@@ -487,9 +483,9 @@ public class Item extends DSpaceObject
     }
     
     /**
-     * Clear Dublin Core metadata values. As with <code>getDC</code> above,
+     * Clear Dublin Core metadata values. As with {@link #getDC},
      * passing in <code>null</code> only matches fields where the qualifier or
-     * language is actually <code>null</code>.<code>Item.ANY</code> will
+     * language is actually <code>null</code>.  <code>Item.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
      * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
      * remove all Dublin Core metadata associated with an item.
