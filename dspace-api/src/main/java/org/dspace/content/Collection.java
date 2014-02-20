@@ -65,9 +65,6 @@ public class Collection extends DSpaceObject
     /** Our Handle */
     private String handle;
 
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
-
     /**
      * Groups corresponding to workflow steps - NOTE these start from one, so
      * workflowGroups[0] corresponds to workflow_step_1.
@@ -139,7 +136,7 @@ public class Collection extends DSpaceObject
         context.cache(this, row.getIntColumn("collection_id"));
 
         modified = false;
-        modifiedMetadata = false;
+        metadataChanged = false;
         clearDetails();
     }
 
@@ -523,7 +520,7 @@ public class Collection extends DSpaceObject
             ourRow.setColumn(field, value.trim());
         }
 
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails(field);
     }
 

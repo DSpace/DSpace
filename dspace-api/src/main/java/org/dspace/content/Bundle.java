@@ -45,12 +45,6 @@ public class Bundle extends DSpaceObject
     /** The bitstreams in this bundle */
     private List<Bitstream> bitstreams;
 
-    /** Flag set when data is modified, for events */
-    private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
-
     /**
      * Construct a bundle object with the given table row
      * 
@@ -127,7 +121,7 @@ public class Bundle extends DSpaceObject
         context.cache(this, row.getIntColumn("bundle_id"));
 
         modified = false;
-        modifiedMetadata = false;
+        metadataChanged = false;
     }
 
     /**
@@ -231,7 +225,7 @@ public class Bundle extends DSpaceObject
     public void setName(String name)
     {
         ourRow.setColumn("name", name);
-        modifiedMetadata = true;
+        metadataChanged = true;
     }
 
     /**

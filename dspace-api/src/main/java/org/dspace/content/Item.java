@@ -1148,12 +1148,12 @@ public class Item extends DSpaceObject
         }
 
         // Redo metadata if it's changed
-        if (dublinCoreChanged)
+        if (metadataChanged)
         {
             updateMetadata();
         }
 
-        if (dublinCoreChanged || modified)
+        if (metadataChanged || modified)
         {
             // Set the last modified date
             ourRow.setColumn("last_modified", new Date());

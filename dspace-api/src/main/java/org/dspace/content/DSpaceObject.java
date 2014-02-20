@@ -52,10 +52,10 @@ public abstract class DSpaceObject
     private final MetadataCache dublinCore = new MetadataCache();
 
     /**
-     * True if the Dublin Core has changed since reading from the DB or the last
+     * True if the metadata have changed since reading from the DB or the last
      * update()
      */
-    protected boolean dublinCoreChanged;
+    protected boolean metadataChanged;
 
     protected transient MetadataField[] allMetadataFields = null;
 
@@ -75,7 +75,7 @@ public abstract class DSpaceObject
     {
         ourContext = context;
         ourRow = row;
-        dublinCoreChanged = false;
+        metadataChanged = false;
     }
 
     /**
@@ -243,11 +243,11 @@ public abstract class DSpaceObject
     {
         DatabaseManager.update(ourContext, ourRow);
 
-        if (dublinCoreChanged)
+        if (metadataChanged)
         {
             ourContext.addEvent(new Event(Event.MODIFY_METADATA, getType(), getID(), getDetails()));
             clearDetails();
-            dublinCoreChanged = false;
+            metadataChanged = false;
         }
 
         ourContext.addEvent(new Event(Event.MODIFY, getType(), getID(), null));
@@ -268,7 +268,7 @@ public abstract class DSpaceObject
         // element/qualifier
         Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
-        dublinCoreChanged = false;
+        metadataChanged = false;
 
         // Arrays to store the working information required
         int[]     placeNum = new int[getMetadata().size()];
@@ -422,7 +422,7 @@ public abstract class DSpaceObject
                     if (removeRow)
                     {
                         DatabaseManager.delete(ourContext, tr);
-                        dublinCoreChanged = true;
+                        metadataChanged = true;
                         modified = true;
                     }
                 }
@@ -452,7 +452,7 @@ public abstract class DSpaceObject
                 metadata.setAuthority(dcv.authority);
                 metadata.setConfidence(dcv.confidence);
                 metadata.create(ourContext);
-                dublinCoreChanged = true;
+                metadataChanged = true;
                 modified = true;
             }
         }
@@ -650,7 +650,7 @@ public abstract class DSpaceObject
 
         if (values.length > 0)
         {
-            dublinCoreChanged = true;
+            metadataChanged = true;
         }
     }
 
@@ -693,7 +693,7 @@ public abstract class DSpaceObject
 
         // Now swap the old list of values for the new, unremoved values
         setMetadata(values);
-        dublinCoreChanged = true;
+        metadataChanged = true;
     }
 
     /**
@@ -838,7 +838,7 @@ public abstract class DSpaceObject
     protected void setMetadata(List<DCValue> metadata)
     {
         dublinCore.set(metadata);
-        dublinCoreChanged = true;
+        metadataChanged = true;
     }
 
     /**

@@ -54,9 +54,6 @@ public class Community extends DSpaceObject
     /** Handle, if any */
     private String handle;
 
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
-
     /** The default group of administrators */
     private Group admins;
 
@@ -96,7 +93,7 @@ public class Community extends DSpaceObject
         context.cache(this, row.getIntColumn("community_id"));
 
         modified = false;
-        modifiedMetadata = false;
+        metadataChanged = false;
 
         admins = groupFromColumn("admin");
 
@@ -428,7 +425,7 @@ public class Community extends DSpaceObject
             ourRow.setColumn(field, value.trim());
         }
         
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails(field);
     }
 

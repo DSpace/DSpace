@@ -30,7 +30,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing bitstreams stored in the DSpace system.
  * <P>
  * When modifying the bitstream metadata, changes are not reflected in the
- * database until <code>update</code> is called. Note that you cannot alter
+ * database until {@link #update} is called. Note that you cannot alter
  * the contents of a bitstream; you need to create a new bitstream.
  * 
  * @author Robert Tansley
@@ -43,12 +43,6 @@ public class Bitstream extends DSpaceObject
 
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
-
-    /** Flag set when data is modified, for events */
-    private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Private constructor for creating a Bitstream object based on the contents
@@ -84,7 +78,7 @@ public class Bitstream extends DSpaceObject
         context.cache(this, row.getIntColumn("bitstream_id"));
 
         modified = false;
-        modifiedMetadata = false;
+        metadataChanged = false;
         clearDetails();
     }
 
@@ -281,7 +275,7 @@ public class Bitstream extends DSpaceObject
     public void setSequenceID(int sid)
     {
         ourRow.setColumn("sequence_id", sid);
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails("SequenceID");
     }
 
@@ -306,7 +300,7 @@ public class Bitstream extends DSpaceObject
     public void setName(String n)
     {
         ourRow.setColumn("name", n);
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails("Name");
     }
 
@@ -331,7 +325,7 @@ public class Bitstream extends DSpaceObject
     public void setSource(String n)
     {
         ourRow.setColumn("source", n);
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails("Source");
     }
 
@@ -355,7 +349,7 @@ public class Bitstream extends DSpaceObject
     public void setDescription(String n)
     {
         ourRow.setColumn("description", n);
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails("Description");
     }
 
@@ -403,7 +397,7 @@ public class Bitstream extends DSpaceObject
         // but we need to find the unknown format!
         setFormat(null);
         ourRow.setColumn("user_format_description", desc);
-        modifiedMetadata = true;
+        metadataChanged = true;
         addDetails("UserFormatDescription");
     }
 
