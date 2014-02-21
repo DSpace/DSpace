@@ -401,4 +401,26 @@ on names with last name first (comma delimited). -->
         </xsl:for-each>
     </xsl:template>
 
+    <xsl:template name="addPropagateButton">
+      <xsl:param name="packageDoi"/>
+      <xsl:param name="metadataFieldName"/>
+      <br/>
+      <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
+        <xsl:attribute name="value">
+          <xsl:text>Propagate</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="onClick">
+          <xsl:text>javascript:DryadPropagateMetadata('</xsl:text>
+          <!-- URL -->
+          <xsl:value-of select="concat($context-path,'/admin/item/propagate-metadata')"/>
+          <xsl:text>', '</xsl:text>
+          <!-- Metadata Field -->
+          <xsl:value-of select="$metadataFieldName"/>
+          <xsl:text>', '</xsl:text>
+          <!-- Package DOI -->
+          <xsl:value-of select="$packageDoi"/>
+          <xsl:text>');</xsl:text>
+        </xsl:attribute>
+      </input>
+    </xsl:template>
 </xsl:stylesheet>
