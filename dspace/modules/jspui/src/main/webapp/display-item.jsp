@@ -48,11 +48,27 @@
 
     String agree_to_view_bitstreams = null;
     String agree_cookie = null;
-    Collection owner = item.getOwningCollection();
-    if (owner != null) {
-         DSpaceObject obj = owner.getParentObject();  // assuming this is the owning community 
+    String timeout = null;
+    int agree_timeout = 15;   // DEFAULT agreement timeout: 15 minutes
+    String agree_javascript = "alert";
+    DSpaceObject obj = item.getOwningCollection();
+    while (obj != null) {
          agree_cookie = obj.getHandle();
          agree_to_view_bitstreams = ConfigurationManager.getProperty(agree_cookie + ".bitstream_view_agreement");
+
+         if (agree_to_view_bitstreams != null) {
+             timeout = ConfigurationManager.getProperty(agree_cookie + ".bitstream_view_timeout");
+             if (timeout != null) {
+                try {
+                    agree_timeout = Integer.parseInt(timeout);
+                } catch (NumberFormatException e) {
+                    // stick with default
+                }
+             }
+             agree_javascript = ConfigurationManager.getProperty(agree_cookie + ".bitstream_javascript");
+             break;
+         }
+         obj = obj.getParentObject(); 
     }
 
     Collection[] collections = (Collection[]) request.getAttribute("collections");
@@ -97,7 +113,7 @@ if (agree_to_view_bitstreams != null) {
 
 <script type="text/javascript" >
 window.onload = function() {
-  must_agree_to_view_bitstreams('<%= agree_cookie %>', '<%= agree_to_view_bitstreams %>');
+  <%= agree_javascript %>('<%= agree_cookie %>', <%= agree_timeout %>, '<%= agree_to_view_bitstreams %>');
 }
 </script>
 <% 

@@ -710,7 +710,7 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<table align=\"center\" class=\"miscTable\"><tr>");
+        out.print("<table align=\"center\" id='bitstreamLinkTable' class=\"miscTable\"><tr>");
         out.println("<td class=\"evenRowEvenCol\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
@@ -731,7 +731,7 @@ public class ItemTag extends TagSupport
             	}
             }
             
-            // if user already has uploaded at least one file
+            // if user already has not yet uploaded at least one file
         	if (!filesExist)
         	{
         		out.println("<p>"
@@ -788,7 +788,7 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table cellpadding=\"6\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table class='bitstreamLink' cellpadding=\"6\"><tr><th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
