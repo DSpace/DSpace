@@ -305,7 +305,7 @@ public class Context
             DatabaseManager.freeConnection(connection);
             connection = null;
             clearCache();
-            log.error("Context.complete()", new Exception());        }
+        }
     }
 
     /**
@@ -423,7 +423,6 @@ public class Context
                 if (!connection.isClosed())
                 {
                     DatabaseManager.freeConnection(connection);
-                    log.error("Context free db connection", new Exception());
                 }
             }
             catch (Exception ex)
