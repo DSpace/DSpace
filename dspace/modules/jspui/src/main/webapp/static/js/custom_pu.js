@@ -33,6 +33,114 @@ function setCookie(cname, cvalue, exmins, path) {
 	document.cookie = cname + "=" + cvalue + "; " + expires + "; path=" + path;
 }
 
+function getParam(name) {
+   var params = {};
+   var parts = (window.location.search || '').split(/[&?]/);
+   for (var i = 0; i < parts.length; ++i) {
+      var eq = parts[i].indexOf('=');
+      if (eq < 0) continue;
+      params[parts[i].substring(0, eq)]   = parts[i].substring(eq+1);
+   }
+   return params[name];
+}
+
+// ----------------------------------------------------------------------------
+// build custom page 'in front' of bitstream
+// ----------------------------------------------------------------------------
+function gotoUrl(cookie, timeout, url) {
+    setCookie(cookie, "yes", timeout, "/");
+    window.location = url;
+}
+
+function agree_to_view_in_bitstream_page(url, cookie, timeout, agreementText)
+{
+    var cookieValue = getCookie(cookie);
+    if (cookieValue === "yes") {
+        return true;
+    }
+
+    var win=window.open(location.href + "?bitstream=" + url, '_blank');
+    win.focus();
+}
+
+function must_agree_to_view_in_bitstream_pages(cookie, timeout, agreementText)
+{
+     var url =  getParam('bitstream');
+     if (url == undefined) {
+        var links = document.links;
+        if (links)
+        {
+           for (var i = 0; i < links.length; ++i)
+           {
+             if (links[i].href.indexOf("/bitstream") != -1) {
+               links[i].href =  window.location + "?bitstream=" + links[i].href;
+             }
+           }
+         }
+     } else {
+       var cookieValue = getCookie(cookie);
+       if (cookieValue === "yes") {
+           window.location = url; 
+           return;
+       }
+
+       // build agreemnt table
+       // with OK button that if clicked triggers restoreBitstreamLinks_table function
+       var agreement = new Element('tr').update('<td> ' + agreementText + '</td>');
+
+       var fctCall = 'gotoUrl("' + cookie + '",' + timeout + ',"' + url + '")'; 
+       var button = new Element('form').update('<input type="button" Value="I Agree" onClick=' + fctCall + " />"); 
+
+       agreeTable = "<table width='80%' class='pageContent' align='center'><tbody>" +
+                    "<tr><td>" + agreementText + "</td></tr>" +
+                    "<tr><td>" + button.innerHTML + "</td></tr>" +
+                    "</tbody></table>";
+
+        $$('.centralPane')[0].innerHTML = agreeTable;
+     }
+};
+
+// ----------------------------------------------------------------------------
+// if (cookie is not set or is not yes)
+//      hide bitstream links
+//      show agreement instead
+// restore when cookie has been set to yes
+// ----------------------------------------------------------------------------
+// ugly global for this page
+var theCookie;
+var theTimeout;
+
+function restoreBitstreamLinks_table()
+{
+     setCookie(theCookie, "yes", theTimeout, "/");
+     $('bitstreamLinkTable').show(); 
+     $$('.agreementTable')[0].remove();
+}
+
+
+function must_agree_to_view_bitstreams_modify_table(cookie, timeout, agreementText)
+{
+     if (getCookie(cookie) === "yes" )  {
+         return ;
+     }
+     theCookie = cookie;
+     theTimeout = timeout;
+
+     // build agreemnt table  
+     // with OK button that if clicked triggers restoreBitstreamLinks_table function
+     var agreement = new Element('tr').update('<td> ' + agreementText + '</td>');
+     var button = new Element('form').update('<input type="button" Value="I Agree" onClick="restoreBitstreamLinks_table()" />' );
+     agreeTable = "<table class='agreementTable miscTable' align='center'><tbody>" + 
+                    "<tr><td>" + agreementText + "</td></tr>" + 
+                    "<tr><td>" + button.innerHTML + "</td></tr>" + 
+                    "</tbody></table>"; 
+     
+     // insert before bistream link table 
+     $('bitstreamLinkTable').insert({ before : agreeTable }); 
+     // hide bitstream links
+     $('bitstreamLinkTable').hide(); 
+}
+
 
 // ----------------------------------------------------------------------------
 // popup when clicking a bitstream link
@@ -66,77 +174,6 @@ function must_agree_to_view_bitstreams_popup(cookie, timeout, agreementText)
         }
       }
 };
-
-
-
-// ----------------------------------------------------------------------------
-// if (cookie is not set or is not yes)
-//      hide bitstream links
-//      show agreement instead
-// restore when cookie has been set to yes
-// ----------------------------------------------------------------------------
-// ugly global for this page
-var theCookie;
-var theTimeout;
-
-function restoreBitstreamLinks_table()
-{
-     setCookie(theCookie, "yes", theTimeout, "/");
-     $('bitstreamLinkTable').show(); 
-     $('agreement').hide(); 
-}
-
-
-function must_agree_to_view_bitstreams_modify_table(cookie, timeout, agreementText)
-{
-     if (getCookie(cookie) === "yes" )  {
-         return ;
-     }
-     theCookie = cookie;
-     theTimeout = timeout;
-
-     // build agreemnt table  
-     // with OK button that if clicked triggers restoreBitstreamLinks_table function
-     var agreement = new Element('tr').update('<td> ' + agreementText + '</td>');
-     var button = new Element('form').update('<input type="button" Value="I Agree" onClick="restoreBitstreamLinks_table()" />' );
-     agreeTable = "<table class='agreement miscTable' align='center'><tbody>" + 
-                    "<tr><td>" + agreementText + "</td></tr>" + 
-                    "<tr><td>" + button.innerHTML + "</td></tr>" + 
-                    "</tbody></table>"; 
-     
-     // insert before bistream link table 
-     $('bitstreamLinkTable').insert({ before : agreeTable }); 
-     // hide bitstream links
-     $('bitstreamLinkTable').hide(); 
-
-
-}
-
-function must_agree_to_view_bitstreams_modify_table_v0(cookie, timeout, agreementText)
-{
-     if (getCookie(cookie) === "yes" )  {
-         return ;
-     }
-     theCookie = cookie;
-     theTimeout = timeout;
-
-     // hide bitstream links
-     // insert agreeement  --> with OK button that if clicked triggers restoreBitstreamLinks_table function
-     //
-     var tableBody = $('bitstreamLinkTable').childElements()[0];
-     // hide al existing table rows
-     //tableBody.childElements().each(Element.hide);
-     $$('.bitstreamLink').each(Element.hide);
-
-     var agreement = new Element('tr').addClassName('agreement').update('<td> ' + agreementText + '</td>');
-     var button = new Element('form').update('<input type="button" Value="I Agree" onClick="restoreBitstreamLinks_table()" />' );
-     button = new Element('td').update(button);
-     button = new Element('tr').update(button);
-     button.addClassName('agreement');
-     tableBody.insert( {
-          top:  agreement
-     }).insert(button);;
-}
 
 
 
