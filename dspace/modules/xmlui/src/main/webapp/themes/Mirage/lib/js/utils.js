@@ -639,7 +639,28 @@ function getUploadFileSize(fileInputElement) {
 //}
 /////// END TESTING PROGRESS BAR /////////////////
 
+function DryadPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
+  var link = serverUrl + '?metadataFieldName=' + metadataFieldName + '&packageDoi=' + packageDoi;
 
-
+  var width = 680;
+  var height = 480;
+  var left;
+  var top;
+  var cOffset = 0;
+  if (window.screenX == null) {
+      left = window.screenLeft + cOffset.left - (width / 2);
+      top = window.screenTop + cOffset.top - (height / 2);
+  } else {
+      left = window.screenX + cOffset.left - (width / 2);
+      top = window.screenY + cOffset.top - (height / 2);
+  }
+  if (left < 0) left = 0;
+  if (top < 0) top = 0;
+  var pw = window.open(link, 'ignoreme',
+          'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top +
+                  ',toolbar=no,menubar=no,location=no,status=no,resizable');
+  if (window.focus) pw.focus();
+  return false;
+}
 
 
