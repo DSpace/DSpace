@@ -136,6 +136,7 @@ This file has been altered to support the embargo functionality
     	<map:actions>
     		<map:action name="ControlPanelAction" src="org.dspace.app.xmlui.aspect.administrative.ControlPanelAction" />
     		<map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
+    		<map:action name="PropagateItemMetadataAction" src="org.dspace.app.xmlui.aspect.administrative.PropagateItemMetadataAction" />
     	</map:actions>
 
 		<map:selectors>
@@ -979,6 +980,7 @@ This file has been altered to support the embargo functionality
 
             <!-- Propagate metadata from packages to files -->
             <map:match pattern="admin/item/propagate-metadata">
+              <map:act type="PropagateItemMetadataAction"/>
               <map:transform type="PropagateItemMetadataForm">
                 <map:parameter name="metadataFieldName" value="{request-param:metadataFieldName}"/>
                 <map:parameter name="packageDoi" value="{request-param:packageDoi}"/>

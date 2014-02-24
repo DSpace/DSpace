@@ -161,8 +161,11 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             CheckBox checkbox = cell.addCheckBox("select_" + dataFile.getID());
             checkbox.setLabel("Propagate");
             checkbox.addOption(dataFile.getID());
+            checkbox.setOptionSelected(dataFile.getID());
         }
         main.addHidden("package_item_id").setValue(dataPackage.getID());
+        main.addHidden("packageDoi").setValue(packageDoi);
+        main.addHidden("metadataFieldName").setValue(metadataFieldName);
         Para actions = main.addPara();
         actions.addButton("submit_update").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
