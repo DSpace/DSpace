@@ -216,6 +216,13 @@ public final class BitstreamInfo extends CheckerInfo
     }
 
     /**
+     * checksum algorithm setter
+     */
+    public void setChecksumAlgorithm(String algo) {
+        dspaceBitstream.setChecksumAlgorithm(algo);
+    }
+
+    /**
      * Get the checksum.
      * 
      * @return String
@@ -260,12 +267,20 @@ public final class BitstreamInfo extends CheckerInfo
 
     /**
      * bitstreamFound accessor.
-     * 
+     *
      * @return Returns bitstreamFound.
      */
     public boolean getBitstreamFound()
     {
         return this.bitstreamFound;
+    }
+
+    /**
+     * bitstreamFound setter.
+     */
+    public void setBitstreamFound(boolean found)
+    {
+        this.bitstreamFound = found;
     }
 
    /**
