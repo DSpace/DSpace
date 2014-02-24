@@ -2,6 +2,7 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -9,11 +10,13 @@ import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
@@ -29,6 +32,7 @@ import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -101,7 +105,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         // what metadata field?
         // get the metadata values for the file, including the file name
 
-        Division main = body.addInteractiveDivision("propagate", contextPath + "/admin/propagate-metadata", Division.METHOD_POST, "primary administrative item");
+        Division main = body.addInteractiveDivision("propagate", contextPath + "/admin/item/propagate-metadata", Division.METHOD_POST, "primary administrative item");
         main.setHead(T_title);
         int numberOfDataFiles = dataFiles.length;
         int numberOfRows = numberOfDataFiles + 1;
@@ -160,6 +164,17 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         actions.addButton("submit_update").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
 }
+
+    public void addPageMeta(PageMeta pageMeta) throws SAXException,
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
+    {
+        // Set the page title
+        pageMeta.addMetadata("title").addContent(T_title);
+
+        // This invokes magic popup transformation in XSL - "framing.popup"
+        pageMeta.addMetadata("framing","popup").addContent("true");
+    }
 
     private void loadMetadataField(String metadataFieldName) {
         if (metadataFieldName == null) {
