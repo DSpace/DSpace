@@ -432,7 +432,7 @@ else if( qResults != null)
     
     // create the URLs accessing the previous and next search result pages
     String baseURL =  request.getContextPath()
-                    + searchScope
+                    + (searchScope != "" ? "/handle/" + searchScope : "")
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
                     + httpFilters

@@ -425,7 +425,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Last add the current filter query
             url += "&filtertype=" + facetField;
             url += "&filter_relational_operator="+value.getFilterType();
-            url += "&filter=" + URLEncoder.encode(displayedValue, "UTF-8");
+            url += "&filter=" + URLEncoder.encode(value.getAsFilterQuery(), "UTF-8");
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );
         }
