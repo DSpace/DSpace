@@ -249,11 +249,15 @@ public class I18nUtil
      */
     public static String getMessage(String key) throws MissingResourceException
     {
-        
-        String message = getMessage(key.trim(), DEFAULTLOCALE);
-      
-        return message;
+        try {
+            String message = getMessage(key.trim(), DEFAULTLOCALE);
+            return message;
+        } catch (java.util.MissingResourceException e) {
+            log.error("Missing Setting for key: " + key);
+            return key;
+        }
     }
+
     
     /**
      * Get the i18n message string for a given key and locale
