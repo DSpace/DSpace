@@ -403,7 +403,6 @@ public class HandleServlet extends DSpaceServlet
             }
         }
 
-        try {
         // Fire usage event.
         new DSpace().getEventService().fireEvent(
             		new UsageEvent(
@@ -411,9 +410,7 @@ public class HandleServlet extends DSpaceServlet
             				request,
             				context,
             				item));
-        } catch (Exception e) {
-            log.warn("could not record usage event", e);
-        }
+
         // Set attributes and display
         request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));
         request.setAttribute("display.all", Boolean.valueOf(displayAll));
