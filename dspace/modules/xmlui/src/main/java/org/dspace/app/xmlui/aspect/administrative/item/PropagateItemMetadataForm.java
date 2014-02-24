@@ -15,6 +15,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
@@ -157,9 +158,11 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
 
             // Select - checkbox
             cell = fileRow.addCell();
-            cell.addCheckBox("propagate_select");
+            CheckBox checkbox = cell.addCheckBox("select_" + dataFile.getID());
+            checkbox.setLabel("Propagate");
+            checkbox.addOption(dataFile.getID());
         }
-
+        main.addHidden("package_item_id").setValue(dataPackage.getID());
         Para actions = main.addPara();
         actions.addButton("submit_update").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
