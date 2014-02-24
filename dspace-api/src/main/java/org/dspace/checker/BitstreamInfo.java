@@ -18,22 +18,15 @@ import java.util.Date;
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
+ *
  */
-public final class BitstreamInfo
+public final class BitstreamInfo extends CheckerInfo
 {
     /** deleted flag. */
     private boolean deleted;
 
     /** dspace bitstream information */
     private DSpaceBitstreamInfo dspaceBitstream;
-
-    /**
-     * Indicates the bitstream info (metadata) was found in the database.
-     * 
-     * @todo Is this actually used for anything?
-     */
-    private boolean infoFound;
 
     /** indicates the bitstream was found in the database. */
     private boolean bitstreamFound;
@@ -54,13 +47,6 @@ public final class BitstreamInfo
     private Date processEndDate;
 
     /**
-     * Blanked off no-op default constructor.
-     */
-    private BitstreamInfo()
-    {
-    }
-
-    /**
      * Minimal constructor.
      * 
      * @param bid
@@ -68,13 +54,10 @@ public final class BitstreamInfo
      */
     public BitstreamInfo(int bid)
     {
+        super(bid);
         deleted = false;
 
         dspaceBitstream = new DSpaceBitstreamInfo(bid);
-
-        // set default to true since it's the
-        // case for most bitstreams
-        infoFound = true;
         bitstreamFound = false;
         calculatedChecksum = null;
         processEndDate = null;
@@ -119,6 +102,7 @@ public final class BitstreamInfo
             String chksumAlgorthm, String chksum, String nm, Date procEndDate,
             boolean toBeProc, Date procStartDate)
     {
+        super(bitstrmId);
         dspaceBitstream = new DSpaceBitstreamInfo(del, storeNo, sz, bitstrmFmt,
                 bitstrmId, usrFmtDesc, intrnlId, src, chksumAlgorthm, chksum,
                 nm, "");
@@ -127,7 +111,6 @@ public final class BitstreamInfo
         this.processEndDate = (processEndDate == null ? null : new Date(procEndDate.getTime()));
         this.toBeProcessed = toBeProc;
         this.processStartDate = (processStartDate == null ? null : new Date(procStartDate.getTime()));
-        this.infoFound = true;
     }
 
     /**
@@ -162,17 +145,6 @@ public final class BitstreamInfo
     }
 
     /**
-     * Set the store number.
-     * 
-     * @param storeNumber
-     *            the store number
-     */
-    public void setStoreNumber(int storeNumber)
-    {
-        dspaceBitstream.setStoreNumber(storeNumber);
-    }
-
-    /**
      * Get the size.
      * 
      * @return int
@@ -180,17 +152,6 @@ public final class BitstreamInfo
     public long getSize()
     {
         return dspaceBitstream.getSize();
-    }
-
-    /**
-     * Set the size.
-     * 
-     * @param size
-     *            the bitstream size
-     */
-    public void setSize(int size)
-    {
-        dspaceBitstream.setSize(size);
     }
 
     /**
@@ -203,16 +164,6 @@ public final class BitstreamInfo
         return dspaceBitstream.getBitstreamFormatId();
     }
 
-    /**
-     * Set the Bitstream Format id.
-     * 
-     * @param bitstrmFmt
-     *            id of the bitstream format
-     */
-    public void setBitstreamFormatId(String bitstrmFmt)
-    {
-        dspaceBitstream.setBitstreamFormatId(bitstrmFmt);
-    }
 
     /**
      * Get the Bitstream id.
@@ -235,17 +186,6 @@ public final class BitstreamInfo
     }
 
     /**
-     * Set the user format description.
-     * 
-     * @param userFormatDescription
-     *            the userFormatDescription
-     */
-    public void setUserFormatDescription(String userFormatDescription)
-    {
-        dspaceBitstream.setUserFormatDescription(userFormatDescription);
-    }
-
-    /**
      * Get the Internal Id.
      * 
      * @return String
@@ -253,17 +193,6 @@ public final class BitstreamInfo
     public String getInternalId()
     {
         return dspaceBitstream.getInternalId();
-    }
-
-    /**
-     * Set the Internal Id.
-     * 
-     * @param internalId
-     *            the DSpace internal sequence id for the bitstream.
-     */
-    public void setInternalId(String internalId)
-    {
-        dspaceBitstream.setInternalId(internalId);
     }
 
     /**
@@ -277,17 +206,6 @@ public final class BitstreamInfo
     }
 
     /**
-     * Set the source.
-     * 
-     * @param source
-     *            The bitstream source.
-     */
-    public void setSource(String source)
-    {
-        dspaceBitstream.setSource(source);
-    }
-
-    /**
      * Get the checksum algorithm.
      * 
      * @return String
@@ -298,14 +216,10 @@ public final class BitstreamInfo
     }
 
     /**
-     * Set the checksum algorithm.
-     * 
-     * @param checksumAlgorithm
-     *            the algorithm used for checking this bitstream
+     * checksum algorithm setter
      */
-    public void setChecksumAlgorithm(String checksumAlgorithm)
-    {
-        dspaceBitstream.setChecksumAlgorithm(checksumAlgorithm);
+    public void setChecksumAlgorithm(String algo) {
+        dspaceBitstream.setChecksumAlgorithm(algo);
     }
 
     /**
@@ -319,17 +233,6 @@ public final class BitstreamInfo
     }
 
     /**
-     * Set the checksum.
-     * 
-     * @param checksum
-     *            The last stored checksum for this bitstream.
-     */
-    public void setStoredChecksum(String checksum)
-    {
-        dspaceBitstream.setStoredChecksum(checksum);
-    }
-
-    /**
      * Get the name of the bitstream.
      * 
      * @return String
@@ -339,16 +242,6 @@ public final class BitstreamInfo
         return dspaceBitstream.getName();
     }
 
-    /**
-     * Set the name of the bitstream.
-     * 
-     * @param nm
-     *            The name of this bitstream.
-     */
-    public void setName(String nm)
-    {
-        dspaceBitstream.setName(nm);
-    }
 
     /**
      * calculatedChecksum accessor.
@@ -371,30 +264,10 @@ public final class BitstreamInfo
         this.calculatedChecksum = calculatedChecksum;
     }
 
-    /**
-     * infoFound accessor.
-     * 
-     * @return Returns infoFound.
-     */
-    public boolean getInfoFound()
-    {
-        return this.infoFound;
-    }
-
-    /**
-     * infoFound accessor.
-     * 
-     * @param found
-     *            sets infoFound.
-     */
-    public void setInfoFound(boolean found)
-    {
-        this.infoFound = found;
-    }
 
     /**
      * bitstreamFound accessor.
-     * 
+     *
      * @return Returns bitstreamFound.
      */
     public boolean getBitstreamFound()
@@ -403,17 +276,14 @@ public final class BitstreamInfo
     }
 
     /**
-     * sets bitstreamFound.
-     * 
-     * @param found
-     *            value of bitstreamFound to set.
+     * bitstreamFound setter.
      */
     public void setBitstreamFound(boolean found)
     {
         this.bitstreamFound = found;
     }
 
-    /**
+   /**
      * Identity entirely dependent upon <code>bitstreamId</code>.
      * 
      * @see java.lang.Object#equals(java.lang.Object)
@@ -452,8 +322,7 @@ public final class BitstreamInfo
      */
     public String toString()
     {
-        return new StringBuffer("ChecksumInformation for id ").append(
-                getBitstreamId()).toString();
+        return "ChecksumInformation for id "+ String.valueOf(getBitstreamId());
     }
 
     /**
