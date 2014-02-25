@@ -151,7 +151,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
 
             // Select - checkbox
             cell = fileRow.addCell();
-            CheckBox checkbox = cell.addCheckBox("dataFiles[]");
+            CheckBox checkbox = cell.addCheckBox("data_file_ids[]");
             checkbox.setLabel("Propagate");
             checkbox.addOption(dataFile.getID());
             checkbox.setOptionSelected(dataFile.getID());
