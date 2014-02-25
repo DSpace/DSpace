@@ -320,7 +320,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact Us</message>
     <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview" target="_blank">membership</a>, <a href="/pages/journalIntegration" target="_blank">submission integration</a>, <a href="/pages/pricing" target="_blank">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">To submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">For urgent requests, or to submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
