@@ -191,6 +191,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             case 2:
                 this.metadataSchema = fields[0];
                 this.metadataElement = fields[1];
+                this.metadataQualifier = null;
                 break;
             case 3:
                 this.metadataSchema = fields[0];
@@ -239,4 +240,15 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         }
 
     }
+
+    @Override
+    public void recycle() {
+        this.metadataElement = null;
+        this.metadataQualifier = null;
+        this.metadataSchema = null;
+        this.dataPackage = null;
+        this.dataFiles = new Item[] {};
+        super.recycle();
+    }
+
 }
