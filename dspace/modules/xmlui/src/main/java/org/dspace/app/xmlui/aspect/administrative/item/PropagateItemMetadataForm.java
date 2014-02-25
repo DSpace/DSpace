@@ -4,9 +4,8 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import org.apache.avalon.framework.parameters.ParameterException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -23,11 +22,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.core.Context;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
@@ -79,23 +74,21 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
          */
 
         // Get the metadata field we're editing
-        String metadataFieldName = null;
-        try {
-            metadataFieldName = parameters.getParameter("metadataFieldName");
-        } catch (ParameterException ex) {
-            log.error("Metadata Field Name not found in parameters", ex);
-            body.addDivision("error").setHead("Error - metadata field ID not found in parameters");
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String metadataFieldName = request.getParameter("metadataFieldName");
+        if(metadataFieldName == null) {
+            log.error("Metadata Field Name not found in parameters");
+            body.addDivision("error").setHead("Error - Metadata field name not found in parameters");
             return;
         }
+
         loadMetadataField(metadataFieldName);
 
         // Get the metadata for the package item.
-        String packageDoi = null;
-        String fileDois[] = null;
-        try {
-            packageDoi = parameters.getParameter("packageDoi");
-        } catch (ParameterException ex) {
-            log.error("Package DOI not found in parameters", ex);
+        String packageDoi = request.getParameter("packageDoi");
+        if(packageDoi == null) {
+            log.error("Package DOI not found in parameters");
             body.addDivision("error").setHead("Error - package DOI not found in parameters");
             return;
         }
@@ -171,6 +164,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         actions.addButton("submit_return").setValue(T_button_return);
 }
 
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -208,7 +202,6 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
                         fields.length + " after splitting " + metadataFieldName);
                 break;
         }
-        return;
     }
     
     private String formatMetadataField() {
@@ -232,7 +225,6 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         } catch (IdentifierNotResolvableException ex) {
             log.error("Identifier not resolvable for package with DOI: " + doi, ex);
         }
-        return;
     }
 
     private void loadDataFiles() {
