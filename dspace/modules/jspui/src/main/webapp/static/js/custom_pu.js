@@ -65,15 +65,21 @@ function agree_to_view_in_bitstream_page(url, cookie, timeout, agreementText)
 
 function must_agree_to_view_in_bitstream_pages(cookie, timeout, agreementText)
 {
-     var url =  getParam('bitstream');
-     if (url == undefined) {
+     var hdlcookie =  getParam('bitstream');
+     var url = getCookie(hdlcookie); 
+     if (url == undefined || url === "") {
         var links = document.links;
-        if (links)
+        if (links) 
         {
            for (var i = 0; i < links.length; ++i)
            {
              if (links[i].href.indexOf("/bitstream") != -1) {
-               links[i].href =  window.location + "?bitstream=" + links[i].href;
+               var parts = links[i].href.split('/') 
+               var hdl  = parts[parts.length -3]; 
+               var bitid = parts[parts.length -2]; 
+               hdlcookie  =  hdl + "/" + bitid; 
+               setCookie(hdlcookie, links[i].href, timeout, "/"); 
+               links[i].href =  window.location + "?bitstream=" +  hdlcookie; 
              }
            }
          }
@@ -175,44 +181,3 @@ function must_agree_to_view_bitstreams_popup(cookie, timeout, agreementText)
       }
 };
 
-
-
-
-
-
-// old versions --> unused
-function v0agree_to_view(cookie, bitstreamUrl, agreementText) {
-	var cookieValue = getCookie(cookie);
-	if (cookieValue === "yes") {
-		window.location.assign(bitstreamUrl);
-	} else {
-		var r = confirm("License Agreement: \n" + agreementText);
-		if (r == true) {
-			agree  = "yes";
-		} else {
-			agree  = "no";
-		}
-		setCookie(cookie, agree, 1, "/");
-		if (agree === "yes") {
-			window.location.assign(bitstreamUrl);  // do the download
-		}
-	}
-	return false;
-}
-
-
-function vxagree_to_view(cookie, bitstreamUrl, agreementText) {
-    var cookieValue = getCookie(cookie);
-    if (cookieValue === "yes") {
-        return true;
-    }
-
-    var r = confirm("License Agreement: \n" + agreementText);
-    if (r == true) {
-        agree  = "yes";
-    } else {
-        agree  = "no";
-    }
-    setCookie(cookie, agree, 1, "/");
-    return  (agree === "yes");
-}
