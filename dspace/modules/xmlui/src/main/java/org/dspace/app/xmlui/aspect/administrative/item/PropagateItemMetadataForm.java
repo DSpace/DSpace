@@ -4,6 +4,9 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
@@ -249,6 +252,13 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         }
         try {
             this.dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage);
+            // Sort by Item ID so that order does not change
+            Arrays.sort(this.dataFiles, new Comparator<Item>() {
+                @Override
+                public int compare(Item t, Item t1) {
+                    return t.getID() - t1.getID();
+                }
+            });
         } catch (SQLException ex) {
             log.error("Unable to get data files for package with ID: " + dataPackage.getID(), ex);
         }
