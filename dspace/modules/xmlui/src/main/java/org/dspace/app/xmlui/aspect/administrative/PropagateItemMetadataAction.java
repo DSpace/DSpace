@@ -33,7 +33,6 @@ public class PropagateItemMetadataAction extends AbstractAction {
 
     private Integer dataPackageId = NOT_FOUND;
     private String metadataField;
-    private Integer updatedFiles;
 
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
@@ -44,13 +43,10 @@ public class PropagateItemMetadataAction extends AbstractAction {
         if(isFormSubmission()) {
             handleFormSubmission();
         }
-        Map map = new HashMap();
-        map.put("updated_files", updatedFiles);
-        return map;
+        return null;
     }
 
     private void handleFormSubmission() throws Exception {
-        updatedFiles = 0;
         // get metadata field
         String raw_field = getMetadataField();
         if(raw_field == null) {
@@ -95,7 +91,6 @@ public class PropagateItemMetadataAction extends AbstractAction {
                 dataFile.addMetadata(value.schema, value.element, value.qualifier, value.language, value.value);
             }
             dataFile.update();
-            updatedFiles++;
         }
     }
 

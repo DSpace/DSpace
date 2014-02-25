@@ -103,6 +103,15 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
 
         Division main = body.addInteractiveDivision("propagate", contextPath + "/admin/item/propagate-metadata", Division.METHOD_POST, "primary administrative item");
         main.setHead(T_title);
+        // Show results if we updated anything
+        String[] parameterValues = request.getParameterValues("data_file_ids[]");
+        if(parameterValues != null && parameterValues.length > 0) {
+            int updatedFiles = parameterValues.length;
+            Division notice = main.addDivision("updated-files", "ds-notice-div notice success");
+            String plural = updatedFiles != 1 ? "s" : "";
+            notice.addPara("The update was successfully propagated to  " + updatedFiles + " file" + plural + ".");
+        }
+
         int numberOfDataFiles = dataFiles.length;
         int numberOfRows = numberOfDataFiles + 1;
         int numberOfColumns = 5; // [Name, File, Current, New, Select]
