@@ -57,7 +57,6 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
     private String metadataElement;
     private String metadataQualifier;
 
-    private int metadataValuePosition = 0;
     private Item dataPackage;
     private Item[] dataFiles = new Item[] {};
 
@@ -134,8 +133,9 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             // Current Value - from file
             cell = fileRow.addCell();
             DCValue[] fileValues = dataFile.getMetadata(this.metadataSchema, this.metadataElement, this.metadataQualifier, Item.ANY);
-            if(fileValues.length > metadataValuePosition) {
-                cell.addContent(fileValues[metadataValuePosition].value);
+            String[] fileStringValues = getStringValues(fileValues);
+            if(fileStringValues != null) {
+                cell.addContent(StringUtils.join(fileStringValues, ", "));
             } else {
                 cell.addContent(T_cell_no_value);
             }
@@ -143,8 +143,9 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             // New value - from package
             cell = fileRow.addCell();
             DCValue[] packageValues = dataFile.getMetadata(this.metadataSchema, this.metadataElement, this.metadataQualifier, Item.ANY);
-            if(packageValues.length > metadataValuePosition) {
-                cell.addContent(packageValues[metadataValuePosition].value);
+            String[] packageStringValues = getStringValues(packageValues);
+            if(packageStringValues != null) {
+                cell.addContent(StringUtils.join(packageStringValues, ", "));
             } else {
                 cell.addContent(T_cell_no_value);
             }
@@ -162,7 +163,20 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         Para actions = main.addPara();
         actions.addButton("submit_update").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
-}
+    }
+    
+    private String[] getStringValues(DCValue dcValues[]) {
+        if(dcValues.length > 0) {
+            String[] stringValues = new String[dcValues.length];
+            for(int i=0;i<dcValues.length;i++) {
+                stringValues[i] = dcValues[i].value;
+            }
+            return stringValues;
+        } else {
+            return null;
+        }
+    }
+
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
