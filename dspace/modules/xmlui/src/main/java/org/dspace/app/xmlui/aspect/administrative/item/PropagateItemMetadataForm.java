@@ -142,7 +142,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
 
             // New value - from package
             cell = fileRow.addCell();
-            DCValue[] packageValues = dataFile.getMetadata(this.metadataSchema, this.metadataElement, this.metadataQualifier, Item.ANY);
+            DCValue[] packageValues = dataPackage.getMetadata(this.metadataSchema, this.metadataElement, this.metadataQualifier, Item.ANY);
             String[] packageStringValues = getStringValues(packageValues);
             if(packageStringValues != null) {
                 cell.addContent(StringUtils.join(packageStringValues, ", "));
