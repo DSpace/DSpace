@@ -112,7 +112,7 @@ public class PropagateItemMetadataAction extends AbstractAction {
     }
 
     private String getMetadataField() {
-        String metadataFieldString = request.getParameter("metadataFieldName");
+        String metadataFieldString = request.getParameter("metadata_field_name");
         if(metadataFieldString == null) {
             return null;
         }
