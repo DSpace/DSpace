@@ -640,7 +640,7 @@ function getUploadFileSize(fileInputElement) {
 /////// END TESTING PROGRESS BAR /////////////////
 
 function DryadPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
-  var link = serverUrl + '?metadataFieldName=' + metadataFieldName + '&packageDoi=' + packageDoi;
+  var link = serverUrl + '?metadata_field_name=' + metadataFieldName + '&package_doi=' + packageDoi;
 
   var width = 680;
   var height = 480;

@@ -75,7 +75,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         // Get the metadata field we're editing
 
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String metadataFieldName = request.getParameter("metadataFieldName");
+        String metadataFieldName = request.getParameter("metadata_field_name");
         if(metadataFieldName == null) {
             log.error("Metadata Field Name not found in parameters");
             body.addDivision("error").setHead("Error - Metadata field name not found in parameters");
@@ -85,7 +85,7 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         loadMetadataField(metadataFieldName);
 
         // Get the metadata for the package item.
-        String packageDoi = request.getParameter("packageDoi");
+        String packageDoi = request.getParameter("package_doi");
         if(packageDoi == null) {
             log.error("Package DOI not found in parameters");
             body.addDivision("error").setHead("Error - package DOI not found in parameters");
@@ -158,8 +158,8 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             checkbox.setOptionSelected(dataFile.getID());
         }
         main.addHidden("package_item_id").setValue(dataPackage.getID());
-        main.addHidden("packageDoi").setValue(packageDoi);
-        main.addHidden("metadataFieldName").setValue(metadataFieldName);
+        main.addHidden("package_doi").setValue(packageDoi);
+        main.addHidden("metadata_field_name").setValue(metadataFieldName);
         Para actions = main.addPara();
         actions.addButton("submit_update").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
