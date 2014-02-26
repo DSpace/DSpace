@@ -57,13 +57,21 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.open(dbPath, Storage.DEFAULT_PAGE_POOL_SIZE);
 
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
-
-		if (myStorage.getRoot() == null) {
+                try {
+                    if (myStorage.getRoot() == null) {
 			LOG.debug("Database root not found -- creating one");
 			myStorage.setRoot(new DatabaseRoot());
-		}
+                    }
+                } catch (Exception e) {
+                    log.error("Unable to initialize DOI database", e);
+                } finally {
+                    if (myStorage.getRoot() == null) {
+                        myStorage.rollbackThreadTransaction();
+                    } else {
+                        myStorage.endThreadTransaction();
+                    }
+                }
 
-		myStorage.endThreadTransaction();
         DATABASE=this;
     }
 
