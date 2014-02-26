@@ -1286,4 +1286,16 @@ parameter that is being used (see variable defined above) -->
         </a>
     </xsl:template>
 
+    <!-- Add 'return' link to propagate-metadata form-->
+    <xsl:template match="dri:field[@id='aspect.administrative.item.PropagateItemMetadataForm.field.submit_return']" mode="normalField">
+        <a href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:DryadClosePropagate()</xsl:text>
+            </xsl:attribute>
+                <i18n:text>
+                    <xsl:value-of select="."/>
+                </i18n:text>
+        </a>
+    </xsl:template>
+
 </xsl:stylesheet>

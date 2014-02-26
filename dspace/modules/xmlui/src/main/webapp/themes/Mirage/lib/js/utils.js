@@ -663,4 +663,7 @@ function DryadPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
   return false;
 }
 
-
+function DryadClosePropagate() {
+  window.close();
+  return false;
+}
