@@ -16,6 +16,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
@@ -105,11 +106,13 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
         main.setHead(T_title);
         // Show results if we updated anything
         String[] parameterValues = request.getParameterValues("data_file_ids[]");
+        Boolean disableControls = false;
         if(parameterValues != null && parameterValues.length > 0) {
             int updatedFiles = parameterValues.length;
             Division notice = main.addDivision("updated-files", "ds-notice-div notice success");
             String plural = updatedFiles != 1 ? "s" : "";
             notice.addPara("The update was successfully propagated to  " + updatedFiles + " file" + plural + ".");
+            disableControls = true;
         }
 
         int numberOfDataFiles = dataFiles.length;
@@ -166,14 +169,16 @@ public class PropagateItemMetadataForm extends AbstractDSpaceTransformer{
             cell = fileRow.addCell();
             CheckBox checkbox = cell.addCheckBox("data_file_ids[]");
             checkbox.setLabel("Propagate");
-            checkbox.addOption(dataFile.getID());
-            checkbox.setOptionSelected(dataFile.getID());
+            if(disableControls == false) {
+                checkbox.addOption(dataFile.getID());
+                checkbox.setOptionSelected(dataFile.getID());
+            }
         }
         main.addHidden("package_item_id").setValue(dataPackage.getID());
         main.addHidden("package_doi").setValue(packageDoi);
         main.addHidden("metadata_field_name").setValue(metadataFieldName);
         Para actions = main.addPara();
-        actions.addButton("submit_update").setValue(T_button_update);
+        actions.addButton("submit_update", disableControls ? "disabled" : "").setValue(T_button_update);
         actions.addButton("submit_return").setValue(T_button_return);
     }
     
