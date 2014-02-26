@@ -91,7 +91,7 @@
     </div>
 </div>
 -->
-<div class="container row home-browse-panel">
+<div class="container-fluid row home-browse-panel">
     <div class="well">
         <div class="row">
 <%

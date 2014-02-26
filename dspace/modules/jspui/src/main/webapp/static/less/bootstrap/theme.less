@@ -6,7 +6,16 @@
 @import "variables.less";
 @import "mixins.less";
 
-
+//
+// Containers
+// --------------------------------------------------
+.container-fluid{
+    
+    @media (min-width: @screen-lg-min) {
+        max-width: 1170px;
+         .center-block();
+    }
+}
 
 //
 // Buttons
@@ -303,6 +312,11 @@
 //-----------------------------------------------------
 #icesi-info{
     padding-top: 12px;
+}
+
+.community-logo{
+    text-align:center;
+    .center-block();
 }
 
 .community-toggler{

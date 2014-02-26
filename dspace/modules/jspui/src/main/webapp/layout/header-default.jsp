@@ -161,7 +161,7 @@
     if (locbar)
     {
 %>
-<div class="container">
+<div class="container-fluid">
                 <dspace:include page="/layout/location-bar.jsp" />
 </div>                
 <%
@@ -170,7 +170,7 @@
 
 
         <%-- Page contents --%>
-<div class="container">
+<div class="container-fluid">
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
 		<div class="col-md-9">
