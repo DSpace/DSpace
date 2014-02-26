@@ -60,11 +60,10 @@ public class PropagateItemMetadataAction extends AbstractAction {
         }
         // get file id
         Integer[] dataFileIds = getDataFileIds();
-        if(dataFileIds == null) {
-            throw new Exception("Data file IDs not found");
+        if(dataFileIds != null) {
+            propagateMetadata(dataFileIds);
         }
 
-        propagateMetadata(dataFileIds);
     }
 
     private void propagateMetadata(Integer[] dataFileIds) throws SQLException, AuthorizeException {
