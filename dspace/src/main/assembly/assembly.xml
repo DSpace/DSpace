@@ -48,7 +48,6 @@
          <includes>
             <include>bin/**</include>
             <include>config/**</include>
-            <include>docs/**</include>
             <include>etc/**</include>
             <include>solr/**</include>
          </includes>
