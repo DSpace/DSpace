@@ -980,11 +980,15 @@ This file has been altered to support the embargo functionality
 
             <!-- Propagate metadata from packages to files -->
             <map:match pattern="admin/item/propagate-metadata">
-              <map:act type="PropagateItemMetadataAction"/>
-              <map:transform type="PropagateItemMetadataForm">
-                <map:parameter name="metadataFieldName" value="{request-param:metadataFieldName}"/>
-                <map:parameter name="packageDoi" value="{request-param:packageDoi}"/>
-              </map:transform>
+              <map:select type="AuthenticatedSelector">
+                <map:when test="eperson">
+                  <map:act type="PropagateItemMetadataAction"/>
+                  <map:transform type="PropagateItemMetadataForm"/>
+                </map:when>
+                <map:otherwise>
+                  <map:act type="StartAuthentication"/>
+                </map:otherwise>
+              </map:select>
             </map:match>
 
                   <map:match pattern="admin/**">
