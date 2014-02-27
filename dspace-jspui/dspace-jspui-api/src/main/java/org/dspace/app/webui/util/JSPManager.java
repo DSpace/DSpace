@@ -108,20 +108,21 @@ public class JSPManager
             HttpServletResponse response, AuthorizeException exception)
             throws ServletException, IOException
     {
-log.info("Called with AuthorizeException");
+        String ipAddress = "<>";
+        if (log.isDebugEnabled()) {
+            ipAddress = request.getHeader("Remote_Addr");
+            if (ipAddress == null) {
+                ipAddress = request.getHeader("HTTP_X_FORWARDED_FOR");
+
+                if (ipAddress == null) {
+                    ipAddress = request.getRemoteAddr();
+                }
+            }
+        }
+        log.info("Called with AuthorizeException by IP " + ipAddress );
         // FIXME: Need to work out which error message to display?
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         showJSP(request, response, "/error/authorize.jsp");
-    }
-
-    public static void showPUIPAuthorizeError(HttpServletRequest request,
-            HttpServletResponse response, PUIPAuthorizeException exception)
-            throws ServletException, IOException
-    {
-log.info("Called with PUAuthorizeException");
-        // FIXME: Need to work out which error message to display?
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        showJSP(request, response, "/error/puipauthorize.jsp");
     }
 
 

@@ -132,12 +132,7 @@ public class DSpaceServlet extends HttpServlet
 
             JSPManager.showInternalError(request, response);
         }
-// Mark Ratliff:  Special case for handling Princeton campus network authentication
-catch (PUIPAuthorizeException puipae)
-{
-log.info("YOU ARE NOT ON THE CAMPUS NETWORK!!!!!");
-JSPManager.showPUIPAuthorizeError(request, response, puipae);
-}
+
         catch (AuthorizeException ae)
         {
             /*

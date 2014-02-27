@@ -111,7 +111,9 @@ public class IPAuthentication implements AuthenticationMethod
     private void addMatchers(String groupName, String ipRanges)
     {
         String[] ranges = ipRanges.split("\\s*,\\s*");
-
+        if (log.isDebugEnabled()) {
+              log.debug(groupName +  "=" + ipRanges);
+        }
         for (String entry : ranges)
         {
             try
@@ -303,7 +305,8 @@ public class IPAuthentication implements AuthenticationMethod
             }
 
             log.debug(LogManager.getHeader(context, "authenticated",
-                    "special_groups=" + gsb.toString()));
+                    "special_groups=" + gsb.toString()) + " IP:" + ((addr == null) ? "null" : addr));
+
         }
 
         return results;

@@ -48,57 +48,18 @@
         </tr>
     </table>
     <p></p>
-    <table class="miscTable" align="center" width="70%">
-      <tr>
-        <td class="evenRowEvenCol">
-          <h2><fmt:message key="jsp.login.chooser.chooseyour"/></h2>
-          <ul>
-<%
-    Iterator ai = AuthenticationManager.authenticationMethodIterator();
-    AuthenticationMethod am;
-    Context context = null;
-    try
-    {
-    	context = UIUtil.obtainContext(request);
-    	int count = 0;
-    	String url = null;
-    	while (ai.hasNext())
-    	{
-        am = (AuthenticationMethod)ai.next();
-        if ((url = am.loginPageURL(context, request, response)) != null)
-        {
-%>
-            <li><p><strong><a href="<%= url %>">
-		<%-- This kludge is necessary because fmt:message won't
-                     evaluate its attributes, so we can't use it on java expr --%>
-                <%= javax.servlet.jsp.jstl.fmt.LocaleSupport.getLocalizedMessage(pageContext, am.loginPageTitle(context)) %>
-                        </a></strong></p></li>
-<%
-        }
-        }
-    }
-    catch(SQLException se)
-    {
-    	// Database error occurred.
-        Logger log = Logger.getLogger("org.dspace.jsp");
-        log.warn(LogManager.getHeader(context,
-                "database_error",
-                se.toString()), se);
+    <table border="0" width="90%">
+            <tr>
+                <td align="left">
+                    <a href="https://fed.princeton.edu/cas/login?service=http://dataspace.princeton.edu/mydspace">
+                        <H1> Princeton CAS Authentication</H1>
+                    </a>
+                </td>
 
-        // Also email an alert
-        UIUtil.sendAlert(request, se);
-        JSPManager.showInternalError(request, response);
-    }
-    finally 
-    {
-    	context.abort();
-    }
-  
-%>
-          </ul>
-        </td>
-      </tr>
+            </tr>
     </table>
+
+
 
 
 </dspace:layout>

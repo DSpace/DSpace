@@ -127,7 +127,9 @@ public class BitstreamServlet extends DSpaceServlet
         if (dso != null && dso.getType() == Constants.ITEM && sequenceID >= 0)
         {
             item = (Item) dso;
-        
+
+            // test for agreement
+
             if (item.isWithdrawn())
             {
                 log.info(LogManager.getHeader(context, "view_bitstream",
