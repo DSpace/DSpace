@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.webui.util.ViewAgreement;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -127,7 +128,16 @@ public class BitstreamServlet extends DSpaceServlet
         if (dso != null && dso.getType() == Constants.ITEM && sequenceID >= 0)
         {
             item = (Item) dso;
-        
+
+            // check whether we need to make user sign agreement before proceeding
+            if (ViewAgreement.mustAgree(request.getSession(), item)) {
+                log.info(LogManager.getHeader(context, "view_bitstream",
+                        "handle=" + handle + ",mustAgree=true"));
+                request.setAttribute("item", item);
+                JSPManager.showJSP(request, response, "/display-agreement.jsp");
+                return;
+            }
+
             if (item.isWithdrawn())
             {
                 log.info(LogManager.getHeader(context, "view_bitstream",
