@@ -32,10 +32,21 @@
 %>
 
 
-<dspace:layout titlekey="jsp.agreement.title">
+<dspace:layout titlekey="jsp.agreement.title"  navbar="off"  locbar="nolink">
 
     <h1><fmt:message key="jsp.agreement.title"/></h1>
 
     <p>  <%= agreementText %> </p>
+
+
+    <table>
+    <tr><td>
+        <form method="post">
+             <input type="submit" name="submit_agree" value="<fmt:message key="jsp.bitstream.agreement.yes"/>" />
+        </form>
+    </td> <td>
+        <a href="javascript:window.close()"><button type="button"><fmt:message key="jsp.bitstream.agreement.no"/></button></a>
+    </td> </tr>
+    </table>
 
 </dspace:layout>
