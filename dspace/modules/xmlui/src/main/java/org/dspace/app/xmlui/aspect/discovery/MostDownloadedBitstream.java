@@ -56,9 +56,8 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
     private static final Logger log = Logger.getLogger(SiteRecentSubmissions.class);
 
-    private static final String T_head_view_count = "xmlui.statistics.view.count";
-    private static final String T_head_view_title = "xmlui.statistics.download.title";
-    private static final String T_head_viewed_item = "xmlui.statistics.download.title";
+    private static final String T_head_download_count = "xmlui.statistics.download.count";
+    private static final String T_head_download_title = "xmlui.statistics.download.title";
     private static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
     /**
      * Display a single community (and refrence any sub communites or
@@ -79,7 +78,6 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
         Division home = body.addDivision("home", "primary repository");
         Division mostPopular =  home.addDivision("stats", "secondary stats");
 
-        mostPopular.setHead(message(T_head_view_title));
         Division items = mostPopular.addDivision("items");
         Division count = mostPopular.addDivision("count");
         ReferenceSet referenceSet = items.addReferenceSet(
@@ -89,9 +87,8 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
                 "most-viewed-count",
                 org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
 
-        items.setHead(message(T_head_view_title));
-
-        count.setHead(message(T_head_view_count));
+        items.setHead(message(T_head_download_title));
+        count.setHead(message(T_head_download_count));
 
 
         int numberOfItemsAdded=0;
