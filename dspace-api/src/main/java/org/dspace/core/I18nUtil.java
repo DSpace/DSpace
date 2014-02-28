@@ -401,9 +401,9 @@ public class I18nUtil
         }
         return localizedFileName;
     }
-    
 
-    
+
+
     /**
      * Get the appropriate localized version of an email template according to language settings
      *
@@ -423,6 +423,27 @@ public class I18nUtil
 
         templateName = getFilename(locale, templateFile, "");
         return templateName;
+    }
+
+    /**
+     * Get the appropriate localized version of an agreement file according to language settings
+     *
+     * @param locale
+     *        Locale for this request
+     * @param name
+     *        String - base name of the email template
+     * @return templateName
+     *         String - localized filename of an email template
+     */
+    public static String getAgreementFilename(Locale locale, String name)
+    {
+        String agreementFile = "";
+        String templateFile = ConfigurationManager.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + "agreements"
+                + File.separator + name;
+
+        agreementFile = getFilename(locale, templateFile, "");
+        return agreementFile;
     }
 
     /**

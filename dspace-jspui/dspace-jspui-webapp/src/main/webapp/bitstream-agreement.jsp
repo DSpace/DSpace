@@ -36,8 +36,8 @@
 
     <h1><fmt:message key="jsp.agreement.title"/></h1>
 
+<% if (agreementText != null) { %>
     <p>  <%= agreementText %> </p>
-
 
     <table>
     <tr><td>
@@ -49,4 +49,17 @@
     </td> </tr>
     </table>
 
+<% } else { %>
+
+       <%-- <h1> Agreement file not configured properly </h1> --%>
+       <h2><fmt:message key="jsp.bitstream.agreement.misconfigured"/></h2>
+
+       <%-- <p> The system has logged the issue  </p> --%>
+       <p><fmt:message key="jsp.bitstream.agreement.logged"/> 
+           : <%= (item != null) ? item.getHandle() : "null" %> </p>
+
+       <dspace:include page="/components/contact-info.jsp" />
+
+
+<% } %>
 </dspace:layout>

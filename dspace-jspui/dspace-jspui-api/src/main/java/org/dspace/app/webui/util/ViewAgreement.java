@@ -11,12 +11,15 @@
  */
 package org.dspace.app.webui.util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.I18nUtil;
 
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -40,13 +43,13 @@ public class ViewAgreement
         ViewAgreement viewAgreements = getViewAgreement(session);
         DSpaceObject obj = viewAgreements.getWantsAgreement(item);
         if (obj == null) {
-            log.debug(String.format("mustAgree item %s   obj = null -> false", item.getHandle()));
+            log.debug(String.format("item %s   obj = null -> mustAgree=false", item.getHandle()));
             return false;    // nothing in config found that says we need an agreement
         } else {
             ViewAgreementStatus status = viewAgreements.getAgreementStatus(obj);
             if (log.isDebugEnabled()) {
-                log.debug(String.format("mustAgree item %s  status %s   timedOut %s",
-                        item.getHandle(), status.toString(), String.valueOf(status.isTimedOut())));
+                log.debug(String.format("item %s  status %s   timedOut %s -> mustAgree=%s",
+                        item.getHandle(), status.toString(), String.valueOf(status.isTimedOut()), status.isTimedOut()));
             }
             return status.isTimedOut();
         }
@@ -63,15 +66,26 @@ public class ViewAgreement
     }
 
     public static String getText(HttpSession session, Item item) {
-        assert(item != null);
+        assert (item != null);
+        String theAgreementText = null;
+
         ViewAgreement viewAgreements = getViewAgreement(session);
         DSpaceObject obj = viewAgreements.getWantsAgreement(item);
         if (obj == null) {
-            log.error(String.format("getAgreementText called for item %s that has no agreement requirement",
-                    item.getHandle()));
-            return null;
+            log.error(String.format("getText called for item %s which has no agreement requirement", item.getHandle()));
+        } else {
+            String filename = viewAgreements.agreements.get(obj).agreementFile;
+            if (filename != null) {
+                String realFilename = I18nUtil.getAgreementFilename(Locale.getDefault(), filename);
+                try {
+                    FileInputStream fisTargetFile = new FileInputStream(new File(realFilename));
+                    theAgreementText = IOUtils.toString(fisTargetFile, "UTF-8");
+                } catch (IOException e) {
+                    log.error("could not read agreement file " + realFilename);
+                }
+            }
         }
-        return viewAgreements.agreements.get(obj).agreementText;
+        return theAgreementText;
     }
 
     private Map<DSpaceObject, ViewAgreementStatus> agreements;
@@ -96,12 +110,12 @@ public class ViewAgreement
         return status;
     }
 
-    private void setAgreementText(DSpaceObject obj, String agreementTxt) {
+    private void setAgreementText(DSpaceObject obj, String agreementFile) {
         ViewAgreementStatus status = agreements.get(obj);
         if (status == null) {
-            agreements.put(obj, new ViewAgreementStatus(obj, agreementTxt));
+            agreements.put(obj, new ViewAgreementStatus(obj, agreementFile));
         } else {
-            status.agreementText = agreementTxt;
+            status.agreementFile = agreementFile;
         }
     }
 
@@ -129,11 +143,11 @@ public class ViewAgreement
             obj = item.getOwningCollection();
             while (obj != null) {
                 String handle = obj.getHandle();
-                String handle_view_agreement = ConfigurationManager.getProperty(handle + ".bitstream_view_agreement");
-                if (handle_view_agreement != null) {
+                String handle_view_agreement_file = ConfigurationManager.getProperty(handle + ".bitstream_view_agreement_file");
+                if (handle_view_agreement_file != null) {
+                    this.setAgreementText(obj, handle_view_agreement_file);
                     String handle_view_timeout_str = ConfigurationManager.getProperty(handle + ".bitstream_view_timeout");
                     if (handle_view_timeout_str != null) {
-                        this.setAgreementText(obj, handle_view_agreement);
                         try {
                             this.setAgreementTimeout(obj, Integer.parseInt(handle_view_timeout_str));
                         } catch (NumberFormatException e) {
@@ -166,7 +180,7 @@ class ViewAgreementStatus {
 
     DSpaceObject obj;
     Date lastTimeAgreed;
-    String agreementText;
+    String agreementFile;
     int timeoutMilliSec;
 
     /**
@@ -174,9 +188,9 @@ class ViewAgreementStatus {
      */
     static final int DEFAULT_TIMEOUT = 20 * 60 * 1000;
 
-    ViewAgreementStatus(DSpaceObject obj, String agreementText) {
+    ViewAgreementStatus(DSpaceObject obj, String agreementFile) {
         this.obj = obj;
-        this.agreementText = agreementText;
+        this.agreementFile = agreementFile;
         this.lastTimeAgreed = null;
         this.timeoutMilliSec = DEFAULT_TIMEOUT ;
     }
@@ -206,6 +220,6 @@ class ViewAgreementStatus {
         return String.format("(obj %s, lastAgree %s, txt %36s)",
                 obj.getHandle(),
                 (lastTimeAgreed == null ? "never" : lastTimeAgreed),
-                agreementText);
+                agreementFile);
     }
 }
