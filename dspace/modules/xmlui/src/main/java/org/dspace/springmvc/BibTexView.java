@@ -44,11 +44,14 @@ public class BibTexView implements View {
 
         String doi = DOIIdentifierProvider.getDoiValue((Item) item);
         String fileName = doi.substring(doi.lastIndexOf('/') +1).replace('.', '_') + ".bib";
-        write(response, getBibTex((Item) item, doi), fileName);
-
-        OutputStream aOutputStream = response.getOutputStream();
-        aOutputStream.close();
-
+        String bibTex = getBibTex((Item) item, doi);
+        // Close the context before writing the response and closing the stream
+        Context context = (Context) request.getAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        if(context != null) {
+            context.abort();
+            request.removeAttribute(ResourceIdentifierController.DSPACE_CONTEXT);
+        }
+        write(response, bibTex, fileName);
     }
 
     private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException {

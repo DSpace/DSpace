@@ -522,7 +522,7 @@
 
     <!-- Internal DSpace Object ID -->
    <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
-
+   <field name="popularity" type="sint" indexed="true" stored="true" required="false" omitNorms="true" />
     <!-- Internal DSpaceObject Type ID -->
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
 

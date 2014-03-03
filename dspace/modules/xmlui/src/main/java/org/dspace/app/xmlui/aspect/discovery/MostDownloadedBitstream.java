@@ -53,11 +53,11 @@ import org.dspace.statistics.content.StatisticsListing;
  */
 public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
+
     private static final Logger log = Logger.getLogger(SiteRecentSubmissions.class);
 
-    private static final String T_head_view_count = "xmlui.statistics.view.count";
-    private static final String T_head_view_title = "xmlui.statistics.download.title";
-    private static final String T_head_viewed_item = "xmlui.statistics.download.title";
+    private static final String T_head_download_count = "xmlui.statistics.download.count";
+    private static final String T_head_download_title = "xmlui.statistics.download.title";
     private static String myDataPkgColl = ConfigurationManager.getProperty("stats.datapkgs.coll");
     /**
      * Display a single community (and refrence any sub communites or
@@ -66,24 +66,51 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException {
 
-        //Try to find our dspace object
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
-        try
-        {
-            if(dso != null)
-            {
-                renderViewer(body, dso);
-            }
-            else
-            {
-                renderHome(body);
-            }
-
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
+        try {
+            performSearch(null);
+        } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
+        }
+
+        boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
+        int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
+
+        Division home = body.addDivision("home", "primary repository");
+        Division mostPopular =  home.addDivision("stats", "secondary stats");
+
+        Division items = mostPopular.addDivision("items");
+        Division count = mostPopular.addDivision("count");
+        ReferenceSet referenceSet = items.addReferenceSet(
+                "most-viewed-items", ReferenceSet.TYPE_SUMMARY_LIST,
+                null, "most-viewed");
+        org.dspace.app.xmlui.wing.element.List list = count.addList(
+                "most-viewed-count",
+                org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
+
+        items.setHead(message(T_head_download_title));
+        count.setHead(message(T_head_download_count));
+
+
+        int numberOfItemsAdded=0;
+        if (queryResults != null)  {
+            String searchUrl="discover?sort_by=popularity&order=DESC&submit=Go";
+            mostPopular.addList("most_popular").addItemXref(searchUrl,"View more");
+            for (SolrDocument doc : queryResults.getResults()) {
+                DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
+                if(obj != null)
+                {
+                    // filter out Items that are not world-readable
+                    if (!includeRestrictedItems) {
+                        if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                            referenceSet.addReference(obj);
+                            list.addItem().addContent(doc.getFieldValue(SearchUtils.getConfig().getString("total.download.sort-option")).toString());
+                            numberOfItemsAdded++;
+                            if(numberOfItemsAdded==numberOfItemsToShow)
+                                return;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -91,7 +118,6 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
     {
         return "site";
     }
-    String solr=  ConfigurationManager.getBooleanProperty("solr.log.server")+"/select/?q=type%3A2&facet=on&rows=0&facet.limit=-1&facet.field=id" ;
 
     /**
      * facet.limit=11&wt=javabin&rows=5&sort=dateaccessioned+asc&facet=true&facet.mincount=1&q=search.resourcetype:2&version=1
@@ -110,9 +136,9 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
-        queryArgs.setRows(1000);
+        queryArgs.setRows(10);
 
-        String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
+        String sortField = SearchUtils.getConfig().getString("total.download.sort-option");
         if(sortField != null){
             queryArgs.setSortField(
                     sortField,
@@ -138,152 +164,8 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
         }
         return false;
     }
-    private void addDisplayListing(Division mainDiv, StatisticsListing display)
-            throws SAXException, WingException, SQLException,
-            SolrServerException, IOException, ParseException {
 
-        String title = display.getTitle();
-
-        Dataset dataset = display.getDataset();
-
-        if (dataset == null) {
-            /** activate dataset query */
-            dataset = display.getDataset(context);
-        }
-
-        if (dataset != null)
-        {
-            String[][] matrix = dataset.getMatrixFormatted();
-
-            java.util.List<String[]> values = retrieveResultList(title, dataset, matrix[0]);
-            if (title != null)
-            {
-                mainDiv.setHead(message(title));
-            }
-            Division items = mainDiv.addDivision("items");
-            Division count = mainDiv.addDivision("count");
-
-            ReferenceSet referenceSet = items.addReferenceSet(
-                    "most-viewed-items", ReferenceSet.TYPE_SUMMARY_LIST,
-                    null, "most-viewed");
-            org.dspace.app.xmlui.wing.element.List list = count.addList(
-                    "most-viewed-count",
-                    org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "most-viewed-count");
-
-            items.setHead(message(T_head_view_title));
-
-            count.setHead(message(T_head_view_count));
-
-            for (String[] temp : values){
-                DSpaceObject dso = Item.find(context,Constants.ITEM,Integer.parseInt(temp[0]));
-                referenceSet.addReference(dso);
-                list.addItem().addContent(temp[1]);
-
-            }
-            if(!this.sitemapURI.contains("most_viewed_items")){
-                mainDiv.addList("link-to-button").addItemXref("/most_viewed_items","View More");
-            }
-
-        }
-    }
-    public void renderHome(Body body) throws WingException {
-
-        Division home = body.addDivision("home", "primary repository");
-        Division division = home.addDivision("stats", "secondary stats");
-        // division.setHead(T_head_title);
-
-        try {
-            /** List of the top 10 items for the entire repository **/
-            StatisticsListing statListing = new StatisticsListing(
-                    new StatisticsDataVisits());
-
-            statListing.setTitle(T_head_viewed_item);
-            statListing.setId("list1");
-
-            DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-            dsoAxis.addDsoChild(Constants.BITSTREAM, -1, false, -1);
-
-
-            statListing.addDatasetGenerator(dsoAxis);
-
-            //Render the list as a table
-            addDisplayListing(division, statListing);
-
-        } catch (Exception e) {
-            log.error("Error occurred while creating statistics for home page", e);
-        }
-
-    }
-    public void renderViewer(Body body, DSpaceObject dso) throws WingException {
-
-
-    }
-    private java.util.List<String[]> retrieveResultList(String title, Dataset dataset, String[] strings) throws SQLException {
-
-        java.util.List<String[]> values = new ArrayList<String[]>();
-        java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
-        int i=0;
-        Map<Integer,Integer> downloadCount = new HashMap<Integer,Integer>();
-        for (Map<String, String> map : urls)
-        {
-            String itemId= map.get("item");
-            if(itemId!=null){
-                DSpaceObject dso = Item.find(context,Constants.ITEM,Integer.parseInt(itemId));
-
-                int totalDownload = 0;
-                if(dso instanceof Item)
-                {
-                    Item item = (Item)dso;
-                    Item dataPackage = item;
-                    if(item.getOwningCollection()!=null){
-                        if (!item.getOwningCollection().getHandle().equals(myDataPkgColl)) {
-                            dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-                        }
-                        if(dataPackage!=null){
-
-                            DCValue[] vals = dataPackage.getMetadata("dc", "title", null, Item.ANY);
-
-                            if(vals != null && 0 < vals.length)
-                            {
-                                if(downloadCount.get(dataPackage.getID())!=null){
-                                    totalDownload=Integer.parseInt(strings[i])+downloadCount.get(dataPackage.getID()).intValue();
-                                }
-                                else
-                                {
-                                    totalDownload=Integer.parseInt(strings[i]);
-                                }
-                                downloadCount.put(dataPackage.getID(),totalDownload);
-
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    String bitstreamId = map.get("bitstream");
-                }
-            }
-            i++;
-        }
-        ArrayList<Integer> arrayList = new ArrayList<Integer>();
-        for(Integer id : downloadCount.keySet()){
-            arrayList.add(downloadCount.get(id));
-        }
-
-        Collections.sort(arrayList);
-        int topItemCount=0;
-        if(downloadCount.size()>2){
-            topItemCount = arrayList.get(2);
-        }
-
-        for(Integer id : downloadCount.keySet()){
-            if(downloadCount.get(id)>=topItemCount){
-                String[] temp=new String[2];
-                temp[0]=Integer.toString(id);
-                temp[1]=downloadCount.get(id).toString();
-                values.add(temp);
-            }
-        }
-        return values;
-    }
 }
+
+
+
