@@ -698,6 +698,10 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
 
+        <war destfile="${dspace.dir}/webapps/rdf.war">
+            <fileset dir="${dspace.dir}/webapps/rdf/"/>
+        </war>
+
         <war destfile="${dspace.dir}/webapps/rest.war">
             <fileset dir="${dspace.dir}/webapps/rest/"/>
         </war>
@@ -727,6 +731,8 @@ Common usage:
         <mkdir dir="${dspace.dir}/etc" />
 
         <mkdir dir="${dspace.dir}/webapps" />
+
+        <mkdir dir="${dspace.dir}/triplestore" />
 
         <mkdir dir="${org.dspace.app.itemexport.work.dir}" />
 

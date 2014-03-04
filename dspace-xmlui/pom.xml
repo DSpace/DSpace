@@ -101,6 +101,12 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rdf</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
+        </dependency>
 
         <!-- Custom build DSpace cocoon -->
         <dependency>
