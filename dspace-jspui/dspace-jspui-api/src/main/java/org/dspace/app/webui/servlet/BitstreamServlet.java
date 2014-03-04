@@ -66,76 +66,82 @@ public class BitstreamServlet extends DSpaceServlet
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         ReferredObjects ref = new ReferredObjects(context, request);
 
-        if (ref.item.isWithdrawn()) {
-            log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",withdrawn=true"));
-            JSPManager.showJSP(request, response, "/tombstone.jsp");
-            return;
-        }
+        InputStream is = null;
 
-        if (ref.bitstream == null || ref.filename == null || !ref.filename.equals(ref.bitstream.getName())) {
-            // No bitstream found or filename was wrong -- ID invalid
-            log.info(LogManager.getHeader(context, "invalid_id", "path=" + ref.idString));
-            JSPManager.showInvalidIDError(request, response, ref.idString, Constants.BITSTREAM);
-
-            return;
-        }
-
-        // throws exception if not authorized to access
-        InputStream is = ref.bitstream.retrieve();
-
-        // now that we know that user has authorization to access bitstream
-        // check whether we need to make user sign agreement before proceeding
-        if (ViewAgreement.mustAgree(request.getSession(), ref.item)) {
-            log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",mustAgree=true"));
-            request.setAttribute("item", ref.item);
-            JSPManager.showJSP(request, response, "/bitstream-agreement.jsp");
-            return;
-        }
-
-
-        log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + ref.bitstream.getID()));
-
-        //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
-        //		Constants.BITSTREAM, bitstream.getID());
-
-        new DSpace().getEventService().fireEvent(new UsageEvent(UsageEvent.Action.VIEW, request, context, ref.bitstream));
-
-
-        // Now put response together
-        // Modification date
-        // Only use last-modified if this is an anonymous access
-        // - caching content that may be generated under authorisation
-        //   is a security problem
-        if (context.getCurrentUser() == null) {
-            // TODO: Currently the date of the item, since we don't have dates
-            // for files
-            response.setDateHeader("Last-Modified", ref.item.getLastModified().getTime());
-
-            // Check for if-modified-since header
-            long modSince = request.getDateHeader("If-Modified-Since");
-
-            if (modSince != -1 && ref.item.getLastModified().getTime() < modSince) {
-                // Item has not been modified since requested date,
-                // hence bitstream has not; return 304
-                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        try {
+            if (ref.item.isWithdrawn()) {
+                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",withdrawn=true"));
+                JSPManager.showJSP(request, response, "/tombstone.jsp");
                 return;
             }
+
+            if (ref.bitstream == null || ref.filename == null || !ref.filename.equals(ref.bitstream.getName())) {
+                // No bitstream found or filename was wrong -- ID invalid
+                log.info(LogManager.getHeader(context, "invalid_id", "path=" + ref.idString));
+                JSPManager.showInvalidIDError(request, response, ref.idString, Constants.BITSTREAM);
+
+                return;
+            }
+
+            // throws exception if not authorized to access
+            is = ref.bitstream.retrieve();
+
+            // now that we know that user has authorization to access bitstream
+            // check whether we need to make user sign agreement before proceeding
+            if (ViewAgreement.mustAgree(request.getSession(), ref.item)) {
+                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",mustAgree=true"));
+                request.setAttribute("item", ref.item);
+                JSPManager.showJSP(request, response, "/bitstream-agreement.jsp");
+                return;
+            }
+
+
+            log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + ref.bitstream.getID()));
+
+            //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
+            //		Constants.BITSTREAM, bitstream.getID());
+
+            new DSpace().getEventService().fireEvent(new UsageEvent(UsageEvent.Action.VIEW, request, context, ref.bitstream));
+
+
+            // Now put response together
+            // Modification date
+            // Only use last-modified if this is an anonymous access
+            // - caching content that may be generated under authorisation
+            //   is a security problem
+            if (context.getCurrentUser() == null) {
+                // TODO: Currently the date of the item, since we don't have dates
+                // for files
+                response.setDateHeader("Last-Modified", ref.item.getLastModified().getTime());
+
+                // Check for if-modified-since header
+                long modSince = request.getDateHeader("If-Modified-Since");
+
+                if (modSince != -1 && ref.item.getLastModified().getTime() < modSince) {
+                    // Item has not been modified since requested date,
+                    // hence bitstream has not; return 304
+                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    return;
+                }
+            }
+
+            // Set the response MIME type
+            response.setContentType(ref.bitstream.getFormat().getMIMEType());
+
+            // Response length
+            response.setHeader("Content-Length", String.valueOf(ref.bitstream.getSize()));
+
+            if (threshold != -1 && ref.bitstream.getSize() >= threshold) {
+                UIUtil.setBitstreamDisposition(ref.bitstream.getName(), request, response);
+            }
+
+            // piping the bits from input stream to response
+            Utils.bufferedCopy(is, response.getOutputStream());
+        } finally {
+            if (is != null)
+                is.close();
+            response.getOutputStream().flush();
         }
-
-        // Set the response MIME type
-        response.setContentType(ref.bitstream.getFormat().getMIMEType());
-
-        // Response length
-        response.setHeader("Content-Length", String.valueOf(ref.bitstream.getSize()));
-
-        if (threshold != -1 && ref.bitstream.getSize() >= threshold) {
-            UIUtil.setBitstreamDisposition(ref.bitstream.getName(), request, response);
-        }
-
-        // piping the bits from input stream to response
-        Utils.bufferedCopy(is, response.getOutputStream());
-        is.close();
-        response.getOutputStream().flush();
     }
 
     @Override
