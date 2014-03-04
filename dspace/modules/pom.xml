@@ -71,6 +71,15 @@
             </modules>
         </profile>
         <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>rdf</module>
+            </modules>
+        </profile>
+        <profile>
             <id>dspace-rest</id>
             <activation>
                 <file>

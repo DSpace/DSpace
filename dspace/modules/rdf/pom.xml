@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>rdf</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace RDF :: Local Customizations</name>
+    <description>
+        Overlay RDF customizations
+    </description>
+
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
+
+    <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>false</archiveClasses>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>${basedir}/src/main/webapp</directory>
+                            <includes>
+                                    <include>WEB-INF/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rdf</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rdf</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

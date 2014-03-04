@@ -69,6 +69,11 @@
     <filter-name>registered-only</filter-name>
     <filter-class>org.dspace.app.webui.filter.RegisteredOnlyFilter</filter-class>
   </filter>
+  
+  <filter>
+      <filter-name>rdf-content-negotiation</filter-name>
+      <filter-class>org.dspace.rdf.providing.negotiation.NegotiationFilter</filter-class>
+  </filter>
 
   <!-- Filter mappings -->
   <filter-mapping>
@@ -116,6 +121,10 @@
     <url-pattern>/view-workspaceitem</url-pattern>
   </filter-mapping>
 
+  <filter-mapping>
+      <filter-name>rdf-content-negotiation</filter-name>
+      <url-pattern>/handle/*</url-pattern>
+  </filter-mapping>
  
 
   <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->

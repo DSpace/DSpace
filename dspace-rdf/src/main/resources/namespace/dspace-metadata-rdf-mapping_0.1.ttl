@@ -1,0 +1,158 @@
+# 
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+# 
+# http://www.dspace.org/license/
+# 
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+
+@prefix :    <http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.1#> .
+
+
+<http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.1>
+    rdfs:comment    "Vocabulary for describing mappings of DSpace metadata to rdf." ;
+    dc:contributor  "Pascal-Nicolas Becker" ;
+    dc:title        "DSpace Metadata RDF Mapping Spec" ;
+    dc:description  "Vocabulary for describing mappings of DSpace metadata to RDF. This vocabulary is used to configure DSpace how to convert stored metadata into RDF." ;
+    dc:date         "2014-04-14" ;
+    dc:format       "Turtle" ;
+    .
+
+
+# 
+# DSpaceMetadataRDFMapping
+# 
+:DSpaceMetadataRDFMapping
+    a rdfs:Class ;
+    rdfs:label "DSpace Metadata RDF Mapping" ;
+    rdfs:comment "Represents the mapping of a DSpace metadata value to an RDF equivalent." ;
+    .
+
+:Result
+    a rdfs:Class ;
+    rdfs:subClassOf rdf:Statement ;
+    rdfs:label "DSpace Metadata RDF Mapping Result" ;
+    rdfs:comment "A reified statement that describes the result of the DSpaceMetadataRDFMapping." ;
+    .
+
+:ValueProcessor
+    a rdfs:Class ;
+    rdfs:label "DSpace metadata value processor" ;
+    rdfs:comment "Processes a metadata value into a RDF value or an IRI. May use regex." ;
+    .
+
+:ValueModifier
+    a rdfs:Class ;
+    rdfs:label "Java Regex" ;
+    rdfs:comment "A regular expression to be used with java, composed of a matching and a replaying expression." ;
+    .
+
+:LiteralGenerator
+    a rdfs:Class ;
+    rdfs:subClassOf :ValueProcessor ;
+    rdfs:label "DSpace metadata value literal generator" ;
+    rdfs:comment "Generates a literal depending on a DSpace metadata value. May uses regex." ;
+    .
+
+:ResourceGenerator
+    a rdfs:Class ;
+    rdfs:subClassOf :ValueProcessor ;
+    rdfs:label "DSpace metadata value resource generator" ;
+    rdfs:comment "Generates an IRI used for a rdfs:Resource depending on the converted DSpace Object and one of its metadata values." ;
+    .
+
+:DSpaceObjectIRI
+    a rdfs:Resource ;
+    rdf:type :ResourceGenerator ;
+    rdf:type :ValueProcessor ;
+    rdfs:label "DSpace Object IRI" ;
+    rdfs:comment "Placeholder for the IRI of the DSpace Object that gets converted." ;
+    .
+
+:creates
+    a rdf:Property ;
+    rdfs:label "Result" ;
+    rdfs:comment "Specifies the RDF to generate for a specified matadata." ;
+    rdfs:domain :DSpaceMetadataRDFMapping ;
+    rdfs:range  :Result ;
+    .
+
+:subject
+    a rdf:Property ;
+    rdfs:subPropertyOf rdf:subject ;
+    rdfs:label "Subject" ;
+    rdfs:comment "The subject of a DSpace metadata RDF mapping result." ;
+    rdfs:domain :Result ;
+    # rdfs:range :ResourceGenerator ; # can be a rdfs:Resource as well
+    .
+
+:predicate
+    a rdf:Property ;
+    rdfs:subPropertyOf rdf:predicate ;
+    rdfs:label "Subject" ;
+    rdfs:comment "The predicate of a DSpace metadata RDF mapping result." ;
+    rdfs:domain :Result ;
+    # rdfs:range :ResourceGenerator ; # can be a rdfs:Resource as well.
+    .
+
+:object
+    a rdf:Property ;
+    rdfs:subPropertyOf rdf:object ;
+    rdfs:label "Object" ;
+    rdfs:comment "The object of a DSpace metadata RDF mapping result." ;
+    rdfs:domain :Result ;
+    # rdfs:range :ValueProcessor ; # can be a rdfs:Resource or rdfs:Literal as well
+    .
+
+:named
+    a rdf:Property ;
+    rdfs:label "Metadata name" ;
+    rdfs:comment "The name of the metadata to convert (g.e. dc.title)." ;
+    rdfs:domain :DSpaceMetadataRDFMapping ;
+    rdfs:range rdfs:Literal ;
+    .
+
+:fulfills
+    a rdf:Property ;
+    rdfs:label "Regex" ;
+    rdfs:comment "A regex that the metadata value has to fulfill if the mapping should become active." ;
+    rdfs:domain :DSpaceMetadataRDFMapping ;
+    rdfs:range rdfs:Literal ;
+    .
+
+:modifier
+    a rdf:Property ;
+    rdfs:label "Value modifier" ;
+    rdfs:comment "A regex used on the metadata value before it is inserted." ;
+    rdfs:domain :ValueProcessor ;
+    rdfs:range :ValueModifier ;
+    .
+
+:matcher
+    a rdf:Property ;
+    rdfs:label "matching regex" ;
+    rdfs:comment "A regex that matches those subsequences of a metadata value, that should be replaced." ;
+    rdfs:domain rdfs:ValueModifier ;
+    rdfs:range rdfs:Literal;
+    .
+
+:replacement
+    a rdf:Property ;
+    rdfs:label "replacing regex" ;
+    rdfs:comment "A regex that replaces previously matched subsequences of a metadata value." ;
+    rdfs:domain :ValueModifier ;
+    rdfs:range rdfs:Literal ;
+    .
+
+:pattern
+    a rdf:Property ;
+    rdfs:label "Pattern" ;
+    rdfs:comment "A pattern that contains $DSpaceValue as placeholder for the metadata value." ;
+    rdfs:domain :ValueProcessor ;
+    rdfs:range rdfs:Literal ;
+    .
