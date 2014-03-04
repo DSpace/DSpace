@@ -2062,7 +2062,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
                         alt="Open Health Data cover"/>
                 </a>
             </xsl:when>
@@ -2204,7 +2204,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
                         alt="Open Health Data cover"/>
                 </a>
             </xsl:when>
