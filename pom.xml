@@ -202,11 +202,12 @@
                     </excludes>
                     <mapping> 
                         <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
-                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.LICENSE -->
+                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
                         <xmap>XML_STYLE</xmap>
                         <xslt>XML_STYLE</xslt>
                         <wsdd>XML_STYLE</wsdd>
                         <wsdl>XML_STYLE</wsdl>
+                        <ttl>SCRIPT_STYLE</ttl>
                         <LICENSE>TEXT</LICENSE>
                     </mapping>  
                     <encoding>UTF-8</encoding>
@@ -452,6 +453,21 @@
             </modules>
         </profile>
 
+        <!--
+             Builds RDF Data Provider WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <file>
+                    <exists>dspace-rdf/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-rdf</module>
+            </modules>
+        </profile>
+
        <!-- REST Jersey -->
        <profile>
            <id>dspace-rest</id>
@@ -571,12 +587,13 @@
          <!-- Activate all modules *except* for the 'dspace' module,
               as it does not include any Java source code to release. -->
          <modules>
-            <module>dspace-api</module>
-            <module>dspace-jspui</module>
+             <module>dspace-api</module>
+             <module>dspace-jspui</module>
              <module>dspace-xmlui-mirage2</module>
              <module>dspace-xmlui</module>
              <module>dspace-lni</module>
              <module>dspace-oai</module>
+             <module>dspace-rdf</module>
              <module>dspace-rest</module>
              <module>dspace-sword</module>
              <module>dspace-swordv2</module>
@@ -693,6 +710,19 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
             <version>5.0-SNAPSHOT</version>
+         </dependency>
+         <dependency>
+             <groupId>org.dspace</groupId>
+             <artifactId>dspace-rdf</artifactId>
+             <version>5.0-SNAPSHOT</version>
+             <type>jar</type>
+             <classifier>classes</classifier>
+         </dependency>
+         <dependency>
+             <groupId>org.dspace</groupId>
+             <artifactId>dspace-rdf</artifactId>
+             <version>5.0-SNAPSHOT</version>
+             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -1386,6 +1416,14 @@
             <role>developer</role>
          </roles>
          <timezone>+10</timezone>
+      </contributor>
+      <contributor>
+         <name>Pascal-Nicolas Becker</name>
+         <email>dspace at pascal-becker dot de</email>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>+1</timezone>
       </contributor>
    </contributors>
 
