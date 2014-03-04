@@ -77,15 +77,6 @@ public class BitstreamServlet extends DSpaceServlet
             return;
         }
 
-        // check whether we need to make user sign agreement before proceeding
-        if (ViewAgreement.mustAgree(request.getSession(), ref.item)) {
-            log.info(LogManager.getHeader(context, "view_bitstream",
-                    "handle=" + ref.item.getHandle() + ",mustAgree=true"));
-            request.setAttribute("item", ref.item);
-            JSPManager.showJSP(request, response, "/bitstream-agreement.jsp");
-            return;
-        }
-
         if (ref.bitstream == null || ref.filename == null
                 || !ref.filename.equals(ref.bitstream.getName()))
         {
@@ -97,6 +88,20 @@ public class BitstreamServlet extends DSpaceServlet
 
             return;
         }
+
+        // throws exception if not authorized to access
+        InputStream is = ref.bitstream.retrieve();
+
+        // now that we know that user has authorization to access bitstream
+        // check whether we need to make user sign agreement before proceeding
+        if (ViewAgreement.mustAgree(request.getSession(), ref.item)) {
+            log.info(LogManager.getHeader(context, "view_bitstream",
+                    "handle=" + ref.item.getHandle() + ",mustAgree=true"));
+            request.setAttribute("item", ref.item);
+            JSPManager.showJSP(request, response, "/bitstream-agreement.jsp");
+            return;
+        }
+
 
         log.info(LogManager.getHeader(context, "view_bitstream",
                 "bitstream_id=" + ref.bitstream.getID()));
@@ -111,6 +116,8 @@ public class BitstreamServlet extends DSpaceServlet
         				context,
                         ref.bitstream));
         
+
+        // Now put response together
         // Modification date
         // Only use last-modified if this is an anonymous access
         // - caching content that may be generated under authorisation
@@ -133,9 +140,6 @@ public class BitstreamServlet extends DSpaceServlet
                 return;
             }
         }
-        
-        // Pipe the bits
-        InputStream is = ref.bitstream.retrieve();
      
 		// Set the response MIME type
         response.setContentType(ref.bitstream.getFormat().getMIMEType());
@@ -149,6 +153,7 @@ public class BitstreamServlet extends DSpaceServlet
 			UIUtil.setBitstreamDisposition(ref.bitstream.getName(), request, response);
 		}
 
+        // piping the bits from input stream to response
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
