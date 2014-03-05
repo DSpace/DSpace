@@ -1,0 +1,561 @@
+[1mdiff --git a/dspace-api/src/main/java/org/dspace/core/Context.java b/dspace-api/src/main/java/org/dspace/core/Context.java[m
+[1mindex c3d856b..8167803 100644[m
+[1m--- a/dspace-api/src/main/java/org/dspace/core/Context.java[m
+[1m+++ b/dspace-api/src/main/java/org/dspace/core/Context.java[m
+[36m@@ -305,7 +305,7 @@[m [mpublic class Context[m
+             DatabaseManager.freeConnection(connection);[m
+             connection = null;[m
+             clearCache();[m
+[31m-            log.error("Context.complete()", new Exception());        }[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     /**[m
+[36m@@ -423,7 +423,6 @@[m [mpublic class Context[m
+                 if (!connection.isClosed())[m
+                 {[m
+                     DatabaseManager.freeConnection(connection);[m
+[31m-                    log.error("Context free db connection", new Exception());[m
+                 }[m
+             }[m
+             catch (Exception ex)[m
+[1mdiff --git a/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/HandleServlet.java b/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/HandleServlet.java[m
+[1mindex 51fedcc..a9fdf8b 100644[m
+[1m--- a/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/HandleServlet.java[m
+[1m+++ b/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/HandleServlet.java[m
+[36m@@ -399,6 +399,7 @@[m [mpublic class HandleServlet extends DSpaceServlet[m
+             }[m
+         }[m
+ [m
+[32m+[m[32m        try {[m
+         // Fire usage event.[m
+         new DSpace().getEventService().fireEvent([m
+             		new UsageEvent([m
+[36m@@ -406,7 +407,9 @@[m [mpublic class HandleServlet extends DSpaceServlet[m
+             				request,[m
+             				context,[m
+             				item));[m
+[31m-[m
+[32m+[m[32m        } catch (Exception e) {[m
+[32m+[m[32m            log.warn("could not record usage event", e);[m
+[32m+[m[32m        }[m
+         // Set attributes and display[m
+         request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));[m
+         request.setAttribute("display.all", Boolean.valueOf(displayAll));[m
+[1mdiff --git a/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/util/CollectionStyleSelection.java b/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/util/CollectionStyleSelection.java[m
+[1mindex 1659a81..d6bd302 100644[m
+[1m--- a/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/util/CollectionStyleSelection.java[m
+[1m+++ b/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/util/CollectionStyleSelection.java[m
+[36m@@ -75,6 +75,7 @@[m [mpublic class CollectionStyleSelection extends AKeyBasedStyleSelection[m
+                 for (int i = 0; i < collections.length; i++)[m
+                 {[m
+                     styles.put(collections[i].trim(), styleName.toLowerCase());[m
+[32m+[m[32m                    log.debug(collections[i].trim() + " -> "  + styleName.toLowerCase());[m
+                 }[m
+             }[m
+         }[m
+[36m@@ -100,6 +101,7 @@[m [mpublic class CollectionStyleSelection extends AKeyBasedStyleSelection[m
+         if (styleName == null)[m
+         {[m
+             // No specific style specified for this collection[m
+[32m+[m[32m            log.debug("'" + handle + "' --style--> default" );[m
+             return "default";[m
+         }[m
+ [m
+[36m@@ -108,8 +110,10 @@[m [mpublic class CollectionStyleSelection extends AKeyBasedStyleSelection[m
+         {[m
+             log.warn("dspace.cfg specifies undefined item display style '"[m
+                     + styleName + "' for collection handle " + handle + ".  Using default");[m
+[32m+[m[32m            log.debug("'" + handle + "' --style--> default" );[m
+             return "default";[m
+         }[m
+[32m+[m[32m        log.debug("'" + handle + "' --style--> " + styleName );[m
+ [m
+         return styleName;[m
+     }[m
+[1mdiff --git a/dspace/config/dspace.cfg b/dspace/config/dspace.cfg[m
+[1mindex 85a809a..c44bae0 100644[m
+[1m--- a/dspace/config/dspace.cfg[m
+[1m+++ b/dspace/config/dspace.cfg[m
+[36m@@ -1849,144 +1849,112 @@[m [mcas.logout.url= https://fed.princeton.edu/cas/logout[m
+ webui.cas.autoregister = false[m
+ [m
+ #[m
+[31m-# Define the metadata elements that should be displayed in working paper collections[m
+[31m-#[m
+[31m-[m
+[31m-webui.itemdisplay.workingpaper = dc.title, dc.title.alternative, dc.contributor.author, \[m
+[31m-                            dc.subject, dc.date.issued(date), dc.publisher, \[m
+[31m-                            dc.identifier.citation, dc.relation.ispartofseries, \[m
+[31m-                            dc.description.abstract, dc.description, \[m
+[31m-                            dc.identifier.govdoc, dc.identifier.uri(link), \[m
+[31m-                            dc.identifier.isbn, dc.identifier.issn, \[m
+[31m-                            dc.identifier.ismn, dc.identifier, \[m
+[31m-                            dc.relation.uri(link), \[m
+[31m-                            dc.relation.replaces(link), \[m
+[31m-                            dc.relation.isreplacedby(link)[m
+[31m-[m
+[31m-webui.itemdisplay.workingpaper.collections = 88435/dsp017h149p85f, 88435/dsp01cj82k732m, 88435/dsp01gb19f584f, 88435/dsp01pr76f345n[m
+[31m-[m
+[31m-#[m
+[31m-# Define the metadata elements that should be displayed in[m
+[31m-# dissertation collections[m
+[31m-#[m
+[31m-[m
+[31m-webui.itemdisplay.dissertations = dc.title, \[m
+[31m-                            dc.contributor.author, dc.contributor.advisor, \[m
+[31m-                            dc.contributor, dc.contributor.other, \[m
+[31m-                            dc.subject, dc.subject.classification, \[m
+[31m-                            dc.date.issued(date), dc.publisher, \[m
+[31m-                            dc.description.abstract, dc.description, \[m
+[31m-                            dc.identifier.uri(link), \[m
+[31m-                            dc.relation.isformatof, \[m
+[31m-                            dc.type, dc.language.iso[m
+[31m-[m
+[31m-webui.itemdisplay.dissertations.collections = \[m
+[31m-     88435/dsp01pn89d660h, \[m
+[31m-     88435/dsp01jw827b67j, \[m
+[31m-     88435/dsp01f4752g74r, \[m
+[31m-     88435/dsp019c67wm82p, \[m
+[31m-     88435/dsp015m60qr913, \[m
+[31m-     88435/dsp011z40ks831, \[m
+[31m-     88435/dsp01x633f104k, \[m
+[31m-     88435/dsp01sf2685121, \[m
+[31m-     88435/dsp01np193919r, \[m
+[31m-     88435/dsp01hx11xf26b, \[m
+[31m-     88435/dsp01d504rk346, \[m
+[31m-     88435/dsp018c97kq43p, \[m
+[31m-     88435/dsp014q77fr35m, \[m
+[31m-     88435/dsp010z708w441, \[m
+[31m-     88435/dsp01w6634364j, \[m
+[31m-     88435/dsp01rf55z771t, \[m
+[31m-     88435/dsp01mp48sc78j, \[m
+[31m-     88435/dsp01gx41mh869, \[m
+[31m-     88435/dsp01c534fn95t, \[m
+[31m-     88435/dsp017h149p87r, \[m
+[31m-     88435/dsp013r074t96v, \[m
+[31m-     88435/dsp01000000039, \[m
+[31m-     88435/dsp01v692t6222, \[m
+[31m-     88435/dsp01qf85nb30h, \[m
+[31m-     88435/dsp01kp78gg38w, \[m
+[31m-     88435/dsp01fx719m479, \[m
+[31m-     88435/dsp01b8515n39n, \[m
+[31m-     88435/dsp016h440s48r, \[m
+[31m-     88435/dsp012r36tx551, \[m
+[31m-     88435/dsp01z029p474w, \[m
+[31m-     88435/dsp01t722h882n, \[m
+[31m-     88435/dsp01pg15bd903, \[m
+[31m-     88435/dsp01jq085j994, \[m
+[31m-     88435/dsp01f1881k91x, \[m
+[31m-     88435/dsp019880vr006, \[m
+[31m-     88435/dsp015h73pw07x, \[m
+[31m-     88435/dsp011r66j1148, \[m
+[31m-     88435/dsp01x059c7347, \[m
+[31m-     88435/dsp01s7526c420, \[m
+[31m-     88435/dsp01ng451h513, \[m
+[31m-     88435/dsp01ht24wj43h[m
+[31m-[m
+[31m-#[m
+ # Define the metadata elements that should be displayed in[m
+[31m-# dissertation collections[m
+[31m-#[m
+[32m+[m[32m# theses collections[m
+[32m+[m[32m#[m
+[32m+[m[32m# handle/88435/1097   Aeronautical Engineering[m
+[32m+[m[32m# handle/88435/1098   Anthropology[m
+[32m+[m[32m# handle/88435/1099   Architecture School[m
+[32m+[m[32m# handle/88435/1100   Art and Archaeology[m
+[32m+[m[32m# handle/88435/1101   Astrophysical Sciences[m
+[32m+[m[32m# handle/88435/1102   Biology[m
+[32m+[m[32m# handle/88435/1103   Chemical and Biological Engineering[m
+[32m+[m[32m# handle/88435/1104   Chemistry[m
+[32m+[m[32m# handle/88435/1105   Civil Engineering and Operations Research[m
+[32m+[m[32m# handle/88435/1106   Civil and Environmental Engineering[m
+[32m+[m[32m# handle/88435/1107   Classics[m
+[32m+[m[32m# handle/88435/1108   Comparative Literature[m
+[32m+[m[32m# handle/88435/1109   Computer Science[m
+[32m+[m[32m# handle/88435/1110   Creative Writing Program[m
+[32m+[m[32m# handle/88435/1111   East Asian Studies[m
+[32m+[m[32m# handle/88435/1112   Ecology and Evolutionary Biology[m
+[32m+[m[32m# handle/88435/1113   Economics[m
+[32m+[m[32m# handle/88435/1114   Electrical Engineering[m
+[32m+[m[32m# handle/88435/1115   Engineering and Applied Science[m
+[32m+[m[32m# handle/88435/1116   English[m
+[32m+[m[32m# handle/88435/1117   French and Italian[m
+[32m+[m[32m# handle/88435/1118   Geosciences[m
+[32m+[m[32m# handle/88435/1119   German[m
+[32m+[m[32m# handle/88435/1120   History[m
+[32m+[m[32m# handle/88435/1121   Independent Concentration[m
+[32m+[m[32m# handle/88435/1122   Mathematics[m
+[32m+[m[32m# handle/88435/1123   Mechanical and Aerospace Engineering[m
+[32m+[m[32m# handle/88435/1124   Medieval Studies[m
+[32m+[m[32m# handle/88435/1125   Modern Languages[m
+[32m+[m[32m# handle/88435/1126   Molecular Biology[m
+[32m+[m[32m# handle/88435/1127   Music[m
+[32m+[m[32m# handle/88435/1128   Near Eastern Studies[m
+[32m+[m[32m# handle/88435/1129   Operations Research and Financial Engineering[m
+[32m+[m[32m# handle/88435/1130   Oriental Studies[m
+[32m+[m[32m# handle/88435/1131   Philosophy[m
+[32m+[m[32m# handle/88435/1132   Physics[m
+[32m+[m[32m# handle/88435/1133   Politics[m
+[32m+[m[32m# handle/88435/1134   Psychology[m
+[32m+[m[32m# handle/88435/1135   Religion[m
+[32m+[m[32m# handle/88435/1136   Romance Languages and Literatures[m
+[32m+[m[32m# handle/88435/1137   Slavic Languages and Literature[m
+[32m+[m[32m# handle/88435/1138   Sociology[m
+[32m+[m[32m# handle/88435/1139   Spanish and Portuguese Languages and Cultures[m
+[32m+[m[32m# handle/88435/1140   Special Program in Humanities[m
+[32m+[m[32m# handle/88435/1141   Statistics[m
+[32m+[m[32m# handle/88435/1142   Theatre[m
+[32m+[m[32m# handle/88435/1143   Woodrow Wilson School[m
+ [m
+ webui.itemdisplay.theses = dc.title, \[m
+[31m-                            dc.contributor.author, dc.contributor.advisor, \[m
+[31m-                            dc.contributor, pu.department, pu.date.graduation(date), \[m
+[31m-                            dc.publisher, \[m
+[31m-                            dc.description.abstract, dc.description, \[m
+[31m-                            dc.format.extent, dc.format, dc.identifier.other, \[m
+                             dc.identifier.uri(link), \[m
+[31m-                            dc.relation.isformatof, \[m
+                             dc.type, dc.language.iso[m
+ [m
+ webui.itemdisplay.theses.collections = \[m
+[31m-     88435/dsp015m60qr96c, \[m
+[31m-     88435/dsp011v53jx03j, \[m
+[31m-     88435/dsp01x346d4232, \[m
+[31m-     88435/dsp01sf268516n, \[m
+[31m-     88435/dsp01np1939243, \[m
+[31m-     88435/dsp01hx11xf31p, \[m
+[31m-     88435/dsp01d504rk39g, \[m
+[31m-     88435/dsp018c97kq479, \[m
+[31m-     88435/dsp014m90dv552, \[m
+[31m-     88435/dsp010v8380632, \[m
+[31m-     88435/dsp01w66343685, \[m
+[31m-     88435/dsp01rf55z7763, \[m
+[31m-     88435/dsp01mp48sc83w, \[m
+[31m-     88435/dsp01gx41mh91n, \[m
+[31m-     88435/dsp01c534fn99f, \[m
+[31m-     88435/dsp017d278t078, \[m
+[31m-     88435/dsp013n203z151, \[m
+[31m-     88435/dsp0100000007x, \[m
+[31m-     88435/dsp01v692t627b, \[m
+[31m-     88435/dsp01qf85nb35s, \[m
+[31m-     88435/dsp01kp78gg437, \[m
+[31m-     88435/dsp01fx719m510, \[m
+[31m-     88435/dsp01b5644r59s, \[m
+[31m-     88435/dsp016d56zw67q, \[m
+[31m-     88435/dsp012r36tx59n, \[m
+[31m-     88435/dsp01z029p4795, \[m
+[31m-     88435/dsp01t722h887x, \[m
+[31m-     88435/dsp01pg15bd95c, \[m
+[31m-     88435/dsp01jq085k036, \[m
+[31m-     88435/dsp01dz010q11z, \[m
+[31m-     88435/dsp019593tv19m, \[m
+[31m-     88435/dsp015h73pw11m, \[m
+[31m-     88435/dsp011r66j119j, \[m
+[31m-     88435/dsp01x059c739h, \[m
+[31m-     88435/dsp01s7526c478, \[m
+[31m-     88435/dsp01ng451h55q, \[m
+[31m-     88435/dsp01hq37vn649, \[m
+[31m-     88435/dsp01cz30ps722, \[m
+[31m-     88435/dsp018910jt63r, \[m
+[31m-     88435/dsp014j03cz716, \[m
+[31m-     88435/dsp010r967379h, \[m
+[31m-     88435/dsp01w0892999g, \[m
+[31m-     88435/dsp01r781wg073, \[m
+[31m-     88435/dsp01mg74qm166, \[m
+[31m-     88435/dsp01gq67jr24n, \[m
+[31m-     88435/dsp01c247ds15b, \[m
+[31m-     88435/dsp0179407x233[m
+[31m-[m
+[32m+[m	[32mhandle/88435/1097, \[m
+[32m+[m[32m    handle/88435/1098, \[m
+[32m+[m	[32mhandle/88435/1099, \[m
+[32m+[m	[32mhandle/88435/1100, \[m
+[32m+[m	[32mhandle/88435/1101, \[m
+[32m+[m	[32mhandle/88435/1102, \[m
+[32m+[m	[32mhandle/88435/1103, \[m
+[32m+[m	[32mhandle/88435/1104, \[m
+[32m+[m	[32mhandle/88435/1105, \[m
+[32m+[m	[32mhandle/88435/1106, \[m
+[32m+[m	[32mhandle/88435/1107, \[m
+[32m+[m	[32mhandle/88435/1108, \[m
+[32m+[m	[32mhandle/88435/1109, \[m
+[32m+[m	[32mhandle/88435/1110, \[m
+[32m+[m	[32mhandle/88435/1111, \[m
+[32m+[m	[32mhandle/88435/1112, \[m
+[32m+[m	[32mhandle/88435/1113, \[m
+[32m+[m	[32mhandle/88435/1114, \[m
+[32m+[m	[32mhandle/88435/1115, \[m
+[32m+[m	[32mhandle/88435/1116, \[m
+[32m+[m	[32mhandle/88435/1117, \[m
+[32m+[m	[32mhandle/88435/1118, \[m
+[32m+[m	[32mhandle/88435/1119, \[m
+[32m+[m	[32mhandle/88435/1120, \[m
+[32m+[m	[32mhandle/88435/1121, \[m
+[32m+[m	[32mhandle/88435/1122, \[m
+[32m+[m	[32mhandle/88435/1123, \[m
+[32m+[m	[32mhandle/88435/1124, \[m
+[32m+[m	[32mhandle/88435/1125, \[m
+[32m+[m	[32mhandle/88435/1126, \[m
+[32m+[m	[32mhandle/88435/1127, \[m
+[32m+[m	[32mhandle/88435/1128, \[m
+[32m+[m	[32mhandle/88435/1129, \[m
+[32m+[m	[32mhandle/88435/1130, \[m
+[32m+[m	[32mhandle/88435/1131, \[m
+[32m+[m	[32mhandle/88435/1132, \[m
+[32m+[m	[32mhandle/88435/1133, \[m
+[32m+[m	[32mhandle/88435/1134, \[m
+[32m+[m	[32mhandle/88435/1135, \[m
+[32m+[m	[32mhandle/88435/1136, \[m
+[32m+[m	[32mhandle/88435/1137, \[m
+[32m+[m	[32mhandle/88435/1138, \[m
+[32m+[m	[32mhandle/88435/1139, \[m
+[32m+[m	[32mhandle/88435/1140, \[m
+[32m+[m	[32mhandle/88435/1141, \[m
+[32m+[m	[32mhandle/88435/1142, \[m
+[32m+[m	[32mhandle/88435/1143 [m
+[32m+[m
+[32m+[m
+[32m+[m[32m88435/1096.bitstream_view_agreement = agree with me and do NOT share [m
+ [m
+ Princeton_IP_group = 142[m
+ [m
+[1mdiff --git a/dspace/modules/jspui/src/main/webapp/display-item.jsp b/dspace/modules/jspui/src/main/webapp/display-item.jsp[m
+[1mindex dd3ceac..4665034 100644[m
+[1m--- a/dspace/modules/jspui/src/main/webapp/display-item.jsp[m
+[1m+++ b/dspace/modules/jspui/src/main/webapp/display-item.jsp[m
+[36m@@ -30,6 +30,7 @@[m
+ [m
+ <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>[m
+ [m
+[32m+[m[32m<%@ page import="org.dspace.content.DSpaceObject" %>[m
+ <%@ page import="org.dspace.content.Collection" %>[m
+ <%@ page import="org.dspace.content.DCValue" %>[m
+ <%@ page import="org.dspace.content.Item" %>[m
+[36m@@ -44,6 +45,16 @@[m
+     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");[m
+     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());[m
+     Item item = (Item) request.getAttribute("item");[m
+[32m+[m
+[32m+[m[32m    String agree_to_view_bitstreams = null;[m
+[32m+[m[32m    String agree_cookie = null;[m
+[32m+[m[32m    Collection owner = item.getOwningCollection();[m
+[32m+[m[32m    if (owner != null) {[m
+[32m+[m[32m         DSpaceObject obj = owner.getParentObject();  // assuming this is the owning community [m
+[32m+[m[32m         agree_cookie = obj.getHandle();[m
+[32m+[m[32m         agree_to_view_bitstreams = ConfigurationManager.getProperty(agree_cookie + ".bitstream_view_agreement");[m
+[32m+[m[32m    }[m
+[32m+[m
+     Collection[] collections = (Collection[]) request.getAttribute("collections");[m
+     Boolean admin_b = (Boolean)request.getAttribute("admin_button");[m
+     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());[m
+[36m@@ -76,32 +87,24 @@[m
+ 			title = "Item " + handle;[m
+ 		}[m
+ 	}[m
+[31m-[m
+[31m-    // Princeton University customization -- [m
+[31m-    //    Get dc.type so that we know whether or not this is a thesis[m
+[31m-    String dctype = null;[m
+[31m-    DCValue[] dctypeValue = item.getDC("type", null, Item.ANY);[m
+[31m-    if (dctypeValue.length != 0)[m
+[31m-    {[m
+[31m-      dctype = dctypeValue[0].value;[m
+[31m-    }[m
+ %>[m
+ [m
+ <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>[m
+ <dspace:layout title="<%= title %>">[m
+[31m-[m
+[31m-<!-- Princeton University customization -->[m
+[31m-<%[m
+[31m-    // If dc.type is a senior theses, then include javascript for popup copyright notification[m
+[31m-    if (dctype != null && dctype.equals("Princeton University Senior Theses"))[m
+[31m-    {[m
+[32m+[m[32m<% [m
+[32m+[m[32mif (agree_to_view_bitstreams != null) {[m
+ %>[m
+[31m-    <!-- Princeton University customization for generating popup for terms of use for senior theses -->[m
+[31m-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/senior-theses-popup.js"> </script>[m
+[31m-<%[m
+[31m-    }[m
+[32m+[m
+[32m+[m[32m<script type="text/javascript" >[m
+[32m+[m[32mwindow.onload = function() {[m
+[32m+[m[32m  must_agree_to_view_bitstreams('<%= agree_cookie %>', '<%= agree_to_view_bitstreams %>');[m
+[32m+[m[32m}[m
+[32m+[m[32m</script>[m
+[32m+[m[32m<% [m
+[32m+[m[32m} [m
+ %>[m
+ [m
+[32m+[m
+ <%[m
+     if (handle != null)[m
+     {[m
+[1mdiff --git a/dspace/modules/jspui/src/main/webapp/layout/header-default.jsp b/dspace/modules/jspui/src/main/webapp/layout/header-default.jsp[m
+[1mindex 0b2e51e..5d1ecae 100644[m
+[1m--- a/dspace/modules/jspui/src/main/webapp/layout/header-default.jsp[m
+[1m+++ b/dspace/modules/jspui/src/main/webapp/layout/header-default.jsp[m
+[36m@@ -77,6 +77,7 @@[m
+     if (doAnalytics) {[m
+         uaCode =  ConfigurationManager.getProperty("jspui.google.analytics.key");[m
+         uaDomain =  ConfigurationManager.getProperty("jspui.google.analytics.domain");[m
+[32m+[m[32m        doAnalytics =  (uaCode != null || uaDomain != null); [m
+     }[m
+ %>[m
+ [m
+[36m@@ -115,7 +116,7 @@[m
+ %>[m
+         [m
+     <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>[m
+[31m-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/google-analytics.js"> </script>[m
+[32m+[m[32m    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/custom_pu.js"> </script>[m
+     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>[m
+     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>[m
+     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>[m
+[1mdiff --git a/dspace/modules/jspui/src/main/webapp/static/js/custom_pu.js b/dspace/modules/jspui/src/main/webapp/static/js/custom_pu.js[m
+[1mindex 9eb44c3..b35c790 100644[m
+[1m--- a/dspace/modules/jspui/src/main/webapp/static/js/custom_pu.js[m
+[1m+++ b/dspace/modules/jspui/src/main/webapp/static/js/custom_pu.js[m
+[36m@@ -9,7 +9,8 @@[m [mfunction googleAnalytics(code, domain) {[m
+   ga('send', 'pageview');[m
+ }[m
+ [m
+[31m-[m
+[32m+[m[32m/* <!--http://www.webappers.com/2009/11/23/fancy-javascript-popup-library-with-jquery-ui/ -->[m
+[32m+[m[32m*/[m
+ /*[m
+  * Utility Javascript methods for Princeton University specific  Javascript[m
+  */[m
+[36m@@ -32,9 +33,9 @@[m [mfunction setCookie(cname, cvalue, exmins, path) {[m
+ 	document.cookie = cname + "=" + cvalue + "; " + expires + "; path=" + path;[m
+ }[m
+ [m
+[31m-function agree_to_view(cookie, bitstreamUrl, agreementText) {[m
+[32m+[m
+[32m+[m[32mfunction v0agree_to_view(cookie, bitstreamUrl, agreementText) {[m
+ 	var cookieValue = getCookie(cookie);[m
+[31m-	bitstreamUrl = this.href;[m
+ 	if (cookieValue === "yes") {[m
+ 		window.location.assign(bitstreamUrl);[m
+ 	} else {[m
+[36m@@ -49,15 +50,42 @@[m [mfunction agree_to_view(cookie, bitstreamUrl, agreementText) {[m
+ 			window.location.assign(bitstreamUrl);  // do the download[m
+ 		}[m
+ 	}[m
+[32m+[m	[32mreturn false;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m[32mfunction vxagree_to_view(cookie, bitstreamUrl, agreementText) {[m
+[32m+[m[32m    var cookieValue = getCookie(cookie);[m
+[32m+[m[32m    if (cookieValue === "yes") {[m
+[32m+[m[32m        return true;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    var r = confirm("License Agreement: \n" + agreementText);[m
+[32m+[m[32m    if (r == true) {[m
+[32m+[m[32m        agree  = "yes";[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        agree  = "no";[m
+[32m+[m[32m    }[m
+[32m+[m[32m    setCookie(cookie, agree, 1, "/");[m
+[32m+[m[32m    return  (agree === "yes");[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mfunction agree_to_view(cookie, agreementText) {[m
+[32m+[m[32m    var cookieValue = getCookie(cookie);[m
+[32m+[m[32m    if (cookieValue === "yes") {[m
+[32m+[m[32m        return true;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    var r = confirm("License Agreement: \n" + agreementText);[m
+[32m+[m[32m    if (r == true) {[m
+[32m+[m[32m        agree  = "yes";[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        agree  = "no";[m
+[32m+[m[32m    }[m
+[32m+[m[32m    setCookie(cookie, agree, 1, "/");[m
+[32m+[m[32m    return  (agree === "yes");[m
+ }[m
+ [m
+[31m-/*[m
+[31m- * When the user clicks on a link whose target URL contains the string "bitstream", this script will generate a popup window displaying terms of use[m
+[31m- * for senior theses.[m
+[31m- *[m
+[31m- * Author: Mark Ratliff[m
+[31m- *[m
+[31m- */[m
+ [m
+ function must_agree_to_view_bitstreams(cookie, agreementText)[m
+ {[m
+[36m@@ -67,7 +95,7 @@[m [mfunction must_agree_to_view_bitstreams(cookie, agreementText)[m
+         for (var i = 0; i < links.length; ++i)[m
+         {[m
+           if (links[i].href.indexOf("/bitstream") != -1) {[m
+[31m-            links[i].onclick = agree_to_view(cookie, agreementText);[m
+[32m+[m[32m            links[i].onclick = function () { return agree_to_view(cookie,  agreementText); };[m
+           }[m
+         }[m
+       }[m
+[1mdiff --git a/dspace/modules/jspui/src/main/webapp/static/js/google-analytics.js b/dspace/modules/jspui/src/main/webapp/static/js/google-analytics.js[m
+[1mdeleted file mode 100644[m
+[1mindex e69120d..0000000[m
+[1m--- a/dspace/modules/jspui/src/main/webapp/static/js/google-analytics.js[m
+[1m+++ /dev/null[m
+[36m@@ -1,11 +0,0 @@[m
+[31m-function googleAnalytics(code, domain) {[m
+[31m-[m
+[31m-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){[m
+[31m-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),[m
+[31m-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)[m
+[31m-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');[m
+[31m-[m
+[31m-  ga('create', code, domain);[m
+[31m-  ga('send', 'pageview');[m
+[31m-}[m
+[31m-[m
+[1mdiff --git a/dspace/modules/jspui/src/main/webapp/static/js/senior-theses-popup.js b/dspace/modules/jspui/src/main/webapp/static/js/senior-theses-popup.js[m
+[1mdeleted file mode 100644[m
+[1mindex e5dfd8f..0000000[m
+[1m--- a/dspace/modules/jspui/src/main/webapp/static/js/senior-theses-popup.js[m
+[1m+++ /dev/null[m
+[36m@@ -1,36 +0,0 @@[m
+[31m-/*[m
+[31m- * When the user clicks on a link whose target URL contains the string "bitstream", this script will generate a popup window displaying terms of use[m
+[31m- * for senior theses.[m
+[31m- *[m
+[31m- * Author: Mark Ratliff[m
+[31m- *[m
+[31m- */[m
+[31m-[m
+[31m-window.onload = function()[m
+[31m-{  [m
+[31m-     var lnks = document.links;[m
+[31m-     if (lnks)[m
+[31m-     {[m
+[31m-        for (var i = 0; i < lnks.length; ++i)[m
+[31m-        {[m
+[31m-          lnks[i].onclick = linkOnClick;[m
+[31m-        }[m
+[31m-      }[m
+[31m-};[m
+[31m-[m
+[31m-[m
+[31m-function linkOnClick()[m
+[31m-{[m
+[31m-  var h = this.href;[m
+[31m-  var action = true;[m
+[31m-[m
+[31m-  if (h.indexOf('bitstream') != -1) [m
+[31m-  {[m
+[31m-    if (!confirm('PDF access currently not available. Contact Mudd@princeton.edu with questions. (Please click the Cancel button.)'))[m
+[31m-    {      [m
+[31m-      action = false;    [m
+[31m-    }  [m
+[31m-  }[m
+[31m-[m
+[31m-  return action;[m
+[31m-}[m

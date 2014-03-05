@@ -1,0 +1,17 @@
+4980f2e prefix lines in ascii bitstream reports with biistream id ==> makes for easier grep on commandline
+f871857 include instance info in report  header (name, db.url, assetstore)
+19b829b chatty unchecked bitstream report - includes item,collection,community info where available
+db248c2 get result string from query if not passed as parameter to ReporterDAO.getChecksumHistory
+355bb66 DailyReportEmailer : fix usage message
+9e4c58f checker-emailer prints bitstreams' internal_ids and source strings in chatty mode
+fce44fc report Item,Collection,Community handle in chatty report mode
+86be732 one dbConnection across all rquests; getting ready to be verbose - aka include item,collection,community info in reports
+d342e5e adde TSV formatted output;  SQL statement logging in debug mode ; guard against null field valuesin ChecksumHistory
+d26916a fewer empty lines in help message
+b90340e should never have been added to git
+7371983 should never have been added to git
+0b26a62 new option -eternity: report on all results not just the ones within given date Range
+bac28d0 reorg checker reporting
+c9c44d1 prune option is ignord --> delete it
+18d4a3e config nits
+e41046e BitStreamInfo.infoFiud field only used for logging - deleted it

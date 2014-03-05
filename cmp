@@ -1,0 +1,3 @@
+#!/bin/tcsh 
+set f = $1 
+git diff dspace-1_8_x:$f -- $f 

@@ -1,0 +1,17 @@
+2014-02-20 12:08:23,786 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-02-20 12:08:37,939 DEBUG org.dspace.core.PluginManager @ Adding Sequence plugin for interface= org.dspace.authenticate.AuthenticationMethod, class=org.dspace.authenticate.IPAuthentication
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 128.112 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 140.180 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.55.106 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.103.13 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.188.106 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 198.35.0.0/32 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 198.125.224.0/20 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.core.PluginManager @ Adding Sequence plugin for interface= org.dspace.authenticate.AuthenticationMethod, class=org.dspace.authenticate.CASAuthentication
+2014-02-20 12:08:37,945 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=
+2014-02-20 12:08:37,947 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM community WHERE NOT community_id IN (SELECT child_comm_id FROM community2community) ORDER BY name"  with parameters: 
+2014-02-20 12:08:37,985 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,24
+2014-02-20 12:08:37,994 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,27
+2014-02-20 12:08:37,995 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,37
+2014-02-20 12:08:37,996 DEBUG org.dspace.app.webui.util.JSPManager @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:view_jsp:/home.jsp
+2014-02-20 12:08:38,219 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=

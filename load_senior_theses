@@ -1,0 +1,461 @@
+2014-02-20 12:08:23,786 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-02-20 12:08:37,939 DEBUG org.dspace.core.PluginManager @ Adding Sequence plugin for interface= org.dspace.authenticate.AuthenticationMethod, class=org.dspace.authenticate.IPAuthentication
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 128.112 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 140.180 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.55.106 for special group Princeton_IPs
+2014-02-20 12:08:37,941 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.103.13 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 192.188.106 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 198.35.0.0/32 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.authenticate.IPAuthentication @ Configured 198.125.224.0/20 for special group Princeton_IPs
+2014-02-20 12:08:37,942 DEBUG org.dspace.core.PluginManager @ Adding Sequence plugin for interface= org.dspace.authenticate.AuthenticationMethod, class=org.dspace.authenticate.CASAuthentication
+2014-02-20 12:08:37,945 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=
+2014-02-20 12:08:37,947 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM community WHERE NOT community_id IN (SELECT child_comm_id FROM community2community) ORDER BY name"  with parameters: 
+2014-02-20 12:08:37,985 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,24
+2014-02-20 12:08:37,994 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,27
+2014-02-20 12:08:37,995 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,37
+2014-02-20 12:08:37,996 DEBUG org.dspace.app.webui.util.JSPManager @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:view_jsp:/home.jsp
+2014-02-20 12:08:38,219 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=
+2014-02-20 12:09:38,312 DEBUG org.dspace.core.PluginManager @ Got Named configuration for interface=org.dspace.content.crosswalk.DisseminationCrosswalk, config=org.dspace.content.crosswalk.AIPDIMCrosswalk = DIM, org.dspace.content.crosswalk.AIPTechMDCrosswalk = AIP-TECHMD, org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk = DC, org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk = dc, org.dspace.content.crosswalk.PREMISCrosswalk = PREMIS, org.dspace.content.crosswalk.METSDisseminationCrosswalk = METS, org.dspace.content.crosswalk.METSDisseminationCrosswalk = mets, org.dspace.content.crosswalk.METSRightsCrosswalk = METSRIGHTS, org.dspace.content.crosswalk.OREDisseminationCrosswalk = ore, org.dspace.content.crosswalk.DIMDisseminationCrosswalk = dim, org.dspace.content.crosswalk.RoleCrosswalk = DSPACE-ROLES
+2014-02-20 12:09:38,314 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=DIM, class=org.dspace.content.crosswalk.AIPDIMCrosswalk
+2014-02-20 12:09:38,314 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=AIP-TECHMD, class=org.dspace.content.crosswalk.AIPTechMDCrosswalk
+2014-02-20 12:09:38,314 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=DC, class=org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk
+2014-02-20 12:09:38,314 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=dc, class=org.dspace.content.crosswalk.SimpleDCDisseminationCrosswalk
+2014-02-20 12:09:38,315 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=PREMIS, class=org.dspace.content.crosswalk.PREMISCrosswalk
+2014-02-20 12:09:38,315 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=METS, class=org.dspace.content.crosswalk.METSDisseminationCrosswalk
+2014-02-20 12:09:38,315 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=mets, class=org.dspace.content.crosswalk.METSDisseminationCrosswalk
+2014-02-20 12:09:38,315 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=METSRIGHTS, class=org.dspace.content.crosswalk.METSRightsCrosswalk
+2014-02-20 12:09:38,315 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=ore, class=org.dspace.content.crosswalk.OREDisseminationCrosswalk
+2014-02-20 12:09:38,316 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=dim, class=org.dspace.content.crosswalk.DIMDisseminationCrosswalk
+2014-02-20 12:09:38,316 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=DSPACE-ROLES, class=org.dspace.content.crosswalk.RoleCrosswalk
+2014-02-20 12:09:38,336 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=MODS, class=org.dspace.content.crosswalk.MODSDisseminationCrosswalk
+2014-02-20 12:09:38,336 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=mods, class=org.dspace.content.crosswalk.MODSDisseminationCrosswalk
+2014-02-20 12:09:38,338 DEBUG org.dspace.content.crosswalk.XSLTCrosswalk @ XSLTCrosswalk: Looking for config prefix = crosswalk.dissemination.
+2014-02-20 12:09:38,338 DEBUG org.dspace.content.crosswalk.XSLTCrosswalk @ Getting XSLT plugin name from config line: crosswalk.dissemination.marc.stylesheet
+2014-02-20 12:09:38,338 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=marc, class=org.dspace.content.crosswalk.XSLTDisseminationCrosswalk
+2014-02-20 12:09:38,340 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=QDC, class=org.dspace.content.crosswalk.QDCCrosswalk
+2014-02-20 12:09:38,340 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=qdc, class=org.dspace.content.crosswalk.QDCCrosswalk
+2014-02-20 12:09:38,341 DEBUG org.dspace.core.PluginManager @ Got Named Plugin, intfc=org.dspace.content.crosswalk.DisseminationCrosswalk, name=XHTML_HEAD_ITEM, class=org.dspace.content.crosswalk.XHTMLHeadDisseminationCrosswalk
+2014-02-20 12:09:38,341 DEBUG org.dspace.core.PluginManager @ Creating cached instance of: org.dspace.content.crosswalk.XHTMLHeadDisseminationCrosswalk for interface=org.dspace.content.crosswalk.DisseminationCrosswalk pluginName=XHTML_HEAD_ITEM
+2014-02-20 12:09:38,344 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=
+2014-02-20 12:09:38,345 DEBUG org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:http_request:-- URL Was\colon; http\colon;//localhost\colon;8080/master_jspui/handle/88435/1096
+-- Method\colon; GET
+-- Parameters were\colon;
+
+2014-02-20 12:09:38,345 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from handle where handle = ? "  with parameters: 88435/1096
+2014-02-20 12:09:38,347 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from community where community_id = ? "  with parameters: 37
+2014-02-20 12:09:38,348 DEBUG org.dspace.content.Community @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_community:community_id=37
+2014-02-20 12:09:38,348 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 4,37
+2014-02-20 12:09:38,349 DEBUG org.dspace.handle.HandleManager @ Resolved handle 88435/1096 to community 37
+2014-02-20 12:09:38,349 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT community.* FROM community, community2community WHERE community2community.parent_comm_id=community.community_id AND community2community.child_comm_id= ? "  with parameters: 37
+2014-02-20 12:09:38,350 INFO  org.dspace.app.webui.servlet.HandleServlet @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:view_community:community_id=37
+2014-02-20 12:09:38,350 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT collection.* FROM collection, community2collection WHERE community2collection.collection_id=collection.collection_id AND community2collection.community_id= ? ORDER BY collection.name"  with parameters: 37
+2014-02-20 12:09:38,360 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,293
+2014-02-20 12:09:38,361 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,294
+2014-02-20 12:09:38,362 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,295
+2014-02-20 12:09:38,363 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,296
+2014-02-20 12:09:38,363 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,297
+2014-02-20 12:09:38,364 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,298
+2014-02-20 12:09:38,365 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,299
+2014-02-20 12:09:38,365 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,300
+2014-02-20 12:09:38,366 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,301
+2014-02-20 12:09:38,366 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,302
+2014-02-20 12:09:38,367 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,303
+2014-02-20 12:09:38,367 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,304
+2014-02-20 12:09:38,368 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,305
+2014-02-20 12:09:38,368 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,306
+2014-02-20 12:09:38,368 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,307
+2014-02-20 12:09:38,369 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,308
+2014-02-20 12:09:38,369 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,309
+2014-02-20 12:09:38,370 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,310
+2014-02-20 12:09:38,370 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,311
+2014-02-20 12:09:38,370 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,312
+2014-02-20 12:09:38,371 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,313
+2014-02-20 12:09:38,371 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,314
+2014-02-20 12:09:38,372 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,315
+2014-02-20 12:09:38,372 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,316
+2014-02-20 12:09:38,372 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,317
+2014-02-20 12:09:38,373 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,318
+2014-02-20 12:09:38,373 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,319
+2014-02-20 12:09:38,373 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,320
+2014-02-20 12:09:38,374 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,321
+2014-02-20 12:09:38,374 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,322
+2014-02-20 12:09:38,375 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,323
+2014-02-20 12:09:38,375 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,324
+2014-02-20 12:09:38,376 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,325
+2014-02-20 12:09:38,376 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,326
+2014-02-20 12:09:38,377 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,327
+2014-02-20 12:09:38,377 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,328
+2014-02-20 12:09:38,378 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,329
+2014-02-20 12:09:38,378 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,330
+2014-02-20 12:09:38,378 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,331
+2014-02-20 12:09:38,379 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,332
+2014-02-20 12:09:38,379 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,333
+2014-02-20 12:09:38,380 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,334
+2014-02-20 12:09:38,380 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,335
+2014-02-20 12:09:38,381 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,336
+2014-02-20 12:09:38,381 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,337
+2014-02-20 12:09:38,382 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,338
+2014-02-20 12:09:38,382 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 3,339
+2014-02-20 12:09:38,382 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT community.* FROM community, community2community WHERE community2community.child_comm_id=community.community_id AND community2community.parent_comm_id= ? ORDER BY community.name"  with parameters: 37
+2014-02-20 12:09:38,384 DEBUG org.dspace.core.PluginManager @ Adding Sequence plugin for interface= org.dspace.plugin.CommunityHomeProcessor, class=org.dspace.app.webui.components.RecentCommunitySubmissions
+2014-02-20 12:09:38,390 INFO  org.dspace.browse.BrowseEngine @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:browse_mini:
+2014-02-20 12:09:38,390 DEBUG org.dspace.browse.BrowseDAOPostgres @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:executing_full_query:query=SELECT bi_item.* FROM bi_item, (SELECT communities2item.item_id FROM communities2item WHERE communities2item.community_id=? ) mappings  WHERE  bi_item.item_id=mappings.item_id  ORDER BY sort_3 DESC  NULLS LAST  LIMIT ? 
+2014-02-20 12:09:38,390 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT bi_item.* FROM bi_item, (SELECT communities2item.item_id FROM communities2item WHERE communities2item.community_id=? ) mappings  WHERE  bi_item.item_id=mappings.item_id  ORDER BY sort_3 DESC  NULLS LAST  LIMIT ? "  with parameters: 37,5
+2014-02-20 12:09:38,403 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from item where item_id = ? "  with parameters: 1523
+2014-02-20 12:09:38,406 DEBUG org.dspace.content.Item @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_item:item_id=1523
+2014-02-20 12:09:38,406 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 2,1523
+2014-02-20 12:09:38,407 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from item where item_id = ? "  with parameters: 882
+2014-02-20 12:09:38,408 DEBUG org.dspace.content.Item @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_item:item_id=882
+2014-02-20 12:09:38,408 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 2,882
+2014-02-20 12:09:38,408 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from item where item_id = ? "  with parameters: 1092
+2014-02-20 12:09:38,409 DEBUG org.dspace.content.Item @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_item:item_id=1092
+2014-02-20 12:09:38,409 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 2,1092
+2014-02-20 12:09:38,409 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from item where item_id = ? "  with parameters: 1437
+2014-02-20 12:09:38,410 DEBUG org.dspace.content.Item @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_item:item_id=1437
+2014-02-20 12:09:38,410 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 2,1437
+2014-02-20 12:09:38,411 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "select * from item where item_id = ? "  with parameters: 1140
+2014-02-20 12:09:38,412 DEBUG org.dspace.content.Item @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:find_item:item_id=1140
+2014-02-20 12:09:38,412 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM Handle WHERE resource_type_id = ? AND resource_id = ?"  with parameters: 2,1140
+2014-02-20 12:09:38,412 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT community.* FROM community, community2community WHERE community2community.parent_comm_id=community.community_id AND community2community.child_comm_id= ? "  with parameters: 37
+2014-02-20 12:09:38,414 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,1
+2014-02-20 12:09:38,422 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,1
+2014-02-20 12:09:38,423 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,3
+2014-02-20 12:09:38,424 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,3
+2014-02-20 12:09:38,425 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,4
+2014-02-20 12:09:38,425 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? AND action_id= ? "  with parameters: 4,37,4
+2014-02-20 12:09:38,428 INFO  org.dspace.usage.LoggerUsageEventListener @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:view_community:community_id=37
+2014-02-20 12:09:38,436 INFO  org.dspace.statistics.SolrLogger @ solr-statistics.spidersfile:null
+2014-02-20 12:09:38,436 INFO  org.dspace.statistics.SolrLogger @ solr-statistics.server:http://localhost:8080/solr/statistics
+2014-02-20 12:09:38,436 INFO  org.dspace.statistics.SolrLogger @ solr-statistics.dbfile:/Users/monikam/Installations/master/config/GeoLiteCity.dat
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Java version: 1.6.0_65
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Java vendor: Apple Inc.
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Java class path: /usr/local/tomcat/libexec/bin/bootstrap.jar:/usr/local/tomcat/libexec/bin/tomcat-juli.jar
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Operating system name: Mac OS X
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Operating system architecture: x86_64
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Operating system version: 10.9.1
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SUN 1.6: SUN (DSA key/parameter generation; DSA signing; SHA-1, MD5 digests; SecureRandom; X.509 certificates; JKS keystore; PKIX CertPathValidator; PKIX CertPathBuilder; LDAP, Collection CertStores, JavaPolicy Policy; JavaLoginConfig Configuration)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ Apple 1.0: Apple Provider (implements DES, Triple DES, AES, Blowfish, PBE, Diffie-Hellman, HMAC/MD5, HMAC/SHA1)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunRsaSign 1.5: Sun RSA signature provider
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunJSSE 1.6: Sun JSSE provider(PKCS12, SunX509 key/trust factories, SSLv3, TLSv1)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunJCE 1.6: SunJCE Provider (implements RSA, DES, Triple DES, AES, Blowfish, ARCFOUR, RC2, PBE, Diffie-Hellman, HMAC)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunJGSS 1.0: Sun (Kerberos v5, SPNEGO)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunSASL 1.5: Sun SASL provider(implements client mechanisms for: DIGEST-MD5, GSSAPI, EXTERNAL, PLAIN, CRAM-MD5; server mechanisms for: DIGEST-MD5, GSSAPI, CRAM-MD5)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ XMLDSig 1.0: XMLDSig (DOM XMLSignatureFactory; DOM KeyInfoFactory)
+2014-02-20 12:09:38,447 DEBUG org.apache.commons.httpclient.HttpClient @ SunPCSC 1.6: Sun PC/SC provider
+2014-02-20 12:09:38,453 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.useragent = Jakarta Commons-HttpClient/3.1
+2014-02-20 12:09:38,454 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.protocol.version = HTTP/1.1
+2014-02-20 12:09:38,455 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.connection-manager.class = class org.apache.commons.httpclient.SimpleHttpConnectionManager
+2014-02-20 12:09:38,455 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.protocol.cookie-policy = default
+2014-02-20 12:09:38,455 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.protocol.element-charset = US-ASCII
+2014-02-20 12:09:38,455 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.protocol.content-charset = ISO-8859-1
+2014-02-20 12:09:38,456 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.method.retry-handler = org.apache.commons.httpclient.DefaultHttpMethodRetryHandler@73a83205
+2014-02-20 12:09:38,456 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.dateparser.patterns = [EEE, dd MMM yyyy HH:mm:ss zzz, EEEE, dd-MMM-yy HH:mm:ss zzz, EEE MMM d HH:mm:ss yyyy, EEE, dd-MMM-yyyy HH:mm:ss z, EEE, dd-MMM-yyyy HH-mm-ss z, EEE, dd MMM yy HH:mm:ss z, EEE dd-MMM-yyyy HH:mm:ss z, EEE dd MMM yyyy HH:mm:ss z, EEE dd-MMM-yyyy HH-mm-ss z, EEE dd-MMM-yy HH:mm:ss z, EEE dd MMM yy HH:mm:ss z, EEE,dd-MMM-yy HH:mm:ss z, EEE,dd-MMM-yyyy HH:mm:ss z, EEE, dd-MM-yyyy HH:mm:ss z]
+2014-02-20 12:09:38,460 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.method.retry-handler = org.apache.commons.httpclient.DefaultHttpMethodRetryHandler@1d83bfee
+2014-02-20 12:09:38,460 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.connection-manager.max-per-host = {HostConfiguration[]=32}
+2014-02-20 12:09:38,460 DEBUG org.apache.commons.httpclient.params.DefaultHttpParams @ Set parameter http.connection-manager.max-total = 128
+2014-02-20 12:09:38,483 DEBUG org.apache.commons.httpclient.methods.GetMethod @ enter GetMethod(String)
+2014-02-20 12:09:38,484 DEBUG org.apache.commons.httpclient.HttpMethodBase @ HttpMethodBase.addRequestHeader(Header)
+2014-02-20 12:09:38,484 DEBUG org.apache.commons.httpclient.HttpClient @ enter HttpClient.executeMethod(HttpMethod)
+2014-02-20 12:09:38,484 DEBUG org.apache.commons.httpclient.HttpClient @ enter HttpClient.executeMethod(HostConfiguration,HttpMethod,HttpState)
+2014-02-20 12:09:38,488 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.getConnectionWithTimeout(HostConfiguration, long)
+2014-02-20 12:09:38,488 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ HttpConnectionManager.getConnection:  config = HostConfiguration[host=http://localhost:8080], timeout = 0
+2014-02-20 12:09:38,488 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,488 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,488 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Allocating new connection, hostConfig=HostConfiguration[host=http://localhost:8080]
+2014-02-20 12:09:38,491 DEBUG org.apache.commons.httpclient.HttpMethodDirector @ Attempt number 1 to process request
+2014-02-20 12:09:38,491 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.open()
+2014-02-20 12:09:38,492 DEBUG org.apache.commons.httpclient.HttpConnection @ Open connection to localhost:8080
+2014-02-20 12:09:38,494 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.execute(HttpState, HttpConnection)
+2014-02-20 12:09:38,494 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequest(HttpState, HttpConnection)
+2014-02-20 12:09:38,494 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequestLine(HttpState, HttpConnection)
+2014-02-20 12:09:38,494 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.generateRequestLine(HttpConnection, String, String, String, String)
+2014-02-20 12:09:38,495 DEBUG httpclient.wire.header @ >> "GET /solr/statistics/select?q=type%3A2+AND+id%3A1&wt=javabin&version=2 HTTP/1.1[\r][\n]"
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequestHeaders(HttpState,HttpConnection)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addUserAgentRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addHostRequestHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Adding Host request header
+2014-02-20 12:09:38,495 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addCookieRequestHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpState @ enter HttpState.getCookies()
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.cookie.CookieSpec @ enter CookieSpecBase.match(String, int, String, boolean, Cookie[])
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addProxyConnectionHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,502 DEBUG httpclient.wire.header @ >> "User-Agent: Solr[org.apache.solr.client.solrj.impl.CommonsHttpSolrServer] 1.0[\r][\n]"
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,502 DEBUG httpclient.wire.header @ >> "Host: localhost:8080[\r][\n]"
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.writeLine()
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,502 DEBUG httpclient.wire.header @ >> "[\r][\n]"
+2014-02-20 12:09:38,502 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.flushRequestOutputStream()
+2014-02-20 12:09:38,503 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponse(HttpState, HttpConnection)
+2014-02-20 12:09:38,503 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readStatusLine(HttpState, HttpConnection)
+2014-02-20 12:09:38,503 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.readLine()
+2014-02-20 12:09:38,504 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,504 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,504 DEBUG httpclient.wire.header @ << "HTTP/1.1 404 Not Found[\r][\n]"
+2014-02-20 12:09:38,504 DEBUG httpclient.wire.header @ << "HTTP/1.1 404 Not Found[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseHeaders(HttpState,HttpConnection)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.getResponseInputStream()
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HeaderParser.parseHeaders(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "Server: Apache-Coyote/1.1[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "Content-Type: text/html;charset=utf-8[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "Content-Language: en[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "Content-Length: 995[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "Date: Thu, 20 Feb 2014 17:09:38 GMT[\r][\n]"
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,505 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,505 DEBUG httpclient.wire.header @ << "[\r][\n]"
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.processResponseHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.processCookieHeaders(Header[], HttpState, HttpConnection)
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseBody(HttpState, HttpConnection)
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseBody(HttpConnection)
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.getResponseInputStream()
+2014-02-20 12:09:38,506 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.canResponseHaveBody(int)
+2014-02-20 12:09:38,507 DEBUG httpclient.wire.content @ << "<html><head><title>Apache Tomcat/7.0.47 - Error report</title><style><!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}A.name {color : black;}HR {color : #525D76;}--></style> </head><body><h1>HTTP Status 404 - /solr/statistics/select</h1><HR size="1" noshade="noshade"><p><b>type</b> Status report</p><p><b>message</b> <u>/solr/statistics/select</u></p><p><b>description</b> <u>The requested resource is not available.</u></p><HR size="1" noshade="noshade"><h3>Apache Tomcat/7.0.47</h3></body></html>"
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Resorting to protocol version default close connection policy
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Should NOT close connection, using HTTP/1.1
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.isResponseAvailable()
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.releaseConnection()
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.HttpConnection @ Releasing connection back to connection manager.
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.releaseConnection(HttpConnection)
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Freeing connection, hostConfig=HostConfiguration[host=http://localhost:8080]
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.util.IdleConnectionHandler @ Adding connection at: 1392916178507
+2014-02-20 12:09:38,507 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Notifying no-one, there are no waiting threads
+2014-02-20 12:09:38,508 ERROR org.dspace.statistics.SolrLogger @ Error executing query
+org.apache.solr.client.solrj.SolrServerException: Error executing query
+	at org.apache.solr.client.solrj.request.QueryRequest.process(QueryRequest.java:95)
+	at org.apache.solr.client.solrj.SolrServer.query(SolrServer.java:118)
+	at org.dspace.statistics.SolrLogger.<clinit>(SolrLogger.java:91)
+	at org.dspace.statistics.SolrLoggerUsageEventListener.receiveEvent(SolrLoggerUsageEventListener.java:37)
+	at org.dspace.services.events.SystemEventService.fireLocalEvent(SystemEventService.java:144)
+	at org.dspace.services.events.SystemEventService.fireEvent(SystemEventService.java:86)
+	at org.dspace.app.webui.servlet.HandleServlet.communityHome(HandleServlet.java:475)
+	at org.dspace.app.webui.servlet.HandleServlet.doDSGet(HandleServlet.java:253)
+	at org.dspace.app.webui.servlet.DSpaceServlet.processRequest(DSpaceServlet.java:120)
+	at org.dspace.app.webui.servlet.DSpaceServlet.doGet(DSpaceServlet.java:68)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:621)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:728)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:305)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:210)
+	at org.dspace.utils.servlet.DSpaceWebappServletFilter.doFilter(DSpaceWebappServletFilter.java:78)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:243)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:210)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:222)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:123)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:502)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:171)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:100)
+	at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:953)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:118)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:408)
+	at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1041)
+	at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:603)
+	at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:310)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+	at java.lang.Thread.run(Thread.java:695)
+Caused by: org.apache.solr.common.SolrException: Not Found
+
+Not Found
+
+request: http://localhost:8080/solr/statistics/select?q=type:2 AND id:1&wt=javabin&version=2
+	at org.apache.solr.client.solrj.impl.CommonsHttpSolrServer.request(CommonsHttpSolrServer.java:435)
+	at org.apache.solr.client.solrj.impl.CommonsHttpSolrServer.request(CommonsHttpSolrServer.java:244)
+	at org.apache.solr.client.solrj.request.QueryRequest.process(QueryRequest.java:89)
+	... 30 more
+2014-02-20 12:09:38,514 INFO  org.dspace.statistics.SolrLogger @ useProxies=false
+2014-02-20 12:09:38,520 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-altavista.txt
+2014-02-20 12:09:38,521 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-excite.txt
+2014-02-20 12:09:38,530 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-google.txt
+2014-02-20 12:09:38,532 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-infoseek.txt
+2014-02-20 12:09:38,556 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-inktomi.txt
+2014-02-20 12:09:38,558 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-lycos.txt
+2014-02-20 12:09:38,655 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-misc.txt
+2014-02-20 12:09:38,659 INFO  org.dspace.statistics.util.SpiderDetector @ Loaded Spider IP file: /Users/monikam/Installations/master/config/spiders/iplists.com-non_engines.txt
+2014-02-20 12:09:38,683 ERROR org.dspace.statistics.SolrLogger @ Failed DNS Lookup for IP:0:0:0:0:0:0:0:1%0
+2014-02-20 12:09:38,683 DEBUG org.dspace.statistics.SolrLogger @ Invalid IP address
+java.net.UnknownHostException: Invalid IP address
+	at org.xbill.DNS.ReverseMap.fromAddress(ReverseMap.java:109)
+	at org.xbill.DNS.ReverseMap.fromAddress(ReverseMap.java:122)
+	at org.dspace.statistics.util.DnsLookup.reverseDns(DnsLookup.java:30)
+	at org.dspace.statistics.SolrLogger.post(SolrLogger.java:212)
+	at org.dspace.statistics.SolrLoggerUsageEventListener.receiveEvent(SolrLoggerUsageEventListener.java:37)
+	at org.dspace.services.events.SystemEventService.fireLocalEvent(SystemEventService.java:144)
+	at org.dspace.services.events.SystemEventService.fireEvent(SystemEventService.java:86)
+	at org.dspace.app.webui.servlet.HandleServlet.communityHome(HandleServlet.java:475)
+	at org.dspace.app.webui.servlet.HandleServlet.doDSGet(HandleServlet.java:253)
+	at org.dspace.app.webui.servlet.DSpaceServlet.processRequest(DSpaceServlet.java:120)
+	at org.dspace.app.webui.servlet.DSpaceServlet.doGet(DSpaceServlet.java:68)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:621)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:728)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:305)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:210)
+	at org.dspace.utils.servlet.DSpaceWebappServletFilter.doFilter(DSpaceWebappServletFilter.java:78)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:243)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:210)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:222)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:123)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:502)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:171)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:100)
+	at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:953)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:118)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:408)
+	at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1041)
+	at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:603)
+	at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:310)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:895)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:918)
+	at java.lang.Thread.run(Thread.java:695)
+2014-02-20 12:09:38,684 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT community.* FROM community, community2community WHERE community2community.parent_comm_id=community.community_id AND community2community.child_comm_id= ? "  with parameters: 37
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.methods.PostMethod @ enter PostMethod.clearRequestBody()
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.clearRequestBody()
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.HttpMethodBase @ HttpMethodBase.addRequestHeader(Header)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.HttpClient @ enter HttpClient.executeMethod(HttpMethod)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.HttpClient @ enter HttpClient.executeMethod(HostConfiguration,HttpMethod,HttpState)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.getConnectionWithTimeout(HostConfiguration, long)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ HttpConnectionManager.getConnection:  config = HostConfiguration[host=http://localhost:8080], timeout = 0
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Getting free connection, hostConfig=HostConfiguration[host=http://localhost:8080]
+2014-02-20 12:09:38,689 DEBUG org.apache.commons.httpclient.HttpMethodDirector @ Attempt number 1 to process request
+2014-02-20 12:09:38,691 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.execute(HttpState, HttpConnection)
+2014-02-20 12:09:38,691 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequest(HttpState, HttpConnection)
+2014-02-20 12:09:38,691 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequestLine(HttpState, HttpConnection)
+2014-02-20 12:09:38,691 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.generateRequestLine(HttpConnection, String, String, String, String)
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "POST /solr/statistics/update?wt=javabin&version=2 HTTP/1.1[\r][\n]"
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.writeRequestHeaders(HttpState,HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.addRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.ExpectContinueMethod @ enter ExpectContinueMethod.addRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addUserAgentRequestHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addHostRequestHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Adding Host request header
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addCookieRequestHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpState @ enter HttpState.getCookies()
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.cookie.CookieSpec @ enter CookieSpecBase.match(String, int, String, boolean, Cookie[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.addProxyConnectionHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.addContentLengthRequestHeader(HttpState, HttpConnection)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.getRequestContentLength()
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.PostMethod @ enter PostMethod.hasRequestContent()
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.hasRequestContent()
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpMethodBase @ HttpMethodBase.addRequestHeader(Header)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.renerateRequestBody()
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "User-Agent: Solr[org.apache.solr.client.solrj.impl.CommonsHttpSolrServer] 1.0[\r][\n]"
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "Host: localhost:8080[\r][\n]"
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "Transfer-Encoding: chunked[\r][\n]"
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "Content-Type: application/xml; charset=UTF-8[\r][\n]"
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.print(String)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.writeLine()
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[])
+2014-02-20 12:09:38,692 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.write(byte[], int, int)
+2014-02-20 12:09:38,692 DEBUG httpclient.wire.header @ >> "[\r][\n]"
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.writeRequestBody(HttpState, HttpConnection)
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.PostMethod @ enter PostMethod.hasRequestContent()
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.hasRequestContent()
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.getRequestContentLength()
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.PostMethod @ enter PostMethod.hasRequestContent()
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ enter EntityEnclosingMethod.hasRequestContent()
+2014-02-20 12:09:38,693 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.getRequestOutputStream()
+2014-02-20 12:09:38,694 DEBUG httpclient.wire.content @ >> "b6[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.content @ >> "<add><doc boost="1.0"><field name="ip">0:0:0:0:0:0:0:1%0</field><field name="id">37</field><field name="type">4</field><field name="time">2014-02-20T12:09:38.661Z</field></doc></add>"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.content @ >> "[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.content @ >> "0"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.content @ >> "[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.content @ >> "[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.methods.EntityEnclosingMethod @ Request body sent
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.flushRequestOutputStream()
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponse(HttpState, HttpConnection)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readStatusLine(HttpState, HttpConnection)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.readLine()
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.header @ << "HTTP/1.1 404 Not Found[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.header @ << "HTTP/1.1 404 Not Found[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseHeaders(HttpState,HttpConnection)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.getResponseInputStream()
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HeaderParser.parseHeaders(InputStream, String)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.header @ << "Server: Apache-Coyote/1.1[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,695 DEBUG httpclient.wire.header @ << "Content-Type: text/html;charset=utf-8[\r][\n]"
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,695 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,696 DEBUG httpclient.wire.header @ << "Content-Language: en[\r][\n]"
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,696 DEBUG httpclient.wire.header @ << "Content-Length: 995[\r][\n]"
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,696 DEBUG httpclient.wire.header @ << "Date: Thu, 20 Feb 2014 17:09:38 GMT[\r][\n]"
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readLine(InputStream, String)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpParser @ enter HttpParser.readRawLine()
+2014-02-20 12:09:38,696 DEBUG httpclient.wire.header @ << "[\r][\n]"
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.processResponseHeaders(HttpState, HttpConnection)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.processCookieHeaders(Header[], HttpState, HttpConnection)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseBody(HttpState, HttpConnection)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.readResponseBody(HttpConnection)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.getResponseInputStream()
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ enter HttpMethodBase.canResponseHaveBody(int)
+2014-02-20 12:09:38,696 DEBUG httpclient.wire.content @ << "<html><head><title>Apache Tomcat/7.0.47 - Error report</title><style><!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}A.name {color : black;}HR {color : #525D76;}--></style> </head><body><h1>HTTP Status 404 - /solr/statistics/update</h1><HR size="1" noshade="noshade"><p><b>type</b> Status report</p><p><b>message</b> <u>/solr/statistics/update</u></p><p><b>description</b> <u>The requested resource is not available.</u></p><HR size="1" noshade="noshade"><h3>Apache Tomcat/7.0.47</h3></body></html>"
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Resorting to protocol version default close connection policy
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpMethodBase @ Should NOT close connection, using HTTP/1.1
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.isResponseAvailable()
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpConnection @ enter HttpConnection.releaseConnection()
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.HttpConnection @ Releasing connection back to connection manager.
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.releaseConnection(HttpConnection)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Freeing connection, hostConfig=HostConfiguration[host=http://localhost:8080]
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.util.IdleConnectionHandler @ Adding connection at: 1392916178696
+2014-02-20 12:09:38,696 DEBUG org.apache.commons.httpclient.MultiThreadedHttpConnectionManager @ Notifying no-one, there are no waiting threads
+2014-02-20 12:09:38,696 ERROR org.dspace.statistics.SolrLoggerUsageEventListener @ Not Found
+
+Not Found
+
+request: http://localhost:8080/solr/statistics/update?wt=javabin&version=2
+2014-02-20 12:09:38,697 DEBUG org.dspace.app.webui.util.JSPManager @ anonymous:session_id=9DBCB4F42D9A2F90E82A46F6F393B62E:ip_addr=0:0:0:0:0:0:0:1%0:view_jsp:/community-home.jsp
+2014-02-20 12:09:38,720 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place"  with parameters: 1523
+2014-02-20 12:09:38,742 INFO  org.dspace.content.MetadataField @ Loading MetadataField elements into cache.
+2014-02-20 12:09:38,742 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * from MetadataFieldRegistry"  with parameters: 
+2014-02-20 12:09:38,756 INFO  org.dspace.content.MetadataSchema @ Loading schema cache for fast finds
+2014-02-20 12:09:38,756 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * from MetadataSchemaRegistry"  with parameters: 
+2014-02-20 12:09:38,769 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place"  with parameters: 882
+2014-02-20 12:09:38,776 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place"  with parameters: 1092
+2014-02-20 12:09:38,779 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place"  with parameters: 1437
+2014-02-20 12:09:38,782 DEBUG org.dspace.storage.rdbms.DatabaseManager @ Running query "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place"  with parameters: 1140
+2014-02-20 12:09:38,836 DEBUG org.dspace.authenticate.IPAuthentication @ anonymous::authenticated:special_groups=
