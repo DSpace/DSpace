@@ -135,23 +135,14 @@ public class DSpaceServlet extends HttpServlet
 
         catch (AuthorizeException ae)
         {
-            /*
-             * If no user is logged in, we will start authentication, since if
-             * they authenticate, they might be allowed to do what they tried to
-             * do. If someone IS logged in, and we got this exception, we know
-             * they tried to do something they aren't allowed to, so we display
-             * an error in that case.
-             */
-            if (context.getCurrentUser() != null ||
-                Authenticate.startAuthentication(context, request, response))
-            {
+
                 // FIXME: Log the right info?
                 // Log the error
                 log.info(LogManager.getHeader(context, "authorize_error", ae
                         .toString()));
 
                 JSPManager.showAuthorizeError(request, response, ae);
-            }
+
         }
         finally
         {
