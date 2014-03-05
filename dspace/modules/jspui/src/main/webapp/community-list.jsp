@@ -55,43 +55,63 @@
     		Map collectionMap, Map subcommunityMap, boolean showLogos) throws ItemCountException, IOException, SQLException
     {
 		
-        out.println( "<li class=\"media well\">" );
+        out.println( "<div class=\"list-group-item\">" );
+        out.println( "<div class=\"row\">" );
         Bitstream logo = c.getLogo();
+        String titleOffset="";
+        String titleCols="";
         if (showLogos && logo != null)
         {
-        	out.println("<a class=\"pull-left col-md-2\" href=\"" + request.getContextPath() + "/handle/" 
-        		+ c.getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 
+            out.println("<a class=\"pull-left col-md-1 col-sm-2 col-xs-12\" href=\"" + request.getContextPath() + "/handle/" 
+        		+ c.getHandle() + "\"><img class=\"community-logo img-responsive\" src=\"" + 
         		request.getContextPath() + "/retrieve/" + logo.getID() + "\" alt=\"community logo\"></a>");
+            titleCols="col-md-9 col-sm-8 col-xs-10";            
         }
-        out.println( "<div class=\"media-body\"><h4 class=\"media-heading\"><a href=\"" + request.getContextPath() + "/handle/" 
-        	+ c.getHandle() + "\">" + c.getMetadata("name") + "</a>");
+        if (showLogos && logo == null){
+            titleOffset="col-md-offset-1 col-sm-offset-2";
+            titleCols="col-md-9 col-sm-8 col-xs-10";
+        }
+        out.println( "<div class=\""+ titleCols +" "+titleOffset+"\">");
+        out.println( "<h4 class=\"\"><a href=\"" + request.getContextPath() + "/handle/" 
+        	+ c.getHandle() + "\">" + c.getMetadata("name") + "</a></h4>");
+        
+        if (StringUtils.isNotBlank(c.getMetadata("short_description")))
+	{
+            out.println(c.getMetadata("short_description"));
+	}
+        out.println("</div>");
+
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
-            out.println(" <span class=\"badge\">" + ic.getCount(c) + "</span>");
+            out.println("<div class=\"col-md-1 col-sm-1 col-xs-1\" >");
+            out.println("<span class=\"badge pull-right\">" + ic.getCount(c) + "</span>");
+            out.println("</div>");
         }
-		out.println("</h4>");
-		if (StringUtils.isNotBlank(c.getMetadata("short_description")))
-		{
-			out.println(c.getMetadata("short_description"));
-		}
-		out.println("<br>");
+	
+        
+        out.println( "<div class=\"col-md-1 col-xs-1 col-xs-1 pull-right\" style=\"text-align:center\">");
+        out.println( "<a class=\"community-toggler\" id=\"cinvoker-"+c.getHandle().replace("/","-")+"\" data-toggle=\"collapse\" data-parent=\"community-list\" data-target=\"#collapse-"+c.getHandle().replace("/","-")+"\" href=\"#collapse-"+c.getHandle().replace("/","-")+"\"><span class=\"glyphicon glyphicon-plus\"></a>");
+        out.println( "</div>");
+        out.println( "<div class=\"clearfix\"></div>");
+        out.println( "<div class=\"collapse collapsible\" data-invoker=\"cinvoker-"+c.getHandle().replace("/","-")+"\" id=\"collapse-"+c.getHandle().replace("/","-")+"\">" );
+        
         // Get the collections in this community
-        Collection[] cols = (Collection[]) collectionMap.get(c.getID());
+        Collection[] cols = (Collection[]) c.getCollections();
         if (cols != null && cols.length > 0)
         {
-            out.println("<ul class=\"media-list\">");
+            out.println("<div class=\"list-group community-collections\">");
             for (int j = 0; j < cols.length; j++)
             {
-                out.println("<li class=\"media well\">");
-                
+                out.println("<div class=\"list-group-item\">");
+                out.println("<div class=\"row\">");
                 Bitstream logoCol = cols[j].getLogo();
                 if (showLogos && logoCol != null)
                 {
-                	out.println("<a class=\"pull-left col-md-2\" href=\"" + request.getContextPath() + "/handle/" 
+                	out.println("<a class=\"pull-left col-md-1\" href=\"" + request.getContextPath() + "/handle/" 
                 		+ cols[j].getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 
                 		request.getContextPath() + "/retrieve/" + logoCol.getID() + "\" alt=\"collection logo\"></a>");
                 }
-                out.println("<div class=\"media-body\"><h4 class=\"media-heading\"><a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
+                out.println("<div class=\"col-md-11\"><h4 class=\"media-heading\"><a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
                     out.println(" [" + ic.getCount(cols[j]) + "]");
@@ -102,58 +122,65 @@
 					out.println(cols[j].getMetadata("short_description"));
 				}
 				out.println("</div>");
-                out.println("</li>");
+                out.println("</div>");
+                out.println("</div>");
             }
-            out.println("</ul>");
+            out.println("</div>");
         }
-
+        
         // Get the sub-communities in this community
-        Community[] comms = (Community[]) subcommunityMap.get(c.getID());
+        Community[] comms = (Community[]) c.getSubcommunities();
         if (comms != null && comms.length > 0)
         {
-            out.println("<ul class=\"media-list\">");
+            out.println("<div class=\"list-group community-subcommunities\">");
             for (int k = 0; k < comms.length; k++)
             {
-               showCommunity(comms[k], out, request, ic, collectionMap, subcommunityMap);
+               showCommunity(comms[k], out, request, ic, collectionMap, subcommunityMap, showLogos);
             }
-            out.println("</ul>"); 
+            out.println("</div>"); 
         }
+        
         out.println("</div>");
-        out.println("</li>");
+        out.println("</div>");
+        out.println("</div>");
     }
 %>
 
 <dspace:layout titlekey="jsp.community-list.title">
-    <div class="well">
+    <div class="panel">
 <%
     if (admin_button)
     {
 %>     
 <dspace:sidebar>
-			<div class="panel panel-warning">
-			<div class="panel-heading">
-				<fmt:message key="jsp.admintools"/>
-				<span class="pull-right">
-					<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
-				</span>
-			</div>
-			<div class="panel-body">
-                <form method="post" action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
-                    <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
-					<input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.community-list.create.button"/>" />
-                </form>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <fmt:message key="jsp.admintools"/>
+            <span class="pull-right">
+                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>
+                </span>
             </div>
+            <div class="panel-body">
+                <form method="post" action="<%=request.getContextPath()%>/dspace-admin/edit-communities">
+                <input type="hidden" name="action" value="<%=EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
+                <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.community-list.create.button"/>" />
+            </form>
+        </div>
+    </div>
 </dspace:sidebar>
 <%
     }
 %>
-	<h1><fmt:message key="jsp.community-list.title"/></h1>
-	<p><fmt:message key="jsp.community-list.text1"/></p>
+    
+        <h1><fmt:message key="jsp.community-list.title"/></h1>
+        <p><fmt:message key="jsp.community-list.text1"/></p>
+    
+	
 
 <% if (communities.length != 0)
 {
 %>
-    <ul class="media-list">
+    <div class="list-group" id="community-list">
 <%
         for (int i = 0; i < communities.length; i++)
         {
@@ -161,8 +188,10 @@
         }
 %>
     </ul>
- 
+    </div>
 <% }
 %>
+
+    
     </div>
 </dspace:layout>

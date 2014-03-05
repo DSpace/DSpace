@@ -9,8 +9,22 @@ $(document).ready(function() {
         e.stopPropagation();
     });
 
-    jQuery('.community-toggler').click(function(e) {
-        e.preventDefault();
-        var collapse = jQuery(this).closest('');
+    jQuery('.collapsible').on('shown.bs.collapse', function(e) {
+        // Get Invoker
+        var invokerId = $(this).attr('data-invoker');
+        jQuery('#' + invokerId).children('span.glyphicon').removeClass("glyphicon-plus").addClass("glyphicon-minus");
+        e.stopPropagation();
+        //Getlist group item
+        jQuery(this).parents('.list-group-item').addClass('active');
     });
+
+    jQuery('.collapsible').on('hidden.bs.collapse', function(e) {
+        // Get Invoker
+        var invokerId = $(this).attr('data-invoker');
+        jQuery('#' + invokerId).children('span.glyphicon').removeClass("glyphicon-minus").addClass("glyphicon-plus");
+        e.stopPropagation();
+        //Getlist group item
+        jQuery(this).parents('.list-group-item').removeClass('active');
+    });
+
 });
