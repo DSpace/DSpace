@@ -10,7 +10,7 @@ package org.dspace;
 
 import java.util.Properties;
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 import org.dspace.core.ConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +23,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author mwood
  */
-@MockClass(realClass=ConfigurationManager.class)
-public class MockConfigurationManager {
+public class MockConfigurationManager
+        extends MockUp<ConfigurationManager>
+{
     private static final Properties properties = new Properties();
     private static final Logger log = LoggerFactory.getLogger(MockConfigurationManager.class);
 
