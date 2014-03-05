@@ -162,6 +162,7 @@ public class BitstreamServlet extends DSpaceServlet
 }
 
 class ReferredObjects {
+    private static Logger log = Logger.getLogger(BitstreamServlet.class);
 
     Item item = null;
     Bitstream bitstream = null;
@@ -216,13 +217,11 @@ class ReferredObjects {
         // Now try and retrieve the item
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
-        Boolean found = false;
-
         // Make sure we have valid item and sequence number
         if (dso != null && dso.getType() == Constants.ITEM && sequenceID >= 0) {
             item = (Item) dso;
             if (!item.isWithdrawn()) {
-
+                Boolean found = false;
                 Bundle[] bundles = item.getBundles();
                 for (int i = 0; (i < bundles.length) && !found; i++) {
                     Bitstream[] bitstreams = bundles[i].getBitstreams();

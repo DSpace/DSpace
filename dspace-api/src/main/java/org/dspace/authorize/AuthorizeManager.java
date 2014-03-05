@@ -185,26 +185,6 @@ public class AuthorizeManager
                 actionText = Constants.actionText[action];
             }
 
-// -----------------------------------------------------------------------------------
-// Mark Ratliff:  Added this to handle Princeton campus network authentication
-
-// Get the Group Number of the authorization group representing Princeton IP addresses
-String ipgrpstr = ConfigurationManager.getProperty("Princeton_IP_group");
-int ipgrp = Integer.parseInt(ipgrpstr);
-
-// Check to see if any resrouce policies associated with this item match the
-//  IP address group
-for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
-{
-if (rp.getGroupID() == ipgrp)
-{
-     throw new PUIPAuthorizeException("Authorization denied for action "
-                    + actionText + " on " + Constants.typeText[otype] + ":"
-                    + oid + " by user " + userid, o, action);
-}
-}
-// -----------------------------------------------------------------------------------
-
             throw new AuthorizeException("Authorization denied for action "
                     + actionText + " on " + Constants.typeText[otype] + ":"
                     + oid + " by user " + userid, o, action);
