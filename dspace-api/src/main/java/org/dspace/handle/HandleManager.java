@@ -139,6 +139,7 @@ public class HandleManager
     public static String createHandle(Context context, DSpaceObject dso)
             throws SQLException
     {
+
 //        TableRow handle = DatabaseManager.create(context, "Handle");
 //        String handleId = createId(handle.getIntColumn("handle_id"));
 //
@@ -147,24 +148,20 @@ public class HandleManager
 //        handle.setColumn("resource_id", dso.getID());
 //        DatabaseManager.update(context, handle);
 //
-//        if (log.isDebugEnabled())
-//        {
-//            log.debug("Created new handle for "
-//                    + Constants.typeText[dso.getType()] + " " + handleId);
-//        }
-//    	
-//		  return handleID;
-    	
-    	// Retrieve an ARK identifier and pass it to the overloaded createHandle
-    	// method below.
-    	
-    	// Request ARK ID
-    	
-		String arkId = ArkManager.createArkID();
-		
-    	HandleManager.createHandle(context, dso, arkId);
-    	
-        return arkId;
+
+        // PU modification - using ArkManager
+        // create handleId from ArkManager
+        String handleId = ArkManager.createArkID();
+        // attach handleId to dso
+    	HandleManager.createHandle(context, dso, handleId);
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Created new handle for "
+                    + Constants.typeText[dso.getType()] + " '" + handleId + "'");
+        }
+
+        return handleId;
     }
 
     /**

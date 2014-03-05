@@ -6,8 +6,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
+import com.sun.tools.internal.ws.wsdl.document.jaxws.*;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+
+import javax.naming.ConfigurationException;
 
 /**
  * This class provides static methods for requesting ARK identifiers from
@@ -19,8 +26,9 @@ import org.dspace.core.ConfigurationManager;
 
 public class ArkManager {
 	
-	
-	/**
+	static Logger log = Logger.getLogger(ArkManager.class);
+
+    /**
 	 * This method requests a new ARK identifier from the ARK minter defined
 	 *   as ark.minter_url in the dpsace.cfg configuration file.
 	 *   
@@ -29,21 +37,32 @@ public class ArkManager {
 	
 	public static String createArkID() {
 
-		String arkminterurl = ConfigurationManager
-				.getProperty("ark.minter_url");
-		
-		// Define the command that will be sent to the ARK minter
-		String command = "?mint+1";
+		String arkminterurl = ConfigurationManager.getProperty("ark.minter_url");
 
-		String prefixedarkID = doRequest(arkminterurl+command);
+        if (null != arkminterurl) {
+            // assume we are authorized and go ahead get an arkId
 
-		// Strip off the "id: " that NOID puts in front of the ID
-		String arkID = prefixedarkID.substring(4);
+    		// Define the command that will be sent to the ARK minter
+	    	String command = "?mint+1";
 
-		registerItemURL(arkID);
+		    String prefixedarkID = doRequest(arkminterurl+command);
 
-		return arkID;
-	}
+		    // Strip off the "id: " that NOID puts in front of the ID
+		    String arkID = prefixedarkID.substring(4);
+
+		    registerItemURL(arkID);
+
+            return arkID;
+
+        } else {
+            if (ConfigurationManager.getBooleanProperty("dspace.debug")) {
+                // fake it and return a unique but meaningless string
+                return "nohandle/" + String.valueOf(new Date().getTime());
+            } else {
+                throw new RuntimeException("no setting for " + "ark.minter_url");
+            }
+		}
+    }
 
 	/**
 	 * This method registers the URL of Item in DSpace with the ARK resolver service
@@ -96,7 +115,11 @@ public class ArkManager {
 	
 	private static String makeHttpRequest(String myUri) throws IOException {
 		String str = null;
-		URL hp = new URL(myUri);
+        if (log.isDebugEnabled()) {
+            log.debug("Request arkId from " + myUri);
+        }
+
+        URL hp = new URL(myUri);
 		URLConnection conn = hp.openConnection();
 		conn.addRequestProperty("User-Agent", "WelshCorgi/1.0(WC 1.0; "
 				+ System.getProperty("os.version") + "; "
@@ -104,8 +127,14 @@ public class ArkManager {
 				+ System.getProperty("os.arch") + ") Corgi/1.0.0.0");
 		InputStream input = conn.getInputStream();
 		conn.connect();
-		String mime = conn.getContentType();
 
+        if (log.isDebugEnabled()) {
+            Map<String, List<String>> headers = conn.getHeaderFields();
+            for (String elem : headers.keySet()) {
+                log.debug(String.format("connection.%s= %s", elem, headers.get(elem)));
+            }
+        }
+		String mime = conn.getContentType();
 		if (mime.startsWith("html") || mime.startsWith("text")) {
 			// Get response data.
 			BufferedReader inputData = new BufferedReader(
