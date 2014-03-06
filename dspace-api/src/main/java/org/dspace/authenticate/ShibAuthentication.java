@@ -1102,7 +1102,7 @@ public class ShibAuthentication implements AuthenticationMethod
                             "reconvert.attributes",
                             false);
                 
-                if (reconvertAttributes)
+                if (!StringUtils.isEmpty(value) && reconvertAttributes)
                 {
                     try {
                         value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
