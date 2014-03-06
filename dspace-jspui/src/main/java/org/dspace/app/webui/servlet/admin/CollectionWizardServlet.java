@@ -303,7 +303,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         }
 
         // Need to set a name so that the indexer won't throw an exception
-        collection.setMetadata("name", "");
+        collection.setMetadata(Collection.NAME_TEXT, "");
         collection.update();
 
         // Now display "basic info" screen
@@ -471,12 +471,12 @@ public class CollectionWizardServlet extends DSpaceServlet
             }
 
             // Get metadata
-            collection.setMetadata("name", wrapper.getParameter("name"));
-            collection.setMetadata("short_description", wrapper.getParameter("short_description"));
-            collection.setMetadata("introductory_text", wrapper.getParameter("introductory_text"));
-            collection.setMetadata("copyright_text", wrapper.getParameter("copyright_text"));
-            collection.setMetadata("side_bar_text", wrapper.getParameter("side_bar_text"));
-            collection.setMetadata("provenance_description", wrapper.getParameter("provenance_description"));
+            collection.setMetadata(Collection.NAME_TEXT, wrapper.getParameter("name"));
+            collection.setMetadata(Collection.SHORT_DESCRIPTION, wrapper.getParameter("short_description"));
+            collection.setMetadata(Collection.INTRODUCTORY_TEXT, wrapper.getParameter("introductory_text"));
+            collection.setMetadata(Collection.COPYRIGHT_TEXT, wrapper.getParameter("copyright_text"));
+            collection.setMetadata(Collection.SIDEBAR_TEXT, wrapper.getParameter("side_bar_text"));
+            collection.setMetadata(Collection.PROVENANCE_TEXT, wrapper.getParameter("provenance_description"));
             // Need to be more careful about license -- make sure it's null if
             // nothing was entered
             String license = wrapper.getParameter("license");

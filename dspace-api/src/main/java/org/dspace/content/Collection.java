@@ -78,6 +78,7 @@ public class Collection extends DSpaceObject
     private Group admins;
 
     // Keys for accessing Collection metadata
+    public static final String NAME_TEXT = "name";
     public static final String COPYRIGHT_TEXT = "copyright_text";
     public static final String INTRODUCTORY_TEXT = "introductory_text";
     public static final String SHORT_DESCRIPTION = "short_description";
@@ -885,7 +886,7 @@ public class Collection extends DSpaceObject
      */
     public void setLicense(String license)
     {
-        setMetadata("license",license);
+        setMetadata(LICENSE_TEXT,license);
     }
 
     /**

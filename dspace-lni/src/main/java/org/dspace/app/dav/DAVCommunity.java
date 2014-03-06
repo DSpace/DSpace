@@ -228,7 +228,7 @@ class DAVCommunity extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.community.setMetadata("name", newValue);
+            this.community.setMetadata(Community.NAME_TEXT, newValue);
         }
         else if (elementsEqualIsh(prop, logoProperty))
         {
@@ -330,7 +330,7 @@ class DAVCommunity extends DAVDSpaceObject
             SQLException, AuthorizeException, IOException
     {
         Collection newColl = this.community.createCollection();
-        newColl.setMetadata("name", name);
+        newColl.setMetadata(Collection.NAME_TEXT, name);
         newColl.update();
         return HttpServletResponse.SC_OK;
     }

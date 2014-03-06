@@ -58,6 +58,7 @@ public class Community extends DSpaceObject
     private Group admins;
 
     // Keys for accessing Community metadata
+    public static final String NAME_TEXT = "name";
     public static final String COPYRIGHT_TEXT = "copyright_text";
     public static final String INTRODUCTORY_TEXT = "introductory_text";
     public static final String SHORT_DESCRIPTION = "short_description";
@@ -398,7 +399,7 @@ public class Community extends DSpaceObject
      */
     public void setMetadata(String field, String value)throws MissingResourceException
     {
-        if ((field.trim()).equals("name") 
+        if ((field.trim()).equals(NAME_TEXT)
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -432,7 +433,7 @@ public class Community extends DSpaceObject
     @Override
     public String getName()
     {
-    	String metadata = ourRow.getStringColumn("name");
+    	String metadata = ourRow.getStringColumn(NAME_TEXT);
     	return (metadata == null) ? "" : metadata;
     }
 
@@ -451,8 +452,8 @@ public class Community extends DSpaceObject
      * Give the community a logo. Passing in <code>null</code> removes any
      * existing logo. You will need to set the format of the new logo bitstream
      * before it will work, for example to "JPEG". Note that
-     * <code>update(/code> will need to be called for the change to take
-     * effect.  Setting a logo and not calling <code>update</code> later may
+     * {@link update} will need to be called for the change to take
+     * effect.  Setting a logo and not calling {@link update} later may
      * result in a previous logo lying around as an "orphaned" bitstream.
      *
      * @param  is   the stream to use as the new logo

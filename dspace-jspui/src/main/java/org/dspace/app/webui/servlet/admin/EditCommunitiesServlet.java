@@ -509,8 +509,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         storeAuthorizeAttributeCommunityEdit(context, request, community);
         
-        community.setMetadata("name", request.getParameter("name"));
-        community.setMetadata("short_description", request
+        community.setMetadata(Community.NAME_TEXT, request.getParameter("name"));
+        community.setMetadata(Community.SHORT_DESCRIPTION, request
                 .getParameter("short_description"));
 
         String intro = request.getParameter("introductory_text");
@@ -534,9 +534,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
             side = null;
         }
 
-        community.setMetadata("introductory_text", intro);
-        community.setMetadata("copyright_text", copy);
-        community.setMetadata("side_bar_text", side);
+        community.setMetadata(Community.INTRODUCTORY_TEXT, intro);
+        community.setMetadata(Community.COPYRIGHT_TEXT, copy);
+        community.setMetadata(Community.SIDEBAR_TEXT, side);
         community.update();
 
         // Which button was pressed?
@@ -646,8 +646,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         storeAuthorizeAttributeCollectionEdit(context, request, collection);
 
         // Update the basic metadata
-        collection.setMetadata("name", request.getParameter("name"));
-        collection.setMetadata("short_description", request
+        collection.setMetadata(Collection.NAME_TEXT, request.getParameter("name"));
+        collection.setMetadata(Collection.SHORT_DESCRIPTION, request
                 .getParameter("short_description"));
 
         String intro = request.getParameter("introductory_text");
@@ -685,11 +685,11 @@ public class EditCommunitiesServlet extends DSpaceServlet
             provenance = null;
         }
 
-        collection.setMetadata("introductory_text", intro);
-        collection.setMetadata("copyright_text", copy);
-        collection.setMetadata("side_bar_text", side);
-        collection.setMetadata("license", license);
-        collection.setMetadata("provenance_description", provenance);
+        collection.setMetadata(Collection.INTRODUCTORY_TEXT, intro);
+        collection.setMetadata(Collection.COPYRIGHT_TEXT, copy);
+        collection.setMetadata(Collection.SIDEBAR_TEXT, side);
+        collection.setMetadata(Collection.LICENSE_TEXT, license);
+        collection.setMetadata(Collection.PROVENANCE_TEXT, provenance);
         
         
         

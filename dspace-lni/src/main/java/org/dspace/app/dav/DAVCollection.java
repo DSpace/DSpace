@@ -288,7 +288,7 @@ class DAVCollection extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.collection.setMetadata("name", newValue);
+            this.collection.setMetadata(Collection.NAME_TEXT, newValue);
         }
         else if (elementsEqualIsh(prop, default_licenseProperty))
         {

@@ -248,7 +248,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         String provDesc = "provenance description";
         String license = "license text";
 
-        c.setMetadata("name", name);
+        c.setMetadata(Collection.NAME_TEXT, name);
         c.setMetadata(Collection.SHORT_DESCRIPTION, sdesc);
         c.setMetadata(Collection.INTRODUCTORY_TEXT, itext);
         c.setMetadata("logo_bitstream_id", logo);
@@ -256,7 +256,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         c.setMetadata(Collection.SIDEBAR_TEXT, sidebar);
         c.setMetadata("template_item_id", tempItem);
         c.setMetadata(Collection.PROVENANCE_TEXT, provDesc);
-        c.setMetadata("license", license);
+        c.setMetadata(Collection.LICENSE_TEXT, license);
 
         assertThat("testSetMetadata 0",c.getName(), equalTo(name));
         assertThat("testSetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(sdesc));

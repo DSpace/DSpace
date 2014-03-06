@@ -355,7 +355,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         String copy = "copyright declaration";
         String sidebar = "side bar text";
 
-        c.setMetadata("name", name);
+        c.setMetadata(Community.NAME_TEXT, name);
         c.setMetadata(Community.SHORT_DESCRIPTION, sdesc);
         c.setMetadata(Community.INTRODUCTORY_TEXT, itext);
         c.setMetadata("logo_bitstream_id", logo);

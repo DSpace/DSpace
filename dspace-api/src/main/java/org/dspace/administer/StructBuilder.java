@@ -398,7 +398,7 @@ public class StructBuilder
             }
             
             // default the short description to be an empty string
-            community.setMetadata("short_description", " ");
+            community.setMetadata(Community.SHORT_DESCRIPTION, " ");
             
             // now update the metadata
             Node tn = communities.item(i);
@@ -509,7 +509,7 @@ public class StructBuilder
             Collection collection = parent.createCollection();
             
             // default the short description to the empty string
-            collection.setMetadata("short_description", " ");
+            collection.setMetadata(Collection.SHORT_DESCRIPTION, " ");
             
             // import the rest of the metadata
             Node tn = collections.item(i);

@@ -122,13 +122,13 @@ public class FlowContainerUtils
         }
 		
 		// Save the metadata
-		collection.setMetadata("name", name);
-		collection.setMetadata("short_description", shortDescription);
-		collection.setMetadata("introductory_text", introductoryText);
-		collection.setMetadata("copyright_text", copyrightText);
-		collection.setMetadata("side_bar_text", sideBarText);
-		collection.setMetadata("license", license);
-		collection.setMetadata("provenance_description", provenanceDescription);
+		collection.setMetadata(Collection.NAME_TEXT, name);
+		collection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
+		collection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
+		collection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
+		collection.setMetadata(Collection.SIDEBAR_TEXT, sideBarText);
+		collection.setMetadata(Collection.LICENSE_TEXT, license);
+		collection.setMetadata(Collection.PROVENANCE_TEXT, provenanceDescription);
 		
         
 		// Change or delete the logo
@@ -786,15 +786,15 @@ public class FlowContainerUtils
         }
 		
 		// Save the metadata
-		newCollection.setMetadata("name", name);
-		newCollection.setMetadata("short_description", shortDescription);
-		newCollection.setMetadata("introductory_text", introductoryText);
-		newCollection.setMetadata("copyright_text", copyrightText);
-		newCollection.setMetadata("side_bar_text", sideBarText);
-		newCollection.setMetadata("license", license);
-		newCollection.setMetadata("provenance_description", provenanceDescription);
-		
-        
+		newCollection.setMetadata(Collection.NAME_TEXT, name);
+		newCollection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
+		newCollection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
+		newCollection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
+		newCollection.setMetadata(Collection.SIDEBAR_TEXT, sideBarText);
+		newCollection.setMetadata(Collection.LICENSE_TEXT, license);
+		newCollection.setMetadata(Collection.PROVENANCE_TEXT, provenanceDescription);
+
+
         // Set the logo
     	Object object = request.get("logo");
     	Part filePart = null;
@@ -881,11 +881,11 @@ public class FlowContainerUtils
             sideBarText = null;
         }
 		
-		newCommunity.setMetadata("name", name);
-		newCommunity.setMetadata("short_description", shortDescription);
-		newCommunity.setMetadata("introductory_text", introductoryText);
-		newCommunity.setMetadata("copyright_text", copyrightText);
-		newCommunity.setMetadata("side_bar_text", sideBarText);
+		newCommunity.setMetadata(Community.NAME_TEXT, name);
+		newCommunity.setMetadata(Community.SHORT_DESCRIPTION, shortDescription);
+		newCommunity.setMetadata(Community.INTRODUCTORY_TEXT, introductoryText);
+		newCommunity.setMetadata(Community.COPYRIGHT_TEXT, copyrightText);
+		newCommunity.setMetadata(Community.SIDEBAR_TEXT, sideBarText);
         
     	// Upload the logo
 		Object object = request.get("logo");
@@ -961,11 +961,11 @@ public class FlowContainerUtils
         }
 		
 		// Save the data
-		community.setMetadata("name", name);
-		community.setMetadata("short_description", shortDescription);
-        community.setMetadata("introductory_text", introductoryText);
-        community.setMetadata("copyright_text", copyrightText);
-        community.setMetadata("side_bar_text", sideBarText);
+		community.setMetadata(Community.NAME_TEXT, name);
+		community.setMetadata(Community.SHORT_DESCRIPTION, shortDescription);
+        community.setMetadata(Community.INTRODUCTORY_TEXT, introductoryText);
+        community.setMetadata(Community.COPYRIGHT_TEXT, copyrightText);
+        community.setMetadata(Community.SIDEBAR_TEXT, sideBarText);
         
         if (deleteLogo)
         {
