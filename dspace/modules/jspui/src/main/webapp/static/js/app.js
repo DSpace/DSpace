@@ -15,7 +15,7 @@ $(document).ready(function() {
         jQuery('#' + invokerId).children('span.glyphicon').removeClass("glyphicon-plus").addClass("glyphicon-minus");
         e.stopPropagation();
         //Getlist group item
-        jQuery(this).parents('.list-group-item').addClass('active');
+        jQuery(this).closest('.list-group-item').addClass('active');
     });
 
     jQuery('.collapsible').on('hidden.bs.collapse', function(e) {
@@ -24,7 +24,7 @@ $(document).ready(function() {
         jQuery('#' + invokerId).children('span.glyphicon').removeClass("glyphicon-minus").addClass("glyphicon-plus");
         e.stopPropagation();
         //Getlist group item
-        jQuery(this).parents('.list-group-item').removeClass('active');
+        jQuery(this).closest('.list-group-item').removeClass('active');
     });
 
 });
