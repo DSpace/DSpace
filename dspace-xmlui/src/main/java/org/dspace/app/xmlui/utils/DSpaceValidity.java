@@ -239,11 +239,11 @@ public class DSpaceValidity implements SourceValidity
 
             validityKey.append("Community:");
             validityKey.append(community.getHandle());
-            validityKey.append(community.getMetadataSingleValue("introductory_text"));
-            validityKey.append(community.getMetadataSingleValue("short_description"));
-            validityKey.append(community.getMetadataSingleValue("side_bar_text"));
-            validityKey.append(community.getMetadataSingleValue("copyright_text"));
-            validityKey.append(community.getMetadataSingleValue("name"));
+            validityKey.append(community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT));
+            validityKey.append(community.getMetadataSingleValue(Community.SHORT_DESCRIPTION));
+            validityKey.append(community.getMetadataSingleValue(Community.SIDEBAR_TEXT));
+            validityKey.append(community.getMetadataSingleValue(Community.COPYRIGHT_TEXT));
+            validityKey.append(community.getName());
             
             // Add the communities logo
             this.add(community.getLogo());
@@ -255,13 +255,13 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Collection:");
             validityKey.append(collection.getHandle());
-            validityKey.append(collection.getMetadataSingleValue("introductory_text"));
-            validityKey.append(collection.getMetadataSingleValue("short_description"));
-            validityKey.append(collection.getMetadataSingleValue("side_bar_text"));
-            validityKey.append(collection.getMetadataSingleValue("provenance_description"));
-            validityKey.append(collection.getMetadataSingleValue("copyright_text"));
-            validityKey.append(collection.getMetadataSingleValue("license"));
-            validityKey.append(collection.getMetadataSingleValue("name"));
+            validityKey.append(collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
+            validityKey.append(collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.LICENSE_TEXT));
+            validityKey.append(collection.getName());
             
             // Add the logo also;
             this.add(collection.getLogo());

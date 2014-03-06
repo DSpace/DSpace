@@ -304,11 +304,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             if (searchScope instanceof Community)
             {
                 Community community = (Community) searchScope;
-                String communityName = community.getMetadataSingleValue("name");
+                String communityName = community.getName();
                 results.setHead(T_head1_community.parameterize(displayedResults, totalResults, communityName, searchTime));
             } else if (searchScope instanceof Collection){
                 Collection collection = (Collection) searchScope;
-                String collectionName = collection.getMetadataSingleValue("name");
+                String collectionName = collection.getName();
                 results.setHead(T_head1_collection.parameterize(displayedResults, totalResults, collectionName, searchTime));
             } else {
                 results.setHead(T_head1_none.parameterize(displayedResults, totalResults, searchTime));
@@ -495,14 +495,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
     protected void renderCollection(Collection collection, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List collectionMetadata) throws WingException {
 
-        String description = collection.getMetadataSingleValue("introductory_text");
-        String description_abstract = collection.getMetadataSingleValue("short_description");
-        String description_table = collection.getMetadataSingleValue("side_bar_text");
+        String description = collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT);
+        String description_abstract = collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION);
+        String description_table = collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT);
         String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
-        String provenance = collection.getMetadataSingleValue("provenance_description");
-        String rights = collection.getMetadataSingleValue("copyright_text");
-        String rights_license = collection.getMetadataSingleValue("license");
-        String title = collection.getMetadataSingleValue("name");
+        String provenance = collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT);
+        String rights = collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT);
+        String rights_license = collection.getMetadataSingleValue(Collection.LICENSE_TEXT);
+        String title = collection.getName();
 
         if(StringUtils.isNotBlank(description))
         {
@@ -546,12 +546,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
 
     protected void renderCommunity(Community community, DiscoverResult.DSpaceObjectHighlightResult highlightedResults, org.dspace.app.xmlui.wing.element.List communityMetadata) throws WingException {
-        String description = community.getMetadataSingleValue("introductory_text");
-        String description_abstract = community.getMetadataSingleValue("short_description");
-        String description_table = community.getMetadataSingleValue("side_bar_text");
+        String description = community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT);
+        String description_abstract = community.getMetadataSingleValue(Community.SHORT_DESCRIPTION);
+        String description_table = community.getMetadataSingleValue(Community.SIDEBAR_TEXT);
         String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
-        String rights = community.getMetadataSingleValue("copyright_text");
-        String title = community.getMetadataSingleValue("name");
+        String rights = community.getMetadataSingleValue(Community.COPYRIGHT_TEXT);
+        String title = community.getName();
 
         if(StringUtils.isNotBlank(description))
         {
@@ -681,30 +681,30 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             scope.addOption("/", T_all_of_dspace);
             scope.setOptionSelected("/");
             for (Community community : Community.findAllTop(context)) {
-                scope.addOption(community.getHandle(), community.getMetadataSingleValue("name"));
+                scope.addOption(community.getHandle(), community.getName());
             }
         } else if (scopeDSO instanceof Community) {
             // The scope is a community, display all collections contained
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/", T_all_of_dspace);
-            scope.addOption(community.getHandle(), community.getMetadataSingleValue("name"));
+            scope.addOption(community.getHandle(), community.getName());
             scope.setOptionSelected(community.getHandle());
 
             for (Collection collection : community.getCollections()) {
-                scope.addOption(collection.getHandle(), collection.getMetadataSingleValue("name"));
+                scope.addOption(collection.getHandle(), collection.getName());
             }
         } else if (scopeDSO instanceof Collection) {
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/", T_all_of_dspace);
-            scope.addOption(collection.getHandle(), collection.getMetadataSingleValue("name"));
+            scope.addOption(collection.getHandle(), collection.getName());
             scope.setOptionSelected(collection.getHandle());
 
             Community[] communities = collection.getCommunities()[0]
                     .getAllParents();
             for (Community community : communities) {
-                scope.addOption(community.getHandle(), community.getMetadataSingleValue("name"));
+                scope.addOption(community.getHandle(), community.getName());
             }
         }
     }

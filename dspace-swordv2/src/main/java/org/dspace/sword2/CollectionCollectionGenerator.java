@@ -53,7 +53,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 		String location = urlManager.getDepositLocation(col);
 
 		// collection title is just its name
-		String title = col.getMetadataSingleValue("name");
+		String title = col.getName();
 
 		// the collection policy is the licence to which the collection adheres
 		String collectionPolicy = col.getLicense();
@@ -62,7 +62,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 		// String treatment = " ";
 
 		// abstract is the short description of the collection
-		String dcAbstract = col.getMetadataSingleValue("short_description");
+		String dcAbstract = col.getMetadataSingleValue(Collection.SHORT_DESCRIPTION);
 
 		// we just do support mediation
 		boolean mediation = swordConfig.isMediated();

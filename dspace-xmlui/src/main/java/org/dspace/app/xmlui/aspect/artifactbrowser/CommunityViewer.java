@@ -177,7 +177,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set up the major variables
         Community community = (Community) dso;
         // Set the page title
-        String name = community.getMetadataSingleValue("name");
+        String name = community.getName();
         if (name == null || name.length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
@@ -233,7 +233,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-        String name = community.getMetadataSingleValue("name");
+        String name = community.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);

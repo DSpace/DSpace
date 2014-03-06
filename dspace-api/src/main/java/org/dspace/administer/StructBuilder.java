@@ -433,34 +433,34 @@ public class StructBuilder
             element.setAttribute("identifier", community.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(community.getMetadataSingleValue("name"));
+            nameElement.setText(community.getName());
             element.addContent(nameElement);
             
-            if (community.getMetadataSingleValue("short_description") != null)
+            if (community.getMetadataSingleValue(Community.SHORT_DESCRIPTION) != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(community.getMetadataSingleValue("short_description"));
+                descriptionElement.setText(community.getMetadataSingleValue(Community.SHORT_DESCRIPTION));
                 element.addContent(descriptionElement);
             }
             
-            if (community.getMetadataSingleValue("introductory_text") != null)
+            if (community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT) != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(community.getMetadataSingleValue("introductory_text"));
+                introElement.setText(community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT));
                 element.addContent(introElement);
             }
             
-            if (community.getMetadataSingleValue("copyright_text") != null)
+            if (community.getMetadataSingleValue(Community.COPYRIGHT_TEXT) != null)
             {
-                Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(community.getMetadataSingleValue("copyright_text"));
+                Element copyrightElement = new Element(Community.COPYRIGHT_TEXT);
+                copyrightElement.setText(community.getMetadataSingleValue(Community.COPYRIGHT_TEXT));
                 element.addContent(copyrightElement);
             }
             
-            if (community.getMetadataSingleValue("side_bar_text") != null)
+            if (community.getMetadataSingleValue(Community.SIDEBAR_TEXT) != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(community.getMetadataSingleValue("side_bar_text"));
+                sidebarElement.setText(community.getMetadataSingleValue(Community.SIDEBAR_TEXT));
                 element.addContent(sidebarElement);
             }
             
@@ -527,48 +527,48 @@ public class StructBuilder
             element.setAttribute("identifier", collection.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(collection.getMetadataSingleValue("name"));
+            nameElement.setText(collection.getName());
             element.addContent(nameElement);
             
-            if (collection.getMetadataSingleValue("short_description") != null)
+            if (collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION) != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(collection.getMetadataSingleValue("short_description"));
+                descriptionElement.setText(collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
                 element.addContent(descriptionElement);
             }
             
-            if (collection.getMetadataSingleValue("introductory_text") != null)
+            if (collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT) != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(collection.getMetadataSingleValue("introductory_text"));
+                introElement.setText(collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
                 element.addContent(introElement);
             }
             
-            if (collection.getMetadataSingleValue("copyright_text") != null)
+            if (collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT) != null)
             {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(collection.getMetadataSingleValue("copyright_text"));
+                copyrightElement.setText(collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
                 element.addContent(copyrightElement);
             }
             
-            if (collection.getMetadataSingleValue("side_bar_text") != null)
+            if (collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT) != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(collection.getMetadataSingleValue("side_bar_text"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadataSingleValue("license") != null)
+            if (collection.getMetadataSingleValue(Collection.LICENSE_TEXT) != null)
             {
                 Element sidebarElement = new Element("license");
-                sidebarElement.setText(collection.getMetadataSingleValue("license"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.LICENSE_TEXT));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadataSingleValue("provenance_description") != null)
+            if (collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT) != null)
             {
                 Element sidebarElement = new Element("provenance");
-                sidebarElement.setText(collection.getMetadataSingleValue("provenance_description"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT));
                 element.addContent(sidebarElement);
             }
             

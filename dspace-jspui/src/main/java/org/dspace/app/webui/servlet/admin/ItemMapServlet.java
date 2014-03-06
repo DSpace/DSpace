@@ -346,8 +346,7 @@ public class ItemMapServlet extends DSpaceServlet
             }
     		
             request.setAttribute("collection", myCollection);
-    		request.setAttribute("browsetext", targetCollection
-    				.getMetadataSingleValue("name"));
+    		request.setAttribute("browsetext", targetCollection.getName());
     		request.setAttribute("items", items);
     		request.setAttribute("browsetype", "Remove");
     		

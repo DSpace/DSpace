@@ -83,6 +83,7 @@ public class Collection extends DSpaceObject
     public static final String SHORT_DESCRIPTION = "short_description";
     public static final String SIDEBAR_TEXT = "side_bar_text";
     public static final String PROVENANCE_TEXT = "provenance_description";
+    public static final String LICENSE_TEXT = "license";
     
     /**
      * Construct a collection with the given table row
@@ -527,7 +528,8 @@ public class Collection extends DSpaceObject
     @Override
     public String getName()
     {
-        return getMetadataSingleValue("name");
+    	String name = ourRow.getStringColumn("name");
+    	return (name == null) ? "" : name;
     }
 
     /**
@@ -840,7 +842,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicense()
     {
-        String license = getMetadataSingleValue("license");
+        String license = getMetadataSingleValue(LICENSE_TEXT);
 
         if (license == null || license.trim().equals(""))
         {
@@ -859,7 +861,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicenseCollection()
     {
-        return getMetadataSingleValue("license");
+        return getMetadataSingleValue(LICENSE_TEXT);
     }
 
     /**
@@ -869,7 +871,7 @@ public class Collection extends DSpaceObject
      */
     public boolean hasCustomLicense()
     {
-        String license = getMetadataSingleValue("license");
+        String license = getMetadataSingleValue(LICENSE_TEXT);
 
         return !( license == null || license.trim().equals("") );
     }

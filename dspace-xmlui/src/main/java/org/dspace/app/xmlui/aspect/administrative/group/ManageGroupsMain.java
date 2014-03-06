@@ -226,7 +226,7 @@ public class ManageGroupsMain
                 Collection collection = Collection.find(context, id);
                 if (collection != null)
                 {
-                    collectionOrCommunityName = collection.getMetadataSingleValue("name");
+                    collectionOrCommunityName = collection.getName();
                     collectionOrCommunity = collection;
                 }
             }
@@ -238,7 +238,7 @@ public class ManageGroupsMain
                     Community community = Community.find(context, id);
                     if (community != null)
                     {
-                        collectionOrCommunityName = community.getMetadataSingleValue("name");
+                        collectionOrCommunityName = community.getName();
                         collectionOrCommunity = community;
                     }
                 }

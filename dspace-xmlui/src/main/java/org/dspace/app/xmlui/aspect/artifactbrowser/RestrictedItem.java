@@ -134,14 +134,14 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             Community community = (Community) dso;
             unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_community);
-            unauthorized.addPara(T_para_community.parameterize(community.getMetadataSingleValue("name")));
+            unauthorized.addPara(T_para_community.parameterize(community.getName()));
         } 
         else if (dso instanceof Collection) 
         {
             Collection collection = (Collection) dso;
             unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_collection);
-            unauthorized.addPara(T_para_collection.parameterize(collection.getMetadataSingleValue("name")));
+            unauthorized.addPara(T_para_collection.parameterize(collection.getName()));
         } 
         else if (dso instanceof Item) 
         {

@@ -185,14 +185,14 @@ public class FeedServlet extends DSpaceServlet
             labelMap.put(SyndicationFeed.MSG_FEED_TITLE,
                 MessageFormat.format(msgs.getString(clazz + ".feed.title"),
                                      new Object[]{ msgs.getString(clazz + ".feed-type.collection"),
-                                                   ((Collection)dso).getMetadataSingleValue("short_description")}));
+                                                   ((Collection)dso).getMetadataSingleValue(Collection.SHORT_DESCRIPTION)}));
         }
         else if (dso != null &&  dso.getType() == Constants.COMMUNITY)
         {
             labelMap.put(SyndicationFeed.MSG_FEED_TITLE,
                 MessageFormat.format(msgs.getString(clazz + ".feed.title"),
                                      new Object[]{ msgs.getString(clazz + ".feed-type.community"),
-                                                   ((Community)dso).getMetadataSingleValue("short_description")}));
+                                                   ((Community)dso).getMetadataSingleValue(Community.SHORT_DESCRIPTION)}));
         }
 
         // Lookup or generate the feed

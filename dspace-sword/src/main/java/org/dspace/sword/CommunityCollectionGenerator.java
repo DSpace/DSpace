@@ -43,7 +43,7 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 		scol.setLocation(location);
 
 		// collection title is just the community name
-		String title = com.getMetadataSingleValue("name");
+		String title = com.getName();
 		if (title != null && !"".equals(title))
 		{
 			scol.setTitle(title);
@@ -54,7 +54,7 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 		// String collectionPolicy = col.getLicense();
 
 		// abstract is the short description of the collection
-		String dcAbstract = com.getMetadataSingleValue("short_description");
+		String dcAbstract = com.getMetadataSingleValue(Community.SHORT_DESCRIPTION);
 		if (dcAbstract != null && !"".equals(dcAbstract))
 		{
 			scol.setAbstract(dcAbstract);

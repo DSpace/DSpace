@@ -707,11 +707,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         // and populate it
-        String description = community.getMetadataSingleValue("introductory_text");
-        String description_abstract = community.getMetadataSingleValue("short_description");
-        String description_table = community.getMetadataSingleValue("side_bar_text");
-        String rights = community.getMetadataSingleValue("copyright_text");
-        String title = community.getMetadataSingleValue("name");
+        String description = community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT);
+        String description_abstract = community.getMetadataSingleValue(Community.SHORT_DESCRIPTION);
+        String description_table = community.getMetadataSingleValue(Community.SIDEBAR_TEXT);
+        String rights = community.getMetadataSingleValue(Community.COPYRIGHT_TEXT);
+        String title = community.getName();
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(community.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description", description);
@@ -758,13 +758,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
 
         // and populate it
-        String description = collection.getMetadataSingleValue("introductory_text");
-        String description_abstract = collection.getMetadataSingleValue("short_description");
-        String description_table = collection.getMetadataSingleValue("side_bar_text");
-        String provenance = collection.getMetadataSingleValue("provenance_description");
-        String rights = collection.getMetadataSingleValue("copyright_text");
-        String rights_license = collection.getMetadataSingleValue("license");
-        String title = collection.getMetadataSingleValue("name");
+        String description = collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT);
+        String description_abstract = collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION);
+        String description_table = collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT);
+        String provenance = collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT);
+        String rights = collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT);
+        String rights_license = collection.getMetadataSingleValue(Collection.LICENSE_TEXT);
+        String title = collection.getName();
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(collection.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description", description);

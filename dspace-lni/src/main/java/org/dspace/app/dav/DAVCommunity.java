@@ -157,19 +157,19 @@ class DAVCommunity extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(property, short_descriptionProperty))
         {
-            value = getObjectMetadata("short_description");
+            value = getObjectMetadata(Community.SHORT_DESCRIPTION);
         }
         else if (elementsEqualIsh(property, introductory_textProperty))
         {
-            value = getObjectMetadata("introductory_text");
+            value = getObjectMetadata(Community.INTRODUCTORY_TEXT);
         }
         else if (elementsEqualIsh(property, side_bar_textProperty))
         {
-            value = getObjectMetadata("side_bar_text");
+            value = getObjectMetadata(Community.SIDEBAR_TEXT);
         }
         else if (elementsEqualIsh(property, copyright_textProperty))
         {
-            value = getObjectMetadata("copyright_text");
+            value = getObjectMetadata(Community.COPYRIGHT_TEXT);
         }
         else
         {

@@ -1022,7 +1022,7 @@ public class DSIndexer
         Document doc = buildDocument(Constants.COMMUNITY, community.getID(), community.getHandle(), null);
 
         // and populate it
-        String name = community.getMetadataSingleValue("name");
+        String name = community.getName();
 
         if (name != null)
         {
@@ -1048,7 +1048,7 @@ public class DSIndexer
         Document doc = buildDocument(Constants.COLLECTION, collection.getID(), collection.getHandle(), location_text);
 
         // and populate it
-        String name = collection.getMetadataSingleValue("name");
+        String name = collection.getName();
 
         if (name != null)
         {

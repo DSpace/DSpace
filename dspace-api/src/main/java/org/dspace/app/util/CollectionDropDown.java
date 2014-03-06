@@ -54,10 +54,10 @@ public class CollectionDropDown {
         getCom = col.getCommunities(); // all communities containing given collection
         for (Community com : getCom)
         {
-            name.insert(0, com.getMetadataSingleValue("name") + separator);
+            name.insert(0, com.getName() + separator);
         }
 
-        name.append(col.getMetadataSingleValue("name"));
+        name.append(col.getName());
 
         if (maxchars != 0)
         {

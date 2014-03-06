@@ -168,7 +168,7 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-        String name = community.getMetadataSingleValue("name");
+        String name = community.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);

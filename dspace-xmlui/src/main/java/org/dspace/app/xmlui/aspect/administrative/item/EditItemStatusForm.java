@@ -135,7 +135,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		List subList = itemInfo.addList("collections", List.TYPE_SIMPLE);
 		Collection[] collections = item.getCollections();
 		for(Collection collection : collections) {
-			subList.addItem(collection.getMetadataSingleValue("name"));
+			subList.addItem(collection.getName());
 		}
 		
 		itemInfo.addLabel(T_label_page);

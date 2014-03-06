@@ -432,7 +432,8 @@ public class Community extends DSpaceObject
     @Override
     public String getName()
     {
-        return getMetadataSingleValue("name");
+    	String metadata = ourRow.getStringColumn("name");
+    	return (metadata == null) ? "" : metadata;
     }
 
     /**

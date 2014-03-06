@@ -59,7 +59,7 @@ public class DeleteCollectionConfirm extends AbstractDSpaceTransformer
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-confirm-delete",contextPath+"/admin/collection",Division.METHOD_POST,"primary administrative collection");
 	    main.setHead(T_main_head.parameterize(collectionID));
-	    main.addPara(T_main_para.parameterize(thisCollection.getMetadataSingleValue("name")));	    
+	    main.addPara(T_main_para.parameterize(thisCollection.getName()));
 	    List deleteConfirmHelp = main.addList("consequences",List.TYPE_BULLETED);
 	    deleteConfirmHelp.addItem(T_confirm_item1);
 	    deleteConfirmHelp.addItem(T_confirm_item2);

@@ -221,15 +221,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     public void testGetMetadata()
     {
         //by default all empty values will return ""
-        assertThat("testGetMetadata 0",c.getMetadataSingleValue("name"), equalTo(""));
-        assertThat("testGetMetadata 1",c.getMetadataSingleValue("short_description"), equalTo(""));
-        assertThat("testGetMetadata 2",c.getMetadataSingleValue("introductory_text"), equalTo(""));
+        assertThat("testGetMetadata 0",c.getName(), equalTo(""));
+        assertThat("testGetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(""));
+        assertThat("testGetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(""));
         assertThat("testGetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(""));
-        assertThat("testGetMetadata 4",c.getMetadataSingleValue("copyright_text"), equalTo(""));
+        assertThat("testGetMetadata 4",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(""));
         assertThat("testGetMetadata 5",c.getMetadataSingleValue("template_item_id"), equalTo(""));
-        assertThat("testGetMetadata 6",c.getMetadataSingleValue("provenance_description"), equalTo(""));
-        assertThat("testGetMetadata 7",c.getMetadataSingleValue("side_bar_text"), equalTo(""));
-        assertThat("testGetMetadata 8",c.getMetadataSingleValue("license"), equalTo(""));
+        assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(""));
+        assertThat("testGetMetadata 7",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(""));
+        assertThat("testGetMetadata 8",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(""));
     }
 
     /**
@@ -249,24 +249,24 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         String license = "license text";
 
         c.setMetadata("name", name);
-        c.setMetadata("short_description", sdesc);
-        c.setMetadata("introductory_text", itext);
+        c.setMetadata(Collection.SHORT_DESCRIPTION, sdesc);
+        c.setMetadata(Collection.INTRODUCTORY_TEXT, itext);
         c.setMetadata("logo_bitstream_id", logo);
-        c.setMetadata("copyright_text", copy);
-        c.setMetadata("side_bar_text", sidebar);
+        c.setMetadata(Collection.COPYRIGHT_TEXT, copy);
+        c.setMetadata(Collection.SIDEBAR_TEXT, sidebar);
         c.setMetadata("template_item_id", tempItem);
-        c.setMetadata("provenance_description", provDesc);
+        c.setMetadata(Collection.PROVENANCE_TEXT, provDesc);
         c.setMetadata("license", license);
 
-        assertThat("testSetMetadata 0",c.getMetadataSingleValue("name"), equalTo(name));
-        assertThat("testSetMetadata 1",c.getMetadataSingleValue("short_description"), equalTo(sdesc));
-        assertThat("testSetMetadata 2",c.getMetadataSingleValue("introductory_text"), equalTo(itext));
+        assertThat("testSetMetadata 0",c.getName(), equalTo(name));
+        assertThat("testSetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(sdesc));
+        assertThat("testSetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(itext));
         assertThat("testSetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(logo));
-        assertThat("testSetMetadata 4",c.getMetadataSingleValue("copyright_text"), equalTo(copy));
-        assertThat("testSetMetadata 5",c.getMetadataSingleValue("side_bar_text"), equalTo(sidebar));
+        assertThat("testSetMetadata 4",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(copy));
+        assertThat("testSetMetadata 5",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(sidebar));
         assertThat("testGetMetadata 6",c.getMetadataSingleValue("template_item_id"), equalTo(tempItem));
-        assertThat("testGetMetadata 7",c.getMetadataSingleValue("provenance_description"), equalTo(provDesc));
-        assertThat("testGetMetadata 8",c.getMetadataSingleValue("license"), equalTo(license));
+        assertThat("testGetMetadata 7",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(provDesc));
+        assertThat("testGetMetadata 8",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(license));
     }
 
     /**

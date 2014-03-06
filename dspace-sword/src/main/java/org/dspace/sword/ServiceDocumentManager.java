@@ -125,7 +125,7 @@ public class ServiceDocumentManager
 			{
 				Collection collection = (Collection) dso;
 				Workspace workspace = new Workspace();
-				workspace.setTitle(collection.getMetadataSingleValue("name"));
+				workspace.setTitle(collection.getName());
 
 				List<Item> items = swordAuth.getAllowedItems(swordContext, collection);
 				for (Item item : items)
@@ -140,7 +140,7 @@ public class ServiceDocumentManager
 			{
 				Community community = (Community) dso;
 				Workspace workspace = new Workspace();
-				workspace.setTitle(community.getMetadataSingleValue("name"));
+				workspace.setTitle(community.getName());
 
 				List<Collection> collections = swordAuth.getAllowedCollections(swordContext, community);
 				for (Collection collection : collections)

@@ -288,13 +288,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
-	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getMetadataSingleValue("name"));
+	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getName());
 	    }
 	    else if(community != null)
         {
             Para para = main.addPara();
             para.addContent(T_community_para);
-            para.addXref(contextPath+"/handle/"+community.getHandle(), community.getMetadataSingleValue("name"));
+            para.addXref(contextPath+"/handle/"+community.getHandle(), community.getName());
         }
 	   
 	    // DIVISION: group-actions
@@ -510,7 +510,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         		Collection collection = Collection.find(context, FlowGroupUtils.getCollectionId(group.getName()) );
         		if (collection != null)
         		{
-	        		String collectionName = collection.getMetadataSingleValue("name");
+	        		String collectionName = collection.getName();
 	        		
 	        		if (collectionName == null)
                     {

@@ -92,7 +92,7 @@ public class SuggestServlet extends DSpaceServlet
                     title = titleDC[0].value;
                 }
                 Collection[] colls = item.getCollections();
-                collName = colls[0].getMetadataSingleValue("name");
+                collName = colls[0].getName();
             }
         }
         else

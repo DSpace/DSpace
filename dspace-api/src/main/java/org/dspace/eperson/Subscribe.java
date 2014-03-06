@@ -456,7 +456,7 @@ public class Subscribe
                     }
 
                     emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(" ").append(
-                            c.getMetadataSingleValue("name")).append(": ").append(
+                            c.getName()).append(": ").append(
                             itemInfos.size()).append("\n\n");
 
                     for (int j = 0; j < itemInfos.size(); j++)

@@ -416,7 +416,7 @@ public class XmlWorkflowManager {
 
             email.addRecipient(ep.getEmail());
             email.addArgument(title);
-            email.addArgument(coll.getMetadataSingleValue("name"));
+            email.addArgument(coll.getName());
             email.addArgument(HandleManager.getCanonicalForm(handle));
 
             email.send();
@@ -860,7 +860,7 @@ public class XmlWorkflowManager {
 
             email.addRecipient(wi.getSubmitter().getEmail());
             email.addArgument(title);
-            email.addArgument(coll.getMetadataSingleValue("name"));
+            email.addArgument(coll.getName());
             email.addArgument(rejector);
             email.addArgument(reason);
             email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");
