@@ -40,10 +40,12 @@ public class ViewAgreement
      * @return whether user should sign agreement before proceeding
      */
     public static boolean mustAgree(HttpSession session, Item item) {
+        log.debug("> mustAgree " + item.getHandle());
         ViewAgreement viewAgreements = getViewAgreement(session);
         DSpaceObject obj = viewAgreements.getWantsAgreement(item);
         if (obj == null) {
-            log.debug(String.format("item %s   obj = null -> mustAgree=false", item.getHandle()));
+            if (log.isDebugEnabled())
+                log.debug(String.format("item %s   obj = null -> mustAgree=false", item.getHandle()));
             return false;    // nothing in config found that says we need an agreement
         } else {
             ViewAgreementStatus status = viewAgreements.getAgreementStatus(obj);
@@ -138,10 +140,10 @@ public class ViewAgreement
     }
 
     private  DSpaceObject getWantsAgreement(Item item) {
-        DSpaceObject obj;
+        DSpaceObject obj = item;
         try {
-            obj = item.getOwningCollection();
             while (obj != null) {
+                log.debug("getWantsAgreement: obj = " + obj.getHandle());
                 String handle = obj.getHandle();
                 String handle_view_agreement_file = ConfigurationManager.getProperty(handle + ".bitstream_view_agreement_file");
                 if (handle_view_agreement_file != null) {
@@ -153,17 +155,18 @@ public class ViewAgreement
                         } catch (NumberFormatException e) {
                             // stick with default
                         }
-                        break;
                     }
+                    return obj;
                 }
                 obj = obj.getParentObject();
             }
         } catch (SQLException e) {
             log.error("How come???  SQLException", e);
             obj = null;
-        }
-        if (log.isDebugEnabled() && obj != null) {
-            log.debug(String.format("getWantsAgreement item %s  - obj %s", item.getHandle(), obj.getHandle()));
+        } finally {
+            if (log.isDebugEnabled() && obj != null) {
+                log.debug(String.format("getWantsAgreement item %s  - obj %s", item.getHandle(), obj.getHandle()));
+            }
         }
         return obj;
     }
