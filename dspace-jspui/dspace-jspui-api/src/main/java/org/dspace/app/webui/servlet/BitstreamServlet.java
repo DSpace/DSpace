@@ -63,8 +63,11 @@ public class BitstreamServlet extends DSpaceServlet
 	}
 
     @Override
-    protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
+    protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException, AuthorizeException {
         ReferredObjects ref = new ReferredObjects(context, request);
+        if (log.isDebugEnabled())
+            log.debug("doDSGet " + ref);
 
         InputStream is = null;
 
@@ -77,7 +80,7 @@ public class BitstreamServlet extends DSpaceServlet
 
             if (ref.bitstream == null || ref.filename == null || !ref.filename.equals(ref.bitstream.getName())) {
                 // No bitstream found or filename was wrong -- ID invalid
-                log.info(LogManager.getHeader(context, "invalid_id", "path=" + ref.idString));
+                log.error(LogManager.getHeader(context, "invalid_id", "path=" + ref.idString));
                 JSPManager.showInvalidIDError(request, response, ref.idString, Constants.BITSTREAM);
 
                 return;
@@ -89,12 +92,12 @@ public class BitstreamServlet extends DSpaceServlet
             // now that we know that user has authorization to access bitstream
             // check whether we need to make user sign agreement before proceeding
             if (ViewAgreement.mustAgree(request.getSession(), ref.item)) {
-                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",mustAgree=true"));
+                if (log.isDebugEnabled())
+                    log.debug(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",mustAgree=true"));
                 request.setAttribute("item", ref.item);
                 JSPManager.showJSP(request, response, "/bitstream-agreement.jsp");
                 return;
             }
-
 
             log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + ref.bitstream.getID()));
 
@@ -137,6 +140,9 @@ public class BitstreamServlet extends DSpaceServlet
 
             // piping the bits from input stream to response
             Utils.bufferedCopy(is, response.getOutputStream());
+        } catch (AuthorizeException ae) {
+            log.debug("why?" , ae);
+            JSPManager.showAuthorizeError(request, response, ae);
         } finally {
             if (is != null)
                 is.close();
@@ -147,6 +153,9 @@ public class BitstreamServlet extends DSpaceServlet
     @Override
     protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         ReferredObjects ref = new ReferredObjects(context, request);
+        if  (log.isDebugEnabled())
+            log.debug("doDSPost " + ref);
+
         if (ref.item != null && ref.bitstream != null && !ref.item.isWithdrawn()) {
             String buttonPressed;
             buttonPressed = UIUtil.getSubmitButton(request, "submit_noagree");
@@ -235,5 +244,11 @@ class ReferredObjects {
                 }
             }
         }
+    }
+
+    public String toString() {
+        return (String.format("bitstream-seq-id=%d  item=%s",
+                (bitstream == null) ? "-1" : bitstream.getSequenceID(),
+                (item == null) ? "null" : item.getHandle()));
     }
 }
