@@ -318,7 +318,7 @@ CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY,
   object_type        INTEGER NOT NULL,
-  object_id          INTEGER REFERENCES Item(item_id),
+  object_id          INTEGER,
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),

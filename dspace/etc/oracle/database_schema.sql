@@ -270,15 +270,15 @@ CREATE TABLE MetadataFieldRegistry
 
 CREATE TABLE MetadataValue
 (
-  metadata_value_id  INTEGER PRIMARY KEY,
-  object_type        INTEGER NOT NULL,
-  object_id          INTEGER REFERENCES Item(item_id),
-  metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value CLOB,
-  text_lang  VARCHAR(24),
-  place              INTEGER,
-  authority VARCHAR(100),
-  confidence INTEGER DEFAULT -1
+  metadata_value_id INTEGER PRIMARY KEY,
+  object_type       INTEGER NOT NULL,
+  object_id         INTEGER,
+  metadata_field_id INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
+  text_value        CLOB,
+  text_lang         VARCHAR(24),
+  place             INTEGER,
+  authority         VARCHAR(100),
+  confidence        INTEGER DEFAULT -1
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -304,12 +304,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR2(128),
-  short_description VARCHAR2(512),
-  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  copyright_text    CLOB,
-  side_bar_text     VARCHAR2(2000),
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -322,15 +317,8 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
-  name              VARCHAR2(128),
-  short_description VARCHAR2(512),
-  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
-  provenance_description  VARCHAR2(2000),
-  license           CLOB,
-  copyright_text    CLOB,
-  side_bar_text     VARCHAR2(2000),
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),

@@ -312,7 +312,7 @@ CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
   object_type        INTEGER NOT NULL,
-  object_id          INTEGER REFERENCES Item(item_id),
+  object_id          INTEGER,
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
@@ -344,12 +344,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -362,15 +357,8 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
-  provenance_description  TEXT,
-  license           TEXT,
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
