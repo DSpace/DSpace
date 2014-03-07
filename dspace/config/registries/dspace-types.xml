@@ -32,34 +32,98 @@
       <namespace>http://duraspace.org/namespaces/dspace-types/</namespace>
   </dc-schema>
 
+  <!-- Community -->
+
   <dc-type>
       <schema>dspace</schema>
-      <element>copyright</element>
+      <element>community</element>
+      <qualifier>name</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
   <dc-type>
       <schema>dspace</schema>
-      <element>introduction</element>
+      <element>community</element>
+      <qualifier>copyright</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
   <dc-type>
       <schema>dspace</schema>
-      <element>description</element>
+      <element>community</element>
+      <qualifier>introduction</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
   <dc-type>
       <schema>dspace</schema>
-      <element>sidebar</element>
+      <element>community</element>
+      <qualifier>description</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
   <dc-type>
       <schema>dspace</schema>
-      <element>provenance</element>
-      <qualifier></qualifier>
+      <element>community</element>
+      <qualifier>sidebar</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>provenance</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <!-- Collection -->
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>name</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>copyright</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>introduction</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>license</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>description</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>sidebar</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>provenance</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
