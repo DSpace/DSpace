@@ -135,7 +135,9 @@ public class DSpaceServlet extends HttpServlet
 
         catch (AuthorizeException ae)
         {
-
+            // do not try to do further (aka explicit) autentication
+            // implicit authentication done in earlier requests does not give
+            // rights  to access content - so just say
                 // FIXME: Log the right info?
                 // Log the error
                 log.info(LogManager.getHeader(context, "authorize_error", ae

@@ -71,7 +71,6 @@ public class BitstreamServlet extends DSpaceServlet
 
         InputStream is = null;
 
-        try {
             if (ref.item.isWithdrawn()) {
                 log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + ref.item.getHandle() + ",withdrawn=true"));
                 JSPManager.showJSP(request, response, "/tombstone.jsp");
@@ -88,6 +87,7 @@ public class BitstreamServlet extends DSpaceServlet
 
             // throws exception if not authorized to access
             is = ref.bitstream.retrieve();
+            assert(is != null);
 
             // now that we know that user has authorization to access bitstream
             // check whether we need to make user sign agreement before proceeding
@@ -140,13 +140,10 @@ public class BitstreamServlet extends DSpaceServlet
 
             // piping the bits from input stream to response
             Utils.bufferedCopy(is, response.getOutputStream());
-        } catch (AuthorizeException ae) {
-            JSPManager.showAuthorizeError(request, response, ae);
-        } finally {
-            if (is != null)
-                is.close();
+
             response.getOutputStream().flush();
-        }
+            is.close();
+
     }
 
     @Override
