@@ -40,7 +40,6 @@ public class ViewAgreement
      * @return whether user should sign agreement before proceeding
      */
     public static boolean mustAgree(HttpSession session, Item item) {
-        log.debug("> mustAgree " + item.getHandle());
         ViewAgreement viewAgreements = getViewAgreement(session);
         DSpaceObject obj = viewAgreements.getWantsAgreement(item);
         if (obj == null) {
@@ -143,7 +142,6 @@ public class ViewAgreement
         DSpaceObject obj = item;
         try {
             while (obj != null) {
-                log.debug("getWantsAgreement: obj = " + obj.getHandle());
                 String handle = obj.getHandle();
                 String handle_view_agreement_file = ConfigurationManager.getProperty(handle + ".bitstream_view_agreement_file");
                 if (handle_view_agreement_file != null) {
@@ -170,10 +168,6 @@ public class ViewAgreement
         }
         return obj;
     }
-
-
-
-
 }
 
 

@@ -141,7 +141,6 @@ public class BitstreamServlet extends DSpaceServlet
             // piping the bits from input stream to response
             Utils.bufferedCopy(is, response.getOutputStream());
         } catch (AuthorizeException ae) {
-            log.debug("why?" , ae);
             JSPManager.showAuthorizeError(request, response, ae);
         } finally {
             if (is != null)
