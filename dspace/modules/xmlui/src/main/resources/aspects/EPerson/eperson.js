@@ -100,7 +100,7 @@ function doRegister()
                 return;
             }
         
-        	if (email == null) {
+          if (errors.length > 0) {
 	            cocoon.sendPageAndWait("register/start",{"email" : email, "errors" : errors.join(','), "accountExists" : accountExists});
 			}
 			
