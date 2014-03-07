@@ -710,7 +710,7 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<table align=\"center\" id='bitstreamLinkTable' class=\"miscTable\"><tr>");
+        out.print("<table align=\"center\" class=\"miscTable\"><tr>");
         out.println("<td class=\"evenRowEvenCol\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
