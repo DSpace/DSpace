@@ -121,7 +121,9 @@ CREATE TABLE BitstreamFormatRegistry
   description         TEXT,
   support_level       INTEGER,
   -- Identifies internal types
-  internal             BOOL
+  internal             BOOL,
+  -- Identifies streamable types
+  streamable             BOOL
 );
 
 -------------------------------------------------------

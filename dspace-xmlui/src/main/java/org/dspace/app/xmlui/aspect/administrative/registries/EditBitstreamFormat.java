@@ -76,6 +76,10 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		message("xmlui.administrative.registries.EditBitstreamFormat.internal");
 	private static final Message T_internal_help =
 		message("xmlui.administrative.registries.EditBitstreamFormat.internal_help");
+	private static final Message T_streamable =
+		message("xmlui.administrative.registries.EditBitstreamFormat.streamable");
+	private static final Message T_streamable_help =
+		message("xmlui.administrative.registries.EditBitstreamFormat.streamable_help");
 	private static final Message T_extensions =
 		message("xmlui.administrative.registries.EditBitstreamFormat.extensions");
 	private static final Message T_extensions_help =
@@ -122,6 +126,7 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         String descriptionValue = request.getParameter("description");
         String supportLevelValue = request.getParameter("support_level");
         String internalValue = request.getParameter("internal");
+        String streamableValue = request.getParameter("streamable");
         java.util.List<String> extensionsList = RequestUtils.getFieldValues(request, "extensions");
         String[] extensionValues = extensionsList.toArray(new String[extensionsList.size()]);
         
@@ -155,6 +160,10 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         	if (request.getParameter("mimetype") == null)
             {
                 internalValue = format.isInternal() ? "true" : null;
+            }
+        	if (request.getParameter("streamable") == null)
+            {
+                streamableValue = format.streamable();
             }
         	if (request.getParameter("extensions") == null)
             {
@@ -219,6 +228,11 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		internal.setLabel(T_internal);
 		internal.setHelp(T_internal_help);
 		internal.addOption((internalValue != null),"true");
+		
+		CheckBox streamable = form.addItem().addCheckBox("streamable");
+		streamable.setLabel(T_streamable);
+		streamable.setHelp(T_streamable_help);
+		streamable.addOption((streamableValue != null),"true");
 		
 		Text extensions = form.addItem().addText("extensions");
 		extensions.setLabel(T_extensions);

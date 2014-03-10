@@ -59,6 +59,9 @@ public class FormatRegistryMain
     private static final Message T_internal =
             message(
             "xmlui.administrative.registries.FormatRegistryMain.internal");
+    private static final Message T_streamable =
+            message(
+            "xmlui.administrative.registries.FormatRegistryMain.streaming");
     private static final Message T_support_0 =
             message(
             "xmlui.administrative.registries.FormatRegistryMain.support_0");
@@ -117,6 +120,7 @@ public class FormatRegistryMain
             String name = format.getShortDescription();
             int supportLevel = format.getSupportLevel();
             boolean internal = format.isInternal();
+            boolean streamable = format.isStreamable();
 
             boolean highlight = false;
             if (format.getID() == highlightID)
@@ -162,6 +166,11 @@ public class FormatRegistryMain
             {
                 cell.addContent(" ");
                 cell.addContent(T_internal);
+            }
+            if (streamable)
+            {
+                cell.addContent(" ");
+                cell.addContent(T_streamable);
             }
 
             // support level

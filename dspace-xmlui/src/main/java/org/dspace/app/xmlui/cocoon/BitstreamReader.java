@@ -144,6 +144,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     
     /** True if bitstream is readable by anonymous users */
     protected boolean isAnonymouslyReadable;
+    
+    /** True if bitstream has been set as streamable in the registry */
+    protected boolean isStreamable;
 
     /** Item containing the Bitstream */
     private Item item = null;
@@ -314,6 +317,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
+            this.bitstreamStreamable = bitstream.getFormat().getStreamable();
             this.bitstreamName = bitstream.getName();
             if (context.getCurrentUser() == null)
             {
@@ -548,9 +552,14 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             response.setDateHeader("Expires", System.currentTimeMillis() + expires);
         }
         
-        // If this is a large bitstream then tell the browser it should treat it as a download.
+        // Check if streaming is enabled, and if so, what kind.  0 is off,
+	// 1 is pseudo-streaming and 2 is real streaming through another means.
+        // If this is a large bitstream that we're not pseudo-streaming
+	// then tell the browser it should treat it as a download.
+        ByteRange byteRange = null;
+        int streaming = ConfigurationManager.getIntProperty("xmlui.content_streaming");
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
-        if (bitstreamSize > threshold && threshold != 0)
+        if ((this.bitstreamStreamable == false || streaming != 1) && (bitstreamSize > threshold && threshold != 0))
         {
                 String name  = bitstreamName;
                 
@@ -571,36 +580,32 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         // do nothing
                 }
                 response.setHeader("Content-Disposition", "attachment;filename=" + name);
-        }
 
-        ByteRange byteRange = null;
-
-        // Turn off partial downloads, they cause problems
-        // and are only rarely used. Specifically some windows pdf
-        // viewers are incapable of handling this request. You can
-        // uncomment the following lines to turn this feature back on.
-
-//        response.setHeader("Accept-Ranges", "bytes");
-//        String ranges = request.getHeader("Range");
-//        if (ranges != null)
-//        {
-//            try
-//            {
-//                ranges = ranges.substring(ranges.indexOf('=') + 1);
-//                byteRange = new ByteRange(ranges);
-//            }
-//            catch (NumberFormatException e)
-//            {
-//                byteRange = null;
-//                if (response instanceof HttpResponse)
-//                {
-//                    // Respond with status 416 (Request range not
-//                    // satisfiable)
-//                    response.setStatus(416);
-//                }
-//            }
-//        }
-
+	// If pseudo-streaming is enabled in dspace.cfg and has been turned on
+	// for this format in the registry, then do a partial download.
+        } else if (this.bitstreamStreamable == true && streaming == 1)
+	{
+        	response.setHeader("Accept-Ranges", "bytes");
+	        String ranges = request.getHeader("Range");
+	        if (ranges != null)
+	        {
+	            try
+	            {
+	                ranges = ranges.substring(ranges.indexOf('=') + 1);
+	                byteRange = new ByteRange(ranges);
+	            }
+	            catch (NumberFormatException e)
+	            {
+	                byteRange = null;
+	                if (response instanceof HttpResponse)
+	                {
+	                    // Respond with status 416 (Request range not
+	                    // satisfiable)
+	                    response.setStatus(416);
+	                }
+	            }
+	        }
+	}
         try
         {
             if (byteRange != null)

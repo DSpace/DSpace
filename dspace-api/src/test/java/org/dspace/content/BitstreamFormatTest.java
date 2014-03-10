@@ -95,6 +95,7 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testFind 2", found, notNullValue());
         assertThat("testFind 3", found.getShortDescription(), equalTo("License"));
         assertTrue("testFind 4", found.isInternal());
+        assertTrue("testFind 5", found.isStreamable());
     }
 
     /**
@@ -124,11 +125,12 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testFindByShortDescription 0", found, notNullValue());
         assertThat("testFindByShortDescription 1", found.getShortDescription(), equalTo("Adobe PDF"));
         assertFalse("testFindByShortDescription 2", found.isInternal());
+        assertFalse("testFindByShortDescription 3", found.isStreamable());
 
         found =  BitstreamFormat.findByShortDescription(context, "XML");
-        assertThat("testFindByShortDescription 3", found, notNullValue());
-        assertThat("testFindByShortDescription 4", found.getShortDescription(), equalTo("XML"));
-        assertFalse("testFindByShortDescription 5", found.isInternal());
+        assertThat("testFindByShortDescription 4", found, notNullValue());
+        assertThat("testFindByShortDescription 5", found.getShortDescription(), equalTo("XML"));
+        assertFalse("testFindByShortDescription 6", found.isStreamable());
     }
 
     /**
@@ -142,7 +144,8 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testFindUnknown 0", found, notNullValue());
         assertThat("testFindUnknown 1", found.getShortDescription(), equalTo("Unknown"));
         assertFalse("testFindUnknown 2", found.isInternal());
-        assertThat("testFindUnknown 3", found.getSupportLevel(), equalTo(0));
+        assertFalse("testFindUnknown 3", found.isStreamable());
+        assertThat("testFindUnknown 4", found.getSupportLevel(), equalTo(0));
     }
 
     /**
@@ -158,7 +161,8 @@ public class BitstreamFormatTest extends AbstractUnitTest
         //check pos 0 is Unknown
         assertThat("testFindAll 1", found[0].getShortDescription(), equalTo("Unknown"));
         assertFalse("testFindAll 2", found[0].isInternal());
-        assertThat("testFindAll 3", found[0].getSupportLevel(), equalTo(0));
+        assertFalse("testFindAll 3", found[0].isStreamable());
+        assertThat("testFindAll 4", found[0].getSupportLevel(), equalTo(0));
 
         boolean added = false;
         for(BitstreamFormat bsf: found)
@@ -189,6 +193,23 @@ public class BitstreamFormatTest extends AbstractUnitTest
     }
 
     /**
+     * Test of findNonStreamable method, of class BitstreamFormat.
+     */
+    @Test
+    public void testFindNonStreamable() throws SQLException
+    {
+
+        BitstreamFormat[] found =  BitstreamFormat.findNonStreamable(context);
+        assertThat("testFindNonStreamable 0", found, notNullValue());
+        int i = 0;
+        for(BitstreamFormat b: found)
+        {
+            i++;
+            assertFalse("testFindNonStreamable "+i+" ("+b.getShortDescription()+")", b.isStreamable());
+        }
+    }
+
+    /**
      * Test of create method, of class BitstreamFormat.
      */
     @Test
@@ -208,6 +229,7 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testCreate 2", found.getMIMEType(), nullValue());
         assertThat("testCreate 3", found.getSupportLevel(), equalTo(-1));
         assertFalse("testCreate 4", found.isInternal());
+        assertFalse("testCreate 5", found.isStreamable());
     }
 
     /**
@@ -443,6 +465,30 @@ public class BitstreamFormatTest extends AbstractUnitTest
         bf.setInternal(true);
 
         assertThat("testSetInternal 1", bf.isInternal(), equalTo(true));
+    }
+
+    /**
+     * Test of isStreamable method, of class BitstreamFormat.
+     */
+    @Test
+    public void testIsStreamable() throws SQLException
+    {
+        assertThat("testIsStreamable 0", bf.isStreamable(), equalTo(false));
+
+        assertThat("testIsStreamable 1", bunknown.isStreamable(), equalTo(false));
+    }
+
+    /**
+     * Test of setStreamable method, of class BitstreamFormat.
+     */
+    @Test
+    public void testSetStreamable()
+    {
+        assertFalse("testSetStreamable 0", bf.isStreamable());
+
+        bf.setStreamable(true);
+
+        assertThat("testSetStreamable 1", bf.isStreamable(), equalTo(true));
     }
 
     /**
