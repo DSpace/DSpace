@@ -130,7 +130,8 @@ public class BitstreamFormatTest extends AbstractUnitTest
         found =  BitstreamFormat.findByShortDescription(context, "XML");
         assertThat("testFindByShortDescription 4", found, notNullValue());
         assertThat("testFindByShortDescription 5", found.getShortDescription(), equalTo("XML"));
-        assertFalse("testFindByShortDescription 6", found.isStreamable());
+        assertFalse("testFindByShortDescription 6", found.isInternal());
+        assertFalse("testFindByShortDescription 7", found.isStreamable());
     }
 
     /**
