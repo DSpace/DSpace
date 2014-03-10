@@ -349,10 +349,11 @@ public class PackageUtils
      * @param MIMEType - mime content-type
      * @param desc - long description
      * @param internal value for the 'internal' flag of a new format if created.
+     * @param streamable value for the 'streamable' flag of a new format if created.
      * @return BitstreamFormat object that was found or created.  Never null.
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
-            String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal)
+            String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal, boolean streamable,)
         throws SQLException, AuthorizeException
      {
         BitstreamFormat bsf = BitstreamFormat.findByShortDescription(context,
@@ -366,6 +367,7 @@ public class PackageUtils
             bsf.setDescription(desc);
             bsf.setSupportLevel(supportLevel);
             bsf.setInternal(internal);
+            bsf.setStreamable(streamable);
             bsf.update();
         }
         return bsf;

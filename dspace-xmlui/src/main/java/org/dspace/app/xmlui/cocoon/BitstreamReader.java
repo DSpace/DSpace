@@ -317,7 +317,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
-            this.bitstreamStreamable = bitstream.getFormat().getStreamable();
+            this.isStreamable = bitstream.getFormat().isStreamable();
             this.bitstreamName = bitstream.getName();
             if (context.getCurrentUser() == null)
             {
@@ -559,7 +559,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         ByteRange byteRange = null;
         int streaming = ConfigurationManager.getIntProperty("xmlui.content_streaming");
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
-        if ((this.bitstreamStreamable == false || streaming != 1) && (bitstreamSize > threshold && threshold != 0))
+        if ((this.isStreamable == false || streaming != 1) && (bitstreamSize > threshold && threshold != 0))
         {
                 String name  = bitstreamName;
                 
@@ -583,7 +583,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
 	// If pseudo-streaming is enabled in dspace.cfg and has been turned on
 	// for this format in the registry, then do a partial download.
-        } else if (this.bitstreamStreamable == true && streaming == 1)
+        } else if (this.isStreamable == true && streaming == 1)
 	{
         	response.setHeader("Accept-Ranges", "bytes");
 	        String ranges = request.getHeader("Range");

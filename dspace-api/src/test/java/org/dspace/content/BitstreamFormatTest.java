@@ -95,7 +95,7 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testFind 2", found, notNullValue());
         assertThat("testFind 3", found.getShortDescription(), equalTo("License"));
         assertTrue("testFind 4", found.isInternal());
-        assertTrue("testFind 5", found.isStreamable());
+        assertFalse("testFind 5", found.isStreamable());
     }
 
     /**
@@ -108,11 +108,13 @@ public class BitstreamFormatTest extends AbstractUnitTest
         assertThat("testFindByMIMEType 0", found, notNullValue());
         assertThat("testFindByMIMEType 1", found.getMIMEType(), equalTo("text/plain"));
         assertFalse("testFindByMIMEType 2", found.isInternal());
+        assertFalse("testFindByMIMEType 3", found.isStreamable());
 
         found =  BitstreamFormat.findByMIMEType(context, "text/xml");
-        assertThat("testFindByMIMEType 3", found, notNullValue());
-        assertThat("testFindByMIMEType 4", found.getMIMEType(), equalTo("text/xml"));
-        assertFalse("testFindByMIMEType 5", found.isInternal());
+        assertThat("testFindByMIMEType 4", found, notNullValue());
+        assertThat("testFindByMIMEType 5", found.getMIMEType(), equalTo("text/xml"));
+        assertFalse("testFindByMIMEType 6", found.isInternal());
+        assertFalse("testFindByMIMEType 7", found.isStreamable());
     }
 
     /**

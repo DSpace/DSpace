@@ -435,6 +435,7 @@ public class FlowRegistryUtils
         String description = request.getParameter("description");
         String supportLevel = request.getParameter("support_level");
         String internal = request.getParameter("internal");
+        String streamable = request.getParameter("streamable");
         List<String> extensionsList = RequestUtils.getFieldValues(request, "extensions");
         String[] extensions = extensionsList.toArray(new String[extensionsList.size()]);
 		
@@ -482,6 +483,15 @@ public class FlowRegistryUtils
         {
             format.setInternal(true);
         }
+                if (streamable == null)
+        {
+            format.setStreamable(false);
+        }
+                else
+        {
+            format.setStreamable(true);
+        }
+
 		format.setExtensions(extensions);
 
 		

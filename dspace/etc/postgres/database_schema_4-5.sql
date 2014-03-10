@@ -27,4 +27,4 @@
 
 ALTER TABLE BitstreamFormatRegistry ADD streamable BOOLEAN;
 
-update item set streamable=false;
+update BitstreamFormatRegistry set streamable=false;

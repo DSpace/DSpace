@@ -566,6 +566,29 @@ public class BitstreamFormat
     }
 
     /**
+     * Find out if the bitstream format is a streambable format - that is, one
+     * that is should be sent out in parts, rather than a full download.
+     *
+     * @return <code>true</code> if the bitstream format is a streamable type
+     */
+    public final boolean isStreamable()
+    {
+        return bfRow.getBooleanColumn("streamable");
+    }
+
+    /**
+     * Set whether the bitstream format is a streamable format
+     *
+     * @param b
+     *            pass in <code>true</code> if the bitstream format is an
+     *            internal type
+     */
+    public final void setStreamable(boolean b)
+    {
+        bfRow.setColumn("streamable", b);
+    }
+
+    /**
      * Update the bitstream format metadata
      * 
      * @throws SQLException

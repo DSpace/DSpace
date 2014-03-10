@@ -1128,6 +1128,8 @@
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.support_2">Supported</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.internal">Internal</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.internal_help">Formats marked as internal are are hidden from the user, and used for administrative purposes.</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.streamable">Streamable</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.streamable_help">Formats marked as streamable may be served in chunks through either Apache Tomcat "pseudo-streaming" or some other streaming method. Useful for audio and video formats.  For this to work, streaming must also be enabled in dspace.cfg and may require theme customization to get a good experience across browsers.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.extensions">File extensions</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.extensions_help">Extensions are file extensions that are used to automatically identify the format of uploaded files. You can enter several extensions for each format.</message>
 

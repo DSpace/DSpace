@@ -163,7 +163,7 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
             }
         	if (request.getParameter("streamable") == null)
             {
-                streamableValue = format.streamable();
+                streamableValue = format.isStreamable() ? "true" : null;
             }
         	if (request.getParameter("extensions") == null)
             {

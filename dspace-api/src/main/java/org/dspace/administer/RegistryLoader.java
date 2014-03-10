@@ -166,6 +166,9 @@ public class RegistryLoader
         String internalString = getElementData(node, "internal");
         boolean internal = Boolean.valueOf(internalString).booleanValue();
 
+        String streamableString = getElementData(node, "streamable");
+        boolean streamable = Boolean.valueOf(streamableString).booleanValue();
+
         String[] extensions = getRepeatedElementData(node, "extension");
 
         // Create the format object
@@ -177,6 +180,7 @@ public class RegistryLoader
         format.setDescription(desc);
         format.setSupportLevel(supportLevel);
         format.setInternal(internal);
+        format.setStreamable(streamable);
         format.setExtensions(extensions);
 
         // Write to database
