@@ -121,7 +121,7 @@
                <id>native2ascii-utf8</id>
                <phase>generate-resources</phase>
                <configuration>
-                 <target name="Encode any UTF-8 chars in [src]/*.properties">
+                 <target name="Encode any UTF-8 chars in properties">
                    <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
                    <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
                  </target>
