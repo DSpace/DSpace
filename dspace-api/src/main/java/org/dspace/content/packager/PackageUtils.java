@@ -31,6 +31,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
@@ -89,9 +90,9 @@ public class PackageUtils
      * <P>
      * e.g. "dc.title" would translate to the "name" database column
      * <P>
-     * This method is of use when crosswalking Community or Collection metadata for ingest, 
+     * This method is of use when crosswalking Community or Collection metadata for ingest,
      * as most ingest Crosswalks tend to deal with translating to DC-based metadata.
-     * 
+     *
      * @param dcField The dublin core metadata field
      * @return The Community or Collection DB column where this metadata info is stored.
      */
@@ -477,7 +478,7 @@ public class PackageUtils
                 // and doesn't yet have a handle assigned.
                 // This Item will remain "incomplete" until 'PackageUtils.finishCreateItem()' is called
                 return wsi.getItem();
-                
+
             case Constants.SITE:
                 return Site.find(context, Site.SITE_ID);
         }
@@ -637,7 +638,7 @@ public class PackageUtils
     /**
      * Creates the specified file (along with all parent directories) if it doesn't already
      * exist.  If the file already exists, nothing happens.
-     * 
+     *
      * @param file
      * @return boolean true if succeeded, false otherwise
      * @throws IOException
@@ -753,7 +754,8 @@ public class PackageUtils
             {
                 try
                 {
-                    community.setMetadata(dbField, null);
+                    community.clearMetadata(MetadataSchema.DSPACE_SCHEMA,
+                            Community.ELEMENT, null, dbField);
                 }
                 catch(IllegalArgumentException ie)
                 {
