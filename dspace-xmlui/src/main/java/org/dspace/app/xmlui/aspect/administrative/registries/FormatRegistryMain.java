@@ -61,7 +61,7 @@ public class FormatRegistryMain
             "xmlui.administrative.registries.FormatRegistryMain.internal");
     private static final Message T_streamable =
             message(
-            "xmlui.administrative.registries.FormatRegistryMain.streaming");
+            "xmlui.administrative.registries.FormatRegistryMain.streamable");
     private static final Message T_support_0 =
             message(
             "xmlui.administrative.registries.FormatRegistryMain.support_0");
