@@ -1,8 +1,0 @@
-select most_recent_checksum.bitstream_id, 
-            most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, 
-            most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, 
-            most_recent_checksum.result, result_description 
-            from checksum_results, most_recent_checksum 
-            where most_recent_checksum.to_be_processed = false 
-            and most_recent_checksum.result = checksum_results.result_code 
-            order by most_recent_checksum.bitstream_id
