@@ -16,59 +16,109 @@
  <!-- never a collection), here mapped to "traditional". Any collection    -->
  <!-- which does not appear in this map will be associated with the mapping-->
  <!-- for handle "default".                                                -->
- <submission-map>
+<submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
-<!-- ======================================== -->
-<!-- Map submission process for senior theses -->
-<!-- ======================================== -->
-   <name-map collection-handle="88435/dsp015m60qr96c" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp011v53jx03j" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01x346d4232" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01sf268516n" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01np1939243" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01hx11xf31p" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01d504rk39g" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp018c97kq479" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp014m90dv552" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp010v8380632" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01w66343685" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01rf55z7763" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01mp48sc83w" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01gx41mh91n" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01c534fn99f" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp017d278t078" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp013n203z151" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp0100000007x" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01v692t627b" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01qf85nb35s" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01kp78gg437" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01fx719m510" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01b5644r59s" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp016d56zw67q" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp012r36tx59n" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01z029p4795" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01t722h887x" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01pg15bd95c" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01jq085k036" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01dz010q11z" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp019593tv19m" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp015h73pw11m" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp011r66j119j" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01x059c739h" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01s7526c478" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01ng451h55q" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01hq37vn649" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01cz30ps722" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp018910jt63r" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp014j03cz716" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp010r967379h" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01w0892999g" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01r781wg073" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01mg74qm166" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01gq67jr24n" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01c247ds15b" submission-name="seniortheses" />
-   <name-map collection-handle="88435/dsp0179407x233" submission-name="seniortheses" />
- </submission-map>
+
+   <!-- ======================================== -->
+   <!-- Map submission process for senior theses -->
+   <!-- ======================================== -->
+   <!-- 88435/scr013t945q80r Aeronautical -->
+   <name-map collection-handle='88435/scr013t945q80r' submission-name='seniortheses' />
+   <!-- 88435/scr0102870v90x Anthropology, -->
+   <name-map collection-handle='88435/scr0102870v90x' submission-name='seniortheses' />
+   <!-- 88435/scr01v979v310w Architecture -->
+   <name-map collection-handle='88435/scr01v979v310w' submission-name='seniortheses' />
+   <!-- 88435/scr01qj72p717x Art -->
+   <name-map collection-handle='88435/scr01qj72p717x' submission-name='seniortheses' />
+   <!-- 88435/scr01ks65hc24q Astrophysical -->
+   <name-map collection-handle='88435/scr01ks65hc24q' submission-name='seniortheses' />
+   <!-- 88435/scr01n583xv011 Biochemical -->
+   <name-map collection-handle='88435/scr01n583xv011' submission-name='seniortheses' />
+   <!-- 88435/scr01g158bh337 Biology, -->
+   <name-map collection-handle='88435/scr01g158bh337' submission-name='seniortheses' />
+   <!-- 88435/scr01bc386j24h Chemical -->
+   <name-map collection-handle='88435/scr01bc386j24h' submission-name='seniortheses' />
+   <!-- 88435/scr016m311p33x Chemistry -->
+   <name-map collection-handle='88435/scr016m311p33x' submission-name='seniortheses' />
+   <!-- 88435/scr012v23vt42h Civil -->
+   <name-map collection-handle='88435/scr012v23vt42h' submission-name='seniortheses' />
+   <!-- 88435/scr01z316q1621 Civil -->
+   <name-map collection-handle='88435/scr01z316q1621' submission-name='seniortheses' />
+   <!-- 88435/scr01tb09j569r Classics -->
+   <name-map collection-handle='88435/scr01tb09j569r' submission-name='seniortheses' />
+   <!-- 88435/scr01pk02c976v Comparative -->
+   <name-map collection-handle='88435/scr01pk02c976v' submission-name='seniortheses' />
+   <!-- 88435/ktx34q7 Computer -->
+   <name-map collection-handle='88435/ktx34q7' submission-name='seniortheses' />
+   <!-- 88435/scr01js956f85b Creative -->
+   <name-map collection-handle='88435/scr01js956f85b' submission-name='seniortheses' />
+   <!-- 88435/scr01f4752g761 East -->
+   <name-map collection-handle='88435/scr01f4752g761' submission-name='seniortheses' />
+   <!-- 88435/scr019c67wm85m Ecology -->
+   <name-map collection-handle='88435/scr019c67wm85m' submission-name='seniortheses' />
+   <!-- 88435/scr015m60qr941 Economics -->
+   <name-map collection-handle='88435/scr015m60qr941' submission-name='seniortheses' />
+   <!-- 88435/scr011v53jx016 Electrical -->
+   <name-map collection-handle='88435/scr011v53jx016' submission-name='seniortheses' />
+   <!-- 88435/scr01x346d4202 Engineering -->
+   <name-map collection-handle='88435/scr01x346d4202' submission-name='seniortheses' />
+   <!-- 88435/scr01sb397828f English -->
+   <name-map collection-handle='88435/scr01sb397828f' submission-name='seniortheses' />
+   <!-- 88435/scr01nk322d37v French -->
+   <name-map collection-handle='88435/scr01nk322d37v' submission-name='seniortheses' />
+   <!-- 88435/scr01hx11xf28m Geosciences -->
+   <name-map collection-handle='88435/scr01hx11xf28m' submission-name='seniortheses' />
+   <!-- 88435/kt89127 German -->
+   <name-map collection-handle='88435/kt89127' submission-name='seniortheses' />
+   <!-- 88435/ktsb405 History -->
+   <name-map collection-handle='88435/ktsb405' submission-name='seniortheses' />
+   <!-- 88435/scr01d504rk374 Independent -->
+   <name-map collection-handle='88435/scr01d504rk374' submission-name='seniortheses' />
+   <!-- 88435/scr018c97kq45z Mathematics -->
+   <name-map collection-handle='88435/scr018c97kq45z' submission-name='seniortheses' />
+   <!-- 88435/scr014m90dv53q Mechanical -->
+   <name-map collection-handle='88435/scr014m90dv53q' submission-name='seniortheses' />
+   <!-- 88435/scr010v8380602 Medieval -->
+   <name-map collection-handle='88435/scr010v8380602' submission-name='seniortheses' />
+   <!-- 88435/scr01w37636801 Modern -->
+   <name-map collection-handle='88435/scr01w37636801' submission-name='seniortheses' />
+   <!-- 88435/scr01rb68xb89j Molecular -->
+   <name-map collection-handle='88435/scr01rb68xb89j' submission-name='seniortheses' />
+   <!-- 88435/scr01mp48sc80w Music -->
+   <name-map collection-handle='88435/scr01mp48sc80w' submission-name='seniortheses' />
+   <!-- 88435/scr01gx41mh897 Near -->
+   <name-map collection-handle='88435/scr01gx41mh897' submission-name='seniortheses' />
+   <!-- 88435/scr01c534fn973 Operations -->
+   <name-map collection-handle='88435/scr01c534fn973' submission-name='seniortheses' />
+   <!-- 88435/scr017d278t05x Oriental -->
+   <name-map collection-handle='88435/scr017d278t05x' submission-name='seniortheses' />
+   <!-- 88435/scr013n203z121 Philosophy -->
+   <name-map collection-handle='88435/scr013n203z121' submission-name='seniortheses' />
+   <!-- 88435/scr01zw12z532m Physics -->
+   <name-map collection-handle='88435/scr01zw12z532m' submission-name='seniortheses' />
+   <!-- 88435/scr01v405s9414 Politics -->
+   <name-map collection-handle='88435/scr01v405s9414' submission-name='seniortheses' />
+   <!-- 88435/scr01qf85nb32s Psychology -->
+   <name-map collection-handle='88435/scr01qf85nb32s' submission-name='seniortheses' />
+   <!-- 88435/scr01kp78gg41w Religion -->
+   <name-map collection-handle='88435/scr01kp78gg41w' submission-name='seniortheses' />
+   <!-- 88435/scr01fx719m49k Romance -->
+   <name-map collection-handle='88435/scr01fx719m49k' submission-name='seniortheses' />
+   <!-- 88435/scr01b5644r57f Slavic -->
+   <name-map collection-handle='88435/scr01b5644r57f' submission-name='seniortheses' />
+   <!-- 88435/scr016d56zw64q Sociology -->
+   <name-map collection-handle='88435/scr016d56zw64q' submission-name='seniortheses' />
+   <!-- 88435/scr012n49t172q Spanish -->
+   <name-map collection-handle='88435/scr012n49t172q' submission-name='seniortheses' />
+   <!-- 88435/scr01xw42n7937 Special -->
+   <name-map collection-handle='88435/scr01xw42n7937' submission-name='seniortheses' />
+   <!-- 88435/scr01t722h884x Statistics -->
+   <name-map collection-handle='88435/scr01t722h884x' submission-name='seniortheses' />
+   <!-- 88435/scr01pg15bd931 Theatre -->
+   <name-map collection-handle='88435/scr01pg15bd931' submission-name='seniortheses' />
+   <!-- 88435/scr01jq085k01v Woodrow -->
+   <name-map collection-handle='88435/scr01jq085k01v' submission-name='seniortheses' />
+</submission-map>
 
 
  
