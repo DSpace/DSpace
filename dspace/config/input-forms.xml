@@ -18,109 +18,103 @@
 <!-- ============================================= -->
 <!-- Departmental Collections for Senior Theses    -->
 <!-- ============================================= -->
-   <name-map collection-handle="88435/dsp015m60qr96c" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp011v53jx03j" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01x346d4232" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01sf268516n" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01np1939243" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01hx11xf31p" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01d504rk39g" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp018c97kq479" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp014m90dv552" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp010v8380632" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01w66343685" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01rf55z7763" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01mp48sc83w" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01gx41mh91n" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01c534fn99f" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp017d278t078" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp013n203z151" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp0100000007x" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01v692t627b" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01qf85nb35s" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01kp78gg437" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01fx719m510" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01b5644r59s" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp016d56zw67q" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp012r36tx59n" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01z029p4795" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01t722h887x" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01pg15bd95c" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01jq085k036" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01dz010q11z" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp019593tv19m" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp015h73pw11m" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp011r66j119j" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01x059c739h" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01s7526c478" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01ng451h55q" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01hq37vn649" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01cz30ps722" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp018910jt63r" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp014j03cz716" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp010r967379h" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01w0892999g" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01r781wg073" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01mg74qm166" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01gq67jr24n" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp01c247ds15b" form-name="seniortheses" />
-   <name-map collection-handle="88435/dsp0179407x233" form-name="seniortheses" />
-<!-- ============================================= -->
-<!-- Research Data                                 -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp01vd66vz894" form-name="researchdata" />
-<!-- ============================================= -->
-<!-- CEE Department: Princeton-Bergen Series on Carbon Storage -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp016q182k13h" form-name="pubergen"/>
-<!-- ============================================= -->
-<!-- Astrophysics: Research Data Sets              -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp01ff365529x" form-name="researchdata" />
-<!-- ============================================= -->
-<!-- IRS Data Sets Collection                      -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp01g445cd15f" form-name="researchdata" />
-<!-- ============================================= -->
-<!-- Library Digital Publications                  -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp01bg257f09p" form-name="digpubs_monographs"/>
-   <name-map collection-handle="88435/dsp016q182k16g" form-name="digpubs_monographs"/>
-   <name-map collection-handle="88435/dsp012z10wq24q" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01z603qx45b" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01nc580m70k" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01cv43nw866" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01hm50tr78r" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01pv63g030v" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp015q47rn79w" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01k643b124h" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp018c97kq48z" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01dn39x161s" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01n583xv05p" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01hd76s014b" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01br86b365k" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp017m01bk81x" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp013t945q89p" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01gx41mh97k" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01z029p4855" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01tb09j578r" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01pk02c986h" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01js956f94b" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01mk61rh06p" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01gt54kn144" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01zp38wc747" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01tx31qh820" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01q811kj74b" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01kh04dp82s" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01rv042t18r" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01qj72p727k" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01kw52j8207" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01bc386j35t" form-name="digpubs_serials"/>
-   <name-map collection-handle="88435/dsp01vx021f236" form-name="digpubs_serials"/>
-<!-- ============================================= -->
-<!-- Pushkin Prokofiev Collection                  -->
-<!-- ============================================= -->
-   <name-map collection-handle="88435/dsp01x633f1086" form-name="prokofiev"/>
+   <!-- 88435/scr013t945q80r Aeronautical -->
+   <name-map collection-handle='88435/scr013t945q80r' form-name='seniortheses' />
+      <!-- 88435/scr0102870v90x Anthropology, -->
+   <name-map collection-handle='88435/scr0102870v90x' form-name='seniortheses' />
+      <!-- 88435/scr01v979v310w Architecture -->
+   <name-map collection-handle='88435/scr01v979v310w' form-name='seniortheses' />
+      <!-- 88435/scr01qj72p717x Art -->
+   <name-map collection-handle='88435/scr01qj72p717x' form-name='seniortheses' />
+      <!-- 88435/scr01ks65hc24q Astrophysical -->
+   <name-map collection-handle='88435/scr01ks65hc24q' form-name='seniortheses' />
+      <!-- 88435/scr01n583xv011 Biochemical -->
+   <name-map collection-handle='88435/scr01n583xv011' form-name='seniortheses' />
+      <!-- 88435/scr01g158bh337 Biology, -->
+   <name-map collection-handle='88435/scr01g158bh337' form-name='seniortheses' />
+      <!-- 88435/scr01bc386j24h Chemical -->
+   <name-map collection-handle='88435/scr01bc386j24h' form-name='seniortheses' />
+      <!-- 88435/scr016m311p33x Chemistry -->
+   <name-map collection-handle='88435/scr016m311p33x' form-name='seniortheses' />
+      <!-- 88435/scr012v23vt42h Civil -->
+   <name-map collection-handle='88435/scr012v23vt42h' form-name='seniortheses' />
+      <!-- 88435/scr01z316q1621 Civil -->
+   <name-map collection-handle='88435/scr01z316q1621' form-name='seniortheses' />
+      <!-- 88435/scr01tb09j569r Classics -->
+   <name-map collection-handle='88435/scr01tb09j569r' form-name='seniortheses' />
+      <!-- 88435/scr01pk02c976v Comparative -->
+   <name-map collection-handle='88435/scr01pk02c976v' form-name='seniortheses' />
+      <!-- 88435/ktx34q7 Computer -->
+   <name-map collection-handle='88435/ktx34q7' form-name='seniortheses' />
+      <!-- 88435/scr01js956f85b Creative -->
+   <name-map collection-handle='88435/scr01js956f85b' form-name='seniortheses' />
+      <!-- 88435/scr01f4752g761 East -->
+   <name-map collection-handle='88435/scr01f4752g761' form-name='seniortheses' />
+      <!-- 88435/scr019c67wm85m Ecology -->
+   <name-map collection-handle='88435/scr019c67wm85m' form-name='seniortheses' />
+      <!-- 88435/scr015m60qr941 Economics -->
+   <name-map collection-handle='88435/scr015m60qr941' form-name='seniortheses' />
+      <!-- 88435/scr011v53jx016 Electrical -->
+   <name-map collection-handle='88435/scr011v53jx016' form-name='seniortheses' />
+      <!-- 88435/scr01x346d4202 Engineering -->
+   <name-map collection-handle='88435/scr01x346d4202' form-name='seniortheses' />
+      <!-- 88435/scr01sb397828f English -->
+   <name-map collection-handle='88435/scr01sb397828f' form-name='seniortheses' />
+      <!-- 88435/scr01nk322d37v French -->
+   <name-map collection-handle='88435/scr01nk322d37v' form-name='seniortheses' />
+      <!-- 88435/scr01hx11xf28m Geosciences -->
+   <name-map collection-handle='88435/scr01hx11xf28m' form-name='seniortheses' />
+      <!-- 88435/kt89127 German -->
+   <name-map collection-handle='88435/kt89127' form-name='seniortheses' />
+      <!-- 88435/ktsb405 History -->
+   <name-map collection-handle='88435/ktsb405' form-name='seniortheses' />
+      <!-- 88435/scr01d504rk374 Independent -->
+   <name-map collection-handle='88435/scr01d504rk374' form-name='seniortheses' />
+      <!-- 88435/scr018c97kq45z Mathematics -->
+   <name-map collection-handle='88435/scr018c97kq45z' form-name='seniortheses' />
+      <!-- 88435/scr014m90dv53q Mechanical -->
+   <name-map collection-handle='88435/scr014m90dv53q' form-name='seniortheses' />
+      <!-- 88435/scr010v8380602 Medieval -->
+   <name-map collection-handle='88435/scr010v8380602' form-name='seniortheses' />
+      <!-- 88435/scr01w37636801 Modern -->
+   <name-map collection-handle='88435/scr01w37636801' form-name='seniortheses' />
+      <!-- 88435/scr01rb68xb89j Molecular -->
+   <name-map collection-handle='88435/scr01rb68xb89j' form-name='seniortheses' />
+      <!-- 88435/scr01mp48sc80w Music -->
+   <name-map collection-handle='88435/scr01mp48sc80w' form-name='seniortheses' />
+      <!-- 88435/scr01gx41mh897 Near -->
+   <name-map collection-handle='88435/scr01gx41mh897' form-name='seniortheses' />
+      <!-- 88435/scr01c534fn973 Operations -->
+   <name-map collection-handle='88435/scr01c534fn973' form-name='seniortheses' />
+      <!-- 88435/scr017d278t05x Oriental -->
+   <name-map collection-handle='88435/scr017d278t05x' form-name='seniortheses' />
+      <!-- 88435/scr013n203z121 Philosophy -->
+   <name-map collection-handle='88435/scr013n203z121' form-name='seniortheses' />
+      <!-- 88435/scr01zw12z532m Physics -->
+   <name-map collection-handle='88435/scr01zw12z532m' form-name='seniortheses' />
+      <!-- 88435/scr01v405s9414 Politics -->
+   <name-map collection-handle='88435/scr01v405s9414' form-name='seniortheses' />
+      <!-- 88435/scr01qf85nb32s Psychology -->
+   <name-map collection-handle='88435/scr01qf85nb32s' form-name='seniortheses' />
+      <!-- 88435/scr01kp78gg41w Religion -->
+   <name-map collection-handle='88435/scr01kp78gg41w' form-name='seniortheses' />
+      <!-- 88435/scr01fx719m49k Romance -->
+   <name-map collection-handle='88435/scr01fx719m49k' form-name='seniortheses' />
+      <!-- 88435/scr01b5644r57f Slavic -->
+   <name-map collection-handle='88435/scr01b5644r57f' form-name='seniortheses' />
+      <!-- 88435/scr016d56zw64q Sociology -->
+   <name-map collection-handle='88435/scr016d56zw64q' form-name='seniortheses' />
+      <!-- 88435/scr012n49t172q Spanish -->
+   <name-map collection-handle='88435/scr012n49t172q' form-name='seniortheses' />
+      <!-- 88435/scr01xw42n7937 Special -->
+   <name-map collection-handle='88435/scr01xw42n7937' form-name='seniortheses' />
+      <!-- 88435/scr01t722h884x Statistics -->
+   <name-map collection-handle='88435/scr01t722h884x' form-name='seniortheses' />
+      <!-- 88435/scr01pg15bd931 Theatre -->
+   <name-map collection-handle='88435/scr01pg15bd931' form-name='seniortheses' />
+      <!-- 88435/scr01jq085k01v Woodrow -->
+   <name-map collection-handle='88435/scr01jq085k01v' form-name='seniortheses' />
+
  </form-map>
 
 
