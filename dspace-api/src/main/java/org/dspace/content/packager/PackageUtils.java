@@ -332,7 +332,7 @@ public class PackageUtils
             String shortDesc, String MIMEType, String desc)
         throws SQLException, AuthorizeException
      {
-        return findOrCreateBitstreamFormat(context, shortDesc, MIMEType, desc, BitstreamFormat.KNOWN, false);
+        return findOrCreateBitstreamFormat(context, shortDesc, MIMEType, desc, BitstreamFormat.KNOWN, false, false);
      }
 
     /**
@@ -353,7 +353,7 @@ public class PackageUtils
      * @return BitstreamFormat object that was found or created.  Never null.
      */
      public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
-            String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal, boolean streamable,)
+            String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal, boolean streamable)
         throws SQLException, AuthorizeException
      {
         BitstreamFormat bsf = BitstreamFormat.findByShortDescription(context,

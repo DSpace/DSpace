@@ -246,6 +246,7 @@ public class AIPTechMDCrosswalk
             dc.add(makeDC("format", "mimetype", bsf.getMIMEType()));
             dc.add(makeDC("format", "supportlevel", bsf.getSupportLevelText()));
             dc.add(makeDC("format", "internal", Boolean.toString(bsf.isInternal())));
+            dc.add(makeDC("format", "streamable", Boolean.toString(bsf.isStreamable())));
         }
         else if (dso.getType() == Constants.COLLECTION)
         {
@@ -340,6 +341,7 @@ public class AIPTechMDCrosswalk
         String bsfMIMEType = null;
         int bsfSupport = BitstreamFormat.KNOWN;
         boolean bsfInternal = false;
+        boolean bsfStreamable = false;
 
         for (Element field : dimList)
         {
@@ -404,6 +406,10 @@ public class AIPTechMDCrosswalk
                         else if (dcField.equals("format.internal"))
                         {
                             bsfInternal = (Boolean.valueOf(value)).booleanValue();
+                        }
+                        else if (dcField.equals("format.streamable"))
+                        {
+                            bsfStreamable = (Boolean.valueOf(value)).booleanValue();
                         }
                         else
                         {
@@ -547,7 +553,8 @@ public class AIPTechMDCrosswalk
                         bsfMIMEType,
                         bsfShortName,
                         bsfSupport,
-                        bsfInternal);
+                        bsfInternal,
+			bsfStreamable);
             }
             if (bsf != null)
             {

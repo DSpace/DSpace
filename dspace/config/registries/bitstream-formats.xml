@@ -49,7 +49,7 @@
     <description>Unknown data format</description>
     <support_level>0</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
   </bitstream-type>
 
   <!-- Used by system: do not remove -->
@@ -59,7 +59,7 @@
     <description>Item-specific license agreed upon to submission</description>
     <support_level>1</support_level>
     <internal>true</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
   </bitstream-type>
 
   <!-- Used by system: do not remove -->
@@ -69,7 +69,7 @@
     <description>Item-specific Creative Commons license agreed upon to submission</description>
     <support_level>1</support_level>
     <internal>true</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
   </bitstream-type>
 
   <bitstream-type>
@@ -78,7 +78,7 @@
     <description>Adobe Portable Document Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>pdf</extension>
   </bitstream-type>
 
@@ -88,7 +88,7 @@
     <description>Extensible Markup Language</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>xml</extension>
   </bitstream-type>
 
@@ -98,7 +98,7 @@
     <description>Plain Text</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>txt</extension>
     <extension>asc</extension>
   </bitstream-type>
@@ -109,7 +109,7 @@
     <description>Hypertext Markup Language</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>htm</extension>
     <extension>html</extension>
   </bitstream-type>
@@ -120,7 +120,7 @@
     <description>Cascading Style Sheets</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>css</extension>
   </bitstream-type>
 
@@ -130,7 +130,7 @@
     <description>Microsoft Word</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>doc</extension>
   </bitstream-type>
 
@@ -140,7 +140,7 @@
     <description>Microsoft Word XML</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>docx</extension>
   </bitstream-type>
 
@@ -150,7 +150,7 @@
     <description>Microsoft Powerpoint</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>ppt</extension>
   </bitstream-type>
 
@@ -160,7 +160,7 @@
     <description>Microsoft Powerpoint XML</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>pptx</extension>
   </bitstream-type>
 
@@ -170,7 +170,7 @@
     <description>Microsoft Excel</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>xls</extension>
   </bitstream-type>
 
@@ -181,7 +181,7 @@
     <description>Microsoft Excel XML</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>xlsx</extension>
   </bitstream-type>
 
@@ -192,7 +192,7 @@
     <description>Machine-Readable Cataloging records</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
   </bitstream-type>
 
   <bitstream-type>
@@ -201,7 +201,7 @@
     <description>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>jpeg</extension>
     <extension>jpg</extension>
   </bitstream-type>
@@ -212,7 +212,7 @@
     <description>Graphics Interchange Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>gif</extension>
   </bitstream-type>
 
@@ -222,7 +222,7 @@
     <description>Portable Network Graphics</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>png</extension>
   </bitstream-type>
      
@@ -232,7 +232,7 @@
     <description>Tag Image File Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>tiff</extension>
     <extension>tif</extension>
   </bitstream-type>
@@ -243,7 +243,7 @@
     <description>Audio Interchange File Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>aiff</extension>
     <extension>aif</extension>
     <extension>aifc</extension>
@@ -255,7 +255,7 @@
     <description>Basic Audio</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>au</extension>
     <extension>snd</extension>
   </bitstream-type>
@@ -266,7 +266,7 @@
     <description>Broadcase Wave Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>wav</extension>
   </bitstream-type>
 
@@ -276,7 +276,7 @@
     <description>Moving Picture Experts Group</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>mpeg</extension>
     <extension>mpg</extension>
     <extension>mpe</extension>
@@ -288,7 +288,7 @@
     <description>Rich Text Format</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>rtf</extension>
   </bitstream-type>
 
@@ -298,7 +298,7 @@
     <description>Microsoft Visio</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>vsd</extension>
   </bitstream-type>
 
@@ -308,7 +308,7 @@
     <description>Filemaker Pro</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>fm</extension>
   </bitstream-type>
 
@@ -318,7 +318,7 @@
     <description>Microsoft Windows bitmap</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>bmp</extension>
   </bitstream-type>
 
@@ -328,7 +328,7 @@
     <description>Photoshop</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>psd</extension>
     <extension>pdd</extension>
   </bitstream-type>
@@ -339,7 +339,7 @@
     <description>Postscript Files</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>ps</extension>
     <extension>eps</extension>
     <extension>ai</extension>
@@ -351,7 +351,7 @@
     <description>Video Quicktime</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>mov</extension>
     <extension>qt</extension>
   </bitstream-type>
@@ -362,7 +362,7 @@
     <description>MPEG Audio</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>mpa</extension>
     <extension>abs</extension>
     <extension>mpega</extension>
@@ -374,7 +374,7 @@
     <description>Microsoft Project</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>mpp</extension>
     <extension>mpx</extension>
     <extension>mpd</extension>
@@ -386,7 +386,7 @@
     <description>Mathematica Notebook</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>ma</extension>
   </bitstream-type>
 
@@ -396,7 +396,7 @@
     <description>LaTeX document</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>latex</extension>
   </bitstream-type>
 
@@ -406,7 +406,7 @@
     <description>Tex/LateX document</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>tex</extension>
   </bitstream-type>
 
@@ -416,7 +416,7 @@
     <description>TeX dvi format </description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>dvi</extension>
   </bitstream-type>
 
@@ -426,7 +426,7 @@
     <description>SGML application (RFC 1874)</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>sgm</extension>
     <extension>sgml</extension>
   </bitstream-type>
@@ -437,7 +437,7 @@
     <description>WordPerfect 5.1 document</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>wpd</extension>
   </bitstream-type>
 
@@ -447,7 +447,7 @@
     <description>RealAudio file</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>ra</extension>
     <extension>ram</extension>
   </bitstream-type>
@@ -458,7 +458,7 @@
     <description>Kodak Photo CD image</description>
     <support_level>1</support_level>
     <internal>false</internal>
-    <streamable>false</streamablel>
+    <streamable>false</streamable>
     <extension>pcd</extension>
   </bitstream-type>
 
@@ -468,7 +468,7 @@
 	  <description>OpenDocument Text</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odt</extension>
 	</bitstream-type>
 	
@@ -478,7 +478,7 @@
 	  <description>OpenDocument Text Template</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>ott</extension>
 	</bitstream-type>
 	
@@ -488,7 +488,7 @@
 	  <description>OpenDocument HTML Template</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>oth</extension>
 	</bitstream-type>
 	
@@ -498,7 +498,7 @@
 	  <description>OpenDocument Master Document</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odm</extension>
 	</bitstream-type>
 	
@@ -508,7 +508,7 @@
 	  <description>OpenDocument Drawing</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odg</extension>
 	</bitstream-type>
 	
@@ -518,7 +518,7 @@
 	  <description>OpenDocument Drawing Template</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>otg</extension>
 	</bitstream-type>
 	
@@ -528,7 +528,7 @@
 	  <description>OpenDocument Presentation</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odp</extension>
 	</bitstream-type>
 	
@@ -538,7 +538,7 @@
 	  <description>OpenDocument Presentation Template</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>otp</extension>
 	</bitstream-type>
 	
@@ -548,7 +548,7 @@
 	  <description>OpenDocument Spreadsheet</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>ods</extension>
 	</bitstream-type>
 	
@@ -558,7 +558,7 @@
 	  <description>OpenDocument Spreadsheet Template</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>ots</extension>
 	</bitstream-type>
 	
@@ -568,7 +568,7 @@
 	  <description>OpenDocument Chart</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odc</extension>
 	</bitstream-type>
 	
@@ -578,7 +578,7 @@
 	  <description>OpenDocument Formula</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odf</extension>
 	</bitstream-type>
 	
@@ -588,7 +588,7 @@
 	  <description>OpenDocument Database</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odb</extension>
 	</bitstream-type>
 	
@@ -598,7 +598,7 @@
 	  <description>OpenDocument Image</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>odi</extension>
 	</bitstream-type>
 	
@@ -608,7 +608,7 @@
 	  <description>OpenOffice.org extension (since OOo 2.1)</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>oxt</extension>
 	</bitstream-type>
 	
@@ -618,7 +618,7 @@
 	  <description>Writer 6.0 documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxw</extension>
 	</bitstream-type>
 	
@@ -628,7 +628,7 @@
 	  <description>Writer 6.0 templates</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>stw</extension>
 	</bitstream-type>
 	
@@ -638,7 +638,7 @@
 	  <description>Calc 6.0 spreadsheets</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxc</extension>
 	</bitstream-type>
 	
@@ -648,7 +648,7 @@
 	  <description>Calc 6.0 templates</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>stc</extension>
 	</bitstream-type>
 	
@@ -658,7 +658,7 @@
 	  <description>Draw 6.0 documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxd</extension>
 	</bitstream-type>
 	
@@ -668,7 +668,7 @@
 	  <description>Draw 6.0 templates</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>std</extension>
 	</bitstream-type>
 	
@@ -678,7 +678,7 @@
 	  <description>Impress 6.0 presentations</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxi</extension>
 	</bitstream-type>
 	
@@ -688,7 +688,7 @@
 	  <description>Impress 6.0 templates</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sti</extension>
 	</bitstream-type>
 	
@@ -698,7 +698,7 @@
 	  <description>Writer 6.0 global documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxg</extension>
 	</bitstream-type>
 	
@@ -708,7 +708,7 @@
 	  <description>Math 6.0 documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sxm</extension>
 	</bitstream-type>
 	
@@ -718,7 +718,7 @@
 	  <description>StarWriter 5.x documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sdw</extension>
 	</bitstream-type>
 	
@@ -728,7 +728,7 @@
 	  <description>StarWriter 5.x global documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sgl</extension>
 	</bitstream-type>
 	
@@ -738,7 +738,7 @@
 	  <description>StarCalc 5.x spreadsheets</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sdc</extension>
 	</bitstream-type>
 	
@@ -748,7 +748,7 @@
 	  <description>StarDraw 5.x documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sda</extension>
 	</bitstream-type>
 	
@@ -758,7 +758,7 @@
 	  <description>StarImpress 5.x presentations</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sdd</extension>
 	</bitstream-type>
 	
@@ -768,7 +768,7 @@
 	  <description>StarImpress Packed 5.x files</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sdp</extension>
 	</bitstream-type>
 	
@@ -778,7 +778,7 @@
 	  <description>StarMath 5.x documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>smf</extension>
 	</bitstream-type>
 	
@@ -788,7 +788,7 @@
 	  <description>StarChart 5.x documents</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sds</extension>
 	</bitstream-type>
 	
@@ -798,7 +798,7 @@
 	  <description>StarMail 5.x mail files</description>
 	  <support_level>1</support_level>
 	  <internal>false</internal>
-	  <streamable>false</streamablel>
+	  <streamable>false</streamable>
 	  <extension>sdm</extension>
 	</bitstream-type>
 
@@ -808,7 +808,7 @@
       <description>RDF serialized in XML</description>
       <support_level>1</support_level>
       <internal>false</internal>
-      <streamable>false</streamablel>
+      <streamable>false</streamable>
       <extension>rdf</extension>
     </bitstream-type>
 

@@ -1172,6 +1172,7 @@
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column4">MIME Type</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column5">Support Level</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.internal">(<i>internal</i>)</message>
+	<message key="xmlui.administrative.registries.FormatRegistryMain.streamable">(<i>streamable</i>)</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_0">Unknown</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_1">Known</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Support</message>
