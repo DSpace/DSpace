@@ -31,3 +31,6 @@ META-INF/
 ##Mac noise
 .DS_Store
 /dspace/modules/jspui/src/main/webapp/static/less/bootstrap/icesi-theme.map
+/dspace/modules/jspui/src/main/webapp/static/less/bootstrap/theme.map
+/dspace/modules/jspui/src/main/webapp/static/css/bootstrap/theme.map
+/dspace/modules/jspui/src/main/webapp/static/css/bootstrap/icesi-theme.map
