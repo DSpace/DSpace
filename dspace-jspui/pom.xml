@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>4.0</version>
+      <version>4.1</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -64,6 +64,7 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/bootstrap/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
