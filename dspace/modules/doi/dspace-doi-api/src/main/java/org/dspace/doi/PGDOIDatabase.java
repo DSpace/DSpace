@@ -170,7 +170,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         return doi;
     }
     private static int countFromRow(TableRow row) {
-        return row.getIntColumn(DOI_TABLE);
+        return row.getIntColumn(COLUMN_DOI_COUNT);
     }
 
     private static void updateExistingDOIRow(TableRow row, DOI aDOI) {
