@@ -128,15 +128,15 @@ public class ItemRequestResponseAction extends AbstractAction
     	String name = request.getParameter("name");
     	String mail = request.getParameter("email");
     	if(StringUtils.isNotEmpty(name)&&StringUtils.isNotEmpty(mail)){
-    	    String emailRequest;
-            EPerson submiter = item.getSubmitter();
-            if(submiter!=null){
-     	    	emailRequest=submiter.getEmail();
-            }else{
-                emailRequest=ConfigurationManager.getProperty("mail.helpdesk");
+    	    String emailRequest = ConfigurationManager.getProperty("mail.admin");;
+    	    boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
+    	    String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
+            EPerson submitter = item.getSubmitter();
+            if((helpdeskOverridesSubmitter || submitter == null) && StringUtils.isNotEmpty(helpDeskEmail)) {
+                emailRequest = helpDeskEmail;
             }
-            if(emailRequest==null){
-                emailRequest=ConfigurationManager.getProperty("mail.admin");
+            else if(submitter!=null){
+     	    	emailRequest=submitter.getEmail();
             }
 	    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
 	        email.addRecipient(emailRequest);

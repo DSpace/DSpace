@@ -215,19 +215,17 @@ public class RequestItemServlet extends DSpaceServlet
 				
 				String authorEmail = author.getEmail();
 				String authorName = author.getFullName();
-				String emailRequest;
+				String emailRequest = ConfigurationManager.getProperty("mail.admin");;
+				boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
+				String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
 				
-				if (authorEmail != null) {
+				if ((helpdeskOverridesSubmitter || StringUtils.isEmpty(authorEmail)) && StringUtils.isNotEmpty(helpDeskEmail)) {
+					emailRequest = ConfigurationManager.getProperty("mail.helpdesk");
+				}
+				else if (StringUtils.isNotEmpty(authorEmail)) {
 					emailRequest = authorEmail;
-				} else {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.helpdesk");
-				}
+				} 
 				
-				if (emailRequest == null) {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.admin");
-				}
 				email.addRecipient(emailRequest);
 
 				email.addArgument(reqname);
