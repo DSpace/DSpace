@@ -169,8 +169,8 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
                 );
         return doi;
     }
-    private static int countFromRow(TableRow row) {
-        return row.getIntColumn(COLUMN_DOI_COUNT);
+    private static long countFromRow(TableRow row) {
+        return row.getLongColumn(COLUMN_DOI_COUNT);
     }
 
     private static void updateExistingDOIRow(TableRow row, DOI aDOI) {
@@ -370,8 +370,8 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         TableRow countRow = null;
         try {
             countRow = countMatchingDOIs(aDOI);
-            int count = countFromRow(countRow);
-            found = count > 0;
+            long count = countFromRow(countRow);
+            found = count > 0l;
         } catch (SQLException ex) {
             LOG.error("Unable check for DOI in database: " + aDOI.toString(),ex);
         }
@@ -379,7 +379,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     }
 
     public int size() {
-        int size = 0;
+        long size = 0l;
         TableRow countRow = null;
         try {
             countRow = countAllDOIs();
@@ -387,7 +387,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         } catch (SQLException ex) {
             LOG.error("Unable count DOIs in database",ex);
         }
-        return size;
+        return (int)size;
 
     }
 
