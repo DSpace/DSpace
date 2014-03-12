@@ -131,12 +131,12 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
 
     private TableRowIterator queryAllDOIs() throws SQLException {
         String query = DOI_QUERY_ALL;
-        return DatabaseManager.queryTable(getContext(), DOI_TABLE, query, new Object());
+        return DatabaseManager.queryTable(getContext(), DOI_TABLE, query);
     }
 
     private TableRow countAllDOIs() throws SQLException {
         String query = DOI_COUNT_ALL;
-        return DatabaseManager.querySingle(getContext(), query, new Object());
+        return DatabaseManager.querySingle(getContext(), query);
     }
 
     private void insertRow(TableRow row) throws SQLException {
