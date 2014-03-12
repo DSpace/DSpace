@@ -308,10 +308,43 @@
 }
 
 //
+// Carousel
+// --------------------------------------------------
+
+// Left/right controls for nav
+// ---------------------------
+
+.carousel-control {
+  // Set gradients for backgrounds
+  &.left {
+    background:@white;
+  }
+  &.right {
+    left: auto;
+    right: 0;
+    background:@white;
+  }
+}
+
+// Optional indicator pips
+//
+// Add an unordered list with the following class and add a list item for each
+// slide your carousel holds.
+
+.carousel-indicators {
+  color:@link-color;
+}
+
+
+//
 // Other clases and ids
 //-----------------------------------------------------
 #icesi-info{
     padding-top: 12px;
+}
+
+#recent-submissions-carousel{
+    background:@gray-lighter;
 }
 
 .community-logo{
@@ -329,8 +362,18 @@
     margin-top: @container-margin-top;
 }
 
+.recent-submission{
+    /*padding-left: 80px; padding-right: 80px; display: inline-block;*/
+    display:block;
+    margin:15px 15% 0 15%;
+}
+
 .simple-search{
     margin-bottom:10px;
+}
+
+.type-icon{
+    font-size:3em;
 }
 
 .wave{
