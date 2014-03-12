@@ -21,10 +21,12 @@ import org.dspace.storage.rdbms.*;
 public class PGDOIDatabase implements org.springframework.beans.factory.InitializingBean{
 
     private static final String DOI_TABLE ="doi";
+    private static final String COLUMN_DOI_ID = "doi_id";
     private static final String COLUMN_DOI_PREFIX = "doi_prefix";
     private static final String COLUMN_DOI_SUFFIX = "doi_suffix";
     private static final String COLUMN_URL = "url";
     private static final List<String> DOI_COLUMNS = Arrays.asList(
+            COLUMN_DOI_ID,
             COLUMN_DOI_PREFIX,
             COLUMN_DOI_SUFFIX,
             COLUMN_URL
