@@ -255,7 +255,7 @@
             <form method="get" action="<%= request.getContextPath() %>/handle/<%= community.getHandle() %>/browse">
                 <input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
                 <%-- <input type="hidden" name="community" value="<%= community.getHandle() %>" /> --%>
-                <input class="btn btn-default col-md-3" type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
+                <input class="btn btn-default col-md-2 col-sm-12 col-xs-12" type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
             </form>
         <%	
             }
@@ -305,6 +305,8 @@
                         String displayTitle = "Untitled";
                         String authorDate ="";
                         String displayDesc="";
+                        String displayType = "";
+                        String itemCols="";
 
                         if (dcv != null)
                         {
@@ -316,9 +318,9 @@
                         
                         if(dcAuthors!=null && dcAuthors.length > 0){
                             for (int j=0; j<dcAuthors.length;j++){
-                                authorDate+=(dcAuthors[0].value);
-                                if (j > 0 && j!=dcAuthors.length-1){
-                                    authorDate+=(", ");
+                                authorDate+=(dcAuthors[j].value);
+                                if (j!=dcAuthors.length-1){
+                                    authorDate+=("., ");
                                 }
                             }
                         }
@@ -337,19 +339,29 @@
                             authorDate+=")";
                             
                         }
+
                         if (dcDescription != null && dcDescription.length > 0)
                         {
                                 displayDesc = dcDescription[0].value;
                         }
+                        
+                        if (dcTypes != null && dcTypes.length > 0){
+                            displayType = dcTypes[0].value;
+                            itemCols="col-md-11";
+                        }else{
+                            itemCols="col-md-12";
+                        }
                     %>
                         <div style="padding-bottom: 50px;" class="item <%= first?"active":""%>">
                             <div class="recent-submission row">
+                                <% if (!displayType.equals("")){%>
                                     <div class="col-md-1">
-                                        <span class="type-icon icesiicon icesiicon-conference-object"></span>
+                                        <span class="type-icon icesiicon icesiicon-<%= displayType %>"></span>
                                     </div>
-                                    <div class="col-md-11">
+                                <% } %>    
+                                    <div class="<%= itemCols %>">
                                         <a class="lead" href="<%= request.getContextPath() %>/handle/<%=items[i].getHandle() %>"> 
-                                            <%= StringUtils.abbreviate(displayTitle, 200) %> 
+                                            <%= StringUtils.abbreviate(displayTitle, 70) %> 
                                         </a>
                                     <% if (!authorDate.equals("")){%>
                                         <p>
