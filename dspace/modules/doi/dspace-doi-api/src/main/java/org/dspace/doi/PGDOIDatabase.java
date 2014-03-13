@@ -128,7 +128,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             throw new DOIFormatException("DOI string does not contain a suffix");
         }
         String query = DOI_QUERY_BY_PREFIX_SUFFIX;
-        return DatabaseManager.querySingleTable(getContext(), DOI_TABLE, prefix, suffix);
+        return DatabaseManager.querySingleTable(getContext(), DOI_TABLE, query, prefix, suffix);
     }
 
     private TableRowIterator queryExistingDOIByURL(String aURL) throws SQLException {
