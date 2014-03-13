@@ -19,6 +19,8 @@ import org.dspace.storage.rdbms.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class PGDOIDatabase implements org.springframework.beans.factory.InitializingBean{
+    // This prefix is only used for test cases
+    final static String internalTestingPrefix = "10.5072-testprefix";
 
     private static final String DOI_TABLE ="doi";
     private static final String COLUMN_DOI_ID = "doi_id";
@@ -196,6 +198,14 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     private boolean deleteRow(TableRow row) throws SQLException {
         int rowsDeleted = DatabaseManager.delete(getContext(), row);
         return rowsDeleted == 1;
+    }
+
+    /**
+     * Removes all DOIs in the database with the internal testing prefix
+     * @throws SQLException 
+     */
+    private int deleteDOIRowsWithTestPrefix() throws SQLException {
+        return DatabaseManager.deleteByValue(getContext(), DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
     }
 
     /**
@@ -399,6 +409,23 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
         return (int)size;
 
+    }
+
+    /**
+     * Remove DOIs associated with the test prefix.
+     * This method exists to clean up before and after tests.
+     * It is package-private and single-purpose because it should
+     * only be called by the test.  It is in this class because it
+     * has knowledge of the PGDOIDatabase tables
+     */
+    int removeTestDOIs() {
+        int removed = 0;
+        try {
+            removed = deleteDOIRowsWithTestPrefix();
+        } catch (SQLException ex) {
+            LOG.error("Unable to delete DOI Rows with test prefix", ex);
+        }
+        return removed;
     }
 
     public void dumpTo(FileWriter aFileWriter) throws IOException {

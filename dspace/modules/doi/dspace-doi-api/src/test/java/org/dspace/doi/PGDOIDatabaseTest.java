@@ -16,18 +16,21 @@ import org.junit.Test;
 public class PGDOIDatabaseTest {
     private static PGDOIDatabase myPGDOIDatabase;
     private static String myRandomSuffix;
-    private final static String myPrefix = "10.5072-testprefix";
     @BeforeClass
     public static void setupBeforeClass() {
         myPGDOIDatabase = PGDOIDatabase.getInstance();
         int randomInt = (int) (Math.random() * 10000);
         myRandomSuffix = String.format("test-suffix-%d", randomInt);
         // delete DOIs created by this class
+        int removed = myPGDOIDatabase.removeTestDOIs();
+        System.out.println("Removed " + removed + " test DOIs before running tests");
     }
 
     @AfterClass
     public static void teardownAfterClass() {
         // delete DOIs created by this class
+        int removed = myPGDOIDatabase.removeTestDOIs();
+        System.out.println("Removed " + removed + " test DOIs after running tests");
         myPGDOIDatabase.close();
     }
 
@@ -37,7 +40,7 @@ public class PGDOIDatabaseTest {
         String url2 = "http://test-suffix.doi.org/2/" + myRandomSuffix;
 
         // Verify a DOI can be set
-        DOI aDOI = new DOI(myPrefix, myRandomSuffix, url1);
+        DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffix, url1);
         DOI setDOI = myPGDOIDatabase.set(aDOI);
         assert aDOI.equals(setDOI);
 
@@ -47,7 +50,7 @@ public class PGDOIDatabaseTest {
 
         //Verify set also works to change the target of the DOI
         // change the target URL of the DOI
-        DOI otherDOI = new DOI(myPrefix, myRandomSuffix, url2);
+        DOI otherDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffix, url2);
         // Update the DOI
         boolean put = myPGDOIDatabase.put(otherDOI);
         getDOI = myPGDOIDatabase.getByDOI(aDOI.toString());
