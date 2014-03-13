@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.RequestItemEmailUtil;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.RequestItemManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -215,19 +216,8 @@ public class RequestItemServlet extends DSpaceServlet
 				
 				String authorEmail = author.getEmail();
 				String authorName = author.getFullName();
-				String emailRequest;
+				String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
 				
-				if (authorEmail != null) {
-					emailRequest = authorEmail;
-				} else {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.helpdesk");
-				}
-				
-				if (emailRequest == null) {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.admin");
-				}
 				email.addRecipient(emailRequest);
 
 				email.addArgument(reqname);
