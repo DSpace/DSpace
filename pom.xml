@@ -24,10 +24,13 @@
         <relativePath />
     </parent>
 
-    <!--Force UTF-8 encoding during build on all platforms-->
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.6</java.version> <!-- DSpace requires Java 1.6 or higher -->		
+        <java.version>1.7</java.version>
         <lucene.version>4.4.0</lucene.version>
         <solr.version>4.4.0</solr.version>
         <slf4j.version>1.6.1</slf4j.version>
