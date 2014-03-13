@@ -85,8 +85,8 @@
     
     function updateProgressBar($, data){
     	$('#uploadForm').find('input').attr('disabled','disabled');
-    	$('#spanFile').button("disable")
-    	$('#spanFileCancel').button("disable")
+    	$('#spanFile').attr('disabled','disabled');
+    	$('#spanFileCancel').attr('disabled','disabled');
     	var percent = parseInt(data.loaded / data.total * 100, 10);
 		var progressbarArea = $("#progressBarArea");
 		var progressbar = $("#progressBar");
