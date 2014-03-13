@@ -24,10 +24,13 @@
         <relativePath />
     </parent>
 
-    <!--Force UTF-8 encoding during build on all platforms-->
+    <prerequisites>
+      <maven>3.0</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.6</java.version> <!-- DSpace requires Java 1.6 or higher -->		
+        <java.version>1.7</java.version>
         <lucene.version>4.4.0</lucene.version>
         <solr.version>4.4.0</solr.version>
         <slf4j.version>1.6.1</slf4j.version>
@@ -93,8 +96,6 @@
                     Enable to debug Maven Surefire tests in remote proces
                     <debugForkedProcess>true</debugForkedProcess>
                     -->
-                    <!-- required when running JMockit under Java 1.5 -->
-                    <argLine>-javaagent:"${settings.localRepository}"/mockit/jmockit/0.999.4/jmockit-0.999.4.jar</argLine>
                 </configuration>
              </plugin>
              <plugin>
@@ -1021,16 +1022,16 @@
              <artifactId>slf4j-log4j12</artifactId>
              <version>${slf4j.version}</version>
          </dependency>
+         <dependency> <!-- Keep jmockit before junit -->
+            <groupId>com.googlecode.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+         </dependency>
          <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
-            <scope>test</scope>
-         </dependency>
-         <dependency>
-            <groupId>mockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <version>0.999.4</version>
             <scope>test</scope>
          </dependency>
          <dependency>

@@ -51,6 +51,11 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
+        <dependency> <!-- Keep jmockit before junit -->
+            <groupId>com.googlecode.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
             <groupId>junit</groupId>
@@ -68,11 +73,6 @@
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-servlet-tester</artifactId>
             <version>6.1.14</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mockit</groupId>
-            <artifactId>jmockit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
