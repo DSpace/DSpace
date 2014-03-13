@@ -22,6 +22,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.jdom.Element;
 
@@ -224,11 +226,12 @@ class DAVCommunity extends DAVDSpaceObject
                 || elementsEqualIsh(prop, side_bar_textProperty)
                 || elementsEqualIsh(prop, copyright_textProperty))
         {
-            this.community.setMetadata(prop.getName(), newValue);
+            this.community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, prop.getName(), DSpaceObject.ANY);
+            this.community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, prop.getName(), null, newValue);
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.community.setMetadata(Community.NAME_TEXT, newValue);
+            this.community.setName(newValue);
         }
         else if (elementsEqualIsh(prop, logoProperty))
         {

@@ -53,7 +53,7 @@ public class XSLTIngestionCrosswalk
 
     private static final String DIRECTION = "submission";
 
-    private static String aliases[] = makeAliases(DIRECTION);
+    private static final String aliases[] = makeAliases(DIRECTION);
 
     public static String[] getPluginNames()
     {
@@ -119,6 +119,7 @@ public class XSLTIngestionCrosswalk
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
+    @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
@@ -145,6 +146,7 @@ public class XSLTIngestionCrosswalk
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
      */
+    @Override
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
@@ -239,7 +241,8 @@ public class XSLTIngestionCrosswalk
                         }
                         else
                         {
-                            ((Community) dso).setMetadata(md, field.getText());
+                            ((Community) dso).clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, md, DSpaceObject.ANY);
+                            ((Community) dso).addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, md, null, field.getText());
                         }
                     }
                 }

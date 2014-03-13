@@ -28,6 +28,7 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.jdom.Element;
@@ -398,7 +399,7 @@ public class StructBuilder
             }
             
             // default the short description to be an empty string
-            community.setMetadata(Community.SHORT_DESCRIPTION, " ");
+            community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.SHORT_DESCRIPTION, null, " ");
             
             // now update the metadata
             Node tn = communities.item(i);
@@ -407,7 +408,7 @@ public class StructBuilder
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    community.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
+                    community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
             

@@ -78,6 +78,7 @@ public class Collection extends DSpaceObject
     private Group admins;
 
     // Keys for accessing Collection metadata
+    public static final String ELEMENT = "collection";
     public static final String NAME_TEXT = "name";
     public static final String COPYRIGHT_TEXT = "copyright_text";
     public static final String INTRODUCTORY_TEXT = "introductory_text";
@@ -465,7 +466,7 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get the value of a metadata field
+     * Get the first (or only) value of a metadata field.
      *
      * @param field
      *            the name of the metadata field to get
@@ -477,8 +478,8 @@ public class Collection extends DSpaceObject
      */
     public String getMetadataSingleValue(String field)
     {
-    	String metadata = ourRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+    	DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
+    	return (metadata.length <= 0) ? "" : metadata[0].value;
     }
 
     /**

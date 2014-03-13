@@ -370,7 +370,7 @@ public class Community extends DSpaceObject
     }
 
     /**
-     * Get the value of a metadata field
+     * Get the first (or only) value of a metadata field.
      *
      * @param field
      *            the name of the metadata field to get
@@ -382,53 +382,8 @@ public class Community extends DSpaceObject
      */
     public String getMetadataSingleValue(String field)
     {
-    	String metadata = ourRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
-    }
-
-    /**
-     * Set a metadata value
-     *
-     * @param field
-     *            the name of the metadata field to get
-     * @param value
-     *            value to set the field to
-     *
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
-     * @exception MissingResourceException
-     */
-    public void setMetadata(String field, String value)throws MissingResourceException
-    {
-        if ((field.trim()).equals(NAME_TEXT)
-                && (value == null || value.trim().equals("")))
-        {
-            try
-            {
-                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            }
-            catch (MissingResourceException e)
-            {
-                value = "Untitled";
-            }
-        }
-
-        /*
-         * Set metadata field to null if null
-         * and trim strings to eliminate excess
-         * whitespace.
-         */
-        if(value == null)
-        {
-            ourRow.setColumnNull(field);
-        }
-        else
-        {
-            ourRow.setColumn(field, value.trim());
-        }
-
-        metadataChanged = true;
-        addDetails(field);
+    	DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
+    	return (metadata.length <= 0) ? "" : metadata[0].value;
     }
 
     @Override
@@ -436,6 +391,18 @@ public class Community extends DSpaceObject
     {
     	String metadata = ourRow.getStringColumn(NAME_TEXT);
     	return (metadata == null) ? "" : metadata;
+    }
+
+    public void setName(String name)
+    {
+        if (name == null)
+        {
+            ourRow.setColumnNull(NAME_TEXT);
+        }
+        else
+        {
+            ourRow.setColumn(NAME_TEXT, name.trim());
+        }
     }
 
     /**
