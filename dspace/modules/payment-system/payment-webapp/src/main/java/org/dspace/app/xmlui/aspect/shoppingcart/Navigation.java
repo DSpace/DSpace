@@ -195,11 +195,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             Item site = (Item) dso;
             boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
             // can they admin this collection?
-            if (isSystemAdmin)
-            {
-                context.addItemXref(contextPath+"/admin/paymentsystem/site?siteID=" + site.getID(), T_administrative_edit_paymentsystem);
-                options++;
-            }
+//            if (isSystemAdmin)
+//            {
+//                context.addItemXref(contextPath+"/admin/paymentsystem/site?siteID=" + site.getID(), T_administrative_edit_paymentsystem);
+//                options++;
+//            }
         }
 
         return options;
