@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.RequestItemEmailUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
@@ -105,7 +106,6 @@ public class SendItemRequestAction extends AbstractAction
         if (titleDC != null || titleDC.length > 0) {
         	title=titleDC[0].value;
         }
-        String emailRequest;
         
 		RequestItemAuthor author = new DSpace()
 				.getServiceManager()
@@ -116,14 +116,8 @@ public class SendItemRequestAction extends AbstractAction
 		String authorEmail = author.getEmail();
 		String authorName = author.getFullName();
 		
-        if(authorEmail!=null){
-            emailRequest=authorEmail;
-        }else{
-            emailRequest=ConfigurationManager.getProperty("mail.helpdesk");
-        }
-        if(emailRequest==null){
-            emailRequest=ConfigurationManager.getProperty("mail.admin");
-        }
+		String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
+		
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
         email.addRecipient(emailRequest);
