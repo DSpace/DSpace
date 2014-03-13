@@ -124,8 +124,11 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
 
         String prefix = getPrefix(aDOIKey);
         String suffix = getSuffix(aDOIKey);
-        if(suffix == null) {
+        if(suffix == null || suffix.length() == 0) {
             throw new DOIFormatException("DOI string does not contain a suffix");
+        }
+        if(prefix == null || prefix.length() == 0) {
+            throw new DOIFormatException("DOI string does not contain a prefix");
         }
         String query = DOI_QUERY_BY_PREFIX_SUFFIX;
         return DatabaseManager.querySingleTable(getContext(), DOI_TABLE, query, prefix, suffix);
