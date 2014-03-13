@@ -55,6 +55,13 @@
             <scope>test</scope>
         </dependency>
 
+         <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.0-801.jdbc4</version>
+            <scope>test</scope>
+         </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
