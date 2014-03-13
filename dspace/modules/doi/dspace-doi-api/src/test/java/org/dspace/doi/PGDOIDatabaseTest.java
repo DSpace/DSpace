@@ -51,9 +51,9 @@ public class PGDOIDatabaseTest {
         // Update the DOI
         boolean put = myPGDOIDatabase.put(otherDOI);
         getDOI = myPGDOIDatabase.getByDOI(aDOI.toString());
-        // The DOI objects should not be equal, even though they have the same
-        // prefix/suffix
-        assert aDOI.equals(getDOI) == false;
+        // The DOI internal identifiers should not be equal
+        // even though they have the same prefix/suffix
+        assert aDOI.getInternalIdentifier().equals(getDOI.getInternalIdentifier()) == false;
         assert otherDOI.equals(getDOI);
     }
 
