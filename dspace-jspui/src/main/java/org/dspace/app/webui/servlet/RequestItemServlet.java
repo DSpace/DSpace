@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.RequestItemEmailUtil;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.RequestItemManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -215,16 +216,7 @@ public class RequestItemServlet extends DSpaceServlet
 				
 				String authorEmail = author.getEmail();
 				String authorName = author.getFullName();
-				String emailRequest = ConfigurationManager.getProperty("mail.admin");;
-				boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
-				String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
-				
-				if ((helpdeskOverridesSubmitter || StringUtils.isEmpty(authorEmail)) && StringUtils.isNotEmpty(helpDeskEmail)) {
-					emailRequest = ConfigurationManager.getProperty("mail.helpdesk");
-				}
-				else if (StringUtils.isNotEmpty(authorEmail)) {
-					emailRequest = authorEmail;
-				} 
+				String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
 				
 				email.addRecipient(emailRequest);
 

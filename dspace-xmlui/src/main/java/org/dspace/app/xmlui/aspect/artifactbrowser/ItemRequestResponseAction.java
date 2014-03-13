@@ -8,7 +8,6 @@
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,21 +23,15 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItemEmailUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.core.Utils;
-import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -128,16 +121,7 @@ public class ItemRequestResponseAction extends AbstractAction
     	String name = request.getParameter("name");
     	String mail = request.getParameter("email");
     	if(StringUtils.isNotEmpty(name)&&StringUtils.isNotEmpty(mail)){
-    	    String emailRequest = ConfigurationManager.getProperty("mail.admin");;
-    	    boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
-    	    String helpDeskEmail = ConfigurationManager.getProperty("mail.helpdesk");
-            EPerson submitter = item.getSubmitter();
-            if((helpdeskOverridesSubmitter || submitter == null) && StringUtils.isNotEmpty(helpDeskEmail)) {
-                emailRequest = helpDeskEmail;
-            }
-            else if(submitter!=null){
-     	    	emailRequest=submitter.getEmail();
-            }
+    	    String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
 	    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
 	        email.addRecipient(emailRequest);
 	        
