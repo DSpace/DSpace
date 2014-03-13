@@ -67,6 +67,9 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         DATABASE = this;
     }
     public static PGDOIDatabase getInstance() {
+        if(DATABASE == null) {
+            DATABASE = new PGDOIDatabase();
+        }
         return DATABASE;
     }
     public void close() {
