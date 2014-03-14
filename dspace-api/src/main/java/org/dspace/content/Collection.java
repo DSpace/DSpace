@@ -482,10 +482,12 @@ public class Collection extends DSpaceObject
     {
         try {
             if (null == MetadataField.findByElement(ourContext, getDspaceSchemaID(), ELEMENT, field))
-                throw new IllegalArgumentException(field + " does not exist in "
-                        + MetadataSchema.DSPACE_SCHEMA);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("Exception looking up Collection metadata field " + field, ex);
+                throw new IllegalArgumentException("Metadata field '" +field +
+                        "' does not exist in " + MetadataSchema.DSPACE_SCHEMA);
+        } catch (SQLException ex) {
+            throw new IllegalArgumentException("Exception looking up Collection metadata field:  " + field, ex);
+        } catch (AuthorizeException ex) {
+            throw new IllegalArgumentException("Exception looking up Collection metadata field:  " + field, ex);
         }
 
         DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
