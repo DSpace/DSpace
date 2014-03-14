@@ -49,7 +49,7 @@ import org.jdom.Element;
  */
 class DAVCollection extends DAVDSpaceObject
 {
-    
+
     /** log4j category. */
     private static Logger log = Logger.getLogger(DAVCollection.class);
 
@@ -58,7 +58,7 @@ class DAVCollection extends DAVDSpaceObject
 
     /** The temporary upload directory. */
     private static String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
+                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
 
     /** The Constant short_descriptionProperty. */
     private static final Element short_descriptionProperty = new Element(
@@ -104,7 +104,7 @@ class DAVCollection extends DAVDSpaceObject
 
     /**
      * Instantiates a new DAV collection.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
@@ -153,13 +153,13 @@ class DAVCollection extends DAVDSpaceObject
                 ii.close();
             }
         }
-        
+
         return (DAVResource[]) result.toArray(new DAVResource[result.size()]);
     }
 
     /**
      * Gets the collection.
-     * 
+     *
      * @return the DSpace Collection object represented by this resource.
      */
     protected Collection getCollection()
@@ -249,9 +249,9 @@ class DAVCollection extends DAVDSpaceObject
     // syntactic sugar around getting collection metadata values:
     /**
      * Gets the object metadata.
-     * 
+     *
      * @param mdname the mdname
-     * 
+     *
      * @return the object metadata
      */
     private String getObjectMetadata(String mdname)
@@ -288,7 +288,7 @@ class DAVCollection extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.collection.setMetadata(Collection.NAME_TEXT, newValue);
+            this.collection.setName(newValue);
         }
         else if (elementsEqualIsh(prop, default_licenseProperty))
         {
@@ -354,7 +354,7 @@ class DAVCollection extends DAVDSpaceObject
      */
     private static class CountedInputStream extends FilterInputStream
     {
-        
+
         /** The count. */
         private long count = 0;
 
@@ -363,7 +363,7 @@ class DAVCollection extends DAVDSpaceObject
 
         /**
          * Instantiates a new counted input stream.
-         * 
+         *
          * @param is the is
          * @param length the length
          */
@@ -438,7 +438,7 @@ class DAVCollection extends DAVDSpaceObject
      * PUT ingests a package as a new Item. Package type (must match pluggable
      * packager name) is in either (a) "package" query arg in URI (b)
      * content-type request header
-     * 
+     *
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.

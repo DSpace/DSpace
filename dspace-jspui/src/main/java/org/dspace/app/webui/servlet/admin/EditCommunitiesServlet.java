@@ -510,10 +510,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         storeAuthorizeAttributeCommunityEdit(context, request, community);
 
-        community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
-                Community.NAME_TEXT, DSpaceObject.ANY);
-        community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
-                Community.NAME_TEXT, null, request.getParameter("name"));
+        community.setName(request.getParameter("name"));
         community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
                 Community.SHORT_DESCRIPTION, DSpaceObject.ANY);
         community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
@@ -662,7 +659,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         storeAuthorizeAttributeCollectionEdit(context, request, collection);
 
         // Update the basic metadata
-        collection.setMetadata(Collection.NAME_TEXT, request.getParameter("name"));
+        collection.setName(request.getParameter("name"));
         collection.setMetadata(Collection.SHORT_DESCRIPTION, request
                 .getParameter("short_description"));
 

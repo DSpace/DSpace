@@ -59,7 +59,7 @@ class DAVCommunity extends DAVDSpaceObject
 
     /** The all props. */
     private static List<Element> allProps = new ArrayList<Element>(commonProps);
-    
+
     static
     {
         allProps.add(logoProperty);
@@ -72,7 +72,7 @@ class DAVCommunity extends DAVDSpaceObject
 
     /**
      * Instantiates a new DAV community.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
@@ -192,9 +192,9 @@ class DAVCommunity extends DAVDSpaceObject
     // syntactic sugar around getting community metadata values:
     /**
      * Gets the object metadata.
-     * 
+     *
      * @param mdname the mdname
-     * 
+     *
      * @return the object metadata
      */
     private String getObjectMetadata(String mdname)
@@ -333,7 +333,7 @@ class DAVCommunity extends DAVDSpaceObject
             SQLException, AuthorizeException, IOException
     {
         Collection newColl = this.community.createCollection();
-        newColl.setMetadata(Collection.NAME_TEXT, name);
+        newColl.setName(name);
         newColl.update();
         return HttpServletResponse.SC_OK;
     }

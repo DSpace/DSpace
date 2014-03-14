@@ -79,14 +79,16 @@ public class Collection extends DSpaceObject
 
     // Keys for accessing Collection metadata
     public static final String ELEMENT = "collection";
-    public static final String NAME_TEXT = "name";
+
+    private static final String NAME_TEXT = "name";
+
     public static final String COPYRIGHT_TEXT = "copyright_text";
     public static final String INTRODUCTORY_TEXT = "introductory_text";
     public static final String SHORT_DESCRIPTION = "short_description";
     public static final String SIDEBAR_TEXT = "side_bar_text";
     public static final String PROVENANCE_TEXT = "provenance_description";
     public static final String LICENSE_TEXT = "license";
-    
+
     /**
      * Construct a collection with the given table row
      *
@@ -514,7 +516,7 @@ public class Collection extends DSpaceObject
          * and trim strings to eliminate excess
          * whitespace.
          */
-		if(value == null)
+        if(value == null)
         {
             ourRow.setColumnNull(field);
         }
@@ -532,6 +534,23 @@ public class Collection extends DSpaceObject
     {
     	String name = ourRow.getStringColumn("name");
     	return (name == null) ? "" : name;
+    }
+
+    public void setName(String name)
+    {
+        if ((name == null || name.trim().equals("")))
+        {
+            try
+            {
+                name = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+            }
+            catch (MissingResourceException e)
+            {
+                name = "Untitled";
+            }
+        }
+
+        ourRow.setColumn(NAME_TEXT, name);
     }
 
     /**

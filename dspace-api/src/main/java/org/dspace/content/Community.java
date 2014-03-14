@@ -18,7 +18,6 @@ import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
@@ -33,6 +32,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import org.dspace.core.I18nUtil;
 
 /**
  * Class representing a community.
@@ -59,7 +59,9 @@ public class Community extends DSpaceObject
 
     // Keys for accessing Community metadata
     public static final String ELEMENT = "community";
-    public static final String NAME_TEXT = "name";
+
+    private static final String NAME_TEXT = "name";
+
     public static final String COPYRIGHT_TEXT = "copyright_text";
     public static final String INTRODUCTORY_TEXT = "introductory_text";
     public static final String SHORT_DESCRIPTION = "short_description";
@@ -395,14 +397,19 @@ public class Community extends DSpaceObject
 
     public void setName(String name)
     {
-        if (name == null)
+        if ((name == null || name.trim().equals("")))
         {
-            ourRow.setColumnNull(NAME_TEXT);
+            try
+            {
+                name = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+            }
+            catch (MissingResourceException e)
+            {
+                name = "Untitled";
+            }
         }
-        else
-        {
-            ourRow.setColumn(NAME_TEXT, name.trim());
-        }
+
+        ourRow.setColumn(NAME_TEXT, name);
     }
 
     /**

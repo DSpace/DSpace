@@ -197,11 +197,10 @@ public class DOIIdentifierProviderTest
         ctx.setCurrentUser(eperson);
         // Create an environment for our test objects to live in.
         community = Community.create(null, ctx);
-        community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
-                Community.NAME_TEXT, null, "A Test Community");
+        community.setName("A Test Community");
         community.update();
         collection = community.createCollection();
-        collection.setMetadata(Collection.NAME_TEXT, "A Test Collection");
+        collection.setName("A Test Collection");
         collection.update();
         ctx.complete();
 

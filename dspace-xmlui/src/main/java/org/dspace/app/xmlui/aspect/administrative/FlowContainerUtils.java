@@ -124,7 +124,7 @@ public class FlowContainerUtils
         }
 
 		// Save the metadata
-		collection.setMetadata(Collection.NAME_TEXT, name);
+		collection.setName(name);
 		collection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
 		collection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
 		collection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
@@ -788,7 +788,7 @@ public class FlowContainerUtils
         }
 
 		// Save the metadata
-		newCollection.setMetadata(Collection.NAME_TEXT, name);
+		newCollection.setName(name);
 		newCollection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
 		newCollection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
 		newCollection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
@@ -883,11 +883,15 @@ public class FlowContainerUtils
             sideBarText = null;
         }
 
-        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.NAME_TEXT, null, name);
-        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.SHORT_DESCRIPTION, null, shortDescription);
-        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.INTRODUCTORY_TEXT, null, introductoryText);
-        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.COPYRIGHT_TEXT, null, copyrightText);
-        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.SIDEBAR_TEXT, null, sideBarText);
+        newCommunity.setName(name);
+        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
+                Community.SHORT_DESCRIPTION, null, shortDescription);
+        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
+                Community.INTRODUCTORY_TEXT, null, introductoryText);
+        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
+                Community.COPYRIGHT_TEXT, null, copyrightText);
+        newCommunity.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
+                Community.SIDEBAR_TEXT, null, sideBarText);
 
     	// Upload the logo
         Object object = request.get("logo");
@@ -963,10 +967,7 @@ public class FlowContainerUtils
         }
 
         // Save the data
-        community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
-                Community.NAME_TEXT, DSpaceObject.ANY);
-        community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
-                Community.NAME_TEXT, null, name);
+        community.setName(name);
         community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
                 Community.SHORT_DESCRIPTION, DSpaceObject.ANY);
         community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT,
