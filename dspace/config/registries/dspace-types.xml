@@ -58,7 +58,7 @@
   <dc-type>
       <schema>dspace</schema>
       <element>community</element>
-      <qualifier>description</qualifier>
+      <qualifier>short_description</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
@@ -109,7 +109,7 @@
   <dc-type>
       <schema>dspace</schema>
       <element>collection</element>
-      <qualifier>description</qualifier>
+      <qualifier>short_description</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
