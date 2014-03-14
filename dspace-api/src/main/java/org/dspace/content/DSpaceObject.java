@@ -974,6 +974,37 @@ public abstract class DSpaceObject
     }
 
     /**
+     * Look up the database ID for the internal DSpace schema.
+     * It looks expensive, but MetadataSchema.find caches what it finds.
+     *
+     * @return
+     */
+    protected int getDspaceSchemaID()
+    {
+        int dspaceSchemaID;
+        try
+        {
+            MetadataSchema dspaceSchema = MetadataSchema.find(ourContext,
+                    MetadataSchema.DSPACE_SCHEMA);
+            if (null == dspaceSchema)
+            {
+                log.error("Schema " + MetadataSchema.DSPACE_SCHEMA +
+                        " unknown!");
+                dspaceSchemaID = -2;
+            }
+            else
+            {
+                dspaceSchemaID = dspaceSchema.getSchemaID();
+            }
+        } catch (SQLException ex)
+        {
+            log.error("Unable to look up DSpace schema", ex);
+            dspaceSchemaID = -1;
+        }
+        return dspaceSchemaID;
+    }
+
+    /**
      * Cache all metadata on this object from the database.
      */
     protected class MetadataCache

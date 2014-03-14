@@ -537,7 +537,7 @@ public class MetadataSchema
      *            context, in case we need to read it in from DB
      * @param shortName
      *            the short name for the schema
-     * @return the metadata schema object
+     * @return the metadata schema object, or null if there is none by that name.
      * @throws SQLException
      */
     public static MetadataSchema find(Context context, String shortName)

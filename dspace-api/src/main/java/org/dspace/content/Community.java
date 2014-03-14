@@ -18,6 +18,7 @@ import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
@@ -32,7 +33,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
-import org.dspace.core.I18nUtil;
 
 /**
  * Class representing a community.
@@ -377,13 +377,21 @@ public class Community extends DSpaceObject
      * @param field
      *            the name of the metadata field to get
      *
-     * @return the value of the metadata field
+     * @return the value of the metadata field, or an empty string if there is none.
      *
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
     public String getMetadataSingleValue(String field)
     {
+        try {
+            if (null == MetadataField.findByElement(ourContext, getDspaceSchemaID(), ELEMENT, field))
+                throw new IllegalArgumentException(field + " does not exist in "
+                        + MetadataSchema.DSPACE_SCHEMA);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Exception looking up Community metadata field " + field, ex);
+        }
+
     	DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
     	return (metadata.length <= 0) ? "" : metadata[0].value;
     }

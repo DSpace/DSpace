@@ -480,7 +480,15 @@ public class Collection extends DSpaceObject
      */
     public String getMetadataSingleValue(String field)
     {
-    	DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
+        try {
+            if (null == MetadataField.findByElement(ourContext, getDspaceSchemaID(), ELEMENT, field))
+                throw new IllegalArgumentException(field + " does not exist in "
+                        + MetadataSchema.DSPACE_SCHEMA);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Exception looking up Collection metadata field " + field, ex);
+        }
+
+        DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
     	return (metadata.length <= 0) ? "" : metadata[0].value;
     }
 
