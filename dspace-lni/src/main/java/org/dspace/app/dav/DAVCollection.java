@@ -29,6 +29,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
@@ -284,7 +285,8 @@ class DAVCollection extends DAVDSpaceObject
                 || elementsEqualIsh(prop, copyright_textProperty)
                 || elementsEqualIsh(prop, provenance_descriptionProperty))
         {
-            this.collection.setMetadata(prop.getName(), newValue);
+            this.collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, prop.getName(), DSpaceObject.ANY);
+            this.collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, prop.getName(), null, newValue);
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {

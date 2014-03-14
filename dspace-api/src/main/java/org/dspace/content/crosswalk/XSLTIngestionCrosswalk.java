@@ -237,7 +237,8 @@ public class XSLTIngestionCrosswalk
                     {
                         if (type == Constants.COLLECTION)
                         {
-                            ((Collection) dso).setMetadata(md, field.getText());
+                            ((Collection) dso).clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, md, DSpaceObject.ANY);
+                            ((Collection) dso).addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, md, null, field.getText());
                         }
                         else
                         {

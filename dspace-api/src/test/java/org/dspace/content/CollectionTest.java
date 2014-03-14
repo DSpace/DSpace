@@ -234,6 +234,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest
 
     /**
      * Test of setMetadata method, of class Collection.
+     * FIXME need to test template_item_id.
+     * FIXME should test addMetadata, clearMetadata instead.
      */
     @Test
     public void testSetMetadata()
@@ -248,22 +250,26 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         String license = "license text";
 
         c.setName(name);
-        c.setMetadata(Collection.SHORT_DESCRIPTION, sdesc);
-        c.setMetadata(Collection.INTRODUCTORY_TEXT, itext);
-        c.setMetadata(Collection.COPYRIGHT_TEXT, copy);
-        c.setMetadata(Collection.SIDEBAR_TEXT, sidebar);
-        c.setMetadata("template_item_id", tempItem);
-        c.setMetadata(Collection.PROVENANCE_TEXT, provDesc);
-        c.setMetadata(Collection.LICENSE_TEXT, license);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, sdesc);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, itext);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, copy);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, sidebar);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, provDesc);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, null, license);
 
         assertThat("testSetMetadata 0",c.getName(), equalTo(name));
         assertThat("testSetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(sdesc));
         assertThat("testSetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(itext));
         assertThat("testSetMetadata 3",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(copy));
         assertThat("testSetMetadata 4",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(sidebar));
-        assertThat("testGetMetadata 5",c.getMetadataSingleValue("template_item_id"), equalTo(tempItem));
-        assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(provDesc));
-        assertThat("testGetMetadata 7",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(license));
+        assertThat("testGetMetadata 5",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(provDesc));
+        assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(license));
     }
 
     /**

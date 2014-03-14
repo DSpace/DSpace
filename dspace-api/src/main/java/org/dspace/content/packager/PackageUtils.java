@@ -734,7 +734,8 @@ public class PackageUtils
             {
                 try
                 {
-                    collection.setMetadata(dbField, null);
+                    collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA,
+                            Collection.ELEMENT, dbField, DSpaceObject.ANY);
                 }
                 catch(IllegalArgumentException ie)
                 {

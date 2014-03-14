@@ -34,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -472,11 +473,16 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             // Get metadata
             collection.setName(wrapper.getParameter("name"));
-            collection.setMetadata(Collection.SHORT_DESCRIPTION, wrapper.getParameter("short_description"));
-            collection.setMetadata(Collection.INTRODUCTORY_TEXT, wrapper.getParameter("introductory_text"));
-            collection.setMetadata(Collection.COPYRIGHT_TEXT, wrapper.getParameter("copyright_text"));
-            collection.setMetadata(Collection.SIDEBAR_TEXT, wrapper.getParameter("side_bar_text"));
-            collection.setMetadata(Collection.PROVENANCE_TEXT, wrapper.getParameter("provenance_description"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, wrapper.getParameter("short_description"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, wrapper.getParameter("introductory_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, wrapper.getParameter("copyright_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, wrapper.getParameter("side_bar_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, wrapper.getParameter("provenance_description"));
             // Need to be more careful about license -- make sure it's null if
             // nothing was entered
             String license = wrapper.getParameter("license");

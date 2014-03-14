@@ -503,15 +503,16 @@ public class StructBuilder
     	throws TransformerException, SQLException, AuthorizeException, IOException, Exception
     {
         Element[] elements = new Element[collections.getLength()];
-        
+
         for (int i = 0; i < collections.getLength(); i++)
         {
             Element element = new Element("collection");
             Collection collection = parent.createCollection();
-            
+
             // default the short description to the empty string
-            collection.setMetadata(Collection.SHORT_DESCRIPTION, " ");
-            
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA,
+                    Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, " ");
+
             // import the rest of the metadata
             Node tn = collections.item(i);
             for (Map.Entry<String, String> entry : collectionMap.entrySet())
@@ -519,7 +520,8 @@ public class StructBuilder
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    collection.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
+                    collection.addMetadata(MetadataSchema.DSPACE_SCHEMA,
+                            Collection.ELEMENT, entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
             

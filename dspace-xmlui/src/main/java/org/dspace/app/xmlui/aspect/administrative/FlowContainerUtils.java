@@ -125,12 +125,18 @@ public class FlowContainerUtils
 
 		// Save the metadata
 		collection.setName(name);
-		collection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
-		collection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
-		collection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
-		collection.setMetadata(Collection.SIDEBAR_TEXT, sideBarText);
-		collection.setMetadata(Collection.LICENSE_TEXT, license);
-		collection.setMetadata(Collection.PROVENANCE_TEXT, provenanceDescription);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, shortDescription);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, introductoryText);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, copyrightText);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, sideBarText);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, null, license);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+		collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, provenanceDescription);
 
 
 		// Change or delete the logo
@@ -789,13 +795,12 @@ public class FlowContainerUtils
 
 		// Save the metadata
 		newCollection.setName(name);
-		newCollection.setMetadata(Collection.SHORT_DESCRIPTION, shortDescription);
-		newCollection.setMetadata(Collection.INTRODUCTORY_TEXT, introductoryText);
-		newCollection.setMetadata(Collection.COPYRIGHT_TEXT, copyrightText);
-		newCollection.setMetadata(Collection.SIDEBAR_TEXT, sideBarText);
-		newCollection.setMetadata(Collection.LICENSE_TEXT, license);
-		newCollection.setMetadata(Collection.PROVENANCE_TEXT, provenanceDescription);
-
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, shortDescription);
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, introductoryText);
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, copyrightText);
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, sideBarText);
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, null, license);
+		newCollection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, provenanceDescription);
 
         // Set the logo
     	Object object = request.get("logo");

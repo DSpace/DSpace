@@ -492,51 +492,6 @@ public class Collection extends DSpaceObject
     	return (metadata.length <= 0) ? "" : metadata[0].value;
     }
 
-    /**
-     * Set a metadata value
-     *
-     * @param field
-     *            the name of the metadata field to get
-     * @param value
-     *            value to set the field to
-     *
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
-     * @exception MissingResourceException
-     */
-    public void setMetadata(String field, String value) throws MissingResourceException
-    {
-        if ((field.trim()).equals("name")
-                && (value == null || value.trim().equals("")))
-        {
-            try
-            {
-                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            }
-            catch (MissingResourceException e)
-            {
-                value = "Untitled";
-            }
-        }
-
-        /*
-         * Set metadata field to null if null
-         * and trim strings to eliminate excess
-         * whitespace.
-         */
-        if(value == null)
-        {
-            ourRow.setColumnNull(field);
-        }
-        else
-        {
-            ourRow.setColumn(field, value.trim());
-        }
-
-        metadataChanged = true;
-        addDetails(field);
-    }
-
     @Override
     public String getName()
     {
@@ -914,7 +869,17 @@ public class Collection extends DSpaceObject
      */
     public void setLicense(String license)
     {
-        setMetadata(LICENSE_TEXT,license);
+        if(license == null)
+        {
+            ourRow.setColumnNull(LICENSE_TEXT);
+        }
+        else
+        {
+            ourRow.setColumn(LICENSE_TEXT, license.trim());
+        }
+
+        metadataChanged = true;
+        addDetails(LICENSE_TEXT);
     }
 
     /**

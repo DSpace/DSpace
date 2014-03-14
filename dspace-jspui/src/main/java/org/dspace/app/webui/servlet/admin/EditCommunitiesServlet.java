@@ -660,8 +660,11 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         // Update the basic metadata
         collection.setName(request.getParameter("name"));
-        collection.setMetadata(Collection.SHORT_DESCRIPTION, request
-                .getParameter("short_description"));
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT,
+                Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT,
+                Collection.SHORT_DESCRIPTION, null,
+                request.getParameter("short_description"));
 
         String intro = request.getParameter("introductory_text");
 
@@ -698,11 +701,16 @@ public class EditCommunitiesServlet extends DSpaceServlet
             provenance = null;
         }
 
-        collection.setMetadata(Collection.INTRODUCTORY_TEXT, intro);
-        collection.setMetadata(Collection.COPYRIGHT_TEXT, copy);
-        collection.setMetadata(Collection.SIDEBAR_TEXT, side);
-        collection.setMetadata(Collection.LICENSE_TEXT, license);
-        collection.setMetadata(Collection.PROVENANCE_TEXT, provenance);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, intro);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, copy);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, side);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, null, license);
+        collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+        collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, provenance);
 
 
 
