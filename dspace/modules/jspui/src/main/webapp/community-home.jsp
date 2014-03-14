@@ -90,7 +90,7 @@
                 if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
             %>
-            : [<%= ic.getCount(community) %>]
+            <span class="badge"><%= ic.getCount(community) %></span>
             <%
                 }
             %>

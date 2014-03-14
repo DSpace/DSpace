@@ -27,10 +27,10 @@
     if (sidebar != null) {
 %>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6 col-xs-6 sidebar-section sidebar-offcanvas">
                     <%= sidebar%>
                 </div>
-            </div>       
+           </div>       
 <%
     }
 %>

@@ -26,6 +26,10 @@ $(document).ready(function() {
         //Getlist group item
         jQuery(this).closest('.list-group-item').removeClass('active');
     });
+        
+    // Implements off-canvas columns
+    jQuery('[data-toggle=offcanvas]').click(function() {
+        jQuery('.row-offcanvas').toggleClass('active');
+    });
 
 });
- 
