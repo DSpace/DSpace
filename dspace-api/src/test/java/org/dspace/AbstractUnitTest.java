@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 public class AbstractUnitTest
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractUnitTest.class);
+    private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
 
     //Below there are static variables shared by all the instances of the class
     
@@ -137,6 +137,7 @@ public class AbstractUnitTest
 
                 RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
                 MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
+                MetadataImporter.loadRegistry(base + "dspace-types.xml", true);
                 MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
                 ctx.commit();
 
