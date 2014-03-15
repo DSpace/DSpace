@@ -67,6 +67,8 @@ public class Community extends DSpaceObject
     public static final String SHORT_DESCRIPTION = "short_description";
     public static final String SIDEBAR_TEXT = "sidebar_text";
 
+    static final String LOGO_BITSTREAM_ID = "logo_bitstream_id";
+
     /**
      * Construct a community object from a database row.
      *
@@ -80,14 +82,14 @@ public class Community extends DSpaceObject
         super(context, row);
 
         // Get the logo bitstream
-        if (ourRow.isColumnNull("logo_bitstream_id"))
+        if (ourRow.isColumnNull(LOGO_BITSTREAM_ID))
         {
             logo = null;
         }
         else
         {
             logo = Bitstream.find(ourContext, ourRow
-                    .getIntColumn("logo_bitstream_id"));
+                    .getIntColumn(LOGO_BITSTREAM_ID));
         }
 
         // Get our Handle if any
@@ -461,7 +463,7 @@ public class Community extends DSpaceObject
         {
             log.info(LogManager.getHeader(ourContext, "remove_logo",
                     "community_id=" + getID()));
-            ourRow.setColumnNull("logo_bitstream_id");
+            ourRow.setColumnNull(LOGO_BITSTREAM_ID);
             logo.delete();
             logo = null;
         }
@@ -469,7 +471,7 @@ public class Community extends DSpaceObject
         if (is != null)
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
-            ourRow.setColumn("logo_bitstream_id", newLogo.getID());
+            ourRow.setColumn(LOGO_BITSTREAM_ID, newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream

@@ -224,9 +224,9 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         assertThat("testGetMetadata 0",c.getName(), equalTo(""));
         assertThat("testGetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(""));
         assertThat("testGetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(""));
+        assertThat("testGetMetadata 3",c.getMetadataSingleValue(Collection.LOGO_BITSTREAM_ID), equalTo(""));
         assertThat("testGetMetadata 4",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(""));
-        assertThat("testGetMetadata 5",c.getMetadataSingleValue("template_item_id"), equalTo(""));
+        assertThat("testGetMetadata 5",c.getMetadataSingleValue(Collection.TEMPLATE_ITEM_ID), equalTo(""));
         assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(""));
         assertThat("testGetMetadata 7",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(""));
         assertThat("testGetMetadata 8",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(""));

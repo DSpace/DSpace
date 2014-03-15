@@ -89,6 +89,9 @@ public class Collection extends DSpaceObject
     public static final String PROVENANCE_TEXT = "provenance";
     public static final String LICENSE_TEXT = "license";
 
+    static final String LOGO_BITSTREAM_ID = "logo_bitstream_id";
+    static final String TEMPLATE_ITEM_ID = "template_item_id";
+
     /**
      * Construct a collection with the given table row
      *
@@ -103,25 +106,25 @@ public class Collection extends DSpaceObject
         super(context, row);
 
         // Get the logo bitstream
-        if (ourRow.isColumnNull("logo_bitstream_id"))
+        if (ourRow.isColumnNull(LOGO_BITSTREAM_ID))
         {
             logo = null;
         }
         else
         {
             logo = Bitstream.find(ourContext, ourRow
-                    .getIntColumn("logo_bitstream_id"));
+                    .getIntColumn(LOGO_BITSTREAM_ID));
         }
 
         // Get the template item
-        if (ourRow.isColumnNull("template_item_id"))
+        if (ourRow.isColumnNull(TEMPLATE_ITEM_ID))
         {
             template = null;
         }
         else
         {
             template = Item.find(ourContext, ourRow
-                    .getIntColumn("template_item_id"));
+                    .getIntColumn(TEMPLATE_ITEM_ID));
         }
 
         // Get the relevant groups
@@ -558,14 +561,14 @@ public class Collection extends DSpaceObject
         }
 
         // First, delete any existing logo
-        if (!ourRow.isColumnNull("logo_bitstream_id"))
+        if (!ourRow.isColumnNull(LOGO_BITSTREAM_ID))
         {
             logo.delete();
         }
 
         if (is == null)
         {
-            ourRow.setColumnNull("logo_bitstream_id");
+            ourRow.setColumnNull(LOGO_BITSTREAM_ID);
             logo = null;
 
             log.info(LogManager.getHeader(ourContext, "remove_logo",
@@ -574,7 +577,7 @@ public class Collection extends DSpaceObject
         else
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
-            ourRow.setColumn("logo_bitstream_id", newLogo.getID());
+            ourRow.setColumn(LOGO_BITSTREAM_ID, newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream
@@ -914,7 +917,7 @@ public class Collection extends DSpaceObject
         if (template == null)
         {
             template = Item.create(ourContext);
-            ourRow.setColumn("template_item_id", template.getID());
+            ourRow.setColumn(TEMPLATE_ITEM_ID, template.getID());
 
             log.info(LogManager.getHeader(ourContext, "create_template_item",
                     "collection_id=" + getID() + ",template_item_id="
@@ -940,7 +943,7 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
 
-        ourRow.setColumnNull("template_item_id");
+        ourRow.setColumnNull(TEMPLATE_ITEM_ID);
         DatabaseManager.update(ourContext, ourRow);
 
         if (template != null)

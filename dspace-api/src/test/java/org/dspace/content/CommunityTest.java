@@ -51,7 +51,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     {
         super.init();
         try
-        {   
+        {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             this.c = Community.create(null, context);
@@ -59,7 +59,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
             context.commit();
-        }       
+        }
         catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
@@ -122,8 +122,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         // test that a Community Admin can create a Community with parent (Sub-Community)
         Community son = Community.create(c, context);
         //the item created by default has no name set
-        assertThat("testCreate 2", son, notNullValue());        
-        assertThat("testCreate 3", son.getName(), equalTo(""));        
+        assertThat("testCreate 2", son, notNullValue());
+        assertThat("testCreate 3", son.getName(), equalTo(""));
         assertTrue("testCreate 4", son.getAllParents().length == 1);
         assertThat("testCreate 5", son.getAllParents()[0], equalTo(c));
     }
@@ -209,8 +209,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testCreateWithValidHandle 0", created, notNullValue());
         assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
     }
-    
-    
+
+
      /**
      * Test of create method (with specified invalid handle), of class Community.
      */
@@ -321,7 +321,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      */
     @Test
     @Override
-    public void testGetHandle() 
+    public void testGetHandle()
     {
         //default instance has a random handle
         assertTrue("testGetHandle 0", c.getHandle().contains("123456789/"));
@@ -337,7 +337,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testGetMetadata 0",c.getName(), equalTo(""));
         assertThat("testGetMetadata 1",c.getMetadataSingleValue(Community.SHORT_DESCRIPTION), equalTo(""));
         assertThat("testGetMetadata 2",c.getMetadataSingleValue(Community.INTRODUCTORY_TEXT), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadataSingleValue("logo_bitstream_id"), equalTo(""));
+        assertThat("testGetMetadata 3",c.getMetadataSingleValue(Community.LOGO_BITSTREAM_ID), equalTo(""));
         assertThat("testGetMetadata 4",c.getMetadataSingleValue(Community.COPYRIGHT_TEXT), equalTo(""));
         assertThat("testGetMetadata 5",c.getMetadataSingleValue(Community.SIDEBAR_TEXT), equalTo(""));
     }
@@ -580,7 +580,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             AuthorizeUtil authManager;
             {
                 AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Community) any);
-                result = null;                
+                result = null;
             }
         };
 
@@ -654,7 +654,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getAdministrators method, of class Community.
      */
     @Test
-    public void testGetAdministrators() 
+    public void testGetAdministrators()
     {
         //null by default
         assertThat("testGetAdministrators 0",c.getAdministrators(), nullValue());
@@ -719,7 +719,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getParentCommunity method, of class Community.
      */
     @Test
-    public void testGetParentCommunity() throws Exception 
+    public void testGetParentCommunity() throws Exception
     {
         new NonStrictExpectations()
         {
@@ -997,7 +997,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testRemoveCollectionAuth 0", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 1", c.getCollections().length == 1);
         assertThat("testRemoveCollectionAuth 2", c.getCollections()[0], equalTo(col));
-        
+
         c.removeCollection(col);
         assertThat("testRemoveCollectionAuth 3", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 4", c.getCollections().length == 0);
@@ -1267,7 +1267,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         };
 
         assertFalse("testCanEditBooleanNoAuth 0", c.canEditBoolean());
-    }    
+    }
 
     /**
      * Test of canEdit method, of class Community.
@@ -1362,7 +1362,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of countItems method, of class Community.
      */
     @Test
-    public void testCountItems() throws Exception 
+    public void testCountItems() throws Exception
     {
         //0 by default
         assertTrue("testCountItems 0", c.countItems() == 0);
