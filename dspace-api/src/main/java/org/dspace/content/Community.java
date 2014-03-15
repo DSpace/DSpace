@@ -390,7 +390,9 @@ public class Community extends DSpaceObject
             if (null == MetadataField.findByElement(ourContext, getDspaceSchemaID(), ELEMENT, field))
                 throw new IllegalArgumentException(field + " does not exist in "
                         + MetadataSchema.DSPACE_SCHEMA);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
+            throw new IllegalArgumentException("Exception looking up Community metadata field " + field, ex);
+        } catch (AuthorizeException ex) {
             throw new IllegalArgumentException("Exception looking up Community metadata field " + field, ex);
         }
 
