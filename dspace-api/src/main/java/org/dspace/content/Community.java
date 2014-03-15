@@ -62,10 +62,10 @@ public class Community extends DSpaceObject
 
     private static final String NAME_TEXT = "name";
 
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String COPYRIGHT_TEXT = "copyright";
+    public static final String INTRODUCTORY_TEXT = "introduction";
     public static final String SHORT_DESCRIPTION = "short_description";
-    public static final String SIDEBAR_TEXT = "side_bar_text";
+    public static final String SIDEBAR_TEXT = "sidebar_text";
 
     /**
      * Construct a community object from a database row.

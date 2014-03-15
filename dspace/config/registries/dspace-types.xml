@@ -65,7 +65,7 @@
   <dc-type>
       <schema>dspace</schema>
       <element>community</element>
-      <qualifier>sidebar</qualifier>
+      <qualifier>sidebar_text</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
@@ -116,7 +116,7 @@
   <dc-type>
       <schema>dspace</schema>
       <element>collection</element>
-      <qualifier>sidebar</qualifier>
+      <qualifier>sidebar_text</qualifier>
       <scope_note></scope_note>
   </dc-type>
 
