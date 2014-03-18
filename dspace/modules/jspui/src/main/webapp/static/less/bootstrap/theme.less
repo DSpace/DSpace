@@ -72,9 +72,9 @@
 .btn-default { .btn-styles(@btn-default-bg); text-shadow: 0 1px 0 #fff; border-color: #ccc; }
 .btn-primary { .btn-styles(@btn-primary-bg); }
 .btn-success { .btn-styles(@btn-success-bg); }
+.btn-info    { .btn-styles(@btn-info-bg); }
 .btn-warning { .btn-styles(@btn-warning-bg); }
 .btn-danger  { .btn-styles(@btn-danger-bg); }
-.btn-info    { .btn-styles(@btn-info-bg); }
 
 
 
@@ -108,7 +108,7 @@
 
 
 //
-// Navbars
+// Navbar
 // --------------------------------------------------
 .navbar {
 
@@ -161,8 +161,6 @@
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
   }
 }
-
-
 
 // Undo rounded corners in static and fixed navbars
 .navbar-static-top,
@@ -338,7 +336,7 @@
 //
 // Off canvas columns
 //-----------------------------------------------------
-@media screen and (max-width: 767px) {
+@media screen and (max-width: @screen-xs-max) {
   .row-offcanvas {
     position: relative;
     -webkit-transition: all 0.25s ease-out;
@@ -394,7 +392,7 @@
 }
 
 .home-browse-panel{
-    margin-top: @container-margin-top;
+    margin-top: 10px;
 }
 
 .home-discovery-panel{
@@ -408,8 +406,16 @@
     margin:15px 15% 0 15%;
 }
 
+.rss-link{
+   margin-top:10px; 
+}
+
 .simple-search{
     margin-bottom:10px;
+}
+
+.statistics-link{
+    margin-top:10px;
 }
 
 .type-icon{
