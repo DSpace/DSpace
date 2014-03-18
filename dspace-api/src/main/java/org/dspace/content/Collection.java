@@ -295,7 +295,7 @@ public class Collection extends DSpaceObject
     public static Collection[] findAll(Context context) throws SQLException
     {
         TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
-                "SELECT * FROM collection ORDER BY name");
+                "SELECT * FROM collection ORDER BY name"); // FIXME no name column; fetch from metadatavalue
 
         List<Collection> collections = new ArrayList<Collection>();
 
@@ -500,10 +500,15 @@ public class Collection extends DSpaceObject
     @Override
     public String getName()
     {
-    	String name = ourRow.getStringColumn("name");
+        String name = getMetadataSingleValue(NAME_TEXT);
     	return (name == null) ? "" : name;
     }
 
+    /**
+     * Give this Collection a name.
+     *
+     * @param name
+     */
     public void setName(String name)
     {
         if ((name == null || name.trim().equals("")))
@@ -518,7 +523,8 @@ public class Collection extends DSpaceObject
             }
         }
 
-        ourRow.setColumn(NAME_TEXT, name);
+        clearMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, NAME_TEXT, DSpaceObject.ANY);
+        addMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, NAME_TEXT, null, name);
     }
 
     /**
