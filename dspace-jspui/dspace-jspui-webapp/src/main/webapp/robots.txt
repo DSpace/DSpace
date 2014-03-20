@@ -13,3 +13,4 @@ User-agent: *
 Disallow: /browse
 Disallow: /items-by-author
 Disallow: /handle/*/*/browse
+Disallow: /simple-search
