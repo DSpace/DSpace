@@ -4,7 +4,7 @@
 
 **[DSpace Instance Installation](#dspace-installation)**
 
-**[Validation procedure](#installation)**
+**[Validation procedure](#validate-installation)**
 
 
 ##<a name="prerequisite-software"></a>Prerequisite Software
@@ -533,7 +533,9 @@ $ cd /apps/servers/dspace/tomcat41
 $ ./control start
 
 ```
-###Check DSpace 4.1 Installation
+
+##<a name="validate-installation"></a>Check DSpace 4.1 Installation
+
 
 * Check webapps
 
