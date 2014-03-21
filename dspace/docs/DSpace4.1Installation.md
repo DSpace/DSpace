@@ -1,4 +1,4 @@
-#Dspace 4.1 Installation 
+#DSpace 4.1 Installation 
 
 **[Prerequisite Software](#prerequisite-software)**
 
