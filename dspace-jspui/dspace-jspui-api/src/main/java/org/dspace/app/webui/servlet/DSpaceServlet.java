@@ -20,7 +20,7 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.PUIPAuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -65,12 +65,18 @@ public class DSpaceServlet extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+        if (log.isDebugEnabled()) {
+            Logger.getLogger(this.getClass()).debug("doGet");
+        }
         processRequest(request, response);
     }
 
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+        if (log.isDebugEnabled()) {
+            Logger.getLogger(this.getClass()).debug("doPost");
+        }
         processRequest(request, response);
     }
 
@@ -135,15 +141,32 @@ public class DSpaceServlet extends HttpServlet
 
         catch (AuthorizeException ae)
         {
-            // do not try to do further (aka explicit) autentication
-            // implicit authentication done in earlier requests does not give
-            // rights  to access content - so just say
+            /*
+             * somebody logged in
+             * ==> we know user not allowed to do whatever she tried
+             */
+            /* nobody logged in && auto.explicit == true
+             * ==> start explicit authentication
+             *  account owners can login and might get their request through
+             *  others get login prompt instead of 403
+             */
+            /* nobody logged in && auto.explicit == false
+             * ==> authenticate error
+             * account owners can try to login in by clicking the 'My DSpace' and ty again
+             * others will get error page
+             */
+            Boolean doexplicit = ConfigurationManager.getBooleanProperty("authentication", "auto.explicit", true);
+            Boolean noAccess = true;
+            if (doexplicit && null == context.getCurrentUser() ) {
+                noAccess = Authenticate.startAuthentication(context, request, response);
+            }
+            if (noAccess) {
                 // FIXME: Log the right info?
                 // Log the error
-                log.info(LogManager.getHeader(context, "authorize_error", ae
-                        .toString()));
+                log.info(LogManager.getHeader(context, "authorize_error", ae.toString()));
 
                 JSPManager.showAuthorizeError(request, response, ae);
+            }
 
         }
         finally

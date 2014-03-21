@@ -1,27 +1,18 @@
 package org.dspace.authenticate;
 
 import org.apache.log4j.Logger;
-//import org.dspace.app.webui.util.JSPManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
-import org.dspace.eperson.Group;
-import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.AuthenticationManager;
-import org.dspace.authorize.AuthorizeException;
-import javax.servlet.jsp.PageContext;
-//import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.sql.SQLException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+
 
 // we use the Java CAS client
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
