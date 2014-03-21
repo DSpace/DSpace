@@ -238,6 +238,8 @@ $ sudo su
 ```
 $ createuser -U postgres -d -A -P dspace
 
+```
+
 You will be prompted for the password of the PostgreSQL superuser (postgres). Then you'll be prompted (twice) for a password for the new dspace user. 
 
 Please, just press Enter for the dspace user (we set empty password for now).
@@ -246,13 +248,15 @@ Please, just press Enter for the dspace user (we set empty password for now).
 Enter password for new role:
 Enter it again:
 Shall the new role be allowed to create more new roles? (y/n) y
+
 ```
 
-* Create a dspace database, owned by the dspace PostgreSQL user, logged in as 'root'. We will give a databasename **dspace41** to this instance of the DSpace server.
+* 	Create a dspace database, owned by the dspace PostgreSQL user, logged in as 'root'.
 
 
 ```
 $ createdb -U dspace -E UNICODE dspace41
+
 ```
 
 ####DSpace Directory
@@ -310,7 +314,7 @@ $ ant fresh_install
 
 ####Deploy Web Applications
 
-#### Create a context entry for each DSpace web-application
+##### Create a context entry for each DSpace web-application
 
 ```
 $ cd /apps/servers/dspace/tomcat41/conf/Catalina/localhost
@@ -448,16 +452,17 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/dspace/solr/
 	
 	```
 	 <lib dir="/apps/dspace/contrib/extraction/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
+     <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
+  
 	```
 	
 
@@ -472,17 +477,17 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/dspace/solr/
 	
 	
 	```
-	 <lib dir="/apps/dspace/contrib/extraction/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
+	<lib dir="/apps/dspace/contrib/extraction/lib" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
 	```
 	
 * Statistics core
@@ -496,17 +501,17 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/dspace/solr/
 	
 	
 	```
-	 <lib dir="/apps/dspace/contrib/extraction/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
+	<lib dir="/apps/dspace/contrib/extraction/lib" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist/" regex="solr-cell-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-langid-\d.*\.jar" />
 
-  <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
-  <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/dspace/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/dspace/dist" regex="solr-velocity-\d.*\.jar" />
 	```
 * Copy solr libraries to the DSpace 4.1 Tomcat instance
 
