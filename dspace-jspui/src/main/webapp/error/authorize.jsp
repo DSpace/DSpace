@@ -18,7 +18,9 @@
 	
 <%@ page isErrorPage="true" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="/WEB-INF/dspace-tags.tld" prefix="dspace" %>
+
+<%@ page import="org.dspace.eperson.EPerson" %>
 
 <dspace:layout titlekey="jsp.error.authorize.title">
 
@@ -28,9 +30,27 @@
     <%-- <p>You do not have permission to perform the action you just attempted.</p> --%>
     <p><fmt:message key="jsp.error.authorize.text1"/></p>
 
+<%
+    // Is anyone logged in?
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+
+    if (user == null) {
+        /* nobody logged + authorization error => system decided based
+         * on implicit authorization (in PU case IPAutentocation) alone
+         */
+%>
+    <p>
+    If you have an account you should login and attempt your action again.
+    </p>
+<%
+    } else {
+%>
     <%-- <p>If you think you should have authorization, please feel free to
     contact the DSpace administrators:</p> --%>
     <p><fmt:message key="jsp.error.authorize.text2"/></p>
+<%
+    }
+%>
 
     <dspace:include page="/components/contact-info.jsp" />
 
@@ -38,5 +58,5 @@
         <%-- <a href="<%= request.getContextPath() %>/">Go to the DSpace home page</a> --%>
         <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.gohome"/></a>
     </p>
-	
+
 </dspace:layout>
