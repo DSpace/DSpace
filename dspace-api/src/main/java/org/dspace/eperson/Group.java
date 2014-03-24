@@ -48,6 +48,12 @@ public class Group extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Group.class);
 
+    /** ID of Anonymous Group */
+    public static final int ANONYMOUS_ID = 0;
+
+    /** ID of Administrator Group */
+    public static final int ADMIN_ID = 1;
+
     /** Our context */
     private Context myContext;
 
@@ -332,7 +338,7 @@ public class Group extends DSpaceObject
     public boolean isMember(EPerson e)
     {
         // special, group 0 is anonymous
-        if (getID() == 0)
+        if (getID() == Group.ANONYMOUS_ID)
         {
             return true;
         }
