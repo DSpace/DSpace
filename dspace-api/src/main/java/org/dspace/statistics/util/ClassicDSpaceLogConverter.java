@@ -33,10 +33,10 @@ import java.text.ParsePosition;
  * @author Stuart Lewis
  */
 public class ClassicDSpaceLogConverter {
-    private Logger log = Logger.getLogger(ClassicDSpaceLogConverter.class);
+    private final Logger log = Logger.getLogger(ClassicDSpaceLogConverter.class);
 
     /** A DSpace context */
-    private Context context;
+    private final Context context;
 
     /** Whether or not to provide verbose output */
     private boolean verbose = false;
@@ -45,19 +45,19 @@ public class ClassicDSpaceLogConverter {
     private boolean newEvents = false;
 
     /** A regular expression for extracting the IP address from a log line */
-    private Pattern ipaddrPattern = Pattern.compile("ip_addr=(\\d*\\.\\d*\\.\\d*\\.\\d*):");
+    private final Pattern ipaddrPattern = Pattern.compile("ip_addr=(\\d*\\.\\d*\\.\\d*\\.\\d*):");
 
     /** Date format (in) from the log line */
-    private SimpleDateFormat dateFormatIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat dateFormatIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /** Date format out (for solr) */
-    private SimpleDateFormat dateFormatOut = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final SimpleDateFormat dateFormatOut = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** Date format (in) from the log line for the UID */
-    private SimpleDateFormat dateFormatInUID = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+    private final SimpleDateFormat dateFormatInUID = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
     /** Date format out (for uid) */
-    private SimpleDateFormat dateFormatOutUID = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private final SimpleDateFormat dateFormatOutUID = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
 
     /**
@@ -349,24 +349,33 @@ public class ClassicDSpaceLogConverter {
         {
             // Convert all the files
             final File sample = new File(line.getOptionValue('i'));
-            File dir = sample.getParentFile();
+            File dir = sample.getAbsoluteFile().getParentFile();
             FilenameFilter filter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.startsWith(sample.getName());
                 }
             };
             String[] children = dir.list(filter);
-            for (String in : children)
+            if (null == children)
             {
-                System.err.println(in);
-                String out = line.getOptionValue('o') +
-                             (dir.getAbsolutePath() +
-                              System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
-
-                converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in, out);
+                System.err.println(sample + " could not be used to find a directory of log files.");
+                System.exit(1);
             }
+            else if (children.length <= 0)
+                System.err.println(sample + " matched no files.");
+            else
+                for (String in : children)
+                {
+                    System.err.println(in);
+                    String out = line.getOptionValue('o') +
+                                 (dir.getAbsolutePath() +
+                                  System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
+
+                    converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in, out);
+                }
         }
         else
         {
