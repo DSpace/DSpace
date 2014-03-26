@@ -12,28 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.Vector;
-
+import java.util.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
@@ -61,14 +45,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -1024,7 +1002,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     for (DiscoverySearchFilter searchFilter : searchFilterConfigs)
                     {
-                        Date date = null;
+                        Date date = null;                       
                         String separator = new DSpace().getConfigurationService().getProperty("discovery.solr.facets.split.char");
                         if(separator == null)
                         {
@@ -1038,6 +1016,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             {
                                 //TODO: make this date format configurable !
                                 value = DateFormatUtils.formatUTC(date, "yyyy-MM-dd");
+                            }
+                        }
+                         if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_LOCATION))
+                        {
+                            //For our search filters that are spatial location we format them properly
+                             if(value != null)
+                            {
+                                DCBoundingBox dcbb=new DCBoundingBox(value);
+                                Double[] bbox=dcbb.toDouble();
+                                value=bbox[0] + " " + bbox[2] + " " + bbox[1] + " " + bbox[3];                     
                             }
                         }
                         doc.addField(searchFilter.getIndexFieldName(), value);
@@ -2008,6 +1996,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 	}
                 	filterQuery.append(value);
                 }
+            }
+            // Spatial search
+            else if("intersects".equals(operator) || "iswithin".equals(operator))
+            {
+                filterQuery.append('"').append(operator).append("(");
+                DCBoundingBox dcbb=new DCBoundingBox(value);
+                value=dcbb.getWest() + " " + dcbb.getSouth() + " " + dcbb.getEast()+ " " + dcbb.getNorth();  
+                filterQuery.append(value).append(")").append('"');     
             }
             else{
                 //DO NOT ESCAPE RANGE QUERIES !

@@ -219,6 +219,10 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 readDate(request, item, schema, element, qualifier);
             }
+            else if (inputType.equals("location"))
+            {
+                readLocation(request, item, schema, element, qualifier);
+            }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
             else if (inputType.equals("dropdown") || inputType.equals("list") ||
@@ -808,6 +812,62 @@ public class DescribeStep extends AbstractProcessingStep
         {
             // Only put in date if there is one!
             item.addMetadata(schema, element, qualifier, null, d.toString());
+        }
+    }
+
+       /**
+     * Fill out a metadata location field with the value from a form.
+     * If the field is "dc.spatial", the bounding box in the request will be from
+     * the fields as follows:
+     *
+     * dc_spatial_west -> west longitude of Bounding Box
+     * dc_spatial_east -> east longitude of Bounding Box
+     * dc_spatial_south -> south latitude of Bounding Box
+     * dc_spatial_north -> north latitude of Bounding Box
+     *
+     * @param request
+     *            the request object
+     * @param item
+     *            the item to update
+     * @param schema
+     *            the metadata schema
+     * @param element
+     *            the metadata element
+     * @param qualifier
+     *            the metadata qualifier, or null if unqualified
+     * @throws SQLException
+     */
+    protected void readLocation(HttpServletRequest request, Item item, String schema,
+            String element, String qualifier) throws SQLException
+    {
+        String metadataField = MetadataField
+                .formKey(schema, element, qualifier);
+
+         
+            String west = request.getParameter(metadataField + "_west").trim();
+            String east = request.getParameter(metadataField + "_east").trim();
+            String south = request.getParameter(metadataField + "_south").trim();
+            String north = request.getParameter(metadataField + "_north").trim();
+            String boundingBox;   
+ 
+        try  
+        {  
+            Double.parseDouble(west);
+            Double.parseDouble(east);
+            Double.parseDouble(south);
+            Double.parseDouble(north);
+            // Stored in DB as string in the following form
+            boundingBox= west + "," + east + "," + south + "," + north;
+        }  
+        catch(NumberFormatException nfe)  
+        {  
+            boundingBox= "";
+        }  
+            
+        if (!boundingBox.equals(""))
+        {
+            // Only put if there is one!
+            item.addMetadata(schema, element, qualifier, null, boundingBox);
         }
     }
 

@@ -16,6 +16,7 @@ public class DiscoveryConfigurationParameters {
 
     public static final String TYPE_TEXT = "text";
     public static final String TYPE_DATE = "date";
+    public static final String TYPE_LOCATION = "location";
     public static final String TYPE_HIERARCHICAL = "hierarchical";
     public static final String TYPE_AC = "ac";
     public static final String TYPE_AUTHORITY = "authority";
