@@ -199,6 +199,19 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <hint>Enter any other description or comments in this box. </hint>
          <required></required>
        </field>
+
+       <!-- Input Type Location. Renders a map for filling this metadata field with item's bounding box
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Spatial Location</label>
+         <input-type>location</input-type>
+         <hint>Use the map to fill spatial location</hint>
+         <required></required>
+      </field>-->
+
      </page>
    </form>
 

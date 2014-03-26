@@ -37,12 +37,7 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCPersonName;
-import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
@@ -229,6 +224,10 @@ public class DescribeStep extends AbstractSubmissionStep
                         else if (inputType.equals("date"))
                         {
                                 renderDateField(form, fieldName, dcInput, dcValues, readonly);
+                        }
+                        else if (inputType.equals("location"))
+                        {
+                               renderLocationField(form, fieldName, dcInput, dcValues, readonly);
                         }
                         else if (inputType.equals("series"))
                         {
@@ -627,6 +626,102 @@ public class DescribeStep extends AbstractSubmissionStep
                             day.setValue(String.valueOf(dcDate.getDay()));
                         }
                 }
+        }
+        
+           /**
+         * Render a Location field to the DRI document. The location field consists of four
+         * text fields which consist the item's Bounding Box. Four Fields are:
+         * West, East, South, North
+         *
+         * @param form
+         *                      The form list to add the field to
+         * @param fieldName
+         *                      The field's name.
+         * @param dcInput
+         *                      The field's input definition
+         * @param dcValues
+         *                      The field's pre-existing values.
+         */
+        private void renderLocationField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        {
+                // The location field is a composite field containing four text fields
+                Composite location = form.addItem().addComposite(fieldName, "submit-location");
+                Text westBound = location.addText(fieldName+"_west","submit-location");
+                Text eastBound = location.addText(fieldName+"_east","submit-location");
+                Text southBound = location.addText(fieldName+"_south","submit-location");
+                Text northBound = location.addText(fieldName+"_north","submit-location");
+
+                // Setup the full name
+                location.setLabel(dcInput.getLabel());
+                location.setHelp(cleanHints(dcInput.getHints()));
+                if (dcInput.isRequired())
+                {
+                    location.setRequired();
+                }
+                if (isFieldInError(fieldName))
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
+                        location.addError(dcInput.getWarning());
+                    }
+                    else
+                    {
+                        location.addError(T_required_field);
+                    }
+                }
+              
+               // Repetable is not supported 
+              /*  if (dcInput.isRepeatable() && !readonly)
+                {
+                    location.enableAddOperation();
+                }
+                if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
+                {
+                    location.enableDeleteOperation();
+                }
+               */
+
+                // Setup the Bounding Box
+                westBound.setLabel("West");
+                eastBound.setLabel("East");
+                southBound.setLabel("South");
+                northBound.setLabel("North");
+                
+                if (readonly)
+                {
+                    eastBound.setDisabled();
+                    westBound.setDisabled();
+                    southBound.setDisabled();
+                    northBound.setDisabled();
+                    location.setDisabled();
+                }
+                
+                // Setup the field's values
+              /*  if (dcInput.isRepeatable() || dcValues.length > 1)
+                {
+                        for (DCValue dcValue : dcValues)
+                        {
+                                DCBoundingBox dbb = new DCBoundingBox(dcValue.value);
+                
+                                west.addInstance().setValue(dbb.getWest());
+                                east.addInstance().setValue(dbb.getEast());
+                                south.addInstance().setValue(dbb.getSouth());
+                                north.addInstance().setValue(dbb.getNorth());
+                                Instance bb = location.addInstance();
+                                bb.setValue(dcValue.value);
+                              
+                }
+                }
+                else*/ if (dcValues.length == 1)
+                {
+                        DCBoundingBox bbox = new DCBoundingBox(dcValues[0].value);
+                
+                        westBound.setValue(bbox.getWest());
+                        eastBound.setValue(bbox.getEast());
+                        southBound.setValue(bbox.getSouth());
+                        northBound.setValue(bbox.getNorth());
+                  
+        }
         }
         
         /**

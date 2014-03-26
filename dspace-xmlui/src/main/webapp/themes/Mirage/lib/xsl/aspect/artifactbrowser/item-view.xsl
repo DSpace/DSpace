@@ -345,6 +345,17 @@
                   <xsl:with-param name="confidence" select="./@confidence"/>
                 </xsl:call-template>
               </xsl:if>
+                	<!-- View Item Bounding Box on Map
+		<xsl:if test="./@element='coverage' and ./@qualifier='spatial'">
+			<div id="map" class="smallmap" style="width: 400px; height: 200px; border: 1px solid #ccc; display:block"> </div>
+			<script defer="defer" type="text/javascript">
+				var mapID='map';
+				addMap(mapID,'null');
+				var itemBoundingBox='<xsl:copy-of select="./node()"/>';
+				var itemCoords=itemBoundingBox.split(',');
+				addItemsBoxToMap(itemCoords[0],itemCoords[2],itemCoords[1],itemCoords[3]);
+			</script>
+		</xsl:if>  -->
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>

@@ -957,6 +957,10 @@
                             <xsl:if test="@type='button'">
                                 <xsl:attribute name="type">submit</xsl:attribute>
                             </xsl:if>
+                             <!-- For location input-type submission item. Load function from spatial.js-->
+			    <xsl:if test="@rend='submit-location'">
+                                <xsl:attribute name="onchange">updateMap(this.id)</xsl:attribute>
+			    </xsl:if>
                             <xsl:attribute name="value">
                                 <xsl:choose>
                                     <xsl:when test="./dri:value[@type='raw']">
@@ -972,6 +976,54 @@
                             </xsl:if>
                             <xsl:apply-templates />
                         </input>
+                         <!-- For spatial query form element!! Add Map functionality from spatial.js-->
+                        <xsl:if test="@rend='spatial-search'">
+			  <div class="spatial-search-div"><!-- display none by default on style.css -->		
+				<p style="width:430px; "><b><i18n:text>xmlui.Spatial.Map.Search</i18n:text></b></p>
+				<div class="smallmap" style="width: 450px; height: 225px; border: 1px solid #ccc; display:inline-block; clear: both; ">
+					<xsl:attribute name="id">
+						<xsl:value-of select="@id"/>
+				 	</xsl:attribute>  
+				</div>		
+				<script defer="defer" type="text/javascript">
+					var mapID='<xsl:value-of select="@id"/>';
+					// spatial query form field id
+					var fieldID=mapID.replace(/\./g,'_');
+					addMap(mapID,'search');
+
+					// Keep Spatial query Bounding Box from response and add it to map
+					var val=document.getElementById (fieldID).value;
+					if (val!=""){
+						var coords=val.split(",");
+						addItemsBoxToMap(coords[0],coords[2],coords[1],coords[3]);
+					}
+
+				</script>
+				<p><i18n:text>xmlui.Spatial.Map.Tip</i18n:text></p>
+				<i18n:text>xmlui.Spatial.Map.Relation</i18n:text>&#160;
+				<!-- Select spatial relation for search!!
+				     Supporting relations are: 
+				     	- Within: Item's Box must be completely included in search Bounding Box
+				     	- Intesects: Item's Box that intersects search Bounding Box
+				-->
+				<select name="spatial-relation">
+					<option value="within" ><i18n:text>xmlui.Spatial.Map.isWithin</i18n:text></option>
+					 <xsl:choose>
+						<xsl:when test="contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString'],'spatial-relation=intersect')">
+							<option value="intersect" selected="true"><i18n:text>xmlui.Spatial.Map.Intersect</i18n:text></option>
+						</xsl:when>
+						<xsl:otherwise>
+							<option value="intersect"><i18n:text>xmlui.Spatial.Map.Intersect</i18n:text></option>
+						</xsl:otherwise>
+					</xsl:choose>
+				</select>&#160;&#160;
+				<!-- Clear Spatial search query -->
+				<button name="clearmap" class="ds-button-field" >
+ 					<xsl:attribute name="onclick">clearMap()</xsl:attribute>
+					<i18n:text>xmlui.Spatial.Map.Clear</i18n:text>
+				</button>
+		          </div>
+                        </xsl:if><!-- End of Map Search Functionality -->
 
                         <xsl:variable name="confIndicatorID" select="concat(@id,'_confidence_indicator')"/>
                         <xsl:if test="dri:params/@authorityControlled">

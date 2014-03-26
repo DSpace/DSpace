@@ -480,6 +480,12 @@
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
               ￼￼￼￼￼  </analyzer>
       </fieldType>
+
+      <!--Spatial Index Field Type -->
+      <fieldType name="location_rpt"   class="solr.SpatialRecursivePrefixTreeFieldType"
+                 spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
+	         units="degrees"/>
+
  </types>
 
 
@@ -517,7 +523,10 @@
     <field name="search_text" type="text" indexed="true" stored="false" multiValued="true"/>
 
 
-   <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
+
+    <!-- Spatial index field -->
+    <field name="spatial-search"  type="location_rpt"  indexed="true" stored="true"  /> 
 
     <!-- Internal DSpace Object ID -->
    <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />

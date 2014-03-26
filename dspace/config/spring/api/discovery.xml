@@ -297,7 +297,18 @@
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
-    </bean>
+     </bean>
+
+     <!-- Spatial Filter bean 
+     <bean id="searchFilterSpatial" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="spatial-search"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.coverage.spatial</value>
+            </list>
+    </property>
+     <property name="type" value="location"/>
+    </bean>-->
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="dateIssued"/>

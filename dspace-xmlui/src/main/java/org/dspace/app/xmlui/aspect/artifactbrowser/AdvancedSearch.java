@@ -21,15 +21,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -133,6 +125,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             UIException, SQLException, IOException, AuthorizeException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
+        String spatialQueryString = getSpatialQuery();
         String numSearchField = request.getParameter("num_search_field");
         if (numSearchField == null || numSearchField.length() == 0)
         {
@@ -149,15 +142,15 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         query.addHidden("num_search_field").setValue(numSearchField);
         query.addHidden("results_per_page").setValue(getParameterRpp());
         
-        List queryList = query.addList("search-query",List.TYPE_FORM);
+      //  List queryList = query.addList("search-query",List.TYPE_FORM);
         
-        if (variableScope())
+     /*   if (variableScope())
         {
             Select scope = queryList.addItem().addSelect("scope");
             scope.setLabel(T_search_scope);
             scope.setHelp(T_search_scope_help);
             buildScopeList(scope);
-        }
+        }*/
         
         Table queryTable = query.addTable("search-query", 4, 3);
         Row header = queryTable.addRow(Row.ROLE_HEADER);
@@ -186,6 +179,22 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	query.addHidden("field"+i).setValue(field.getField());
         	query.addHidden("query"+i).setValue(field.getQuery());
         }
+        
+        Division spatialsearch = query.addDivision("advanced-search","spatial-advanced-search");
+        List queryList = spatialsearch.addList("search-query",List.TYPE_FORM);
+        
+       
+        
+        if (variableScope())
+        {
+            Select scope = queryList.addItem().addSelect("scope");
+            scope.setLabel(T_search_scope);
+            scope.setHelp(T_search_scope_help);
+            buildScopeList(scope);
+        }
+        
+        Hidden bbox=queryList.addItem().addHidden("spatial-query","spatial-search");
+        bbox.setValue(spatialQueryString);
 
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -332,6 +341,18 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             parameters.put("field" + index, field);
             parameters.put("query" + index, query);
         }
+        
+        String spatialQuery = getSpatialQuery();
+        if (!"".equals(spatialQuery))
+        {
+            parameters.put("spatial-query", encodeForURL(spatialQuery));
+        }
+        
+        String spatialRelation = getSpatialRelation();
+        if (!"".equals(spatialRelation))
+        {
+            parameters.put("spatial-relation", encodeForURL(spatialRelation));
+        } 
         
         if (parameters.get("page") == null)
         {

@@ -14,6 +14,8 @@ import org.dspace.discovery.SearchService;
 import org.dspace.utils.DSpace;
 
 import java.util.*;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.dspace.app.xmlui.utils.UIException;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -37,20 +39,30 @@ public class DiscoveryUIUtils {
      */
     public static Map<String, String[]> getParameterFilterQueries(Request request) {
         Map<String, String[]> fqs = new HashMap<String, String[]>();
-
+        
         List<String> filterTypes = getRepeatableParameters(request, "filtertype");
         List<String> filterOperators = getRepeatableParameters(request, "filter_relational_operator");
         List<String> filterValues = getRepeatableParameters(request, "filter");
-
+  //      String spatialIndex =request.getParameter("spatial-index");
+  //      String spatialQuery =request.getParameter("spatial-query");
+  //      String spatialRelation = request.getParameter("spatial-relation");
+        
         for (int i = 0; i < filterTypes.size(); i++) {
             String filterType = filterTypes.get(i);
             String filterValue = filterValues.get(i);
             String filterOperator = filterOperators.get(i);
-
+            
             fqs.put("filtertype_" + i, new String[]{filterType});
             fqs.put("filter_relational_operator_" + i, new String[]{filterOperator});
             fqs.put("filter_" + i, new String[]{filterValue});
         }
+        
+     //   if(StringUtils.isNotBlank(spatialQuery)){
+      //    fqs.put("spatial-index", new String[]{spatialIndex});  
+      //    fqs.put("spatial-query", new String[]{spatialQuery});
+     //     fqs.put("spatial-relation", new String[]{spatialRelation});
+    
+   //     }
         return fqs;
     }
 
@@ -64,6 +76,9 @@ public class DiscoveryUIUtils {
             List<String> filterTypes = getRepeatableParameters(request, "filtertype");
             List<String> filterOperators = getRepeatableParameters(request, "filter_relational_operator");
             List<String> filterValues = getRepeatableParameters(request, "filter");
+            String spatialIndex =request.getParameter("spatial-index");
+            String spatialQuery =request.getParameter("spatial-query");
+            String spatialRelation = request.getParameter("spatial-relation");
 
             for (int i = 0; i < filterTypes.size(); i++) {
                 String filterType = filterTypes.get(i);
@@ -73,6 +88,10 @@ public class DiscoveryUIUtils {
                 if(StringUtils.isNotBlank(filterValue)){
                     allFilterQueries.add(searchService.toFilterQuery(context, (filterType.equals("*") ? "" : filterType), filterOperator, filterValue).getFilterQuery());
                 }
+            }
+            
+            if(StringUtils.isNotBlank(spatialQuery)){
+                  allFilterQueries.add(searchService.toFilterQuery(context, spatialIndex, spatialRelation, spatialQuery).getFilterQuery());          
             }
 
             return allFilterQueries.toArray(new String[allFilterQueries.size()]);
