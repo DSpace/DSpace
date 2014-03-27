@@ -84,10 +84,20 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 
 *JSP Pages*
 
-* [error/authorize-etd-embargo](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/error/authorize-etd-embargo.jsp) - customized message based on embargo dates
+* [authorize-etd-embargo](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/error/authorize-etd-embargo.jsp) - customized message based on embargo dates
 
 ### Embargoed Item Statistics
 
+*JSP Pages*
+
+* [statistics.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics.jsp) - link from custom statistics page to embargo-list.jsp
+
+* [embargo-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - page display of embargo list
+
+* [embargo-list-csv.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - CSV export of embargo list
+
+* [embargo-list-sql.jspf](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - SQL for embargo query
+ 
 ### Loader
         transform Proquest metadata to dublin core
         transform Proquest metadata to marc and transfer to TSD
