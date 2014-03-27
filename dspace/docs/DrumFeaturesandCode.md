@@ -8,6 +8,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
  * **[Select/Display the bundle of a bitstreamg](#display-bundle-by-bitstream)**
  * **[Add preservation bundle](#display-bundle-bitstream)**
 
+[Electronic Theses and Dissertations (ETD)](#etd)
 
 ##<a name="administration"></a>Administration
 
@@ -75,3 +76,38 @@ immediate parents
 			* _1a63a7ebe5f7714066b89c7b8671db2345f9a82f_ - (fix "Submit to This Collection"; broken by submit to multiple collections functionality
 )
 			* fc6804209708cb7c9e128420bd5a2f30dfe1e224 - (add selectcollection jsp tag to selecting multiple collections from a popup window)
+
+
+##<a name="etd"></a>Electronic Theses and Dissertations (ETD)
+
+### Bitstream start/end authorization
+
+Add display of start and end date for ResourcePolicy on "Policies for Item" edit page.
+
+*JSP Pages*
+
+* [authorize-item-edit.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/authorize-item-edit.jsp)
+
+### Custom embargoed bitstream messaging
+
+Custom messaging for unathorized access to Bitstream if the Bitstream is under embargo; relies on ResourcePolicy with group named 'ETD Embargo'
+
+*Java Source*
+
+* [Bitstream.java](../../dspace-api/src/main/java/org/dspace/content/Bitstream.java) - new methods getETDEmbargo(), isETDEmbargo(), getMetadata(String), getIntMetadata(String), setMetadata(String, String), setMetadata(String, int)
+* [ItemTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - listBistreams() add 'RESTRICTED ACCESS' to the Bitstream description
+* [BitstreamServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/BitstreamServlet.java) - doDSGet() if not authorized and is ETD embargo then redirect to /error/authorize-etd-embargo.jsp
+
+*JSP Pages*
+
+* [error/authorize-etd-embargo](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/error/authorize-etd-embargo.jsp) - customized message based on embargo dates
+
+### Embargoed Item Statistics
+
+### Loader
+        transform Proquest metadata to dublin core
+        transform Proquest metadata to marc and transfer to TSD
+        map into department etd collections
+        transfer of files to bindery
+        email notification: duplicate titles, .csv with embargoes, load report, marc transfer, bindery transfer
+
