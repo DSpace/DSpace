@@ -16,7 +16,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 ### Customizations Summary
 	*	Ability to select unmapped collections
 	    
-	    * Initial Commit: _0ae555614e462f0d45d726a09d132c7f6619d828_**
+	    * Initial Commit: _0ae555614e462f0d45d726a09d132c7f6619d828_
 		* **Java Source**
 			*	New method _getCollectionsUnmapped()_  in the existing source [Community.java](../../dspace-api/src/main/java/org/dspace/content/Community.java)
 			*	Updates to in the existing source [Collection.java](../../dspace-api/src/main/java/org/dspace/content/Collection.java)
@@ -39,8 +39,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 								
  	* JSP Pages					
 			*	New jsp page [mapcollections.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp)
-			*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)
-			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
+			*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
 			*	Updates to [community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/mapcollections.jsp)
 			*   Updates to [my dspace.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp)
 			*   Updates to [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp)
@@ -63,10 +62,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 	 * **All Commits**
 			* _0ae555614e462f0d45d726a09d132c7f6619d828_ - (first step in adding collections mapping)
 			* _99998ce5f7075ae01c63027444b968f9efa4a35e_ - (finish first cut at collection mapping functionality)
-			* _e6c3ce5f5462e4c167bbd70ff58ce3ae6012da82_ - (- fix Collection unmapping confirmation; use Collection.getParents()
-since Collection.getCommunities() gets all ancestors not just
-immediate parents
-)
+			* _e6c3ce5f5462e4c167bbd70ff58ce3ae6012da82_ - (fix Collection unmapping confirmation)
 			* _650296ea9baef456e5949f8ad0dcfbffbbed1b8f_ - (fix Community.findByCommunityGroupTop())
 			* _519690cfd40a1b3eaf0d17079f93bfb356a380a6_ - (fix queries for mapped collections in submission process)
 			* _766c43c384fdfb73859f17ff2fb26bd9ad26c4ac_ - (submission fixes for selecting multiple collections)
