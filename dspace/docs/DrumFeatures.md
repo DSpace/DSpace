@@ -24,7 +24,7 @@ Summary of DRUM enhancements to base DSpace functionality.
         admin: Unit -> Group mapping
         admin: display Ldap info on Eperson edit page
 
-## ETD
+## Electronic Theses and Dissertations (ETD)
 
     bitstream start/end authorization
     custom embargoed bitstream messaging
@@ -32,10 +32,10 @@ Summary of DRUM enhancements to base DSpace functionality.
     loader
         transform Proquest metadata to dublin core
         transform Proquest metadata to marc and transfer to TSD
-        map into department etd collections
-        transfer of files to bindery
-        email notification: duplicate titles, .csv with embargoes, load report, marc transfer, bindery transfer
-
+        map into department etd collection
+        email notification: duplicate titles, .csv with embargoes, load report, marc transfer
+    ETD Departments
+    
 ## Item/Community/Collection display
 
     live links for urls

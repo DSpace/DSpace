@@ -61,8 +61,9 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 	 		* [dspace-tags.tld](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/dspace-tags.tld)
 
 
-##<a name="etd"></a>Electronic Theses and Dissertations (ETD)
-
+<a name="etd"></a>
+##Electronic Theses and Dissertations (ETD)
+ 
 ### Bitstream start/end authorization
 
 Add display of start and end date for ResourcePolicy on "Policies for Item" edit page.
@@ -93,5 +94,80 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
         map into department etd collections
         transfer of files to bindery
         email notification: duplicate titles, .csv with embargoes, load report, marc transfer, bindery transfer
+ 
+*Scripts*
+
+* [load-etd-nightly](../../dspace/bin/load-etd-nightly) - nightly check for new etd zip files
+
+* [load-etd](../../dspace/bin/load-etd) - load one etd zip file
+
+* [etd2marc-mail](../../dspace/bin/etd2marc-mail) - email notice of Marc file to Technical Services
+
+* [etd2marc-transfer](../../dspace/bin/etd2marc-transfer) - transfer Marc file to Technical Services (LAN)
+
+*Configuration*
+
+* configuration is currently housed in drum-env source repository
+
+* config/load/etd2dc.xsl - crosswalk Proquest metadata to dublin core
+
+* config/load/etd2marc.xsl - crosswalk Proquest metadata to Marc
+
+*Java Source*
+
+* [EtdLoader.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/EtdLoader.java) - main loader control class
+
+        Get command line parameters
+        Get properties
+        Open zipfile for reading
+        Open marc file for writing (append)
+        Read all items from zipfile
+        Foreach item
+           XSL transform: Proquest metadata to dublin core
+           Begin new Item
+           Add dublin core
+           Add additional mapped collections
+           Foreach file
+              Add Bitstream
+           Commit Item
+           Add embargo to Bitstreams
+           XSL transform: Proquest metadata to marc
+           Save to Marc output file
+           Save to CSV output file
+           If duplicate title
+              send email notice
+           If no mapped collections
+              send email notice
+
+### ETD Departments
+
+Maintain mapping from campus departments (from Proquest metadata) to DSpace collections.
+
+*Configuration*
+
+* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - etdunit messages for JSP
+
+*Database Schema*
+
+* [database_schema_etdunit.sql](../../dspace/etc/database_schema_etdunit.sql) - add EtdUnit and Collection2EtdUnit tables
+
+*Java Source*
+
+* [EtdUnit.java](../../dspace-api/src/main/java/org/dspace/content/EtdUnit.java) - EtdUnit table Controller
+
+* [EtdUnitEditServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/admin/EtdUnitEditServlet.java) - servlet controller for EtdUnit administrat
 
 
+*JSP Pages*
+
+add EtdUnit table editing to dspace-admin
+
+* [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml) - add /tools/etdunit-edit servlet handling
+
+* [etdunit-confirm-delete.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/etdunit-confirm-delete.jsp) - confirm deletion of an EtdUnit
+
+* [navbar-admin.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-admin.jsp) - navbar link to /tools/etdunit-edit
+
+* [etdunit-edit](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/etdunit-edit.jsp) - edit single EtdUnit page
+
+* [etdunit-list](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/etdunit-list.jsp) - list of all EtdUnit
