@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -30,12 +30,12 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Mocks some methods of BrowseCreateDAOOracle to enable compatibility with H2
  * @author pvillega
  */
-@MockClass(realClass=BrowseCreateDAOOracle.class)
 public class MockBrowseCreateDAOOracle
+        extends MockUp<BrowseCreateDAOOracle>
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(MockBrowseCreateDAOOracle.class);
+    private static final Logger log = Logger.getLogger(MockBrowseCreateDAOOracle.class);
 
     /**
      * internal copy of the current DSpace context (including the database

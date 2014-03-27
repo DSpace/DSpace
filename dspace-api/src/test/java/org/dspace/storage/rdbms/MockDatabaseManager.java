@@ -7,16 +7,12 @@
  */
 package org.dspace.storage.rdbms;
 
-import mockit.Mock;
-import mockit.MockClass;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -31,15 +27,16 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import mockit.Mock;
+import mockit.MockUp;
 
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
@@ -61,16 +58,16 @@ import org.dspace.core.Context;
  *
  * @author pvillega
  */
-@MockClass(realClass = DatabaseManager.class)
 public class MockDatabaseManager
+        extends MockUp<DatabaseManager>
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(DatabaseManager.class);
+    private static final Logger log = Logger.getLogger(DatabaseManager.class);
 
     /** True if initialization has been done */
     private static boolean initialized = false;
 
-    private static Map<String, String> insertSQL = new HashMap<String, String>();
+    private static final Map<String, String> insertSQL = new HashMap<String, String>();
     
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
@@ -108,7 +105,7 @@ public class MockDatabaseManager
      * A map of database column information. The key is the table name, a
      * String; the value is an array of ColumnInfo objects.
      */
-    private static Map<String, Map<String, ColumnInfo>> info = new HashMap<String, Map<String, ColumnInfo>>();
+    private static final Map<String, Map<String, ColumnInfo>> info = new HashMap<String, Map<String, ColumnInfo>>();
 
     /**
      * It allows us to print information on the pool, for debugging purposes
