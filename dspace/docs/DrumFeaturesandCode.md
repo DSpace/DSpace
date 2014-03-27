@@ -29,7 +29,6 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 )
 				* [WorkflowItem.java](../../dspace-api/src/main/java/org/dspace/content/WorkspaceItem.java
 )
-
 		   * Updates to the selection of collection step:
 			   * [SelectCollectionStep.java](../../dspace-api/src/main/java/org/dspace/submit/step/SelectCollectionStep.java) 
 			   * [JSPSelectCollectionStep.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/submit/step/JSPSelectCollectionStep.java)	
@@ -38,13 +37,13 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 			* Updates to the DC input set in the existing source [DCInputSet.java](../../dspace-api/src/main/java/org/dspace/app/util/DCInputSet.java)
 								
  	* JSP Pages					
-			*	New jsp page [mapcollections.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp)
-			*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
-			*	Updates to [community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/mapcollections.jsp)
-			*   Updates to [my dspace.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp)
-			*   Updates to [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp)
-			*   Updates to [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp)
-			*   Updates to [collection-select-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/collection-select-list.jsp)
+		*	New jsp page [mapcollections.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp)
+		*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
+		*	Updates to [community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/mapcollections.jsp)
+		*   Updates to [my dspace.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp)
+		*   Updates to [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp)
+		*   Updates to [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp)
+		*   Updates to [collection-select-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/collection-select-list.jsp)
 					
 	   * **Collection Servlet Mappings**
 	  
@@ -69,8 +68,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 			* _9b62bc5cefc9f8f532e9128da7f5dab86c047aca_ - (more fixes for submission process)
 			* _1e8ada8d016b04eee944fd73af946517c7e365a9_ - (fix collection to community mapping)
 			* _4018f23ba379244cc34c3d9c4c005056bd8ec7cd_ - (increase size of collection list in submission process)
-			* _1a63a7ebe5f7714066b89c7b8671db2345f9a82f_ - (fix "Submit to This Collection"; broken by submit to multiple collections functionality
-)
+			* _1a63a7ebe5f7714066b89c7b8671db2345f9a82f_ - (fix "Submit to This Collection"; broken by submit to multiple collections functionality)
 			* fc6804209708cb7c9e128420bd5a2f30dfe1e224 - (add selectcollection jsp tag to selecting multiple collections from a popup window)
 
 
