@@ -38,19 +38,11 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 								
  	* JSP Pages					
 			*	New jsp page [mapcollections.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp)
-			
-			*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)
-			
-			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
-			
+			*	New jsp page [confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)			*	New jsp page [confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
 			*	Updates to [community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/mapcollections.jsp)
-			
 			*   Updates to [my dspace.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp)
-			
 			*   Updates to [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp)
-			
 			*   Updates to [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp)
-			
 			*   Updates to [collection-select-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/collection-select-list.jsp)
 					
 	   * **Collection Servlet Mappings**
