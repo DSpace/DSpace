@@ -11,7 +11,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 
 ##<a name="administration"></a>Administration
 
-*	###<a name="collection-to-community-mapping"></a>Add collection to community mapping
+* ### <a name="collection-to-community-mapping"></a>Add collection to community mapping
 ### Customizations Summary
 	*	Ability to select unmapped collections
 	    
