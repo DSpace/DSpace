@@ -48,7 +48,7 @@ Summary of DRUM enhancements to base DSpace functionality as well as related cha
 	
    * **Collection Servlet Mappings**
 	  
-	 		* Updates in [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml)		
+	 * Updates in [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml)		
 	
 	  * **Input forms**	
 		* [input-forms.xml](../../dspace/config/input-forms.xml)
