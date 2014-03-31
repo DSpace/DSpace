@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -156,14 +155,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         getContext().commit();
     }
 
-    private Savepoint setSavepoint() throws SQLException {
-        return getContext().getDBConnection().setSavepoint();
-    }
-
-    private void rollback(Savepoint savepoint) throws SQLException {
-        getContext().getDBConnection().rollback(savepoint);
-    }
-
     private static TableRow createRowFromDOI(DOI aDOI) {
         // TODO: Throw DOIFormatException
         TableRow row = new TableRow(DOI_TABLE, DOI_COLUMNS);
@@ -197,6 +188,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     // Only works for rows with primary key.
     private boolean deleteRow(TableRow row) throws SQLException {
         int rowsDeleted = DatabaseManager.delete(getContext(), row);
+        getContext().commit();
         return rowsDeleted == 1;
     }
 
@@ -205,7 +197,9 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      * @throws SQLException 
      */
     private int deleteDOIRowsWithTestPrefix() throws SQLException {
-        return DatabaseManager.deleteByValue(getContext(), DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
+        int rowsDeleted = DatabaseManager.deleteByValue(getContext(), DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
+        getContext().commit();
+        return rowsDeleted;
     }
 
     /**
@@ -223,13 +217,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             LOG.error("Unable to query DOI database", ex);
         }
 
-        Savepoint savepoint = null;
-        try {
-            savepoint = setSavepoint();
-        } catch (SQLException ex) {
-            LOG.error("Unable to set savepoint in put DOI: " + aDOI.toString(), ex);
-        }
-
         if(doiRow == null) {
             // new DOI, record it
             doiRow = createRowFromDOI(aDOI);
@@ -237,7 +224,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
                 insertRow(doiRow);
                 success = true;
             } catch(SQLException ex) {
-                LOG.error("Unable to insert DOI, rolling back: " + aDOI.toString(), ex);
+                LOG.error("Unable to insert DOI: " + aDOI.toString(), ex);
             }
         } else {
             // existing DOI - prefix and suffix match, update the URL.
@@ -246,15 +233,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
                 updateRow(doiRow);
                 success = true;
             } catch (SQLException ex) {
-                LOG.error("Unable to update DOI, rolling back: " + aDOI.toString(), ex);
-            }
-        }
-
-        if(savepoint != null && success == false) {
-            try {
-                rollback(savepoint);
-            } catch (SQLException ex) {
-                LOG.error("Unable to rollback after failed put of: " + aDOI.toString(), ex);
+                LOG.error("Unable to update DOI,: " + aDOI.toString(), ex);
             }
         }
         return success;
@@ -270,26 +249,13 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         boolean success = false;
         DOI returnDoi = null;
         TableRow doiRow = createRowFromDOI(aDOI);
-        Savepoint savepoint = null;
-        try {
-            savepoint = setSavepoint();
-        } catch (SQLException ex) {
-            LOG.error("Unable to set savepoint in set DOI: " + aDOI.toString(), ex);
-        }
         try {
             insertRow(doiRow);
             returnDoi = aDOI;
         } catch (SQLException ex) {
-            LOG.error("Unable to set DOI, rolling back: " + aDOI.toString(), ex);
+            LOG.error("Unable to set DOI: " + aDOI.toString(), ex);
         }
 
-        if(savepoint != null && returnDoi == null) {
-            try {
-                rollback(savepoint);
-            } catch (SQLException ex) {
-                LOG.error("Unable to rollback after failed set of: " + aDOI.toString(), ex);
-            }
-        }
         return returnDoi;
     }
 
@@ -307,13 +273,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             LOG.error("Unable to query DOI database", ex);
         }
 
-        Savepoint savepoint = null;
-        try {
-            savepoint = setSavepoint();
-        } catch (SQLException ex) {
-            LOG.error("Unable to set savepoint in remove DOI: " + aDOI.toString(), ex);
-        }
-
         if(doiRow == null) {
             LOG.error("Attempting to remove DOI: " + aDOI.toString() +" but not found");
         } else {
@@ -321,17 +280,10 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             try {
                 success = deleteRow(doiRow);
             } catch(SQLException ex) {
-                LOG.error("Unable to delete DOI, rolling back: " + aDOI.toString(), ex);
+                LOG.error("Unable to delete DOI: " + aDOI.toString(), ex);
             }
         }
 
-        if(savepoint != null && success == false) {
-            try {
-                rollback(savepoint);
-            } catch (SQLException ex) {
-                LOG.error("Unable to rollback after failed deletion of: " + aDOI.toString(), ex);
-            }
-        }
         return success;
     }
     /**
