@@ -238,6 +238,11 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
+                        <div><span class="publication-date">2014-03-18</span>
+                            <a href="/pages/membershipMeeting2014">
+                                <img alt="Dryad Membership Meeting 2014" src="/themes/Mirage/images/membershipMeeting2014.png" />
+                            </a>
+                        </div>
                         <div><span class="publication-date">2013-03-01</span>
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />

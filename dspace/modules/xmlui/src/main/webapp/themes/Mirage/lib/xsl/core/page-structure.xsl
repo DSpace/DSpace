@@ -439,6 +439,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/whoWeAre">Who we are</a>
                                 </li>
                                 <li>
+                                    <a href="/pages/employment">Employment Opportunities</a>
+                                </li>
+                                <li>
                                   <a href="/pages/faq">Frequently asked questions</a>
                                 </li>
                             </ul>
