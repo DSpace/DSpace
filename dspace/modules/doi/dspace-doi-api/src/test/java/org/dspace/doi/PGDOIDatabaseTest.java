@@ -18,14 +18,18 @@ public class PGDOIDatabaseTest {
     private static PGDOIDatabase myPGDOIDatabase;
     private static String myRandomSuffix, myRandomSuffixModified;
     private static String url1, url2;
+    private static String myBaseURL = "http://test-suffix.doi.org";
+    private int numberOfDOIsToCreateConcurrently = 10000;
+    private int numberOfTimers = 10;
+
     @BeforeClass
     public static void setupBeforeClass() {
         myPGDOIDatabase = PGDOIDatabase.getInstance();
         int randomInt = (int) (Math.random() * 10000);
         myRandomSuffix = String.format("test-suffix-%d", randomInt);
         myRandomSuffixModified = String.format("test-suffix-%d-modified", randomInt);
-        url1 = "http://test-suffix.doi.org/1/" + myRandomSuffix;
-        url2 = "http://test-suffix.doi.org/2/" + myRandomSuffix;
+        url1 = myBaseURL + "/1/" + myRandomSuffix;
+        url2 = myBaseURL + "/2/" + myRandomSuffix;
         // delete DOIs created by this class
         int removed = myPGDOIDatabase.removeTestDOIs();
         System.out.println("Removed " + removed + " test DOIs before running tests");
@@ -124,6 +128,7 @@ public class PGDOIDatabaseTest {
             int randomInt = (int) (Math.random() * 10000);
             String RandomSuffix = String.format("test-suffix-%d", randomInt);
             String url = myBaseURL + String.format("/%d", randomInt);
+            DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, RandomSuffix, url);
             assert myPGDOIDatabase.put(aDOI);
             assert myPGDOIDatabase.getByURL(url) != null;
             assert myPGDOIDatabase.size() > 0;
@@ -152,6 +157,7 @@ public class PGDOIDatabaseTest {
                 Thread.sleep(1000l);
                 int left = getNumberOfDoisLeftToCreate();
                 if(last == left) {
+                    assert false;
                 }
                 last = getNumberOfDoisLeftToCreate();
                 System.out.println("Waiting with " + getNumberOfDoisLeftToCreate() + " left");
