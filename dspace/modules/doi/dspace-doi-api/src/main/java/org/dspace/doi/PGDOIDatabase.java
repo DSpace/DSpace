@@ -67,6 +67,23 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         return context;
     }
 
+    private synchronized void commitContext() throws SQLException {
+        try {
+            getContext().commit();
+        } catch (SQLException ex) {
+            // Abort the context to force a new connection
+            abortContext();
+            throw ex;
+        }
+    }
+
+    private synchronized void abortContext() {
+        if(context != null) {
+            context.abort();
+        }
+        this.context = null;
+    }
+
     private PGDOIDatabase(){}
     public void afterPropertiesSet() throws Exception {
         DATABASE = this;
@@ -83,7 +100,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
         context = null;
     }
-
 
     private TableRow queryExistingDOI(DOI aDOI) throws SQLException {
         String query = DOI_QUERY_BY_PREFIX_SUFFIX;
@@ -152,7 +168,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
 
     private void insertRow(TableRow row) throws SQLException {
         DatabaseManager.insert(getContext(), row);
-        getContext().commit();
     }
 
     private static TableRow createRowFromDOI(DOI aDOI) {
@@ -182,13 +197,11 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
 
     private void updateRow(TableRow row) throws SQLException {
         DatabaseManager.update(getContext(), row);
-        getContext().commit();
     }
 
     // Only works for rows with primary key.
     private boolean deleteRow(TableRow row) throws SQLException {
         int rowsDeleted = DatabaseManager.delete(getContext(), row);
-        getContext().commit();
         return rowsDeleted == 1;
     }
 
@@ -198,7 +211,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      */
     private int deleteDOIRowsWithTestPrefix() throws SQLException {
         int rowsDeleted = DatabaseManager.deleteByValue(getContext(), DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
-        getContext().commit();
         return rowsDeleted;
     }
 
@@ -222,18 +234,22 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             doiRow = createRowFromDOI(aDOI);
             try {
                 insertRow(doiRow);
+                commitContext();
                 success = true;
             } catch(SQLException ex) {
                 LOG.error("Unable to insert DOI: " + aDOI.toString(), ex);
+                abortContext();
             }
         } else {
             // existing DOI - prefix and suffix match, update the URL.
             updateExistingDOIRow(doiRow, aDOI);
             try {
                 updateRow(doiRow);
+                commitContext();
                 success = true;
             } catch (SQLException ex) {
                 LOG.error("Unable to update DOI,: " + aDOI.toString(), ex);
+                abortContext();
             }
         }
         return success;
@@ -251,9 +267,11 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         TableRow doiRow = createRowFromDOI(aDOI);
         try {
             insertRow(doiRow);
+            commitContext();
             returnDoi = aDOI;
         } catch (SQLException ex) {
             LOG.error("Unable to set DOI: " + aDOI.toString(), ex);
+            abortContext();
         }
 
         return returnDoi;
@@ -279,8 +297,10 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             // row found, delete it.
             try {
                 success = deleteRow(doiRow);
+                commitContext();
             } catch(SQLException ex) {
                 LOG.error("Unable to delete DOI: " + aDOI.toString(), ex);
+                abortContext();
             }
         }
 
@@ -374,8 +394,10 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         int removed = 0;
         try {
             removed = deleteDOIRowsWithTestPrefix();
+            commitContext();
         } catch (SQLException ex) {
             LOG.error("Unable to delete DOI Rows with test prefix", ex);
+            abortContext();
         }
         return removed;
     }
