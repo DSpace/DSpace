@@ -47,12 +47,20 @@
 						xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
 						<mods:mods
 							xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-1.xsd">
+                                                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='creator']/doc:element">
+							<mods:name>
+								<mods:role>
+									<mods:roleTerm type="text"><xsl:value-of select="@name" /></mods:roleTerm>
+								</mods:role>
+								<mods:namePart><xsl:value-of select="doc:field[@name='value']/text()" /></mods:namePart>
+							</mods:name>
+							</xsl:for-each>
 							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element">
 							<mods:name>
 								<mods:role>
 									<mods:roleTerm type="text"><xsl:value-of select="@name" /></mods:roleTerm>
 								</mods:role>
-								<mods:namePart><xsl:value-of select="doc:element/doc:field[@name='value']/text()" /></mods:namePart>
+								<mods:namePart><xsl:value-of select="doc:field[@name='value']/text()" /></mods:namePart>
 							</mods:name>
 							</xsl:for-each>
 							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='accessioned']">
@@ -98,9 +106,14 @@
 								<mods:topic><xsl:value-of select="text()" /></mods:topic>
 							</mods:subject>
 							</xsl:for-each>
-							<mods:titleInfo>
+                                                        <mods:titleInfo>
 								<mods:title><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element/doc:field[@name='value']"></xsl:value-of></mods:title>
 							</mods:titleInfo>
+							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element[@name='alternative']/doc:element">
+                                                        <mods:titleInfo type="alternative">
+								<mods:title><xsl:value-of select="doc:field[@name='value']/text()"></xsl:value-of></mods:title>
+							</mods:titleInfo>
+                                                        </xsl:for-each>
 							<mods:genre><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']"></xsl:value-of></mods:genre>
 						</mods:mods>
 					</xmlData>
@@ -211,6 +224,44 @@
 					<file>
 						<xsl:attribute name="ID">
 							<xsl:value-of select="concat('BITSTREAM_ORIGINAL_', translate(/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(), '/', '_'), '_', doc:field[@name='sid']/text())" />
+						</xsl:attribute>
+						<xsl:attribute name="MIMETYPE">
+							<xsl:value-of select="doc:field[@name='format']/text()" />
+						</xsl:attribute>
+						<xsl:attribute name="SEQ">
+							<xsl:value-of select="doc:field[@name='sid']/text()" />
+						</xsl:attribute>
+						<xsl:attribute name="SIZE">
+							<xsl:value-of select="doc:field[@name='size']/text()" />
+						</xsl:attribute>
+						<xsl:attribute name="CHECKSUM">
+							<xsl:value-of select="doc:field[@name='checksum']/text()" />
+						</xsl:attribute>
+						<xsl:attribute name="CHECKSUMTYPE">
+							<xsl:value-of select="doc:field[@name='checksumAlgorithm']/text()" />
+						</xsl:attribute>
+						<xsl:attribute name="ADMID">
+							<xsl:value-of select="concat('FO_', translate(/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(), '/', '_'), '_', doc:field[@name='sid']/text())" />
+						</xsl:attribute>
+						<xsl:attribute name="GROUPID">
+							<xsl:value-of select="concat('GROUP_BITSTREAM_', translate(/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(), '/', '_'), '_', doc:field[@name='sid']/text())" />
+						</xsl:attribute>
+						<FLocat LOCTYPE="URL" xlink:type="simple">
+							<xsl:attribute name="xlink:href">
+								<xsl:value-of select="doc:field[@name='url']/text()" />
+							</xsl:attribute>
+						</FLocat>
+					</file>
+				</xsl:for-each>
+				</fileGrp>
+				</xsl:for-each>
+                                <!-- damanzano expose branded preview -->
+                                <xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element/doc:field[text()='BRANDED_PREVIEW']">
+				<fileGrp USE="BRANDED_PREVIEW">
+				<xsl:for-each select="../doc:element[@name='bitstreams']/doc:element">
+					<file>
+						<xsl:attribute name="ID">
+							<xsl:value-of select="concat('BITSTREAM_BRANDED_PREVIEW_', translate(/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text(), '/', '_'), '_', doc:field[@name='sid']/text())" />
 						</xsl:attribute>
 						<xsl:attribute name="MIMETYPE">
 							<xsl:value-of select="doc:field[@name='format']/text()" />
