@@ -149,7 +149,7 @@ public class PGDOIDatabaseTest {
         // doesn't keep going down.
         int last = getNumberOfDoisLeftToCreate();
         // Round-robin the tasks to the timers
-        for(int i=0;i<numberOfDOIsToCreateConcurrently;i++) {
+        for(int i=0;i<last;i++) {
             int timerId = i % numberOfTimers;
             timers[timerId].schedule(new UpdateTask(), 0l);
         }
@@ -158,7 +158,7 @@ public class PGDOIDatabaseTest {
                 Thread.sleep(5000l);
                 int left = getNumberOfDoisLeftToCreate();
                 if(last == left) {
-                    Assert.fail("DOI DB is locked up.");
+                    Assert.fail("DB is locked up with " + left + " DOIs left");
                 }
                 last = getNumberOfDoisLeftToCreate();
                 System.out.println("Waiting with " + getNumberOfDoisLeftToCreate() + " left");
