@@ -3,9 +3,8 @@
 package org.dspace.doi;
 
 import java.util.Set;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.utils.DSpace;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -112,8 +111,55 @@ public class PGDOIDatabaseTest {
         assert size > 0;
     }
 
+    private synchronized void madeDOI() {
+        numberOfDOIsToCreateConcurrently--;
+    }
+    private synchronized int getNumberOfDoisLeftToCreate() {
+        return numberOfDOIsToCreateConcurrently;
+    }
+    class UpdateTask extends TimerTask {
+
+        @Override
+        public void run() {
+            int randomInt = (int) (Math.random() * 10000);
+            String RandomSuffix = String.format("test-suffix-%d", randomInt);
+            String url = myBaseURL + String.format("/%d", randomInt);
+            assert myPGDOIDatabase.put(aDOI);
+            assert myPGDOIDatabase.getByURL(url) != null;
+            assert myPGDOIDatabase.size() > 0;
+            assert myPGDOIDatabase.remove(aDOI);
+            System.out.println("Made " + aDOI.toString() + " on thread ID: " + Thread.currentThread().getId());
+            madeDOI();
+        }
+    }
+
     @Test
     public void testConcurrency() {
-        assert false;
+        Timer[] timers = new Timer[numberOfTimers];
+        for(int i=0;i<numberOfTimers;i++) {
+            timers[i] = new Timer("PGDOIConcurrencyTest-" + i);
+        }
+        // Keep track of how many are left to create.  Test fails if this number
+        // doesn't keep going down.
+        int last = getNumberOfDoisLeftToCreate();
+        // Round-robin the tasks to the timers
+        for(int i=0;i<numberOfDOIsToCreateConcurrently;i++) {
+            int timerId = i % numberOfTimers;
+            timers[timerId].schedule(new UpdateTask(), 0l);
+        }
+        while(getNumberOfDoisLeftToCreate() > 0) {
+            try {
+                Thread.sleep(1000l);
+                int left = getNumberOfDoisLeftToCreate();
+                if(last == left) {
+                }
+                last = getNumberOfDoisLeftToCreate();
+                System.out.println("Waiting with " + getNumberOfDoisLeftToCreate() + " left");
+
+                last = getNumberOfDoisLeftToCreate();
+            } catch (InterruptedException ex) {
+                Assert.fail("Interrupted during concurrency");
+            }
+        }
     }
 }
