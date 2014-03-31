@@ -18,11 +18,16 @@
 
 	<build>
 		<plugins>
+			
+			<!-- El plugin no realiza correctamente el filtrado del WEB-INF/web.xml. 
+				Habria que realizar un filtrado similar al que se encuentra en 
+				el pom.xml del proyecto XMLUI -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<archiveClasses>false</archiveClasses>
+					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 					<webResources>
 						<resource>
 							<filtering>true</filtering>
