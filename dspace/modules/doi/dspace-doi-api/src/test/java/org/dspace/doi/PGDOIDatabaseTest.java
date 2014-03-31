@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Assert;
 
 /**
  * Test cases for DOI Database in Postgres.  All DOIs created use
@@ -48,11 +49,11 @@ public class PGDOIDatabaseTest {
         // Verify a DOI can be set
         DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffix, url1);
         DOI setDOI = myPGDOIDatabase.set(aDOI);
-        assert aDOI.equals(setDOI);
+        Assert.assertEquals(aDOI, setDOI);
 
         // Verify the DOI we set can be retrieved
         DOI getDOI = myPGDOIDatabase.getByDOI(aDOI.toString());
-        assert aDOI.equals(getDOI);
+        Assert.assertEquals(aDOI, getDOI);
 
         //Verify set also works to change the target of the DOI
         // change the target URL of the DOI
@@ -62,57 +63,57 @@ public class PGDOIDatabaseTest {
         getDOI = myPGDOIDatabase.getByDOI(aDOI.toString());
         // The DOI internal identifiers should not be equal
         // even though they have the same prefix/suffix
-        assert aDOI.getInternalIdentifier().equals(getDOI.getInternalIdentifier()) == false;
-        assert otherDOI.equals(getDOI);
+        Assert.assertNotSame(aDOI.getInternalIdentifier(), getDOI.getInternalIdentifier());
+        Assert.assertEquals(otherDOI, getDOI);
     }
 
     @Test
     public void testPutContainsRemove() {
         DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified,url1);
-        assert myPGDOIDatabase.put(aDOI);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
         // make sure put was successful
-        assert myPGDOIDatabase.contains(aDOI);
-        assert myPGDOIDatabase.remove(aDOI);
+        Assert.assertTrue(myPGDOIDatabase.contains(aDOI));
+        Assert.assertTrue(myPGDOIDatabase.remove(aDOI));
     }
 
     @Test
     public void testGetByDOI() {
         DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified,url1);
-        assert myPGDOIDatabase.put(aDOI);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
         // doi:10.5061/dryad.xxxxx
         String doiKey = "doi:" + PGDOIDatabase.internalTestingPrefix + '/' + myRandomSuffixModified;
         DOI byKey = myPGDOIDatabase.getByDOI(doiKey);
-        assert byKey.equals(aDOI);
+        Assert.assertEquals(byKey,aDOI);
     }
 
     @Test
     public void testGetByURL() {
         DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified,url1);
-        assert myPGDOIDatabase.put(aDOI);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
         // doi:10.5061/dryad.xxxxx
         Set<DOI> DOIsbyURL = myPGDOIDatabase.getByURL(url1);
-        assert DOIsbyURL.contains(aDOI);
+        Assert.assertTrue(DOIsbyURL.contains(aDOI));
     }
 
     @Test
     public void testGetALL() {
         DOI aDOI1 = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffix,url1);
         DOI aDOI2 = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified,url2);
-        assert myPGDOIDatabase.put(aDOI1);
-        assert myPGDOIDatabase.put(aDOI2);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI1));
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI2));
         Set<DOI> allDOIs = myPGDOIDatabase.getALL();
-        assert allDOIs.isEmpty() == false;
-        assert allDOIs.contains(aDOI1);
-        assert allDOIs.contains(aDOI2);
-        assert allDOIs.size() >= 2;
+        Assert.assertFalse(allDOIs.isEmpty());
+        Assert.assertTrue(allDOIs.contains(aDOI1));
+        Assert.assertTrue(allDOIs.contains(aDOI2));
+        Assert.assertTrue(allDOIs.size() >= 2);
     }
 
     @Test
     public void testSize() {
         DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified,url1);
-        assert myPGDOIDatabase.put(aDOI);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
         int size = myPGDOIDatabase.size();
-        assert size > 0;
+        Assert.assertTrue(size > 0);
     }
 
     private synchronized void madeDOI() {
@@ -129,10 +130,10 @@ public class PGDOIDatabaseTest {
             String RandomSuffix = String.format("test-suffix-%d", randomInt);
             String url = myBaseURL + String.format("/%d", randomInt);
             DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, RandomSuffix, url);
-            assert myPGDOIDatabase.put(aDOI);
-            assert myPGDOIDatabase.getByURL(url) != null;
-            assert myPGDOIDatabase.size() > 0;
-            assert myPGDOIDatabase.remove(aDOI);
+            Assert.assertTrue(myPGDOIDatabase.put(aDOI));
+            Assert.assertNotNull(myPGDOIDatabase.getByURL(url));
+            Assert.assertTrue(myPGDOIDatabase.size() > 0);
+            Assert.assertTrue(myPGDOIDatabase.remove(aDOI));
             System.out.println("Made " + aDOI.toString() + " on thread ID: " + Thread.currentThread().getId());
             madeDOI();
         }
@@ -154,10 +155,10 @@ public class PGDOIDatabaseTest {
         }
         while(getNumberOfDoisLeftToCreate() > 0) {
             try {
-                Thread.sleep(1000l);
+                Thread.sleep(5000l);
                 int left = getNumberOfDoisLeftToCreate();
                 if(last == left) {
-                    assert false;
+                    Assert.fail("DOI DB is locked up.");
                 }
                 last = getNumberOfDoisLeftToCreate();
                 System.out.println("Waiting with " + getNumberOfDoisLeftToCreate() + " left");
