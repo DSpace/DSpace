@@ -122,19 +122,24 @@ public class PGDOIDatabaseTest {
     private synchronized int getNumberOfDoisLeftToCreate() {
         return numberOfDOIsToCreateConcurrently;
     }
+
+    private synchronized void putGetRemove(DOI aDOI, String url) {
+        myPGDOIDatabase.put(aDOI);
+        Set<DOI> DOIsbyURL = myPGDOIDatabase.getByURL(url);
+        Assert.assertTrue(DOIsbyURL.size() > 0);
+        Assert.assertTrue(myPGDOIDatabase.remove(aDOI));
+    }
+
     class UpdateTask extends TimerTask {
 
         @Override
         public void run() {
-            int randomInt = (int) (Math.random() * 10000);
+            // Guarantee collisions
+            int randomInt = (int) (Math.random() * 100);
             String RandomSuffix = String.format("test-suffix-%d", randomInt);
             String url = myBaseURL + String.format("/%d", randomInt);
             DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, RandomSuffix, url);
-            // Leaving off assertions since the same DOI may be accessed by multiple threads
-            myPGDOIDatabase.put(aDOI);
-            myPGDOIDatabase.getByURL(url);
-            myPGDOIDatabase.remove(aDOI);
-            System.out.println("Made " + aDOI.toString() + " on thread ID: " + Thread.currentThread().getId());
+            putGetRemove(aDOI, url);
             madeDOI();
         }
     }
