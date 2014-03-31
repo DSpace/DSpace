@@ -402,6 +402,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
     private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context,
 				   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
+	String title = journalID; // Preserve the case of the original entry
 	journalID = journalID.toLowerCase();
 	
 	log.debug("processing journal ID " + journalID);
@@ -411,7 +412,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
 		log.debug(journalID + " is not integrated OR manuscript number is null");
                 //Just add the journal title
-                String title= journalID;
                 if(journalVals.indexOf(journalID)!=-1){
                     title = journalNames.get(journalVals.indexOf(journalID));
                     //Should it end with a *, remove it.
