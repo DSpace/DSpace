@@ -40,14 +40,16 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     // DOI Table Queries
     private static String DOI_QUERY_BY_PREFIX_SUFFIX = "SELECT " + 
             COLUMN_DOI_ID + ", " + COLUMN_DOI_PREFIX + ", " + 
-            COLUMN_DOI_SUFFIX + " FROM " + DOI_TABLE + " WHERE " +
-            COLUMN_DOI_PREFIX + " = ? AND " + COLUMN_DOI_SUFFIX + " = ?";
+            COLUMN_DOI_SUFFIX + ", " + COLUMN_URL + " FROM " + DOI_TABLE +
+            " WHERE " + COLUMN_DOI_PREFIX + " = ? AND " + COLUMN_DOI_SUFFIX +
+            " = ?";
     private static String DOI_QUERY_BY_URL = "SELECT " + COLUMN_DOI_ID +
-            ", " + COLUMN_DOI_PREFIX + ", " + COLUMN_DOI_SUFFIX + " FROM " +
-            DOI_TABLE + " WHERE " + COLUMN_URL + " = ?";
+            ", " + COLUMN_DOI_PREFIX + ", " + COLUMN_DOI_SUFFIX + ", " +
+            COLUMN_URL + " FROM " + DOI_TABLE + " WHERE " + COLUMN_URL +
+            " = ?";
     private static String DOI_QUERY_ALL = "SELECT " + COLUMN_DOI_ID +
-            ", " + COLUMN_DOI_PREFIX + ", " + COLUMN_DOI_SUFFIX + " FROM " +
-            DOI_TABLE;
+            ", " + COLUMN_DOI_PREFIX + ", " + COLUMN_DOI_SUFFIX + ", " +
+            COLUMN_URL + " FROM " + DOI_TABLE;
     private static String DOI_COUNT_BY_PREFIX_SUFFIX = "SELECT COUNT(*) AS " +
             COLUMN_DOI_COUNT + " FROM " + DOI_TABLE + " WHERE " +
             COLUMN_DOI_PREFIX + " = ? AND " + COLUMN_DOI_SUFFIX + " = ?";
