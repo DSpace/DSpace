@@ -17,10 +17,9 @@ public class DOIMigrator {
         DOIDatabase perstDatabase = DOIDatabase.getInstance();
         PGDOIDatabase postgresDatabase = PGDOIDatabase.getInstance();
 
-        Set<DOI> perstDOIs = perstDatabase.getALL();
-        for(DOI perstDOI : perstDOIs) {
-            log.info("Migrating " + perstDOI.toString());
-            DOI doi = new DOI(perstDOI.getPrefix(), perstDOI.getSuffix(), perstDOI.getInternalIdentifier());
+        Set<DOI> DOIs = perstDatabase.getALL();
+        for(DOI doi : DOIs) {
+            log.info("Migrating " + doi.toString());
             postgresDatabase.put(doi);
         }
         log.info("Finished migration");
