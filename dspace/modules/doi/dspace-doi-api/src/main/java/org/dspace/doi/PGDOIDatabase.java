@@ -54,34 +54,32 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     private static Logger LOG = Logger.getLogger(PGDOIDatabase.class);
     private static PGDOIDatabase DATABASE;//= new PGDOIDatabase();
     private ConfigurationService configurationService=null;
-    private Context context = null;
 
-    private synchronized  Context getContext() {
-        if(context == null) {
-            try {
-                context = new Context();
-            } catch (SQLException ex) {
-                LOG.error("Unable to instantiate DSpace context", ex);
-            }
+    // Still getting concurrency issues
+    // get a new context for every operation
+
+    private static Context getContext() {
+        Context context = null;
+        try {
+            context = new Context();
+        } catch (SQLException ex) {
+            LOG.error("Unable to instantiate DSpace context", ex);
         }
         return context;
     }
 
-    private synchronized void commitContext() throws SQLException {
+    private static void completeContext(Context context) throws SQLException {
         try {
-            getContext().commit();
+            context.complete();
         } catch (SQLException ex) {
             // Abort the context to force a new connection
-            abortContext();
+            abortContext(context);
             throw ex;
         }
     }
 
-    private synchronized void abortContext() {
-        if(context != null) {
-            context.abort();
-        }
-        this.context = null;
+    private static void abortContext(Context context) {
+        context.abort();
     }
 
     private PGDOIDatabase(){}
@@ -95,20 +93,17 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         return DATABASE;
     }
     public void close() {
-        if(context != null) {
-            context.abort();
-        }
-        context = null;
+        // Intentionally blank
     }
 
-    private TableRow queryExistingDOI(DOI aDOI) throws SQLException {
+    private static TableRow queryExistingDOI(Context context, DOI aDOI) throws SQLException {
         String query = DOI_QUERY_BY_PREFIX_SUFFIX;
-        return DatabaseManager.querySingleTable(getContext(), DOI_TABLE, query, aDOI.getPrefix(), aDOI.getSuffix());
+        return DatabaseManager.querySingleTable(context, DOI_TABLE, query, aDOI.getPrefix(), aDOI.getSuffix());
     }
 
-    private TableRow countMatchingDOIs(DOI aDOI) throws SQLException {
+    private static TableRow countMatchingDOIs(Context context, DOI aDOI) throws SQLException {
         String query = DOI_COUNT_BY_PREFIX_SUFFIX;
-        return DatabaseManager.querySingle(getContext(), query, aDOI.getPrefix(), aDOI.getSuffix());
+        return DatabaseManager.querySingle(context, query, aDOI.getPrefix(), aDOI.getSuffix());
     }
 
     private static String getPrefix(String aDOIKey) {
@@ -129,7 +124,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
     }
 
-    private TableRow queryExistingDOI(String aDOIKey) throws SQLException, DOIFormatException {
+    private static TableRow queryExistingDOI(Context context, String aDOIKey) throws SQLException, DOIFormatException {
         // split key into prefix and suffix;
         if(aDOIKey == null) {
             throw new DOIFormatException("null string provided as DOI");
@@ -148,26 +143,26 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
             throw new DOIFormatException("DOI string does not contain a prefix");
         }
         String query = DOI_QUERY_BY_PREFIX_SUFFIX;
-        return DatabaseManager.querySingleTable(getContext(), DOI_TABLE, query, prefix, suffix);
+        return DatabaseManager.querySingleTable(context, DOI_TABLE, query, prefix, suffix);
     }
 
-    private TableRowIterator queryExistingDOIByURL(String aURL) throws SQLException {
+    private static TableRowIterator queryExistingDOIByURL(Context context, String aURL) throws SQLException {
         String query = DOI_QUERY_BY_URL;
-        return DatabaseManager.queryTable(getContext(), DOI_TABLE, query, aURL);
+        return DatabaseManager.queryTable(context, DOI_TABLE, query, aURL);
     }
 
-    private TableRowIterator queryAllDOIs() throws SQLException {
+    private static TableRowIterator queryAllDOIs(Context context) throws SQLException {
         String query = DOI_QUERY_ALL;
-        return DatabaseManager.queryTable(getContext(), DOI_TABLE, query);
+        return DatabaseManager.queryTable(context, DOI_TABLE, query);
     }
 
-    private TableRow countAllDOIs() throws SQLException {
+    private static TableRow countAllDOIs(Context context) throws SQLException {
         String query = DOI_COUNT_ALL;
-        return DatabaseManager.querySingle(getContext(), query);
+        return DatabaseManager.querySingle(context, query);
     }
 
-    private void insertRow(TableRow row) throws SQLException {
-        DatabaseManager.insert(getContext(), row);
+    private static void insertRow(Context context, TableRow row) throws SQLException {
+        DatabaseManager.insert(context, row);
     }
 
     private static TableRow createRowFromDOI(DOI aDOI) {
@@ -195,13 +190,13 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         row.setColumn(COLUMN_URL, aDOI.getInternalIdentifier());
     }
 
-    private void updateRow(TableRow row) throws SQLException {
-        DatabaseManager.update(getContext(), row);
+    private static void updateRow(Context context, TableRow row) throws SQLException {
+        DatabaseManager.update(context, row);
     }
 
     // Only works for rows with primary key.
-    private boolean deleteRow(TableRow row) throws SQLException {
-        int rowsDeleted = DatabaseManager.delete(getContext(), row);
+    private boolean deleteRow(Context context, TableRow row) throws SQLException {
+        int rowsDeleted = DatabaseManager.delete(context, row);
         return rowsDeleted == 1;
     }
 
@@ -209,8 +204,8 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      * Removes all DOIs in the database with the internal testing prefix
      * @throws SQLException 
      */
-    private int deleteDOIRowsWithTestPrefix() throws SQLException {
-        int rowsDeleted = DatabaseManager.deleteByValue(getContext(), DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
+    private int deleteDOIRowsWithTestPrefix(Context context) throws SQLException {
+        int rowsDeleted = DatabaseManager.deleteByValue(context, DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
         return rowsDeleted;
     }
 
@@ -221,35 +216,43 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      */
     public boolean put(DOI aDOI) {
         boolean success = false;
-        // Overrwite if already exists
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for put: " + aDOI.toString() + ", failing");
+            return success;
+        }
+
+        // Query for existing DOI, will overwrite if exists
         TableRow doiRow = null;
         try {
-            doiRow = queryExistingDOI(aDOI);
+            doiRow = queryExistingDOI(context, aDOI);
         } catch (SQLException ex) {
             LOG.error("Unable to query DOI database", ex);
+            abortContext(context);
         }
 
         if(doiRow == null) {
             // new DOI, record it
             doiRow = createRowFromDOI(aDOI);
             try {
-                insertRow(doiRow);
-                commitContext();
+                insertRow(context, doiRow);
+                completeContext(context);
                 success = true;
             } catch(SQLException ex) {
                 LOG.error("Unable to insert DOI: " + aDOI.toString(), ex);
-                abortContext();
+                abortContext(context);
             }
         } else {
             // existing DOI - prefix and suffix match, update the URL.
             updateExistingDOIRow(doiRow, aDOI);
             try {
-                updateRow(doiRow);
-                commitContext();
+                updateRow(context, doiRow);
+                completeContext(context);
                 success = true;
             } catch (SQLException ex) {
                 LOG.error("Unable to update DOI,: " + aDOI.toString(), ex);
-                abortContext();
+                abortContext(context);
             }
         }
         return success;
@@ -262,16 +265,23 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      * @return the DOI if it was successfully set
      */
     public DOI set(DOI aDOI) {
-        boolean success = false;
         DOI returnDoi = null;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for set: " + aDOI.toString() + ", failing");
+            return returnDoi;
+        }
+
+        // Insert row for DOI
         TableRow doiRow = createRowFromDOI(aDOI);
         try {
-            insertRow(doiRow);
-            commitContext();
+            insertRow(context, doiRow);
+            completeContext(context);
             returnDoi = aDOI;
         } catch (SQLException ex) {
             LOG.error("Unable to set DOI: " + aDOI.toString(), ex);
-            abortContext();
+            abortContext(context);
         }
 
         return returnDoi;
@@ -284,23 +294,35 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      */
     public boolean remove(DOI aDOI) {
         boolean success = false;
-        TableRow doiRow = null;
-        try {
-            doiRow = queryExistingDOI(aDOI);
-        } catch (SQLException ex) {
-            LOG.error("Unable to query DOI database", ex);
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for remove: " + aDOI.toString() + ", failing");
+            return success;
         }
 
+        // Query for existing DOI - need row to delete it by ID
+        TableRow doiRow = null;
+        try {
+            doiRow = queryExistingDOI(context, aDOI);
+        } catch (SQLException ex) {
+            LOG.error("Unable to query DOI database", ex);
+            abortContext(context);
+        }
+
+        // Delete the row
         if(doiRow == null) {
+            // Row not found.
             LOG.error("Attempting to remove DOI: " + aDOI.toString() +" but not found");
+            abortContext(context);
         } else {
             // row found, delete it.
             try {
-                success = deleteRow(doiRow);
-                commitContext();
+                success = deleteRow(context, doiRow);
+                completeContext(context);
             } catch(SQLException ex) {
                 LOG.error("Unable to delete DOI: " + aDOI.toString(), ex);
-                abortContext();
+                abortContext(context);
             }
         }
 
@@ -313,23 +335,39 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      */
     public DOI getByDOI(String aDOIKey) {
         DOI doi = null;
-        TableRow doiRow = null;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for getByDOI:" + aDOIKey + ", failing");
+            return doi;
+        }
+
         try {
-            doiRow = queryExistingDOI(aDOIKey);
+            TableRow doiRow = queryExistingDOI(context, aDOIKey);
             doi = createDOIFromRow(doiRow);
         } catch (DOIFormatException ex) {
             LOG.error("Unable to get DOI from database: " + aDOIKey, ex);
         } catch (SQLException ex) {
             LOG.error("Unable to get DOI from database: " + aDOIKey, ex);
         }
+
+        // Clean up the context.  Read operation so we can abort it.
+        abortContext(context);
         return doi;
     }
 
     public Set<DOI> getByURL(String aURLKey) {
         Set<DOI> dois = new HashSet<DOI>();
-        TableRowIterator doiIterator = null;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for getByURL:" + aURLKey + ", failing");
+            return dois;
+        }
+
+        // Fetch DOIs by URL
         try {
-            doiIterator = queryExistingDOIByURL(aURLKey);
+            TableRowIterator doiIterator = queryExistingDOIByURL(context, aURLKey);
             while(doiIterator.hasNext()) {
                 TableRow doiRow = doiIterator.next();
                 DOI doi = createDOIFromRow(doiRow);
@@ -338,14 +376,24 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         } catch (SQLException ex) {
             LOG.error("Unable to get DOIs by URL from database: " + aURLKey,ex);
         }
+
+        // Clean up the context.  Read operation so we can abort it.
+        abortContext(context);
         return dois;
     }
 
     public Set<DOI> getALL() {
         Set<DOI> dois = new HashSet<DOI>();
-        TableRowIterator doiIterator = null;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for getAll, failing");
+            return dois;
+        }
+
+        // Fetch All DOIs
         try {
-            doiIterator = queryAllDOIs();
+            TableRowIterator doiIterator = queryAllDOIs(context);
             while(doiIterator.hasNext()) {
                 TableRow doiRow = doiIterator.next();
                 DOI doi = createDOIFromRow(doiRow);
@@ -354,31 +402,54 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         } catch (SQLException ex) {
             LOG.error("Unable to get all DOIs from database",ex);
         }
+
+        // Clean up the context.  Read operation so we can abort it.
+        abortContext(context);
         return dois;
     }
 
     public boolean contains(DOI aDOI) {
         boolean found = false;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for contains: " + aDOI.toString() + ", failing");
+            return found;
+        }
+
         TableRow countRow = null;
         try {
-            countRow = countMatchingDOIs(aDOI);
+            countRow = countMatchingDOIs(context, aDOI);
             long count = countFromRow(countRow);
             found = count > 0l;
         } catch (SQLException ex) {
             LOG.error("Unable check for DOI in database: " + aDOI.toString(),ex);
         }
+
+        // Clean up the context.  Read operation so we can abort it.
+        abortContext(context);
         return found;
     }
 
     public int size() {
         long size = 0l;
-        TableRow countRow = null;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for size, failing");
+            return (int)size;
+        }
+
+        // Count all DOIs
         try {
-            countRow = countAllDOIs();
+            TableRow countRow = countAllDOIs(context);
             size = countFromRow(countRow);
         } catch (SQLException ex) {
             LOG.error("Unable count DOIs in database",ex);
         }
+
+        // Clean up the context.  Read operation so we can abort it.
+        abortContext(context);
         return (int)size;
 
     }
@@ -392,12 +463,18 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      */
     int removeTestDOIs() {
         int removed = 0;
+        // Obtain Context
+        Context context = getContext();
+        if(context == null) { // fail early
+            LOG.error("Unable to create a context for removeTestDOIs, failing");
+            return removed;
+        }
         try {
-            removed = deleteDOIRowsWithTestPrefix();
-            commitContext();
+            removed = deleteDOIRowsWithTestPrefix(context);
+            completeContext(context);
         } catch (SQLException ex) {
             LOG.error("Unable to delete DOI Rows with test prefix", ex);
-            abortContext();
+            abortContext(context);
         }
         return removed;
     }
