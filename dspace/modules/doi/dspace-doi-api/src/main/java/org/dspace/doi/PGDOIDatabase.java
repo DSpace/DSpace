@@ -348,7 +348,9 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
 
         try {
             TableRow doiRow = queryExistingDOI(context, aDOIKey);
-            doi = createDOIFromRow(doiRow);
+            if(doiRow != null) {
+                doi = createDOIFromRow(doiRow);
+            }
         } catch (DOIFormatException ex) {
             LOG.error("Unable to get DOI from database: " + aDOIKey, ex);
         } catch (SQLException ex) {
