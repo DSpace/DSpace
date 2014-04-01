@@ -172,10 +172,11 @@ public class PGDOIDatabaseTest {
                 String line = reader.readLine();
                 if(
                         line.contains(PGDOIDatabase.internalTestingPrefix) &&
-                        line.contains(myRandomSuffixModified) &&
-                        line.contains(url1)
+                        line.contains(myRandomSuffixModified)
                         ) {
-                    // line contains all three components of our DOI
+                    // verify line contains prefix and suffix components of our DOI
+                    // dump() uses getTargetURL, which differs from our internal
+                    // url, so we don't test that.
                     foundDoiInDumpfile = true;
                     }
             }
