@@ -18,7 +18,6 @@
 
         <bean class="org.dspace.doi.Minter" autowire="byType" scope="singleton"/>
 
-        <bean class="org.dspace.doi.DOIDatabase" autowire="byType" scope="singleton"/>
         <bean class="org.dspace.doi.PGDOIDatabase" autowire="byType" scope="singleton"/>
 
 
