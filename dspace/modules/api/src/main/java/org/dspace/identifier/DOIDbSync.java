@@ -13,8 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import org.dspace.doi.DOIDatabase;
 import org.dspace.doi.Minter;
+import org.dspace.doi.PGDOIDatabase;
 
 /**
  * Created by IntelliJ IDEA.
@@ -210,7 +210,7 @@ public class DOIDbSync {
 
         if(doi_!=null && !isTest){
             Minter myMinter = new Minter();
-            myMinter.setMyLocalDatabase(DOIDatabase.getInstance());
+            myMinter.setMyLocalDatabase(PGDOIDatabase.getInstance());
             myMinter.mintDOI(doi_);
         }
 
