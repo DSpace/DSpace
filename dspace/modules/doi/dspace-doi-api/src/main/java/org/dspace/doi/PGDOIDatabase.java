@@ -1,11 +1,14 @@
 package org.dspace.doi;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -480,11 +483,37 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     }
 
     public void dumpTo(FileWriter aFileWriter) throws IOException {
-        // TODO: fill this in.
+        BufferedWriter writer = new BufferedWriter(aFileWriter);
+        Set<DOI> allDois = getALL();
+        Iterator<DOI> iterator = allDois.iterator();
+
+        while (iterator.hasNext()) {
+                DOI doi = iterator.next();
+
+                writer.write(doi.toString() + " "
+                                + doi.getTargetURL().toString());
+                writer.newLine();
+        }
+
+        writer.close();
     }
 
     public void dump(OutputStream aOut) throws IOException {
-        // TODO: fill this in
+        BufferedOutputStream out = new BufferedOutputStream(aOut);
+        Set<DOI> allDois = getALL();
+        Iterator<DOI> iterator = allDois.iterator();
+        byte[] eol = System.getProperty("line.separator").getBytes();
+
+        while (iterator.hasNext()) {
+                DOI doi = iterator.next();
+
+                out.write(doi.toString().getBytes());
+                out.write(" ".getBytes());
+                out.write(doi.getTargetURL().toString().getBytes());
+                out.write(eol);
+        }
+
+        out.close();
     }
 
     public ConfigurationService getConfigurationService() {
