@@ -2,13 +2,21 @@
  */
 package org.dspace.doi;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Before;
 
 /**
  * Test cases for DOI Database in Postgres.  All DOIs created use
@@ -20,6 +28,9 @@ public class PGDOIDatabaseTest {
     private static String myRandomSuffix, myRandomSuffixModified;
     private static String url1, url2;
     private static String myBaseURL = "http://test-suffix.doi.org";
+    private static String myDumpFilePrefix = "PGDOIDatabaseTest";
+    private static String myDumpFileSuffix = "txt";
+    private File testOutputFile;
     private int numberOfDOIsToCreateConcurrently = 10000;
     private int numberOfTimers = 10;
 
@@ -116,6 +127,74 @@ public class PGDOIDatabaseTest {
         Assert.assertTrue(size > 0);
     }
 
+    @Before
+    public void createTempDumpFile() {
+        try {
+            testOutputFile = File.createTempFile(myDumpFilePrefix, myDumpFileSuffix);
+        } catch (IOException ex) {
+            Assert.fail("Unable to create temp file: " + ex.toString());
+        }
+    }
+
+    @Test
+    public void testDump() {
+        // put a DOI
+        DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified, url1);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
+
+        // Dump the database to a file output stream
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(testOutputFile);
+        } catch (FileNotFoundException ex) {
+            Assert.fail("Unable to open temp file for writing: " + ex.toString());
+        }
+        Assert.assertNotNull(fos);
+        try {
+            myPGDOIDatabase.dump(fos);
+            fos.close();
+        } catch (IOException ex) {
+            Assert.fail("Unable to dump doi database: " + ex.toString());
+        }
+
+        // Make sure our put doi is in the file.
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(testOutputFile);
+        } catch (FileNotFoundException ex) {
+            Assert.fail("Unable to open temp file for reading: " + ex.toString());
+        }
+
+        BufferedReader reader = new BufferedReader(fileReader);
+        boolean foundDoiInDumpfile = false;
+        try {
+            while(reader.ready()) {
+                String line = reader.readLine();
+                if(
+                        line.contains(PGDOIDatabase.internalTestingPrefix) &&
+                        line.contains(myRandomSuffixModified) &&
+                        line.contains(url1)
+                        ) {
+                    // line contains all three components of our DOI
+                    foundDoiInDumpfile = true;
+                    }
+            }
+        } catch (IOException ex) {
+            Assert.fail("Unable to read lines from temp file: " + ex.toString());
+        }
+        Assert.assertTrue("DOI Not found in dump file", foundDoiInDumpfile);
+
+    }
+
+    @After
+    public void removeTempDumpFile() {
+        testOutputFile.delete();
+    }
+
+    public void testDumpTo() {
+        Assert.fail("not implemented");
+    }
+
     private synchronized void madeDOI() {
         numberOfDOIsToCreateConcurrently--;
     }
@@ -165,9 +244,7 @@ public class PGDOIDatabaseTest {
                     Assert.fail("DB is locked up with " + left + " DOIs left");
                 }
                 last = getNumberOfDoisLeftToCreate();
-                System.out.println("Waiting with " + getNumberOfDoisLeftToCreate() + " left");
-
-                last = getNumberOfDoisLeftToCreate();
+                System.out.println("Waiting with " + last + " left");
             } catch (InterruptedException ex) {
                 Assert.fail("Interrupted during concurrency");
             }
