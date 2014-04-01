@@ -171,7 +171,6 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
     }
 
     private static TableRow createRowFromDOI(DOI aDOI) {
-        // TODO: Throw DOIFormatException
         TableRow row = new TableRow(DOI_TABLE, DOI_COLUMNS);
         row.setColumn(COLUMN_DOI_PREFIX, aDOI.getPrefix());
         row.setColumn(COLUMN_DOI_SUFFIX, aDOI.getSuffix());
