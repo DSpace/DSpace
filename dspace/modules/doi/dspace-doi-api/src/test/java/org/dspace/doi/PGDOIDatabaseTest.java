@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 import java.util.Timer;
@@ -127,6 +128,37 @@ public class PGDOIDatabaseTest {
         Assert.assertTrue(size > 0);
     }
 
+    // Shared by testDump and testDumpTo
+    private boolean verifyDOIInFile() {
+        // Make sure our put doi is in the file.
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(testOutputFile);
+        } catch (FileNotFoundException ex) {
+            Assert.fail("Unable to open temp file for reading: " + ex.toString());
+        }
+
+        BufferedReader reader = new BufferedReader(fileReader);
+        boolean foundDoiInFile = false;
+        try {
+            while(reader.ready()) {
+                String line = reader.readLine();
+                if(
+                        line.contains(PGDOIDatabase.internalTestingPrefix) &&
+                        line.contains(myRandomSuffixModified)
+                        ) {
+                    // verify line contains prefix and suffix components of our DOI
+                    // dump() uses getTargetURL, which differs from our internal
+                    // url, so we don't test that.
+                    foundDoiInFile = true;
+                    }
+            }
+        } catch (IOException ex) {
+            Assert.fail("Unable to read lines from temp file: " + ex.toString());
+        }
+        return foundDoiInFile;
+    }
+
     @Before
     public void createTempDumpFile() {
         try {
@@ -157,34 +189,8 @@ public class PGDOIDatabaseTest {
             Assert.fail("Unable to dump doi database: " + ex.toString());
         }
 
-        // Make sure our put doi is in the file.
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(testOutputFile);
-        } catch (FileNotFoundException ex) {
-            Assert.fail("Unable to open temp file for reading: " + ex.toString());
-        }
-
-        BufferedReader reader = new BufferedReader(fileReader);
-        boolean foundDoiInDumpfile = false;
-        try {
-            while(reader.ready()) {
-                String line = reader.readLine();
-                if(
-                        line.contains(PGDOIDatabase.internalTestingPrefix) &&
-                        line.contains(myRandomSuffixModified)
-                        ) {
-                    // verify line contains prefix and suffix components of our DOI
-                    // dump() uses getTargetURL, which differs from our internal
-                    // url, so we don't test that.
-                    foundDoiInDumpfile = true;
-                    }
-            }
-        } catch (IOException ex) {
-            Assert.fail("Unable to read lines from temp file: " + ex.toString());
-        }
+        boolean foundDoiInDumpfile = verifyDOIInFile();
         Assert.assertTrue("DOI Not found in dump file", foundDoiInDumpfile);
-
     }
 
     @After
@@ -192,8 +198,43 @@ public class PGDOIDatabaseTest {
         testOutputFile.delete();
     }
 
+    @Before
+    public void createTempDumpToFile() {
+        try {
+            testOutputFile = File.createTempFile(myDumpFilePrefix, myDumpFileSuffix);
+        } catch (IOException ex) {
+            Assert.fail("Unable to create temp file: " + ex.toString());
+        }
+    }
+
+    // Very similar to dump, but uses a FileWriter instead of an output stream
+    @Test
     public void testDumpTo() {
-        Assert.fail("not implemented");
+        // put a DOI
+        DOI aDOI = new DOI(PGDOIDatabase.internalTestingPrefix, myRandomSuffixModified, url1);
+        Assert.assertTrue(myPGDOIDatabase.put(aDOI));
+
+        // Dump the database to a file writer
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(testOutputFile);
+        } catch (IOException ex) {
+            Assert.fail("Unable to open temp file for writing: " + ex.toString());
+        }
+        Assert.assertNotNull(writer);
+        try {
+            myPGDOIDatabase.dumpTo(writer);
+            writer.close();
+        } catch (IOException ex) {
+            Assert.fail("Unable to dumpTo doi database: " + ex.toString());
+        }
+
+        boolean foundDoiInDumpToFile = verifyDOIInFile();
+        Assert.assertTrue("DOI Not found in dump file", foundDoiInDumpToFile);    }
+
+    @After
+    public void removeTempDumpToFile() {
+        testOutputFile.delete();
     }
 
     private synchronized void madeDOI() {
