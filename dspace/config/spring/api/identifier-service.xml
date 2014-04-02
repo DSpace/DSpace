@@ -77,7 +77,8 @@
         <property name='requestFactory'>
             <bean class='org.dspace.identifier.ezid.EZIDRequestFactory'>
                 <property name='EZID_SCHEME' value='https'/>
-                <property name='EZID_HOST' value='n2t.net'/>
+                <property name='EZID_HOST' value='ezid.cdlib.org'/>
+                <property name='EZID_PATH' value=''/>
             </bean>
         </property>
         <property name='crosswalk'>
