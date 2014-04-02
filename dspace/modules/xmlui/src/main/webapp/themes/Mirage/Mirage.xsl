@@ -421,17 +421,17 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
 		  <div class="container">
-		  <!-- Elementa -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aelementa%5C%3A%5C+science%5C+of%5C+the%5C+anthropocene%5C%7C%5C%7C%5C%7CElementa%5C%3A%5C+Science%5C+of%5C+the%5C+Anthropocene"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Elementa.png" alt="Elementa: Science of the Anthropocene" /></a>
-		  <!-- ecology letters -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+letters%5C%7C%5C%7C%5C%7CEcology%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ECOLETScover.gif" alt="Ecology Letters" /></a>
-		  <!-- pala -->
- <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apalaeontology%5C%7C%5C%7C%5C%7CPalaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PALA.gif" alt="Palaeontology" /></a>
-		  <!-- Ecology and Evolution -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C+and%5C+evolution%5C%7C%5C%7C%5C%7C
-		  Ecology%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcologyEvolution.png" alt="Ecology and Evolution" /></a>		  </div>
-                </div>
+<!-- Proceedings of the Royal Society B -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
+        <!-- Scientific Data -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ascientific%5C+data%5C%7C%5C%7C%5C%7CScientific%5C+Data">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ScientificData.png" alt="Scientific Data" /></a>
+        <!-- BMC Ecology -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+ecology%5C%7C%5C%7C%5C%7CBMC%5C+Ecology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEcology.png" alt="BMC Ecology" /></a>
+        <!-- BMC Evolutionary Biology -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
             </div>
+        </div>
+    </div>
 
 
             <!-- START STATISTICS -->
