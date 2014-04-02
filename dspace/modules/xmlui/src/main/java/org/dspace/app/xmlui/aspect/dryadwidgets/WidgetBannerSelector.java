@@ -39,7 +39,7 @@ public class WidgetBannerSelector extends WidgetBannerLookup implements Selector
         try {
             packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
-            log.error("Error looking up article DOI:", ex);
+            log.error("Error looking up article identifier:", ex);
         }
         return packageDOI != null;
     }

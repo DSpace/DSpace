@@ -64,6 +64,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
                     }
                 } catch (Exception e) {
                     LOG.error("Unable to initialize DOI database", e);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error initializing DOI database: ", error);
                 } finally {
                     if (myStorage.getRoot() == null) {
                         myStorage.rollbackThreadTransaction();
@@ -96,10 +98,10 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
                 try {
                     put = ((DatabaseRoot) myStorage.getRoot()).put(aDOI);
-                } catch (AssertionError details) {
-                    LOG.error("Assertion Error: ", details);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error putting DOI: " + aDOI, error);
                 } catch (Exception ex) {
-                    LOG.error("Unable to put DOI: ", ex);
+                    LOG.error("Unable to put DOI: " + aDOI, ex);
                 } finally {
                     if(put) {
                         myStorage.endThreadTransaction();
@@ -115,10 +117,10 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
                 try {
                     doi = ((DatabaseRoot) myStorage.getRoot()).set(aDOI);
-                } catch (AssertionError details) {
-                    LOG.error("Assertion Error: ", details);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error setting DOI: " + aDOI, error);
                 } catch (Exception ex) {
-                    LOG.error("Unable to set DOI: ", ex);
+                    LOG.error("Unable to set DOI: " + aDOI, ex);
                 } finally {
                     if(doi != null) {
                         myStorage.endThreadTransaction();
@@ -134,8 +136,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_WRITE_TRANSACTION);
 		try {
                     result = ((DatabaseRoot) myStorage.getRoot()).remove(aDOI);
-		} catch (AssertionError details) {
-                    LOG.error("Assertion Error: ", details);
+		} catch (AssertionError error) {
+                    LOG.error("Assertion Error removing DOI: " + aDOI, error);
                 } catch (Exception ex) {
                     LOG.error("Unable to remove DOI: ", ex);
 		} finally {
@@ -153,6 +155,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     doi = ((DatabaseRoot) myStorage.getRoot()).getByDOI(aDOIKey);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error getting DOI by key: " + aDOIKey, error);
                 } catch (Exception ex) {
                     LOG.error("Unable to get DOI by key " + aDOIKey, ex);
                 } finally {
@@ -166,6 +170,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     dois =((DatabaseRoot) myStorage.getRoot()).getByURL(aURLKey);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error getting DOI by URL: " + aURLKey, error);
                 } catch (Exception ex) {
                     LOG.error("Unable to get DOIs by URL" + aURLKey, ex);
                 } finally {
@@ -179,6 +185,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     dois = ((DatabaseRoot) myStorage.getRoot()).getAll();
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error getting all DOIs", error);
                 } catch (Exception ex) {
                     LOG.error("Unable to get all DOIs", ex);
                 } finally {
@@ -205,8 +213,10 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     found = ((DatabaseRoot) myStorage.getRoot()).contains(aDOI);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error finding DOI: " + aDOI, error);
                 } catch (Exception ex) {
-                    LOG.error("Exception finding DOI:" + aDOI.toString(), ex);
+                    LOG.error("Exception finding DOI:" + aDOI, ex);
                 } finally {
                     myStorage.endThreadTransaction();
                 }
@@ -217,6 +227,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     ((DatabaseRoot) myStorage.getRoot()).dumpTo(aFileWriter);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error dumping DOIs to file", error);
                 } catch (Exception ex) {
                     LOG.error("Unable to dump DOIs to file", ex);
                 } finally {
@@ -228,6 +240,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     ((DatabaseRoot) myStorage.getRoot()).dump(aOut);
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error dumping DOIs to output stream", error);
                 } catch (Exception ex) {
                     LOG.error("Unable to dump DOIs to output stream", ex);
                 } finally {
@@ -241,6 +255,8 @@ public class DOIDatabase implements org.springframework.beans.factory.Initializi
 		myStorage.beginThreadTransaction(Storage.READ_ONLY_TRANSACTION);
                 try {
                     size = ((DatabaseRoot) myStorage.getRoot()).size();
+                } catch (AssertionError error) {
+                    LOG.error("Assertion Error getting size of DOI Databse", error);
                 } catch (Exception ex) {
                     LOG.error("Unable to get size of DOI Database", ex);
                 } finally {

@@ -70,6 +70,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_MANU_HELP = message("xmlui.submit.publication.journal.manu.help");
     private static final Message T_SELECT_LABEL_NEW = message("xmlui.submit.publication.journal.select.label.new");
     private static final Message T_MANU_LABEL_NEW = message("xmlui.submit.publication.journal.manu.label.new");
+    private static final Message T_MANU_LABEL_REVIEW = message("xmlui.submit.publication.journal.manu.label.review");
 
     private static final Message T_PUB_MANU_ERROR = message("xmlui.submit.select.pub.form.manu_error");
 
@@ -276,7 +277,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
                 manuText.setValue(manuscriptNumber);
         }
 
-        manuText.setLabel(T_MANU_LABEL_NEW);
+        manuText.setLabel(T_MANU_LABEL_REVIEW);
 
         // Add an error message in case manuscript number is invalid
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_JOURNAL){
