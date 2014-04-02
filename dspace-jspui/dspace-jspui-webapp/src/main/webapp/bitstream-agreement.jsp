@@ -34,8 +34,6 @@
 
 <dspace:layout titlekey="jsp.agreement.title"  navbar="off"  locbar="nolink">
 
-    <h1><fmt:message key="jsp.agreement.title"/></h1>
-
 <% if (agreementText != null) { %>
     <p>  <%= agreementText %> </p>
 

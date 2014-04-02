@@ -99,12 +99,6 @@
             out.println(" <span class=\"communityStrength\">[" + ic.getCount(c) + "]</span>");
         }
 
-
-//Supress display of subcommunities under the "Senior Theses" community.  -- Mark Ratliff
-
-if (!c.getMetadata("name").equals("Senior Theses"))
-{
-
         // Get the collections in this community
         Collection[] cols = c.getCollections();
         if (cols.length > 0)
@@ -135,7 +129,7 @@ if (!c.getMetadata("name").equals("Senior Theses"))
             }
             out.println("</ul>"); 
         }
-}
+
         out.println("<br />");
         out.println("</li>");
     }

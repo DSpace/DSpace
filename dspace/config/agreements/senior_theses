@@ -1,67 +1,18 @@
+<h2> Terms and Conditions for Using Princeton University Senior Theses  </h2>
 
 <p>
-Published software should be <a href="/philosophy/free-sw.html">free
-software</a>.  To make it free software, you need to release it
-under a free software license.  We normally use the <a
-href="#GPL">GNU General Public License</a> (GNU GPL),
-but occasionally we use <a href="/licenses/license-list.html#SoftwareLicenses">other
-free software licenses</a>.  We use only licenses that are compatible
-with the GNU GPL for GNU software.
+The Princeton University Senior Theses DataSpace community is a catalog of theses written by seniors at Princeton
+University from 1926 to the present.  Senior theses submitted from 2013 forward contain a full-text PDF that
+is accessible only on the Princeton University network.  Theses written prior to 2013 are available by visiting the
+Princeton University Archives at the Mudd Manuscript Library.
+Email  <a href:'mailto:mudd@princeton.edu'> mudd@princeton.edu</a>  with any questions.
+</p> <p>
+Most theses are protected by copyright.
+The copyright law of the United States governs the making of photocopies or other reproductions of material under copyright.
+Under certain conditions specified in the law, libraries and archives are authorized to furnish a photocopy or other reproduction.
+These reproductions of copyrighted material must be for educational and/or research purposes consistent with
+“fair use” as defined by 17 U.S.C. 107.  A photocopy or other reproduction provided by a library is not to be
+“used for any purpose other than private study, scholarship or research.”  If a user makes a request for, or later uses,
+a photocopy or other reproduction for purposes in excess of “fair use,” that individual may be liable for copyright infringement.
 </p>
-
-<p>
-Documentation for free software should be
-<a href="/philosophy/free-doc.html">free documentation</a>, so that
-people can redistribute it and improve it along with the software
-it describes.  To make it free documentation, you need to release
-it under a free documentation license.  We normally use the
-<a href="#FDL">GNU Free Documentation License</a> (GNU
-FDL), but occasionally we use
-<a href="/licenses/license-list.html#DocumentationLicenses">other free
-documentation licenses</a>.
-</p>
-
-<p>If you've started a new project and you're not sure what license to
-use, <a href="/licenses/license-recommendations.html">&ldquo;How to
-choose a license for your own work&rdquo;</a> details our
-recommendations in an easy-to-follow guide.  If you just want a quick
-list reference, we have a page that names
-our <a href="/licenses/recommended-copylefts.html">recommended
-copyleft licenses</a>.</p>
-
-<p>We also have a page that discusses <a href="/philosophy/bsd.html">the BSD License Problem</a>.</p>
-
-<p>
-Our documentation licenses are currently being revised, and we welcome
-your comments on the proposed texts. Please
-visit <a href="http://gplv3.fsf.org">our license update site</a> to
-read the current drafts and participate in the process.
-</p>
-
-<h3>Common Resources for our Software Licenses</h3>
-
-<p>We have a number of resources to help people understand and use our
-various licenses:</p>
-
-<ul>
-
-  <li><a href="/licenses/gpl-faq.html">Frequently Asked
-  Questions about the GNU licenses</a></li>
-  <li><a href="/licenses/gpl-howto.html">How to use GNU licenses for your
-  own software</a></li>
-  <li><a href="/licenses/gpl-violation.html">What to do if you see a
-  violation of a GNU license</a></li>
-  <li><a href="/licenses/license-list.html">List of Free Software Licenses</a></li>
-  <li><a href="/philosophy/university.html">Releasing Free Software if
-  you work at a university</a></li>
-  <li><a href="/licenses/why-assign.html">Why the FSF gets copyright
-  assignments from contributors</a></li>
-  <li><a href="/graphics/license-logos.html">GNU license logos</a> to use
-  with your project</li>
-  <li><a href="http://www.fsf.org/licensing">The FSF Licensing &amp; Compliance Lab</a></li>
-  <li><a
-href="/licenses/license-list.html#LicensingEmailAddress">&lt;licensing@fsf.org&gt;</a> for general licensing help
-  </li>
-
-</ul>
 
