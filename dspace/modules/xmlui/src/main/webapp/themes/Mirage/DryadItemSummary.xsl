@@ -2460,6 +2460,42 @@
                          alt="PLOS Pathogens logo"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Proceedings of the Royal Society B"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://rspb.royalsocietypublishing.org')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ProceedingsB.png"
+                         alt="Proceedings of the Royal Society B cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Scientific Data"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.nature.com/scientificdata/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ScientificData.png"
+                         alt="Scientific Data cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Subterranean Biology"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
