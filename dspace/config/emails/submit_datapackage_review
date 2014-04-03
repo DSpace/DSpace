@@ -25,6 +25,17 @@ Thank you for submitting your data package to Dryad for journal review.  Dryad h
 Journal editors and anonymous peer reviewers may view the submission for review purposes using the following url:
 {4}
 
+Should you need to modify your data package while it is in review, you may access it at https://datadryad.org/submissions.
+The actions you can perform while a submission is in review are limited. Dryad does not allow files to be deleted 
+while an article is under review. We only allow additions during this time. This restriction ensures that all reviewers
+see the files that were originally submitted.
+
+To add new or corrected files, log into your Dryad account and click on the "My Submissions" link in the menu. 
+Select the appropriate data package. At the bottom of the page for this package, you will see a button 
+"Add new data file". After you have finished adding data files, please email help@datadryad.org to indicate which files
+should be retained during the final curation process. Once your article has been accepted for publication, the Dryad 
+curators will remove duplicate or superseded files.
+
 Many thanks!
 
 The Dryad Team

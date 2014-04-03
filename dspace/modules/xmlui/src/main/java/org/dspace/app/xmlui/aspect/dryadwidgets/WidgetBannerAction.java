@@ -32,7 +32,7 @@ public class WidgetBannerAction extends WidgetBannerLookup implements Action {
         try {
             packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
-            log.error("Error looking up article DOI:", ex);
+            log.error("Error looking up article identifier:", ex);
         }
         if(packageDOI == null) {
             throw new ResourceNotFoundException("No data package was found for pubId:" + pubId);

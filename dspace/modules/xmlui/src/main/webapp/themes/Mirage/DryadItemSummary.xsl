@@ -2058,12 +2058,12 @@
                                     select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="string('http://openpublichealthdata.metajnl.com/')"/>
+                                <xsl:value-of select="string('http://openhealthdata.metajnl.com/')"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/jophdCover.png"
-                        alt="Journal pf Open Public Health Data cover"/>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
+                        alt="Open Health Data cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Paleontology"'>
@@ -2189,6 +2189,23 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/neobiota.png"
                          alt="NeoBiota cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Open Health Data"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://openhealthdata.metajnl.com/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/OHD_Logo.png"
+                        alt="Open Health Data cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Paleobiology"'>
