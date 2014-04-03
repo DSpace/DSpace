@@ -345,23 +345,23 @@
   }
   .row-offcanvas-right
   .sidebar-offcanvas {
-    right: -41.6%;
+    right: -66.6%;
   }
 
   .row-offcanvas-left
   .sidebar-offcanvas {
-    left: -41.6%;
+    left: -66.6%;
   }
   .row-offcanvas-right.active {
-    right: 41.6%;
+    right: 66.6%;
   }
   .row-offcanvas-left.active {
-    left: 41.6%;
+    left: 66.6%;
   }
   .sidebar-offcanvas {
     position: absolute;
     top: 0;
-    width: 41.6%;
+    width: 66.6%;
   }
 }
 
@@ -376,7 +376,7 @@
     background:@gray-lighter;
 }
 
-.browse_range{
+.browse-range{
     .center-block();
 }
 
@@ -389,6 +389,19 @@
     font-size:@font-size-h4;
     margin-top: (@line-height-computed / 2);
     margin-bottom: (@line-height-computed / 2);
+}
+
+.dc-type-icon,
+.dc-type-link{
+    .center-block();
+    text-align:center;
+}
+
+.dc-type-icon{
+    font-size:ceil((@font-size-base * 3));
+}
+.dc-type-icon:hover{
+    text-decoration:none;
 }
 
 .home-browse-panel{
@@ -407,7 +420,12 @@
 }
 
 .rss-link{
-   margin-top:10px; 
+   margin-bottom:10px; 
+}
+
+.row-browse-result{
+    background-color:@gray-lighter;
+    margin-bottom:5px;
 }
 
 .simple-search{
@@ -426,7 +444,7 @@
     background:
     radial-gradient(ellipse at 25% 100%, transparent 23%, rgba(255,255,255,0.1) 24%, rgba(255,255,255,0.1) 24%, transparent 24%, transparent) 0 50px,
     radial-gradient(ellipse at 25% 0, transparent 23%, rgba(255,255,255,0.1) 24%, rgba(255,255,255,0.1) 24%, transparent 24%, transparent) 200px 50px;
-    background-color: @gray-darker;
+    background-color: @white;
     background-size: 400px 50px;
     /*    background: 
     radial-gradient(circle at 100% 50%, transparent 20%, rgba(255,255,255,.3) 21%, rgba(255,255,255,.3) 34%, transparent 35%, transparent),

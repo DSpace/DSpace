@@ -27,7 +27,8 @@
     if (sidebar != null) {
 %>
                 </div>
-                <div class="col-md-3 col-sm-6 col-xs-6 sidebar-section sidebar-offcanvas">
+                <div class="col-md-3 col-sm-3 col-xs-8 sidebar-section sidebar-offcanvas">
+                <!--<div class="col-md-3 col-sm-3 col-xs-6">-->
                     <%= sidebar%>
                 </div>
            </div>       
