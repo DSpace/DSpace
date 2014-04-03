@@ -35,7 +35,7 @@ Scott Phillips adapted it for Manakin's need.
   <xsl:param name="pageTitle">An error has occurred</xsl:param>
 
   <!-- let sitemap override default context path -->
-  <xsl:param name="contextPath">/</xsl:param>
+  <xsl:param name="contextPath"></xsl:param>
 
   <xsl:template match="ex:exception-report">
     <html>
@@ -85,7 +85,7 @@ Scott Phillips adapted it for Manakin's need.
 
         <h1><xsl:value-of select="$pageTitle"/></h1>
         <p class="home">
-          <a><xsl:attribute name="href"><xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></a>
+          <a><xsl:attribute name="href"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></a>
         </p>
         <p class="message">
           <xsl:value-of select="@class"/>:

@@ -61,7 +61,7 @@ Created by Tim Donohue
           <metadata element="contextPath"><xsl:value-of select="$contextPath"/></metadata>
           <metadata element="title"><xsl:value-of select="$pageTitle"/></metadata>
           <trail>
-            <xsl:attribute name="target"><xsl:value-of select="$contextPath"/></xsl:attribute>
+            <xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute>
             <i18n:text>xmlui.general.dspace_home</i18n:text>
           </trail>
         </pageMeta>
