@@ -1106,8 +1106,20 @@
 				<stored-value></stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Objeto de aprendizaje</displayed-value>
-				<stored-value>Objeto de aprendizaje</stored-value>
+				<displayed-value>Clase</displayed-value>
+				<stored-value>Clase</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Trabajo práctico</displayed-value>
+				<stored-value>Trabajo practico</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Material complementario</displayed-value>
+				<stored-value>Material complementario</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Programa</displayed-value>
+				<stored-value>Programa</stored-value>
 			</pair>
 		</value-pairs>
 
