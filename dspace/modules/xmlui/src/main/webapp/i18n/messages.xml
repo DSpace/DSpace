@@ -355,7 +355,7 @@
 			underlying the scholarly literature.</p>
 	</message>
 	<message key="xmlui.Site.stats">As of {0}, Dryad contains <span class="bold">{1} data
-			packages</span> and <span class="bold">{2} data files</span>, associated with articles in <span class="bold"
+			packages</span> and <span class="bold">{2} data files</span>, associated with publications in <span class="bold"
 			>{3} journals</span>.</message>
 	<message key="xmlui.Site.blogfeed.title">News and Views <a href="http://blog.datadryad.org/feed/"><img class="feed-icon" src="/themes/Mirage/images/dryad_rss_icon.png" alt="RSS feed - News and Views" /></a></message>
 
@@ -421,11 +421,10 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource">At the request of the author,
 		this item is embargoed until </message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource.publication">At the request of
-		the author, this item is embargoed until the associated article is
-		published.</message>
+	the author, this item is embargoed until the associated publication appears.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource.custom">At the request of
 		the author, this item is embargoed. The journal editor has set a custom
-	  embargo length. Once the associated article is published, the exact release date of the embargo will be shown here.</message>
+	embargo length. Once the associated publication appears, the exact release date of the embargo will be shown here.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource.oneyear">At the request of the
 		author, this item is embargoed until one year after the associated article is
 		published.</message>
@@ -1044,7 +1043,7 @@
 
   <message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.head">Perform task: Exit Publication Blackout</message>
 	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_help">This item is currently 
-	in Publication Blackout.  Once the associated article has been published, select 'Approve - Exit Blackout' to move the
+	in Publication Blackout.  Once the associated publication appears, select 'Approve - Exit Blackout' to move the
 	item out of Publication Blackout and into the Archive</message>
 	<message key="xmlui.Submission.workflow.AfterPublicationActionXMLUI.after_blackout_submit">Approve - Exit Blackout</message>
 
@@ -3092,9 +3091,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.DryadItemSummary.description">Description</message>
 	<message key="xmlui.DryadItemSummary.abstract">Abstract</message>
 	<message key="xmlui.DryadItemSummary.containedInPackage">Contained in Data Package</message>
-	<message key="xmlui.DryadItemSummary.whenUsing">When using this data, please cite the original article:</message>
-	<message key="xmlui.DryadItemSummary.citationNotYet1">Citation is not yet available for this article from </message>
-	<message key="xmlui.DryadItemSummary.citationNotYet2"> It will become available shortly after the article is published.</message>
+	<message key="xmlui.DryadItemSummary.whenUsing">When using this data, please cite the original publication:</message>
+	<message key="xmlui.DryadItemSummary.citationNotYet1">Citation is not yet available for this publication from </message>
+	<message key="xmlui.DryadItemSummary.citationNotYet2"> It will become available shortly after the publication appears.</message>
 	<message key="xmlui.DryadItemSummary.citationNotYet">Citation not yet available.</message>
 	<message key="xmlui.DryadItemSummary.pleaseCite">Additionally, please cite the Dryad data package: </message>
 	<message key="xmlui.DryadItemSummary.dataFrom">Data from: </message>
@@ -3120,7 +3119,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.DryadItemSummary.views">Pageviews</message>
     <message key="xmlui.Submission.Submissions.claimAction">Awaiting curator review</message>
     <message key="xmlui.DryadItemSummary.withdrawn">The current Item is withdrawn</message>
-    <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated article is in review </message>
+    <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated publication is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
     <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
     <message key="xmlui.DryadItemSummary.charge">Payment Charge</message>
@@ -3153,13 +3152,13 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item">You do not have the credentials to access the item <b>{0}</b>.</message>
 
 
-    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.head">Content restricted ahead of article publication.</message>
+    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.head">Content restricted ahead of publication.</message>
     <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.body"> The
-                                        article associated with this Dryad data package has not yet been
-                                        published and the journal has not agreed that Dryad may post the
-                                        article details ahead of publication. If you think this is an error,
+                                        publication associated with this Dryad data package has not yet been
+                                        published and the publisher has not agreed that Dryad may post
+                                        details ahead of publication. If you think this is an error,
                                         please let us know by filling out the form below. Thanks!</message>
-    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.help">Please provide a link to the article if it is published online, or provide a description of where the article has been published.</message>
+    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.help">Please provide a link to the publication.</message>
     <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.status">The Item is in workflow stage.</message>
 
 
@@ -3301,8 +3300,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In preparation or in review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
-    <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my article. It was published in the journal:</message>
-    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select Your Article Status</span><br/></message>
+    <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
+    <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.  
     <strong>Did you receive an email from your journal with a link to Dryad?  Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 
@@ -3315,7 +3314,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.publication.journal.manu.acc.asterisk_explanation"></message>
 
      <message key="xmlui.submit.publication.journal.manu.help">example: 12345678MEC-11-1234.R1</message>
-     <message key="xmlui.submit.publication.enter_article_doi">Enter article DOI or PubMed ID</message>
+     <message key="xmlui.submit.publication.enter_article_doi">Enter publication's DOI or PubMed ID</message>
 
      <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
      <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
