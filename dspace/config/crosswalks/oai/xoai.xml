@@ -165,7 +165,7 @@
             <Prefix>junii2</Prefix>
             <XSLT>metadataFormats/junii2.xsl</XSLT>
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
-            <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3_0.xsd</SchemaLocation>
+            <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
     </Formats>
 
