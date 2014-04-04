@@ -3093,7 +3093,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.DryadItemSummary.containedInPackage">Contained in Data Package</message>
 	<message key="xmlui.DryadItemSummary.whenUsing">When using this data, please cite the original publication:</message>
 	<message key="xmlui.DryadItemSummary.citationNotYet1">Citation is not yet available for this publication from </message>
-	<message key="xmlui.DryadItemSummary.citationNotYet2"> It will become available shortly after the pubblication appears.</message>
+	<message key="xmlui.DryadItemSummary.citationNotYet2"> It will become available shortly after the publication appears.</message>
 	<message key="xmlui.DryadItemSummary.citationNotYet">Citation not yet available.</message>
 	<message key="xmlui.DryadItemSummary.pleaseCite">Additionally, please cite the Dryad data package: </message>
 	<message key="xmlui.DryadItemSummary.dataFrom">Data from: </message>
