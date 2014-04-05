@@ -195,6 +195,30 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+  
+  <tag>
+    <name>item-video-preview</name>
+    <tagclass>org.dspace.app.webui.jsptag.ItemVideoPreviewTag</tagclass>
+    <info>
+      Tag for displaying an item preview video.  "item" must always be an
+      org.dspace.content.Item
+    </info>
+    <attribute>
+      <name>item</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>title</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>player</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
 
   <tag>
     <name>itemlist</name>

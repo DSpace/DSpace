@@ -20,6 +20,7 @@
 
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
+    String itemVideoPreview = (String)request.getAttribute("item.video.preview.script");
 %>
 
 <%-- Right-hand side bar if appropriate --%>
@@ -63,8 +64,16 @@
         <script type='text/javascript' src='<%= request.getContextPath()%>/static/js/holder.js'></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/utils.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/choice-support.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/jplayer/jquery.jplayer.min.js"></script>
         
         <!-- Custom scripsts -->
         <script src="<%= request.getContextPath() %>/static/js/app.js"></script>
+<% 
+    if (itemVideoPreview!=null ){
+%>
+        <%= itemVideoPreview %>
+<%
+    }
+%>
     </body>
 </html>

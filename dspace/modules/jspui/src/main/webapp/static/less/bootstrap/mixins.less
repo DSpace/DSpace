@@ -360,7 +360,7 @@
 //
 // Short retina mixin for setting background-image and -size
 
-.img-retina(@file-1x; @file-2x; @width-1x; @height-1x) {
+.img-retina(@file-1x; @file-2x; @width-1x:auto; @height-1x:auto) {
   background-image: url("@{file-1x}");
 
   @media

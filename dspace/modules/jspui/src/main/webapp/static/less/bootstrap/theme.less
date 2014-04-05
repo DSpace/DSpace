@@ -5,6 +5,7 @@
 
 @import "variables.less";
 @import "mixins.less";
+@import "../jplayer/jplayer.blue.monday.less";
 
 //
 // Containers
@@ -411,6 +412,12 @@
 .home-discovery-panel{
     border-radius: @border-radius-base;
     background-color: @well-bg;
+}
+.item-video-jplayer{
+    margin-bottom: 10px;
+}
+.patrimonial-item{
+    .img-retina(@file-1x: '../../../image/manzanasaber.png'; @file-2x: '../../../image/manzanasaber@2x.png');
 }
 
 .recent-submission{
