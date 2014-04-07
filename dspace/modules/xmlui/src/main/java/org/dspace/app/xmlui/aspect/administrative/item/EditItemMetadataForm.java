@@ -296,6 +296,15 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
 
                 main.addHidden("administrative-continue").setValue(knot.getId());
+
+                // Handle submit by clicking "Propagate" button
+                String propagateMetadataFieldName = request.getParameter("propagate_md_field_name");
+                if(propagateMetadataFieldName != null) {
+                    // User clicked "Propagate" button and not "Update" button
+                    main.addHidden("propagate_show_popup").setValue("1");
+                    main.addHidden("propagate_md_field").setValue(propagateMetadataFieldName);
+                    // Client-side javascript will take care of opening the window
+                }
         }
 
 
