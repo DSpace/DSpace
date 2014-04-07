@@ -643,7 +643,7 @@ function DryadEditMetadataAndPropagate(metadataFieldName) {
   // adds a hidden input field, like
   // <input type="hidden" name="metadata_field_name" value="dc.author">
   // before submitting the form
-  var hiddenElement = jQuery('<input type="hidden" name="metadata_field_name">');
+  var hiddenElement = jQuery('<input type="hidden" name="propagate_md_field_name">');
   hiddenElement.attr('value',metadataFieldName);
   jQuery('form').append(hiddenElement);
   // must click the submit_update button for administrative.js to interpret as editing
