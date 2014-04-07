@@ -648,7 +648,7 @@ function DryadEditMetadataAndPropagate(metadataFieldName) {
   jQuery('#form').append(hiddenElement).submit();
 }
 
-function DryadPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
+function DryadShowPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
   var link = serverUrl + '?metadata_field_name=' + metadataFieldName + '&package_doi=' + packageDoi;
 
   var width = 680;
