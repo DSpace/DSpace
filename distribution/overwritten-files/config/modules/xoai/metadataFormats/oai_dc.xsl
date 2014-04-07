@@ -116,7 +116,7 @@
 			
 			<!--  dc.coverage.(spatial|temporal) -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:covarage><xsl:value-of select="." /></dc:covarage>
+				<dc:coverage><xsl:value-of select="." /></dc:coverage>
 			</xsl:for-each>
 			
 			<!--dc.language = language -->
