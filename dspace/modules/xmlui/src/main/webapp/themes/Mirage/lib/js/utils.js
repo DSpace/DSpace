@@ -639,7 +639,7 @@ function getUploadFileSize(fileInputElement) {
 //}
 /////// END TESTING PROGRESS BAR /////////////////
 
-function DryadAddHiddenFieldsForPropagateMetadata(metadataFieldName) {
+function DryadEditMetadataAndPropagate(metadataFieldName) {
   // adds a hidden input field, like
   // <input type="hidden" name="metadata_field_name" value="dc.author">
   // before submitting the form

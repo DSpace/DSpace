@@ -410,7 +410,7 @@ on names with last name first (comma delimited). -->
           <xsl:text>Propagate</xsl:text>
         </xsl:attribute>
         <xsl:attribute name="onClick">
-          <xsl:text>javascript:DryadAddHiddenFieldsForPropagateMetadata('</xsl:text>
+          <xsl:text>javascript:DryadEditMetadataAndPropagate('</xsl:text>
           <!-- Metadata Field -->
           <xsl:value-of select="$metadataFieldName"/>
           <xsl:text>');</xsl:text>
