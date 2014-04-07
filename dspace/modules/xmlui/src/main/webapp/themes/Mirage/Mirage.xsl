@@ -1306,7 +1306,16 @@ parameter that is being used (see variable defined above) -->
       <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
       <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
       <xsl:if test="count($fileDois) > 0">
-        <!-- render javascript call here -->
+        <script>
+          <xsl:attribute name="type"><xsl:text>text/javascript</xsl:text></xsl:attribute>
+          <xsl:text>runAfterJSImports.add( function() { DryadShowPropagateMetadata('</xsl:text>
+          <xsl:value-of select="concat($context-path,'/admin/item/propagate-metadata')" />
+          <xsl:text>','</xsl:text>
+          <xsl:value-of select="$metadataFieldName" />
+          <xsl:text>','</xsl:text>
+          <xsl:value-of select="$packageDoi" />
+          <xsl:text>'); } );</xsl:text>
+        </script>
       </xsl:if>
     </xsl:if>
   </xsl:template>
