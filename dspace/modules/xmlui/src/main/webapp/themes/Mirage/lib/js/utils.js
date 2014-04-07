@@ -645,7 +645,9 @@ function DryadEditMetadataAndPropagate(metadataFieldName) {
   // before submitting the form
   var hiddenElement = jQuery('<input type="hidden" name="metadata_field_name">');
   hiddenElement.attr('value',metadataFieldName);
-  jQuery('#form').append(hiddenElement).submit();
+  jQuery('form').append(hiddenElement);
+  // must click the submit_update button for administrative.js to interpret as editing
+  jQuery('form input[name="submit_update"]:first').click();
 }
 
 function DryadShowPropagateMetadata(serverUrl, metadataFieldName, packageDoi) {
