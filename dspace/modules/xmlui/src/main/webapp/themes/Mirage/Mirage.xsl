@@ -1298,4 +1298,16 @@ parameter that is being used (see variable defined above) -->
         </a>
     </xsl:template>
 
+  <xsl:template match="dri:p[@rend='edit-metadata-actions bottom']">
+    <xsl:apply-templates />
+    <xsl:variable name="propagateShowPopup" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
+    <xsl:if test="$propagateShowPopup = '1'">
+      <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+      <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+      <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
+      <xsl:if test="count($fileDois) > 0">
+        <!-- render javascript call here -->
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
 </xsl:stylesheet>
