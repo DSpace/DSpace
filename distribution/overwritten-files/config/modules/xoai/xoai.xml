@@ -88,9 +88,11 @@
 			<Filter refid="titleexistsFilter" />
 			
 			<!-- Regla 5 -->
-			<Filter refid="authorexistsFilter"/>
+			<Filter refid="authorexistsFilter"/> <!-- OK -->
 			
-			<Filter refid="formatExistsFilter"/>
+<!-- 			<Filter refid="formatExistsFilter"/> -->
+			
+			<Filter refid="existsBundleOriginalFilter"/>
 			
 			<Filter refid="snrddocumentsubtypeFilter"/>
 			
@@ -208,11 +210,16 @@
 		</Filter>
 		
 		<!-- ¿Exists bitstreams associated to the item? -->
-		<Filter id="formatExistsFilter">
-			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-			<Parameter key="field">
-				<Value>dc.format.mimetype</Value>
-			</Parameter>
+		<!-- No usar este filtro. Utilizar el DspaceExistsBundleOriginalFilter en su lugar. -->
+<!-- 		<Filter id="formatExistsFilter"> -->
+<!-- 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class> -->
+<!-- 			<Parameter key="field"> -->
+<!-- 				<Value>dc.format.mimetype</Value> -->
+<!-- 			</Parameter> -->
+<!-- 		</Filter> -->
+		
+		<Filter id="existsBundleOriginalFilter">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DspaceExistsBundleOriginalFilter</Class>
 		</Filter>
 		
 		<Filter id="identifierExistsFilter">
