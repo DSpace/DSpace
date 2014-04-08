@@ -26,13 +26,9 @@ import java.sql.SQLException;
 
 
 /**
- *  This action completes the final payment if the shopping cart has a valid
- *  transaction id present. In the event htat the transaction should fail, this step will
- *  forward the user to the ReAuthorizationPayment step, which will provide them with
- *  an opportunity to initiate a new payment.
+ *  Final action to complete the workflow transaction details for shopping cart
  *
  * @author Mark Diggory, mdiggory at atmire.com
- * @author Fabio Bolognesi, fabio at atmire.com
  * @author Lantian Gai, lantian at atmire.com
  */
 public class CompletePaymentAction extends ProcessingAction {
