@@ -392,6 +392,7 @@ public class ItemTag extends TagSupport
             configLine = defaultFields;
         }
 
+        out.println("<div class=\"well item-metadata-display\">");
         out.println("<table class=\"table itemDisplayTable\">");
 
         /*
@@ -435,8 +436,8 @@ public class ItemTag extends TagSupport
             {
                 isDate = style.contains("date");
                 isLink = style.contains("link");
-				isNoBreakLine = style.contains("nobreakline");
-				isDisplay = style.equals("inputform");
+                isNoBreakLine = style.contains("nobreakline");
+		isDisplay = style.equals("inputform");
                 isResolver = style.contains("resolver") || urn2baseurl.keySet().contains(style);
                 field = field.replaceAll("\\("+style+"\\)", "");
             } 
@@ -467,7 +468,7 @@ public class ItemTag extends TagSupport
             
             if (values.length > 0)
             {
-                out.print("<tr><td class=\"metadataFieldLabel\">");
+                out.print("<tr><td class=\"metadata-field-label\">");
 
                 String label = null;
                 try
@@ -485,7 +486,7 @@ public class ItemTag extends TagSupport
                 }
                 
                 out.print(label);
-                out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
+                out.print(":</td><td class=\"metadata-field-value\">");
                 
                 //If the values are in controlled vocabulary and the display value should be shown
                 if (isDisplay){
@@ -530,8 +531,16 @@ public class ItemTag extends TagSupport
 
                         if (isLink)
                         {
+                            String value = values[j].value;
+                            if (value.startsWith("http://")
+                                    || value.startsWith("https://")
+                                    || value.startsWith("ftp://")
+                                    || value.startsWith("ftps://"))
+                            {
+                                // It is already a URL, so print as
                             out.print("<a href=\"" + values[j].value + "\">"
                                     + Utils.addEntities(values[j].value) + "</a>");
+                            }
                         }
                         else if (isDate)
                         {
@@ -624,7 +633,8 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table><br/>");
+        out.println("</table>");
+        out.println("</div>");
 
         listBitstreams();
 
@@ -827,7 +837,7 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table class=\"table panel-body\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table class=\"table panel-body item-files\"><tr><th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
