@@ -27,6 +27,13 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<%-- damanzano: It was added to enable internationalization on all pages --%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="javax.servlet.jsp.jstl.core.*" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 <%
 	// Is anyone logged in?
 	EPerson user = (EPerson) request.getAttribute("dspace.current.user");
@@ -54,7 +61,9 @@
            <span class="icon-bar"></span>
            <span class="icon-bar"></span>
          </button>
-         <a class="navbar-brand" href="<%= request.getContextPath() %>/"><img height="25px" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" /></a>
+         <a class="navbar-brand" href="<%= request.getContextPath() %>/">
+             <img height="40px" src="<%= request.getContextPath() %>/image/icesi-logo.svg" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
+         </a>
        </div>
        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
          <ul class="nav navbar-nav">
@@ -98,24 +107,22 @@
           </li>          
           <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") %>"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup></li>
        </ul>
-       <div class="nav navbar-nav navbar-right">
-		<ul class="nav navbar-nav navbar-right">
-         <li class="dropdown">
+              <ul class="nav navbar-nav navbar-right">
+                  <li class="dropdown">
 
-		<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
-		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20) %></fmt:param>
-		  </fmt:message> <b class="caret"></b></a>
-		<ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
+                          <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20)%></fmt:param>
+                      </fmt:message> <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                      <li><a href="<%= request.getContextPath()%>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
+                      <li><a href="<%= request.getContextPath()%>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
+                      <li><a href="<%= request.getContextPath()%>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
 
-		
-		<li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
-		
-        </ul>
-       </li>
-    </ul>
+
+                      <li><a href="<%= request.getContextPath()%>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
+
+                  </ul>
+              </li>
+          </ul>
           
-	</div>
 </nav>

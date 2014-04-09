@@ -56,12 +56,16 @@
 
 
        <div class="navbar-header">
-         <a class="navbar-brand" href="<%= request.getContextPath() %>/"><img height="25px" src="<%= request.getContextPath() %>/image/dspace-logo-only.png" /></a>
+         <a class="navbar-brand" href="<%= request.getContextPath() %>/">
+             <img height="40px" src="<%= request.getContextPath() %>/image/icesi-logo.svg" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
+         </a>
        </div>
+         
+       <!-- navbar collapsible browse content -->
        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-       <div class="nav navbar-nav navbar-right">
-		<ul class="nav navbar-nav navbar-right">
-         <li class="dropdown">
+            
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
          <%
     if (user != null)
     {
@@ -72,28 +76,26 @@
 		<%
     } else {
 		%>
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
 	<% } %>             
-             <ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
+                        <ul class="dropdown-menu">
+                            <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
+                            <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
+                            <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
 
 		<%
 		  if (isAdmin)
 		  {
 		%>
 			   <li class="divider"></li>  
-               <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
+                            <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
 		<%
 		  }
 		  if (user != null) {
 		%>
-		<li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
+                            <li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
 		<% } %>
-             </ul>
-           </li>
-          </ul>
-          
-	</div>
-    </nav>
+                        </ul>
+                    </li>
+                </ul>
+        </nav>

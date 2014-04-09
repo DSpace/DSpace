@@ -13,7 +13,7 @@ ol.breadcrumb li a {color: #428bca; font-weight: bold; font-style: normal;}
 /*body.undernavigation {overflow-x: hidden; padding-top: 65px;}*/
 #content {padding-bottom:60px;}
 #designedby {padding: 5px;}
-#footer_feedback {padding-top: 12px;}
+#footer_feedback {}
 input[type="file"] {display: block;height: auto;}
 div.panel-primary div.panel-heading a {color: white;}
 /* This magic gets the 16x16 icon to show up.. setting height/width didn't

@@ -40,11 +40,20 @@
         </main>
 </div>
         <%-- Page footer --%>
-        <footer class="navbar navbar-inverse navbar-bottom">
+        <footer class="navbar navbar-default navbar-bottom">
+
+            <div class="icesi-university-info container text-center">
+                <p>
+                    Universidad Icesi, Calle 18 No. 122-135, Cali-Colombia Teléfono: +57 (2) 555 2334 | Fax: +57 (2) 555 1441 <br>
+                    Copyright © 2014 <a href="http://www.icesi.edu.co/" target="_blank">www.icesi.edu.co</a> - 
+                    <a title="Política de privacidad" href="/politica_privacidad.php">Política de privacidad</a> - 
+                    <a href="/politica_de_tratamiento_de_datos_personales.php">Política de tratamiento de datos personales</a>
+                </p>
+                <small>La Universidad Icesi es una Institución de Educación Superior que se encuentra sujeta a inspección y vigilancia por parte del Ministerio de Educación Nacional</small>
+            </div>
+
             <div id="designedby" class="container text-muted">
-                <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it"><img
-                        src="<%= request.getContextPath()%>/image/logo-cineca-small.png"
-                        alt="Logo CINECA" /></a>
+                <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it">Cineca</a>
                 <div id="footer_feedback" class="pull-right">                                    
                     <p class="text-muted"><fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
                         <a target="_blank" href="<%= request.getContextPath()%>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
