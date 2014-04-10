@@ -429,6 +429,7 @@
 	</div>
 	
     <%-- output the results using the browselist tag --%>
+    <div class="panel-body">
     <%
     	if (bix.isMetadataIndex())
     	{
@@ -449,6 +450,7 @@
 	<%
     	}
 	%>
+    </div>
 	<%-- give us the bottom report on what we are looking at --%>
 	<div class="panel-footer text-center">
 		<fmt:message key="browse.full.range">

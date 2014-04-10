@@ -458,7 +458,7 @@ else if( qResults != null)
 
 %>
 <hr/>
-<div class="discovery-result-pagination row container">
+<div class="discovery-result-pagination">
 <%
 	long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
 	        qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
@@ -544,15 +544,15 @@ else if( qResults != null)
 
 <% if (items.length > 0) { %>
     <div class="panel panel-info">
-    <div class="panel-heading"><fmt:message key="jsp.search.results.itemhits"/></div>
-    <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
+        <div class="panel-heading"><fmt:message key="jsp.search.results.itemhits"/></div>
+    <div class="panel-body"><dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" /></div>
     </div>
 <% } %>
 </div>
 <%-- if the result page is enought long... --%>
 <% if ((communities.length + collections.length + items.length) > 10) {%>
 <%-- show again the navigation info/links --%>
-<div class="discovery-result-pagination row container">
+<div class="discovery-result-pagination">
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>

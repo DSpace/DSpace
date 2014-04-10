@@ -21,6 +21,7 @@
 <%
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
     String itemVideoPreview = (String)request.getAttribute("item.video.preview.script");
+    String extraHeadDataLast = (String)request.getAttribute("dspace.layout.head.last");
 %>
 
 <%-- Right-hand side bar if appropriate --%>
@@ -81,6 +82,13 @@
     if (itemVideoPreview!=null ){
 %>
         <%= itemVideoPreview %>
+<%
+    }
+
+    if (extraHeadDataLast != null)
+    { 
+%>
+	<%= extraHeadDataLast %>
 <%
     }
 %>

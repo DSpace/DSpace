@@ -303,11 +303,11 @@ public class ItemListTag extends TagSupport
             }
             else
             {
-                out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
+                //out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
             }
 
             // Output the table headers
-            out.println("<tr>");
+            //out.println("<tr>");
 
             for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
             {
@@ -354,31 +354,32 @@ public class ItemListTag extends TagSupport
                 String message = "itemlist." + field;
 
                 // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
-                        + (emph[colIdx] ? "<strong>" : "")
-                        + LocaleSupport.getLocalizedMessage(pageContext, message)
-                        + (emph[colIdx] ? "</strong>" : "") + "</th>");
+                //out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                //        + (emph[colIdx] ? "<strong>" : "")
+                //        + LocaleSupport.getLocalizedMessage(pageContext, message)
+                //        + (emph[colIdx] ? "</strong>" : "") + "</th>");
             }
 
-            if (linkToEdit)
-            {
-                String id = "t" + Integer.toString(cOddOrEven.length + 1);
-                String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+            /* damanzano: Since our layout is not a table it does not need headers */
+//            if (linkToEdit)
+//            {
+//                String id = "t" + Integer.toString(cOddOrEven.length + 1);
+//                String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+//
+//                // output the header
+//                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+//                        + (emph[emph.length - 2] ? "<strong>" : "")
+//                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
+//                        + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
+//            }
 
-                // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
-                        + (emph[emph.length - 2] ? "<strong>" : "")
-                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
-                        + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
-            }
-
-            out.print("</tr>");
+            //out.print("</tr>");
 
             // now output each item row
             for (int i = 0; i < items.length; i++)
             {
                 // now prepare the XHTML frag for this division
-            	out.print("<tr>"); 
+            	//out.print("<tr>"); 
                 String rOddOrEven;
                 if (i == highlightRow)
                 {
@@ -389,6 +390,77 @@ public class ItemListTag extends TagSupport
                     rOddOrEven = ((i & 1) == 1 ? "odd" : "even");
                 }
 
+                /*  damanazno: using bootstrap row instead of table rows */
+                out.print("<div class=\"row row-browse-result row-"+rOddOrEven+"\">");
+                
+                /*  damanzano:
+                    In this results layout we are always going to show dc.type
+                    and dc.type.spa as an icon a its explanation so we hope any
+                    of the these two field to be presente in webui.itemlist.colums
+                */
+                //  Get the metatdata for both fields
+                DCValue[] typeMetadataArray;
+                DCValue[] typeSpaMetadataArray;
+                
+                typeMetadataArray = items[i].getMetadata("dc", "type", null, Item.ANY);
+                typeSpaMetadataArray = items[i].getMetadata("dc", "type", "spa", Item.ANY);
+                
+                //  Get crosslink for dc.type.spa
+                String typeSpaBrowseType = cl.getLinkType("dc.type.spa");
+                boolean typeSpaViewFull = BrowseIndex.getBrowseIndex(typeSpaBrowseType).isItemIndex();
+                
+                //  Preparing the output
+                StringBuffer sb1 = new StringBuffer();
+
+                String typeStartLink = "";
+                String typeEndLink = "";
+                if (!StringUtils.isEmpty(typeSpaBrowseType) && !disableCrossLinks) {
+                    String argument;
+                    String value;
+                    if (typeSpaMetadataArray[0].authority != null
+                            && typeSpaMetadataArray[0].confidence >= MetadataAuthorityManager.getManager()
+                            .getMinConfidence(typeSpaMetadataArray[0].schema, typeSpaMetadataArray[0].element, typeSpaMetadataArray[0].qualifier)) {
+                        argument = "authority";
+                        value = typeSpaMetadataArray[0].authority;
+                    } else {
+                        argument = "value";
+                        value = typeSpaMetadataArray[0].value;
+                    }
+                    if (typeSpaViewFull) {
+                        argument = "vfocus";
+                    }
+                    typeStartLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + typeSpaBrowseType + "&amp;"
+                            + argument + "=" + URLEncoder.encode(value, "UTF-8");
+
+                    if (typeSpaMetadataArray[0].language != null) {
+                        typeStartLink += "&amp;"
+                                + argument + "_lang=" + URLEncoder.encode(typeSpaMetadataArray[0].language, "UTF-8");
+                    }
+
+                    if ("authority".equals(argument)) {
+                        typeStartLink += "\" class=\"authority " + typeSpaBrowseType + "\">";
+                    } else {
+                        typeStartLink += "\">";
+                    }
+                    typeEndLink = "</a>";
+                }
+                String typeIcon="<span class=\"icesiicon dc-type-icon icesiicon-"+Utils.addEntities(typeMetadataArray[0].value)+"\"></span>";
+                sb1.append(typeStartLink);
+                sb1.append(typeIcon);
+                sb1.append(typeEndLink);
+                String typeLink="<span class=\"icesiicon dc-type-link\">"+Utils.addEntities(typeSpaMetadataArray[0].value)+"</span>";
+                sb1.append(typeStartLink);
+                sb1.append(typeLink);
+                sb1.append(typeEndLink);
+                
+                //  Always print the dc.type, dc.type.spa column 
+                out.print("<div class=\"col-md-2 col-sm-2 col-xs-2\">"+sb1.toString()+"</div>");
+                
+                /*  damanzano:
+                    Any other metadata fields present in webui.itemlist.colums
+                    will be include in a single column.
+                */
+                out.print("<div class=\"col-md-10 col-sm-10 col-xs-10\">");
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
                 {
                     String field = fieldArr[colIdx];
@@ -437,7 +509,11 @@ public class ItemListTag extends TagSupport
                     String metadata = "-";
                     if (field.equals("thumbnail"))
                     {
-                        metadata = getThumbMarkup(hrq, items[i]);
+                        /*  damanzano:
+                            We are not going to show thumnails in this layout
+                        */
+                        //metadata = getThumbMarkup(hrq, items[i]);
+                        metadata=null;
                     }
                     if (metadataArray.length > 0)
                     {
@@ -555,36 +631,54 @@ public class ItemListTag extends TagSupport
 
                     // prepare extra special layout requirements for dates
                     String extras = "";
-                    if (isDate[colIdx])
-                    {
-                        extras = "nowrap=\"nowrap\" align=\"right\"";
-                    }
+                    /*  damanzano: 
+                        there is no uses for this extra now that the 
+                        presentation is not a table
+                    */
+//                    if (isDate[colIdx])
+//                    {
+//                        extras = "nowrap=\"nowrap\" align=\"right\"";
+//                    }
 
                     String id = "t" + Integer.toString(colIdx + 1);
-                    out.print("<td headers=\"" + id + "\" class=\""
-                        + rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + extras + ">"
-                        + (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
-                        + "</td>");
-                }
-
-                // Add column for 'edit item' links
-                if (linkToEdit)
-                {
-                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
-
-                        out.print("<td headers=\"" + id + "\" class=\""
-                            + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
-                            + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
-                            + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
-                            + "<input type=\"submit\" value=\"Edit Item\" /></form>"
-                            + "</td>");
+//                    out.print("<td headers=\"" + id + "\" class=\""
+//                        + rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + extras + ">"
+//                        + (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
+//                        + "</td>");
+                    /*  damanzano:
+                        Now that we are not handling thumbnails metadata can be 
+                        null, so we need to validate it. 
+                    */
+                    if(metadata!=null){
+                        out.print("<div headers=\"" + id + "\" class=\""
+                            + rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + extras + ">"
+                            + (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
+                            + "</div>");
                     }
+                }
+                out.println("</div>");
+                /*  damanzano:
+                    We don´t need this in our browse results layout
+                */
+//                // Add column for 'edit item' links
+//                if (linkToEdit) 
+//                {
+//                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
+//
+//                    out.print("<td headers=\"" + id + "\" class=\""
+//                            + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
+//                            + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+//                            + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+//                            + "<input type=\"submit\" value=\"Edit Item\" /></form>"
+//                            + "</td>");
+//                }
 
-                out.println("</tr>");
+                //out.println("</tr>");
+                out.println("</div>");
             }
 
             // close the table
-            out.println("</table>");
+            //out.println("</table>");
         }
         catch (IOException ie)
         {
@@ -830,7 +924,13 @@ public class ItemListTag extends TagSupport
         try
         {
             Context c = UIUtil.obtainContext(hrq);
+            /*
+            damanzano: I commented this line because ItemServices.ItemService.getThumbnail 
+            is always returning null. I think the reason is that this method uses ItemDAO class
+            in order to get the thumbnail and we are using discovery and so SOLRDAO
+            */
             Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
+            //Thumbnail thumbnail = item.getThumbnail();
 
             if (thumbnail == null)
             {
@@ -856,7 +956,7 @@ public class ItemListTag extends TagSupport
                         UIUtil.encodeBitstreamName(thumb.getName(), Constants.DEFAULT_ENCODING);
             String alt = thumb.getName();
             String scAttr = getScalingAttr(hrq, thumb);
-            thumbFrag.append("<img src=\"")
+            thumbFrag.append("<img class=\"img-thumbnail\" src=\"")
                     .append(img)
                     .append("\" alt=\"").append(alt).append("\" ")
                      .append(scAttr)

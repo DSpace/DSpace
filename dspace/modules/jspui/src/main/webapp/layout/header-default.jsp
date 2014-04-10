@@ -107,12 +107,11 @@
         </script>
     <%
     }
-    if (extraHeadDataLast != null)
-    { %>
-		<%= extraHeadDataLast %>
-		<%
-		    }
     %>
+    <!-- damanzano:
+        Printing of dspace.layout.head.las was sent to footer-default in order 
+        to have all scripts at the end of the page and avoid script dependency errors
+    -->
     
     </head>
 
