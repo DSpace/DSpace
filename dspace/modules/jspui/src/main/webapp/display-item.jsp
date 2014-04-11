@@ -380,5 +380,12 @@
             %>
             </div>
         </div>
+            
+        <div class="panel panel-warning">
+            <div class="panel-heading"><fmt:message key="jsp.display-item.export"/> </div>
+            <div class="panel-body">
+                <dspace:item-bibliography item="<%= item %>"/>
+            </div>
+        </div>
     </dspace:sidebar>
 </dspace:layout>

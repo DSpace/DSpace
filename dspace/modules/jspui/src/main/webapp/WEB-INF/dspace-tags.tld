@@ -181,6 +181,25 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+  
+  <tag>
+      <name>item-bibliography</name>
+      <tagclass>org.dspace.app.webui.jsptag.ItemBibliographyFormatsTag</tagclass>
+      <info>
+        Tag for displaying buttons to export an item bibliography in several formats.  "item" must always be an
+        org.dspace.content.Item
+      </info>
+      <attribute>
+          <name>item</name>
+          <required>true</required>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+          <name>items</name>
+          <required>false</required>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+  </tag>
  
   <tag>
     <name>item-preview</name>

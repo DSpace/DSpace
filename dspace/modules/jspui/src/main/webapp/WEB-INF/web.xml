@@ -475,13 +475,18 @@
     <servlet-name>request-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
   </servlet>
-    	
+  
+  <servlet>
+      <servlet-name>bibliography</servlet-name>
+      <servlet-class>org.dspace.app.webui.servlet.BibliographyServlet</servlet-class>
+  </servlet>
+ 
+  <!-- Servlet Mappings -->
+  
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>
   </servlet-mapping>
- 
-  <!-- Servlet Mappings -->
 
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>
@@ -801,6 +806,11 @@
   <servlet-mapping>
     <servlet-name>request-item</servlet-name>
     <url-pattern>/request-item</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+      <servlet-name>bibliography</servlet-name>
+      <url-pattern>/bibliography</url-pattern>
   </servlet-mapping>
   
   <!-- Icon MIME type -->
