@@ -16,9 +16,7 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 
 /**
  * Class for finding data package DOIs from article identifers (DOI or PMID) using solr.
@@ -50,7 +48,6 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
 
     public String lookup(String pubId, String referrer, Map objectModel) throws SQLException {
 
-            Context context = ContextUtil.obtainContext(objectModel);
             if(referrer == null || referrer.length() == 0) {
                 return null;
             }

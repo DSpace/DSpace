@@ -738,7 +738,28 @@ public class FlowUtils {
             //using the checkout step next button
             if(workItem instanceof WorkspaceItem){
                 EventLogger.log(context, "submission-overview", "button=checkout");
+                PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+                ShoppingCart shoppingCart = null;
+                try{
+                //create new transaction or update transaction id with item
+                shoppingCart = paymentSystemService.getShoppingCartByItemId(context,publication.getID());
+                }catch (Exception e)
+                {
+                    log.error("error when find shopping cart for item:"+publication.getID());
+                }
+                if(shoppingCart!=null)
+                {
+                    if(shoppingCart.getTotal()==0||shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)||shoppingCart.getStatus().equals(ShoppingCart.STATUS_VERIFIED))
+                    {
+                        //already entered cc information
+                        finishSubmission(request, context, publication);
+                        return request.getContextPath() + "/deposit-confirmed?itemID=" + publication.getID();
+                    }
+
+                }
+
                 return request.getContextPath() + "/submit-checkout?workspaceID=" + workItem.getID();
+
             } else {
                 //We have a workflow item & have finished editing, redir to the overview page
                 ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(context, workItem.getID(), context.getCurrentUser().getID());

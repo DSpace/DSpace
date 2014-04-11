@@ -62,6 +62,7 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
     private static final Message T_details_status_workflow = message("xmlui.discovery.InternalItemTransformer.details.status.workflow");
     private static final Message T_details_current_step = message("xmlui.discovery.InternalItemTransformer.details.current-step");
     private static final Message T_details_status_withdrawn = message("xmlui.discovery.InternalItemTransformer.details.status.withdrawn");
+    private static final Message T_details_status_archived= message("xmlui.discovery.InternalItemTransformer.details.status.archived");
     private static final Message T_details_task_owner = message("xmlui.discovery.InternalItemTransformer.details.task-owner");
     private static final Message T_details_task_owner_pool = message("xmlui.discovery.InternalItemTransformer.details.task-owner.pool");
     private static final Message T_details_unknown = message("xmlui.discovery.InternalItemTransformer.unknown");
@@ -207,7 +208,11 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         String currentStep = null;
         if(inProgressSubmission != null){
             currentStep = addInProgressDetails(context, inProgressSubmission, workflowDetails, currentStep);
-        }else{
+        }else if(item.isArchived()){
+            workflowDetails.addItem().addContent(T_details_status_archived);
+        }
+        else
+        {
             //Our item is withdrawn !
             workflowDetails.addItem().addContent(T_details_status_withdrawn);
         }
