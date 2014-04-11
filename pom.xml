@@ -41,9 +41,6 @@
 	        <excludes>
 	            <exclude>**/Abstract*</exclude>
 	        </excludes>
-	        <includes>
-	          <include>**/PGDOIDatabaseTest.java</include>
-	        </includes>
                 <!-- required when running JMockit under Java 1.5 -->
                 <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
                 <argLine>-Ddspace.configuration="${default.dspace.dir}/config/dspace.cfg"</argLine>
