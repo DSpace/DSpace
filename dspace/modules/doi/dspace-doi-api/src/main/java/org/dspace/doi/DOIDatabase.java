@@ -16,6 +16,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.services.ConfigurationService;
 import org.garret.perst.*;
 
+@Deprecated
 public class DOIDatabase implements org.springframework.beans.factory.InitializingBean{
 
 	private static Logger LOG = Logger.getLogger(DOIDatabase.class);

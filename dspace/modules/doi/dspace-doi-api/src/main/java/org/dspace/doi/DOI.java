@@ -74,7 +74,7 @@ public class DOI {
 	}
 
 
-	private DOI(String aPrefix, String aSuffix, String aURL) throws DOIFormatException {
+	DOI(String aPrefix, String aSuffix, String aURL) throws DOIFormatException {
 		myPrefix = new PersistentString(aPrefix);
 		mySuffix = new PersistentString(aSuffix);
 		myURL = new PersistentString(aURL);
