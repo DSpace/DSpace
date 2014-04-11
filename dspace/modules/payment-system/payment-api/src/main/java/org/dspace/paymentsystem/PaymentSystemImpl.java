@@ -86,9 +86,9 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
 
-    protected static final String Country_Help_Text="Input Country code";
+    protected static final String Country_Help_Text= "Submitters requesting a Waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
 
-    protected static final String Voucher_Help_Text="Select voucher to get country discount";
+    protected static final String Voucher_Help_Text="Organizations may sponsor submissions to Dryad by purchasing and distributing voucher codes redeemable for one Data Publishing Charge.  Submitters redeeming vouchers may only use them with the permission of the purchaser.";
 
     protected static final String Currency_Help_Text="Select Currency";
 
