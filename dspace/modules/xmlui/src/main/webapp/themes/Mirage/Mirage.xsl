@@ -1179,6 +1179,52 @@ parameter that is being used (see variable defined above) -->
     </xsl:template>
 
     <!--payment-->
+
+    <xsl:template match="//dri:item[@id='aspect.paymentsystem.ShoppingCartTransformer.item.country-list' or @id='aspect.paymentsystem.ShoppingCartTransformer.item.voucher-list']">
+
+        <li>
+            <xsl:attribute name="name">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:attribute name="class">
+                <xsl:value-of select="@rend"/>
+            </xsl:attribute>
+            <div class="label">
+                <xsl:if test="string-length(dri:field/dri:label)>0">
+                    <i18n:text><xsl:value-of select="dri:field/dri:label"/></i18n:text>
+                </xsl:if>
+            </div>
+            <div class="help-title">
+                <xsl:if test="string-length(dri:field/dri:help)>0">
+                    <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                        <xsl:attribute name="title">
+                            <xsl:value-of select="dri:field/dri:help"/>
+                        </xsl:attribute>
+                    </img>
+                </xsl:if>
+            </div>
+            <xsl:apply-templates select="*"/>
+        </li>
+    </xsl:template>
+
+
+
+    <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.voucher']">
+        <input>
+            <xsl:attribute name="name">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:attribute name="value">
+                <xsl:value-of select="@value"/>
+            </xsl:attribute>
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(@id,'.','_')"/>
+            </xsl:attribute>
+        </input>
+    </xsl:template>
+
+
+
     <xsl:template match="//dri:field[@id='aspect.paymentsystem.ShoppingCartTransformer.field.currency' or @id='aspect.paymentsystem.ShoppingCartTransformer.field.country']">
     <select onchange="javascript:updateOrder()">
             <xsl:attribute name="name">
