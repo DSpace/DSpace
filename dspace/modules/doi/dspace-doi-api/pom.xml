@@ -15,6 +15,21 @@
         <version>1.7.3-SNAPSHOT</version>
     </parent>
 
+    <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <!-- tests whose name starts by Abstract will be ignored -->
+            <configuration>
+              <excludes>
+                  <exclude>**/Abstract*</exclude>
+              </excludes>
+              <argLine>-Ddspace.configuration="${default.dspace.dir}/config/dspace.cfg"</argLine>
+            </configuration>
+         </plugin>
+      </plugins>
+    </build>
     <profiles>
         <!--
            when activated a dspace.config configuration
