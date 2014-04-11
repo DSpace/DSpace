@@ -71,7 +71,7 @@ public class AlterWorkflowStepAction extends AbstractAction {
             // Get user's name + email address
             String usersName = WorkflowManager.getEPersonName(e);
 
-            String provDescription ="Enter "+ newStep.getId() + " Moved by " + usersName + ", reason: changing worflow step "
+            String provDescription ="Enter "+ newStep.getId() + " Moved by " + usersName + ", reason: changing workflow step "
                      + " on " + now + " (GMT) ";
 
             // Add to item as a DC field
