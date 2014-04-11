@@ -3182,6 +3182,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.discovery.InternalItemTransformer.details.status.submission">Submission</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.status.withdrawn">Withdrawn</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.status.workflow">Workflow</message>
+    <message key="xmlui.discovery.InternalItemTransformer.details.status.archived">Archived</message>
+
     <message key="xmlui.discovery.InternalItemTransformer.details.current-step">Current step</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.task-owner">Task owner</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.task-owner.pool">None (in pool)</message>

@@ -9,7 +9,11 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 import org.dspace.workflow.actions.WorkflowActionConfig;
@@ -56,6 +60,23 @@ public class AlterWorkflowStepAction extends AbstractAction {
 
             WorkflowActionConfig nextActionConfig = newStep.getUserSelectionMethod();
             nextActionConfig.getProcessingAction().activate(context, wfItem);
+
+            // rejection provenance
+            Item myitem = wfItem.getItem();
+
+            // Get current date
+            String now = DCDate.getCurrent().toString();
+
+            EPerson e = context.getCurrentUser();
+            // Get user's name + email address
+            String usersName = WorkflowManager.getEPersonName(e);
+
+            String provDescription ="Enter "+ newStep.getId() + " Moved by " + usersName + ", reason: changing worflow step "
+                     + " on " + now + " (GMT) ";
+
+            // Add to item as a DC field
+            myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            myitem.update();
 
             if (!nextActionConfig.hasUserInterface()) {
                 ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(context, wfItem, newStep, null);

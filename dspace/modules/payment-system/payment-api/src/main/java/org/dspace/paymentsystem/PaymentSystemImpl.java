@@ -22,6 +22,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.VersionHistoryImpl;
+import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.IOException;
@@ -168,6 +171,14 @@ public class PaymentSystemImpl implements PaymentSystemService {
         }
         else
         {
+
+            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+            VersionHistory history = versioningService.findVersionHistory(context, itemId);
+            if(history!=null)
+            {
+                Item originalItem = history.getFirstVersion().getItem();
+                itemId = originalItem.getID();
+            }
             ShoppingCart[] shoppingCarts = new ShoppingCart[1];
             shoppingCarts[0] = getShoppingCartByItemId(context, itemId);
             return shoppingCarts;
@@ -183,6 +194,21 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             itemId = dataPackage.getID();
         }
+
+        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+        VersionHistory history = versioningService.findVersionHistory(context, itemId);
+        if(history!=null)
+        {
+            Item originalItem = history.getFirstVersion().getItem();
+            itemId = originalItem.getID();
+            ArrayList<ShoppingCart> shoppingCarts = ShoppingCart.findAllByItem(context,itemId);
+            if(shoppingCarts.size()>0)
+            {
+                return shoppingCarts.get(0);
+            }
+
+        }
+
         List<ShoppingCart> shoppingcartList= ShoppingCart.findAllByItem(context, itemId);
         if(shoppingcartList!=null && shoppingcartList.size()>0)
             return shoppingcartList.get(0);
