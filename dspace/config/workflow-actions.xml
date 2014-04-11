@@ -5,6 +5,7 @@
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+    <bean id="completePaymentActionAPI" class="org.dspace.workflow.actions.processingaction.CompletePaymentAction"/>
     <bean id="finalPaymentActionAPI" class="org.dspace.workflow.actions.processingaction.FinalPaymentAction"/>
     <bean id="dryadAcceptRejectEditActionAPI" class="org.dspace.workflow.actions.processingaction.EditMetadataAction" scope="prototype"/>
     <bean id="reviewActionAPI" class="org.dspace.workflow.actions.processingaction.DryadReviewAction"/>
@@ -36,6 +37,13 @@
         <constructor-arg type="java.lang.String" value="finalPaymentAction"/>
 
         <property name="processingAction" ref="finalPaymentActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="completePaymentAction" class="org.dspace.workflow.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="completePaymentAction"/>
+
+        <property name="processingAction" ref="completePaymentActionAPI"/>
         <property name="requiresUI" value="false"/>
     </bean>
 

@@ -36,14 +36,14 @@
         </step>
 
         <!-- Approve and archive selected -->
-        <step id="finalPaymentStep" userSelectionMethod="noUserSelectionAction">
+        <step id="finalPaymentStep" nextStep="completePaymentStep" userSelectionMethod="noUserSelectionAction">
             <action id="finalPaymentAction"/>
             <alternativeOutcome>
                 <step status="1">reAuthorizationPaymentStep</step>
             </alternativeOutcome>
         </step>
         
-        <step id="reAuthorizationPaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
+        <step id="reAuthorizationPaymentStep" nextStep="completePaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
         </step>
         
@@ -65,14 +65,18 @@
         </step>
         
         <!-- Parked after registration, waiting for a curator to claim -->
-        <step id="pendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+        <step id="pendingPublicationStep" nextStep="completePaymentStep" userSelectionMethod="claimAction" role="curator">
             <action id="afterPublicationAction"/>
         </step>
 
 
-        <step id="pendingdelete" userSelectionMethod="noUserSelectionAction">
+        <step id="pendingdelete"  userSelectionMethod="noUserSelectionAction">
             <action id="pendingdelete"/>
         </step>
 
+        <!-- Approve and archive selected -->
+        <step id="completePaymentStep" userSelectionMethod="noUserSelectionAction">
+            <action id="completePaymentAction"/>
+        </step>
     </workflow>
 </wf-config>
