@@ -2443,6 +2443,8 @@
 <message key="sedici.comunidades.radio.info">Interveiws and artistic productions, among other audios</message>
 <message key="sedici.comunidades.bdigital.nombre">Digital Library</message>
 <message key="sedici.comunidades.bdigital.info">Historical documents and other external digital resources</message>
+<message key="sedici.comunidades.rea.nombre">Open Eduational Resources</message>
+<message key="sedici.comunidades.rea.info">Learning objects and others</message>
 <message key="sedici.comunidades.ehidrica.nombre">Hydric emergency</message>
 <message key="sedici.comunidades.ehidrica.info">Jobs within the Plan of Integrated Management of Disaster's Risk</message>
 

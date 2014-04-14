@@ -2493,6 +2493,8 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.comunidades.radio.info">Entrevistas y producciones artísticas, entre otros audios</message>
 <message key="sedici.comunidades.bdigital.nombre">Biblioteca Digital</message>
 <message key="sedici.comunidades.bdigital.info">Documentos históricos y recursos digitales ajenos a la UNLP</message>
+<message key="sedici.comunidades.rea.nombre">Recursos educativos abiertos</message>
+<message key="sedici.comunidades.rea.info">Material educativo de cursos dictados en la UNLP</message>
 <message key="sedici.comunidades.ehidrica.nombre">Emergencia hídrica</message>
 <message key="sedici.comunidades.ehidrica.info">Trabajos dentro del Plan de Gestión Integrada de Riesgos de Desastres</message>
 

@@ -3545,11 +3545,14 @@ h1.communities_header {
 #icono_radio a {
 	background-image: url(../../images/icono_radio.png);
 }
+#icono_rea a {
+	background-image: url(../../images/icono_rea.png);
+}
 #icono_ehidrica a {
 	background-image: url(../../images/icono_ehidrica.png);
 }
 
-#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_ehidrica{
+#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica{
 padding-left:5px;
 }
 

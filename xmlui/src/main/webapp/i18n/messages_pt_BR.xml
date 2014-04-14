@@ -2134,6 +2134,8 @@
   <message key="sedici.menuSuperior.preguntas">Perguntas Frequentes</message>
   <message key="sedici.comunidades.bdigital.nombre">Digital Library</message>
   <message key="sedici.comunidades.bdigital.info">Historical documents and other external digital resources</message>
+  <message key="sedici.comunidades.rea.nombre">Recursos Educativos Abertos</message>
+  <message key="sedici.comunidades.era.info">Recursos Educativos de la UNLP</message>
   <message key="sedici.comunidades.ehidrica.nombre">Emergência Hídrica</message>
   <message key="sedici.comunidades.ehidrica.info">Trabalhos dentro do Plano de Gestão Integrada de Riscos de Desastres</message>
   <message key="sedici.items.handle.utilizacion_URI">Por favor, utilize este identificador (URI) para citar ou ligar este item: </message>
