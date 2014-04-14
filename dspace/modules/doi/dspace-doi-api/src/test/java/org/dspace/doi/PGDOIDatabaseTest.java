@@ -125,6 +125,8 @@ public class PGDOIDatabaseTest {
         Assert.assertTrue(size > 0);
     }
 
+    // Returns true if testOutputFile contains a DOI with
+    // prefix INTERNAL_TESTING_PREFIX and suffix RANDOM_SUFFIX_MODIFIED
     // Shared by testDump and testDumpTo
     private boolean verifyDOIInFile() {
         // Make sure our put doi is in the file.
