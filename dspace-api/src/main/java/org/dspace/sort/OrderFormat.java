@@ -32,7 +32,7 @@ import org.dspace.core.PluginManager;
  * (ie. run 'index-all', or 'dsrun org.dspace.browse.InitializeBrowse')
  * 
  * @author Graham Triggs
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class OrderFormat
 {

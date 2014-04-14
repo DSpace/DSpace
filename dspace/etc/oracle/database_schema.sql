@@ -1,9 +1,9 @@
 --
 -- database_schema.sql (ORACLE version!)
 --
--- Version: $Revision: 5682 $
+-- Version: $Revision$
 --
--- Date:    $Date: 2010-10-28 11:52:41 -0400 (Thu, 28 Oct 2010) $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 --
@@ -55,6 +55,7 @@ CREATE SEQUENCE collection2item_seq;
 CREATE SEQUENCE resourcepolicy_seq;
 CREATE SEQUENCE epersongroup2eperson_seq;
 CREATE SEQUENCE handle_seq;
+CREATE SEQUENCE doi_seq;
 CREATE SEQUENCE workspaceitem_seq;
 CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
@@ -70,6 +71,10 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE versionitem_seq;
+CREATE SEQUENCE versionhistory_seq;
+CREATE SEQUENCE webapp_seq;
+CREATE SEQUENCE requestitem_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -126,7 +131,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR2(64) UNIQUE,
-  password            VARCHAR2(64),
+  password            VARCHAR2(128),
+  salt                VARCHAR2(32),
+  digest_algorithm    VARCHAR2(16),
   firstname           VARCHAR2(64),
   lastname            VARCHAR2(64),
   can_log_in          NUMBER(1),
@@ -138,12 +145,6 @@ CREATE TABLE EPerson
   netid               VARCHAR2(64) UNIQUE,
   language            VARCHAR2(64)
 );
-
--- index by email
-CREATE INDEX eperson_email_idx ON EPerson(email);
-
--- index by netid
-CREATE INDEX eperson_netid_idx ON EPerson(netid);
 
 -------------------------------------------------------
 -- EPersonGroup table
@@ -195,6 +196,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      NUMBER(1),
   withdrawn       NUMBER(1),
+  discoverable    NUMBER(1),
   last_modified   TIMESTAMP,
   owning_collection INTEGER
 );
@@ -233,9 +235,10 @@ CREATE INDEX item2bundle_bundle_fk_idx ON Item2Bundle(bundle_id);
 -------------------------------------------------------
 CREATE TABLE Bundle2Bitstream
 (
-  id           INTEGER PRIMARY KEY,
-  bundle_id    INTEGER REFERENCES Bundle(bundle_id),
-  bitstream_id INTEGER REFERENCES Bitstream(bitstream_id)
+  id              INTEGER PRIMARY KEY,
+  bundle_id       INTEGER REFERENCES Bundle(bundle_id),
+  bitstream_id    INTEGER REFERENCES Bitstream(bitstream_id),
+  bitstream_order INTEGER
 );
 
 -- index by bundle_id
@@ -400,7 +403,10 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE
+  end_date             DATE,
+  rpname               VARCHAR2(30),
+  rptype               VARCHAR2(30),
+  rpdescription        VARCHAR2(100)
 );
 
 -- index by resource_type,resource_id - all queries by
@@ -439,6 +445,21 @@ CREATE TABLE Handle
 
 -- index by resource id and resource type id
 CREATE INDEX handle_resource_id_type_idx ON handle(resource_id, resource_type_id);
+
+-------------------------------------------------------
+-- Doi table
+-------------------------------------------------------
+CREATE TABLE Doi
+(
+  doi_id           INTEGER PRIMARY KEY,
+  doi              VARCHAR2(256) UNIQUE,
+  resource_type_id INTEGER,
+  resource_id      INTEGER,
+  status           INTEGER
+);
+
+-- index by resource id and resource type id
+CREATE INDEX doi_resource_id_type_idx ON doi(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -732,3 +753,46 @@ CREATE TABLE harvested_item
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+
+CREATE TABLE versionhistory
+(
+  versionhistory_id INTEGER NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE versionitem
+(
+  versionitem_id INTEGER NOT NULL PRIMARY KEY,
+  item_id INTEGER REFERENCES Item(item_id),
+  version_number INTEGER,
+  eperson_id INTEGER REFERENCES EPerson(eperson_id),
+  version_date TIMESTAMP,
+  version_summary VARCHAR2(255),
+  versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
+);
+
+CREATE TABLE Webapp
+(
+    webapp_id INTEGER NOT NULL PRIMARY KEY,
+    AppName VARCHAR2(32),
+    URL VARCHAR2(1000),
+    Started TIMESTAMP,
+    isUI NUMBER(1)
+);
+
+CREATE TABLE requestitem
+(
+  requestitem_id INTEGER NOT NULL,
+  token varchar(48),
+  item_id INTEGER,
+  bitstream_id INTEGER,
+  allfiles NUMBER(1),
+  request_email VARCHAR2(64),
+  request_name VARCHAR2(64),
+  request_date TIMESTAMP,
+  accept_request NUMBER(1),
+  decision_date TIMESTAMP,
+  expires TIMESTAMP,
+  CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),
+  CONSTRAINT requestitem_token_key UNIQUE (token)
+);
+

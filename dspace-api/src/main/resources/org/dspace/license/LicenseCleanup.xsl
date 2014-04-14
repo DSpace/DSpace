@@ -18,9 +18,9 @@
    <!-- 
       LicenseCleanup.xsl
       
-      Version: $Revision: 5860 $
+      Version: $Revision$
       
-      Date: $Date: 2010-11-16 13:15:13 -0500 (Tue, 16 Nov 2010) $
+      Date: $Date$
    -->
 
    <xsl:output method="xml" indent="yes" />

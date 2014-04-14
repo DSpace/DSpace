@@ -76,7 +76,7 @@ import org.jdom.xpath.XPath;
  *
  * @author Larry Stone
  * @author Scott Phillips
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +23,15 @@ import org.dspace.content.InProgressSubmission;
 
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Information about an item being editing with the submission UI
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
-public class SubmissionInfo
+public class SubmissionInfo extends HashMap
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionInfo.class);
@@ -144,7 +146,7 @@ public class SubmissionInfo
      */
     public boolean isInWorkflow()
     {
-        return ((this.submissionItem != null) && this.submissionItem instanceof WorkflowItem);
+        return ((this.submissionItem != null) && (this.submissionItem instanceof WorkflowItem || this.submissionItem instanceof XmlWorkflowItem));
     }
 
     /**

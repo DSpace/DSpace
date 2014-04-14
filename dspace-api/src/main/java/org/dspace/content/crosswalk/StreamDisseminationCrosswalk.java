@@ -28,7 +28,7 @@ import org.dspace.core.Context;
  * just refer to the desired crosswalk by its plugin name.
  *
  * @author  Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public interface StreamDisseminationCrosswalk
 {

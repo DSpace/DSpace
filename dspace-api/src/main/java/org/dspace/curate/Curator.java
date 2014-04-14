@@ -20,6 +20,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -50,14 +51,21 @@ public class Curator
     
     // invocation modes - used by Suspendable tasks
     public static enum Invoked { INTERACTIVE, BATCH, ANY };
+    // transaction scopes
+    public static enum TxScope { OBJECT, CURATION, OPEN };
 
     private static Logger log = Logger.getLogger(Curator.class);
+    
+    private static final ThreadLocal<Context> curationCtx = new ThreadLocal<Context>();
     
     private Map<String, TaskRunner> trMap = new HashMap<String, TaskRunner>();
     private List<String> perfList = new ArrayList<String>();
     private TaskQueue taskQ = null;
     private String reporter = null;
     private Invoked iMode = null;
+    private TaskResolver resolver = new TaskResolver();
+    private int cacheLimit = Integer.MAX_VALUE;
+    private TxScope txScope = TxScope.OPEN;
 
     /**
      * No-arg constructor
@@ -75,13 +83,13 @@ public class Curator
      */
     public Curator addTask(String taskName)
     {
-        CurationTask task = (CurationTask)PluginManager.getNamedPlugin("curate", CurationTask.class, taskName);
+    	ResolvedTask task = resolver.resolveTask(taskName);
         if (task != null)
         {
             try
             {
-                task.init(this, taskName);
-                trMap.put(taskName, new TaskRunner(task, taskName));
+                task.init(this);
+                trMap.put(taskName, new TaskRunner(task));
                 // performance order currently FIFO - to be revisited
                 perfList.add(taskName);
             }
@@ -107,8 +115,7 @@ public class Curator
      {
          return perfList.contains(taskName);
      }
-    
-    
+      
     /**
      * Removes a task from the set to be performed.
      * 
@@ -126,7 +133,7 @@ public class Curator
      * Assigns invocation mode.
      * 
      * @param mode one of INTERACTIVE, BATCH, ANY
-     * @return
+     * @return the Curator instance.
      */
     public Curator setInvoked(Invoked mode)
     {
@@ -146,6 +153,33 @@ public class Curator
         this.reporter = reporter;
         return this;
     }
+    
+    /**
+     * Sets an upper limit for the number of objects in the context cache 
+     * used in a curation, if context accessible. Note that for many forms of
+     * invocation, the context is not accessible. If limit is reached,
+     * context cache will be emptied. The default is no limit.
+     */
+    public Curator setCacheLimit(int limit)
+    {
+    	cacheLimit = limit;
+    	return this;
+    }
+    
+    /**
+     * Defines the transactional scope of curator executions.
+     * The default is 'open' meaning that no commits are
+     * performed by the framework during curation. A scope of
+     * 'curation' means that a single commit will occur after the
+     * entire performance is complete, and a scope of 'object'
+     * will commit for each object (e.g. item) encountered in
+     * a given execution.
+     */
+    public Curator setTransactionScope(TxScope scope)
+    {
+    	txScope = scope;
+    	return this;
+    }
 
     /**
      * Performs all configured tasks upon object identified by id. If
@@ -160,11 +194,13 @@ public class Curator
     {
         if (id == null)
         {
-           log.error("curate - null id");
-           return;            
+           throw new IOException("Cannot perform curation task(s) on a null object identifier!");            
         }
         try
         {
+            //Save the context on current execution thread
+            curationCtx.set(c);
+           
             DSpaceObject dso = HandleManager.resolveToObject(c, id);
             if (dso != null)
             {
@@ -177,15 +213,34 @@ public class Curator
                     trMap.get(taskName).run(c, id);
                 }
             }
+            // if curation scoped, commit transaction
+            if (txScope.equals(TxScope.CURATION)) {
+            	Context ctx = curationCtx.get();
+            	if (ctx != null)
+            	{
+            		ctx.commit();
+            	}
+            }
         }
         catch (SQLException sqlE)
         {
             throw new IOException(sqlE.getMessage(), sqlE);
         }
+        finally
+        {
+            curationCtx.remove();
+        }
     }
 
     /**
-     * Performs all configured tasks upon DSpace object.
+     * Performs all configured tasks upon DSpace object 
+     * (Community, Collection or Item).
+     * <P>
+     * Note: Site-wide tasks will default to running as
+     * an Anonymous User unless you call the Site-wide task
+     * via the 'curate(Context,String)' method with an 
+     * authenticated Context object.
+     * 
      * @param dso the DSpace object
      * @throws IOException
      */
@@ -193,16 +248,14 @@ public class Curator
     {
         if (dso == null)
         {
-            log.error("curate - null dso");
-            return;
+            throw new IOException("Cannot perform curation task(s) on a null DSpaceObject!");
         }
         int type = dso.getType();
         for (String taskName : perfList)
         {
             TaskRunner tr = trMap.get(taskName);
             // do we need to iterate over the object ?
-            if (type == Constants.ITEM ||
-                tr.task.getClass().isAnnotationPresent(Distributive.class))
+            if (type == Constants.ITEM || tr.task.isDistributive())
             {
                 tr.run(dso);
             }
@@ -213,6 +266,10 @@ public class Curator
             else if (type == Constants.COMMUNITY)
             {
                 doCommunity(tr, (Community)dso);
+            }  
+            else if (type == Constants.SITE)
+            {
+                doSite(tr, (Site) dso);    
             }
         }
     }
@@ -305,6 +362,30 @@ public class Curator
             tr.setResult(result);
         }
     }
+    
+    /**
+     * Returns the context object used in the current curation thread.
+     * This is primarily a utility method to allow tasks access to the context when necessary.
+     * <P>
+     * If the context is null or not set, then this just returns
+     * a brand new Context object representing an Anonymous User.
+     * 
+     * @return curation thread's Context object (or a new, anonymous Context if no curation Context exists)
+     */
+    public static Context curationContext() throws SQLException
+    {
+    	// Return curation context or new context if undefined/invalid
+    	Context curCtx = curationCtx.get();
+        
+        if(curCtx==null || !curCtx.isValid())
+        {
+            //Create a new context (represents an Anonymous User)
+            curCtx = new Context();
+            //Save it to current execution thread
+            curationCtx.set(curCtx);
+        }    
+        return curCtx;
+    }
 
     /**
      * Returns whether a given DSO is a 'container' - collection or community
@@ -317,6 +398,61 @@ public class Curator
                 dso.getType() == Constants.COLLECTION);
     }
 
+    /**
+     * Run task for entire Site (including all Communities, Collections & Items)
+     * @param tr TaskRunner
+     * @param site DSpace Site object
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
+    private boolean doSite(TaskRunner tr, Site site) throws IOException
+    {
+        Context ctx = null;
+        try
+        {
+            //get access to the curation thread's current context
+            ctx = curationContext();
+            
+            // Site-wide Tasks really should have an EPerson performer associated with them,
+            // otherwise they are run as an "anonymous" user with limited access rights.
+            if(ctx.getCurrentUser()==null && !ctx.ignoreAuthorization())
+            {
+                log.warn("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
+                         " as there is no EPerson 'performer' associated with this task. To associate an EPerson 'performer' " +
+                         " you should ensure tasks are called via the Curator.curate(Context, ID) method.");
+            }
+            
+            //Run task for the Site object itself
+            if (! tr.run(site))
+            {
+                return false;
+            }
+            
+            //Then, perform this task for all Top-Level Communities in the Site
+            // (this will recursively perform task for all objects in DSpace)
+            for (Community subcomm : Community.findAllTop(ctx))
+            {
+                if (! doCommunity(tr, subcomm))
+                {
+                    return false;
+                }
+            }
+        }
+        catch (SQLException sqlE)
+        {
+            throw new IOException(sqlE);
+        }
+
+        return true;
+    }
+    
+    /**
+     * Run task for Community along with all sub-communities and collections.
+     * @param tr TaskRunner
+     * @param comm Community
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
     private boolean doCommunity(TaskRunner tr, Community comm) throws IOException
     {
         try
@@ -347,6 +483,13 @@ public class Curator
         return true;
     }
 
+    /**
+     * Run task for Collection along with all Items in that collection.
+     * @param tr TaskRunner
+     * @param coll Collection
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
     private boolean doCollection(TaskRunner tr, Collection coll) throws IOException
     {
         try
@@ -370,41 +513,86 @@ public class Curator
         }
         return true;
     }
+    
+    /**
+     * Record a 'visit' to a DSpace object and enforce any policies set
+     * on this curator.
+     */
+    private void visit(DSpaceObject dso) throws IOException
+    {
+    	Context curCtx = curationCtx.get();
+    	if (curCtx != null)
+    	{
+    		try
+    		{
+    			if (txScope.equals(TxScope.OBJECT))
+    			{
+    				curCtx.commit();
+    			}
+    			if (curCtx.getCacheSize() % cacheLimit == 0)
+    			{
+    				curCtx.clearCache();
+    			}
+    		}
+    		catch (SQLException sqlE)
+    		{
+    			throw new IOException(sqlE.getMessage(), sqlE);
+    		}
+    	}
+    }
 
     private class TaskRunner
     {
-        CurationTask task = null;
-        String taskName = null;
+        ResolvedTask task = null;
         int statusCode = CURATE_UNSET;
         String result = null;
-        Invoked mode = null;
-        int[] codes = null;
 
-        public TaskRunner(CurationTask task, String name)
+        public TaskRunner(ResolvedTask task)
         {
             this.task = task;
-            taskName = name;
-            parseAnnotations(task.getClass());
         }
         
         public boolean run(DSpaceObject dso) throws IOException
         {
-            if (dso == null)
-            {
-                throw new IOException("DSpaceObject is null");
+            try
+            {    
+                if (dso == null)
+                {
+                    throw new IOException("DSpaceObject is null");
+                }
+                statusCode = task.perform(dso);
+                String id = (dso.getHandle() != null) ? dso.getHandle() : "workflow item: " + dso.getID();
+                log.info(logMessage(id));
+                visit(dso);
+                return ! suspend(statusCode);
             }
-            statusCode = task.perform(dso);
-            return ! suspend(statusCode);
+            catch(IOException ioe)
+            {
+                //log error & pass exception upwards
+                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                throw ioe;
+            }
         }
         
         public boolean run(Context c, String id) throws IOException
         {
-            if (c == null || id == null)
+            try
             {
-                throw new IOException("Context or identifier is null");
+                if (c == null || id == null)
+                {
+                    throw new IOException("Context or identifier is null");
+                }
+                statusCode = task.perform(c, id);
+                log.info(logMessage(id));
+                visit(null);
+                return ! suspend(statusCode);
             }
-            statusCode = task.perform(c, id);
-            return ! suspend(statusCode);
+            catch(IOException ioe)
+            {
+                //log error & pass exception upwards
+                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                throw ioe;
+            }
         }
 
         public void setResult(String result)
@@ -412,21 +600,12 @@ public class Curator
             this.result = result;
         }
         
-        private void parseAnnotations(Class tClass)
-        {
-            Suspendable suspendAnn = (Suspendable)tClass.getAnnotation(Suspendable.class);
-            if (suspendAnn != null)
-            {
-                mode = suspendAnn.invoked();
-                codes = suspendAnn.statusCodes();
-            }
-        }
-        
         private boolean suspend(int code)
         {
+        	Invoked mode = task.getMode();
             if (mode != null && (mode.equals(Invoked.ANY) || mode.equals(iMode)))
             {
-                for (int i : codes)
+                for (int i : task.getCodes())
                 {
                     if (code == i)
                     {
@@ -435,6 +614,24 @@ public class Curator
                 }
             }
             return false;
+        }
+        
+        /**
+         * Builds a useful log message for a curation task.
+         * @param id ID of DSpace Object
+         * @return log message text
+         */
+        private String logMessage(String id) 
+        {
+            StringBuilder mb = new StringBuilder();
+            mb.append("Curation task: ").append(task.getName()).
+               append(" performed on: ").append(id).
+               append(" with status: ").append(statusCode);
+            if (result != null)
+            {
+                mb.append(". Result: '").append(result).append("'");
+            }
+            return mb.toString();
         }
     }
 }

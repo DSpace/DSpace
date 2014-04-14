@@ -11,7 +11,7 @@ package org.dspace.content;
  * Series and report number, as stored in relation.ispartofseries
  * 
  * @author Robert Tansley
- * @version $Id: DCSeriesNumber.java 5844 2010-11-12 05:29:14Z mdiggory $
+ * @version $Id$
  */
 public class DCSeriesNumber
 {

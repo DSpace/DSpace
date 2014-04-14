@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TEST-SPRING.XML -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- **************************************************************************************************** -->
+	<!-- BTE Batch import Service 																			  -->
+	<!-- **************************************************************************************************** -->
+
+	<bean id="org.dspace.app.itemimport.BTEBatchImportService" class="org.dspace.app.itemimport.BTEBatchImportService">
+		<property name="dataLoaders">
+			<map>
+			    <!-- Specify here any data loaders that you want to have access to in the command line batch import.
+			    	Key is the name that you need to specify in the "-i" option in the command line script when "-b"
+			    	option is used (which means BTE Batch import) -->
+				<entry key="pubmedXML" value-ref="pubmedFileDataLoader" />
+				<entry key="crossrefXML" value-ref="crossRefFileDataLoader" />
+				<entry key="arxivXML" value-ref="arXivFileDataLoader" />
+				<entry key="ciniiXML" value-ref="ciniiFileDataLoader" />
+				<entry key="bibtex" value-ref="bibTeXDataLoader" />
+				<entry key="ris" value-ref="risDataLoader" />
+				<entry key="endnote" value-ref="endnoteDataLoader" />
+				<entry key="csv" value-ref="csvDataLoader" />
+				<entry key="tsv" value-ref="tsvDataLoader" />
+				<entry key="oai" value-ref="oaipmhDataLoader" />
+			</map>
+		</property>
+		
+		<!-- The map that will be used to map internal BTE keys to DSpace metadata fields -->
+		<property name="outputMap" ref="outputMap" />
+
+		<property name="transformationEngine" ref="batchImportTransformationEngine" />
+	</bean>
+
+	<!-- **************************************************************************************************** -->
+	<!-- BTE Batch import Transformation Engine 															  -->
+	<!-- **************************************************************************************************** -->
+
+	<bean id="batchImportTransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+		<property name="workflow" ref="batchImportLinearWorkflow" />
+	</bean>
+
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean id="batchImportLinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+		<property name="process">
+			<list>
+				<!-- Add here filters and modifiers -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- **************************************************************************************************** -->
+	<!-- Submission Lookup Service 																			  -->
+	<!-- **************************************************************************************************** -->
+
+	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
+		name="org.dspace.submit.lookup.SubmissionLookupService">
+		<property name="phase1TransformationEngine" ref="phase1TransformationEngine" />
+		<property name="phase2TransformationEngine" ref="phase2TransformationEngine" />
+		<!-- Uncomment the following property if you want specific fields to appear in the detail presentation
+			 of a publication. Default values are the ones shown below -->
+		<!-- 
+		<property name="detailFields">
+	        <list>
+	        	<value>title</value>
+                <value>authors</value>
+                <value>editors</value>
+                <value>translators</value>
+                <value>chairs</value>
+                <value>issued</value>
+                <value>abstract</value>
+                <value>doi</value>
+                <value>journal</value>
+                <value>volume</value>
+                <value>issue</value>
+                <value>publisher</value>
+                <value>jissn</value>
+                <value>jeissn</value>
+                <value>pisbn</value>
+                <value>eisbn</value>
+                <value>arxivCategory</value>
+                <value>keywords</value>
+                <value>mesh</value>
+                <value>language</value>
+                <value>subtype</value>
+                <value>translators</value>
+	        </list>
+	    </property>
+	    -->
+	</bean>
+
+	<!-- **************************************************************************************************** -->
+	<!-- Submission Lookup Transformation Engine (phase 1) 												      -->
+	<!-- **************************************************************************************************** -->
+	
+	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="multipleDataLoader"/>
+    	<property name="workflow" ref="phase1LinearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+  	</bean>
+
+	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	    <property name="dataloadersMap">
+	        <map>
+	            <!-- Specify here any data loaders you want to include in the submission lookup process.
+	            	Dataloades must either extend the "NetworkSubmissionLookupDataLoader" abstract class
+	            	or conform to "FileDataLoader" interface of BTE -->
+	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
+	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
+	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
+	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
+	            <entry key="pubmedXML" value-ref="pubmedFileDataLoader"/>
+	            <entry key="crossRefXML" value-ref="crossRefFileDataLoader"/>
+	            <entry key="arXivXML" value-ref="arXivFileDataLoader"/>
+	            <entry key="ciniiXML" value-ref="ciniiFileDataLoader"/>
+	            <entry key="bibtex" value-ref="bibTeXDataLoader"/>
+	            <entry key="ris" value-ref="risDataLoader"/>
+	            <entry key="endnote" value-ref="endnoteDataLoader"/>
+	            <entry key="csv" value-ref="csvDataLoader"/>
+	            <entry key="tsv" value-ref="tsvDataLoader"/>
+			</map>
+	    </property>
+	</bean>
+
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+	
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	    <property name="process">
+			<list>
+			    <ref bean="mapConverter_arxivSubject"/>
+			    <ref bean="mapConverter_pubstatusPubmed"/>
+			    <ref bean="removeLastDot"/>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Converts an input value to an output one -->
+	<bean name="mapConverter_arxivSubject" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
+	    <constructor-arg value="mapConverter_arxivSubject Modifier"/>
+	    <property name="converterNameFile" value="mapConverter-arxivSubject.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	    <property name="fieldKeys">
+	        <list>
+	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
+	        	<value>arxivCategory</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- Converts an input value to an output one -->
+	<bean name="mapConverter_pubstatusPubmed" class="org.dspace.submit.lookup.MapConverterModifier" init-method="init">
+	    <constructor-arg value="mapConverter_pubstatusPubmed Modifier"/>
+	    <property name="converterNameFile" value="mapConverter-pubstatusPubmed.properties"/>
+	    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	    <property name="defaultValue" value="Subjected to Journal"/>
+	    <property name="fieldKeys">
+	        <list>
+	            <!-- Specify the internal BTE keys that this modifiers needs to be applied -->
+	        	<value>publicationStatus</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- Remove the last dot in the specified field keys -->
+	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier">
+	    <constructor-arg value="removeLastDot Modifier"/>
+	    <property name="fieldKeys">
+	        <list>
+	        	<value>title</value>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- **************************************************************************************************** -->
+	<!-- Submission Lookup Transformation Engine (phase 2) 													  -->
+	<!-- **************************************************************************************************** -->
+	
+	<bean name="phase2TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	    <property name="dataLoader" ref="submissionItemDataLoader"/>
+    	<property name="workflow" ref="phase2linearWorkflow"/>
+    	<property name="outputGenerator" ref="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator"/>
+  	</bean>
+  	
+	<bean name="submissionItemDataLoader" class="org.dspace.submit.lookup.SubmissionItemDataLoader"/>
+	
+	<!-- Specify here any filters or modifiers to run before the output -->
+	<bean name="phase2linearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	    <property name="process">
+			<list>
+			    <ref bean="fieldMergeModifier"/>
+			    <ref bean="valueConcatenationModifier"/>
+			    <ref bean="languageCodeModifier"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="fieldMergeModifier" class="org.dspace.submit.lookup.FieldMergeModifier">
+	    <property name="mergeFieldMap">
+	        <map>
+	            <entry key="allauthors">
+	                <list>
+						<value>authors</value>
+					</list>
+	            </entry>
+	            <entry key="allkeywords">
+	                <list>
+						<value>keywords</value>
+						<value>mesh</value>
+					</list>
+	            </entry>
+	        </map>
+	    </property>
+	</bean>
+	
+	<bean name="valueConcatenationModifier" class="org.dspace.submit.lookup.ValueConcatenationModifier">
+	    <property name="field" value="allkeywords"/>
+	    <property name="separator" value=";" />
+	    <property name="whitespaceAfter" value="true" />
+	</bean>
+
+        <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
+
+	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
+	    <property name="outputMap" ref="outputMap"/>
+
+	    <property name="extraMetadataToKeep">
+			<list>
+				<value>dc.import.contributorauthor</value>
+				<value>dc.import.contributoreditor</value>
+				<value>dc.import.contributortranslator</value>
+				<!-- <value>dc.description.scopusurl</value>
+				<value>dc.description.scopuscitationcount</value>
+				<value>dc.description.scopuscitationurl</value>-->
+			</list>
+		</property> 
+	</bean>
+	
+	<!-- **************************************************************************************************** -->
+	<!-- DataLoader beans 																					  -->
+	<!-- **************************************************************************************************** -->
+	<!-- Each dataloader needs a mapping that defines how the input maps to 
+		records. Internally every record organizes the data as key-list of values 
+		pairs, and in order to be able to recall the values the keys should have 
+		distinct names. Each data format has a way to address individual data, and 
+		this is the key of the map. The value is the label that the record internally 
+		associates with the specific data and is used in the output mapping as well. -->
+
+	<!-- The key of the map is just the BibTeX label (e.g. author, date, pages 
+		etc). The value the label that the record internally associates with the 
+		specific data. -->
+	<bean id="bibTeXDataLoader" class="gr.ekt.bteio.loaders.BibTeXDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="title" value="title" />
+				<entry key="author" value="authors" />
+				<entry key="journal" value="journal" />
+				<entry key="year" value="issued" />
+				<entry key="ISSN" value="jissn" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- Each entry in a CSV is a row, and each column represents the same data 
+		in each entry. For example the first column might record the item title, 
+		the second the authors etc. The key of the field map is this number. Note 
+		that the first column is number 0. The CSV data loader has these extra parameters 
+		that configure its behaviour: - skipLines: a number that instructs the reader 
+		to ignore the first lines in the input file. Default value: 0 - separator: 
+		a character that signifies how the values are separated. Default value ',' 
+		-quoteChar: individual valued could include the separator character. For 
+		example if the separator is ',' and there is an abstract, there is a high 
+		probability that it will contain commas. If the value is quoted using the 
+		quoteChar then separator characters inside it will be ignored. Default value 
+		'"'. -valueSeparator: There are cases where a value is the concatenation 
+		of multiple values. For instance a list of authors. In this case the CSVDataLoader 
+		can split the CSV value into its individual values, if they are separated 
+		with valueSeparator. This can be a full java regular expression. Default 
+		value: null (the csv value is not used by default). -->
+	<bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="0" value="title" />
+				<entry key="1" value="authors" />
+				<entry key="2" value="issued" />
+				<entry key="3" value="journal" />
+				<entry key="4" value="abstract" />
+				<entry key="5" value="jissn" />
+				<entry key="6" value="subtype" />
+			</map>
+		</property>
+		<property name="skipLines" value="1" />
+	</bean>
+
+	<!-- A TSV file is exactly the same as a CSV one, with the difference that 
+		the separator is a tab instead of a comma. See the comments in the previous 
+		section. -->
+	<bean id="tsvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="0" value="title" />
+				<entry key="1" value="authors" />
+				<entry key="2" value="issued" />
+				<entry key="3" value="journal" />
+				<entry key="4" value="abstract" />
+				<entry key="5" value="jissn" />
+				<entry key="6" value="subtype" />
+			</map>
+		</property>
+		<!-- This makes the CSV data loader able to load TSV data -->
+		<property name="separator" value="\u0009" />
+		<property name="skipLines" value="1" />
+	</bean>
+
+	<!-- The map for the RIS data loader has to have as keys the RIS tags that 
+		need to be loaded. -->
+	<bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="T1" value="title" />
+				<entry key="AU" value="authors" />
+				<entry key="SO" value="journal" />
+				<entry key="PY" value="issued" />
+				<entry key="SN" value="jissn" />
+				<entry key="PT" value="subtype" />
+				<entry key="AB" value="abstract" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="endnoteDataLoader" class="gr.ekt.bteio.loaders.EndnoteDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="TI" value="title" />
+				<entry key="AU" value="authors" />
+				<entry key="AB" value="abstract" />
+				<entry key="PY" value="issued" />
+				<entry key="SO" value="journal" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- OAI Data Loader -->
+	<bean id="oaipmhDataLoader" class="gr.ekt.bteio.loaders.OAIPMHDataLoader">
+		<property name="fieldMap">
+			<map>
+				<entry key="title" value="title" />
+				<entry key="creator" value="authors" />
+				<entry key="description" value="abstract" />
+				<entry key="date" value="issued" />
+				<entry key="type" value="subtype" />
+			</map>
+		</property>
+		<property name="prefix" value="oai_dc" />
+		<property name="serverAddress"
+			value="http://ebooks.serrelib.gr/serrelib-oai/request" />
+	</bean>
+
+	<!-- PubMed -->
+	<bean id="pubmedOnlineDataLoader" class="org.dspace.submit.lookup.PubmedOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="pubmedInputMap" />
+	</bean>
+
+	<bean id="pubmedFileDataLoader" class="org.dspace.submit.lookup.PubmedFileDataLoader">
+		<property name="fieldMap" ref="pubmedInputMap" />
+	</bean>
+
+	<bean name="pubmedInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="pubmedID" value="pubmedID" />
+				<entry key="doi" value="doi" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
+				<entry key="journalTitle" value="journal" />
+				<entry key="articleTitle" value="title" />
+				<entry key="pubDate" value="issued" />
+				<entry key="journalVolume" value="volume" />
+				<entry key="journalIssue" value="issue" />
+				<entry key="language" value="language" />
+				<entry key="publicationType" value="subtype" />
+				<entry key="primaryKeyword" value="keywords" />
+				<entry key="secondaryKeyword" value="keywords" />
+				<entry key="primaryMeshHeading" value="mesh" />
+				<entry key="secondaryMeshHeading" value="mesh" />
+				<entry key="startPage" value="firstpage" />
+				<entry key="endPage" value="lastpage" />
+				<entry key="abstractText" value="abstract" />
+				<entry key="publicationStatus" value="publicationStatus" />
+				<entry key="author" value="authors" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="pubblicationModel" value="" />
+				 -->
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- Arxiv Data Loaders -->
+	<bean id="arXivOnlineDataLoader" class="org.dspace.submit.lookup.ArXivOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="arxivInputMap" />
+	</bean>
+
+	<bean id="arXivFileDataLoader" class="org.dspace.submit.lookup.ArXivFileDataLoader">
+		<property name="fieldMap" ref="arxivInputMap" />
+	</bean>
+
+	<bean name="arxivInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="journalRef" value="journal" />
+				<entry key="doi" value="doi" />
+				<entry key="author" value="authors" />
+				<entry key="authorWithAffiliation" value="authorsWithAffiliation" />
+				<entry key="comment" value="note" />
+				<entry key="published" value="issued" />
+				<entry key="articleTitle" value="title" />
+				<entry key="summary" value="abstract" />
+				<entry key="id" value="url" />
+				<entry key="pdfUrl" value="fulltextUrl" />
+				<entry key="primaryCategory" value="arxivCategory" />
+				<entry key="category" value="arxivCategory" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- CrossRef Data Loaders -->
+	<bean id="crossRefOnlineDataLoader" class="org.dspace.submit.lookup.CrossRefOnlineDataLoader">
+		<property name="searchProvider" value="false" />
+		<!-- For CrossRef service you need to obtain an API Key from CrossRef. Once you get it, add it 
+			 to the following configuration value 
+		-->
+		<property name="apiKey" value="" />
+		<!-- Uncomment the following line if you want to define the max results returned by the 
+			 CrossRef free text (by author, title, date) search. Default value is 10 
+		-->
+		<!-- <property name="maxResults" value="10" /> -->
+		<property name="fieldMap" ref="crossrefInputMap" />
+	</bean>
+
+	<bean id="crossRefFileDataLoader" class="org.dspace.submit.lookup.CrossRefFileDataLoader">
+		<property name="fieldMap" ref="crossrefInputMap" />
+	</bean>
+
+	<bean name="crossrefInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="journalTitle" value="journal" />
+				<entry key="doi" value="doi" />
+				<entry key="authors" value="authors" />
+				<entry key="printISSN" value="jissn" />
+				<entry key="electronicISSN" value="jeissn" />
+				<entry key="year" value="issued" />
+				<entry key="articleTitle" value="title" />
+				<entry key="volume" value="volume" />
+				<entry key="issue" value="issue" />
+				<entry key="firstPage" value="firstpage" />
+				<entry key="lastPage" value="lastpage" />
+				<entry key="printISBN" value="pisbn" />
+				<entry key="electronicISBN" value="eisbn" />
+				<entry key="editionNumber" value="editionnumber" />
+				<entry key="seriesTitle" value="seriestitle" />
+				<entry key="volumeTitle" value="volumetitle" />
+				<entry key="editors" value="editors" />
+				<entry key="translators" value="translators" />
+				<entry key="chairs" value="chairs" />
+				<entry key="doyType" value="subtype" />
+				<!-- Not used -->
+				<!-- 
+					<entry key="publicationType" value="" />
+				 -->
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- CiNii -->
+	<bean id="ciniiOnlineDataLoader" class="org.dspace.submit.lookup.CiNiiOnlineDataLoader">
+            <property name="searchProvider" value="false" />
+            <!-- For CiNii service you need to obtain an Application ID from NII. 
+                 Once you get it, add it to the following configuration value.
+                 For details, see http://ci.nii.ac.jp/info/en/api/developer.html
+             -->
+            <property name="appId" value="" />
+            <!-- Uncomment the following line if you want to define the max results 
+                 returned by the CiNii free text (by author, title, date) search. 
+                 Default value is 10 
+             -->
+            <!-- <property name="maxResults" value="10" /> -->
+            <property name="fieldMap" ref="ciniiInputMap" />
+	</bean>
+
+	<bean id="ciniiFileDataLoader" class="org.dspace.submit.lookup.CiNiiFileDataLoader">
+            <property name="fieldMap" ref="ciniiInputMap" />
+	</bean>
+
+	<bean name="ciniiInputMap" class="java.util.HashMap" scope="prototype">
+            <constructor-arg>
+                <map key-type="java.lang.String" value-type="java.lang.String">
+                    <entry key="naid" value="naid" />
+                    <entry key="ncid" value="ncid" />
+                    <entry key="issn" value="jissn" />
+                    <entry key="journal" value="journal" />
+                    <entry key="title" value="title" />
+                    <entry key="issued" value="issued" />
+                    <entry key="volume" value="volume" />
+                    <entry key="issue" value="issue" />
+                    <entry key="spage" value="firstpage" />
+                    <entry key="epage" value="lastpage" />
+                    <entry key="language" value="language" />
+                    <entry key="description" value="abstract" />
+                    <entry key="subjects" value="keywords" />
+                    <entry key="authors" value="authors" />
+                    <entry key="publisher" value="publisher" />
+                </map>
+            </constructor-arg>
+	</bean>
+
+	<!-- **************************************************************************************************** -->
+	<!-- Output Mapping 																					  -->
+	<!-- **************************************************************************************************** -->
+
+	<!-- The output generator needs a configuration on how to map internal records 
+		to the DSpace metadata fields. The following map specifies this relationship. 
+		The value needs to be the label that the record internally associates with 
+		the specific data and it is specified in the data loader beans. The key is 
+		in the format of <schema>.<element>[.<qualifier>] and specified the dspace 
+		metadata field that the value will map to. -->
+	<bean name="outputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry value="jissn" key="dc.identifier.issn" />
+				<entry value="pisbn" key="dc.identifier.isbn" />
+				<entry value="journal" key="dc.source" />
+				<entry value="title" key="dc.title" />
+				<entry value="issued" key="dc.date.issued" />
+				<entry value="language" key="dc.language.iso" />
+				<entry value="subtype" key="dc.type" />
+				<entry value="authors" key="dc.contributor.author" />
+				<entry value="editors" key="dc.contributor.editor" />
+				<entry value="translators" key="dc.contributor.other" />
+				<entry value="chairs" key="dc.contributor.other" />
+				<entry value="abstract" key="dc.description.abstract" />
+				<entry value="allkeywords" key="dc.subject" />
+				<entry value="arxivCategory" key="dc.subject" />
+				<entry value="doi" key="dc.identifier" />
+				<entry value="publisher" key="dc.publisher" />
+				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
+				<!-- 
+				<entry value="url" key="" />
+				<entry value="note" key="" />
+				<entry value="fulltextUrl" key="" />
+				<entry value="authorsWithAffiliation" key="" />
+				<entry value="pubmedID" key="" />
+				<entry value="publicationStatus" key="" />
+				<entry value="jeissn" key="" />
+				<entry value="volume" key="" />
+				<entry value="issue" key="" />
+				<entry value="firstpage" key="" />
+				<entry value="lastpage" key="" />
+				<entry value="eisbn" key="" />
+				<entry value="editionnumber" key="" />
+				<entry value="seriestitle" key="" />
+				<entry value="volumetitle" key="" />
+				<entry value="titleAlternative" key="" />
+				<entry value="authorAlternative" key="" />
+				<entry value="ncid" key="" />
+				<entry value="naid" key="" />
+				 -->
+				 
+			</map>
+		</constructor-arg>
+	</bean>
+
+</beans>

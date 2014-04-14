@@ -26,7 +26,7 @@ public class CrossLinks
 	private Map<String, String> links = new HashMap<String, String>();
 	
 	/**
-	 * Construct a new object which will obtain the configuration for itself
+	 * Construct a new object which will obtain the configuration for itself.
 	 * 
 	 * @throws BrowseException
 	 */
@@ -54,10 +54,9 @@ public class CrossLinks
 	}
 
 	/**
-	 * Is there a link for the given canonical form of metadata (i.e. schema.element.qualifier)
+	 * Is there a link for the given canonical form of metadata (i.e. schema.element.qualifier)?
 	 * 
 	 * @param metadata	the metadata to check for a link on
-	 * @return
 	 */
 	public boolean hasLink(String metadata)
 	{
@@ -65,10 +64,9 @@ public class CrossLinks
 	}
 	
 	/**
-	 * get the type of link that the bit of metadata has
+	 * Get the type of link that the bit of metadata has.
 	 * 
 	 * @param metadata	the metadata to get the link type for
-	 * @return
 	 */
 	public String getLinkType(String metadata)
 	{

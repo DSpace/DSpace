@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  * exceptions. This class is intended for declarations and catch clauses.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class PackageException extends Exception
 {

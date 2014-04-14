@@ -17,7 +17,7 @@ import org.dspace.core.Context;
  * invoked asynchronously, once in a long time period, rather than synchronously
  * after every Context.commit().
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public interface Consumer
 {

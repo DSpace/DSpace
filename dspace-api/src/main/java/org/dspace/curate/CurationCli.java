@@ -17,7 +17,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
-import org.dspace.content.Community;
+import org.dspace.content.Site;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
@@ -48,6 +48,10 @@ public class CurationCli
                 "email address of curating eperson");
         options.addOption("r", "reporter", true,
                 "reporter to manage results - use '-' to report to console. If absent, no reporting");
+        options.addOption("l", "limit", true,
+                "maximum number of objects allowed in context cache. If absent, no limit");
+        options.addOption("s", "scope", true,
+                "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' applies");
         options.addOption("v", "verbose", false,
                 "report activity to stdout");
         options.addOption("h", "help", false, "help");
@@ -60,6 +64,8 @@ public class CurationCli
         String taskQueueName = null;
         String ePersonName = null;
         String reporterName = null;
+        String limit = null;
+        String scope = null;
         boolean verbose = false;
 
         if (line.hasOption('h'))
@@ -104,6 +110,16 @@ public class CurationCli
         { // report file
             reporterName = line.getOptionValue('r');
         }
+        
+        if (line.hasOption('l'))
+        { // cache limit
+            limit = line.getOptionValue('l');
+        }
+        
+        if (line.hasOption('s'))
+        { // transaction scope
+            scope = line.getOptionValue('s');
+        }
 
         if (line.hasOption('v'))
         { // verbose
@@ -122,6 +138,18 @@ public class CurationCli
             System.out.println("A curation task or queue must be specified (-h for help)");
             System.exit(1);
         }
+        
+        if (limit != null && Integer.parseInt(limit) <= 0 )
+        {
+        	System.out.println("Cache limit '" + limit + "' must be a positive integer");
+        	System.exit(1);
+        }
+        
+        if (scope != null && Curator.TxScope.valueOf(scope.toUpperCase()) == null)
+    	{
+        	System.out.println("Bad transaction scope '" + scope + "': only 'object', 'curation' or 'open' recognized");
+        	System.exit(1);
+    	}
 
         Context c = new Context();
         if (ePersonName != null)
@@ -143,6 +171,15 @@ public class CurationCli
         if (reporterName != null)
         {
             curator.setReporter(reporterName);
+        }
+        if (limit != null)
+        {
+        	curator.setCacheLimit(Integer.parseInt(limit));
+        }
+        if (scope != null)
+        {
+        	Curator.TxScope txScope = Curator.TxScope.valueOf(scope.toUpperCase());
+        	curator.setTransactionScope(txScope);
         }
         // we are operating in batch mode, if anyone cares.
         curator.setInvoked(Curator.Invoked.BATCH);
@@ -197,15 +234,8 @@ public class CurationCli
             }
             if ("all".equals(idName))
             {
-                // run on all top-level communities
-                for (Community comm : Community.findAllTop(c))
-                {
-                    if (verbose)
-                    {
-                       System.out.println("Curating community: " + comm.getHandle());
-                    }
-                    curator.curate(comm);
-                }
+            	// run on whole Site
+            	curator.curate(c, Site.getSiteHandle());
             }
             else
             {

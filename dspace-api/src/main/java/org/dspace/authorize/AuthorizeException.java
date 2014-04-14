@@ -14,7 +14,7 @@ import org.dspace.content.DSpaceObject;
  * to perform a particular action.
  * 
  * @author David Stuve
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class AuthorizeException extends Exception
 {

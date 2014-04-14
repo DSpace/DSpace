@@ -50,10 +50,9 @@ public interface ItemCountDAO
 	/**
 	 * Get the number of items in the given DSpaceObject container.  This method will
 	 * only succeed if the DSpaceObject is an instance of either a Community or a
-	 * Collection.  Otherwise it will throw an exception
+	 * Collection.  Otherwise it will throw an exception.
 	 * 
 	 * @param dso
-	 * @return
 	 * @throws ItemCountException
 	 */
 	public int getCount(DSpaceObject dso) throws ItemCountException;

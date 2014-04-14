@@ -37,7 +37,7 @@ import org.dspace.handle.HandleManager;
  */
 public class Harvest
 {
-	private static Context context;
+    private static Context context;
 	
     public static void main(String[] argv) throws Exception
     {
@@ -251,6 +251,8 @@ public class Harvest
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
+
+            pingResponder(oaiSource, oaiSetID, metadataKey);
         }
     }
     
@@ -435,49 +437,80 @@ public class Harvest
 
         System.out.println("Harvest complete. ");
     }
-    
-    
+
     /**
      * Resets harvest_status and harvest_start_time flags for all collections that have a row in the harvested_collections table 
      */
     private static void resetHarvesting() {
     	System.out.print("Resetting harvest status flag on all collections... ");
-    	
-    	try 
+
+    	try
     	{
-	    	List<Integer> cids = HarvestedCollection.findAll(context);
-	    	for (Integer cid : cids) 
-	    	{
-	    		HarvestedCollection hc = HarvestedCollection.find(context, cid);
-	    		//hc.setHarvestResult(null,"");
-	    		hc.setHarvestStartTime(null);
-	    		hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
-	    		hc.update();
-	    	}
-	    	context.commit();
-	    	System.out.println("success. ");
+            List<Integer> cids = HarvestedCollection.findAll(context);
+            for (Integer cid : cids)
+            {
+                HarvestedCollection hc = HarvestedCollection.find(context, cid);
+                //hc.setHarvestResult(null,"");
+                hc.setHarvestStartTime(null);
+                hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+                hc.update();
+            }
+            context.commit();
+            System.out.println("success. ");
     	}
     	catch (Exception ex) {
-    		System.out.println("failed. ");
-    		ex.printStackTrace();
+            System.out.println("failed. ");
+            ex.printStackTrace();
     	}    	
     }
-    
-    
+
     /**
      * Starts up the harvest scheduler. Terminating this process will stop the scheduler.
      */
     private static void startHarvester() 
     {
-	    try 
-	    {
-	    	System.out.print("Starting harvest loop... ");
-	    	OAIHarvester.startNewScheduler();
-	    	System.out.println("running. ");
+        try
+        {
+            System.out.print("Starting harvest loop... ");
+            OAIHarvester.startNewScheduler();
+            System.out.println("running. ");
     	}
     	catch (Exception ex) {
-    		ex.printStackTrace();
+            ex.printStackTrace();
     	}
     }
-    
+
+    /**
+     * See if the responder is alive and working.
+     *
+     * @param server address of the responder's host.
+     * @param set name of an item set.
+     * @param metadataFormat local prefix name, or null for "dc".
+     */
+    private static void pingResponder(String server, String set, String metadataFormat)
+    {
+        List<String> errors;
+
+        System.out.print("Testing basic PMH access:  ");
+        errors = OAIHarvester.verifyOAIharvester(server, set,
+                (null != metadataFormat) ? metadataFormat : "dc", false);
+        if (errors.isEmpty())
+            System.out.println("OK");
+        else
+        {
+            for (String error : errors)
+                System.err.println(error);
+        }
+
+        System.out.print("Testing ORE support:  ");
+        errors = OAIHarvester.verifyOAIharvester(server, set,
+                (null != metadataFormat) ? metadataFormat : "dc", true);
+        if (errors.isEmpty())
+            System.out.println("OK");
+        else
+        {
+            for (String error : errors)
+                System.err.println(error);
+        }
+    }
 }

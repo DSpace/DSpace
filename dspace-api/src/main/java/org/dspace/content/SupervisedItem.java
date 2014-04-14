@@ -23,7 +23,7 @@ import org.dspace.storage.rdbms.TableRow;
  * WorkspaceItem class and adds the methods required to be a Supervised Item.
  *
  * @author Richard Jones
- * @version  $Revision: 5844 $
+ * @version  $Revision$
  */
 public class SupervisedItem extends WorkspaceItem
 {

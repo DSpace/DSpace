@@ -10,10 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -38,7 +35,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * removing bitstreams has instant effect in the database.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Bundle extends DSpaceObject
 {
@@ -85,19 +82,19 @@ public class Bundle extends DSpaceObject
         {
             bitstreamOrderingDirection = "ASC";
         }
-        
+
         StringBuilder query = new StringBuilder();
-        query.append("SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE");
+        query.append("SELECT bitstream.*,bundle2bitstream.bitstream_order FROM bitstream, bundle2bitstream WHERE");
         query.append(" bundle2bitstream.bitstream_id=bitstream.bitstream_id AND");
         query.append(" bundle2bitstream.bundle_id= ?");
-        query.append(" ORDER BY bitstream.");
+        query.append(" ORDER BY ");
         query.append(bitstreamOrderingField);
         query.append(" ");
         query.append(bitstreamOrderingDirection);
 
         // Get bitstreams
-        TableRowIterator tri = DatabaseManager.queryTable(
-                ourContext, "bitstream",
+        TableRowIterator tri = DatabaseManager.query(
+                ourContext,
                 query.toString(),
                 bundleRow.getIntColumn("bundle_id"));
 
@@ -105,7 +102,7 @@ public class Bundle extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow r = (TableRow) tri.next();
+                TableRow r = tri.next();
 
                 // First check the cache
                 Bitstream fromCache = (Bitstream) context.fromCache(
@@ -117,6 +114,9 @@ public class Bundle extends DSpaceObject
                 }
                 else
                 {
+                    //Since bitstreams can be ordered by a column in bundle2bitstream
+                    //We cannot use queryTable & so we need to add our table later on
+                    r.setTable("bitstream");
                     bitstreams.add(new Bitstream(ourContext, r));
                 }
             }
@@ -449,11 +449,66 @@ public class Bundle extends DSpaceObject
         // FIXME: multiple inclusion is affected by this...
         AuthorizeManager.inheritPolicies(ourContext, this, b);
 
+        //Determine the current highest bitstream order in our bundle2bitstream table 
+        //This will always append a newly added bitstream as the last one 
+        int bitstreamOrder = 0;  //bitstream order starts at '0' index
+        TableRow tableRow = DatabaseManager.querySingle(ourContext, "SELECT MAX(bitstream_order) as max_value FROM bundle2bitstream WHERE bundle_id=?", getID());
+        if(tableRow != null){
+            bitstreamOrder = tableRow.getIntColumn("max_value") + 1;
+        }
+
         // Add the mapping row to the database
         TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
+        mappingRow.setColumn("bitstream_order", bitstreamOrder);
         DatabaseManager.insert(ourContext, mappingRow);
+    }
+
+    /**
+     * Changes bitstream order according to the array
+     * @param bitstreamIds the identifiers in the order they are to be set
+     * @throws SQLException when an SQL error has occurred (querying DSpace)
+     * @throws AuthorizeException If the user can't make the changes
+     */
+    public void setOrder(int bitstreamIds[]) throws AuthorizeException, SQLException {
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+
+        //Map the bitstreams of the bundle by identifier
+        Map<Integer, Bitstream> bitstreamMap = new HashMap<Integer, Bitstream>();
+        for (Bitstream bitstream : bitstreams) {
+            bitstreamMap.put(bitstream.getID(), bitstream);
+        }
+
+        //We need to also reoder our cached bitstreams list
+        bitstreams = new ArrayList<Bitstream>();
+        for (int i = 0; i < bitstreamIds.length; i++) {
+            int bitstreamId = bitstreamIds[i];
+
+            //TODO: take into account the asc & desc ! from the dspace.cfg
+            TableRow row = DatabaseManager.querySingleTable(ourContext, "bundle2bitstream",
+                    "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ", bitstreamId);
+
+            if(row == null){
+                //This should never occur but just in case
+                log.warn(LogManager.getHeader(ourContext, "Invalid bitstream id while changing bitstream order", "Bundle: " + getID() + ", bitstream id: " + bitstreamId));
+            }else{
+                row.setColumn("bitstream_order", i);
+                DatabaseManager.update(ourContext, row);
+            }
+
+            // Place the bitstream in the list of bitstreams in this bundle
+            bitstreams.add(bitstreamMap.get(bitstreamId));
+        }
+
+        //The order of the bitstreams has changed, ensure that we update the last modified of our item
+        Item owningItem = (Item) getParentObject();
+        if(owningItem != null)
+        {
+            owningItem.updateLastModified();
+            owningItem.update();
+
+        }
     }
 
     /**
@@ -492,7 +547,16 @@ public class Bundle extends DSpaceObject
         }
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
-        
+
+        //Ensure that the last modified from the item is triggered !
+        Item owningItem = (Item) getParentObject();
+        if(owningItem != null)
+        {
+            owningItem.updateLastModified();
+            owningItem.update();
+
+        }
+
         // In the event that the bitstream to remove is actually
         // the primary bitstream, be sure to unset the primary
         // bitstream.
@@ -746,5 +810,11 @@ public class Bundle extends DSpaceObject
         {
             return null;
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
     }
 }

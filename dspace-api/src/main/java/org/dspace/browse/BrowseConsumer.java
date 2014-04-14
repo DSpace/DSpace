@@ -38,7 +38,7 @@ import org.dspace.event.Event;
  *
  * Recommended filter:  Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
  *
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class BrowseConsumer implements Consumer
 {
@@ -73,7 +73,7 @@ public class BrowseConsumer implements Consumer
 
         // If an Item is created or its metadata is modified..
         case Constants.ITEM:
-            if (et == Event.MODIFY_METADATA || et == Event.CREATE)
+            if (et == Event.MODIFY_METADATA || et == Event.CREATE || et == Event.MODIFY)
             {
                 Item subj = (Item)event.getSubject(ctx);
                 if (subj != null)

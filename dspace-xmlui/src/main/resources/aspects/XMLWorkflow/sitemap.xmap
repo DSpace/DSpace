@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+
+<!--
+
+  The XML Workflow Aspect is responsible
+  the workflow process, and finally ingesting the new items into the
+  DSpace repository.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:transformers>
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.xmlworkflow.Navigation"/>
+            <map:transformer name="Submissions" src="org.dspace.app.xmlui.aspect.xmlworkflow.Submissions"/>
+
+            <map:transformer name="WorkflowTransformer"
+                             src="org.dspace.app.xmlui.aspect.xmlworkflow.WorkflowTransformer"/>
+            <map:transformer name="WorkflowExceptionTransformer"
+                             src="org.dspace.app.xmlui.aspect.xmlworkflow.WorkflowExceptionTransformer"/>
+            <map:transformer name="WorkflowOverviewTransformer"
+                             src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.WorkflowOverviewTransformer"/>
+            <map:transformer name="WorkflowItemTransformer"
+                             src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.WorkflowItemTransformer"/>
+        </map:transformers>
+
+        <map:selectors>
+            <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+        </map:selectors>
+
+        <map:matchers default="wildcard">
+            <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+            <map:matcher name="HandleAuthorizedMatcher"
+                         src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+            <map:matcher name="regexp" src="org.apache.cocoon.matching.RegexpURIMatcher"/>
+        </map:matchers>
+
+        <map:actions>
+            <map:action name="ClaimTasksAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.ClaimTasksAction"/>
+            <map:action name="UnclaimTasksAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.UnclaimTasksAction"/>
+            <map:action name="ReturnToSubmitterAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.ReturnToSubmitterAction"/>
+            <map:action name="DeleteWorkflowItemsAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.DeleteWorkflowItemsAction"/>
+        </map:actions>
+
+    </map:components>
+
+
+    <map:flow language="javascript">
+        <map:script src="xmlworkflow.js"/>
+    </map:flow>
+
+    <map:pipelines>
+        <map:pipeline>
+
+            <!-- Make sure the user is atleast logged in -->
+            <map:select type="AuthenticatedSelector">
+                <map:when test="eperson">
+
+
+                    <!-- Workflow task "flow" -->
+                    <map:match pattern="handle/*/*/xmlworkflow">
+                        <map:match type="request" pattern="submission-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+                        <map:call function="doWorkflow"/>
+                    </map:match>
+
+
+                    <map:generate/>
+
+                    <map:transform type="Navigation"/>
+
+
+                    <map:match pattern="admin/xmlworkflowoverview">
+                        <!--Check if the send back to submitter button is pressed-->
+                        <map:match type="request" pattern="submit_submitter">
+                            <map:act type="ReturnToSubmitterAction"/>
+                        </map:match>
+                        <map:match type="request" pattern="submit_delete">
+                            <map:act type="DeleteWorkflowItemsAction"/>
+                        </map:match>
+
+                        <map:transform type="WorkflowOverviewTransformer"/>
+                    </map:match>
+
+                    <map:match pattern="admin/display-workflowItem">
+                        <map:transform type="WorkflowItemTransformer"/>
+                    </map:match>
+
+
+                    <!--
+                    The submissions page provides a list of all submission
+                    related tasks/items/thingys. It is used by both those
+                    who are submitting new items to dspace and those who are
+                    reviewing those submissions.
+                    -->
+                    <map:match pattern="submissions">
+                        <map:match type="request" pattern="submit_take_tasks">
+                            <map:act type="ClaimTasksAction" />
+                        </map:match>
+
+                        <map:match type="request" pattern="submit_return_tasks">
+                            <map:act type="UnclaimTasksAction"/>
+                        </map:match>
+
+                        <map:transform type="Submissions"/>
+                    </map:match>
+
+                    <!--
+
+                    Flow pages Steps
+
+                    -->
+                    <map:match pattern="handle/*/*/xmlworkflow/getTask">
+                        <map:transform type="WorkflowTransformer">
+                            <map:parameter name="workflowID" value="{flow-attribute:workflowID}"/>
+                            <map:parameter name="stepID" value="{flow-attribute:stepID}"/>
+                            <map:parameter name="actionID" value="{flow-attribute:actionID}"/>
+                        </map:transform>
+                    </map:match>
+
+                    <map:match pattern="handle/*/*/xmlworkflow/workflowexception">
+                        <map:transform type="WorkflowExceptionTransformer">
+                            <map:parameter name="error" value="{flow-attribute:error}"/>
+                        </map:transform>
+                    </map:match>
+
+                    <map:match pattern="handle/*/*/workflow/workflowexception">
+                        <map:transform type="WorkflowExceptionTransformer">
+                            <map:parameter name="error" value="{flow-attribute:error}"/>
+                        </map:transform>
+                    </map:match>
+
+                    <map:match type="WildcardParameterMatcher" pattern="true">
+                        <map:parameter name="parameter-name" value="flow"/>
+                        <map:parameter name="flow" value="{flow-attribute:flow}"/>
+
+
+                    </map:match>
+                    <!-- flow match-->
+
+                    <map:serialize type="xml"/>
+
+                </map:when>
+                <map:otherwise>
+
+                    <!-- non-authenticated users -->
+                    <map:generate/>
+
+                    <!--
+                    If the user is going to the xmlworkflow page and they are
+                    not logged in then ask them to login first. This will also
+                    handle cases where user's sessions are timed out, after logging
+                    back in they will be able to resume their flow.
+                    -->
+                    <map:match pattern="handle/*/*/xmlworkflow">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+
+                    <map:match pattern="admin/xmlworkflowoverview">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+
+                    <map:serialize/>
+
+                </map:otherwise>
+            </map:select>
+
+        </map:pipeline>
+    </map:pipelines>
+
+
+</map:sitemap>

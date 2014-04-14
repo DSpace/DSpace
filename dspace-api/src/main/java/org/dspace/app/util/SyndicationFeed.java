@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 
 import org.dspace.content.Bitstream;
@@ -33,6 +34,8 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndEnclosure;
+import com.sun.syndication.feed.synd.SyndEnclosureImpl;
 import com.sun.syndication.feed.synd.SyndImage;
 import com.sun.syndication.feed.synd.SyndImageImpl;
 import com.sun.syndication.feed.synd.SyndPerson;
@@ -42,10 +45,13 @@ import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.module.DCModuleImpl;
 import com.sun.syndication.feed.module.DCModule;
 import com.sun.syndication.feed.module.Module;
+import com.sun.syndication.feed.module.itunes.*;
+import com.sun.syndication.feed.module.itunes.types.Duration;
 import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.FeedException;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bundle;
 
 /**
  * Invoke ROME library to assemble a generic model of a syndication
@@ -80,6 +86,7 @@ public class SyndicationFeed
     private static String defaultAuthorField = "dc.contributor.author";
     private static String defaultDateField = "dc.date.issued";
     private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
+    private static String defaultExternalMedia = "dc.source.uri";
 
     // metadata field for Item title in entry:
     private static String titleField =
@@ -96,6 +103,9 @@ public class SyndicationFeed
     private static String authorField =
         getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
 
+    // metadata field for Podcast external media source url
+    private static String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
+
     // metadata field for Item dc:creator field in entry's DCModule (no default)
     private static String dcCreatorField = ConfigurationManager.getProperty("webui.feed.item.dc.creator");
 
@@ -105,6 +115,8 @@ public class SyndicationFeed
     // metadata field for Item dc:author field in entry's DCModule (no default)
     private static String dcDescriptionField = ConfigurationManager.getProperty("webui.feed.item.dc.description");
 
+    // List of available mimetypes that we'll add to podcast feed. Multiple values separated by commas
+    private static String podcastableMIMETypes = getDefaultedConfiguration("webui.feed.podcast.mimetypes", "audio/x-mpeg");
 
     // -------- Instance variables:
 
@@ -114,6 +126,8 @@ public class SyndicationFeed
     // memory of UI that called us, "xmlui" or "jspui"
     // affects Bitstream retrieval URL and I18N keys
     private String uiType = null;
+
+    private HttpServletRequest request = null;
 
     /**
      * Constructor.
@@ -135,33 +149,7 @@ public class SyndicationFeed
         return (String[]) ArrayUtils.clone(descriptionFields);
     }
 
-    /**
-     * Strip out control characters, which are invalid XML.
-     */
-    private String stripControl(String value){
-        // strip out control characters
-        StringBuffer sb = new StringBuffer(value);
-        stripControl(sb);
-    	return sb.toString();	
-    }
-    
-    /**
-     * Strip out control characters, which are invalid XML.
-     */
-    private void stripControl(StringBuffer sb){
-        // strip out control characters
-        for (int j=0; j < sb.length(); j++) {
-    	    if (Character.isISOControl(sb.charAt(j)) 
-    	        && sb.charAt(j) != '\t'
-    	    	&& sb.charAt(j) != '\r'
-    	    	&& sb.charAt(j) != '\n'
-    	       ) 
-    	    {
-                sb.setCharAt(j, '\ufffd');
-    		}
-    	}
-    }
-    
+
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
      */
@@ -171,6 +159,8 @@ public class SyndicationFeed
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
+        boolean podcastFeed = false;
+        this.request = request;
 
         // dso is null for the whole site, or a search without scope
         if (dso == null)
@@ -189,6 +179,10 @@ public class SyndicationFeed
                 defaultTitle = col.getMetadata("name");
                 feed.setDescription(col.getMetadata("short_description"));
                 logo = col.getLogo();
+                String cols = ConfigurationManager.getProperty("webui.feed.podcast.collections");
+                if(cols != null && cols.length() > 1 && cols.contains(col.getHandle()) ) {
+                    podcastFeed = true;
+                }
             }
             else if (dso.getType() == Constants.COMMUNITY)
             {
@@ -196,6 +190,10 @@ public class SyndicationFeed
                 defaultTitle = comm.getMetadata("name");
                 feed.setDescription(comm.getMetadata("short_description"));
                 logo = comm.getLogo();
+                String comms = ConfigurationManager.getProperty("webui.feed.podcast.communities");
+                if(comms != null && comms.length() > 1 && comms.contains(comm.getHandle()) ){
+                    podcastFeed = true;
+                }
             }
             objectURL = resolveURL(request, dso);
             if (logo != null)
@@ -216,7 +214,11 @@ public class SyndicationFeed
             // be contained in the rdf. Not all RSS-viewers show this logo.
             SyndImage image = new SyndImageImpl();
             image.setLink(objectURL);
-            image.setTitle(localize(labels, MSG_LOGO_TITLE));
+            if (StringUtils.isNotBlank(feed.getTitle())) {
+                image.setTitle(feed.getTitle());
+            } else {
+                image.setTitle(localize(labels, MSG_LOGO_TITLE));
+            }
             image.setUrl(logoURL);
             feed.setImage(image);
         }
@@ -241,7 +243,7 @@ public class SyndicationFeed
                 entry.setUri(entryURL);
              
                 String title = getOneDC(item, titleField);
-                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : stripControl(title));
+                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
              
                 // "published" date -- should be dc.date.issued
                 String pubDate = getOneDC(item, dateField);
@@ -291,7 +293,6 @@ public class SyndicationFeed
                 {
                     SyndContent desc = new SyndContentImpl();
                     desc.setType("text/plain");
-                    stripControl(db);
                     desc.setValue(db.toString());
                     entry.setDescription(desc);
                 }
@@ -304,7 +305,7 @@ public class SyndicationFeed
                     for (DCValue author : authors)
                     {
                         SyndPerson sp = new SyndPersonImpl();
-                        sp.setName(stripControl(author.value));
+                        sp.setName(author.value);
                         creators.add(sp);
                     }
                     entry.setAuthors(creators);
@@ -323,7 +324,7 @@ public class SyndicationFeed
                             List<String> creators = new ArrayList<String>();
                             for (DCValue author : dcAuthors)
                             {
-                                creators.add(stripControl(author.value));
+                                creators.add(author.value);
                             }
                             dc.setCreators(creators);
                         }
@@ -350,11 +351,83 @@ public class SyndicationFeed
                                 }
                                 descs.append(d.value);
                             }
-                            stripControl(descs);
                             dc.setDescription(descs.toString());
                         }
                     }
                     entry.getModules().add(dc);
+                }
+
+                //iTunes Podcast Support - START
+                if (podcastFeed)
+                {
+                    // Add enclosure(s)
+                    List<SyndEnclosure> enclosures = new ArrayList();
+                    try {
+                        Bundle[] bunds = item.getBundles("ORIGINAL");
+                        if (bunds[0] != null) {
+                            Bitstream[] bits = bunds[0].getBitstreams();
+                            for (int i = 0; (i < bits.length); i++) {
+                                String mime = bits[i].getFormat().getMIMEType();
+                                if(podcastableMIMETypes.contains(mime)) {
+                                    SyndEnclosure enc = new SyndEnclosureImpl();
+                                    enc.setType(bits[i].getFormat().getMIMEType());
+                                    enc.setLength(bits[i].getSize());
+                                    enc.setUrl(urlOfBitstream(request, bits[i]));
+                                    enclosures.add(enc);
+                                } else {
+                                    continue;
+                                }
+                            }
+                        }
+                        //Also try to add an external value from dc.identifier.other
+                        // We are assuming that if this is set, then it is a media file
+                        DCValue[] externalMedia = item.getMetadata(externalSourceField);
+                        if(externalMedia.length > 0)
+                        {
+                            for(int i = 0; i< externalMedia.length; i++)
+                            {
+                                SyndEnclosure enc = new SyndEnclosureImpl();
+                                enc.setType("audio/x-mpeg");        //We can't determine MIME of external file, so just picking one.
+                                enc.setLength(1);
+                                enc.setUrl(externalMedia[i].value);
+                                enclosures.add(enc);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    entry.setEnclosures(enclosures);
+
+                    // Get iTunes specific fields: author, subtitle, summary, duration, keywords
+                    EntryInformation itunes = new EntryInformationImpl();
+
+                    String author = getOneDC(item, authorField);
+                    if (author != null && author.length() > 0) {
+                        itunes.setAuthor(author);                               // <itunes:author>
+                    }
+
+                    itunes.setSubtitle(title == null ? localize(labels, MSG_UNTITLED) : title); // <itunes:subtitle>
+
+                    if (db.length() > 0) {
+                        itunes.setSummary(db.toString());                       // <itunes:summary>
+                    }
+
+                    String extent = getOneDC(item, "dc.format.extent");         // assumed that user will enter this field with length of song in seconds
+                    if (extent != null && extent.length() > 0) {
+                        extent = extent.split(" ")[0];
+                        Integer duration = Integer.parseInt(extent);
+                        itunes.setDuration(new Duration(duration));             // <itunes:duration>
+                    }
+
+                    String subject = getOneDC(item, "dc.subject");
+                    if (subject != null && subject.length() > 0) {
+                        String[] subjects = new String[1];
+                        subjects[0] = subject;
+                        itunes.setKeywords(subjects);                           // <itunes:keywords>
+                    }
+
+                    entry.getModules().add(itunes);
                 }
             }
             feed.setEntries(entries);
@@ -444,7 +517,7 @@ public class SyndicationFeed
      *
      * If the dspaceobject is null then a local url to the repository is generated.
      *
-     * @param dso The object to refrence, null if to the repository.
+     * @param dso The object to reference, null if to the repository.
      * @return
      */
     private String baseURL = null;  // cache the result for null

@@ -50,6 +50,8 @@ import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import org.apache.log4j.Logger;
 
@@ -68,6 +70,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -108,7 +111,7 @@ import org.jdom.output.XMLOutputter;
  * @author Larry Stone
  * @author Robert Tansley
  * @author Tim Donohue
- * @version $Revision: 5932 $
+ * @version $Revision$
  */
 public abstract class AbstractMETSDisseminator
     extends AbstractPackageDisseminator
@@ -177,6 +180,15 @@ public abstract class AbstractMETSDisseminator
     {
         return prefix + "_" + String.valueOf(idCounter++);
     }
+    
+    /**
+     * Resets the unique ID counter used by gensym() method to
+     * determine the @ID values of METS tags.
+     */
+    protected synchronized void resetCounter()
+    {
+        idCounter = 1;
+    }
 
     @Override
     public String getMIMEType(PackageParameters params)
@@ -201,17 +213,22 @@ public abstract class AbstractMETSDisseminator
      * a failure creating the package.
      *
      * @param context  DSpace context.
-     * @param object  DSpace object (item, collection, etc)
+     * @param dso  DSpace object (item, collection, etc)
      * @param params Properties-style list of options specific to this packager
      * @param pkgFile File where export package should be written
-     * @throws PackageValidationException if package cannot be created or there is
-     *  a fatal error in creating it.
+     * @throws PackageValidationException if package cannot be created or there
+     * is a fatal error in creating it.
      */
     @Override
     public void disseminate(Context context, DSpaceObject dso,
                             PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
+        // Reset our 'unique' ID counter back to 1 (in case a previous dissemination was run)
+        // This ensures that the @ID attributes of METS tags always begin at '1', which
+        // also ensures that the Checksums don't change because of accidental @ID value changes.
+        resetCounter();
+        
         FileOutputStream outStream = null;
         try
         {
@@ -1202,7 +1219,7 @@ public abstract class AbstractMETSDisseminator
      * @param type - type attr value for the <div>
      * @param dso - object for which to create the div
      * @param params
-     * @return
+     * @return a new {@code Div} with {@code dso} as child.
      */
     protected Div makeChildDiv(String type, DSpaceObject dso, PackageParameters params)
     {
@@ -1377,7 +1394,7 @@ public abstract class AbstractMETSDisseminator
      * @param context current DSpace Context
      * @param params current Packager Parameters
      * @param dso current DSpace Object
-     * @param ref the rightsMD <mdRef> element
+     * @param mdRef the rightsMD <mdRef> element
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
@@ -1475,14 +1492,78 @@ public abstract class AbstractMETSDisseminator
     }
 
     /**
-     * Return identifier for bitstream in an Item; when making a package,
-     * this is the archive member name (e.g. in Zip file).  In a bare
-     * manifest, it might be an external URL.  The name should be in URL
-     * format ("file:" may be elided for in-archive filenames).  It should
-     * be deterministic, since this gets called twice for each bitstream
-     * when building archive.
+     * Get the URL by which the METS manifest refers to a Bitstream
+     * member within the same package.  In other words, this is generally
+     * a relative path link to where the Bitstream file is within the Zipped
+     * up package.
+     * <p>
+     * For a manifest-only METS, this is a reference to an HTTP URL where
+     * the bitstream should be able to be downloaded from.
+     * 
+     * @param bitstream  the Bitstream
+     * @param params Packager Parameters
+     * @return String in URL format naming path to bitstream.
      */
-    public abstract String makeBitstreamURL(Bitstream bitstream, PackageParameters params);
+    public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
+    {
+        // if bare manifest, use external "persistent" URI for bitstreams
+        if (params != null && (params.getBooleanProperty("manifestOnly", false)))
+        {
+            // Try to build a persistent(-ish) URI for bitstream
+            // Format: {site-base-url}/bitstream/{item-handle}/{sequence-id}/{bitstream-name}
+            try
+            {
+                // get handle of parent Item of this bitstream, if there is one:
+                String handle = null;
+                Bundle[] bn = bitstream.getBundles();
+                if (bn.length > 0)
+                {
+                    Item bi[] = bn[0].getItems();
+                    if (bi.length > 0)
+                    {
+                        handle = bi[0].getHandle();
+                    }
+                }
+                if (handle != null)
+                {
+                    return ConfigurationManager
+                                    .getProperty("dspace.url")
+                            + "/bitstream/"
+                            + handle
+                            + "/"
+                            + String.valueOf(bitstream.getSequenceID())
+                            + "/"
+                            + URLEncoder.encode(bitstream.getName(), "UTF-8");
+                }
+                else
+                {   //no Handle assigned, so persistent(-ish) URI for bitstream is
+                    // Format: {site-base-url}/retrieve/{bitstream-internal-id}
+                    return ConfigurationManager
+                                    .getProperty("dspace.url")
+                            + "/retrieve/"
+                            + String.valueOf(bitstream.getID());
+                }
+            }
+            catch (SQLException e)
+            {
+                log.error("Database problem", e);
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                log.error("Unknown character set", e);
+            }
+
+            // We should only get here if we failed to build a nice URL above
+            // so, by default, we're just going to return the bitstream name.
+            return bitstream.getName();
+        }
+        else
+        {
+            String base = "bitstream_"+String.valueOf(bitstream.getID());
+            String ext[] = bitstream.getFormat().getExtensions();
+            return (ext.length > 0) ? base+"."+ext[0] : base;
+        }
+    }
 
     /**
      * Create metsHdr element - separate so subclasses can override.

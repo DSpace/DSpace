@@ -3,7 +3,7 @@
 --
 -- Version: $$
 --
--- Date:    $Date: 2009-04-23 23:26:59 -0400 (Thu, 23 Apr 2009) $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 -- 

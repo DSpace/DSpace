@@ -13,7 +13,7 @@ package org.dspace.content.crosswalk;
  * and allow for new exception types to be added.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class CrosswalkException extends Exception
 {

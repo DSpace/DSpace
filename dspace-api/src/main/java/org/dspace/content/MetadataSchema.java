@@ -34,7 +34,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * </p>
  *
  * @author Martin Hald
- * @version $Revision: 6027 $
+ * @version $Revision$
  * @see org.dspace.content.MetadataValue
  * @see org.dspace.content.MetadataField
  */

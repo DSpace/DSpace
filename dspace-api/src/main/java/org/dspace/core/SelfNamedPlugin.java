@@ -25,7 +25,7 @@ package org.dspace.core;
  * <code>PluginManager</code> class for more details.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see PluginManager
  */
 public abstract class SelfNamedPlugin

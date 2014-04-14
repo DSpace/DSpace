@@ -45,14 +45,21 @@ public class DSpaceCSV implements Serializable
     /** The value separator (defaults to double pipe '||') */
     protected static String valueSeparator;
 
-    /** The value separator in an escaped form for using in regexs */
+    /** The value separator in an escaped form for using in regexes */
     protected static String escapedValueSeparator;
 
     /** The field separator (defaults to comma) */
     protected static String fieldSeparator;
 
-    /** The field separator in an escaped form for using in regexs */
+    /** The field separator in an escaped form for using in regexes */
     protected static String escapedFieldSeparator;
+
+    /** The authority separator (defaults to double colon '::') */
+    protected static String authoritySeparator;
+
+    /** The authority separator in an escaped form for using in regexes */
+    protected static String escapedAuthoritySeparator;
+
 
     /** Whether to export all metadata such as handles and provenance information */
     private boolean exportAll;
@@ -97,8 +104,11 @@ public class DSpaceCSV implements Serializable
             // Read the heading line
             String head = input.readLine();
             String[] headingElements = head.split(escapedFieldSeparator);
+            int columnCounter = 0;
             for (String element : headingElements)
             {
+                columnCounter++;
+
                 // Remove surrounding quotes if there are any
                 if ((element.startsWith("\"")) && (element.endsWith("\"")))
                 {
@@ -111,11 +121,24 @@ public class DSpaceCSV implements Serializable
                     // Store the heading
                     headings.add(element);
                 }
+                // Store the action
+                else if ("action".equals(element))
+                {
+                    // Store the heading
+                    headings.add(element);
+                }
                 else if (!"id".equals(element))
                 {
                     // Verify that the heading is valid in the metadata registry
                     String[] clean = element.split("\\[");
                     String[] parts = clean[0].split("\\.");
+
+                    if (parts.length < 2) {
+                        throw new MetadataImportInvalidHeadingException(element,
+                                                                        MetadataImportInvalidHeadingException.ENTRY,
+                                                                        columnCounter);
+                    }
+
                     String metadataSchema = parts[0];
                     String metadataElement = parts[1];
                     String metadataQualifier = null;
@@ -127,7 +150,8 @@ public class DSpaceCSV implements Serializable
                     MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
                     if (foundSchema == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA);
+                                                                        MetadataImportInvalidHeadingException.SCHEMA,
+                                                                        columnCounter);
                     }
 
                     // Check that the metadata element exists in the schema
@@ -135,7 +159,8 @@ public class DSpaceCSV implements Serializable
                     MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
                     if (foundField == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.ELEMENT);
+                                                                        MetadataImportInvalidHeadingException.ELEMENT,
+                                                                        columnCounter);
                     }
 
                     // Store the heading
@@ -208,6 +233,9 @@ public class DSpaceCSV implements Serializable
         // Set the field separator
         setFieldSeparator();
 
+        // Set the authority separator
+        setAuthoritySeparator();
+
         // Create the headings
         headings = new ArrayList<String>();
 
@@ -219,7 +247,7 @@ public class DSpaceCSV implements Serializable
 
         // Set the metadata fields to ignore
         ignore = new HashMap<String, String>();
-        String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
+        String toIgnore = ConfigurationManager.getProperty("bulkedit", "ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
             // Set a default value
@@ -237,16 +265,31 @@ public class DSpaceCSV implements Serializable
     }
 
     /**
+     * Decide if this CSV file has an 'action' (case-dependent!) header.
+     *
+     * @return Whether or not there is an 'action' header
+     */
+    public boolean hasActions() {
+        // Look for a heading called 'action'
+        for (String header : headings) {
+            if (header.equals("action")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Set the value separator for multiple values stored in one csv value.
      *
-     * Is set in dspace.cfg as bulkedit.valueseparator
+     * Is set in bulkedit.cfg as valueseparator
      *
      * If not set, defaults to double pipe '||'
      */
     private void setValueSeparator()
     {
         // Get the value separator
-        valueSeparator = ConfigurationManager.getProperty("bulkedit.valueseparator");
+        valueSeparator = ConfigurationManager.getProperty("bulkedit", "valueseparator");
         if ((valueSeparator != null) && (!"".equals(valueSeparator.trim())))
         {
             valueSeparator = valueSeparator.trim();
@@ -265,7 +308,7 @@ public class DSpaceCSV implements Serializable
     /**
      * Set the field separator use to separate fields in the csv.
      *
-     * Is set in dspace.cfg as bulkedit.fieldseparator
+     * Is set in bulkedit.cfg as fieldseparator
      *
      * If not set, defaults to comma ','.
      *
@@ -275,7 +318,7 @@ public class DSpaceCSV implements Serializable
     private void setFieldSeparator()
     {
         // Get the value separator
-        fieldSeparator = ConfigurationManager.getProperty("bulkedit.fieldseparator");
+        fieldSeparator = ConfigurationManager.getProperty("bulkedit", "fieldseparator");
         if ((fieldSeparator != null) && (!"".equals(fieldSeparator.trim())))
         {
             fieldSeparator = fieldSeparator.trim();
@@ -307,6 +350,32 @@ public class DSpaceCSV implements Serializable
         escapedFieldSeparator = match.replaceAll("\\\\$1");
     }
 
+     /**
+     * Set the authority separator for value with authority data.
+     *
+     * Is set in dspace.cfg as bulkedit.authorityseparator
+     *
+     * If not set, defaults to double colon '::'
+     */
+    private void setAuthoritySeparator()
+    {
+        // Get the value separator
+        authoritySeparator = ConfigurationManager.getProperty("bulkedit", "authorityseparator");
+        if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim())))
+        {
+            authoritySeparator = authoritySeparator.trim();
+        }
+        else
+        {
+            authoritySeparator = "::";
+        }
+
+        // Now store the escaped version
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Matcher match = spchars.matcher(authoritySeparator);
+        escapedAuthoritySeparator = match.replaceAll("\\\\$1");
+    }
+
     /**
      * Add a DSpace item to the CSV file
      *
@@ -316,6 +385,12 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(Item i) throws Exception
     {
+        // If the item does not have an "owningCollection" the the below "getHandle()" call will fail
+        // This should not happen but is here for safety.
+        if (i.getOwningCollection() == null) {
+            return;
+        }
+
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
 
@@ -357,7 +432,13 @@ public class DSpaceCSV implements Serializable
             // Store the item
             if (exportAll || okToExport(value))
             {
-                line.add(key, value.value);
+                // Add authority and confidence if authority is not null
+                String mdValue = value.value;
+                if (value.authority != null && !"".equals(value.authority))
+                {
+                    mdValue += authoritySeparator + value.authority + authoritySeparator + value.confidence;
+                }
+                line.add(key, mdValue);
                 if (!headings.contains(key))
                 {
                     headings.add(key);
@@ -376,7 +457,7 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(String line) throws Exception
     {
-        // Check to see if the last character is a field separator, which hides the last empy column
+        // Check to see if the last character is a field separator, which hides the last empty column
         boolean last = false;
         if (line.endsWith(fieldSeparator))
         {
@@ -474,6 +555,11 @@ public class DSpaceCSV implements Serializable
                 }
 
                 // Make sure we register that this column was there
+                if (headings.size() < i) {
+                    throw new MetadataImportInvalidHeadingException("",
+                                                                    MetadataImportInvalidHeadingException.MISSING,
+                                                                    i + 1);
+                }
                 csvLine.add(headings.get(i - 1), null);
                 String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements)
@@ -551,19 +637,13 @@ public class DSpaceCSV implements Serializable
      * Is it Ok to export this value? When exportAll is set to false, we don't export
      * some of the metadata elements.
      *
-     * The list can be configured via the key bulkedit.ignore-on-export in dspace.cfg
+     * The list can be configured via the key ignore-on-export in bulkedit.cfg
      *
      * @param md The DCValue to examine
      * @return Whether or not it is OK to export this element
      */
     private final boolean okToExport(DCValue md)
     {
-        // First check the metadata format, and K all non DC elements
-        if (!"dc".equals(md.schema))
-        {
-            return true;
-        }
-
         // Now compare with the list to ignore
         String key = md.schema + "." + md.element;
         if (md.qualifier != null)

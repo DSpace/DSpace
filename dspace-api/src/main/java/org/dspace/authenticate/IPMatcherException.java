@@ -10,7 +10,7 @@ package org.dspace.authenticate;
 /**
  * Thrown when there is a problem parsing an IP matcher specification.
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @author Robert Tansley
  */
 public class IPMatcherException extends Exception

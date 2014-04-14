@@ -7,13 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -23,8 +16,8 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.browse.ItemCounter;
 import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -36,6 +29,13 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
+
 import javax.servlet.jsp.JspWriter;
 
 /**
@@ -46,7 +46,7 @@ import javax.servlet.jsp.JspWriter;
  * <code>update</code> is called.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Community extends DSpaceObject
 {
@@ -73,6 +73,12 @@ public class Community extends DSpaceObject
 
     /** The default group of administrators */
     private Group admins;
+
+    // Keys for accessing Community metadata
+    public static final String COPYRIGHT_TEXT = "copyright_text";
+    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String SHORT_DESCRIPTION = "short_description";
+    public static final String SIDEBAR_TEXT = "side_bar_text";
 
     /**
      * Construct a community object from a database row.
@@ -576,7 +582,7 @@ public class Community extends DSpaceObject
     /**
      * Update the community metadata (including logo) to the database.
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit();
@@ -778,7 +784,7 @@ public class Community extends DSpaceObject
         return collectionArray;
     }
 
-    /**
+   /**
      * Get the immediate sub-communities of this community. Throws an
      * SQLException because creating a community object won't load in all
      * collections.
@@ -911,6 +917,48 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Return an array of collections of this community and its subcommunities
+     * 
+     * @return an array of collections
+     */
+
+    public Collection[] getAllCollections() throws SQLException
+    {
+        List<Collection> collectionList = new ArrayList<Collection>();
+        for (Community subcommunity : getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        for (Collection collection : getCollections())
+        {
+            collectionList.add(collection);
+        }
+
+        // Put them in an array
+        Collection[] collectionArray = new Collection[collectionList.size()];
+        collectionArray = (Collection[]) collectionList.toArray(collectionArray);
+
+        return collectionArray;
+
+    }
+    /**
+     * Internal method to process subcommunities recursively
+     */
+    private void addCollectionList(Community community, List<Collection> collectionList) throws SQLException
+    {
+        for (Community subcommunity : community.getSubcommunities())
+        {
+            addCollectionList(subcommunity, collectionList);
+        }
+
+        for (Collection collection : community.getCollections())
+        {
+            collectionList.add(collection);
+        }
+    }
+
+    /**
      * Create a new collection within this community. The collection is created
      * without any workflow groups or default submitter group.
      * 
@@ -920,6 +968,25 @@ public class Community extends DSpaceObject
             AuthorizeException
     {
         return createCollection(null);
+    }
+
+    /**
+     * Create a new collection within this community. The collection is created
+     * without any workflow groups or default submitter group.
+     *
+     * @param handle the pre-determined Handle to assign to the new community
+     * @return the new collection
+     */
+    public Collection createCollection(String handle) throws SQLException,
+            AuthorizeException
+    {
+        // Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
+
+        Collection c = Collection.create(ourContext, handle);
+        addCollection(c);
+
+        return c;
     }
 
     /**
@@ -999,34 +1066,41 @@ public class Community extends DSpaceObject
         }
 
         // Update browse indexes for all items in the collection
-        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
-          Item i = ii.next();
+        for (ItemIterator ii = c.getItems(); ii.hasNext();)
+        {
+            Item i = ii.next();
 
-          String message = "Updated browse index";
-          try {
-            // Update browse indices
-            ourContext.turnOffAuthorisationSystem();
-            IndexBrowse ib = new IndexBrowse(ourContext);
-            ib.indexItem(i);
-            ourContext.restoreAuthSystemState();
-          }
-          catch (BrowseException e) {
-            message = e.getMessage();
-          }
+            String message = "Updated browse index";
+            try
+            {
+                // Update browse indices
+                ourContext.turnOffAuthorisationSystem();
+                IndexBrowse ib = new IndexBrowse(ourContext);
+                ib.indexItem(i);
+                ourContext.restoreAuthSystemState();
+            }
+            catch (BrowseException e)
+            {
+                message = e.getMessage();
+            }
 
-	  if (out != null) {
-	    try {
-	      String strHandle = HandleManager.findHandle(ourContext, i);
-	      out.write(message + ": " + strHandle + "<br/>");
-	      for (int x=0; x < 1024; x++) {
-		out.write(" ");
-	      }
-	      out.write("\n");
-	      out.flush();
-	    } 
-	    catch (IOException e) {
-	    }
-	  }
+            if (out != null)
+            {
+                try
+                {
+                    String strHandle = HandleManager.findHandle(ourContext, i);
+                    out.write(message + ": " + strHandle + "<br/>");
+                    for (int x = 0; x < 1024; x++)
+                    {
+                        out.write(" ");
+                    }
+                    out.write("\n");
+                    out.flush();
+                }
+                catch (IOException e)
+                {
+                }
+            }
 
         }
     }
@@ -1155,34 +1229,41 @@ public class Community extends DSpaceObject
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
 
         // Update browse indexes for all items in the collection
-        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
-          Item i = ii.next();
+        for (ItemIterator ii = c.getItems(); ii.hasNext();)
+        {
+            Item i = ii.next();
 
-          String message = "Updated browse index";
-          try {
-            // Update browse indices
-            ourContext.turnOffAuthorisationSystem();
-            IndexBrowse ib = new IndexBrowse(ourContext);
-            ib.indexItem(i);
-            ourContext.restoreAuthSystemState();
-          }
-          catch (BrowseException e) {
-            message = e.getMessage();
-          }
+            String message = "Updated browse index";
+            try
+            {
+                // Update browse indices
+                ourContext.turnOffAuthorisationSystem();
+                IndexBrowse ib = new IndexBrowse(ourContext);
+                ib.indexItem(i);
+                ourContext.restoreAuthSystemState();
+            }
+            catch (BrowseException e)
+            {
+                message = e.getMessage();
+            }
 
-	  if (out != null) {
-	    try {
-	      String strHandle = HandleManager.findHandle(ourContext, i);
-	      out.write(message + ": " + strHandle + "<br/>");
-	      for (int x=0; x < 1024; x++) {
-		out.write(" ");
-	      }
-	      out.write("\n");
-	      out.flush();
-	    } 
-	    catch (IOException e) {
-	    }
-	  }
+            if (out != null)
+            {
+                try
+                {
+                    String strHandle = HandleManager.findHandle(ourContext, i);
+                    out.write(message + ": " + strHandle + "<br/>");
+                    for (int x = 0; x < 1024; x++)
+                    {
+                        out.write(" ");
+                    }
+                    out.write("\n");
+                    out.flush();
+                }
+                catch (IOException e)
+                {
+                }
+            }
 
         }
     }
@@ -1443,7 +1524,7 @@ public class Community extends DSpaceObject
         }
         return total;
     }
-
+    
     /**
      * Set a metadata value
      *
@@ -1500,5 +1581,12 @@ public class Community extends DSpaceObject
         {
             return null;
         }       
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the community HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
     }
 }

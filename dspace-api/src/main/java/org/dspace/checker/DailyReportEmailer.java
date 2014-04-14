@@ -12,21 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -36,6 +22,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Email;
 
 /**
  * <p>
@@ -75,48 +62,20 @@ public class DailyReportEmailer
      * @throws javax.mail.MessagingException
      *             if message cannot be sent.
      */
-    public void sendReport(File attachment, int numberOfBitstreams)
-            throws IOException, javax.mail.MessagingException
-    {
-        // Get the mail configuration properties
-        String server = ConfigurationManager.getProperty("mail.server");
-
-        // Set up properties for mail session
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", server);
-
-        // Get session
-        Session session = Session.getDefaultInstance(props, null);
-
-        MimeMessage msg = new MimeMessage(session);
-        Multipart multipart = new MimeMultipart();
-
-        // create the first part of the email
-        BodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart
-                .setText("This is the checksum checker report see attachment for details \n"
-                        + numberOfBitstreams
-                        + " Bitstreams found with POSSIBLE issues");
-        multipart.addBodyPart(messageBodyPart);
-
-        // add the file
-        messageBodyPart = new MimeBodyPart();
-
-        DataSource source = new FileDataSource(attachment);
-        messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName("checksum_checker_report.txt");
-        multipart.addBodyPart(messageBodyPart);
-        msg.setContent(multipart);
-        msg.setFrom(new InternetAddress(ConfigurationManager
-                .getProperty("mail.from.address")));
-        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                ConfigurationManager.getProperty("mail.admin")));
-
-        msg.setSentDate(new Date());
-        msg.setSubject("Checksum checker Report - " + numberOfBitstreams
-                + " Bitstreams found with POSSIBLE issues");
-        Transport.send(msg);
-    }
+    public void sendReport(File attachment, int numberOfBitstreams) 
+            throws IOException, javax.mail.MessagingException 
+    { 
+        if(numberOfBitstreams > 0)
+        {
+            String hostname = ConfigurationManager.getProperty("dspace.hostname");
+            Email email = new Email();
+            email.setSubject("Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues on " + hostname);
+            email.setContent("report is attached ...");
+            email.addAttachment(attachment, "checksum_checker_report.txt");
+            email.addRecipient(ConfigurationManager.getProperty("mail.admin"));
+            email.send();
+        }
+    } 
 
     /**
      * Allows users to have email sent to them. The default is to send all

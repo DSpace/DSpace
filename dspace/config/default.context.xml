@@ -4,7 +4,4 @@
 	<Parameter name="dspace-config" override="false"
 		value="${dspace.dir}/config/dspace.cfg"
 		description="Path to the DSpace configuration file." />
-	<Parameter name="properties" override="false"
-		value="${dspace.dir}/config/oaicat.properties"
-		description="The location of the oaicat.properties file." />
 </Context>

@@ -33,7 +33,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class VerifyStep extends AbstractProcessingStep
 {

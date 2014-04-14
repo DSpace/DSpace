@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-services</artifactId>
+    <packaging>jar</packaging>
+    <name>DSpace Services Framework :: API and Implementation</name>
+    
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>4.1</version>
+    </parent>
+
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
+    <dependencies>
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- spring service manager -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>3.1.1.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <!-- this needs to eventually go into common/lib for tomcat 5 -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>1.7.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- for filters -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+        <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- testing only -->
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-servlet-tester</artifactId>
+            <version>6.1.14</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.dependencies.jmockit</groupId>
+            <artifactId>dspace-jmockit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <!-- needed to ensure that all JCL is 1.1.1 -->
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+    </dependencies>
+
+    <developers>
+        <developer>
+            <id>azeckoski</id>
+            <name>Aaron Zeckoski</name>
+            <email>azeckoski@gmail.com</email>
+            <url>http://wiki.sakaiproject.org/confluence/display/~aaronz
+            </url>
+            <organization>CARET, University of Cambridge</organization>
+            <organizationUrl>http://caret.cam.ac.uk/
+            </organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>committer</role>
+            </roles>
+            <timezone>0</timezone>
+        </developer>
+        <developer>
+            <id>mdiggory</id>
+            <name>Mark Diggory</name>
+            <email>mdiggory@atmire.com</email>
+            <roles>
+                <role>architect</role>
+                <role>committer</role>
+            </roles>
+            <organization>@mire</organization>
+            <organizationUrl>http://www.atmire.com</organizationUrl>
+            <timezone>-8</timezone>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Add Your Name Here and submit a patch!</name>
+            <email>contributor at myu.edu</email>
+            <url>http://www.myu.edu/me</url>
+            <organization>My University</organization>
+            <organizationUrl>http://www.myu.edu</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>0</timezone>
+        </contributor>
+    </contributors>
+
+</project>

@@ -45,7 +45,7 @@ import org.dspace.core.Context;
  * <li> - timestamp -- exact millisecond timestamp at which event was logged.</li>
  * </ul>
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Event implements Serializable
 {

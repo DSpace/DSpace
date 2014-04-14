@@ -496,7 +496,7 @@ public class BrowseInfo
 
     /**
      * @deprecated
-     * @return
+     * @return an empty array of Item.
      */
     public Item[] getItemResults()
     {

@@ -37,7 +37,7 @@ import org.dspace.eperson.Group;
  * the contents of a bitstream; you need to create a new bitstream.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Bitstream extends DSpaceObject
 {
@@ -216,7 +216,7 @@ public class Bitstream extends DSpaceObject
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
 
-	bitstream.bRow.setColumn("views", 0);
+    	bitstream.bRow.setColumn("views", 0);
 
         return bitstream;
     }
@@ -672,7 +672,9 @@ public class Bitstream extends DSpaceObject
     }
     
     /**
-     * Determine if this bitstream is registered
+     * Determine if this bitstream is registered (available elsewhere on
+     * filesystem than in assetstore). More about registered items:
+     * https://wiki.duraspace.org/display/DSDOC3x/Registering+(not+Importing)+Bitstreams+via+Simple+Archive+Format
      * 
      * @return true if the bitstream is registered, false otherwise
      */
@@ -794,6 +796,14 @@ public class Bitstream extends DSpaceObject
     }
 
     
+    /**
+     * Get the parent object of a bitstream. The parent can be an item if this
+     * is a normal bitstream, or it could be a collection or a community if the
+     * bitstream is a logo.
+     *
+     * @return this bitstream's parent.
+     * @throws SQLException
+     */    
     public DSpaceObject getParentObject() throws SQLException
     {
         Bundle[] bundles = getBundles();
@@ -837,5 +847,12 @@ public class Bitstream extends DSpaceObject
                 }
             }                                   
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the bitstream HAS been modified
+        bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
     }
 }

@@ -29,7 +29,7 @@ import org.jdom.Namespace;
  * server.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk

@@ -15,7 +15,7 @@ package org.dspace.core;
  * the DSpace system in an unusable state.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see PluginManager
  */
 

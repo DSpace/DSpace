@@ -1,0 +1,8 @@
+#Configure authority control for testing
+
+plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
+	org.dspace.content.authority.DCInputAuthority
+
+choices.plugin.dc.language.iso = common_iso_languages
+choices.presentation.dc.language.iso = select
+authority.controlled.dc.language.iso = true

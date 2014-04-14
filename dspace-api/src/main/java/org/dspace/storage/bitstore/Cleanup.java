@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * Cleans up asset store.
  * 
  * @author Peter Breton
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Cleanup
 {

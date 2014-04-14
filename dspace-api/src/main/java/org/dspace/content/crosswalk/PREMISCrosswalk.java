@@ -39,7 +39,7 @@ import org.jdom.Namespace;
  * specification for both ingest and dissemination.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class PREMISCrosswalk
     implements IngestionCrosswalk, DisseminationCrosswalk

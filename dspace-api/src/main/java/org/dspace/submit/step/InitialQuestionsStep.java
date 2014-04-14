@@ -41,7 +41,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class InitialQuestionsStep extends AbstractProcessingStep
 {
@@ -196,7 +196,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
                 request.setAttribute("will.remove.titles", Boolean.valueOf(willRemoveTitles));
                 request.setAttribute("will.remove.date", Boolean.valueOf(willRemoveDate));
                 request.setAttribute("will.remove.files", Boolean.valueOf(willRemoveFiles));
-                
+
                 return STATUS_VERIFY_PRUNE; // we will need to do pruning!
             }
         }
@@ -209,6 +209,20 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         if (!subInfo.isInWorkflow())
         {
             subInfo.getSubmissionItem().setMultipleFiles(multipleFiles);
+        }
+
+        // If this work has not been published before & no issued date is set,
+        // then the assumption is that TODAY is the issued date.
+        // (This logic is necessary since the date field is hidden on DescribeStep when publishedBefore==false)
+        if(!publishedBefore)
+        {
+            DCValue[] dateIssued = subInfo.getSubmissionItem().getItem()
+                            .getDC("date", "issued", Item.ANY);
+            if(dateIssued.length==0)
+            {
+                //Set issued date to "today" (NOTE: InstallItem will determine the actual date for us)
+                subInfo.getSubmissionItem().getItem().addDC("date", "issued", null, "today");
+            }
         }
 
         // commit all changes to DB

@@ -20,11 +20,20 @@ public class MetadataImportInvalidHeadingException extends Exception
     /** The bad heading */
     private String badHeading;
 
+    /** The column number */
+    private int column;
+
     /** Error with the schema */
     public static final int SCHEMA = 0;
 
     /** Error with the element */
     public static final int ELEMENT = 1;
+
+    /** Error with a missing header */
+    public static final int MISSING = 98;
+
+    /** Error with the whole entry */
+    public static final int ENTRY = 99;
 
 
     /**
@@ -33,11 +42,12 @@ public class MetadataImportInvalidHeadingException extends Exception
      * @param message the error message
      * @param theType the type of the error
      */
-    public MetadataImportInvalidHeadingException(String message, int theType)
+    public MetadataImportInvalidHeadingException(String message, int theType, int theColumn)
     {
         super(message);
         badHeading = message;
         type = theType;
+        column = theColumn;
     }
 
     /**
@@ -61,6 +71,16 @@ public class MetadataImportInvalidHeadingException extends Exception
     }
 
     /**
+     * Get the column number that was invalid
+     *
+     * @return the invalid column number
+     */
+    public int getColumn()
+    {
+        return column;
+    }
+
+    /**
      * Get the exception message
      *
      * @return The exception message
@@ -69,11 +89,16 @@ public class MetadataImportInvalidHeadingException extends Exception
     {
         if (type == SCHEMA)
         {
-            return "Unknown metadata schema in heading: " + badHeading;
-        }
-        else
+            return "Unknown metadata schema in row " + column + ": " + badHeading;
+        } else if (type == ELEMENT)
         {
-            return "Unknown metadata element in heading: " + badHeading;
+            return "Unknown metadata element in row " + column + ": " + badHeading;
+        } else if (type == MISSING)
+        {
+            return "Row with missing header: Row " + column;
+        } else
+        {
+            return "Bad metadata declaration in row " + column + ": " + badHeading;
         }
     }
 }

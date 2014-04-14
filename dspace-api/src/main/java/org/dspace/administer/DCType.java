@@ -29,7 +29,7 @@ import org.dspace.core.Context;
  *
  * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @deprecated
  */
 public class DCType

@@ -1,0 +1,146 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+div#ds-body {
+	margin-top: 12px;
+}
+
+div.ds-option-set {
+	padding: 30px 2px 3px 2px;
+	width: 133px;
+	margin: -10px 0px 0px 0px;
+}
+
+div#ds-options h3 {
+	position: relative;
+	top: 18px;
+	font-size: 130%; 
+}
+
+div#ds-options h4 {
+    font-size: 110%;
+}
+
+div#ds-search-option input {
+	font-size: 90%;
+}
+
+div#ds-search-option input.ds-text-field {
+	width: 70%;
+	margin-left: -5px;
+	padding: 0;
+	top: -2px;
+}
+
+form#ds-search-form {
+    margin-bottom: 5px;
+}
+
+div#ds-search-option input.ds-button-field {
+	width: auto;
+	height: 20px;
+	margin: 0px;
+	padding-left: 2px;
+	padding-right: 2px;
+	position: relative;
+	top: -1px;
+	left: 10px;
+}
+
+div#ds-search-option a {
+	margin-top: -20px;
+	padding: 0;
+}
+
+div#ds-search-option label {
+	padding-left: 10px;
+}
+
+
+input.ds-button-field {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+ul.ds-progress-list li.button input.ds-button-field {
+	font-size: smaller;
+	padding: 1px;
+}
+
+/* admin tabs */
+form.administrative{
+  border: 1px solid rgb(240, 240, 210);
+  border-top: 0px;
+  width: inherit;
+}
+
+form.administrative fieldset{
+  margin: 7px;
+  width: auto;
+}
+form.administrative h3{
+  margin: 7px;
+}
+form.administrative table{
+  margin: 7px;
+  width: auto;
+}
+
+
+form#administrative_item_FindItemForm_div_find-item{
+  border: 0px;
+  margin-left: 0px;
+}
+
+ul.horizontal
+{
+font-weight: bold;
+list-style-type: none;
+padding: 0px;
+padding-left: 0px;
+padding-bottom: 24px;
+border-bottom: 1px solid rgb(240, 240, 210);
+border-left: 1px solid white;
+border-right: 1px solid white;
+margin: 0px;
+margin-left: -1px;
+margin-right: -1px;
+width: inherit;
+}
+
+ul.horizontal li
+{
+float: left;
+height: 21px;
+background-color: rgb(252, 252, 232);
+margin: 2px 2px 0px 2px;
+border: 1px solid rgb(240, 240, 210);
+}
+
+
+ul.horizontal a
+{
+float: left;
+display: block;
+text-decoration: none;
+padding: 4px;
+}
+
+ul.horizontal a:hover { background: white; text-decoration: underline;}
+
+ul.horizontal li span.bold a
+{
+border-bottom: 1px solid white;
+background-color: white;
+}
+
+ul.horizontal li span.bold a { color: black; }
+
+form.ds-interactive-div  li.ds-form-item.last {
+	width: 558px;
+}

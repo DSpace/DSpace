@@ -3,9 +3,9 @@
 <!--
   - dublin-core-types.xml
   -
-  - Version:  $Revision: 3705 $
+  - Version:  $Revision$
   -
-  - Date:     $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
+  - Date:     $Date$
   -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
@@ -33,8 +33,8 @@
     <contributor.author>Joan Kolias</contributor.author>
     <contributor.author>Rebecca Lubas</contributor.author>
     <contributor.author>Sarah Mitchell</contributor.author>
-    <contributor.editor>$Author: mdiggory $</contributor.editor>
-    <date.created>$Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $</date.created>
+    <contributor.editor>$Author$</contributor.editor>
+    <date.created>$Date$</date.created>
     <description>
       $Log$
       Revision 1.5  2006/10/18 15:38:34  cjuergen
@@ -80,7 +80,7 @@
       (hopefully) fixed cvs keyword Log to expand in tags properly.
 
     </description>
-    <description.version>$Revision: 3705 $</description.version>
+    <description.version>$Revision$</description.version>
   </dspace-header>
 
   <dc-schema>

@@ -55,7 +55,7 @@ import org.dspace.core.SelfNamedPlugin;
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements ChoiceAuthority
 {
 
-	private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
+    private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
     private static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
     private static String idTemplate = "//node[@id = '%s']";
     private static String pluginNames[] = null;
@@ -85,22 +85,24 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
         if (pluginNames == null)
         {
-        	class xmlFilter implements java.io.FilenameFilter
+            class xmlFilter implements java.io.FilenameFilter
             {
-        		public boolean accept(File dir, String name)
+                @Override
+                public boolean accept(File dir, String name)
                 {
-        			return name.endsWith(".xml");
-        		}
-        	}
-            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
-        	String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
-        	List<String> names = new ArrayList<String>();
-        	for (String filename : xmlFiles)
+                    return name.endsWith(".xml");
+                }
+            }
+            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir")
+                    + "/config/controlled-vocabularies/";
+            String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
+            List<String> names = new ArrayList<String>();
+            for (String filename : xmlFiles)
             {
-        		names.add((new File(filename)).getName().replace(".xml",""));
-        	}
-        	pluginNames = names.toArray(new String[names.size()]);
-            log.info("Got plugin names = "+Arrays.deepToString(pluginNames));
+                names.add((new File(filename)).getName().replace(".xml", ""));
+            }
+            pluginNames = names.toArray(new String[names.size()]);
+            log.info("Got plugin names = " + Arrays.deepToString(pluginNames));
         }
     }
 
@@ -154,6 +156,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	}
     }
 
+    @Override
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
     	init();
@@ -162,47 +165,54 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	XPath xpath = XPathFactory.newInstance().newXPath();
     	Choice[] choices;
     	try {
-    		NodeList results = (NodeList)xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
-    		String[] authorities  = new String[results.getLength()];
-    		String[] values = new String[results.getLength()];
-    		String[] labels  = new String[results.getLength()];
-        	for (int i=0; i<results.getLength(); i++)
+            NodeList results = (NodeList) xpath.evaluate(xpathExpression,
+                    vocabulary, XPathConstants.NODESET);
+            String[] authorities = new String[results.getLength()];
+            String[] values = new String[results.getLength()];
+            String[] labels = new String[results.getLength()];
+            for (int i = 0; i < results.getLength(); i++)
             {
-        		Node node = results.item(i);
-        		String hierarchy = this.buildString(node);
-        		if (this.suggestHierarchy)
+                Node node = results.item(i);
+                String hierarchy = this.buildString(node);
+                if (this.suggestHierarchy)
                 {
-        			labels[i] = hierarchy;
-        		}
+                    labels[i] = hierarchy;
+                }
                 else
                 {
-        			labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-        		}
-        		if (this.storeHierarchy)
+                    labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
+                }
+                if (this.storeHierarchy)
                 {
-        			values[i] = hierarchy;
-        		}
+                    values[i] = hierarchy;
+                }
                 else
                 {
-        			values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-        		}
-        		authorities[i] = node.getAttributes().getNamedItem("id").getNodeValue();
-        	}
-        	int resultCount = Math.min(labels.length-start, limit);
-        	choices = new Choice[resultCount];
-        	if (resultCount > 0)
+                    values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
+                }
+                Node idAttr = node.getAttributes().getNamedItem("id");
+                if (null != idAttr) // 'id' is optional
+                    authorities[i] = idAttr.getNodeValue();
+            }
+            int resultCount = labels.length - start;
+            if ((limit > 0) && (resultCount > limit)) // limit = 0 means no limit
+                resultCount = limit;
+            choices = new Choice[resultCount];
+            if (resultCount > 0)
             {
-            	for (int i=0; i<resultCount; i++)
+                for (int i = 0; i < resultCount; i++)
                 {
-           			choices[i] = new Choice(authorities[start+i],values[start+i],labels[start+i]);
-            	}
-        	}
+                    choices[i] = new Choice(authorities[start + i], values[start
+                            + i], labels[start + i]);
+                }
+            }
     	} catch(XPathExpressionException e) {
     		choices = new Choice[0];
     	}
     	return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, false);
     }
 
+    @Override
     public Choices getBestMatch(String field, String text, int collection, String locale)
     {
     	init();
@@ -210,6 +220,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         return getMatches(field, text, collection, 0, 2, locale);
     }
 
+    @Override
     public String getLabel(String field, String key, String locale)
     {
     	init();

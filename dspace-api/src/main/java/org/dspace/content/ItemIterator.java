@@ -27,7 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * 
  * @author Robert Tansley
  * @author Richard Jones
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class ItemIterator
 {

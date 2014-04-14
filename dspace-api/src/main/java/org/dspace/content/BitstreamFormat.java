@@ -27,7 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * when <code>update</code> is called.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class BitstreamFormat
 {

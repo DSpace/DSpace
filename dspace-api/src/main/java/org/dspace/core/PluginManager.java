@@ -56,7 +56,7 @@ import org.apache.log4j.Logger;
  *  names in the configuration entry.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see SelfNamedPlugin
  */
 public class PluginManager
@@ -131,7 +131,7 @@ public class PluginManager
      * exception.  It is typically used at initialization time to set up
      * a permanent part of the system so any failure is fatal.
      *
-     * @param name of config module, or <code>null</code> for standard location
+     * @param module name of config module, or <code>null</code> for standard location
      * @param interfaceClass interface Class object
      * @return instance of plugin
      * @throws PluginConfigurationError
@@ -202,7 +202,7 @@ public class PluginManager
             if (val == null)
             {
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
-                return new Object[0];
+                return (Object[]) Array.newInstance(intfc, 0);
             }
             classname = val.trim().split("\\s*,\\s*");
             sequenceConfig.put(iname, classname);

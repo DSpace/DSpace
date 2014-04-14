@@ -4,9 +4,9 @@
 #
 # log-reporter
 #
-# Version: $Revision: 3730 $
+# Version: $Revision$
 #
-# Date: $Date: 2009-04-23 23:11:14 -0400 (Thu, 23 Apr 2009) $
+# Date: $Date$
 #
 # Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 #
@@ -124,7 +124,7 @@ if (defined $enddate)
 my $bindir = dirname $0;
 
 # Get the DSpace log directory
-my $logdir = `$bindir/dspace dsprop -property log.dir`;
+my $logdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property log.dir`;
 chomp $logdir;
 
 

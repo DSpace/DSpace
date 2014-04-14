@@ -18,7 +18,7 @@ import org.dspace.eperson.EPerson;
  * which stage of submission they are (in workspace or workflow system)
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public interface InProgressSubmission
 {
@@ -37,7 +37,7 @@ public interface InProgressSubmission
     /**
      * Update the submission, including the unarchived item.
      */
-    void update() throws SQLException, IOException, AuthorizeException;
+    void update() throws SQLException, AuthorizeException;
 
     /**
      * Get the incomplete item object

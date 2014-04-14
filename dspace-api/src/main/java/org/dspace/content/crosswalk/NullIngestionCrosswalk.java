@@ -35,7 +35,7 @@ import org.jdom.output.XMLOutputter;
  *   org.dspace.content.crosswalk.NullIngestionCrosswalk = NULL, LOM
  * </pre>
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class NullIngestionCrosswalk
     implements IngestionCrosswalk

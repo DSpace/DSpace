@@ -29,7 +29,7 @@ import org.jdom.Element;
  * <p>
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public interface IngestionCrosswalk
 {

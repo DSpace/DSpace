@@ -1,0 +1,165 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <!--
+       Licensed to the Apache Software Foundation (ASF) under one or more
+       contributor license agreements. See the NOTICE file distributed
+       with this work for additional information regarding copyright
+       ownership. The ASF licenses this file to you under the Apache
+       License, Version 2.0 (the "License"); you may not use this file
+       except in compliance with the License. You may obtain a copy of
+       the License at http://www.apache.org/licenses/LICENSE-2.0 Unless
+       required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+       implied. See the License for the specific language governing
+       permissions and limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>4.1</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-solr</artifactId>
+    <name>Apache Solr Webapp</name>
+    <description>Apache Solr Server</description>
+    <packaging>war</packaging>
+
+    <properties>
+		<lucene.version>4.4.0</lucene.version>
+		<solr.version>4.4.0</solr.version>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <!-- This 'dspace-solr' WAR overlays the Apache Solr Web Application
+                         available in Maven Central -->
+                    <overlays>
+                        <overlay>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>solr</artifactId>
+                            <!--
+                            Exclude the solr core named apache-solr-core, this is needed because the dspace-solr changes
+                            need to take precendence over the solr-core, the solr-core will still be loaded in the solr-core.jar
+                            -->
+                            <excludes>
+                                <exclude>WEB-INF/lib/apache-solr-core-${solr.version}.jar</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- This execution creates a normal WAR (with all JARs, etc)-->
+                        <id>webapp</id>
+                        <configuration>
+                            <primaryArtifact>true</primaryArtifact>
+                            <archiveClasses>true</archiveClasses>
+                            <attachClasses>true</attachClasses>
+                            <classesClassifier>classes</classesClassifier>
+                            <warSourceExcludes>WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>
+                                WEB-INF/classes/**,
+                                WEB-INF/lib/slf4j-jdk14-*.jar,
+                                WEB-INF/lib/log4j-over-slf4j-*.jar
+                            </packagingExcludes>
+                        </configuration>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                    <execution>
+                        <!-- This execution creates a "skinny" WAR (without any JARs included)-->
+                        <id>skinny</id>
+                        <configuration>
+                            <primaryArtifact>false</primaryArtifact>
+                            <classifier>skinny</classifier>
+                            <warSourceExcludes>WEB-INF/lib/**,WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>WEB-INF/lib/**,WEB-INF/classes/**</packagingExcludes>
+                        </configuration>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Depends on the Apache 'solr' web application (see Overlay settings above)-->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr</artifactId>
+            <version>${solr.version}</version>
+		    <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <version>${solr.version}</version>            
+            <type>jar</type>
+			<exclusions>
+				<exclusion>
+					<groupId>jdk.tools</groupId>
+					<artifactId>jdk.tools</artifactId>
+				</exclusion>
+			</exclusions>              
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>${solr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+        </dependency>
+
+        <!-- Replace J.U.L. logging with log4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+            <type>jar</type>
+            <version>1.2.16</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+         </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,102 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>additions</artifactId>
+   <name>DSpace Kernel :: Additions and Local Customizations</name>
+   <description>
+       This project allows you to easily create your own "additions.jar"
+       including custom Java classes. This JAR will be automatically included
+       in all DSpace web applications.
+   </description>
+   <packaging>jar</packaging>
+
+   <!--
+   A Parent POM that Maven inherits DSpace Defaults
+   POM attributes from.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>4.1</version>
+      <relativePath>..</relativePath>
+   </parent>
+
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
+
+   <profiles>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc6</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+
+      <!--
+         Using xpdf filters requires the inclusion
+         Of Sun dependencies these are not redistributable
+         and you will need to install them locally in your
+         maven repository prior to building your dspace instance
+      -->
+      <profile>
+         <id>xpdf-mediafilter-support</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.sun.media</groupId>
+               <artifactId>jai_imageio</artifactId>
+            </dependency>
+            <dependency>
+               <groupId>javax.media</groupId>
+               <artifactId>jai_core</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+
+   </profiles>
+
+   <!--
+   Runtime and Compile Time dependencies for DSpace.
+   -->
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api-lang</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>ant-contrib</groupId>
+         <artifactId>ant-contrib</artifactId>
+         <version>1.0b3</version>
+         <exclusions>
+            <exclusion>
+               <groupId>ant</groupId>
+               <artifactId>ant</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+   </dependencies>
+
+</project>

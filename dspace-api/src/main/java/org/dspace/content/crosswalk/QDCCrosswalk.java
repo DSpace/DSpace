@@ -87,7 +87,7 @@ import org.jdom.input.SAXBuilder;
  *  http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</pre>
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class QDCCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk, IngestionCrosswalk

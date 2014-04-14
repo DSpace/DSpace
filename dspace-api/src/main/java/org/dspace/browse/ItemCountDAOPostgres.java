@@ -155,10 +155,9 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	}
 
 	/**
-	 * get the count of the items in the given container
+	 * Get the count of the items in the given container.
 	 * 
 	 * @param dso
-	 * @return
 	 * @throws ItemCountException
 	 */
 	public int getCount(DSpaceObject dso) 

@@ -26,7 +26,7 @@ import org.dspace.sort.OrderFormat;
  * the maximum or minimum lexicographic value will be used.
  * 
  * @author Peter Breton
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class ItemComparator implements Comparator, Serializable
 {

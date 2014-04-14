@@ -16,7 +16,7 @@ import java.util.Map;
  * Represents a database row.
  * 
  * @author Peter Breton
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class TableRow
 {
@@ -67,6 +67,10 @@ public class TableRow
     public String getTable()
     {
         return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
     }
 
     /**
@@ -578,7 +582,7 @@ public class TableRow
             return canonicalized;
         }
 
-        throw new IllegalArgumentException("No such column " + canonicalized);
+        throw new IllegalArgumentException("No such column '" + canonicalized + "'");
     }
 
     /**

@@ -19,7 +19,7 @@ package org.dspace.content.packager;
  * or package, or the details of a checksum error on a file.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class PackageValidationException extends PackageException
 {

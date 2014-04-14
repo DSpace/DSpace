@@ -13,7 +13,7 @@ import java.util.Locale;
  * Utility class for dealing with languages
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class DCLanguage
 {

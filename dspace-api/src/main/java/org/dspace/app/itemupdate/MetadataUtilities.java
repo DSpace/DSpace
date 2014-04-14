@@ -375,12 +375,10 @@ public class MetadataUtilities {
     }
     
     /**
-     * 		rewrite of ItemImport's functionality
-     *      but just the parsing of the file, not the processing of its elements
-     *      
+     * Rewrite of ItemImport's functionality
+     * but just the parsing of the file, not the processing of its elements.
      *      
      * @validate  flag to verify matching files in tree
-     * @return
      */
     public static List<ContentsEntry> readContentsFile(File f)
     throws FileNotFoundException, IOException, ParseException
@@ -423,7 +421,6 @@ public class MetadataUtilities {
     /**
      * 
      * @param f
-     * @return
      * @throws FileNotFoundException
      * @throws IOException
      */

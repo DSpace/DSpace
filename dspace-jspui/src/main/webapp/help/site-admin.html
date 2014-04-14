@@ -1,0 +1,459 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>DSpace: Site Administrator Help</title>
+    <link rel="stylesheet" href="../styles.css" type="text/css"/>
+  </head>
+
+  <body class="help">
+    <h2>Site Administrator Help</h2>
+
+    <table>
+      <tr>
+        <td align="left"><h3>Help Contents</h3></td>
+        <td align="right"><a href="#" onclick="window.close()">Close this window</a></td>
+      </tr>
+    </table>
+
+    <ul>
+      <li><a href="#general">General Information</a></li>
+      <li><a href="#topcommunity">Creating a Top-level Community</a></li>
+      <li><a href="#subcommunity">Creating a Sub-community</a></li>
+      <li><a href="#editcommunity">Editing a Community</a></li>
+      <li><a href="#createcollection">Creating a Collection</a></li>
+      <li><a href="#editcollection">Editing a Collection</a></li>
+      <li><a href="#epeople">E-people</a></li>
+      <li><a href="#groups">Groups</a></li>
+      <li><a href="#items">Items</a></li>
+      <li><a href="#supervision">Supervision Orders</a></li>
+      <li><a href="#dublincore">Dublin Core Registry</a></li>
+      <li><a href="#bitstream">Bitstream Format Registry</a></li>
+      <li><a href="#workflow">Workflow</a></li>
+      <li><a href="#authorize">Authorization</a></li>
+      <li><a href="#editnews">Edit News</a></li>
+      <li><a href="#editlicense">Edit Default License</a></li>
+    </ul>
+
+    <h3><a name="general"></a>General Information</h3>
+
+    <p>As of DSpace 1.2, many administration tools can now be accessed via the regular DSpace UI.  However, they only appear if you are logged in as an administrator.  The easiest way to do this is to go to your 'My DSpace' page.</p>
+
+    <p>Some tasks must be performed entrally using the administration user interface, part of the Web UI. To access the administration UI, enter the base URL of your DSpace followed by <code>/dspace-admin</code>, for example:</p>
+
+    <pre>https://dspace.myu.edu/dspace-admin</pre>
+
+    <p>You will need to authenticate as an administrator to be able to access the page.  Then, click on the relevant tool on the left-hand navigation bar.</p>
+
+
+    <h3><a name="topcommunity"></a>Creating a Top-level Community</h3>
+
+    <p>To add a top-level community, go to the community/collection listing page
+    while logged in as an administrator.  On the right there will be an option
+    to <em>Create Top-Level Community...</em>.  Clicking on this will create the
+    new top level community and take you to the 'Edit Community' page.</p>
+
+
+    <h3><a name="subcommunity"></a>Creating a Sub-community</h3>
+
+    <p>To create a sub-community, go to the community home page of the community that is to be the parent of the new sub-community.  Then, click on the 'Create sub-community' in the 'Admin Tools' box at the top right-hand corner of the page.  This will create the new community and take you to the 'Edit Community' page for that community.</p>
+
+
+    <h3><a name="editcommunity"></a>Editing a Community</h3>
+
+    <ul>
+      <li>Fill out the form as needed. 'Name', 'short description' and 'Introductory text' are required; the rest of the fields are optional.</li>
+      <li>The 'short description' appears on the community list page below the community name, and should be one or two sentences of plain text describing the community.</li>
+      <li>The 'introductory text,' 'side bar' and 'copyright text' fields are displayed on the community's home page.  'Introductory text' and 'side bar text' are both HTML fields, which means you should place text in &lt;P&gt; &lt;/P&gt;</li>
+      <li>To add a logo to be displayed on the community's home page, click on the <strong>Upload Logo</strong> button.  On the next screen either type in a path to the logo file or browse to the logo file, then click on the <strong>Upload</strong> button. Note, if you're creating a community, it's best to fill out the rest of the form, click 'Update' and then come back to do this.  Note that in general, relatively small logo sizes look best due to the design of the collection home page.</li>
+      <li>When all information for the Community Page is entered, click on the <strong>Create</strong> button.</li>
+    </ul>
+
+
+    <h3><a name="createcollection"></a>Creating a Collection</h3>
+
+    <p>Creating a collection is done with a 'wizard' style tool that should be familiar to most people who've used modern operating systems user interfaces.  It's rather similar to the submission interface in DSpace.</p>
+
+    <p><strong>Note:  You cannot add new e-people records with this wizard.</strong>  All the e-person records must be loaded into the system first.  However, you will be able to add more e-people and/or groups to each group associated with the collection later if required.</p>
+
+    <p>To create a collection, ensure you're logged in, go to the community home page for the community in which the collection is to appear, and click 'Create Collection' on the top-right hand corner of the page.  This will start the wizard.</p>
+
+    <h4><a name="wizard_questions"></a>Describe the Collection (Checkboxes)</h4>
+
+    <p>The first page of the wizard will ask you some questions about the new collection.  Check those that apply and click on the 'Next&nbsp;&gt;' button.  Note that after you've completed the wizard, you will be able to edit the collection later, so decisions you make here are not permanent.</p>
+
+    <p>However, also note that this wizard is a little less polished than the submission UI, which basically means there are no 'back' buttons, so if you want to change something you entered on one page after clicking 'next', you need to finish the wizard and then go back and edit the collection.</p>
+
+    <p>When you have completed the wizard, you're dropped into the Edit Collection screen.  This allows you to review what you've entered and make any necessary tweaks.</p>
+
+    <p>Note 1:  If the <strong>New items should be publicly readable</strong> option is checked, it means that new items arriving via the submission UI or batch importer will, by default, will get anonymous READ permissions for both the item and all the bitstreams).  You can change this later so that e.g. items get anonymous READ permissions but bitstreams do not.  Items that are 'mapped' or included from other collections will not have their authorizations changed.</p>
+
+    <p>Note 2:  <strong>New items should be publicly readable</strong> is just a default; an item's permissions may later changed.</p>
+
+    <p>Note 3:  If <strong>New items should be publicly readable</strong> is <em>not</em> checked, you will be asked later in the wizard who is allowed to read new items.  Again, this is just a default, and can be changed later.</p>
+
+
+    <h4><a name="wizard_description"></a>Describe the Collection (Information)</h4>
+
+    <p>The next page allows you to fill in some basic information about the collection.  The <strong>Name</strong>, <strong>Short Description</strong> and <strong>Introductory Text</strong> fields are mandatory, the others are not.  (Note that the wizard is not strict, however, and will not enforce this.)</p>
+
+    <p><strong>Copyright Text</strong> is simply text that will appear at the bottom of the collection's home page.</p>
+
+    <p><strong>License</strong> is the <em>deposit license</em> (the license that submitters must grant when they submit an item) for this collection.  This overrides the site default (which is stored in <em>[dspace]</em>/config/default.license and must be edited by a systems adminstrator).  If you leave this field blank, the site default license is used.</p>
+
+    <p><strong>Provenance</strong> is a free-text field you can put any provenance information in you feel like.  It is not visible to end-users.</p>
+
+
+    <h4><a name="wizard_permissions"></a>Collection Authorization</h4>
+
+    <p>Depending on the boxes you checked on the first page of the wizard, you will go through a number of screens asking you which e-people and/or groups can or should perform which actions, for example who can submit, and who should perform the <em>accept/reject</em> submission workflow step.  These pages work exactly the same as the <a href="collection-admin.html#groupeditor">group editor</a>.  Click 'Next&nbsp;&gt;' when you have selected all the e-people and/or groups to appear in the relevant permissions group.</p>
+
+    <p>Note:  You cannot add new e-people records with this wizard.  All the e-person records must be loaded into the system first.  You can add more e-people and/or groups to each group later if required.</p>
+
+
+    <h4><a name="wizard_default"></a>Enter Default Item Metadata</h4>
+
+    <p>On this screen you can specify some Dublin Core values that new submissions will have pre-filled out.  Some of the values you can set here do not appear in the submission UI, so end-users may not have the chance to edit them.  This can be a good or a bad thing!  (FIXME?)  Also note that these Dublin Core values will be added to items imported via the batch importer.</p>
+
+    
+    <h3><a name="editcollection"></a>Editing a Collection</h3>
+    <p>The Edit Collection page allows you to change collection metadata (such as name and introductory text), configure authorization and workflow, or delete the collection entirely.</p>
+
+    <p>The 'Delete' button (located at the top of the page) will remove the collection (including all its items) from the repository.</p>
+
+    <p>The <strong>Name</strong>, <strong>Short Description</strong> and <strong>Introductory Text</strong> fields are mandatory, the others are not. Note that this is not enforced, but is highly recommended.</p>
+
+    <p><strong>Copyright Text</strong> is simply text that will appear at the bottom of the collection's home page.</p>
+
+    <p><strong>License</strong> is the <em>deposit license</em> (the license that submitters must grant when they submit an item) for this collection.  This overrides the site default (which is stored in <em>[dspace]</em>/config/default.license and must be edited by a systems adminstrator).  If you leave this field blank, the site default license is used.
+    There are some substitution variables that can be used to create personalized licenses:</p>
+    <ul>
+	    <li><strong>%1$s</strong> will be translated in the "submitter first name"</li> 
+		<li><strong>%2$s</strong> will be translated in the "submitter last name"</li>
+		<li><strong>%3$s</strong> will be translated in the "submitter email" </li>
+		<li><strong>%4$s</strong> will be translated in the current date</li>
+		<li><strong>%5$s</strong> will be translated in the collection info</li> 
+		<li><strong>%6$s</strong> will be translated in the item info </li>
+		<li><strong>%7$s</strong> will be translated in the eperson info</li> 
+    </ul>
+	<p>If you need to embed in the license text the % symbol you need to escape it with a second %, i.e. you need to write %%. 
+	It is recommended to use a dummy submission to check the license change:  <strong>check the resulting license in the Accept/reject Licence step.</strong> 
+    </p>
+
+    <p><strong>Provenance</strong> is a free-text field you can put any provenance information in you feel like.  It is not visible to end-users.</p>
+
+    <p>To add or change the logo to be displayed on the collection's home page, click on the Upload Logo button. On the next screen either type in a path to the logo file or browse to the logo file, then click on the Upload button.</p>
+
+    <p>To add or change <a href="#authorize">authorisations</a>, <a href="collection-admin.html#submitters">submitters</a> or collection administrators click on the appropriate buttons to create/edit groups and their actions.</p>
+
+    <p>To edit the workflow groups, select the workflow step whose group you want to create or change and follow the <a href="collection-admin.html#groupeditor">group edit</a> process</p>
+
+    <p>Click on the 'Item Template' button to display the <a href="#wizard_default">default item metadata page</a> where you can set default values for metadata fields for all items added to the collection.</p>
+
+    <h3><a name="epeople"></a>E-people</h3>
+
+    <p>Use this tool to register e-mail addresses and other information about people you wish to authorize to play a role in the system, either as submitters, administrators, submission workflow participants, subscribers, or users with permissions to read restricted content.</p>
+
+    <p>Users can also get onto this list by self-registering (if the site configuration allows this).  This does not give them any authorization, however.  All people you wish to add to a group for submitter or workflow authorization must first be registered here.</p>
+
+    <h4>Register an E-Person</h4>
+
+    <p>To register someone, click on the <strong>Add EPerson</strong> button and add their information.</p>
+
+    <ul>
+      <li><p>If the user will be logging in with a password, <em>do not</em> check <strong>Can Log In</strong> as this informs the system the user has a registered, active account, which isn't the case for a new e-person--they'll need to register using the UI to set a password first.</p></li>
+      <li><p>The 'require certificate' checkbox is used by MIT's X509 certificate authenticator.  Ignore this unless you are using the <code>MITAuthenticator</code> authenticator.</p>
+
+      <p>If you check 'require certificate', you may also check 'can log in'.  This  means the user can log straight in with their certificate without registering.  If you want users to go through the registration process (so that they enter their name etc.) then do not check 'can log in'.</p></li>
+    </ul>
+
+    <p>Click on <strong>Save Edits</strong> when done.</p>
+
+    <h4>Delete an E-Person or Edit Information About an E-Person</h4>
+
+    <p>Click on the <strong>Select EPeople...</strong> button to get a pop-up list of e-people in the system.  The links at the top and bottom of the pop-up let you page through the list.  You can also sort the list by e-mail address, last name or ID by clicking on the relevant column heading.  On the left of each e-person in the list is a 'select' button.  Click this next to the relevant e-person, and the pop-up will close and the e-person will appear in the box on the main 'Adminster EPeople' page.  Now you can click the 'edit' or 'delete' buttons which let you edit information about a user or to delete them from the system.</p>
+
+
+    <h3><a name="groups"></a>Groups</h3>
+
+    <p>Use this section to create, edit and delete groups of e-persons and/or groups who can be authorized for specific functions in the system.</p>
+
+    <p>The 'Anonymous' group is a 'special' group that represents every person using the system.  This group exists so that authorization policies can be specified for anonymous access ('everyone in the world can read this item').</p>
+
+    <p>Members of the 'Administrator' group are allowed to perform any action in the system, so be careful who you put in this group!</p>
+
+    <p>Other groups can be used for a variety of purposes.  Groups may represent e-people who are allowed to submit to a particular collection; e-people who are responsible for performing a particular workflow step such as reviewing incoming submissions; or groups of e-people who have permission to access some restricted content.  Information about what each group is allowed to do is controlled using the <a href="#authorize">authorization section</a>.</p>
+
+    <p>Groups may contain other groups to provide greater flexibility in assigning actions and to simplify maintenance. This is useful for reflecting hierarchical group structures, where a group of e-people with particular responsibilties are also part of a larger group with differing reponsibilities and/or scope of responsibility.</p>
+
+    <p>Groups can have names.  Names automatically created by the system follow a convention depending on the what the group is for.  The general form of this is:</p>
+
+    <pre>OBJECTTYPE_OBJECTID_ACTION</pre>
+
+    <p>For example, the group of e-people who are authorized to submit to collection XYZ would be called:</p>
+
+    <pre>COLLECTION_XYZ_ADD</pre>
+
+    <p>Note that XYZ in this case is the <em>internal</em> ID (the database primary key) of the collection, rather than the Handle.  You can find out the internal ID of a collection or community by clicking on 'Communities/collections'.  The second number in brackets beside a community or collection name is that object's internal ID.</p>
+
+    <p>It is recommended that you follow this convention for manually created groups so it's easy to find the group you need.  The admin UI will automatically create groups for workflow steps, but you need to create groups for submitters manually.</p>
+
+    <h4>Create and Editing Groups</h4>
+
+    <p>To manually create a group, click on <strong>Create New Group</strong>.  Change the default group name at top to desired name and click on <strong>Update Name</strong>.</p>
+
+    <p><a href="collection-admin.html#groupeditor">Instructions for using the group editor</a></p>
+
+
+
+    <h3><a name="items"></a>Items</h3>
+
+    <p>Use this tool to edit, withdraw or delete an item.  You can enter an item's Handle or internal ID (database primary key) into the relevant box.  Alternatively, you may find it easier to go to the relevant item's display page and then click the <strong>Edit</strong> button on the page which appears if you're logged in as an administrator.</p>
+
+    <p><a href="collection-admin.html#editmetadata">Instructions for editing items</a></p>
+
+    <p><a href="collection-admin.html#withdraw">Instructions for withdrawing items</a></p>
+
+    <p>Note that the 'expunge' function will expunge the item and its metadata from the system without  leaving a trace.  Note that this functionality hasn't been fully tested (and it's not recommended), so there may be problems.  For example, since there's no record of the deletion, the fact that the item has been deleted isn't exposed to OAI harvesters.</p>
+
+
+    <h3><a name="supervision"></a>Supervision Orders</h3>
+    
+    <p>Select <em>Supervisors</em> in the administration area and you are presented with three options:</p>
+
+	<ul>
+		<li>Add a Supervision Order</li>
+		<li>View Current Supervision Orders</li>
+		<li>Clean Supervision Order Database</li>
+	</ul>
+
+	<p>The sections below detail how to deal with common supervision order tasks.</p>
+
+	<p><em>Note: The option to Clean Supervision Order Database should be used once 
+	in a while just to perform basic maintenance operations on the database.  It is 
+	completely automatic and takes a very short time to execute.</em></p>
+
+
+	<h4>Viewing Current Supervision Orders</h4>
+
+	<p>Select <em>View Current Supervision Orders</em> and you are presented with a list 
+	of all supervision orders currently in effect.  From this page you can modify the 
+	policies for the supervision order or remove the supervision order. (see the sections
+	below).</p>
+
+	<p>The details you have on this page allow you to see the name of the group doing 
+	the supervising, the author of the item being supervised and the title of that item.</p>
+
+	<p>You may also add a supervision order from this page as per the section <strong>Adding Supervision Orders</strong> below.</p>
+
+
+	<h4>Adding Supervision Orders</h4>
+
+	<p>Select <em>Add a Supervision Order</em> from either the main supervision order 
+	page or the Current Supervision Orders page.</p>
+
+	<p>To set a supervision order you need to define the group to do the supervising 
+	and the item in the workspace to be supervised.  In addition, this page gives you 
+	the option to set a default set of policies for the supervising group to have over 
+	the item.</p>
+	
+	<p>Select the desired group from the pull down list of groups on this page; 
+	this box contains all the groups that currently exist on the system.  Next select the WorkSpace item to be 
+	Supervised.  This means clicking on the round select box on the right of the item in the listing you can see on this page,
+	which shows all items currently in user workspaces.</p>
+
+	<p><em>Note: the ID that is in the left hand column of the item listing is the 
+	database id for the workspace item, and is there for the reference of system 
+	administrators.</em></p>
+
+	<p>Once you have chosen the group and the workspace item to be connected you 
+	may also select a default policy from the <em>Initial Policy Setting</em> pull down box.
+	The default policy options that this provides are:</p>
+	
+	<ul>
+		<li><strong>None</strong> - The supervision order is created but the supervising group is 
+		not given any policies regarding the item to be supervised.  This usually 
+		indicates that the administrator has decided to manually set policies for 
+		this supervision order.</li>
+		<li><strong>Observer</strong> - The supervising group is given READ access to the item 
+		(but not to any bundles or bitstreams that already exist).  Any new 
+		bundles or bitstreams inherit the supervision group's policy to permit 
+		READ operations.</li>
+		<li><strong>Editor</strong> - The supervising group is given ADD, WRITE, 
+		and READ access to the item (but not any bundles or bitstreams that 
+		already exist).  Any new bundles or bitstreams inherit the supervising 
+		groups's policy to permit ADD, WRITE and READ operations.</li>
+	</ul>
+	
+	<p>Once happy with your selection click on <em>Submit Supervision Order</em> 
+	and your settings will be applied, and you will be returned to the 
+	supervision order main page.</p>
+
+
+	<h4>Removing Supervision Orders</h4>
+
+	<p>Go to the <em>View Current Supervision Orders</em> page and select <em>Remove</em>
+	from the supervision order that to wish to remove.  You will be asked to confirm 
+	the removal of the order, upon confirmation of which it will be removed from the system.</p>
+
+
+	<h4>Customising Supervision Order Policies</h4>
+
+	<p>Go to the <em>View Current Supervision Orders</em> page and select <em>Policies</em> for 
+	the supervision order for which you would like to customise the policies.  You will be 
+	taken to the <em>Policies for Item</em> page.  From here you may customise the policies 
+	for the particular item.</p>
+
+	<p>In order to set policies for the supervisor group you should select, for example, 
+	<em>Add New Policy</em> for the item or any of its component parts, then select the 
+	supervisor group that you are wanting to configure from the given list of groups.  
+	You can then select the Action that you want to perform and hit <em>Save Policy</em>.</p>
+
+
+    <h3><a name="dublincore"></a>Metadata Registry</h3>
+
+    <p>By default DSpace uses a qualified version of the Dublin Core schema based on the <a href="http://dublincore.org/documents/library-application-profile/">Dublin Core Libraries Working Group Application Profile (LAP)</a>. You can also configure other flat metadata schemas in the registry. The metadata registry provides a list of the elements and qualifiers, with comments.</p>
+
+    <p>You can edit the registry to suit your needs with this tool, but note that:</p>
+
+    <ul>
+      <li>You can only edit one element/qualifier at a time.  Make the edits to one row, and click the relevant 'update' button.  Only edits you've made to that row will be saved.</li>
+      <li>If you delete an element and qualifier, all instances of that element and qualifier in items' metadata will be deleted</li>
+      <li>If you update an element or qualifier, for example changing 'contributor' to 'creator' and clicking 'Update', all instances of 'contributor' in items' metadata will be changed to 'creator'.</li>
+      <li>Some Dublin Core elements/qualifiers are used by the system for various functions, such as <code>date.available</code> for OAI harvesting, and <code>title</code> for the item display and search index.  You can change the scope notes for these but you shouldn't change or remove the element or qualifier.  To see which elements/qualifiers are used by the system, check out the <code><em>[dspace-source]</em>/config/registries/dublin-core.xml</code> file.</li>
+    </ul>
+
+    <p>Also note that the <code>dublin-core-types.xml</code> is only used during the build process to populate the metadata registry in the database, which is the 'live' version.  Changes you make with this UI will only be reflected in the database registry, and not the XML file (and vice versa.)</p>
+
+
+    <h3><a name="bitstream"></a>Bitstream Format Registry</h3>
+
+    <p>This list of bitstreams provides information about known bitstreams and their support level.  You can edit or add new bitstream formats with this tool.  Please take note of the following:</p>
+
+    <ul>
+      <li>You can only edit one bitstream format at a time.  Make the edits to one row, and click the relevant 'update' button.  Only edits you've made to that row will be saved.</li>
+      <li>'Extensions' are file extensions that are used to automatically identify the format of uploaded files.  You can enter several comma-separate extensions for each format.</li>
+      <li>The 'Name' of each format must be unique, though the MIME type need not be.  For example, you might have separate format registry entries for different versions of Microsoft Word, even though the MIME type will be the same for each of them.</li>
+      <li>'Internal' formats are hidden from the user, and are used for administrative purposes.  For example, the licenses that submitters grant are stored as 'License' format bitstreams, and these aren't shown to end users.</li>
+      <li>If you delete a bitstream format, any bitstreams in the system of that format will be reverted to the 'Unknown' format.</li>
+      <li>Do not delete the 'Unknown' or 'License' formats!</li>
+    </ul>
+
+    <p>Also note that the <code>config/registries/bitstream-formats.xml</code> is only used during the build process to populate the format registry in the database, which is the 'live' version.  Changes you make with this UI will only be reflected in the database registry, and not the XML file (and vice versa.)</p>
+
+
+    <h3><a name="workflow"></a>Workflow</h3>
+
+    <p>Use this tool to clear out workflows that have been abandoned and will never be completed.</p>
+
+
+    <h3><a name="authorize"></a>Authorization</h3>
+
+    <p>This section is used to set specific authorization policies
+     for communities, collections, and items. In order for users
+      to perform an action on an object, they must have permission;
+       DSpace operates a 'default deny' policy. Permissions do not 'commute';
+        for example, if an e-person has READ permission on an item,
+         they might not necessarily have READ permission on the bundles
+          and bitstreams in that item.</p>
+
+    <h4><a name="collectionpolicies"></a>Manage a Collection's Policies</h4>
+
+    <p>Use this tool to authorize collection-related groups to perform their roles.</p>
+
+    <ul>
+      <li>Click on <strong>Manage a Collection's Policies</strong>.</li>
+      <li>Select the name of the collection for which you wish to set authorizations and click on <strong>Edit Policies</strong>.</li>
+      <li>Click on <strong>Add New</strong>.</li>
+      <li>Select the group for which you wish to set authorizations, and then select an action for that group from the drop-down menu.</li>
+      <li>Click on <strong>Save Policy</strong>.</li>
+      <li>Repeat until all policies are in place.</li>
+    </ul>
+
+    <p>Note:</p>
+    <ul>
+      <li><p>Newly-submitted items accepted into a collection inherit the
+       <strong>DEFAULT_ITEM_READ</strong> and
+       <strong>DEFAULT_BITSTREAM_READ</strong>
+       authorization policies associated with the collection, which
+       become the <strong>READ</strong> policies for the item and its
+       bitstreams.  However, if you change a
+       collection's default policies after items have been accepted,
+       policies for existing
+       items will not be changed automatically.  You would have
+       to change the permissions on those items using the
+       <strong>Advanced Policy Admin Tool</strong>
+       to make them accessible.</p></li>
+       <li><p>All collections must have an <strong>ADD</strong>
+       policy for a submitter group, or else no one will be able
+       to submit items to the collection.</p></li>
+    </ul>
+
+
+    <h4><a name="communitypolicies"></a>Manage a Community's Policies</h4>
+
+    <p>This tool allows you to edit a community's policies in much the same way as a collection's are edited, described above.</p>
+
+    <p>Presently, since administration is done centrally, this tool doesn't have a lot of use--usually you will just add <strong>READ</strong> permission for the <strong>Anonymous</strong> group just after you create a community, and leave it at that.  This permission is applied to the community's logo if there is one, which allows people to see the logo when they go to the community home page.</p>
+
+    <p>A community's policies are set to a default
+    <strong>Anonymous READ</strong>.</p>
+
+
+    <h4><a name="itempolicies"></a>Manage an Item's Policies</h4>
+
+    <p>This tool allows you to edit the policies for individual items.  When you
+    wish an item's policies to be different from those of the rest of those in
+    a collection, you can use the item policy editor to customize the policies.
+    It is a good practice long term management of a collection however, for
+    all of the items in a collection to share the same authorizations.</p>
+
+
+    <h4><a name="advancedpolicies"></a>Advanced Policy Admin Tool</h4>
+
+    <p>Use this tool to set and clear policies for items or bitstreams across a whole collection. Be careful about using the <strong>Clear Policies</strong> button.</p>
+
+    <p>Select the collection from the top list and the group you want to give or remove permission for from the bottom list.  Then select the type of object (item or bitstream) that you want to edit permissions for.  Then select the action from the drop-down.</p>
+
+    <p>For example, say you wanted to give everyone in a group 'privileged_users' <strong>Read</strong> access to all of the bitstreams in a restricted collection.  You'd select 'privileged users' from the top list, 'bitstream' from the 'content type' drop-down, 'privileged_users' from the 'group' list, 'Read' from the 'action' drop-down, and click 'Add policy'.</p>
+
+
+    <h3><a name="editnews"></a>Edit News</h3>
+
+    <p>You can use this tool to edit the text ("news") in two places on the DSpace home page:
+    the top box of the center frame, and the right sidebar. </p>
+    <p>After clicking on "Edit News" on the admin menu, click on the <strong>Edit</strong> button next
+    to the news item you wish to edit. A text box will be displayed with the current news, which can be deleted
+    or modified by typing directly in the box. You can use HTML tags to format the text, but note that the html won't
+    be validated here.</p>
+    <p>&nbsp;</p>
+    
+    <h3><a name="editlicense"></a>Edit Default License</h3>
+    <p>You can use this tool to edit the default license of DSpace</p>
+    <p>The default license is used when no collection specific license is defined.</p>
+    <p>Note that changing the default license has no effect on already published items.</p>
+	<p>Some substitution variables are available to make possible configure a contextual submission license:</p>
+    <ul>
+	    <li><strong>%1$s</strong> will be translated in the "submitter first name"</li> 
+		<li><strong>%2$s</strong> will be translated in the "submitter last name"</li>
+		<li><strong>%3$s</strong> will be translated in the "submitter email" </li>
+		<li><strong>%4$s</strong> will be translated in the current date</li>
+		<li><strong>%5$s</strong> will be translated in the collection info</li> 
+		<li><strong>%6$s</strong> will be translated in the item info </li>
+		<li><strong>%7$s</strong> will be translated in the eperson info</li> 
+    </ul>
+	<p>If you need to embed in the license text the % symbol you need to escape it with a second %, i.e. you need to write %%. 
+	It is recommended to use a dummy submission to check the license change:  <strong>check the resulting license in the Accept/reject Licence step.</strong> 
+    </p>
+	
+  </body>
+</html>
