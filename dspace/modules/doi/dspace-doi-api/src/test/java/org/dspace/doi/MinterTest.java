@@ -8,7 +8,6 @@ public class MinterTest {
 
     /*	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		System.setProperty("doi.db.path", "src/test/resources/doi.db");
 		myMinter = new Minter();
 	}
 
