@@ -28,7 +28,7 @@ public class DOI {
         }
     };
 
-	transient private Logger LOG = Logger.getLogger(DOIDatabase.class);
+	transient private Logger LOG = Logger.getLogger(DOI.class);
 
 	private PersistentString myURL;
 	private PersistentString myPrefix;
