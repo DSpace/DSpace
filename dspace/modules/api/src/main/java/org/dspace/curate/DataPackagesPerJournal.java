@@ -42,8 +42,8 @@ import org.apache.log4j.Logger;
 @Distributive
 public class DataPackagesPerJournal extends AbstractCurationTask {
 
-    private static final String START_DATE_STRING = "2012-01-01T00:00:00Z";
-    private static final String END_DATE_STRING = "2013-01-01T00:00:00Z";
+    private static final String START_DATE_STRING = "1900-01-01T00:00:00Z";
+    private static final String END_DATE_STRING = "9999-01-01T00:00:00Z";
     private static Date START_DATE = null;
     private static Date END_DATE = null;
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
