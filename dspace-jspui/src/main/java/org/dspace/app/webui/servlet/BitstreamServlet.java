@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.sql.SQLException;
 
 import javax.servlet.ServletConfig;
@@ -35,8 +36,8 @@ import org.dspace.utils.DSpace;
 
 /**
  * Servlet for retrieving bitstreams. The bits are simply piped to the user. If
- * there is an <code>If-Modified-Since</code> header, only a 304 status code
- * is returned if the containing item has not been modified since that date.
+ * there is an <code>If-Modified-Since</code> header, only a 304 status code is
+ * returned if the containing item has not been modified since that date.
  * <P>
  * <code>/bitstream/handle/sequence_id/filename</code>
  * 
@@ -52,22 +53,23 @@ public class BitstreamServlet extends DSpaceServlet
      * Threshold on Bitstream size before content-disposition will be set.
      */
     private int threshold;
-    
-    @Override
-	public void init(ServletConfig arg0) throws ServletException {
-
-		super.init(arg0);
-		threshold = ConfigurationManager
-				.getIntProperty("webui.content_disposition_threshold");
-	}
 
     @Override
-	protected void doDSGet(Context context, HttpServletRequest request,
+    public void init(ServletConfig arg0) throws ServletException
+    {
+
+        super.init(arg0);
+        threshold = ConfigurationManager
+                .getIntProperty("webui.content_disposition_threshold");
+    }
+
+    @Override
+    protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	Item item = null;
-    	Bitstream bitstream = null;
+        Item item = null;
+        Bitstream bitstream = null;
 
         // Get the ID from the URL
         String idString = request.getPathInfo();
@@ -80,7 +82,7 @@ public class BitstreamServlet extends DSpaceServlet
         {
             idString = "";
         }
-        
+
         // Parse 'handle' and 'sequence' (bitstream seq. number) out
         // of remaining URL path, which is typically of the format:
         // {handle}/{sequence}/{bitstream-name}
@@ -105,8 +107,8 @@ public class BitstreamServlet extends DSpaceServlet
                 int slash2 = idString.indexOf('/', slashIndex + 1);
                 if (slash2 != -1)
                 {
-                    sequenceText = idString.substring(slashIndex+1,slash2);
-                    filename = idString.substring(slash2+1);
+                    sequenceText = idString.substring(slashIndex + 1, slash2);
+                    filename = idString.substring(slash2 + 1);
                 }
             }
         }
@@ -119,15 +121,15 @@ public class BitstreamServlet extends DSpaceServlet
         {
             sequenceID = -1;
         }
-        
+
         // Now try and retrieve the item
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-        
+
         // Make sure we have valid item and sequence number
         if (dso != null && dso.getType() == Constants.ITEM && sequenceID >= 0)
         {
             item = (Item) dso;
-        
+
             if (item.isWithdrawn())
             {
                 log.info(LogManager.getHeader(context, "view_bitstream",
@@ -169,21 +171,18 @@ public class BitstreamServlet extends DSpaceServlet
 
         log.info(LogManager.getHeader(context, "view_bitstream",
                 "bitstream_id=" + bitstream.getID()));
-        
-        //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
-		//		Constants.BITSTREAM, bitstream.getID());
+
+        // new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
+        // Constants.BITSTREAM, bitstream.getID());
 
         new DSpace().getEventService().fireEvent(
-        		new UsageEvent(
-        				UsageEvent.Action.VIEW, 
-        				request, 
-        				context, 
-        				bitstream));
-        
+                new UsageEvent(UsageEvent.Action.VIEW, request, context,
+                        bitstream));
+
         // Modification date
         // Only use last-modified if this is an anonymous access
         // - caching content that may be generated under authorisation
-        //   is a security problem
+        // is a security problem
         if (context.getCurrentUser() == null)
         {
             // TODO: Currently the date of the item, since we don't have dates
@@ -202,24 +201,57 @@ public class BitstreamServlet extends DSpaceServlet
                 return;
             }
         }
-        
+
         // Pipe the bits
-        InputStream is = bitstream.retrieve();
-     
-		// Set the response MIME type
+        InputStream is = null;
+        try
+        {
+            is = bitstream.retrieve();
+        }
+        catch (AuthorizeException e)
+        {
+            // Clear the response, including headers (eg, Content-Length)
+            response.reset();
+
+            if (bitstream.isETDEmbargo())
+            {
+                request.setAttribute("date", bitstream.getETDEmbargo()
+                        .getEndDate());
+                JSPManager.showJSP(request, response,
+                        "/error/authorize-etd-embargo.jsp");
+                return;
+            }
+
+            else
+            {
+                throw e;
+            }
+        }
+
+        // Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
 
         // Response length
-        response.setHeader("Content-Length", String
-                .valueOf(bitstream.getSize()));
+        response.setHeader("Content-Length",
+                String.valueOf(bitstream.getSize()));
 
-		if(threshold != -1 && bitstream.getSize() >= threshold)
-		{
-			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
-		}
+        if (threshold != -1 && bitstream.getSize() >= threshold)
+        {
+            UIUtil.setBitstreamDisposition(bitstream.getName(), request,
+                    response);
+        }
 
-        Utils.bufferedCopy(is, response.getOutputStream());
+        try
+        {
+            Utils.bufferedCopy(is, response.getOutputStream());
+            response.getOutputStream().flush();
+        }
+        catch (SocketException e)
+        {
+            log.warn(e.getMessage());
+            response.reset();
+            return;
+        }
         is.close();
-        response.getOutputStream().flush();
     }
 }

@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -66,7 +66,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 
     /** The "reason for rejection" page */
     public static final int REJECT_REASON_PAGE = 4;
-    
+
     /** The "request export archive for download" page */
     public static final int REQUEST_EXPORT_ARCHIVE = 5;
 
@@ -79,8 +79,8 @@ public class MyDSpaceServlet extends DSpaceServlet
     {
         // GET displays the main page - everthing else is a POST
         showMainPage(context, request, response);
-     }
-    
+    }
+
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -125,8 +125,8 @@ public class MyDSpaceServlet extends DSpaceServlet
             break;
 
         default:
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
@@ -175,8 +175,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         {
             // New submission: Redirect to submit
             response.sendRedirect(response.encodeRedirectURL(request
-                    .getContextPath()
-                    + "/submit"));
+                    .getContextPath() + "/submit"));
             ok = true;
         }
         else if (buttonPressed.equals("submit_own"))
@@ -190,8 +189,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             // User clicked on a "Resume" button for a workspace item.
             String wsID = request.getParameter("workspace_id");
             response.sendRedirect(response.encodeRedirectURL(request
-                    .getContextPath()
-                    + "/submit?resume=" + wsID));
+                    .getContextPath() + "/submit?resume=" + wsID));
             ok = true;
         }
         else if (buttonPressed.equals("submit_delete"))
@@ -251,8 +249,8 @@ public class MyDSpaceServlet extends DSpaceServlet
                 log.info(LogManager.getHeader(context, "unclaim_workflow",
                         "workflow_id=" + workflowItem.getID()));
 
-                WorkflowManager.unclaim(context, workflowItem, context
-                        .getCurrentUser());
+                WorkflowManager.unclaim(context, workflowItem,
+                        context.getCurrentUser());
 
                 showMainPage(context, request, response);
                 context.complete();
@@ -262,8 +260,8 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (!ok)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
@@ -299,8 +297,8 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (workspaceItem == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
 
             return;
@@ -317,7 +315,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             showMainPage(context, request, response);
             context.complete();
         }
-        else 
+        else
         {
             // User has cancelled. Back to main page.
             showMainPage(context, request, response);
@@ -357,8 +355,8 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
 
             return;
@@ -367,8 +365,8 @@ public class MyDSpaceServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_start"))
         {
             // User clicked "start" button to claim the task
-            WorkflowManager.claim(context, workflowItem, context
-                    .getCurrentUser());
+            WorkflowManager.claim(context, workflowItem,
+                    context.getCurrentUser());
 
             // Display "perform task" page
             request.setAttribute("workflow.item", workflowItem);
@@ -414,8 +412,8 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
 
             return;
@@ -426,8 +424,8 @@ public class MyDSpaceServlet extends DSpaceServlet
             Item item = workflowItem.getItem();
 
             // Advance the item along the workflow
-            WorkflowManager.advance(context, workflowItem, context
-                    .getCurrentUser());
+            WorkflowManager.advance(context, workflowItem,
+                    context.getCurrentUser());
 
             // FIXME: This should be a return value from advance()
             // See if that gave the item a Handle. If it did,
@@ -473,13 +471,14 @@ public class MyDSpaceServlet extends DSpaceServlet
             // with the relevant item
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
-                    + "/submit?workflow=" + workflowItem.getID()));
+                    + "/submit?workflow="
+                    + workflowItem.getID()));
         }
         else if (buttonPressed.equals("submit_pool"))
         {
             // Return task to pool
-            WorkflowManager.unclaim(context, workflowItem, context
-                    .getCurrentUser());
+            WorkflowManager.unclaim(context, workflowItem,
+                    context.getCurrentUser());
             showMainPage(context, request, response);
             context.complete();
         }
@@ -523,8 +522,8 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         if (workflowItem == null)
         {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
 
             return;
@@ -541,8 +540,8 @@ public class MyDSpaceServlet extends DSpaceServlet
             // associated with
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
-            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c
-                    .getHandle(), false);
+            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(
+                    c.getHandle(), false);
 
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process
@@ -564,116 +563,164 @@ public class MyDSpaceServlet extends DSpaceServlet
     }
 
     private void processExportArchive(Context context,
-            HttpServletRequest request, HttpServletResponse response, boolean migrate) throws ServletException, IOException{
-    	
-    	if (request.getParameter("item_id") != null) {
-			Item item = null;
-			try {
-				item = Item.find(context, Integer.parseInt(request
-						.getParameter("item_id")));
-			} catch (Exception e) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			}
+            HttpServletRequest request, HttpServletResponse response,
+            boolean migrate) throws ServletException, IOException
+    {
 
-			if (item == null) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			} else {
-				try {
-					ItemExport.createDownloadableExport(item, context, migrate);
-				} catch (ItemExportException iee) {
-                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
-		            return;
-                }
-                catch (Exception e) {
-                    log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showIntegrityError(request, response);
-		            return;
-				}
-			}
-			
-			// success
-			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-		} else if (request.getParameter("collection_id") != null) {
-			Collection col = null;
-			try {
-				col = Collection.find(context, Integer.parseInt(request
-						.getParameter("collection_id")));
-			} catch (Exception e) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			}
+        if (request.getParameter("item_id") != null)
+        {
+            Item item = null;
+            try
+            {
+                item = Item.find(context,
+                        Integer.parseInt(request.getParameter("item_id")));
+            }
+            catch (Exception e)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
 
-			if (col == null) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			} else {
-				try {
-					ItemExport.createDownloadableExport(col, context, migrate);
-				} catch (ItemExportException iee) {
-                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
-		            return;
+            if (item == null)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
+            else
+            {
+                try
+                {
+                    ItemExport.createDownloadableExport(item, context, migrate);
                 }
-                catch (Exception e) {
-					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showIntegrityError(request, response);
-		            return;
-				}
-			}
-			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-		} else if (request.getParameter("community_id") != null) {
-			Community com = null;
-			try {
-				com = Community.find(context, Integer.parseInt(request
-						.getParameter("community_id")));
-			} catch (Exception e) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			}
+                catch (ItemExportException iee)
+                {
+                    log.warn(LogManager.getHeader(context,
+                            "export_too_large_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showJSP(request, response,
+                            "/mydspace/export-error.jsp");
+                    return;
+                }
+                catch (Exception e)
+                {
+                    log.warn(LogManager.getHeader(context, "integrity_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showIntegrityError(request, response);
+                    return;
+                }
+            }
 
-			if (com == null) {
-				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-	                    .getRequestLogInfo(request)));
-	            JSPManager.showIntegrityError(request, response);
-	            return;
-			} else {
-				try {
-					org.dspace.app.itemexport.ItemExport.createDownloadableExport(com, context, migrate);
-				} catch (ItemExportException iee) {
-                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
-		            return;
+            // success
+            JSPManager
+                    .showJSP(request, response, "/mydspace/task-complete.jsp");
+        }
+        else if (request.getParameter("collection_id") != null)
+        {
+            Collection col = null;
+            try
+            {
+                col = Collection
+                        .find(context, Integer.parseInt(request
+                                .getParameter("collection_id")));
+            }
+            catch (Exception e)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
+
+            if (col == null)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
+            else
+            {
+                try
+                {
+                    ItemExport.createDownloadableExport(col, context, migrate);
                 }
-                catch (Exception e) {
-					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-		                    .getRequestLogInfo(request)));
-		            JSPManager.showIntegrityError(request, response);
-		            return;
-				}
-			}
-			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-		}
-    	
-    	
+                catch (ItemExportException iee)
+                {
+                    log.warn(LogManager.getHeader(context,
+                            "export_too_large_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showJSP(request, response,
+                            "/mydspace/export-error.jsp");
+                    return;
+                }
+                catch (Exception e)
+                {
+                    log.warn(LogManager.getHeader(context, "integrity_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showIntegrityError(request, response);
+                    return;
+                }
+            }
+            JSPManager
+                    .showJSP(request, response, "/mydspace/task-complete.jsp");
+        }
+        else if (request.getParameter("community_id") != null)
+        {
+            Community com = null;
+            try
+            {
+                com = Community.find(context,
+                        Integer.parseInt(request.getParameter("community_id")));
+            }
+            catch (Exception e)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
+
+            if (com == null)
+            {
+                log.warn(LogManager.getHeader(context, "integrity_error",
+                        UIUtil.getRequestLogInfo(request)));
+                JSPManager.showIntegrityError(request, response);
+                return;
+            }
+            else
+            {
+                try
+                {
+                    org.dspace.app.itemexport.ItemExport
+                            .createDownloadableExport(com, context, migrate);
+                }
+                catch (ItemExportException iee)
+                {
+                    log.warn(LogManager.getHeader(context,
+                            "export_too_large_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showJSP(request, response,
+                            "/mydspace/export-error.jsp");
+                    return;
+                }
+                catch (Exception e)
+                {
+                    log.warn(LogManager.getHeader(context, "integrity_error",
+                            UIUtil.getRequestLogInfo(request)));
+                    JSPManager.showIntegrityError(request, response);
+                    return;
+                }
+            }
+            JSPManager
+                    .showJSP(request, response, "/mydspace/task-complete.jsp");
+        }
+
     }
+
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR SHOWING FORMS
@@ -698,37 +745,46 @@ public class MyDSpaceServlet extends DSpaceServlet
         EPerson currentUser = context.getCurrentUser();
 
         // FIXME: WorkflowManager should return arrays
-        List<WorkflowItem> ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
-        WorkflowItem[] owned = ownedList.toArray(new WorkflowItem[ownedList.size()]);
+        List<WorkflowItem> ownedList = WorkflowManager.getOwnedTasks(context,
+                currentUser);
+        WorkflowItem[] owned = ownedList.toArray(new WorkflowItem[ownedList
+                .size()]);
 
         // Pooled workflow items
-        List<WorkflowItem> pooledList = WorkflowManager.getPooledTasks(context, currentUser);
-        WorkflowItem[] pooled = pooledList.toArray(new WorkflowItem[pooledList.size()]);
+        List<WorkflowItem> pooledList = WorkflowManager.getPooledTasks(context,
+                currentUser);
+        WorkflowItem[] pooled = pooledList.toArray(new WorkflowItem[pooledList
+                .size()]);
 
         // User's WorkflowItems
-        WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context, currentUser);
+        WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context,
+                currentUser);
 
         // User's PersonalWorkspace
-        WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context, currentUser);
+        WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context,
+                currentUser);
 
         // User's authorization groups
         Group[] memberships = Group.allMemberGroups(context, currentUser);
-        
+
         // Should the group memberships be displayed
-        boolean displayMemberships = ConfigurationManager.getBooleanProperty("webui.mydspace.showgroupmemberships", false);
+        boolean displayMemberships = ConfigurationManager.getBooleanProperty(
+                "webui.mydspace.showgroupmemberships", false);
 
         SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
                 context, currentUser);
         // export archives available for download
         List<String> exportArchives = null;
-        try{
-        	exportArchives = ItemExport.getExportsAvailable(currentUser);
+        try
+        {
+            exportArchives = ItemExport.getExportsAvailable(currentUser);
         }
-        catch (Exception e) {
-			// nothing to do they just have no export archives available for download
-		}
-        
-        
+        catch (Exception e)
+        {
+            // nothing to do they just have no export archives available for
+            // download
+        }
+
         // Set attributes
         request.setAttribute("mydspace.user", currentUser);
         request.setAttribute("workspace.items", workspaceItems);
@@ -736,7 +792,8 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
         request.setAttribute("group.memberships", memberships);
-        request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
+        request.setAttribute("display.groupmemberships",
+                Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
 
@@ -761,8 +818,8 @@ public class MyDSpaceServlet extends DSpaceServlet
     {
         // Turn the iterator into a list
         List<Item> subList = new LinkedList<Item>();
-        ItemIterator subs = Item.findBySubmitter(context, context
-                .getCurrentUser());
+        ItemIterator subs = Item.findBySubmitter(context,
+                context.getCurrentUser());
 
         try
         {

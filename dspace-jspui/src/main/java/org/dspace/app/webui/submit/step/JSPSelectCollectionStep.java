@@ -9,13 +9,13 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
@@ -32,14 +32,13 @@ import org.dspace.submit.step.SelectCollectionStep;
  * Step which controls selecting a Collection for the Item Submission process
  * for DSpace JSP-UI
  * <P>
- * This JSPStep class works with the SubmissionController servlet
- * for the JSP-UI
+ * This JSPStep class works with the SubmissionController servlet for the JSP-UI
  * <P>
  * The following methods are called in this order:
  * <ul>
  * <li>Call doPreProcessing() method</li>
- * <li>If showJSP() was specified from doPreProcessing(), then the JSP
- * specified will be displayed</li>
+ * <li>If showJSP() was specified from doPreProcessing(), then the JSP specified
+ * will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called and the step completes immediately</li>
  * <li>Call doProcessing() method on appropriate AbstractProcessingStep after
@@ -104,21 +103,26 @@ public class JSPSelectCollectionStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        String collectionID = request.getParameter("collection");
-        Collection col = null;
+        String collectionID[] = request.getParameterValues("mapcollections");
+        Collection col[] = null;
 
         if (collectionID != null)
         {
-            col = Collection.find(context, Integer.parseInt(collectionID));
+            col = new Collection[collectionID.length];
+
+            for (int i = 0; i < collectionID.length; i++)
+            {
+                col[i] = Collection.find(context,
+                        Integer.parseInt(collectionID[i]));
+            }
         }
 
         // if we already have a valid collection, then we can forward directly
         // to post-processing
         if (col != null)
         {
-            log
-                    .debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
-                            + collectionID);
+            log.debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
+                    + Arrays.asList(collectionID));
         }
         else
         {
@@ -143,7 +147,7 @@ public class JSPSelectCollectionStep extends JSPStep
             // This is a special case, where the user came back to this
             // page after not selecting a collection. This will display
             // the "Please select a collection" message to the user
-            if (collectionID != null && Integer.parseInt(collectionID) == -1)
+            if (collectionID != null && Integer.parseInt(collectionID[0]) == -1)
             {
                 // specify "no collection" error message should be displayed
                 request.setAttribute("no.collection", Boolean.TRUE);
@@ -152,8 +156,21 @@ public class JSPSelectCollectionStep extends JSPStep
             // save collections to request for JSP
             request.setAttribute("collections", collections);
 
+            // pass along the collection from the "Submit to This Collection"
+            // link
+            if (request.getParameter("collection") != null)
+            {
+                Collection c = Collection.find(context,
+                        Integer.parseInt(request.getParameter("collection")));
+                if (c != null)
+                {
+                    request.setAttribute("collection", c);
+                }
+            }
+
             // we need to load the select collection JSP
-            JSPStepManager.showJSP(request, response, subInfo, SELECT_COLLECTION_JSP);
+            JSPStepManager.showJSP(request, response, subInfo,
+                    SELECT_COLLECTION_JSP);
         }
     }
 
@@ -197,14 +214,14 @@ public class JSPSelectCollectionStep extends JSPStep
         }
         else if (status == SelectCollectionStep.STATUS_INVALID_COLLECTION)
         {
-            JSPManager.showInvalidIDError(request, response, request
-                    .getParameter("collection"), Constants.COLLECTION);
+            JSPManager.showInvalidIDError(request, response,
+                    request.getParameter("collection"), Constants.COLLECTION);
         }
     }
-    
+
     /**
-     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
-     * which will review the information that was gathered in this Step.
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP which
+     * will review the information that was gathered in this Step.
      * <P>
      * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
      * generate a submission verification page consisting of the information
@@ -222,6 +239,7 @@ public class JSPSelectCollectionStep extends JSPStep
     public String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
     {
-        return NO_JSP;  //at this time, you cannot review what collection you selected.
+        return NO_JSP; // at this time, you cannot review what collection you
+                       // selected.
     }
 }

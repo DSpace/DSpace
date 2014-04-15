@@ -7,14 +7,8 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -35,7 +29,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author Ben Wallberg
  */
 
-public class Unit extends DSpaceObject {
+public class Unit extends DSpaceObject
+{
 
     // findAll sortby types
     public static final int ID = 0; // sort by ID
@@ -73,12 +68,14 @@ public class Unit extends DSpaceObject {
         groups = new ArrayList<Group>();
 
         // Get groups
-        TableRowIterator tri = DatabaseManager.queryTable(
-                myContext, "epersongroup",
-                "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE "
-                        + "epersongroup2unit.eperson_group_id=epersongroup.eperson_group_id AND "
-                        + "epersongroup2unit.unit_id= ? ",
-                myRow.getIntColumn("unit_id"));
+        TableRowIterator tri = DatabaseManager
+                .queryTable(
+                        myContext,
+                        "epersongroup",
+                        "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE "
+                                + "epersongroup2unit.eperson_group_id=epersongroup.eperson_group_id AND "
+                                + "epersongroup2unit.unit_id= ? ",
+                        myRow.getIntColumn("unit_id"));
 
         try
         {
@@ -87,8 +84,8 @@ public class Unit extends DSpaceObject {
                 TableRow r = (TableRow) tri.next();
 
                 // First check the cache
-                Group fromCache = (Group) context.fromCache(
-                        Group.class, r.getIntColumn("eperson_group_id"));
+                Group fromCache = (Group) context.fromCache(Group.class,
+                        r.getIntColumn("eperson_group_id"));
 
                 if (fromCache != null)
                 {
@@ -135,8 +132,8 @@ public class Unit extends DSpaceObject {
 
         Unit g = new Unit(context, row);
 
-        log.info(LogManager.getHeader(context, "create_unit", "unit_id="
-                + g.getID()));
+        log.info(LogManager.getHeader(context, "create_unit",
+                "unit_id=" + g.getID()));
 
         return g;
     }
@@ -235,8 +232,8 @@ public class Unit extends DSpaceObject {
     public static Unit findByName(Context context, String name)
             throws SQLException
     {
-        TableRow row = DatabaseManager.findByUnique(context, "unit",
-                "name", name);
+        TableRow row = DatabaseManager.findByUnique(context, "unit", "name",
+                name);
 
         if (row == null)
         {
@@ -245,8 +242,8 @@ public class Unit extends DSpaceObject {
         else
         {
             // First check the cache
-            Unit fromCache = (Unit) context.fromCache(Unit.class, row
-                    .getIntColumn("unit_id"));
+            Unit fromCache = (Unit) context.fromCache(Unit.class,
+                    row.getIntColumn("unit_id"));
 
             if (fromCache != null)
             {
@@ -290,11 +287,10 @@ public class Unit extends DSpaceObject {
             s = "name";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // NOTE: The use of 's' in the order by clause can not cause an sql
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.queryTable(
-        		context, "unit",
-                "SELECT * FROM unit ORDER BY "+s);
+        TableRowIterator rows = DatabaseManager.queryTable(context, "unit",
+                "SELECT * FROM unit ORDER BY " + s);
 
         try
         {
@@ -307,8 +303,8 @@ public class Unit extends DSpaceObject {
                 TableRow row = (TableRow) gRows.get(i);
 
                 // First check the cache
-                Unit fromCache = (Unit) context.fromCache(Unit.class, row
-                        .getIntColumn("unit_id"));
+                Unit fromCache = (Unit) context.fromCache(Unit.class,
+                        row.getIntColumn("unit_id"));
 
                 if (fromCache != null)
                 {
@@ -328,8 +324,7 @@ public class Unit extends DSpaceObject {
                 rows.close();
         }
     }
-    
-    
+
     /**
      * Find the units that match the search query across unit_id or name
      * 
@@ -341,11 +336,11 @@ public class Unit extends DSpaceObject {
      * @return array of Unit objects
      */
     public static Unit[] search(Context context, String query)
-    		throws SQLException
-	{
-	    return search(context, query, -1, -1);
-	}
-    
+            throws SQLException
+    {
+        return search(context, query, -1, -1);
+    }
+
     /**
      * Find the units that match the search query across unit_id or name
      * 
@@ -354,26 +349,27 @@ public class Unit extends DSpaceObject {
      * @param query
      *            The search string
      * @param offset
-     *            Inclusive offset 
+     *            Inclusive offset
      * @param limit
      *            Maximum number of matches returned
      * 
      * @return array of Unit objects
      */
-    public static Unit[] search(Context context, String query, int offset, int limit)
-    		throws SQLException
-	{
-		String params = "%"+query.toLowerCase()+"%";
+    public static Unit[] search(Context context, String query, int offset,
+            int limit) throws SQLException
+    {
+        String params = "%" + query.toLowerCase() + "%";
         StringBuffer queryBuf = new StringBuffer();
-		queryBuf.append("SELECT * FROM unit WHERE LOWER(name) LIKE LOWER(?) OR unit_id = ? ORDER BY name ASC ");
-		
+        queryBuf.append("SELECT * FROM unit WHERE LOWER(name) LIKE LOWER(?) OR unit_id = ? ORDER BY name ASC ");
+
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
             {
-                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                queryBuf.insert(0,
+                        "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
                 queryBuf.append(") ");
             }
 
@@ -381,7 +377,8 @@ public class Unit extends DSpaceObject {
             if (limit > 0)
             {
                 queryBuf.append("rec WHERE rownum<=? ");
-                // If we also have an offset, then convert the limit into the maximum row number
+                // If we also have an offset, then convert the limit into the
+                // maximum row number
                 if (offset > 0)
                     limit += offset;
             }
@@ -404,26 +401,30 @@ public class Unit extends DSpaceObject {
 
         String dbquery = queryBuf.toString();
 
-        // When checking against the unit-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
-		}
+        // When checking against the unit-id, make sure the query can be made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = new Integer(-1);
+        }
 
-        // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[]{params, int_param};
+        // Create the parameter array, including limit and offset if part of the
+        // query
+        Object[] paramArr = new Object[] { params, int_param };
         if (limit > 0 && offset > 0)
-            paramArr = new Object[] {params, int_param,limit,offset};
+            paramArr = new Object[] { params, int_param, limit, offset };
         else if (limit > 0)
-            paramArr = new Object[] {params, int_param,limit};
+            paramArr = new Object[] { params, int_param, limit };
         else if (offset > 0)
-            paramArr = new Object[] {params, int_param,offset};
+            paramArr = new Object[] { params, int_param, offset };
 
-        TableRowIterator rows =
-			DatabaseManager.query(context, dbquery, paramArr);
+        TableRowIterator rows = DatabaseManager.query(context, dbquery,
+                paramArr);
 
         try
         {
@@ -435,8 +436,8 @@ public class Unit extends DSpaceObject {
                 TableRow row = (TableRow) unitRows.get(i);
 
                 // First check the cache
-                Unit fromCache = (Unit) context.fromCache(Unit.class, row
-                        .getIntColumn("unit_id"));
+                Unit fromCache = (Unit) context.fromCache(Unit.class,
+                        row.getIntColumn("unit_id"));
 
                 if (fromCache != null)
                 {
@@ -454,11 +455,11 @@ public class Unit extends DSpaceObject {
             if (rows != null)
                 rows.close();
         }
-	}
+    }
 
     /**
-     * Returns the total number of units returned by a specific query, without the overhead 
-     * of creating the Unit objects to store the results.
+     * Returns the total number of units returned by a specific query, without
+     * the overhead of creating the Unit objects to store the results.
      * 
      * @param context
      *            DSpace context
@@ -468,38 +469,42 @@ public class Unit extends DSpaceObject {
      * @return the number of units mathching the query
      */
     public static int searchResultCount(Context context, String query)
-    	throws SQLException
-	{
-		String params = "%"+query.toLowerCase()+"%";
-		String dbquery = "SELECT count(*) as gcount FROM unit WHERE LOWER(name) LIKE LOWER(?) OR unit_id = ? ";
-		
-		// When checking against the unit-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
-		}
-		
-		// Get all the epeople that match the query
-		TableRow row = DatabaseManager.querySingle(context, dbquery, new Object[] {params, int_param});
-		
-		// use getIntColumn for Oracle count data
-		Long count;
+            throws SQLException
+    {
+        String params = "%" + query.toLowerCase() + "%";
+        String dbquery = "SELECT count(*) as gcount FROM unit WHERE LOWER(name) LIKE LOWER(?) OR unit_id = ? ";
+
+        // When checking against the unit-id, make sure the query can be made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = new Integer(-1);
+        }
+
+        // Get all the epeople that match the query
+        TableRow row = DatabaseManager.querySingle(context, dbquery,
+                new Object[] { params, int_param });
+
+        // use getIntColumn for Oracle count data
+        Long count;
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             count = new Long(row.getIntColumn("gcount"));
         }
-        else  //getLongColumn works for postgres
+        else
+        // getLongColumn works for postgres
         {
             count = new Long(row.getLongColumn("gcount"));
         }
 
-		return count.intValue();
-	}
-    
-    
+        return count.intValue();
+    }
+
     /**
      * Delete a unit
      * 
@@ -534,7 +539,8 @@ public class Unit extends DSpaceObject {
 
         if (modifiedMetadata)
         {
-            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.UNIT, getID(), getDetails()));
+            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.UNIT,
+                    getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -544,14 +550,14 @@ public class Unit extends DSpaceObject {
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same Unit as
-     * this object, <code>false</code> otherwise
+     * Return <code>true</code> if <code>other</code> is the same Unit as this
+     * object, <code>false</code> otherwise
      * 
      * @param other
      *            object to compare to
      * 
-     * @return <code>true</code> if object passed in represents the same unit
-     *         as this object
+     * @return <code>true</code> if object passed in represents the same unit as
+     *         this object
      */
     public boolean equals(Object other)
     {
@@ -582,11 +588,14 @@ public class Unit extends DSpaceObject {
     public Group[] getGroups() throws SQLException
     {
         // Get the group table rows
-        TableRowIterator tri = DatabaseManager.queryTable(myContext, "epersongroup",
-                "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE " + 
-                "epersongroup.eperson_group_id=epersongroup2unit.eperson_group_id AND " +
-                "epersongroup2unit.unit_id= ? ",
-                 myRow.getIntColumn("unit_id"));
+        TableRowIterator tri = DatabaseManager
+                .queryTable(
+                        myContext,
+                        "epersongroup",
+                        "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE "
+                                + "epersongroup.eperson_group_id=epersongroup2unit.eperson_group_id AND "
+                                + "epersongroup2unit.unit_id= ? ",
+                        myRow.getIntColumn("unit_id"));
 
         // Build a list of Group objects
         List<Group> groups = new ArrayList<Group>();
@@ -597,8 +606,8 @@ public class Unit extends DSpaceObject {
                 TableRow r = tri.next();
 
                 // First check the cache
-                Group fromCache = (Group) myContext.fromCache(Group.class, r
-                        .getIntColumn("eperson_group_id"));
+                Group fromCache = (Group) myContext.fromCache(Group.class,
+                        r.getIntColumn("eperson_group_id"));
 
                 if (fromCache != null)
                 {
@@ -622,7 +631,6 @@ public class Unit extends DSpaceObject {
 
         return groupArray;
     }
-
 
     /**
      * Add an existing group to this unit
@@ -658,7 +666,6 @@ public class Unit extends DSpaceObject {
         DatabaseManager.update(myContext, mappingRow);
     }
 
-
     /**
      * Remove a group from this unit
      * 
@@ -667,8 +674,8 @@ public class Unit extends DSpaceObject {
      */
     public void removeGroup(Group b) throws SQLException
     {
-        log.info(LogManager.getHeader(myContext, "remove_group",
-                "unit_id=" + getID() + ",eperson_group_id=" + b.getID()));
+        log.info(LogManager.getHeader(myContext, "remove_group", "unit_id="
+                + getID() + ",eperson_group_id=" + b.getID()));
 
         // Remove from internal list of groups
         ListIterator li = groups.listIterator();
@@ -686,12 +693,10 @@ public class Unit extends DSpaceObject {
 
         // Delete the mapping row
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM epersongroup2unit WHERE unit_id= ? "+
-                "AND eperson_group_id= ? ", 
-                getID(), b.getID());
+                "DELETE FROM epersongroup2unit WHERE unit_id= ? "
+                        + "AND eperson_group_id= ? ", getID(), b.getID());
 
     }
-
 
     /**
      * Get the units a groups maps to
@@ -699,14 +704,14 @@ public class Unit extends DSpaceObject {
      * @return array of <code>Unit</code>
      * @throws SQLException
      */
-    public static Unit[] getUnits(Context myContext, Group g) throws SQLException
+    public static Unit[] getUnits(Context myContext, Group g)
+            throws SQLException
     {
         // Get the unit table rows
         TableRowIterator tri = DatabaseManager.queryTable(myContext, "unit",
-                "SELECT unit.* FROM unit, epersongroup2unit WHERE " + 
-                "unit.unit_id=epersongroup2unit.unit_id AND " +
-                "epersongroup2unit.eperson_group_id= ? ",
-                 g.getID());
+                "SELECT unit.* FROM unit, epersongroup2unit WHERE "
+                        + "unit.unit_id=epersongroup2unit.unit_id AND "
+                        + "epersongroup2unit.eperson_group_id= ? ", g.getID());
 
         // Build a list of Unit objects
         List<Unit> units = new ArrayList<Unit>();
@@ -717,8 +722,8 @@ public class Unit extends DSpaceObject {
                 TableRow r = tri.next();
 
                 // First check the cache
-                Unit fromCache = (Unit) myContext.fromCache(Unit.class, r
-                        .getIntColumn("unit_id"));
+                Unit fromCache = (Unit) myContext.fromCache(Unit.class,
+                        r.getIntColumn("unit_id"));
 
                 if (fromCache != null)
                 {
@@ -742,5 +747,11 @@ public class Unit extends DSpaceObject {
         return unitArray;
     }
 
+    @Override
+    public void updateLastModified()
+    {
+        // TODO Auto-generated method stub
+
+    }
 
 }

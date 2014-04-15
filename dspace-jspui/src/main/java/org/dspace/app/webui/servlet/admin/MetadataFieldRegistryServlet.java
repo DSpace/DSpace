@@ -36,7 +36,9 @@ import org.dspace.core.Context;
 public class MetadataFieldRegistryServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(MetadataFieldRegistryServlet.class);
+    private static Logger log = Logger
+            .getLogger(MetadataFieldRegistryServlet.class);
+
     private String clazz = "org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet";
 
     /**
@@ -82,22 +84,22 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             try
             {
                 // Update the metadata for a DC type
-                MetadataField dc = MetadataField.find(context, UIUtil
-                        .getIntParameter(request, "dc_type_id"));
-            dc.setElement(request.getParameter("element"));
+                MetadataField dc = MetadataField.find(context,
+                        UIUtil.getIntParameter(request, "dc_type_id"));
+                dc.setElement(request.getParameter("element"));
 
-            String qual = request.getParameter("qualifier");
-            if (qual.equals(""))
-            {
-                qual = null;
-            }
+                String qual = request.getParameter("qualifier");
+                if (qual.equals(""))
+                {
+                    qual = null;
+                }
 
-            dc.setQualifier(qual);
-            dc.setScopeNote(request.getParameter("scope_note"));
+                dc.setQualifier(qual);
+                dc.setScopeNote(request.getParameter("scope_note"));
                 dc.update(context);
                 showTypes(context, request, response, schemaID);
-            context.complete();
-        }
+                context.complete();
+            }
             catch (NonUniqueMetadataException e)
             {
                 context.abort();
@@ -133,8 +135,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 dc.setScopeNote(request.getParameter("scope_note"));
                 dc.create(context);
                 showTypes(context, request, response, schemaID);
-            context.complete();
-        }
+                context.complete();
+            }
             catch (NonUniqueMetadataException e)
             {
                 // Record the exception as a warning
@@ -142,8 +144,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
 
                 // Show the page again but with an error message to inform the
                 // user that the metadata field was not created and why
-                request.setAttribute("error", labels.getString(clazz
-                        + ".createfailed"));
+                request.setAttribute("error",
+                        labels.getString(clazz + ".createfailed"));
                 showTypes(context, request, response, schemaID);
                 context.abort();
             }
@@ -151,8 +153,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            MetadataField dc = MetadataField.find(context, UIUtil
-                    .getIntParameter(request, "dc_type_id"));
+            MetadataField dc = MetadataField.find(context,
+                    UIUtil.getIntParameter(request, "dc_type_id"));
             request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-mdfield.jsp");
@@ -160,14 +162,15 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
-            MetadataField dc = MetadataField.find(context, UIUtil
-                    .getIntParameter(request, "dc_type_id"));
+            MetadataField dc = MetadataField.find(context,
+                    UIUtil.getIntParameter(request, "dc_type_id"));
             try
             {
                 dc.delete(context);
                 request.setAttribute("failed", Boolean.FALSE);
                 showTypes(context, request, response, schemaID);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 request.setAttribute("type", dc);
                 request.setAttribute("failed", true);
@@ -188,8 +191,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 String[] param = request.getParameterValues("dc_field_id");
                 if (schemaID == 0 || param == null)
                 {
-                    request.setAttribute("error", labels.getString(clazz
-                            + ".movearguments"));
+                    request.setAttribute("error",
+                            labels.getString(clazz + ".movearguments"));
                     showTypes(context, request, response, schemaID);
                     context.abort();
                 }
@@ -204,12 +207,14 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                         field.update(context);
 
                     }
-            context.complete();
-                     
-                    // Send the user to the metadata schema in which they just moved
+                    context.complete();
+
+                    // Send the user to the metadata schema in which they just
+                    // moved
                     // the metadata fields
                     response.sendRedirect(request.getContextPath()
-                            + "/dspace-admin/metadata-schema-registry?dc_schema_id=" + schemaID);
+                            + "/dspace-admin/metadata-schema-registry?dc_schema_id="
+                            + schemaID);
                 }
             }
             catch (NonUniqueMetadataException e)
@@ -219,8 +224,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
 
                 // Show the page again but with an error message to inform the
                 // user that the metadata field could not be moved
-                request.setAttribute("error", labels.getString(clazz
-                        + ".movefailed"));
+                request.setAttribute("error",
+                        labels.getString(clazz + ".movefailed"));
                 showTypes(context, request, response, schemaID);
                 context.abort();
             }
@@ -235,7 +240,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
     /**
      * Get the schema that we are currently working in from the HTTP request. If
      * not present then default to the DSpace Dublin Core schema (schemaID 1).
-     *
+     * 
      * @param request
      * @return the current schema ID
      */
@@ -282,15 +287,15 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         MetadataSchema[] schemas = MetadataSchema.findAll(context);
         request.setAttribute("schemas", schemas);
 
-        JSPManager
-                .showJSP(request, response, "/dspace-admin/list-metadata-fields.jsp");
+        JSPManager.showJSP(request, response,
+                "/dspace-admin/list-metadata-fields.jsp");
     }
 
     /**
      * Return false if the metadata field fail to pass the constraint tests. If
      * there is an error the request error String will be updated with an error
      * description.
-     *
+     * 
      * @param request
      * @param labels
      * @return true of false
@@ -332,8 +337,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 if (qualifier.charAt(ii) == '.' || qualifier.charAt(ii) == '_'
                         || qualifier.charAt(ii) == ' ')
                 {
-                    return error(request, labels.getString(clazz
-                            + ".badqualchar"));
+                    return error(request,
+                            labels.getString(clazz + ".badqualchar"));
                 }
             }
         }
@@ -343,7 +348,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
 
     /**
      * Bind the error text to the request object.
-     *
+     * 
      * @param request
      * @param text
      * @return false

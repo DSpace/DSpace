@@ -32,37 +32,39 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
-/** 
+/**
  * This servlet provides an interface to the statistics reporting for a DSpace
  * repository
- *
- * @author   Richard Jones
- * @version  $Revision$
+ * 
+ * @author Richard Jones
+ * @version $Revision$
  */
-public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServlet
+public class StatisticsServlet extends
+        org.dspace.app.webui.servlet.DSpaceServlet
 {
-    protected void doDSGet(Context c, 
-        HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    protected void doDSGet(Context c, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // forward all requests to the post handler
         doDSPost(c, request, response);
     }
-    
-    protected void doDSPost(Context c, 
-        HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+
+    protected void doDSPost(Context c, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         // check to see if the statistics are restricted to administrators
-        boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
-        
+        boolean publicise = ConfigurationManager
+                .getBooleanProperty("report.public");
+
         // determine the navigation bar to be displayed
         String navbar = (!publicise ? "admin" : "default");
         request.setAttribute("navbar", navbar);
-        
+
         // is the user a member of the Administrator (1) group
         boolean admin = Group.isMember(c, 1);
-        
+
         if (publicise || admin)
         {
             showStatistics(c, request, response);
@@ -72,29 +74,33 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
             throw new AuthorizeException();
         }
     }
-    
+
     /**
      * show the default statistics page
-     *
-     * @param context   current DSpace context
-     * @param request   current servlet request object
-     * @param response  current servlet response object
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
      */
-    private void showStatistics(Context context, 
-        HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException, AuthorizeException
+    private void showStatistics(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
     {
         StringBuffer report = new StringBuffer();
         String date = (String) request.getParameter("date");
         request.setAttribute("date", date);
-        
+
         request.setAttribute("general", Boolean.FALSE);
-        
-        File reportDir = new File(ConfigurationManager.getProperty("report.dir"));
-        
+
+        File reportDir = new File(
+                ConfigurationManager.getProperty("report.dir"));
+
         File[] reports = reportDir.listFiles();
         File reportFile = null;
-        
+
         FileInputStream fir = null;
         InputStreamReader ir = null;
         BufferedReader br = null;
@@ -103,8 +109,10 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         {
             List<Date> monthsList = new ArrayList<Date>();
 
-            Pattern monthly = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
-            Pattern general = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
+            Pattern monthly = Pattern
+                    .compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
+            Pattern general = Pattern
+                    .compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
 
             // FIXME: this whole thing is horribly inflexible and needs serious
             // work; but as a basic proof of concept will suffice
@@ -120,14 +128,16 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
                 for (int i = 0; i < reports.length; i++)
                 {
-                    Matcher matchGeneral = general.matcher(reports[i].getName());
+                    Matcher matchGeneral = general
+                            .matcher(reports[i].getName());
                     if (matchGeneral.matches())
                     {
                         Date parsedDate = null;
 
                         try
                         {
-                             parsedDate = sdf.parse(matchGeneral.group(1).trim());
+                            parsedDate = sdf
+                                    .parse(matchGeneral.group(1).trim());
                         }
                         catch (ParseException e)
                         {
@@ -140,7 +150,8 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
                             reportFile = reports[i];
                         }
 
-                        if (parsedDate != null && parsedDate.compareTo(mostRecentDate) > 0)
+                        if (parsedDate != null
+                                && parsedDate.compareTo(mostRecentDate) > 0)
                         {
                             mostRecentDate = parsedDate;
                             reportFile = reports[i];
@@ -165,7 +176,8 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
             if (reportFile == null)
             {
-                JSPManager.showJSP(request, response, "statistics/no-report.jsp");
+                JSPManager.showJSP(request, response,
+                        "statistics/no-report.jsp");
                 return;
             }
 
@@ -180,7 +192,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
                     try
                     {
-                         parsedDate = sdf.parse(matchReport.group(1).trim());
+                        parsedDate = sdf.parse(matchReport.group(1).trim());
                     }
                     catch (ParseException e)
                     {
@@ -209,7 +221,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
                 catch (IOException e)
                 {
                     // FIXME: no error handing yet
-                    throw new IllegalStateException(e.getMessage(),e);
+                    throw new IllegalStateException(e.getMessage(), e);
                 }
 
                 // FIXME: there's got to be a better way of doing this
@@ -257,7 +269,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         }
         // set the report to be displayed
         request.setAttribute("report", report.toString());
-        
+
         JSPManager.showJSP(request, response, "statistics/report.jsp");
     }
 }

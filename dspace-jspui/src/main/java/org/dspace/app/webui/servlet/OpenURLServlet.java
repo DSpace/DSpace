@@ -66,8 +66,7 @@ public class OpenURLServlet extends DSpaceServlet
                 + "dspacequery=" + query));
 
         response.sendRedirect(response.encodeRedirectURL(request
-                .getContextPath()
-                + "/simple-search?query=" + query));
+                .getContextPath() + "/simple-search?query=" + query));
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,

@@ -29,14 +29,14 @@ import org.dspace.eperson.EPerson;
  */
 public class EPersonListServlet extends DSpaceServlet
 {
-	protected void doDSPost(Context context, HttpServletRequest request, 
-			HttpServletResponse response) throws ServletException, IOException, 
-			SQLException, AuthorizeException 
-	{
-		doDSGet(context, request, response);
-	}
+    protected void doDSPost(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+        doDSGet(context, request, response);
+    }
 
-	protected void doDSGet(Context context, HttpServletRequest request,
+    protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
@@ -76,7 +76,6 @@ public class EPersonListServlet extends DSpaceServlet
         {
             offset = 0;
         }
-        
 
         EPerson[] epeople;
         String search = request.getParameter("search");
@@ -90,14 +89,14 @@ public class EPersonListServlet extends DSpaceServlet
             // Retrieve the e-people in the specified order
             epeople = EPerson.findAll(context, sortBy);
             request.setAttribute("offset", Integer.valueOf(0));
-        }        
-        
+        }
+
         // Set attributes for JSP
         request.setAttribute("sortby", Integer.valueOf(sortBy));
         request.setAttribute("first", Integer.valueOf(first));
         request.setAttribute("epeople", epeople);
         request.setAttribute("search", search);
-        
+
         if (multiple)
         {
             request.setAttribute("multiple", Boolean.TRUE);

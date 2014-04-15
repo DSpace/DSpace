@@ -25,8 +25,8 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.util.Util;
@@ -54,7 +54,7 @@ import org.dspace.license.CreativeCommons;
 
 /**
  * Servlet for editing and deleting (expunging) items
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -123,7 +123,8 @@ public class EditItemServlet extends DSpaceServlet
         else if ((handle != null) && !handle.equals(""))
         {
             // resolve handle
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
+            DSpaceObject dso = HandleManager.resolveToObject(context,
+                    handle.trim());
 
             // make sure it's an ITEM
             if ((dso != null) && (dso.getType() == Constants.ITEM))
@@ -188,9 +189,9 @@ public class EditItemServlet extends DSpaceServlet
          */
         int action = UIUtil.getIntParameter(request, "action");
 
-        Item item = Item.find(context, UIUtil.getIntParameter(request,
-                "item_id"));
- 
+        Item item = Item.find(context,
+                UIUtil.getIntParameter(request, "item_id"));
+
         String handle = HandleManager.findHandle(context, item);
 
         // now check to see if person can edit item
@@ -257,75 +258,92 @@ public class EditItemServlet extends DSpaceServlet
             break;
 
         case START_MOVE_ITEM:
-                if (AuthorizeManager.isAdmin(context,item))
+            if (AuthorizeManager.isAdmin(context, item))
+            {
+                // Display move collection page with fields of collections and
+                // communities
+                Collection[] allNotLinkedCollections = item
+                        .getCollectionsNotLinked();
+                Collection[] allLinkedCollections = item.getCollections();
+
+                // get only the collection where the current user has the right
+                // permission
+                List<Collection> authNotLinkedCollections = new ArrayList<Collection>();
+                for (Collection c : allNotLinkedCollections)
                 {
-                        // Display move collection page with fields of collections and communities
-                        Collection[] allNotLinkedCollections = item.getCollectionsNotLinked();
-                        Collection[] allLinkedCollections = item.getCollections();
-                    
-                        // get only the collection where the current user has the right permission
-                        List<Collection> authNotLinkedCollections = new ArrayList<Collection>();
-                        for (Collection c : allNotLinkedCollections)
-                        {
-                            if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.ADD))
-                            {
-                                authNotLinkedCollections.add(c);
-                            }
-                        }
+                    if (AuthorizeManager.authorizeActionBoolean(context, c,
+                            Constants.ADD))
+                    {
+                        authNotLinkedCollections.add(c);
+                    }
+                }
 
                 List<Collection> authLinkedCollections = new ArrayList<Collection>();
                 for (Collection c : allLinkedCollections)
                 {
-                    if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.REMOVE))
+                    if (AuthorizeManager.authorizeActionBoolean(context, c,
+                            Constants.REMOVE))
                     {
                         authLinkedCollections.add(c);
                     }
                 }
-                        
-                Collection[] notLinkedCollections = new Collection[authNotLinkedCollections.size()];
-                notLinkedCollections = authNotLinkedCollections.toArray(notLinkedCollections);
-                Collection[] linkedCollections = new Collection[authLinkedCollections.size()];
-                linkedCollections = authLinkedCollections.toArray(linkedCollections);
-                
-                        request.setAttribute("linkedCollections", linkedCollections);
-                        request.setAttribute("notLinkedCollections", notLinkedCollections);
-                                    
-                        JSPManager.showJSP(request, response, "/tools/move-item.jsp");
-                } else
-                {
-                        throw new ServletException("You must be an administrator to move an item");
-                }
-                
-                break;
-                        
+
+                Collection[] notLinkedCollections = new Collection[authNotLinkedCollections
+                        .size()];
+                notLinkedCollections = authNotLinkedCollections
+                        .toArray(notLinkedCollections);
+                Collection[] linkedCollections = new Collection[authLinkedCollections
+                        .size()];
+                linkedCollections = authLinkedCollections
+                        .toArray(linkedCollections);
+
+                request.setAttribute("linkedCollections", linkedCollections);
+                request.setAttribute("notLinkedCollections",
+                        notLinkedCollections);
+
+                JSPManager.showJSP(request, response, "/tools/move-item.jsp");
+            }
+            else
+            {
+                throw new ServletException(
+                        "You must be an administrator to move an item");
+            }
+
+            break;
+
         case CONFIRM_MOVE_ITEM:
-                if (AuthorizeManager.isAdmin(context,item))
-                {
-                        Collection fromCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_from_id"));
-                        Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_to_id"));
+            if (AuthorizeManager.isAdmin(context, item))
+            {
+                Collection fromCollection = Collection.find(context,
+                        UIUtil.getIntParameter(request, "collection_from_id"));
+                Collection toCollection = Collection.find(context,
+                        UIUtil.getIntParameter(request, "collection_to_id"));
 
-                        Boolean inheritPolicies = false;
-                        if (request.getParameter("inheritpolicies") != null)
-                        {
-                            inheritPolicies = true;
-                        }
-
-                        if (fromCollection == null || toCollection == null)
-                        {
-                                throw new ServletException("Missing or incorrect collection IDs for moving item");
-                        }
-                                    
-                        item.move(fromCollection, toCollection, inheritPolicies);
-                    
-                    showEditForm(context, request, response, item);
-        
-                    context.complete();
-                } else
+                Boolean inheritPolicies = false;
+                if (request.getParameter("inheritpolicies") != null)
                 {
-                        throw new ServletException("You must be an administrator to move an item");
+                    inheritPolicies = true;
                 }
-                
-                break;
+
+                if (fromCollection == null || toCollection == null)
+                {
+                    throw new ServletException(
+                            "Missing or incorrect collection IDs for moving item");
+                }
+
+                item.move(fromCollection, toCollection, inheritPolicies);
+
+                showEditForm(context, request, response, item);
+
+                context.complete();
+            }
+            else
+            {
+                throw new ServletException(
+                        "You must be an administrator to move an item");
+            }
+
+            break;
 
         case START_PRIVATING:
 
@@ -352,19 +370,19 @@ public class EditItemServlet extends DSpaceServlet
             context.complete();
 
             break;
-                
+
         default:
 
             // Erm... weird action value received.
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
+            log.warn(LogManager.getHeader(context, "integrity_error",
+                    UIUtil.getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
     }
 
     /**
      * Throw an exception if user isn't authorized to edit this item
-     *
+     * 
      * @param c
      * @param item
      */
@@ -389,7 +407,7 @@ public class EditItemServlet extends DSpaceServlet
 
     /**
      * Show the item edit form for a particular item
-     *
+     * 
      * @param context
      *            DSpace context
      * @param request
@@ -403,21 +421,21 @@ public class EditItemServlet extends DSpaceServlet
             HttpServletResponse response, Item item) throws ServletException,
             IOException, SQLException, AuthorizeException
     {
-        if ( request.getParameter("cc_license_url") != null )
+        if (request.getParameter("cc_license_url") != null)
         {
             // check authorization
             AuthorizeUtil.authorizeManageCCLicense(context, item);
-            
+
             // turn off auth system to allow replace also to user that can't
             // remove/add bitstream to the item
             context.turnOffAuthorisationSystem();
-                // set or replace existing CC license
-                CreativeCommons.setLicense( context, item,
-                   request.getParameter("cc_license_url") );
-                context.restoreAuthSystemState();
-                context.commit();
+            // set or replace existing CC license
+            CreativeCommons.setLicense(context, item,
+                    request.getParameter("cc_license_url"));
+            context.restoreAuthSystemState();
+            context.commit();
         }
-  
+
         // Get the handle, if any
         String handle = HandleManager.findHandle(context, item);
 
@@ -426,27 +444,33 @@ public class EditItemServlet extends DSpaceServlet
 
         // All DC types in the registry
         MetadataField[] types = MetadataField.findAll(context);
-        
+
         // Get a HashMap of metadata field ids and a field name to display
         Map<Integer, String> metadataFields = new HashMap<Integer, String>();
-        
+
         // Get all existing Schemas
         MetadataSchema[] schemas = MetadataSchema.findAll(context);
         for (int i = 0; i < schemas.length; i++)
         {
             String schemaName = schemas[i].getName();
             // Get all fields for the given schema
-            MetadataField[] fields = MetadataField.findAllInSchema(context, schemas[i].getSchemaID());
+            MetadataField[] fields = MetadataField.findAllInSchema(context,
+                    schemas[i].getSchemaID());
             for (int j = 0; j < fields.length; j++)
             {
                 Integer fieldID = Integer.valueOf(fields[j].getFieldID());
                 String displayName = "";
-                displayName = schemaName + "." + fields[j].getElement() + (fields[j].getQualifier() == null ? "" : "." + fields[j].getQualifier());
+                displayName = schemaName
+                        + "."
+                        + fields[j].getElement()
+                        + (fields[j].getQualifier() == null ? "" : "."
+                                + fields[j].getQualifier());
                 metadataFields.put(fieldID, displayName);
             }
         }
 
-        request.setAttribute("admin_button", AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADMIN));
+        request.setAttribute("admin_button", AuthorizeManager
+                .authorizeActionBoolean(context, item, Constants.ADMIN));
         try
         {
             AuthorizeUtil.authorizeManageItemPolicy(context, item);
@@ -456,9 +480,9 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("policy_button", Boolean.FALSE);
         }
-        
-        if (AuthorizeManager.authorizeActionBoolean(context, item
-                .getParentObject(), Constants.REMOVE))
+
+        if (AuthorizeManager.authorizeActionBoolean(context,
+                item.getParentObject(), Constants.REMOVE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
         }
@@ -466,7 +490,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("delete_button", Boolean.FALSE);
         }
-        
+
         try
         {
             AuthorizeManager.authorizeAction(context, item, Constants.ADD);
@@ -476,7 +500,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("create_bitstream_button", Boolean.FALSE);
         }
-        
+
         try
         {
             AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
@@ -486,7 +510,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("remove_bitstream_button", Boolean.FALSE);
         }
-        
+
         try
         {
             AuthorizeUtil.authorizeManageCCLicense(context, item);
@@ -496,11 +520,13 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("cclicense_button", Boolean.FALSE);
         }
-        
+
         try
         {
-            if( 0 < item.getBundles("ORIGINAL").length){
-                AuthorizeUtil.authorizeManageBundlePolicy(context, item.getBundles("ORIGINAL")[0]);
+            if (0 < item.getBundles("ORIGINAL").length)
+            {
+                AuthorizeUtil.authorizeManageBundlePolicy(context,
+                        item.getBundles("ORIGINAL")[0]);
                 request.setAttribute("reorder_bitstreams_button", Boolean.TRUE);
             }
         }
@@ -534,17 +560,17 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
-		if (item.isDiscoverable()) 
-		{
-			request.setAttribute("privating_button", AuthorizeManager
-					.authorizeActionBoolean(context, item, Constants.WRITE));
-		} 
-		else 
-		{
-			request.setAttribute("publicize_button", AuthorizeManager
-					.authorizeActionBoolean(context, item, Constants.WRITE));
-		}
-        
+        if (item.isDiscoverable())
+        {
+            request.setAttribute("privating_button", AuthorizeManager
+                    .authorizeActionBoolean(context, item, Constants.WRITE));
+        }
+        else
+        {
+            request.setAttribute("publicize_button", AuthorizeManager
+                    .authorizeActionBoolean(context, item, Constants.WRITE));
+        }
+
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
@@ -556,7 +582,7 @@ public class EditItemServlet extends DSpaceServlet
 
     /**
      * Process input from the edit item form
-     *
+     * 
      * @param context
      *            DSpace context
      * @param request
@@ -587,7 +613,7 @@ public class EditItemServlet extends DSpaceServlet
 
         while (unsortedParamNames.hasMoreElements())
         {
-            sortedParamNames.add((String)unsortedParamNames.nextElement());
+            sortedParamNames.add((String) unsortedParamNames.nextElement());
         }
 
         // Sort the list
@@ -622,7 +648,7 @@ public class EditItemServlet extends DSpaceServlet
 
                 // Get a string with "element" for unqualified or
                 // "element_qualifier"
-                String key = MetadataField.formKey(schema,element,qualifier);
+                String key = MetadataField.formKey(schema, element, qualifier);
 
                 // Get the language
                 String language = request.getParameter("language_" + key + "_"
@@ -639,8 +665,8 @@ public class EditItemServlet extends DSpaceServlet
                 }
 
                 // Get the authority key if any
-                String authority = request.getParameter("choice_" + key + "_authority_"
-                        + sequenceNumber);
+                String authority = request.getParameter("choice_" + key
+                        + "_authority_" + sequenceNumber);
 
                 // Empty string authority = null
                 if ((authority != null) && authority.equals(""))
@@ -649,9 +675,10 @@ public class EditItemServlet extends DSpaceServlet
                 }
 
                 // Get the authority confidence value, passed as symbolic name
-                String sconfidence = request.getParameter("choice_" + key + "_confidence_" + sequenceNumber);
-                int confidence = (sconfidence == null || sconfidence.equals("")) ?
-                                 Choices.CF_NOVALUE : Choices.getConfidenceValue(sconfidence);
+                String sconfidence = request.getParameter("choice_" + key
+                        + "_confidence_" + sequenceNumber);
+                int confidence = (sconfidence == null || sconfidence.equals("")) ? Choices.CF_NOVALUE
+                        : Choices.getConfidenceValue(sconfidence);
 
                 // Get the value
                 String value = request.getParameter(p).trim();
@@ -659,12 +686,12 @@ public class EditItemServlet extends DSpaceServlet
                 // If remove button pressed for this value, we don't add it
                 // back to the item. We also don't add empty values
                 // (if no authority is specified).
-                if (!((value.equals("") && authority == null) || button.equals("submit_remove_" + key
-                        + "_" + sequenceNumber)))
+                if (!((value.equals("") && authority == null) || button
+                        .equals("submit_remove_" + key + "_" + sequenceNumber)))
                 {
                     // Value is empty, or remove button for this wasn't pressed
-                    item.addMetadata(schema, element, qualifier, language, value,
-                            authority, confidence);
+                    item.addMetadata(schema, element, qualifier, language,
+                            value, authority, confidence);
                 }
             }
             else if (p.startsWith("bitstream_name"))
@@ -777,10 +804,10 @@ public class EditItemServlet extends DSpaceServlet
             }
 
             MetadataField field = MetadataField.find(context, dcTypeID);
-            MetadataSchema schema = MetadataSchema.find(context, field
-                    .getSchemaID());
-            item.addMetadata(schema.getName(), field.getElement(), field
-                    .getQualifier(), lang, value);
+            MetadataSchema schema = MetadataSchema.find(context,
+                    field.getSchemaID());
+            item.addMetadata(schema.getName(), field.getElement(),
+                    field.getQualifier(), lang, value);
         }
 
         item.update();
@@ -789,51 +816,66 @@ public class EditItemServlet extends DSpaceServlet
         {
             // Show cc-edit page
             request.setAttribute("item", item);
-            JSPManager
-                    .showJSP(request, response, "/tools/creative-commons-edit.jsp");
+            JSPManager.showJSP(request, response,
+                    "/tools/creative-commons-edit.jsp");
         }
-        
+
         if (button.equals("submit_addbitstream"))
         {
             // Show upload bitstream page
             request.setAttribute("item", item);
             JSPManager
                     .showJSP(request, response, "/tools/upload-bitstream.jsp");
-        }else
-        if(button.equals("submit_update_order") || button.startsWith("submit_order_"))
+        }
+        else if (button.equals("submit_update_order")
+                || button.startsWith("submit_order_"))
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
-            for (Bundle bundle : bundles) {
+            for (Bundle bundle : bundles)
+            {
                 Bitstream[] bitstreams = bundle.getBitstreams();
                 int[] newBitstreamOrder = new int[bitstreams.length];
-                if (button.equals("submit_update_order")) {
-                    for (Bitstream bitstream : bitstreams) {
-                        //The order is determined by javascript
-                        //For each of our bitstream retrieve the order value
-                        int order = Util.getIntParameter(request, "order_" + bitstream.getID());
-                        //-1 the order since the order needed to start from one
+                if (button.equals("submit_update_order"))
+                {
+                    for (Bitstream bitstream : bitstreams)
+                    {
+                        // The order is determined by javascript
+                        // For each of our bitstream retrieve the order value
+                        int order = Util.getIntParameter(request, "order_"
+                                + bitstream.getID());
+                        // -1 the order since the order needed to start from one
                         order--;
-                        //Place the bitstream identifier in the correct order
+                        // Place the bitstream identifier in the correct order
                         newBitstreamOrder[order] = bitstream.getID();
                     }
-                }else{
-                    //Javascript isn't operational retrieve the value from the hidden field
-                    //Retrieve the button key
-                    String inputKey = button.replace("submit_order_", "") + "_value";
-                    if(inputKey.startsWith(bundle.getID() + "_")){
-                        String[] vals = request.getParameter(inputKey).split(",");
-                        for (int i = 0; i < vals.length; i++) {
+                }
+                else
+                {
+                    // Javascript isn't operational retrieve the value from the
+                    // hidden field
+                    // Retrieve the button key
+                    String inputKey = button.replace("submit_order_", "")
+                            + "_value";
+                    if (inputKey.startsWith(bundle.getID() + "_"))
+                    {
+                        String[] vals = request.getParameter(inputKey).split(
+                                ",");
+                        for (int i = 0; i < vals.length; i++)
+                        {
                             String val = vals[i];
                             newBitstreamOrder[i] = Integer.parseInt(val);
                         }
-                    }else{
+                    }
+                    else
+                    {
                         newBitstreamOrder = null;
                     }
 
                 }
 
-                if(newBitstreamOrder != null){
-                    //Set the new order in our bundle !
+                if (newBitstreamOrder != null)
+                {
+                    // Set the new order in our bundle !
                     bundle.setOrder(newBitstreamOrder);
                     bundle.update();
                 }
@@ -847,14 +889,14 @@ public class EditItemServlet extends DSpaceServlet
             // Show edit page again
             showEditForm(context, request, response, item);
         }
-        
+
         // Complete transaction
         context.complete();
     }
 
     /**
      * Process the input from the upload bitstream page
-     *
+     * 
      * @param context
      *            current DSpace context
      * @param request
@@ -867,11 +909,14 @@ public class EditItemServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        try {
+        try
+        {
             // Wrap multipart request to get the submission info
             FileUploadRequest wrapper = new FileUploadRequest(request);
             Bitstream b = null;
-            Item item = Item.find(context, UIUtil.getIntParameter(wrapper, "item_id"));
+            Item item = Item.find(context,
+                    UIUtil.getIntParameter(wrapper, "item_id"));
+            String bundleName = wrapper.getParameter("bundle");
             File temp = wrapper.getFile("file");
 
             // Read the temp file as logo
@@ -881,12 +926,12 @@ public class EditItemServlet extends DSpaceServlet
             checkEditAuthorization(context, item);
 
             // do we already have an ORIGINAL bundle?
-            Bundle[] bundles = item.getBundles("ORIGINAL");
+            Bundle[] bundles = item.getBundles(bundleName);
 
             if (bundles.length < 1)
             {
                 // set bundle's name to ORIGINAL
-                b = item.createSingleBitstream(is, "ORIGINAL");
+                b = item.createSingleBitstream(is, bundleName);
 
                 // set the permission as defined in the owning collection
                 Collection owningCollection = item.getOwningCollection();
@@ -895,7 +940,7 @@ public class EditItemServlet extends DSpaceServlet
                     Bundle bnd = b.getBundles()[0];
                     bnd.inheritCollectionDefaultPolicies(owningCollection);
                 }
-            } 
+            }
             else
             {
                 // we have a bundle already, just add bitstream
@@ -937,10 +982,12 @@ public class EditItemServlet extends DSpaceServlet
 
             // Update DB
             context.complete();
-        } catch (FileSizeLimitExceededException ex)
+        }
+        catch (FileSizeLimitExceededException ex)
         {
             log.warn("Upload exceeded upload.max");
-            JSPManager.showFileSizeLimitExceededError(request, response, ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
+            JSPManager.showFileSizeLimitExceededError(request, response,
+                    ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
         }
     }
 }

@@ -48,23 +48,24 @@ public class RetrieveServlet extends DSpaceServlet
      * Threshold on Bitstream size before content-disposition will be set.
      */
     private int threshold;
-    
-    @Override
-	public void init(ServletConfig arg0) throws ServletException {
 
-		super.init(arg0);
-		threshold = ConfigurationManager
-				.getIntProperty("webui.content_disposition_threshold");
-	}
-    
+    @Override
+    public void init(ServletConfig arg0) throws ServletException
+    {
+
+        super.init(arg0);
+        threshold = ConfigurationManager
+                .getIntProperty("webui.content_disposition_threshold");
+    }
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         Bitstream bitstream = null;
-        boolean displayLicense = ConfigurationManager.getBooleanProperty("webui.licence_bundle.show", false);
+        boolean displayLicense = ConfigurationManager.getBooleanProperty(
+                "webui.licence_bundle.show", false);
         boolean isLicense = false;
-        
 
         // Get the ID from the URL
         String idString = request.getPathInfo();
@@ -103,17 +104,21 @@ public class RetrieveServlet extends DSpaceServlet
         {
 
             // Check whether we got a License and if it should be displayed
-            // (Note: list of bundles may be empty array, if a bitstream is a Community/Collection logo)
-            Bundle bundle = bitstream.getBundles().length>0 ? bitstream.getBundles()[0] : null;
-            
-            if (bundle!=null && 
-                bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME) &&
-                bitstream.getName().equals(Constants.LICENSE_BITSTREAM_NAME))
+            // (Note: list of bundles may be empty array, if a bitstream is a
+            // Community/Collection logo)
+            Bundle bundle = bitstream.getBundles().length > 0 ? bitstream
+                    .getBundles()[0] : null;
+
+            if (bundle != null
+                    && bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME)
+                    && bitstream.getName().equals(
+                            Constants.LICENSE_BITSTREAM_NAME))
             {
-                    isLicense = true;
+                isLicense = true;
             }
-            
-            if (isLicense && !displayLicense && !AuthorizeManager.isAdmin(context))
+
+            if (isLicense && !displayLicense
+                    && !AuthorizeManager.isAdmin(context))
             {
                 throw new AuthorizeException();
             }
@@ -121,15 +126,12 @@ public class RetrieveServlet extends DSpaceServlet
                     "bitstream_id=" + bitstream.getID()));
 
             new DSpace().getEventService().fireEvent(
-            		new UsageEvent(
-            				UsageEvent.Action.VIEW,
-            				request, 
-            				context, 
-            				bitstream));
-            
-            //UsageEvent ue = new UsageEvent();
-           // ue.fire(request, context, AbstractUsageEvent.VIEW,
-		   //Constants.BITSTREAM, bitstream.getID());
+                    new UsageEvent(UsageEvent.Action.VIEW, request, context,
+                            bitstream));
+
+            // UsageEvent ue = new UsageEvent();
+            // ue.fire(request, context, AbstractUsageEvent.VIEW,
+            // Constants.BITSTREAM, bitstream.getID());
 
             // Pipe the bits
             InputStream is = bitstream.retrieve();
@@ -138,13 +140,14 @@ public class RetrieveServlet extends DSpaceServlet
             response.setContentType(bitstream.getFormat().getMIMEType());
 
             // Response length
-            response.setHeader("Content-Length", String.valueOf(bitstream
-                    .getSize()));
-            
-    		if(threshold != -1 && bitstream.getSize() >= threshold)
-    		{
-    			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
-    		}
+            response.setHeader("Content-Length",
+                    String.valueOf(bitstream.getSize()));
+
+            if (threshold != -1 && bitstream.getSize() >= threshold)
+            {
+                UIUtil.setBitstreamDisposition(bitstream.getName(), request,
+                        response);
+            }
 
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
