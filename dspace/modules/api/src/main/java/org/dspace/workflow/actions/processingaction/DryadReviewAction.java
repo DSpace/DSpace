@@ -40,6 +40,12 @@ public class DryadReviewAction extends ProcessingAction {
         UUID uuid = UUID.randomUUID();
         //Next add our unique key to our workflowitem
         wf.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "reviewerKey", null, uuid.toString());
+        try{
+            wf.getItem().update();
+        } catch (AuthorizeException e)
+        {
+            log.error("cant update reviewerKey for item:"+wf.getItem().getID());
+        }
 
         try {
             Role role = WorkflowUtils.getCollectionRoles(wf.getCollection()).get("curator");
