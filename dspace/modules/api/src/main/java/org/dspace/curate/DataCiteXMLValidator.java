@@ -2,7 +2,6 @@
  */
 package org.dspace.curate;
 
-import com.sun.org.apache.bcel.internal.generic.D2F;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
