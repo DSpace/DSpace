@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.0 - Created 2011-01-13 - FZ, TIB, Germany -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datacite.org/schema/kernel-2.2" targetNamespace="http://datacite.org/schema/kernel-2.2" elementFormDefault="qualified">
+	<xs:simpleType name="contributorType">
+		<xs:annotation>
+			<xs:documentation>The type of contributor of the resource.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ContactPerson"/>
+			<xs:enumeration value="DataCollector"/>
+			<xs:enumeration value="DataManager"/>
+			<xs:enumeration value="Distributor"/>
+			<xs:enumeration value="Editor"/>
+			<xs:enumeration value="Funder"/>
+			<xs:enumeration value="HostingInstitution"/>
+			<xs:enumeration value="Producer"/>
+			<xs:enumeration value="ProjectLeader"/>
+			<xs:enumeration value="ProjectMember"/>
+			<xs:enumeration value="RegistrationAgency"/>
+			<xs:enumeration value="RegistrationAuthority"/>
+			<xs:enumeration value="RelatedPerson"/>
+			<xs:enumeration value="RightsHolder"/>
+			<xs:enumeration value="Researcher"/>
+			<xs:enumeration value="Sponsor"/>
+			<xs:enumeration value="Supervisor"/>
+			<xs:enumeration value="WorkPackageLeader"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
