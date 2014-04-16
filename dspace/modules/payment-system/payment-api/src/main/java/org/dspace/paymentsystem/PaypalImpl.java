@@ -16,7 +16,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
-import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -208,8 +207,7 @@ public class PaypalImpl implements PaypalService{
             else
             {
                 log.debug("charging card");
-                Context context = ContextUtil.obtainContext(request);
-                return chargeCard(c, wfi, request,shoppingCart,context);
+                return chargeCard(c, wfi, request,shoppingCart);
             }
 
         }catch (Exception e)
@@ -221,7 +219,7 @@ public class PaypalImpl implements PaypalService{
     }
 
     @Override
-    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart,Context context) {
+    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart) {
         //this method should get the reference code and submit it to paypal to do the actural charge process
 
         if(shoppingCart.getTransactionId()==null){
@@ -254,7 +252,7 @@ public class PaypalImpl implements PaypalService{
             //TODO:add currency from shopping cart
             post.addParameter("CURRENCY", shoppingCart.getCurrency());
 
-            Item item = Item.find(context,shoppingCart.getItem());
+            Item item = Item.find(c,shoppingCart.getItem());
 
             String userFirstName = "";
 
