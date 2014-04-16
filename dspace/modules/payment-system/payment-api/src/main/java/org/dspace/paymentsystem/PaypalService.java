@@ -45,7 +45,7 @@ public interface PaypalService
 
     public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException;
 
-    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart, Context context);
+    public boolean chargeCard(Context c, WorkflowItem wfi, HttpServletRequest request, ShoppingCart shoppingCart);
 
     public void generatePaypalForm(Division mandiv, ShoppingCart shoppingCart, String actionURL, String type,Context context) throws WingException, SQLException;
 
