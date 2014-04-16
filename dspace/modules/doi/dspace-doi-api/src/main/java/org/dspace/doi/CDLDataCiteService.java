@@ -215,7 +215,7 @@ public class CDLDataCiteService {
                 if (doi != null) {
                     String response = lookup(doi);
 
-                    if (response.contains("invalid DOI identifier")) {
+                    if (response.contains("no such identifier")) {
                         registerItem(item, doi);
                         registeredItems++;
                     } else {
