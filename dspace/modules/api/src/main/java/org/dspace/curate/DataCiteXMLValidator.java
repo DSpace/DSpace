@@ -25,6 +25,7 @@ import org.jdom.JDOMException;
  * failed DOI Registration.
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
+@Distributive
 public class DataCiteXMLValidator extends AbstractCurationTask {
     private static final Logger log = Logger.getLogger(DataCiteXMLValidator.class);
     private static final String HEADERS = "\"DOI\",\"Status\",\"Result\",\"Detail\"";
