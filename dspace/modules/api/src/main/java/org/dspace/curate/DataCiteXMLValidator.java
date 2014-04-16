@@ -28,19 +28,19 @@ import org.jdom.JDOMException;
 @Distributive
 public class DataCiteXMLValidator extends AbstractCurationTask {
     private static final Logger log = Logger.getLogger(DataCiteXMLValidator.class);
-    private static final String HEADERS = "\"DOI\",\"Status\",\"Result\",\"Detail\"";
+    private static final String HEADERS = "\"Identifier\",\"Status\",\"Result\",\"Detail\"";
     private static SAXBuilder builder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
     private void report(Item item, Integer status, String result, String detail) {
-        //TODO: Do something with the result.
-        // DOI, status code, result, detail
-        DCValue[] dcdoi = item.getMetadata("dc.identifier");
-        String doi = "";
-        if (dcdoi.length > 0) {
-            doi = dcdoi[0].value;
+        DCValue[] dcIdentifier = item.getMetadata("dc.identifier");
+        String identifier;
+        if (dcIdentifier.length > 0) {
+            identifier = dcIdentifier[0].value;
+        } else {
+            identifier = String.valueOf(item.getID());
         }
 
         String message = String.format("\"%s\",%d,\"%s\",\"%s\"",
-                doi,
+                identifier,
                 status,
                 result,
                 detail);
