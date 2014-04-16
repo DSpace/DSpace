@@ -2,7 +2,9 @@
  */
 package org.dspace.curate;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -82,7 +84,8 @@ public class DataCiteXMLValidator extends AbstractCurationTask {
         // validate xml against datacite schema
         // from http://www.jdom.org/docs/faq.html#a0370
         try {
-            Document doc = builder.build(dataCiteXmlMetadata);
+            InputStream in = new ByteArrayInputStream(dataCiteXmlMetadata.getBytes("UTF-8"));
+            Document doc = builder.build(in);
             report(item, Curator.CURATE_SUCCESS, "Validated", null);
         } catch (JDOMException ex) {
             // There was an exception validating
