@@ -212,7 +212,17 @@ public class CDLDataCiteService {
                 item = item1;
                 doi = getDoiValue(item);
 
-                if (doi != null) {
+                // Only register/update items that are archived or in blackout
+                boolean shouldRegister = (
+                        item.isArchived() ||
+                        DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)
+                        );
+                if(shouldRegister == false) {
+                    // Impossible to process
+                    System.out.println("Item not processed because it is not in the archive: " + item.getID());
+                    notProcessItems++;
+                } else if (doi != null) {
+                    // lookup makes an HTTP call
                     String response = lookup(doi);
 
                     if (response.contains("no such identifier")) {
@@ -242,7 +252,7 @@ public class CDLDataCiteService {
 
         }
 
-        System.out.println("Synchronization executed. Prcocessed Items:" + itemsToProcess.size() + " registeredItems:" + registeredItems + " updateItems:" + syncItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
+        System.out.println("Synchronization executed. Processed Items:" + itemsToProcess.size() + " registeredItems:" + registeredItems + " updateItems:" + syncItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
     }
 
 
