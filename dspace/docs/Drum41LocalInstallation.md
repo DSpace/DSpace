@@ -232,7 +232,7 @@ $ drum41
 
 ### Relational Database: PostgreSQL 8.4
 
-Please, install [PostgeSQL 8.4 according to the instructions](https://github.com/umd-lib/drum-new/blob/drum-develop/dspace/docs/Postgres8.4Installation.mdhttps://github.com/umd-lib/drum-new/blob/drum-develop/dspace/docs/Postgres8.4Installation.md]).
+Please, install [PostgeSQL 8.4 according to the instructions](Postgres8.4Installation.md).
 
 
 ##<a name="drum-installation"></a>DRUM Instance Installation
@@ -247,7 +247,7 @@ $ git https://github.com/umd-lib/drum-new.git
 Checkout drumn-develop branch
 
 ```
-$ $ git br
+$ git br
 
   drum-develop
   drum-master
