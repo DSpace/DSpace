@@ -542,6 +542,15 @@ $ ./control start
 
 ```
 
+* Refresh Browse and Search Indexes
+ 
+Run command from the Drum 4.1 installation directory (Tomcat & Solr should be up and running)
+
+```
+$ cd /apps/drum-new 
+$ bin/dspace index-discovery -f
+```
+
 ##<a name="validate-installation"></a>Check DRUM 4.1 Installation
 
 
@@ -555,4 +564,5 @@ $ ./control start
 	* [DRUM 4.1 Solr](http://localhost:8080/solr/#/)
 	* Look at the Solr Core Tab (ensure all cores: search, statistics, oai are running)
 	* Consult Tomcat/Solr logs if needed
+
 * Login as Administrator and create community, collection, submit an item to the collection.
