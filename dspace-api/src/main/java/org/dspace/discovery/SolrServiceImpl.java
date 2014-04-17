@@ -1301,7 +1301,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         log.debug("  Added Grouping");
 
 
-        //Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
 
         try {
             // now get full text of any bitstreams in the TEXT bundle
