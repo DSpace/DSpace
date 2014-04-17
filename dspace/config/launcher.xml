@@ -2,6 +2,21 @@
 <commands>
 
     <command>
+        <name>bulk-do</name>
+        <description>Apply Action in Bulk</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Main</class>
+        </step>
+    </command>
+    <command>
+        <name>bulk-list</name>
+        <description>Bulk List DSpaceObjects</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Lister</class>
+        </step>
+    </command>
+
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>
