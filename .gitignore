@@ -6,6 +6,8 @@ target/
 .project
 .classpath
 
+dspace-rest/
+
 ## Ignore project files created by IntelliJ IDEA
 *.iml
 *.ipr
