@@ -245,6 +245,6 @@ class ReferredObjects {
     public String toString() {
         return (String.format("bitstream-seq-id=%d  item=%s",
                 (bitstream == null) ? "-1" : bitstream.getSequenceID(),
-                (item == null) ? "null" : item.getHandle()));
+                (item == null) ? "null" : (item);
     }
 }
