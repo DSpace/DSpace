@@ -161,4 +161,9 @@ public abstract class DSpaceObject
     {
         return null;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getID();
+    }
+
 }
