@@ -12,7 +12,7 @@ Before starting, make sure you have installed the prerequisites.
 
 Mac OS Developer's Tools such as XCode can be downloaded from [here](https://developer.apple.com/xcode/). 
 
-[Install Xcode and the Xcode Command Line Tools](http://guide.macports.org/#installing.xcode).
+[Install Xcode and the Xcode Command Line Tools](https://developer.apple.com/downloads/index.action).
 
 You can verify the XCode current setting by opening the *XCode/System Preferences/Components/Command Line Tools*.
 
@@ -40,7 +40,7 @@ $ sudo mkdir -p /opt/local/var/db/postgresql84/defaultdb
 $ vi .profile
 $ export PATH=/opt/local/lib/postgresql84/bin:$PATH
 $ export PGHOST=localhost
-$ export PGDATA=opt/local/var/db/postgresql84/defaultdb
+$ export PGDATA=/opt/local/var/db/postgresql84/defaultdb
 ```
 
 * Create .pgpass file

@@ -105,10 +105,10 @@ $ cd ~
 $ vi .profile
 $ export PATH=/apps/tools/ant/apache-ant-1.9.3/bin:"$PATH"
 $ source ~/.profile
-$ ant --version
+$ ant -version
 
 It should return the installed ant version.
-Apache Ant(TM) version 1.8.2 compiled on June 16 2012
+Apache Ant(TM) version 1.9.3 compiled on December 23 2013
 
 ```
 
@@ -187,7 +187,7 @@ exit 0
 * Grant permissions
 
 ```
-$ chown +x+o control
+$ chmod +x+o control
 
 ```
 * Start and validate Tomcat 
@@ -241,7 +241,7 @@ Please, install [PostgeSQL 8.4 according to the instructions](Postgres8.4Install
 
 ```
 $ cd /apps/git
-$ git https://github.com/umd-lib/drum-new.git
+$ git clone https://github.com/umd-lib/drum-new.git
 
 ```
 Checkout drumn-develop branch
@@ -285,7 +285,7 @@ Shall the new role be allowed to create more new roles? (y/n) y
 * Create a root database user, logged in as 'root'.
 
 ```
-$ createuser -U postgres -d -A -P root
+$ createuser -U postgres -d -A -P -s root
 
 ```
 
@@ -337,7 +337,7 @@ $ pg_restore -U root -d dspace411 /apps/tmp/dump.tar.0
 Login into psql console, and note the unpacked dspace411 database in the list
 
 ```
-$ psql -U dspace
+$ psql -U dspace -d dspace411
 ===>
 \list
 
@@ -515,7 +515,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Copy solr libraries to the DRUM 4.1 Tomcat instance
 
 ```
-$ cp /apps/tools/solr/solr44/example/lib/ext /apps/servers/dspace/tomcat411/lib
+$ cp /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ```
 
 ####Deploy Web Applications
@@ -566,3 +566,4 @@ $ bin/dspace index-discovery -f
 	* Consult Tomcat/Solr logs if needed
 
 * Login as Administrator and create community, collection, submit an item to the collection.
+
