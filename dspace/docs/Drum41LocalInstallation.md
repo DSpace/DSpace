@@ -466,7 +466,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Oai core
 	
 	```
-	$ /apps/drum-new/solr/oai/conf
+	$ cd /apps/drum-new/solr/oai/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -490,7 +490,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Statistics core
 	
 	```
-	$ /apps/dspace/solr/statistics/conf
+	$ cd /apps/dspace/solr/statistics/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -515,7 +515,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Copy solr libraries to the DRUM 4.1 Tomcat instance
 
 ```
-$ cp /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
+$ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ```
 
 ####Deploy Web Applications
@@ -523,7 +523,7 @@ $ cp /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ##### Create soft links for the Drum 4.1 web-applications
 
 ```
-$ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat17/webapps/jspui
+$ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
 $ ln -s /apps/drum-new/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
