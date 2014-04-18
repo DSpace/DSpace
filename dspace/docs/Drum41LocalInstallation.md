@@ -130,7 +130,7 @@ $ ls
 * Create control script
 
 ```
-$ cd /apps/servers/dspace/tomcat411
+$ cd /apps/servers/drum/tomcat411
 $ vi control
 
 ```
