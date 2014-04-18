@@ -452,7 +452,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
@@ -478,7 +478,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
@@ -490,7 +490,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Statistics core
 	
 	```
-	$ cd /apps/dspace/solr/statistics/conf
+	$ cd /apps/drum-new/solr/statistics/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -502,7 +502,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
