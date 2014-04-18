@@ -7,19 +7,12 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -36,7 +29,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author Ben Wallberg
  */
 
-public class EtdUnit extends DSpaceObject {
+public class EtdUnit extends DSpaceObject
+{
 
     // findAll sortby types
     public static final int ID = 0; // sort by ID
@@ -58,7 +52,7 @@ public class EtdUnit extends DSpaceObject {
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
-    /** The mapped collections  */
+    /** The mapped collections */
     private List<Collection> collections;
 
     /**
@@ -74,12 +68,14 @@ public class EtdUnit extends DSpaceObject {
         collections = new ArrayList<Collection>();
 
         // Get collections
-        TableRowIterator tri = DatabaseManager.queryTable(
-                myContext, "collection",
-                "SELECT collection.* FROM collection, collection2etdunit WHERE "
-                        + "collection2etdunit.collection_id=collection.collection_id AND "
-                        + "collection2etdunit.etdunit_id= ? ",
-                myRow.getIntColumn("etdunit_id"));
+        TableRowIterator tri = DatabaseManager
+                .queryTable(
+                        myContext,
+                        "collection",
+                        "SELECT collection.* FROM collection, collection2etdunit WHERE "
+                                + "collection2etdunit.collection_id=collection.collection_id AND "
+                                + "collection2etdunit.etdunit_id= ? ",
+                        myRow.getIntColumn("etdunit_id"));
 
         try
         {
@@ -214,8 +210,8 @@ public class EtdUnit extends DSpaceObject {
     public static EtdUnit findByName(Context context, String name)
             throws SQLException
     {
-        TableRow row = DatabaseManager.findByUnique(context, "etdunit",
-                "name", name);
+        TableRow row = DatabaseManager.findByUnique(context, "etdunit", "name",
+                name);
 
         if (row == null)
         {
@@ -224,8 +220,8 @@ public class EtdUnit extends DSpaceObject {
         else
         {
             // First check the cache
-            EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class, row
-                    .getIntColumn("etdunit_id"));
+            EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class,
+                    row.getIntColumn("etdunit_id"));
 
             if (fromCache != null)
             {
@@ -269,11 +265,10 @@ public class EtdUnit extends DSpaceObject {
             s = "name";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // NOTE: The use of 's' in the order by clause can not cause an sql
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.queryTable(
-        		context, "etdunit",
-                "SELECT * FROM etdunit ORDER BY "+s);
+        TableRowIterator rows = DatabaseManager.queryTable(context, "etdunit",
+                "SELECT * FROM etdunit ORDER BY " + s);
 
         try
         {
@@ -286,8 +281,8 @@ public class EtdUnit extends DSpaceObject {
                 TableRow row = (TableRow) gRows.get(i);
 
                 // First check the cache
-                EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class, row
-                        .getIntColumn("etdunit_id"));
+                EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class,
+                        row.getIntColumn("etdunit_id"));
 
                 if (fromCache != null)
                 {
@@ -307,8 +302,7 @@ public class EtdUnit extends DSpaceObject {
                 rows.close();
         }
     }
-    
-    
+
     /**
      * Find the etdunits that match the search query across etdunit_id or name
      * 
@@ -320,11 +314,11 @@ public class EtdUnit extends DSpaceObject {
      * @return array of EtdUnit objects
      */
     public static EtdUnit[] search(Context context, String query)
-    		throws SQLException
-	{
-	    return search(context, query, -1, -1);
-	}
-    
+            throws SQLException
+    {
+        return search(context, query, -1, -1);
+    }
+
     /**
      * Find the etdunits that match the search query across etdunit_id or name
      * 
@@ -333,26 +327,27 @@ public class EtdUnit extends DSpaceObject {
      * @param query
      *            The search string
      * @param offset
-     *            Inclusive offset 
+     *            Inclusive offset
      * @param limit
      *            Maximum number of matches returned
      * 
      * @return array of EtdUnit objects
      */
-    public static EtdUnit[] search(Context context, String query, int offset, int limit)
-    		throws SQLException
-	{
-		String params = "%"+query.toLowerCase()+"%";
+    public static EtdUnit[] search(Context context, String query, int offset,
+            int limit) throws SQLException
+    {
+        String params = "%" + query.toLowerCase() + "%";
         StringBuffer queryBuf = new StringBuffer();
-		queryBuf.append("SELECT * FROM etdunit WHERE LOWER(name) LIKE LOWER(?) OR etdunit_id = ? ORDER BY name ASC ");
-		
+        queryBuf.append("SELECT * FROM etdunit WHERE LOWER(name) LIKE LOWER(?) OR etdunit_id = ? ORDER BY name ASC ");
+
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
             {
-                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                queryBuf.insert(0,
+                        "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
                 queryBuf.append(") ");
             }
 
@@ -360,7 +355,8 @@ public class EtdUnit extends DSpaceObject {
             if (limit > 0)
             {
                 queryBuf.append("rec WHERE rownum<=? ");
-                // If we also have an offset, then convert the limit into the maximum row number
+                // If we also have an offset, then convert the limit into the
+                // maximum row number
                 if (offset > 0)
                     limit += offset;
             }
@@ -383,26 +379,30 @@ public class EtdUnit extends DSpaceObject {
 
         String dbquery = queryBuf.toString();
 
-        // When checking against the etdunit-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
-		}
+        // When checking against the etdunit-id, make sure the query can be made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = new Integer(-1);
+        }
 
-        // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[]{params, int_param};
+        // Create the parameter array, including limit and offset if part of the
+        // query
+        Object[] paramArr = new Object[] { params, int_param };
         if (limit > 0 && offset > 0)
-            paramArr = new Object[] {params, int_param,limit,offset};
+            paramArr = new Object[] { params, int_param, limit, offset };
         else if (limit > 0)
-            paramArr = new Object[] {params, int_param,limit};
+            paramArr = new Object[] { params, int_param, limit };
         else if (offset > 0)
-            paramArr = new Object[] {params, int_param,offset};
+            paramArr = new Object[] { params, int_param, offset };
 
-        TableRowIterator rows =
-			DatabaseManager.query(context, dbquery, paramArr);
+        TableRowIterator rows = DatabaseManager.query(context, dbquery,
+                paramArr);
 
         try
         {
@@ -414,8 +414,8 @@ public class EtdUnit extends DSpaceObject {
                 TableRow row = (TableRow) etdunitRows.get(i);
 
                 // First check the cache
-                EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class, row
-                        .getIntColumn("etdunit_id"));
+                EtdUnit fromCache = (EtdUnit) context.fromCache(EtdUnit.class,
+                        row.getIntColumn("etdunit_id"));
 
                 if (fromCache != null)
                 {
@@ -433,11 +433,12 @@ public class EtdUnit extends DSpaceObject {
             if (rows != null)
                 rows.close();
         }
-	}
+    }
 
     /**
-     * Returns the total number of etdunits returned by a specific query, without the overhead 
-     * of creating the EtdUnit objects to store the results.
+     * Returns the total number of etdunits returned by a specific query,
+     * without the overhead of creating the EtdUnit objects to store the
+     * results.
      * 
      * @param context
      *            DSpace context
@@ -447,38 +448,42 @@ public class EtdUnit extends DSpaceObject {
      * @return the number of etdunits mathching the query
      */
     public static int searchResultCount(Context context, String query)
-    	throws SQLException
-	{
-		String params = "%"+query.toLowerCase()+"%";
-		String dbquery = "SELECT count(*) as gcount FROM etdunit WHERE LOWER(name) LIKE LOWER(?) OR etdunit_id = ? ";
-		
-		// When checking against the etdunit-id, make sure the query can be made into a number
-		Integer int_param;
-		try {
-			int_param = Integer.valueOf(query);
-		}
-		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
-		}
-		
-		// Get all the epeople that match the query
-		TableRow row = DatabaseManager.querySingle(context, dbquery, new Object[] {params, int_param});
-		
-		// use getIntColumn for Oracle count data
-		Long count;
+            throws SQLException
+    {
+        String params = "%" + query.toLowerCase() + "%";
+        String dbquery = "SELECT count(*) as gcount FROM etdunit WHERE LOWER(name) LIKE LOWER(?) OR etdunit_id = ? ";
+
+        // When checking against the etdunit-id, make sure the query can be made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = new Integer(-1);
+        }
+
+        // Get all the epeople that match the query
+        TableRow row = DatabaseManager.querySingle(context, dbquery,
+                new Object[] { params, int_param });
+
+        // use getIntColumn for Oracle count data
+        Long count;
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             count = new Long(row.getIntColumn("gcount"));
         }
-        else  //getLongColumn works for postgres
+        else
+        // getLongColumn works for postgres
         {
             count = new Long(row.getLongColumn("gcount"));
         }
 
-		return count.intValue();
-	}
-    
-    
+        return count.intValue();
+    }
+
     /**
      * Delete a etdunit
      * 
@@ -499,12 +504,13 @@ public class EtdUnit extends DSpaceObject {
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
 
-        log.info(LogManager.getHeader(myContext, "delete_etdunit", "etdunit_id="
-                + getID()));
+        log.info(LogManager.getHeader(myContext, "delete_etdunit",
+                "etdunit_id=" + getID()));
     }
 
     /**
-     * Update the etdunit - writing out etdunit object and EtdUnit list if necessary
+     * Update the etdunit - writing out etdunit object and EtdUnit list if
+     * necessary
      */
     public void update() throws SQLException, AuthorizeException
     {
@@ -513,13 +519,14 @@ public class EtdUnit extends DSpaceObject {
 
         if (modifiedMetadata)
         {
-            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ETDUNIT, getID(), getDetails()));
+            myContext.addEvent(new Event(Event.MODIFY_METADATA,
+                    Constants.ETDUNIT, getID(), getDetails()));
             modifiedMetadata = false;
             clearDetails();
         }
 
-        log.info(LogManager.getHeader(myContext, "update_etdunit", "etdunit_id="
-                + getID()));
+        log.info(LogManager.getHeader(myContext, "update_etdunit",
+                "etdunit_id=" + getID()));
     }
 
     /**
@@ -561,11 +568,14 @@ public class EtdUnit extends DSpaceObject {
     public Collection[] getCollections() throws SQLException
     {
         // Get the collection table rows
-        TableRowIterator tri = DatabaseManager.queryTable(myContext, "collection",
-                "SELECT collection.* FROM collection, collection2etdunit WHERE " + 
-                "collection.collection_id=collection2etdunit.collection_id AND " +
-                "collection2etdunit.etdunit_id= ? ORDER BY name",
-                 myRow.getIntColumn("etdunit_id"));
+        TableRowIterator tri = DatabaseManager
+                .queryTable(
+                        myContext,
+                        "collection",
+                        "SELECT collection.* FROM collection, collection2etdunit WHERE "
+                                + "collection.collection_id=collection2etdunit.collection_id AND "
+                                + "collection2etdunit.etdunit_id= ? ORDER BY name",
+                        myRow.getIntColumn("etdunit_id"));
 
         // Build a list of Collection objects
         List<Collection> collections = new ArrayList<Collection>();
@@ -576,8 +586,8 @@ public class EtdUnit extends DSpaceObject {
                 TableRow r = tri.next();
 
                 // First check the cache
-                Collection fromCache = (Collection) myContext.fromCache(Collection.class, r
-                        .getIntColumn("collection_id"));
+                Collection fromCache = (Collection) myContext.fromCache(
+                        Collection.class, r.getIntColumn("collection_id"));
 
                 if (fromCache != null)
                 {
@@ -602,7 +612,6 @@ public class EtdUnit extends DSpaceObject {
         return collectionArray;
     }
 
-
     /**
      * Add an existing collection to this etdunit
      * 
@@ -611,8 +620,8 @@ public class EtdUnit extends DSpaceObject {
      */
     public void addCollection(Collection b) throws SQLException
     {
-        log.info(LogManager.getHeader(myContext, "add_collection", "etdunit_id="
-                + getID() + ",collection_id=" + b.getID()));
+        log.info(LogManager.getHeader(myContext, "add_collection",
+                "etdunit_id=" + getID() + ",collection_id=" + b.getID()));
 
         // First check that the collection isn't already in the list
         for (int i = 0; i < collections.size(); i++)
@@ -636,7 +645,6 @@ public class EtdUnit extends DSpaceObject {
         mappingRow.setColumn("collection_id", b.getID());
         DatabaseManager.update(myContext, mappingRow);
     }
-
 
     /**
      * Remove a collection from this etdunit
@@ -665,12 +673,10 @@ public class EtdUnit extends DSpaceObject {
 
         // Delete the mapping row
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM collection2etdunit WHERE etdunit_id= ? "+
-                "AND collection_id= ? ", 
-                getID(), b.getID());
+                "DELETE FROM collection2etdunit WHERE etdunit_id= ? "
+                        + "AND collection_id= ? ", getID(), b.getID());
 
     }
-
 
     /**
      * Get the etdunits a collections maps to
@@ -678,14 +684,18 @@ public class EtdUnit extends DSpaceObject {
      * @return array of <code>EtdUnit</code>
      * @throws SQLException
      */
-    public static EtdUnit[] getEtdUnits(Context myContext, Collection g) throws SQLException
+    public static EtdUnit[] getEtdUnits(Context myContext, Collection g)
+            throws SQLException
     {
         // Get the etdunit table rows
-        TableRowIterator tri = DatabaseManager.queryTable(myContext, "etdunit",
-                "SELECT etdunit.* FROM etdunit, collection2etdunit WHERE " + 
-                "etdunit.etdunit_id=collection2etdunit.etdunit_id AND " +
-                "collection2etdunit.collection_id= ? ",
-                 g.getID());
+        TableRowIterator tri = DatabaseManager
+                .queryTable(
+                        myContext,
+                        "etdunit",
+                        "SELECT etdunit.* FROM etdunit, collection2etdunit WHERE "
+                                + "etdunit.etdunit_id=collection2etdunit.etdunit_id AND "
+                                + "collection2etdunit.collection_id= ? ",
+                        g.getID());
 
         // Build a list of EtdUnit objects
         List<EtdUnit> etdunits = new ArrayList<EtdUnit>();
@@ -696,8 +706,8 @@ public class EtdUnit extends DSpaceObject {
                 TableRow r = tri.next();
 
                 // First check the cache
-                EtdUnit fromCache = (EtdUnit) myContext.fromCache(EtdUnit.class, r
-                        .getIntColumn("etdunit_id"));
+                EtdUnit fromCache = (EtdUnit) myContext.fromCache(
+                        EtdUnit.class, r.getIntColumn("etdunit_id"));
 
                 if (fromCache != null)
                 {
@@ -721,5 +731,11 @@ public class EtdUnit extends DSpaceObject {
         return etdunitArray;
     }
 
+    @Override
+    public void updateLastModified()
+    {
+        // TODO Auto-generated method stub
+
+    }
 
 }
