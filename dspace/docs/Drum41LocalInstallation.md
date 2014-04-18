@@ -523,7 +523,6 @@ $ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ##### Create soft links for the Drum 4.1 web-applications
 
 ```
-$ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
 $ ln -s /apps/drum-new/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
