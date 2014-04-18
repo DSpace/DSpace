@@ -977,6 +977,12 @@
             <version>2.1.1</version>
          </dependency>
          <dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>2.2.1</version>
+			<scope>provided</scope>
+		</dependency>
+         <dependency>
             <groupId>com.sun.media</groupId>
             <artifactId>jai_imageio</artifactId>
             <version>1.0_01</version>

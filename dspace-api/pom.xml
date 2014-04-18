@@ -251,6 +251,10 @@
             <groupId>cas</groupId>
             <artifactId>casclient</artifactId>
         </dependency>
+       	<dependency>
+    		<groupId>javax.servlet.jsp</groupId>
+    		<artifactId>javax.servlet.jsp-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
