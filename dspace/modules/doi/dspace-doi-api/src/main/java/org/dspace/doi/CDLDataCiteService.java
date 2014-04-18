@@ -15,6 +15,7 @@ import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -185,6 +186,79 @@ public class CDLDataCiteService {
         return doi;
     }
 
+    /**
+     * Determine if Dryad should register a DOI for an item.  We should not
+     * register items in workflow/workspace, or items that are part of other
+     * collections
+     * @return true if item is in a dryad collection and archived or in blackout
+     */
+    private static boolean shouldRegister(Item item) {
+        // First check publication blackout
+        // Items in publication blackout are not archived and are not yet in a
+        // collection
+        try {
+            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                return true;
+            }
+        } catch (SQLException ex) {
+            log.error("Exception checking if item with ID " + item.getID() + " is in blackout", ex);
+            return false;
+        }
+
+        // Item is not in blackout.  Do not register unless it is archived
+
+        if(item.isArchived() == false) {
+            return false;
+        }
+
+        // Item is not in blackout and is archived.  Do not register unless it
+        // is in Dryad Data Files or Dryad Data Packages collection
+        Collection[] itemCollectionsNotLinked;
+        try {
+            // Make sure in data packages or files collection
+            itemCollectionsNotLinked = item.getCollectionsNotLinked();
+        } catch (SQLException ex) {
+            log.error("Unable to get collections for item", ex);
+            return false;
+        }
+
+        // check collection
+        String dataPackagesCollectionHandle = ConfigurationManager.getProperty("submit.publications.collection");
+        String dataFilesCollectionHandle = ConfigurationManager.getProperty("submit.dataset.collection");
+        if(dataFilesCollectionHandle == null || dataPackagesCollectionHandle == null) {
+            log.error("Unable to get handle for data files or collections");
+            return false;
+        }
+
+        // dataFilesCollectionHandle and dataPackagesCollectionHandle are populated
+
+        // Loop over the collections the item is NOT in, checking for
+        // Data Files and Data Packages
+        boolean notInDataFiles = false;
+        boolean notInDataPackages = false;
+
+        for (Collection c : itemCollectionsNotLinked) {
+            String collectionHandle = c.getHandle();
+            if (collectionHandle == null) {
+                // unable to get a handle for this collection.
+                continue;
+            }
+            if(collectionHandle.equals(dataFilesCollectionHandle)) {
+                notInDataFiles = true;
+            }
+            if(collectionHandle.equals(dataPackagesCollectionHandle)) {
+                notInDataPackages = true;
+            }
+        }
+
+        // If the item is not in either collection, return false
+        if(notInDataFiles && notInDataPackages) {
+            return false;
+        }
+
+        // All checks passed, return true.
+        return true;
+    }
 
     public void syncAll() {
 
@@ -212,14 +286,9 @@ public class CDLDataCiteService {
                 item = item1;
                 doi = getDoiValue(item);
 
-                // Only register/update items that are archived or in blackout
-                boolean shouldRegister = (
-                        item.isArchived() ||
-                        DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)
-                        );
-                if(shouldRegister == false) {
-                    // Impossible to process
-                    System.out.println("Item not processed because it is not in the archive: " + item.getID());
+                // shouldRegister checks blackout/collection/archived
+                if(shouldRegister(item) == false) {
+                    System.out.println("Item not processed because shouldRegister() returned false: " + item.getID());
                     notProcessItems++;
                 } else if (doi != null) {
                     // lookup makes an HTTP call
