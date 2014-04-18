@@ -1,12 +1,17 @@
 package org.dspace.app.bulkdo;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +20,9 @@ import java.util.Collections;
  * Created by monikam on 4/2/14.
  */
 public class Lister {
+
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(Lister.class);
 
     Context c = null;
     DSpaceObject dobj;
@@ -74,7 +82,7 @@ public class Lister {
         } else {
             cols = new Collection[0];
         }
-        System.out.println("Found " + cols.length + " collections");
+        log.info("Found " + cols.length + " collections");
         return cols;
     }
 
@@ -88,13 +96,13 @@ public class Lister {
             // collect ITEMS from collections  (only the true members / in_archive=1 )
             items = new ArrayList<DSpaceObject>(cols.length * 4);
             for (int i = 0; i < cols.length; i++) {
-                ItemIterator iter = ((Collection) cols[i].geObject()).getItems();
+                ItemIterator iter = ((Collection) cols[i].getObject()).getItems();
                 while (iter.hasNext()) {
                     items.add(iter.next());
                 }
             }
         }
-        System.out.println("Found " + items.size() + " items");
+        log.info("Found " + items.size() + " items");
         return items;
     }
 
@@ -108,11 +116,11 @@ public class Lister {
             // collect BUNDLES from items
             bundles = new ArrayList<DSpaceObject>(items.length);
             for (int i = 0; i < items.length; i++) {
-                Bundle[] bs = ((Item) items[i].geObject()).getBundles();
+                Bundle[] bs = ((Item) items[i].getObject()).getBundles();
                 Collections.addAll(bundles, bs);
             }
         }
-        System.out.println("Found " + bundles.size() + " bundles");
+        log.info("Found " + bundles.size() + " bundles");
         return bundles;
     }
 
@@ -126,24 +134,29 @@ public class Lister {
             bitstreams = new ArrayList<DSpaceObject>(bundles.length);
             // collect BITSTREAMS from bundles
             for (int i = 0; i < bundles.length; i++) {
-                Bitstream[] bits = ((Bundle) bundles[i].geObject()).getBitstreams();
+                Bitstream[] bits = ((Bundle) bundles[i].getObject()).getBitstreams();
                 Collections.addAll(bitstreams, bits);
             }
         }
-        System.out.println("Found " + bitstreams.size() + " bitstreams");
+        log.info("Found " + bitstreams.size() + " bitstreams");
         return bitstreams;
     }
 
 
     public static void main(String argv[]) {
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%c: %m%n"));
+        log.addAppender(ca);
+
         Arguments args = new Arguments();
         try {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
                 ActionTarget[] targets = lister.getTargets(args.getType());
 
-                System.out.println("# " + targets.length + " type=" + args.getType());
-                Printer p = Printer.create(System.out, args.getFormat());
+                log.debug("# " + targets.length + " type=" + args.getType());
+                Printer p = args.getPrinter();
                 for (int i = 0; i < targets.length; i++)
                     p.println(targets[i]);
            }

@@ -1,9 +1,9 @@
 package org.dspace.app.bulkdo;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
-import org.dspace.app.util.Util;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -21,12 +21,12 @@ public class ActionTarget {
         map = null;
     }
 
-    public DSpaceObject geObject() {
+    public DSpaceObject getObject() {
         return obj;
     }
 
     public static ActionTarget create(DSpaceObject obj) {
-        assert(obj != null);
+        assert (obj != null);
         switch (obj.getType()) {
             case Constants.BITSTREAM:
                 return new BitstreamActionTarget(obj);
@@ -36,10 +36,30 @@ public class ActionTarget {
                 return new ItemActionTarget(obj);
             case Constants.COLLECTION:
                 return new CollectionActionTarget(obj);
-            default: assert(false);
+            default:
+                assert (false);
                 throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
         }
     }
+
+    static String theAvailableKeys[] = {"id", "type", "handle", "exception"};
+
+    public static String[] availableKeys(int type) {
+        switch (type) {
+            case Constants.BITSTREAM:
+                return (String[]) ArrayUtils.addAll(theAvailableKeys, BitstreamActionTarget.theAvailableKeys);
+            case Constants.BUNDLE:
+                return (String[]) ArrayUtils.addAll(theAvailableKeys, BundleActionTarget.theAvailableKeys);
+            case Constants.ITEM:
+                return (String[]) ArrayUtils.addAll(theAvailableKeys, ItemActionTarget.theAvailableKeys);
+            case Constants.COLLECTION:
+                return (String[]) ArrayUtils.addAll(theAvailableKeys, CollectionActionTarget.theAvailableKeys);
+            default:
+                assert (false);
+                return null;
+        }
+    }
+
 
     public static ActionTarget[] createArray(DSpaceObject[] objArr) {
         assert (objArr != null);
@@ -65,7 +85,7 @@ public class ActionTarget {
                 try {
                     map.put("type", obj.getType());
                     map.put("id", obj.getID());
-                    map.put("parentObject", obj.getParentObject());
+                    map.put("parent", obj.getParentObject());
                     map.put("handle", obj.getHandle());
                 } catch (SQLException e) {
                     map.put("exception", e.getMessage());
@@ -79,14 +99,16 @@ public class ActionTarget {
 class CollectionActionTarget extends ActionTarget {
     Collection col;
 
+    static String[] theAvailableKeys = {"name"};
+
     CollectionActionTarget(DSpaceObject o) {
         super(o);
         col = (Collection) o;
     }
 
     @Override
-    public HashMap<String, Object> toHashMap()  {
-        HashMap<String, Object>  map = super.toHashMap();
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = super.toHashMap();
         map.put("name", col.getName());
         return map;
     }
@@ -95,14 +117,16 @@ class CollectionActionTarget extends ActionTarget {
 class ItemActionTarget extends ActionTarget {
     Item itm;
 
+    static String[] theAvailableKeys = {"isWithdrawn", "name"};
+
     ItemActionTarget(DSpaceObject o) {
         super(o);
         itm = (Item) o;
     }
 
     @Override
-    public HashMap<String, Object> toHashMap()  {
-        HashMap<String, Object>  map = super.toHashMap();
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = super.toHashMap();
         map.put("isWithdrawn", itm.isWithdrawn());
         map.put("name", itm.getName());
         return map;
@@ -112,20 +136,22 @@ class ItemActionTarget extends ActionTarget {
 class BundleActionTarget extends ActionTarget {
     Bundle bdl;
 
+    static String[] theAvailableKeys = {"isWithdrawn", "isEmbargoed", "name"};
+
     BundleActionTarget(DSpaceObject o) {
         super(o);
         bdl = (Bundle) o;
     }
 
     @Override
-    public HashMap<String, Object> toHashMap()  {
-        HashMap<String, Object>  map = super.toHashMap();
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = super.toHashMap();
         try {
             map.put("isEmbargoed", bdl.isEmbargoed());
         } catch (SQLException e) {
             map.put("isEmbargoed", e.getMessage());
         }
-        map.put("name=", bdl.getName());
+        map.put("name", bdl.getName());
         return map;
     }
 }
@@ -133,14 +159,16 @@ class BundleActionTarget extends ActionTarget {
 class BitstreamActionTarget extends ActionTarget {
     Bitstream bit;
 
+    static String[] theAvailableKeys = {"mimeType", "name", "size", "internalId", "checksum", "checksumAlgo"};
+
     BitstreamActionTarget(DSpaceObject o) {
         super(o);
         bit = (Bitstream) o;
     }
 
     @Override
-    public HashMap<String, Object> toHashMap()  {
-        HashMap<String, Object>  map = super.toHashMap();
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = super.toHashMap();
         map.put("mimeType", bit.getFormat().getMIMEType());
         map.put("name", bit.getName());
         map.put("internalId", bit.getInternalId());

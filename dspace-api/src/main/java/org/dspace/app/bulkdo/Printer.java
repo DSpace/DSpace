@@ -1,12 +1,12 @@
 package org.dspace.app.bulkdo;
 
-
-import sun.tools.attach.HotSpotAttachProvider;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Arrays.deepToString;
 
 
 /**
@@ -18,6 +18,8 @@ public class Printer extends PrintStream {
     public static final int TSV_FORMAT = 1;
 
     public static final String[] formatText = { "TXT", "TSV" };
+
+    protected String[] keys = { "id" };
 
     public static int getFormat(String format)
     {
@@ -31,31 +33,37 @@ public class Printer extends PrintStream {
         return -1;
     }
 
-    public static Printer create(PrintStream p, int format) {
+    public static Printer create(PrintStream p, int format, String[] keys) {
         switch (format) {
             case TSV_FORMAT:
-                return new TSVPrinter(p);
+                return new TSVPrinter(p, keys);
             case TXT_FORMAT:
             default:
-                return new Printer(p);
+                return new Printer(p, keys);
         }
     }
 
-    public Printer (OutputStream out) {
+    public Printer (OutputStream out, String[] keysToPrint) {
         super(out);
+        keys = keysToPrint;
     }
 
     public void println(ActionTarget at) {
             String txt = "";
             HashMap<String,Object> map = at.toHashMap();
-            for (Map.Entry entry : map.entrySet()) {
-                Object v = entry.getValue();
-                if (null == v) {
-                    v = "";
-                }
-                txt = txt + " " + entry.getKey() + "=" + v.toString();
+            for (Integer i = 0; i < keys.length; i++) {
+                txt = txt + " " + keys[i] + "=" + expandToString(map.get(keys[i]));
             }
             println(txt);
+    }
+
+    public static String expandToString(Object obj) {
+        if (obj == null)
+            return "";
+        if (obj.getClass().isArray()) {
+            return deepToString((Object[]) obj);
+        }
+        return obj.toString();
     }
 
 }
@@ -64,8 +72,8 @@ class TSVPrinter extends Printer {
 
     boolean firstTime = true;
 
-    public TSVPrinter(OutputStream out) {
-        super(out);
+    public TSVPrinter(OutputStream out, String[] keys) {
+        super(out, keys);
     }
 
     /**
@@ -76,24 +84,22 @@ class TSVPrinter extends Printer {
     public void println(ActionTarget at) {
         String txt = "";
         HashMap<String, Object> map = at.toHashMap();
-        if (firstTime) {
-            // print header wit key names
-            for (Map.Entry entry : map.entrySet()) {
-                Object v = entry.getValue();
-                txt = txt + "\t" + entry.getKey();
+        if (keys.length > 0) {
+            if (firstTime) {
+                // print header with key names
+                txt = keys[0];
+                for (int i = 1; i < keys.length; i++) {
+                    txt = txt + "\t" + keys[i];
+                }
+                println(txt);
+            }
+            firstTime = false;
+            txt = expandToString(map.get(0));
+            for (Integer i = 1; i < keys.length; i++) {
+                txt = txt + "\t" + expandToString(map.get(keys[i]));
             }
             println(txt);
         }
-        firstTime = false;
-        txt = "";
-        for (Map.Entry entry : map.entrySet()) {
-            Object v = entry.getValue();
-            if (null == v) {
-                v = "";
-            }
-            txt = txt + "\t" + v.toString();
-        }
-        println(txt);
     }
 
 }

@@ -9,6 +9,13 @@
         </step>
     </command>
     <command>
+        <name>bulk-pols</name>
+        <description>Apply Action in Bulk</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Policies</class>
+        </step>
+    </command>
+    <command>
         <name>bulk-list</name>
         <description>Bulk List DSpaceObjects</description>
         <step>

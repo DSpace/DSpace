@@ -274,7 +274,8 @@ public class AuthorizeManager
      *         action, <code>false</code> otherwise
      * @throws SQLException
      */
-    private static boolean authorize(Context c, DSpaceObject o, int action,
+    private static boolean
+    authorize(Context c, DSpaceObject o, int action,
             EPerson e, boolean useInheritance) throws SQLException
     {
         // return FALSE if there is no DSpaceObject

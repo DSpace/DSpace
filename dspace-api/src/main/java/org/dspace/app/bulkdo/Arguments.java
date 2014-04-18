@@ -1,5 +1,6 @@
 package org.dspace.app.bulkdo;
 
+import edu.harvard.hul.ois.mets.Par;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
@@ -9,6 +10,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.app.util.Util;
 
 import java.sql.SQLException;
+
+import static java.util.Arrays.deepToString;
 
 
 /**
@@ -28,6 +31,9 @@ class Arguments {
     public static String FORMAT = "f";
     public static String FORMAT_LONG = "format";
 
+    public static String KEYS = "i";
+    public static String KEYS_LONG = "include";
+
     protected Options options = null;
     protected CommandLine line;
 
@@ -35,6 +41,18 @@ class Arguments {
     private DSpaceObject dobj = null;
     private int myType = -1;
     private int format = Printer.TXT_FORMAT;
+    private static String[] defaultKeys = { "id", "type", "handle", "parent", "name"};
+    private String[] keys = defaultKeys;
+
+    Arguments()  {
+        options = new Options();
+
+        options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
+        options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
+        options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
+        options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
+        options.addOption(HELP, HELP_LONG, false, "help");
+    }
 
     public Context getContext() {
         return c;
@@ -48,24 +66,41 @@ class Arguments {
         return format;
     }
 
+    public String[] getKeys() {
+        return keys;
+    }
+
     public DSpaceObject getRoot() {
         return dobj;
     }
 
-    Arguments()  {
-        options = new Options();
+    public Options getOptions() {
+        return options;
+    }
 
-        options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
-        options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
-        options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
-        options.addOption(HELP, HELP_LONG, false, "help");
+    public Printer getPrinter() {
+        return Printer.create(System.out, getFormat(), getKeys());
     }
 
     public void usage() {
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("Bulk Apply ActionTarget\n", options);
-        System.out.println("\n");
+        System.out.println("");
+
+        System.out.println("OPTION " + KEYS_LONG + ": ");
+        System.out.println("\tDefault: " + deepToString(defaultKeys) );
+        optionExplainKeys();
+        System.out.println("");
+
         System.out.println("TODO: ADD EXPLANATIONS");
+    }
+
+    protected void optionExplainKeys() {
+        System.out.println("\tAvailable Keys depend on the type of object being printed" );
+        System.out.println("\t\t" + Constants.typeText[Constants.COLLECTION] + ":" + deepToString(ActionTarget.availableKeys(Constants.COLLECTION)));
+        System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)));
+        System.out.println("\t\t" + Constants.typeText[Constants.BUNDLE] + ":" + deepToString(ActionTarget.availableKeys(Constants.BUNDLE)));
+        System.out.println("\t\t" + Constants.typeText[Constants.BITSTREAM] + ":" + deepToString(ActionTarget.availableKeys(Constants.BITSTREAM)));
     }
 
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException  {
@@ -102,16 +137,21 @@ class Arguments {
             format = Printer.getFormat(line.getOptionValue(FORMAT).toUpperCase());
         }
 
+        if (line.hasOption(KEYS)) {
+            String[]  keyList = StringUtils.split(line.getOptionValue(KEYS), ",");
+            if (keyList.length > 0) {
+                for (int i = 0; i < keyList.length; i++) {
+                    keyList[i] = keyList[i].trim();
+                }
+                keys = keyList;
+            } else {
+                throw new ParseException("Invalid " + KEYS_LONG + " option: " + line.getOptionValue(KEYS));
+            }
+        }
+
         dobj = HandleManager.resolveToObject(c, handle);
         if (dobj == null) {
-            String[] splits = StringUtils.split(handle, '.');
-            try {
-                String type = splits[0];
-                int id = Integer.parseInt(splits[1]);
-                dobj = DSpaceObject.find(c, Constants.getTypeID(type), id);
-            } catch (Exception e) {
-                dobj = null;
-            }
+            dobj = DSpaceObject.fromString(c, handle);
         }
         if (dobj == null) {
             throw new ParseException(handle + " is not a valid object descriptor");
