@@ -1543,7 +1543,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/baae.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/baae.png"
                          alt="Basic and Applied Ecology cover"/>
                 </a>
             </xsl:when>
@@ -1821,7 +1821,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/flora.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/flora.png"
                          alt="Flora - Morphology, Distribution, Functional Ecology of Plants cover"/>
                 </a>
             </xsl:when>
@@ -2348,7 +2348,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ppees.jpg"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ppees.png"
                          alt="Perspectives in Plant Ecology, Evolution and Systematics cover"/>
                 </a>
             </xsl:when>
