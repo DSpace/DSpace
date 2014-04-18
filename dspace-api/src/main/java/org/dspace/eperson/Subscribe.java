@@ -405,18 +405,6 @@ public class Subscribe
         ResourceBundle labels = ResourceBundle.getBundle("Messages",
                 supportedLocale);
 
-        // Check for restricted eperson list
-        String epersonLimit = ConfigurationManager
-                .getProperty("eperson.subscription.limiteperson");
-        if (epersonLimit != null)
-        {
-            List l = Arrays.asList(epersonLimit.split(" *, *"));
-            if (!l.contains(eperson.getEmail()))
-            {
-                return;
-            }
-        }
-        log.debug("Checking subscriptions for " + eperson.getEmail());
         // Get the start and end dates for yesterday
 
         // The date should reflect the timezone as well. Otherwise we stand to
