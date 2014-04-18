@@ -440,7 +440,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 	* Search core
 	
 	```
-	$ /apps/drum-new/solr/search/conf
+	$ cd /apps/drum-new/solr/search/conf
 	$ vi solrconfig.xml
 	
 	```
