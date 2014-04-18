@@ -130,7 +130,7 @@ $ ls
 * Create control script
 
 ```
-$ cd /apps/servers/dspace/tomcat411
+$ cd /apps/servers/drum/tomcat411
 $ vi control
 
 ```
@@ -452,7 +452,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
@@ -478,7 +478,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
@@ -490,7 +490,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Statistics core
 	
 	```
-	$ cd /apps/dspace/solr/statistics/conf
+	$ cd /apps/drum-new/solr/statistics/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -502,7 +502,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
      <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/dspace/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
      <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
      <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
@@ -523,7 +523,6 @@ $ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ##### Create soft links for the Drum 4.1 web-applications
 
 ```
-$ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum-new/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
 $ ln -s /apps/drum-new/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
