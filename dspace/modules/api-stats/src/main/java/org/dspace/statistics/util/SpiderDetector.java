@@ -336,7 +336,7 @@ public class SpiderDetector {
                     patterns.add(line);
                 }
             } else {
-                patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim());
+                patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").replaceAll(" ","\\ ").trim());
                 // ... add this functionality later
             }
         }
