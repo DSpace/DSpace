@@ -8,6 +8,8 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.xpath.Arg;
+import org.dspace.app.util.Util;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
@@ -45,21 +47,19 @@ public class Policies {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
                 ActionTarget[] targets = lister.getTargets(args.getType());
-
-                Printer p = args.getPrinter();
-                if (args.doit == 'L') {
-                    findPolicyInfo(args.getContext(), targets, args.action_id, args.whoObj);
-                    System.out.println("# " + targets.length + " type=" + args.getType());
-                    for (int i = 0; i < targets.length; i++)
-                        p.println(targets[i]);
-                } else if (args.doit == 'A') {
-                    // add policy where it is not set
-                } else if (args.doit == 'D') {
-                    // del policy where it is  set
-                } else {
-                    assert (false);  // should never get here
+                if (targets == null || targets.length == 0) {
+                    log.info("empty entity array");
+                    return;
                 }
-
+                Printer p = args.getPrinter();
+                System.out.println("# " + args.doitStr + " policy." + Constants.actionText[args.action_id] +
+                        " for " + targets.length + " " + Constants.typeText[args.getType()] + "s");
+                if (args.doit == 'L') {
+                    listPolicyInfo(p, args.getContext(), targets, args.action_id);
+                } else {
+                    System.out.println("# who " + args.whoObj);
+                    changePolicy(args.doitStr, p, args.getContext(), targets, args.action_id, args.whoObj);
+                }
             }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");
@@ -71,15 +71,48 @@ public class Policies {
         }
     }
 
-    public static void findPolicyInfo(Context c, ActionTarget[] targets, int action_id, DSpaceObject who) throws SQLException {
-        assert (who != null);
-        assert (who.getType() == Constants.EPERSON || who.getType() == Constants.GROUP);
-        log.info("findPolicyInfo: " + Constants.actionText[action_id]);
+    public static void changePolicy(String changeHow, Printer p, Context c, ActionTarget[] targets, int action_id, DSpaceObject who) throws SQLException {
+        if (who == null || (who.getType() != Constants.EPERSON && who.getType() != Constants.GROUP)) {
+            log.error(Util.toString(who, "null") + " is not a group or eperson");
+            return;
+        }
         if (targets == null || targets.length == 0) {
-            log.info("findPolicyInfo:  empty entity array");
+            log.debug("changePolicy: empty target list");
         } else {
+            char mode = changeHow.charAt(0);
+            String property = "policy." + Constants.actionText[action_id] + "." + changeHow;
+            try {
+                for (int i = 0; i < targets.length; i++) {
+                    HashMap map = targets[i].toHashMap();
+                    switch (mode) {
+                        case 'A':
+                            if (who.getType() == Constants.EPERSON) {
+                                log.debug("ADD " + who + " " + who.getID());
+                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
+                            } else {
+                                log.debug("ADD " + who + " " + who.getID());
+                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
+                            }
+                            map.put(property, who);
+                            break;
+                        case 'D':
+                            map.put(property, who);
+                            break;
+                        default:
+                            map.put(property + "???", who);
+                    }
+                    p.println(targets[i]);
+                }
+                c.complete();
+            } catch (AuthorizeException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void listPolicyInfo(Printer printer, Context c, ActionTarget[] targets, int action_id) throws SQLException {
+        if (targets != null) {
             for (int i = 0; i < targets.length; i++) {
-                assert (targets[i] != null);
                 List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, targets[i].getObject(), action_id);
                 String[] whoCan = new String[policies.size()];
                 for (int p = 0; p < policies.size(); p++) {
@@ -98,6 +131,7 @@ public class Policies {
                 }
                 HashMap<String, Object> map = targets[i].toHashMap();
                 map.put("policy." + Constants.actionText[action_id], whoCan);
+                printer.println(targets[i]);
             }
         }
     }
@@ -140,11 +174,16 @@ class PolicyArguments extends Arguments {
                 doitStr = line.getOptionValue(DO).toUpperCase();
             }
             doit = doitStr.charAt(0);
-            if (doit != 'L' && line.hasOption(WHO)) {
-                who = line.getOptionValue(WHO);
-                whoObj = DSpaceObject.fromString(getContext(), who);
-                if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
-                    throw new ParseException(who + " is not a known Group or EPerson");
+            if (doit != 'L') {
+                if (line.hasOption(WHO)) {
+                    who = line.getOptionValue(WHO);
+                    whoObj = DSpaceObject.fromString(getContext(), who);
+                    System.out.println((whoObj == null) ? "null" : whoObj);
+                    if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
+                        throw new ParseException(who + " is not a known Group or EPerson");
+                    }
+                } else {
+                    throw new ParseException("Missing " + WHO_LONG + " option");
                 }
             }
             if (line.hasOption(ACTION)) {
@@ -154,15 +193,14 @@ class PolicyArguments extends Arguments {
                     throw new ParseException(action + " is not a valid action");
                 }
             }
+            String property = "policy." + Constants.actionText[action_id];
+            if (doit != 'L') {
+                property += "." + doitStr;
+            }
+            addKey(property);
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected void optionExplainKeys() {
-        super.optionExplainKeys();
-        System.out.println("\tDepending on " + ACTION_LONG + " option all types have an additional key:  policy.<ACTION>");
     }
 
 }

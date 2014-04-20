@@ -2,7 +2,9 @@ package org.dspace.app.bulkdo;
 
 import edu.harvard.hul.ois.mets.Par;
 import org.apache.commons.cli.*;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.util.ArrayUtil;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -66,8 +68,8 @@ class Arguments {
         return format;
     }
 
-    public String[] getKeys() {
-        return keys;
+    protected void addKey(String key) {
+        keys = (String[]) ArrayUtils.add(keys, key);
     }
 
     public DSpaceObject getRoot() {
@@ -79,7 +81,7 @@ class Arguments {
     }
 
     public Printer getPrinter() {
-        return Printer.create(System.out, getFormat(), getKeys());
+        return Printer.create(System.out, getFormat(), keys);
     }
 
     public void usage() {
