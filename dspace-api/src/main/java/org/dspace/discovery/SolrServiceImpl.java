@@ -1874,10 +1874,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
                     //Prepare the string from {facet.field.name}:[startyear TO endyear] to startyear - endyear
                     String facetField = facetQuery.substring(0, facetQuery.indexOf(":"));
-                    String name = facetQuery.substring(facetQuery.indexOf('[') + 1);
-                    name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
-                    String filter = facetQuery.substring(facetQuery.indexOf('['));
-                    filter = filter.substring(0, filter.lastIndexOf(']') + 1);
+                    String name = "";
+                    String filter = "";
+                    if (facetQuery.indexOf('[') > -1 && facetQuery.lastIndexOf(']') > -1)
+                    {
+                        name = facetQuery.substring(facetQuery.indexOf('[') + 1);
+                        name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
+                        filter = facetQuery.substring(facetQuery.indexOf('['));
+                        filter = filter.substring(0, filter.lastIndexOf(']') + 1);
+                    }
 
                     Integer count = sortedFacetQueries.get(facetQuery);
 
