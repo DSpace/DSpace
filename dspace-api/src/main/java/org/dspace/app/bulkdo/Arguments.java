@@ -1,10 +1,7 @@
 package org.dspace.app.bulkdo;
 
-import edu.harvard.hul.ois.mets.Par;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.util.ArrayUtil;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -66,10 +63,6 @@ class Arguments {
 
     public int getFormat() {
         return format;
-    }
-
-    protected void addKey(String key) {
-        keys = (String[]) ArrayUtils.add(keys, key);
     }
 
     public DSpaceObject getRoot() {

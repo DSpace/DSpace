@@ -1,13 +1,11 @@
 package org.dspace.app.bulkdo;
 
-import oracle.jdbc.driver.Const;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.xpath.Arg;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -18,7 +16,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-import java.awt.*;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.*;
@@ -36,6 +33,124 @@ public class Policies {
      */
     private static Logger log = Logger.getLogger(Policies.class);
 
+    static final String[] todo = {"ADD", "DEL", "LIST"};
+
+    public static final char DO_ADD = 'A';
+    public static final char DO_DEL = 'D';
+    public static final char DO_LIST = 'L';
+
+    Context c;
+
+    char doit;
+    int action_id;
+    DSpaceObject who;
+
+    String property;
+    String propertyExists;
+
+    Policies(PolicyArguments args) throws SQLException {
+        c = args.getContext();
+        doit = args.doit;
+        action_id = args.action_id;
+        who = args.whoObj;
+
+        propertyExists = "policy." + Constants.actionText[action_id];
+        if (doit != DO_LIST) {
+            property = propertyExists + "." + doit;
+        }
+
+        switch (doit) {
+            case DO_DEL:
+            case DO_ADD:
+                if (who == null || (who.getType() != Constants.EPERSON && who.getType() != Constants.GROUP)) {
+                    log.error(Util.toString(who, "null") + " is not a group or eperson");
+                }
+                break;
+        }
+    }
+
+    void apply(Printer p, ActionTarget[] targets) throws SQLException {
+        if (targets == null || targets.length == 0) {
+            log.info("Empty target/entity list");
+        } else {
+            System.out.println("# " + doit + " policy." + Constants.actionText[action_id] +
+                    " for " + targets.length + " DSPaceObjects");
+            switch (doit) {
+                case DO_ADD:
+                case DO_DEL:
+                    changePolicy(p, targets);
+                    break;
+                case DO_LIST:
+                    doList(p, targets);
+                    break;
+                default:
+                    log.error("DO WHAT ?");
+            }
+        }
+    }
+
+    public void doList(Printer p, ActionTarget[] targets) throws SQLException {
+        p.addKey(propertyExists);
+        for (int i = 0; i < targets.length; i++) {
+            addPolicyInfo(targets[i]);
+            p.println(targets[i]);
+        }
+        // Todo  p.delKey(propertyExists);
+    }
+
+    private void addPolicyInfo(ActionTarget target) throws SQLException {
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), action_id);
+        HashMap<String, Object> map = target.toHashMap();
+        map.put(propertyExists, policies.toArray());
+    }
+
+
+    private void changePolicy(Printer p, ActionTarget[] targets) throws SQLException {
+        try {
+            p.addKey(propertyExists);
+            p.addKey(property);
+            for (int i = 0; i < targets.length; i++) {
+                HashMap map = targets[i].toHashMap();
+
+                switch (doit) {
+                    case DO_ADD:
+                        addPolicyInfo(targets[i]);
+                        Object[] pols = (Object[]) map.get(propertyExists);
+                        int pi = 0;
+                        for (; pi < pols.length; pi++) {
+                            ResourcePolicy pol = (ResourcePolicy) pols[pi];
+                            if (pol.getGroup() == who || pol.getEPerson() == who) {
+                                // already have a policy in place - don't add again
+                                break;
+                            }
+                        }
+                        if (pi == pols.length) {
+                            if (who.getType() == Constants.EPERSON) {
+                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
+                            } else {
+                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
+                            }
+                            map.put(property, who);
+                        }
+                        break;
+                    case DO_DEL:
+                        map.put(property, who);
+                        break;
+                    default:
+                        map.put(property + "???", who);
+                }
+                p.println(targets[i]);
+            }
+            c.complete();
+        } catch (AuthorizeException e) {
+            e.printStackTrace();
+        } finally {
+            // TODO p.delKey(propertyExists);
+            // TODO p.delKey(property);
+        }
+    }
+
+
     public static void main(String argv[]) {
         ConsoleAppender ca = new ConsoleAppender();
         ca.setWriter(new OutputStreamWriter(System.out));
@@ -45,21 +160,11 @@ public class Policies {
         PolicyArguments args = new PolicyArguments();
         try {
             if (args.parseArgs(argv)) {
+                Policies pols = new Policies(args);
+
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
-                ActionTarget[] targets = lister.getTargets(args.getType());
-                if (targets == null || targets.length == 0) {
-                    log.info("empty entity array");
-                    return;
-                }
                 Printer p = args.getPrinter();
-                System.out.println("# " + args.doitStr + " policy." + Constants.actionText[args.action_id] +
-                        " for " + targets.length + " " + Constants.typeText[args.getType()] + "s");
-                if (args.doit == 'L') {
-                    listPolicyInfo(p, args.getContext(), targets, args.action_id);
-                } else {
-                    System.out.println("# who " + args.whoObj);
-                    changePolicy(args.doitStr, p, args.getContext(), targets, args.action_id, args.whoObj);
-                }
+                pols.apply(p, lister.getTargets(args.getType()));
             }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");
@@ -71,73 +176,11 @@ public class Policies {
         }
     }
 
-    public static void changePolicy(String changeHow, Printer p, Context c, ActionTarget[] targets, int action_id, DSpaceObject who) throws SQLException {
-        if (who == null || (who.getType() != Constants.EPERSON && who.getType() != Constants.GROUP)) {
-            log.error(Util.toString(who, "null") + " is not a group or eperson");
-            return;
-        }
-        if (targets == null || targets.length == 0) {
-            log.debug("changePolicy: empty target list");
-        } else {
-            char mode = changeHow.charAt(0);
-            String property = "policy." + Constants.actionText[action_id] + "." + changeHow;
-            try {
-                for (int i = 0; i < targets.length; i++) {
-                    HashMap map = targets[i].toHashMap();
-                    switch (mode) {
-                        case 'A':
-                            if (who.getType() == Constants.EPERSON) {
-                                log.debug("ADD " + who + " " + who.getID());
-                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
-                            } else {
-                                log.debug("ADD " + who + " " + who.getID());
-                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
-                            }
-                            map.put(property, who);
-                            break;
-                        case 'D':
-                            map.put(property, who);
-                            break;
-                        default:
-                            map.put(property + "???", who);
-                    }
-                    p.println(targets[i]);
-                }
-                c.complete();
-            } catch (AuthorizeException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
-    public static void listPolicyInfo(Printer printer, Context c, ActionTarget[] targets, int action_id) throws SQLException {
-        if (targets != null) {
-            for (int i = 0; i < targets.length; i++) {
-                List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, targets[i].getObject(), action_id);
-                String[] whoCan = new String[policies.size()];
-                for (int p = 0; p < policies.size(); p++) {
-                    ResourcePolicy pol = policies.get(p);
-                    Group g = pol.getGroup();
-                    if (g != null) {
-                        whoCan[p] = g.toString();
-                    } else {
-                        EPerson e = pol.getEPerson();
-                        if (e != null) {
-                            whoCan[p] = e.toString();
-                        } else {
-                            whoCan[p] = "SICK-POLICY." + pol.getID();
-                        }
-                    }
-                }
-                HashMap<String, Object> map = targets[i].toHashMap();
-                map.put("policy." + Constants.actionText[action_id], whoCan);
-                printer.println(targets[i]);
-            }
-        }
-    }
 }
 
 class PolicyArguments extends Arguments {
+
     public static String DO = "d";
     public static String DO_LONG = "do";
 
@@ -147,7 +190,8 @@ class PolicyArguments extends Arguments {
     public static String WHO = "w";
     public static String WHO_LONG = "who";
 
-    private String[] todo = {"ADD", "DEL", "LIST"};
+    String property;
+    String propertyExists;
 
     String doitStr = "LIST";
     char doit;
@@ -162,7 +206,7 @@ class PolicyArguments extends Arguments {
         super();
         String available = deepToString(Constants.actionText);
         options.addOption(ACTION, ACTION_LONG, true, "one of " + available);
-        available = StringUtils.join(todo, ", ");
+        available = StringUtils.join(Policies.todo, ", ");
         options.addOption(DO, DO_LONG, true, "one of " + available);
         options.addOption(WHO, WHO_LONG, true, "group/eperson (ignored if doing LIST)");
     }
@@ -193,11 +237,7 @@ class PolicyArguments extends Arguments {
                     throw new ParseException(action + " is not a valid action");
                 }
             }
-            String property = "policy." + Constants.actionText[action_id];
-            if (doit != 'L') {
-                property += "." + doitStr;
-            }
-            addKey(property);
+
             return true;
         }
         return false;

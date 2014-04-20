@@ -451,4 +451,19 @@ public class ResourcePolicy
         // FIXME: Check authorisation
         DatabaseManager.update(myContext, myRow);
     }
+
+    @Override
+    public String toString() {
+        String who = "???";
+        try {
+            if (getEPerson() != null) {
+                who = getEPerson().toString();
+            } else if (getGroup() != null) {
+                who = getGroup().toString();
+            }
+        } catch (SQLException e) {
+            who = e.getMessage();
+        }
+        return "POLICY." + getID() + "[" +  who + "]";
+    }
 }

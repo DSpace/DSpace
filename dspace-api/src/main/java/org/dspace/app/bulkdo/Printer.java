@@ -1,5 +1,7 @@
 package org.dspace.app.bulkdo;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
@@ -46,6 +48,10 @@ public class Printer extends PrintStream {
     public Printer (OutputStream out, String[] keysToPrint) {
         super(out);
         keys = keysToPrint;
+    }
+
+    protected void addKey(String key) {
+        keys = (String[]) ArrayUtils.add(keys, key);
     }
 
     public void println(ActionTarget at) {
