@@ -199,7 +199,7 @@ public class DiscoverUtility
         {
             for (String f : defaultFilterQueries)
             {
-                queryArgs.addFacetQuery(f);
+                queryArgs.addFilterQueries(f);
             }
         }
         List<String[]> filters = getFilters(request);
