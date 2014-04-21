@@ -464,6 +464,6 @@ public class ResourcePolicy
         } catch (SQLException e) {
             who = e.getMessage();
         }
-        return "POLICY." + getID() + "[" +  who + "]";
+        return "POLICY." + getID() + "(" +  who + ")";
     }
 }

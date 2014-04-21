@@ -47,6 +47,7 @@ public class Policies {
 
     String property;
     String propertyExists;
+    String propertyBefore;
 
     Policies(PolicyArguments args) throws SQLException {
         c = args.getContext();
@@ -57,6 +58,7 @@ public class Policies {
         propertyExists = "policy." + Constants.actionText[action_id];
         if (doit != DO_LIST) {
             property = propertyExists + "." + doit;
+            propertyBefore = propertyExists + "." + "before";
         }
 
         switch (doit) {
@@ -92,53 +94,63 @@ public class Policies {
     public void doList(Printer p, ActionTarget[] targets) throws SQLException {
         p.addKey(propertyExists);
         for (int i = 0; i < targets.length; i++) {
-            addPolicyInfo(targets[i]);
+            addPolicyInfo(targets[i], propertyExists);
             p.println(targets[i]);
         }
-        // Todo  p.delKey(propertyExists);
+        // TODO  p.delKey(propertyExists);
     }
 
-    private void addPolicyInfo(ActionTarget target) throws SQLException {
+    private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
         List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), action_id);
         HashMap<String, Object> map = target.toHashMap();
-        map.put(propertyExists, policies.toArray());
+        map.put(prop, policies.toArray());
     }
 
 
     private void changePolicy(Printer p, ActionTarget[] targets) throws SQLException {
         try {
             p.addKey(propertyExists);
+            p.addKey(propertyBefore);
             p.addKey(property);
             for (int i = 0; i < targets.length; i++) {
                 HashMap map = targets[i].toHashMap();
 
-                switch (doit) {
-                    case DO_ADD:
-                        addPolicyInfo(targets[i]);
-                        Object[] pols = (Object[]) map.get(propertyExists);
-                        int pi = 0;
-                        for (; pi < pols.length; pi++) {
-                            ResourcePolicy pol = (ResourcePolicy) pols[pi];
-                            if (pol.getGroup() == who || pol.getEPerson() == who) {
-                                // already have a policy in place - don't add again
-                                break;
-                            }
+                addPolicyInfo(targets[i],propertyBefore);
+                Object[] pols = (Object[]) map.get(propertyBefore);
+
+                if (doit == DO_ADD) {
+                    // see whether there is already a policy in place
+                    int pi = 0;
+                    for (; pi < pols.length; pi++) {
+                        ResourcePolicy pol = (ResourcePolicy) pols[pi];
+                        if (pol.getGroup() == who || pol.getEPerson() == who) {
+                            // already have a policy in place - don't add again
+                            break;
                         }
-                        if (pi == pols.length) {
-                            if (who.getType() == Constants.EPERSON) {
-                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
-                            } else {
-                                AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
-                            }
-                            map.put(property, who);
+                    }
+                    if (pi == pols.length) {
+                        // policy does not yet exist
+                        if (who.getType() == Constants.EPERSON) {
+                            AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
+                        } else {
+                            AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
                         }
-                        break;
-                    case DO_DEL:
                         map.put(property, who);
-                        break;
-                    default:
-                        map.put(property + "???", who);
+                    }
+                } else if (doit == DO_DEL) {
+                    for (int pi = 0; pi < pols.length; pi++) {
+                        ResourcePolicy pol = (ResourcePolicy) pols[pi];
+                        if (pol.getGroup() == who || pol.getEPerson() == who) {
+                            // found a matching policy ==> delete it
+                            pol.delete();
+                            map.put(property, who);
+                            // keep going there may be duplicate policies
+                        }
+                    }
+                } else {
+                    map.put(property + "???should-never-happen!!!", who);
                 }
+                addPolicyInfo(targets[i],propertyExists);
                 p.println(targets[i]);
             }
             c.complete();
@@ -146,6 +158,7 @@ public class Policies {
             e.printStackTrace();
         } finally {
             // TODO p.delKey(propertyExists);
+            // TODO p.delKey(propertyAfter);
             // TODO p.delKey(property);
         }
     }
@@ -189,9 +202,6 @@ class PolicyArguments extends Arguments {
 
     public static String WHO = "w";
     public static String WHO_LONG = "who";
-
-    String property;
-    String propertyExists;
 
     String doitStr = "LIST";
     char doit;
