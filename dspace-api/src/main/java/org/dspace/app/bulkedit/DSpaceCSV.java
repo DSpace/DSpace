@@ -353,20 +353,22 @@ public class DSpaceCSV implements Serializable
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
 
         // Add in owning collection
-        String owningCollectionHandle = i.getOwningCollection().getHandle();
-        line.add("collection", owningCollectionHandle);
+        if (i.getOwningCollection() == null) {
+            // template items do not have owning collections
+            line.add("collection", "");
+        } else {
+            String owningCollectionHandle = i.getOwningCollection().getHandle();
+            line.add("collection", owningCollectionHandle);
 
-        // Add in any mapped collections
-        Collection[] collections = i.getCollections();
-        for (Collection c : collections)
-        {
-            // Only add if it is not the owning collection
-            if (!c.getHandle().equals(owningCollectionHandle))
-            {
-                line.add("collection", c.getHandle());
+            // Add in any mapped collections
+            Collection[] collections = i.getCollections();
+            for (Collection c : collections) {
+                // Only add if it is not the owning collection
+                if (!c.getHandle().equals(owningCollectionHandle)) {
+                    line.add("collection", c.getHandle());
+                }
             }
         }
-
         // Populate it
         DCValue md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (DCValue value : md)

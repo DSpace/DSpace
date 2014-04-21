@@ -137,6 +137,8 @@ public class MetadataExport
         }
         catch (Exception e)
         {
+            System.err.println("export error : " + e.getMessage());
+            e.printStackTrace(System.err);
             return null;
         }
     }
@@ -219,39 +221,40 @@ public class MetadataExport
         }
         else
         {
-            String handle = line.getOptionValue('i');
-            DSpaceObject dso = HandleManager.resolveToObject(c, handle);
+            String itemStr = line.getOptionValue('i');
+            DSpaceObject dso  = DSpaceObject.fromString(c, itemStr);
             if (dso == null)
             {
-                System.err.println("Item '" + handle + "' does not resolve to an item in your repository!");
+                System.err.println("Item '" + itemStr + "' does not resolve to an item in your repository!");
                 printHelp(options, 1);
             }
 
             if (dso.getType() == Constants.ITEM)
             {
-                System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
+                System.out.println("Exporting item '" + dso.getName() + "' (" + itemStr + ")");
                 List<Integer> item = new ArrayList<Integer>();
                 item.add(dso.getID());
                 exporter = new MetadataExport(c, new ItemIterator(c, item), exportAll);
             }
             else if (dso.getType() == Constants.COLLECTION)
             {
-                System.out.println("Exporting collection '" + dso.getName() + "' (" + handle + ")");
+                System.out.println("Exporting collection '" + dso.getName() + "' (" + itemStr + ")");
                 Collection collection = (Collection)dso;
                 toExport = collection.getAllItems();
                 exporter = new MetadataExport(c, toExport, exportAll);
             }
             else if (dso.getType() == Constants.COMMUNITY)
             {
-                System.out.println("Exporting community '" + dso.getName() + "' (" + handle + ")");
+                System.out.println("Exporting community '" + dso.getName() + "' (" + itemStr + ")");
                 exporter = new MetadataExport(c, (Community)dso, exportAll);
             }
             else
             {
-                System.err.println("Error identifying '" + handle + "'");
+                System.err.println("Error identifying '" + itemStr + "'");
                 System.exit(1);
             }
         }
+        System.out.println("EXPORT");
 
         // Perform the export
         DSpaceCSV csv = exporter.export();
