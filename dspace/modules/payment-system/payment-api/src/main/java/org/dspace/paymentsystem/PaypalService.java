@@ -39,13 +39,9 @@ public interface PaypalService
 {
     public String getSecureTokenId();
 
-    public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String itemID, String knotId);
+    public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String knotId,Context context);
 
     public boolean submitReferenceTransaction(Context c, WorkflowItem wfi, HttpServletRequest request);
-
-    public boolean getReferenceTransaction(Context context, WorkflowItem workItem, HttpServletRequest request);
-
-    public boolean verifyCreditCard(Context context, Item item, HttpServletRequest request);
 
     public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String type, Request request, Item item, DSpaceObject dso) throws WingException, SQLException;
 

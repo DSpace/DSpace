@@ -484,12 +484,9 @@ function enableNextButton() {
             }
         }
 
-        // Status: status_in_review ==> must have JOURNAL_ID && MANUSCRIPT_NUMBER
+        // Status: status_in_review ==> must have JOURNAL_ID (MANUSCRIPT_NUMBER is optional)
         else if (jQuery('input[name|="article_status"]:checked').val()=='2') {
-            var val = jQuery("#aspect_submission_StepTransformer_field_manu").val();
-            if (val != null && val != '') {
-                jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
-            }
+            jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
             return;
         }
 

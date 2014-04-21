@@ -84,10 +84,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
         if (configurationService.getPropertyAsType("doi.service.testmode", true)) {
             myDoiPrefix = configurationService.getProperty("doi.testprefix");
+            myLocalPartPrefix = configurationService.getProperty("doi.localpart.testsuffix");
         } else {
             myDoiPrefix = configurationService.getProperty("doi.prefix");
+            myLocalPartPrefix = configurationService.getProperty("doi.localpart.suffix");
         }
-        myLocalPartPrefix = configurationService.getProperty("doi.localpart.suffix");
 
         try{
             mySuffixVarLength = Integer.parseInt(configurationService.getProperty("doi.suffix.length"));

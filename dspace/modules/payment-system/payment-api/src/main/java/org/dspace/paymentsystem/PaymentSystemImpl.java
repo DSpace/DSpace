@@ -15,12 +15,16 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.Xref;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.VersionHistoryImpl;
+import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.IOException;
@@ -82,6 +86,15 @@ public class PaymentSystemImpl implements PaymentSystemService {
         protected static final Message T_Apply=
 
                         message("xmlui.PaymentSystem.shoppingcart.order.apply");
+
+
+
+    protected static final String Country_Help_Text= "Submitters requesting a Waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
+
+    protected static final String Voucher_Help_Text="Organizations may sponsor submissions to Dryad by purchasing and distributing voucher codes redeemable for one Data Publishing Charge.  Submitters redeeming vouchers may only use them with the permission of the purchaser.";
+
+    protected static final String Currency_Help_Text="Select Currency";
+
 
     /** Protected Constructor */
     protected PaymentSystemImpl()
@@ -158,6 +171,14 @@ public class PaymentSystemImpl implements PaymentSystemService {
         }
         else
         {
+
+            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+            VersionHistory history = versioningService.findVersionHistory(context, itemId);
+            if(history!=null)
+            {
+                Item originalItem = history.getFirstVersion().getItem();
+                itemId = originalItem.getID();
+            }
             ShoppingCart[] shoppingCarts = new ShoppingCart[1];
             shoppingCarts[0] = getShoppingCartByItemId(context, itemId);
             return shoppingCarts;
@@ -173,6 +194,21 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             itemId = dataPackage.getID();
         }
+
+        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+        VersionHistory history = versioningService.findVersionHistory(context, itemId);
+        if(history!=null)
+        {
+            Item originalItem = history.getFirstVersion().getItem();
+            itemId = originalItem.getID();
+            ArrayList<ShoppingCart> shoppingCarts = ShoppingCart.findAllByItem(context,itemId);
+            if(shoppingCarts.size()>0)
+            {
+                return shoppingCarts.get(0);
+            }
+
+        }
+
         List<ShoppingCart> shoppingcartList= ShoppingCart.findAllByItem(context, itemId);
         if(shoppingcartList!=null && shoppingcartList.size()>0)
             return shoppingcartList.get(0);
@@ -502,7 +538,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             try{
 
                 //add selected currency section
-                info.addLabel(T_Header);
+
                 generateCurrencyList(info,manager,shoppingCart);
                 generatePayer(context,info,shoppingCart,item);
 
@@ -578,8 +614,11 @@ public class PaymentSystemImpl implements PaymentSystemService {
         //only generate country selection list when it is not on the publication select page, to do this we need to check the publication is not empty
 
             java.util.List<String> countryArray = manager.getSortedCountry();
-            info.addLabel(T_Country);
+
             Select countryList = info.addItem("country-list", "select-list").addSelect("country");
+
+            countryList.setLabel(T_Country);
+            countryList.setHelp(Country_Help_Text);
             countryList.addOption("","Select Your Country");
             for(String temp:countryArray){
                 String[] countryTemp = temp.split(":");
@@ -615,6 +654,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
     private void generateCurrencyList(org.dspace.app.xmlui.wing.element.List info,PaymentSystemConfigurationManager manager,ShoppingCart shoppingCart) throws WingException,SQLException{
         org.dspace.app.xmlui.wing.element.Item currency = info.addItem("currency-list", "select-list");
         Select currencyList = currency.addSelect("currency");
+        currencyList.setLabel(T_Header);
+        //currencyList.setHelp(Currency_Help_Text);
         Properties currencyArray = manager.getAllCurrencyProperty();
 
         for(String currencyTemp: currencyArray.stringPropertyNames())
@@ -648,17 +689,19 @@ public class PaymentSystemImpl implements PaymentSystemService {
             info.addItem("errorMessage","errorMessage").addContent("");
 
         }
-        info.addLabel(T_Voucher);
+
         org.dspace.app.xmlui.wing.element.Item voucher = info.addItem("voucher-list","voucher-list");
 
         Text voucherText = voucher.addText("voucher","voucher");
+        voucherText.setLabel(T_Voucher);
+        voucherText.setHelp(Voucher_Help_Text);
         voucher.addButton("apply","apply");
         if(voucher1!=null){
             voucherText.setValue(voucher1.getCode());
-            info.addItem("remove-voucher","remove-voucher").addXref("#","Remove Voucher : "+voucher1.getCode());
+            info.addItem("remove-voucher","remove-voucher").addXref("#", "Remove Voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
         }
         else{
-            info.addItem("remove-voucher","remove-voucher").addXref("#","");
+            info.addItem("remove-voucher","remove-voucher").addXref("#", "", "remove-voucher", "remove-voucher");
         }
 
 

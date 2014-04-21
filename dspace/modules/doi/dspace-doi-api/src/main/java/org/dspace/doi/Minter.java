@@ -23,7 +23,7 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
     private boolean myDataCiteConnectionIsLive;
     private CDLDataCiteService myDoiService;
     
-    private DOIDatabase myLocalDatabase;
+    private PGDOIDatabase myLocalDatabase;
     private String myDataPkgColl;
     private String myDataFileColl;
     private String myHdlPrefix;
@@ -158,7 +158,7 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	 * @return
 	 */
 	public DOI getKnownDOI(String aDOIString) {
-        if(myLocalDatabase==null) myLocalDatabase = DOIDatabase.getInstance();
+        if(myLocalDatabase==null) myLocalDatabase = PGDOIDatabase.getInstance();
 		return myLocalDatabase.getByDOI(aDOIString);
 	}
 
@@ -378,11 +378,11 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	}
     }
     
-    public DOIDatabase getMyLocalDatabase() {
+    public PGDOIDatabase getMyLocalDatabase() {
         return myLocalDatabase;
     }
     
-    public void setMyLocalDatabase(DOIDatabase myLocalDatabase) {
+    public void setMyLocalDatabase(PGDOIDatabase myLocalDatabase) {
         this.myLocalDatabase = myLocalDatabase;
     }
 }

@@ -13,6 +13,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.reading.AbstractReader;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -103,13 +104,14 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         String payername = paymentSystemService.getPayer(context,shoppingCart,null);
         switch (paymentSystemService.getWaiver(context,shoppingCart,""))
         {
-	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + "."; break;
+	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + StringEscapeUtils.escapeJava(shoppingCart.getCountry()) + "."; break;
 	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Data Publishing Charges are covered for all submissions to " + shoppingCart.getJournal() + "."; break;
 	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
 	}
 
-        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+shoppingCart.getCountry()+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
 
+
+        String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+StringEscapeUtils.escapeJava(shoppingCart.getCountry())+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"noIntegrateFee\":\""+symbol+noIntegrateFee+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
         byte[] buffer = new byte[8192];
         response.setHeader("Content-Length", String.valueOf(result.length()));
