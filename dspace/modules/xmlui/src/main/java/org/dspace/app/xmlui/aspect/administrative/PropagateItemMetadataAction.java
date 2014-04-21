@@ -52,7 +52,7 @@ public class PropagateItemMetadataAction extends AbstractAction {
         if(raw_field == null) {
             throw new Exception("Metadata field not found");
         }
-        formatMetdataField(raw_field);
+        this.metadataField = formatMetadataField(raw_field);
         // get data package id
         this.dataPackageId = getDataPackageId();
         if(this.dataPackageId == NOT_FOUND) {
@@ -111,10 +111,6 @@ public class PropagateItemMetadataAction extends AbstractAction {
             return null;
         }
         return metadataFieldString;
-    }
-
-    private void formatMetdataField(String raw_field) {
-        this.metadataField = formatMetadataField(raw_field);
     }
 
     private Integer getDataPackageId() {
