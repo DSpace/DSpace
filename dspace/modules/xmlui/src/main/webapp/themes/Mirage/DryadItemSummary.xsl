@@ -1529,6 +1529,24 @@
                          alt="The American Naturalist cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Basic and Applied Ecology"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.elsevier.com/locate/baae')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/baae.png"
+                         alt="Basic and Applied Ecology cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Biological Journal of the Linnean Society"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -1787,6 +1805,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EvolApp.png"
                          alt="Evolutionary Applications cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Flora - Morphology, Distribution, Functional Ecology of Plants"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.elsevier.com/locate/flora')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/flora.png"
+                         alt="Flora - Morphology, Distribution, Functional Ecology of Plants cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Functional Ecology"'>
@@ -2296,6 +2332,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PALA.gif"
                          alt="Palaeontology cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Perspectives in Plant Ecology, Evolution and Systematics"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.elsevier.com/locate/ppees')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ppees.png"
+                         alt="Perspectives in Plant Ecology, Evolution and Systematics cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PhytoKeys"'>
