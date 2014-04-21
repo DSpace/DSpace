@@ -11,7 +11,8 @@ import java.util.*;
 /**
  * Created by monikam on 4/11/14.
  */
-public class ActionTarget {
+public class ActionTarget  {
+
     private DSpaceObject obj;
     private HashMap<String, Object> map;
 
@@ -99,7 +100,7 @@ public class ActionTarget {
 class CollectionActionTarget extends ActionTarget {
     Collection col;
 
-    static String[] theAvailableKeys = {"name"};
+    static String[] theAvailableKeys = {"name", "template"};
 
     CollectionActionTarget(DSpaceObject o) {
         super(o);
@@ -110,6 +111,11 @@ class CollectionActionTarget extends ActionTarget {
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> map = super.toHashMap();
         map.put("name", col.getName());
+        try {
+        map.put("template", col.getTemplateItem());
+        } catch (SQLException e) {
+            map.put("template", e.getMessage());
+        }
         return map;
     }
 }
