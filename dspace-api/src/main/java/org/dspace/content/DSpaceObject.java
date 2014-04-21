@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -181,7 +182,7 @@ public abstract class DSpaceObject
             return null;
         }
         String[] splits = StringUtils.split(str, '.');
-        if (splits.length != 2) {
+        if (splits.length < 2) {
             // bad format
             return null;
         }
@@ -200,8 +201,18 @@ public abstract class DSpaceObject
                 case Constants.COLLECTION:
                 case Constants.COMMUNITY:
                     return HandleManager.resolveToObject(c, splits[1]);
-                case Constants.EPERSON:
-                    return EPerson.findByNetid(c, splits[1]);
+                case Constants.EPERSON: {
+                    DSpaceObject person = EPerson.findByNetid(c, splits[1]);
+                    if (person == null) {
+                        String email = str.substring(splits[0].length() + 1);
+                        try {
+                            person = EPerson.findByEmail(c, email);
+                        } catch (AuthorizeException e) {
+                            person = null;
+                        }
+                    }
+                    return person;
+                }
                 case Constants.GROUP:
                     return Group.findByName(c, splits[1]);
                 default:
