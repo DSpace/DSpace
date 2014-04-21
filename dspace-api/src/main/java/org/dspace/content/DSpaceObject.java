@@ -183,40 +183,37 @@ public abstract class DSpaceObject
         }
         String[] splits = StringUtils.split(str, '.');
         if (splits.length < 2) {
-            // bad format
-            return null;
-        }
-        int typeId = Constants.getTypeID(splits[0].toUpperCase());
-        if (typeId == -1) {
-            // not one of the DSPaceObject types
-            return null;
-        }
+            // this could be a handle
+            return HandleManager.resolveToObject(c, str);
+        } else {
+            int typeId = Constants.getTypeID(splits[0].toUpperCase());
+            if (typeId == -1) {
+                // not one of the DSPaceObject types
+                return null;
+            }
 
-        try {
-            int id = Integer.parseInt(splits[1]);
-            return DSpaceObject.find(c, typeId, id);
-        } catch (NumberFormatException ne) {
-            switch (typeId) {
-                case Constants.ITEM:
-                case Constants.COLLECTION:
-                case Constants.COMMUNITY:
-                    return HandleManager.resolveToObject(c, splits[1]);
-                case Constants.EPERSON: {
-                    DSpaceObject person = EPerson.findByNetid(c, splits[1]);
-                    if (person == null) {
-                        String email = str.substring(splits[0].length() + 1);
-                        try {
-                            person = EPerson.findByEmail(c, email);
-                        } catch (AuthorizeException e) {
-                            person = null;
+            try {
+                int id = Integer.parseInt(splits[1]);
+                return DSpaceObject.find(c, typeId, id);
+            } catch (NumberFormatException ne) {
+                switch (typeId) {
+                    case Constants.EPERSON: {
+                        DSpaceObject person = EPerson.findByNetid(c, splits[1]);
+                        if (person == null) {
+                            String email = str.substring(splits[0].length() + 1);
+                            try {
+                                person = EPerson.findByEmail(c, email);
+                            } catch (AuthorizeException e) {
+                                person = null;
+                            }
                         }
+                        return person;
                     }
-                    return person;
+                    case Constants.GROUP:
+                        return Group.findByName(c, splits[1]);
+                    default:
+                        return null;
                 }
-                case Constants.GROUP:
-                    return Group.findByName(c, splits[1]);
-                default:
-                    return null;
             }
         }
     }
