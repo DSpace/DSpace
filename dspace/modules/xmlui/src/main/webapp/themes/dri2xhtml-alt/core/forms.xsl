@@ -967,8 +967,19 @@
                 </xsl:when>
               </xsl:choose>
               <!-- Dryad Metadata propagation -->
+              <!-- Admin page -->
               <xsl:if test="starts-with(@id,'aspect.administrative.item.EditItemMetadataForm.field.value_')">
                   <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+                  <xsl:variable name="metadataFieldName" select="ancestor::dri:row/@n"></xsl:variable>
+                    <xsl:if test="count($fileDois) > 0">
+                        <xsl:call-template name="addPropagateButton">
+                              <xsl:with-param name="metadataFieldName" select="$metadataFieldName"/>
+                        </xsl:call-template>
+                    </xsl:if>
+              </xsl:if>
+              <!-- Curator edit page -->
+              <xsl:if test="starts-with(@id,'aspect.submission.submit.CuratorEditMetadataForm.field.value')">
+                  <xsl:variable name="fileDois" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
                   <xsl:variable name="metadataFieldName" select="ancestor::dri:row/@n"></xsl:variable>
                     <xsl:if test="count($fileDois) > 0">
                         <xsl:call-template name="addPropagateButton">
