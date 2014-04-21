@@ -1355,19 +1355,37 @@ parameter that is being used (see variable defined above) -->
     <!-- The DRI structure is similar but the elements have different IDs -->
     <xsl:variable name="propagateShowPopupAdmin" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
     <xsl:variable name="propagateShowPopupCurator" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
-    <xsl:if test="$propagateShowPopupAdmin = '1' or $propagateShowPopupCurator == '1'">
-      <xsl:choose>
-        <xsl:when test="$propagateShowPopupAdmin = '1'">
-          <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-          <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-          <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
-        </xsl:when>
-        <xsl:when test="$propagateShowPopupCurator = '1'">
-          <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-          <xsl:variable name="fileDois" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataFormrow.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-          <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
-        </xsl:when>
-      </xsl:choose>
+    <xsl:if test="$propagateShowPopupAdmin = '1' or $propagateShowPopupCurator = '1'">
+      <xsl:variable name="packageDoi">
+        <xsl:choose>
+          <xsl:when test="$propagateShowPopupAdmin = '1'">
+            <xsl:value-of select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+          <xsl:when test="$propagateShowPopupCurator = '1'">
+            <xsl:value-of select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="fileDois">
+        <xsl:choose>
+          <xsl:when test="$propagateShowPopupAdmin = '1'">
+            <xsl:value-of  select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+          <xsl:when test="$propagateShowPopupCurator = '1'">
+            <xsl:value-of select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataFormrow.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="metadataFieldName">
+        <xsl:choose>
+          <xsl:when test="$propagateShowPopupAdmin = '1'">
+            <xsl:value-of select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+          <xsl:when test="$propagateShowPopupCurator = '1'">
+            <xsl:value-of select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:value-of>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
       <xsl:if test="count($fileDois) > 0">
         <script>
           <xsl:attribute name="type"><xsl:text>text/javascript</xsl:text></xsl:attribute>
