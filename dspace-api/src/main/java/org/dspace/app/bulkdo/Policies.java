@@ -55,8 +55,8 @@ public class Policies {
         doit = args.doit;
         action_id = args.action_id;
         who = args.whoObj;
+        verbose = args.getVerbose();
 
-        verbose = args.verbose;
         propertyExists = "policy." + Constants.actionText[action_id];
         if (doit != DO_LIST) {
             property = propertyExists + "." + doit;
@@ -207,12 +207,8 @@ class PolicyArguments extends Arguments {
     public static String WHO = "w";
     public static String WHO_LONG = "who";
 
-    public static String VERBOSE = "v";
-    public static String VERBOSE_LONG = "verbose";
-
     String doitStr = "LIST";
     char doit;
-    boolean verbose;
 
     String action = Constants.actionText[Constants.READ];
     int action_id;
@@ -227,13 +223,11 @@ class PolicyArguments extends Arguments {
         available = StringUtils.join(Policies.todo, ", ");
         options.addOption(DO, DO_LONG, true, "one of " + available);
         options.addOption(WHO, WHO_LONG, true, "group/eperson (ignored if doing LIST)");
-        options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
     }
 
     @Override
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
         if (super.parseArgs(argv)) {
-            verbose = line.hasOption(VERBOSE);
 
             if (line.hasOption(DO)) {
                 doitStr = line.getOptionValue(DO).toUpperCase();

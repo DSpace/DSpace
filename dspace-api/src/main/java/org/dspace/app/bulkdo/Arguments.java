@@ -33,6 +33,9 @@ class Arguments {
     public static String KEYS = "i";
     public static String KEYS_LONG = "include";
 
+    public static String VERBOSE = "v";
+    public static String VERBOSE_LONG = "verbose";
+
     protected Options options = null;
     protected CommandLine line;
 
@@ -42,6 +45,7 @@ class Arguments {
     private int format = Printer.TXT_FORMAT;
     private static String[] defaultKeys = { "object", "handle", "parent", "name"};
     private String[] keys = defaultKeys;
+    private boolean verbose;
 
     Arguments()  {
         options = new Options();
@@ -50,6 +54,7 @@ class Arguments {
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
+        options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
         options.addOption(HELP, HELP_LONG, false, "help");
     }
 
@@ -71,6 +76,10 @@ class Arguments {
 
     public Options getOptions() {
         return options;
+    }
+
+    public boolean getVerbose() {
+        return verbose;
     }
 
     public Printer getPrinter() {
@@ -98,7 +107,7 @@ class Arguments {
         System.out.println("\t\t" + Constants.typeText[Constants.BITSTREAM] + ":" + deepToString(ActionTarget.availableKeys(Constants.BITSTREAM)));
     }
 
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException  {
+    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
         CommandLineParser parser = new PosixParser();
         line = parser.parse(options, argv);
         if (line.hasOption(HELP)) {
@@ -106,34 +115,50 @@ class Arguments {
             return false;
         }
 
+        verbose = line.hasOption(VERBOSE);
+
         try {
             c = new Context();
         } catch (SQLException e) {
             throw new ParseException("Could not access database");
         }
 
-        String handle = line.getOptionValue(ROOT);
-        if (handle == null || handle.isEmpty())
+        String rootObj = line.getOptionValue(ROOT);
+        if (rootObj == null || rootObj.isEmpty())
             throw new ParseException("Missing root object argument");
+        dobj = DSpaceObject.fromString(c, rootObj);
+        if (dobj == null)
+            throw new ParseException(rootObj + " is not a valid DSpaceObject");
 
-        String typeString = line.getOptionValue(TYPE);
-        if (typeString == null || typeString.isEmpty())
-            throw new ParseException("Missing type argument");
+        if (dobj.getType() != Constants.COMMUNITY &&
+                dobj.getType() != Constants.COLLECTION &&
+                dobj.getType() != Constants.ITEM &&
+                dobj.getType() != Constants.BUNDLE &&
+                dobj.getType() != Constants.BITSTREAM) {
+            throw new ParseException(dobj + " is not a community, collection, item, bundle or bitstream");
+        }
 
-        myType = Constants.getTypeID(typeString.toUpperCase());
+        if (line.hasOption(TYPE)) {
+            String typeString = line.getOptionValue(TYPE);
+            if (typeString == null || typeString.isEmpty())
+                throw new ParseException("Missing type argument");
+            myType = Constants.getTypeID(typeString.toUpperCase());
+        } else {
+            // default to type of root arg
+            myType = dobj.getType();
+        }
         if (myType != Constants.COLLECTION &&
                 myType != Constants.ITEM &&
                 myType != Constants.BUNDLE &&
-                myType != Constants.BITSTREAM) {
+                myType != Constants.BITSTREAM)
             throw new ParseException("type must be collection, item, bundle, or bitstream");
-        }
 
         if (line.hasOption(FORMAT)) {
             format = Printer.getFormat(line.getOptionValue(FORMAT).toUpperCase());
         }
 
         if (line.hasOption(KEYS)) {
-            String[]  keyList = StringUtils.split(line.getOptionValue(KEYS), ",");
+            String[] keyList = StringUtils.split(line.getOptionValue(KEYS), ",");
             if (keyList.length > 0) {
                 for (int i = 0; i < keyList.length; i++) {
                     keyList[i] = keyList[i].trim();
@@ -144,20 +169,6 @@ class Arguments {
             }
         }
 
-        dobj = HandleManager.resolveToObject(c, handle);
-        if (dobj == null) {
-            dobj = DSpaceObject.fromString(c, handle);
-        }
-        if (dobj == null) {
-            throw new ParseException(handle + " is not a valid object descriptor");
-        }
-        if (dobj.getType() != Constants.COMMUNITY &&
-                dobj.getType() != Constants.COLLECTION &&
-                dobj.getType() != Constants.ITEM &&
-                dobj.getType() != Constants.BUNDLE &&
-                dobj.getType() != Constants.BITSTREAM) {
-            throw new ParseException(dobj + " is not a community, collection, item, bundle or bitstream");
-        }
         // HACK: relying on const values
         if (myType > dobj.getType()) {
             throw new ParseException(Constants.typeText[myType] + "s are not nested inside " +
