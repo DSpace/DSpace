@@ -1351,11 +1351,23 @@ parameter that is being used (see variable defined above) -->
 
   <xsl:template match="dri:p[@rend='edit-metadata-actions bottom']">
     <xsl:apply-templates />
-    <xsl:variable name="propagateShowPopup" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
-    <xsl:if test="$propagateShowPopup = '1'">
-      <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-      <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
-      <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
+    <!-- Propagate metadata buttons can be clicked from either admin or curator edit metdata interfaces -->
+    <!-- The DRI structure is similar but the elements have different IDs -->
+    <xsl:variable name="propagateShowPopupAdmin" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
+    <xsl:variable name="propagateShowPopupCurator" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
+    <xsl:if test="$propagateShowPopupAdmin = '1' or $propagateShowPopupCurator == '1'">
+      <xsl:choose>
+        <xsl:when test="$propagateShowPopupAdmin = '1'">
+          <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+          <xsl:variable name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+          <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
+        </xsl:when>
+        <xsl:when test="$propagateShowPopupCurator = '1'">
+          <xsl:variable name="packageDoi" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+          <xsl:variable name="fileDois" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataFormrow.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:variable>
+          <xsl:variable name="metadataFieldName" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:variable>
+        </xsl:when>
+      </xsl:choose>
       <xsl:if test="count($fileDois) > 0">
         <script>
           <xsl:attribute name="type"><xsl:text>text/javascript</xsl:text></xsl:attribute>
