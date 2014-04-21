@@ -42,7 +42,7 @@ public class ActionTarget {
         }
     }
 
-    static String theAvailableKeys[] = {"id", "type", "handle", "exception"};
+    static String theAvailableKeys[] = {"object", "id", "type", "handle", "exception"};
 
     public static String[] availableKeys(int type) {
         switch (type) {

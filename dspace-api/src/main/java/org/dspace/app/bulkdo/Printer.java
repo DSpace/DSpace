@@ -100,7 +100,7 @@ class TSVPrinter extends Printer {
                 println(txt);
             }
             firstTime = false;
-            txt = expandToString(map.get(0));
+            txt = expandToString(map.get(keys[0]));
             for (Integer i = 1; i < keys.length; i++) {
                 txt = txt + "\t" + expandToString(map.get(keys[i]));
             }

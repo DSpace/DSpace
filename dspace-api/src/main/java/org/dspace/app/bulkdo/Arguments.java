@@ -40,7 +40,7 @@ class Arguments {
     private DSpaceObject dobj = null;
     private int myType = -1;
     private int format = Printer.TXT_FORMAT;
-    private static String[] defaultKeys = { "id", "type", "handle", "parent", "name"};
+    private static String[] defaultKeys = { "object", "handle", "parent", "name"};
     private String[] keys = defaultKeys;
 
     Arguments()  {
