@@ -187,7 +187,7 @@ public class DSpaceCSVLine implements Serializable
         }
 
         // Replace newline with ' '
-        s = s.replace("\n", " ");
+        s = s.replaceAll("\n", " ");
         // Replace internal quotes with two sets of quotes
         return "\"" + s.replaceAll("\"", "\"\"") + "\"";
     }
