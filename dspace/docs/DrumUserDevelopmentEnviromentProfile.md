@@ -88,6 +88,25 @@ function drum41() {
   export PATH=$M2:$PATH
   mvn --version
 }
+
+function dmvn() {
+  (cd /apps/git/drum/dspace; pwd; mvn "$@")
+}
+
+function dant() {
+  (/apps/servers/drum/tomcat411/control stop;
+   cd /apps/git/drum/dspace/target/dspace-*.*-build/;
+   cp -R /apps/drum/solr /apps/drum/solr.back;
+   ant "$@";
+   cp -R /apps/drum/solr.back /apps/drum-new/solr;
+   rm /apps/drum-new/webapps/jspui/WEB-INF/lib/jsp-api-2.0.jar;
+   rm -rf /apps/servers/drum/tomcat411/work/Catalina/localhost;
+   /apps/servers/drum/tomcat411/control start)
+}
+
+alias dup="dmvn package && dant update"
+alias dp="dmvn package"
+
 ```
 
 
@@ -97,29 +116,53 @@ function drum41() {
 $ drum41
 ```
 
-* Checkout DRUM 4.1 Maven projects into the drum-new workspace:
+* Build package
 
-	Workspace location: /apps/cms/drum-new
+```
+$ dp
+```
+
+* Build package & Redeploy with Tomcat clean-up/restart
+
+```
+$ dup
+```
+
+* Checkout DRUM 4.1 Maven projects into the drum workspace:
+
+	Workspace location: /apps/cms/drum
 	
-* [Enable DSpace specific formatting settings](https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-CodingConventions)
-
-Download DSpace Eclipse formatter from the link above.
-
-* Import formatter
-
-	* Open Spring Preferences and import DSpace formatter from **Java/Code Style/Formatter**.
-	Click Import.
+	* File > Import > Maven > Existing Maven Projects
 	
-* Configure Editor settings: Spring Preferences>Java>Editor>Save Action
+	When you import maven projects, please point to the root drum directory where the  parent pom is located (/apps/git/drum). 
 
-Make sure the following items checked:
+* Set Spring Source settings
+* SpringSource Tool > Preferences
 
-* Perform the following actions on Save:
-	* Format Source Code > Format All Lines
-	* Organize imports
-			
-
-	
+	* General:
+		* Workspace > New text file delimeter > Other > Windows
+		* Workspace > Text file encoding > Other UTF-8
+		* Workspace 
+			* Selected - Build Automatically 
+			* Selected - Refresh using native hooks or polling
+	* Maven 
+		 * Unselected - Do not automatically update dependencies from remote repositories
+         * Selected - Download Artifact Sources
+         * Selected - Download Artifact JavaDoc
+    * Java
+    	* Code Style > Formatter
+        	* Import [DSpace formatter](https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-CodingConventions) and set as Active profile.
+        * Editor
+        	* Save Actions
+        	* Selected - Perform the selected actions on save
+            	* Format source code > Format all lines
+            * Organize imports
+            * Additional actions (Press configure)
+                * Code Organizing
+                 * Remove trailing whitespace > All lines
+                 * Correct indentation
+                 
+ We skip the Web and XML setup for Drum as we usually for the other projects.
 
 
 

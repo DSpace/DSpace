@@ -145,7 +145,7 @@ Please, add bash script directives at the beginning of the file.
 export CATALINA_HOME=/apps/servers/drum/tomcat411
 export CATALINA_BASE=/apps/servers/drum/tomcat411
 
-export SOLR_HOME=/apps/drum-new/solr
+export SOLR_HOME=/apps/drum/solr
 export CATALINA_OPTS="-Dsolr.solr.home=${SOLR_HOME}"
 
 export JAVA_OPTS="-Dsolr.solr.home=${SOLR_HOME}"
@@ -228,7 +228,7 @@ function drum41() {
 ```
 $ drum41
 ```
-[Drum User Development Profile - Configuration Reference](https://github.com/umd-lib/drum-new/blob/drum-develop/dspace/docs/DrumUserDevelopmentEnviromentProfile.md)
+[Drum User Development Profile - Configuration Reference](https://github.com/umd-lib/drum/blob/drum-develop/dspace/docs/DrumUserDevelopmentEnviromentProfile.md)
 
 ### Relational Database: PostgreSQL 8.4
 
@@ -241,7 +241,7 @@ Please, install [PostgeSQL 8.4 according to the instructions](Postgres8.4Install
 
 ```
 $ cd /apps/git
-$ git clone https://github.com/umd-lib/drum-new.git
+$ git clone https://github.com/umd-lib/drum.git
 
 ```
 Checkout drumn-develop branch
@@ -346,12 +346,12 @@ $ psql -U dspace -d dspace411
 ####DSpace Directory
 
 ```
-$ mkdir /apps/drum-new
+$ mkdir /apps/drum
 ```
 
 ####Initial Configuration
 
-Edit /apps/git/drum-new/build.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
+Edit /apps/git/drum/build.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
 
 By the time, you checkout the build.properties it will contain the properties setup.
 Please, pay attention to the value of the database password for the dspace user. You should replace it with the password you have given to the dspace user in the previous steps.
@@ -360,7 +360,7 @@ Please, pay attention to the value of the database password for the dspace user.
 * Configure initial properties
 
 ```
-$ /apps/git/drum-new
+$ /apps/git/drum
 $ vi build.properties
 
 ```
@@ -369,7 +369,7 @@ $ vi build.properties
 ```
 DSpace installation directory
 
-dspace.install.dir=/apps/drum-new
+dspace.install.dir=/apps/drum
 
 Solr Server location
 
@@ -386,7 +386,7 @@ db.password=
 
 
 ```
-$ cd /apps/git/drum-new/dspace
+$ cd /apps/git/drum/dspace
 $ mvn -U clean package
 ```
 
@@ -395,7 +395,7 @@ $ mvn -U clean package
 * Do a fresh install of the code, preserving any data
 
 ```
-$ cd /apps/git/drum-new/dspace/target/dspace-4.1-build
+$ cd /apps/git/drum/dspace/target/dspace-4.1-build
 $ ant install_code
 ```
 
@@ -408,7 +408,7 @@ $ ant update
 * Project help
 
 ```
-$ cd /apps/git/drum-new/dspace/target/dspace-4.1-build
+$ cd /apps/git/drum/dspace/target/dspace-4.1-build
 $ ant -projecthelp
 ```
 
@@ -428,10 +428,10 @@ $ mv solr-4.4.0 solr44
 $ cd solr44/
 $ cd dist
 $ ls
-$ cp solr-4.4.0.war /apps/drum-new/solr/solr.war
-$ mkdir /apps/drum-new/solrlib
-$ cp -R /apps/tools/solr/solr44/dist /apps/drum-new/solrlib
-$ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
+$ cp solr-4.4.0.war /apps/drum/solr/solr.war
+$ mkdir /apps/drum/solrlib
+$ cp -R /apps/tools/solr/solr44/dist /apps/drum/solrlib
+$ cp -R /apps/tools/solr/solr44/contrib /apps/drum/solrlib
 
 ```
 
@@ -440,7 +440,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 	* Search core
 	
 	```
-	$ cd /apps/drum-new/solr/search/conf
+	$ cd /apps/drum/solr/search/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -448,17 +448,17 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 	
 	
 	```
-	 <lib dir="/apps/drum-new/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
+	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
   
 	```
 	
@@ -466,7 +466,7 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 * Oai core
 	
 	```
-	$ cd /apps/drum-new/solr/oai/conf
+	$ cd /apps/drum/solr/oai/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -474,23 +474,23 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 	
 	
 	```
-	 <lib dir="/apps/drum-new/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
+	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
   	```
 	
 * Statistics core
 	
 	```
-	$ cd /apps/drum-new/solr/statistics/conf
+	$ cd /apps/drum/solr/statistics/conf
 	$ vi solrconfig.xml
 	
 	```
@@ -498,17 +498,17 @@ $ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solrlib
 	
 	
 	```
-	 <lib dir="/apps/drum-new/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
+	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-langid-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
 
-     <lib dir="/apps/drum-new/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum-new/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
+     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
+     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
   
 	```
 	
@@ -523,14 +523,14 @@ $ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ##### Create soft links for the Drum 4.1 web-applications
 
 ```
-$ ln -s /apps/drum-new/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
-$ ln -s /apps/drum-new/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
-$ ln -s /apps/drum-new/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
-$ ln -s /apps/drum-new/webapps/oai /apps/servers/drum/tomcat411/webapps/oai
-$ ln -s /apps/drum-new/webapps/lni /apps/servers/drum/tomcat411/webapps/lni
-$ ln -s /apps/drum-new/webapps/rest /apps/servers/drum/tomcat411/webapps/rest
-$ ln -s /apps/drum-new/webapps/sword /apps/servers/drum/tomcat411/webapps/sword
-$ ln -s /apps/drum-new/webapps/swordv2 /apps/servers/drum/tomcat411/webapps/swordv2
+$ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
+$ ln -s /apps/drum/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
+$ ln -s /apps/drum/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
+$ ln -s /apps/drum/webapps/oai /apps/servers/drum/tomcat411/webapps/oai
+$ ln -s /apps/drum/webapps/lni /apps/servers/drum/tomcat411/webapps/lni
+$ ln -s /apps/drum/webapps/rest /apps/servers/drum/tomcat411/webapps/rest
+$ ln -s /apps/drum/webapps/sword /apps/servers/drum/tomcat411/webapps/sword
+$ ln -s /apps/drum/webapps/swordv2 /apps/servers/drum/tomcat411/webapps/swordv2
 ```
 
 ###Start DRUM 4.1 Tomcat Instance
@@ -546,15 +546,43 @@ $ ./control start
 Run command from the Drum 4.1 installation directory (Tomcat & Solr should be up and running)
 
 ```
-$ cd /apps/drum-new 
+$ cd /apps/drum 
 $ bin/dspace index-discovery -f
 ```
 
 * Create administrator account (optional, unlless you have UMD CAS account in the current  DSpace with Administrator permissions). Please, note the user account is identified by email id.
 
 ```
-$ cd /apps/drum-new 
+$ cd /apps/drum 
 $ bin/dspace create-administrator
+```
+
+### Quick Build/Redeploy
+
+Please, enable drum 4.1 functions in the local profile as described in this [document](DrumUserDevelopmentEnviromentProfile.md), source your local profile, switch to drum41 environment and run shortcut commands.
+
+* Source profile
+
+```
+$ source ~/.profile
+```
+
+* Switch to the Drum 4.1 environment
+
+```
+$ drum41
+```
+
+* Build package
+
+```
+$ dp
+```
+
+* Build package & Redeploy with Tomcat clean-up/restart
+
+```
+$ dup
 ```
 
 ##<a name="validate-installation"></a>Check DRUM 4.1 Installation
@@ -571,13 +599,21 @@ $ bin/dspace create-administrator
 	* Look at the Solr Core Tab (ensure all cores: search, statistics, oai are running)
 	* Consult Tomcat/Solr/Dspace logs if needed
 	
-	    * DSpace and Solr logs
+	* DSpace and Solr logs
 	    
 		```
-		$ cd /apps/drum-new/log 
+		$ cd /apps/drum/log 
 		$ tail -f solr.log
 		$
 		``` 
 
+   * Tomcat logs
+   
+  		```
+		$ cd /apps/servers/drum/tomcat411/
+		$ tail -f -catalina.out
+		$
+		```  
+		   
 * Login as Administrator and create community, collection, submit an item to the collection.
 
