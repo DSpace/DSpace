@@ -9,10 +9,13 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 
 /**
  * Abstract base class for DSpace objects
@@ -161,4 +164,58 @@ public abstract class DSpaceObject
     {
         return null;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getID();
+    }
+
+    /**
+     * expects a two part string as parameter: TYPE.ID, where TYPE is a DSpaceObject type and
+     * ID is the object id, handle,  group name, or Eperson's netid
+     *
+     * returns DSpaceObject that corresponds to string or null
+     * @param str    must have format TYPE.ID
+     * @return
+     */
+    public static DSpaceObject fromString(Context c, String str) throws SQLException {
+        if (str == null) {
+            return null;
+        }
+        String[] splits = StringUtils.split(str, '.');
+        if (splits.length < 2) {
+            // this could be a handle
+            return HandleManager.resolveToObject(c, str);
+        } else {
+            int typeId = Constants.getTypeID(splits[0].toUpperCase());
+            if (typeId == -1) {
+                // not one of the DSPaceObject types
+                return null;
+            }
+
+            try {
+                int id = Integer.parseInt(splits[1]);
+                return DSpaceObject.find(c, typeId, id);
+            } catch (NumberFormatException ne) {
+                switch (typeId) {
+                    case Constants.EPERSON: {
+                        DSpaceObject person = EPerson.findByNetid(c, splits[1]);
+                        if (person == null) {
+                            String email = str.substring(splits[0].length() + 1);
+                            try {
+                                person = EPerson.findByEmail(c, email);
+                            } catch (AuthorizeException e) {
+                                person = null;
+                            }
+                        }
+                        return person;
+                    }
+                    case Constants.GROUP:
+                        return Group.findByName(c, splits[1]);
+                    default:
+                        return null;
+                }
+            }
+        }
+    }
+
 }
