@@ -550,6 +550,13 @@ $ cd /apps/drum-new
 $ bin/dspace index-discovery -f
 ```
 
+* Create administrator account (optional, unlless you have UMD CAS account in the current  DSpace with Administrator permissions). Please, note the user account is identified by email id.
+
+```
+$ cd /apps/drum-new 
+$ bin/dspace create-administrator
+```
+
 ##<a name="validate-installation"></a>Check DRUM 4.1 Installation
 
 
@@ -562,7 +569,15 @@ $ bin/dspace index-discovery -f
 * Check DRUM Solr Instance
 	* [DRUM 4.1 Solr](http://localhost:8080/solr/#/)
 	* Look at the Solr Core Tab (ensure all cores: search, statistics, oai are running)
-	* Consult Tomcat/Solr logs if needed
+	* Consult Tomcat/Solr/Dspace logs if needed
+	
+	    * DSpace and Solr logs
+	    
+		```
+		$ cd /apps/drum-new/log 
+		$ tail -f solr.log
+		$
+		``` 
 
 * Login as Administrator and create community, collection, submit an item to the collection.
 
