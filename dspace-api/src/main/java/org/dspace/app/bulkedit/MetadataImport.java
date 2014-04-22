@@ -114,13 +114,9 @@ public class MetadataImport
 
                     // Has it moved collection?
                     List<String> collections = line.get("collection");
-                    if (collections != null)
+                    if (collections != null && collections.size() > 0 )
                     {
                         // Sanity check we're not orphaning it
-                        if (collections.size() == 0)
-                        {
-                            throw new MetadataImportException("Missing collection from item " + item.getHandle());
-                        }
                         Collection[] actualCollections = item.getCollections();
                         compare(item, collections, actualCollections, whatHasChanged, change);
                     }

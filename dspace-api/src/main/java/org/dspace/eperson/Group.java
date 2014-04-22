@@ -1425,4 +1425,10 @@ public class Group extends DSpaceObject
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }

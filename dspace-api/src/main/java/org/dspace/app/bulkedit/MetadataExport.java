@@ -254,7 +254,6 @@ public class MetadataExport
                 System.exit(1);
             }
         }
-        System.out.println("EXPORT");
 
         // Perform the export
         DSpaceCSV csv = exporter.export();
