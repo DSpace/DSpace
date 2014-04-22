@@ -11,6 +11,7 @@
 package ar.edu.unlp.sedici.dspace.curation.preservationHierarchy.preservationRules;
 
 
+
 public abstract class Rule {
-	public abstract int evaluate(org.dspace.content.Item item);
+	public abstract int evaluate(org.dspace.content.Item item, ar.edu.unlp.sedici.dspace.curation.preservationHierarchy.Reporter reporter);
 }
