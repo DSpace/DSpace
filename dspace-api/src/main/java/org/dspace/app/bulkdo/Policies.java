@@ -181,7 +181,7 @@ public class Policies {
 
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
                 Printer p = args.getPrinter();
-                pols.apply(p, lister.getTargets(args.getType()));
+                pols.apply(p, lister.getTargets(args.getType(), false));
             }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");

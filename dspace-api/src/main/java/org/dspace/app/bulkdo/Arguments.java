@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.app.util.Util;
 
 import java.sql.SQLException;
