@@ -429,88 +429,11 @@ $ cd solr44/
 $ cd dist
 $ ls
 $ cp solr-4.4.0.war /apps/drum/solr/solr.war
-$ mkdir /apps/drum/solrlib
-$ cp -R /apps/tools/solr/solr44/dist /apps/drum/solrlib
-$ cp -R /apps/tools/solr/solr44/contrib /apps/drum/solrlib
+$ cp -R /apps/tools/solr/solr44/dist /apps/drum-new/solr
+$ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solr
 
 ```
 
-* Configure drum solr cores
-
-	* Search core
-	
-	```
-	$ cd /apps/drum/solr/search/conf
-	$ vi solrconfig.xml
-	
-	```
-	* Replace lib block (point to the correct location of solr libs)
-	
-	
-	```
-	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
-  
-	```
-	
-
-* Oai core
-	
-	```
-	$ cd /apps/drum/solr/oai/conf
-	$ vi solrconfig.xml
-	
-	```
-	* Replace lib block (point to the correct location of solr libs)
-	
-	
-	```
-	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
-  	```
-	
-* Statistics core
-	
-	```
-	$ cd /apps/drum/solr/statistics/conf
-	$ vi solrconfig.xml
-	
-	```
-	* Replace lib block (point to the correct location of solr libs)
-	
-	
-	```
-	 <lib dir="/apps/drum/solrlib/contrib/extraction/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist/" regex="solr-cell-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/clustering/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-clustering-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/langid/lib/" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-langid-\d.*\.jar" />
-
-     <lib dir="/apps/drum/solrlib/contrib/velocity/lib" regex=".*\.jar" />
-     <lib dir="/apps/drum/solrlib/dist" regex="solr-velocity-\d.*\.jar" />
-  
-	```
 	
 * Copy solr libraries to the DRUM 4.1 Tomcat instance
 
