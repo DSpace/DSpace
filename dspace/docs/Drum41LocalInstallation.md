@@ -386,7 +386,7 @@ db.password=
 
 
 ```
-$ cd /apps/git/drum/dspace
+$ cd /apps/git/drum
 $ mvn -U clean package
 ```
 
@@ -429,8 +429,8 @@ $ cd solr44/
 $ cd dist
 $ ls
 $ cp solr-4.4.0.war /apps/drum/solr/solr.war
-$ cp -R /apps/tools/solr/solr44/dist /apps/drum-new/solr
-$ cp -R /apps/tools/solr/solr44/contrib /apps/drum-new/solr
+$ cp -R /apps/tools/solr/solr44/dist /apps/drum/solr
+$ cp -R /apps/tools/solr/solr44/contrib /apps/drum/solr
 
 ```
 
@@ -461,7 +461,6 @@ $ ln -s /apps/drum/webapps/swordv2 /apps/servers/drum/tomcat411/webapps/swordv2
 ```
 $ cd /apps/servers/drum/tomcat411
 $ ./control start
-
 ```
 
 * Refresh Browse and Search Indexes
@@ -527,7 +526,6 @@ $ dup
 		```
 		$ cd /apps/drum/log 
 		$ tail -f solr.log
-		$
 		``` 
 
    * Tomcat logs
