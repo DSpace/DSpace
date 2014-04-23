@@ -96,10 +96,7 @@ function dmvn() {
 function dant() {
   (/apps/servers/drum/tomcat411/control stop;
    cd /apps/git/drum/dspace/target/dspace-*.*-build/;
-   cp -R /apps/drum/solr /apps/drum/solr.back;
    ant "$@";
-   cp -R /apps/drum/solr.back /apps/drum-new/solr;
-   rm /apps/drum/webapps/jspui/WEB-INF/lib/jsp-api-2.0.jar;
    rm -rf /apps/servers/drum/tomcat411/work/Catalina/localhost;
    /apps/servers/drum/tomcat411/control start)
 }
