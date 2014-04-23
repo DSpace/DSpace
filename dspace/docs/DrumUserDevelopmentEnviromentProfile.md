@@ -90,7 +90,7 @@ function drum41() {
 }
 
 function dmvn() {
-  (cd /apps/git/drum/dspace; pwd; mvn "$@")
+    (cd /apps/git/drum; pwd; mvn "$@")
 }
 
 function dant() {
@@ -99,13 +99,14 @@ function dant() {
    cp -R /apps/drum/solr /apps/drum/solr.back;
    ant "$@";
    cp -R /apps/drum/solr.back /apps/drum-new/solr;
-   rm /apps/drum-new/webapps/jspui/WEB-INF/lib/jsp-api-2.0.jar;
+   rm /apps/drum/webapps/jspui/WEB-INF/lib/jsp-api-2.0.jar;
    rm -rf /apps/servers/drum/tomcat411/work/Catalina/localhost;
    /apps/servers/drum/tomcat411/control start)
 }
 
-alias dup="dmvn package && dant update"
-alias dp="dmvn package"
+alias dup="dmvn clean package && dant update"
+alias dp="dmvn clean package"
+
 
 ```
 
