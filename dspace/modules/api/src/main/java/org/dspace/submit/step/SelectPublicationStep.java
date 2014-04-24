@@ -266,6 +266,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                     return ERROR_SELECT_JOURNAL;
                 }
+                if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW)
+                {
+
+                   item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
+                   item.update();
+
+                }
             }
             EventLogger.log(context, "submission-select-publication", "status=complete");
 
@@ -450,6 +457,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                             //    - all the others ==> go through entering in PublicationDescriptionStep
                             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
                                 if(pBean.getStatus()!=null && (pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED))){
+                                    if(pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) ) {
+                                        item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
+                                        item.update();
+                                    }
                                     request.getSession().setAttribute("submit_error", "Invalid manuscript number.");
                                     return false;
                                 }
