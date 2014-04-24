@@ -17,37 +17,63 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:doc="http://www.lyncode.com/xoai">
 	<xsl:output indent="yes" method="xml" omit-xml-declaration="yes" />
 
+	<xsl:include href="driver-commons.xsl"/>
+
+	<xsl:template match="/doc:metadata">
+	  <doc:metadata>
+	  	
+	  	<xsl:variable name="subtype" select="doc:element[@name='sedici']/doc:element[@name='subtype']/doc:element/doc:field/text()"/>
+		<xsl:variable name="context" select="'driver'"/>
+	  	
+	  	<xsl:call-template name="sedici-identifier">
+			<xsl:with-param name="handle" select="doc:element[@name='others']/doc:field[@name='handle']/text()"/>
+			<xsl:with-param name="context-name" select="$context"/>
+		</xsl:call-template>
+	  	
+	  	<xsl:call-template name="accessRightsAndEmbargo" >
+			<xsl:with-param name="liftDate" select="doc:element[@name='sedici']/doc:element[@name='embargo']/doc:element[@name='liftDate']/doc:element/doc:field/text()"/>
+			<xsl:with-param name="context-name" select="$context"/>
+		</xsl:call-template>
+		
+		<xsl:call-template name="driver-type">
+			<xsl:with-param name="subtype" select="$subtype"/>
+		</xsl:call-template>
+		
+		<xsl:call-template name="driver-version">
+			<xsl:with-param name="subtype" select="$subtype"/>
+		</xsl:call-template>
+	  
+	  	<xsl:apply-templates select="@*|node()" />
+	  
+	  </doc:metadata>
+	</xsl:template>
+	
 	<xsl:template match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()" />
 		</xsl:copy>
 	</xsl:template>
  
- 	<!-- Formatting dc.date.issued -->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field/text()">
-		<xsl:call-template name="formatdate">
-			<xsl:with-param name="datestr" select="." />
-		</xsl:call-template>
-	</xsl:template>
-	
-	<!-- Removing other dc.date.* -->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued']" />
-
 	<!-- Prefixing dc.type -->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field/text()">
-		<xsl:call-template name="addPrefix">
-			<xsl:with-param name="value" select="." />
-			<xsl:with-param name="prefix" select="'info:eu-repo/semantics/'"></xsl:with-param>
-		</xsl:call-template>
-	</xsl:template>
+<!-- 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field/text()"> -->
+<!-- 		<xsl:call-template name="addPrefix"> -->
+<!-- 			<xsl:with-param name="value" select="." /> -->
+<!-- 			<xsl:with-param name="prefix" select="'info:eu-repo/semantics/'"></xsl:with-param> -->
+<!-- 		</xsl:call-template> -->
+<!-- 	</xsl:template> -->
+		
+	
+	<!-- Silenciamos cualquier tipo de dc.format ya que no cumplen con el vocabulario para mimetype de IANA.-->
+	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element"/>
 	
 	<!-- Prefixing and Modifying dc.rights -->
 	<!-- Removing unwanted -->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element" />
+<!-- 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:element" /> -->
 	<!-- Replacing -->
-	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field/text()">
-		<xsl:text>info:eu-repo/semantics/openAccess</xsl:text>
-	</xsl:template>
+<!-- 	<xsl:template match="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field/text()"> -->
+<!-- 		<xsl:text>info:eu-repo/semantics/openAccess</xsl:text> -->
+<!-- 	</xsl:template> -->
+
 	
 
 
@@ -67,12 +93,4 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<!-- Date format -->
-	<xsl:template name="formatdate">
-		<xsl:param name="datestr" />
-		<xsl:variable name="sub">
-			<xsl:value-of select="substring($datestr,1,10)" />
-		</xsl:variable>
-		<xsl:value-of select="$sub" />
-	</xsl:template>
 </xsl:stylesheet>

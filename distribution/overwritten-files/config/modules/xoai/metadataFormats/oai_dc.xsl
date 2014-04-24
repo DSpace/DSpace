@@ -24,8 +24,8 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 			
-			<!--snrd.identifier.handle = identifier -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='identifier']/doc:element[@name='handle']/doc:element/doc:field[@name='value']">
+			<!--(snrd|driver|openaire).identifier.handle = identifier -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd' or @name='driver' or @name='openaire']/doc:element[@name='identifier']/doc:element[@name='handle']/doc:element/doc:field[@name='value']">
 				<dc:identifier><xsl:value-of select="." /></dc:identifier>
 			</xsl:for-each>
 			
@@ -174,18 +174,18 @@
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
 			
-			<!--snrd.type.driver = type -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='driver']/doc:element/doc:field[@name='value']">
+			<!--driver.type = type -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
  			
-			<!--snrd.type.snrd = type -->
- 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='snrd']/doc:element/doc:field[@name='value']">
+			<!--snrd.type = type -->
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
 
-			<!--snrd.type.version = type -->
- 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='type']/doc:element[@name='version']/doc:element/doc:field[@name='value']">
+			<!--driver.type.version = type -->
+ 			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='type']/doc:element[@name='version']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
 			</xsl:for-each>
 			
@@ -200,13 +200,15 @@
 			</xsl:for-each>
 
 			<!-- AccessType de OpenAire opcional -->
-			<!-- snrd.rights.accessRights = rights -->	
-			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='rights']/doc:element[@name='accessRights']/doc:element/doc:field[@name='value']">
+			<!-- driver.rights.accessRights = rights - for SNRD and DRIVER-->	
+			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='rights']/doc:element[@name='accessRights']/doc:element/doc:field[@name='value']">
 				<dc:rights><xsl:value-of select="." /></dc:rights>
 			</xsl:for-each>
 			
-			
-			<!-- snrd.rights.embargoEndDate = rights -->	
+			<!-- (driver|snrd|openaire).rights.embargoEndDate = rights -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='driver' or @name='openaire']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
+				<dc:date><xsl:value-of select="." /></dc:date>
+			</xsl:for-each>
 			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
 				<dc:rights><xsl:value-of select="." /></dc:rights>
 			</xsl:for-each>

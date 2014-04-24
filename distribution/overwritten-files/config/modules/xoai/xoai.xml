@@ -33,14 +33,28 @@
 			<Transformer refid="driverTransformer"/>
 			<!-- Title : Mandatory -->
 			<Filter refid="titleexistsFilter" />
-			<!-- Author : Mandatory -->
+			<!-- Creator : Mandatory -->
 			<Filter refid="authorexistsFilter"/>
-			<!-- Possible Document Type -->
-			<Filter refid="driverdocumenttypeFilter"/>
-			<!-- dc.rights must contain openAccess token -->
-			<Filter refid="driveraccessFilter"/>
+			<!-- Possible Document Type : Mandatory -->
+			<Filter refid="driverDocumentSubtypeFilter"/>
+			<!-- Hay bitstreams asociados al item? -->
+			<!-- Localización electrónica (en caso de ser material externo)? -->
+			<Filter refid="driverBundleOriginalOLocalizacionElectronica"/>
+			<!-- Identifier : Mandatory / Sólo alcanza-basta con el dc.identifier.uri - En el repositorio, todos lo tienen por definición-->
 			<!-- Open Access (Downloadable) -->
-			<Filter refid="bitstreamaccessFilter"/>
+		<!-- Éste filtro es quitado debido a que el mismo muestra o no un item según el permiso de LECTURA que tengan todos sus bundles. Si al menos uno de los bundles no tiene permiso de LECTURA, el recurso se considera 'NO accesible'. Como estos permisos puede ser modificados desde la administración, y dicha acción puede ser propenso a desencadenar errores, entonces este filtro no es aplicado en este contexto.-->
+<!-- 			<Filter refid="bitstreamaccessFilter"/> -->
+			<!-- Date : Mandatory  -->
+			<Filter refid="driverDateExistsFilter" />
+			<!-- Language : -->
+			<!-- No filtro por language, porque: o bien todo registro tiene language o está por defecto en español -->
+			<!-- Éste filtro no aplica, ya que verifica que los tipos de documentos coincidan con los definidos en info-eu-repo. Como los tipos que se almacenan en el repositorio son de criterio propio y no respetan completamente los tipos definidos en el estandar, entonces éste filtro es quitado. -->
+<!-- 			<Filter refid="driverdocumenttypeFilter"/>  -->
+			<!-- dc.rights must contain openAccess token -->
+			<!-- RIGHTS : Mandatory -->
+			<!-- Debe existir al menos un dc:rights con algún tipo de AccessRight definido por la info-eu-repo. Mediante la utilización del transformer driver.xsl, se garantizá que siempre exista.-->
+<!-- 			<Filter refid="driveraccessFilter"/>  -->
+			
 			<!-- Just an alias, if fact it returns all items within the driver context -->
 			<Set refid="driverSet" />
 			<!-- Metadata Formats -->
@@ -61,14 +75,26 @@
 		<Context baseurl="openaire">
 			<!-- Date format, field prefixes, etc are ensured by the transformer -->
 			<Transformer refid="openaireTransformer" />
-			<!-- Title : Mandatory -->
+			<!-- TITLE : Mandatory -->
 			<Filter refid="titleexistsFilter" />
-			<!-- Author : Mandatory -->
+			<!-- CREATOR : Mandatory -->
 			<Filter refid="authorexistsFilter"/>
-			<!-- Possible Document Type (same as Driver)-->
-			<Filter refid="driverdocumenttypeFilter"/>
+			<!-- Possible DOCUMENT TYPE (same as Driver)-->
+			<Filter refid="driverDocumentSubtypeFilter"/>
+<!-- 			<Filter refid="driverdocumenttypeFilter"/> -->
+			<!-- Hay bitstreams asociados al item? -->
+			<!-- Localización electrónica (en caso de ser material externo)? -->
+			<Filter refid="driverBundleOriginalOLocalizacionElectronica"/>
+			<!-- DATE : Mandatory  -->
+			<Filter refid="driverDateExistsFilter" />
+			<!-- IDENTIFIER : Mandatory - Siempre existe en nuestro repositorio para cada item. -->
+			
+			<!-- RIGHTS : Mandatory -->
+			<!-- Debe existir al menos un dc:rights con algún tipo de AccessRight definido por la info-eu-repo. Mediante la utilización del transformer driver.xsl, se garantizá que siempre exista.-->
+			
 			<!-- dc.relation must has the specified prefix -->
-			<Filter refid="openairerelationFilter" />
+			<!-- Este filtro no es usado. Se basa en la utilización del concepto Project Identifier, el cual no es utilizado en nuestro repositorio. -->
+<!-- 			<Filter refid="openairerelationFilter" /> -->
 			<!-- Just an alias, if fact it returns all items within the driver context -->
 			<Set refid="openaireSet" />
 			<!-- Metadata Formats -->
@@ -256,6 +282,20 @@
 				<Value>info:eu-repo/semantics/other</Value>
 			</Parameter>
 		</Filter>
+		
+		<Filter id="driverBundleOriginalOLocalizacionElectronica">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DspaceExistsBundleOriginalOrElectronicLocationFilter</Class>
+		</Filter>
+		
+		<!-- Sólo se considera fecha de publicación o de exposición (en el caso de las tesis) -->
+		<Filter id="driverDateExistsFilter">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DSpaceAnyMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>sedici.date.exposure</Value>
+				<Value>dc.date.issued</Value>
+			</Parameter>
+		</Filter>
+		
 		<Filter id="driveraccessFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
@@ -269,6 +309,47 @@
 				<Value>openAccess</Value>
 			</Parameter>
 		</Filter>
+		
+		<!-- Dejamos tanto objetos textuales como no textuales. Instrumento musical no se exporta -->
+		<Filter id="driverDocumentSubtypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.subtype</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Documento de trabajo</Value>
+				<Value>Preprint</Value>
+				<Value>Articulo</Value>
+				<Value>Comunicacion</Value>
+				<Value>Revision</Value>
+				<Value>Contribuciones a revistas</Value>
+				<Value>Informe tecnico</Value>
+				<Value>Patente</Value>
+				<Value>Tesis de doctorado</Value>
+				<Value>Tesis de maestria</Value>
+				<Value>Tesis de grado</Value>
+				<Value>Libro</Value>
+				<Value>Capitulo de libro</Value>
+				<Value>Objeto de conferencia</Value>
+				<Value>Documento institucional</Value>
+				<Value>Resolucion</Value>
+				<Value>Imagen fija</Value>
+				<Value>Imagen en movimiento</Value>
+				<Value>Audio</Value>
+				<Value>Entrevista</Value>
+				<Value>Musica</Value>
+				<Value>Discurso</Value>
+				<Value>Testimonio</Value>
+				<Value>Clase</Value>
+				<Value>Trabajo practico</Value>
+				<Value>Material complementario</Value>
+				<Value>Programa</Value>
+			</Parameter>
+		</Filter>
+		
 		<Filter id="bitstreamaccessFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAuthorizationFilter</Class>
 		</Filter>
