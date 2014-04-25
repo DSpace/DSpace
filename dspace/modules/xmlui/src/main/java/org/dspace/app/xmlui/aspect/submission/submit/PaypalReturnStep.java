@@ -70,7 +70,11 @@ public class PaypalReturnStep extends AbstractStep {
                     //find the correct shopping cart based on the secrue token
                     ShoppingCart shoppingCart = ShoppingCart.findBySecureToken(context,secureToken);
                     if(shoppingCart!=null){
-                        if("0".equals(result))
+                        // The transaction is successful if the result is 0 (Approved) OR if the
+                        // result is 4 (Invalid amount). Most cards will validate with an 0, but
+                        // American Express cards still don't validate correctly, so they return
+                        // 4 even when the card is fine.
+                        if("0".equals(result) || "4".equals(result))
                         {
                             //successful transaction
                             shoppingCart.setTransactionId(reference);
@@ -85,8 +89,10 @@ public class PaypalReturnStep extends AbstractStep {
                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
                                      Date now = new Date();
                                      shoppingCart.setOrderDate(now);
-                                 }
-				 else
+                                 } else if ("4".equals(result)) {
+                                     //authorization, but paypal isn't supporting our zero-dollar transaction
+                                     shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
+                                 } else
                                  {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                                      Date now = new Date();
