@@ -351,43 +351,71 @@ $ mkdir /apps/drum
 
 ####Initial Configuration
 
-Edit /apps/git/drum/build.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
+Copy /apps/git/drum/local.properties.template to local.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
 
-By the time, you checkout the build.properties it will contain the properties setup.
+The properties with value LOCAL in the local.properties file needs to updated with environment specific values.
 Please, pay attention to the value of the database password for the dspace user. You should replace it with the password you have given to the dspace user in the previous steps.
 
 
 * Configure initial properties
 
 ```
-$ /apps/git/drum
-$ vi build.properties
+$ cd /apps/git/drum
+$ cp local.properties.template local.properties
+$ vi local.properties
 
 ```
-* Set the following properties
+* Set the following in local.properties file
 
 ```
-DSpace installation directory
+# DSpace installation directory
 
 dspace.install.dir=/apps/drum
+dspace.hostname = localhost
+dspace.baseUrl = http://localhost:8080
 
-Solr Server location
+# Solr Server location
 
-solr.server=http://localhost:8080/solr
-Database properties
+solr.server = http://localhost:8080/solr
+
+# CAS LDAP CONFIGURATION 
+ldap.bind.auth = <ENTER-UMD-LDAP-AUTH-INFO-HERE>
+ldap.bind.password = <ENTER-UMD-LDAP-PASSWORD-HERE>
+
+# Database properties
 
 db.url=jdbc:postgresql://localhost:5432/dspace411
 db.username=dspace
-db.password=
+db.password=<ENTER-YOUR-DSPACE-DATABASE-PASSWORD-HERE>
+
+# EMAIL CONFIGURATION (optional in local)
+
+mail.server = <SMTP-SERVER-IP>
+
+mail.server.username=<SMTP-USERNAME-IF-REQUIRED-BY-SMTP-SERVER>
+mail.server.password=<SMTP-PASSWORD-IF-REQUIRED-BY-SMTP-SERVER>
+
+mail.from.address = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.feedback.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.admin = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.alert.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.registration.notify = <ENTER-AN-EMAIL-ADDRESS-HERE>
+
+
+# HANDLE CONFIGURATION 
+handle.prefix = 123456789
+
+
 
 ```
 
 ####Build the Installation Package
 
+The ```-Denv=local``` arguement will specify maven to use local.properties file instead of the default build.properties file while building dspace.
 
 ```
 $ cd /apps/git/drum
-$ mvn -U clean package
+$ mvn -U -Denv=local clean package
 ```
 
 ####Install DRUM code
