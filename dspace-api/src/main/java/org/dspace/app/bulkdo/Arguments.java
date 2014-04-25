@@ -35,6 +35,16 @@ class Arguments {
     public static String VERBOSE = "v";
     public static String VERBOSE_LONG = "verbose";
 
+    public static String ACTION = "a";
+    public static String ACTION_LONG = "action";
+
+    public static final String[] actionText = {"ADD", "DEL", "REPLACE", "LIST"};
+
+    public static final char DO_ADD = 'A';
+    public static final char DO_DEL = 'D';
+    public static final char DO_REPLACE = 'R';
+    public static final char DO_LIST = 'L';
+
     protected Options options = null;
     protected CommandLine line;
 
@@ -42,19 +52,48 @@ class Arguments {
     private DSpaceObject dobj = null;
     private int myType = -1;
     private int format = Printer.TXT_FORMAT;
-    private static String[] defaultKeys = { "object", "handle", "parent", "name"};
+    private static String[] defaultKeys = {"object", "handle", "parent", "name"};
     private String[] keys = defaultKeys;
     private boolean verbose;
+    private char doAction;
+    private char[] availableActions;
 
-    Arguments()  {
+    Arguments() {
+        this(null);
+    }
+
+    Arguments(char[] myAvailableActions) {
         options = new Options();
-
+        availableActions = myAvailableActions;
+        doAction = DO_LIST;
+        if (myAvailableActions != null && myAvailableActions.length > 0) {
+            doAction = myAvailableActions[0]; // the first is the default
+            if (myAvailableActions.length > 1) {
+                // there is actually a choice of what to do
+                String availableActionStrings = "";
+                for (int j = 0; j < myAvailableActions.length; j++) {
+                    if (j > 0)
+                        availableActionStrings += ", ";
+                    availableActionStrings += getActionString(myAvailableActions[j]);
+                }
+                options.addOption(ACTION, ACTION_LONG, true, "what to do, available " + availableActionStrings);
+            }
+        }
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
         options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
         options.addOption(HELP, HELP_LONG, false, "help");
+    }
+
+    private String getActionString(char action) {
+        for (int i = 0; i < actionText.length; i++) {
+            if (actionText[i].charAt(0) == action) {
+                return actionText[i];
+            }
+        }
+        return null;
     }
 
     public Context getContext() {
@@ -73,8 +112,8 @@ class Arguments {
         return dobj;
     }
 
-    public Options getOptions() {
-        return options;
+    public int getAction() {
+        return doAction;
     }
 
     public boolean getVerbose() {
@@ -85,13 +124,17 @@ class Arguments {
         return Printer.create(System.out, getFormat(), keys);
     }
 
+    public Options getOptions() {
+        return options;
+    }
+
     public void usage() {
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("Bulk Apply ActionTarget\n", options);
         System.out.println("");
 
         System.out.println("OPTION " + KEYS_LONG + ": ");
-        System.out.println("\tDefault: " + deepToString(defaultKeys) );
+        System.out.println("\tDefault: " + deepToString(defaultKeys));
         optionExplainKeys();
         System.out.println("");
 
@@ -99,7 +142,7 @@ class Arguments {
     }
 
     protected void optionExplainKeys() {
-        System.out.println("\tAvailable Keys depend on the type of object being printed" );
+        System.out.println("\tAvailable Keys depend on the type of object being printed");
         System.out.println("\t\t" + Constants.typeText[Constants.COLLECTION] + ":" + deepToString(ActionTarget.availableKeys(Constants.COLLECTION)));
         System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)));
         System.out.println("\t\t" + Constants.typeText[Constants.BUNDLE] + ":" + deepToString(ActionTarget.availableKeys(Constants.BUNDLE)));
@@ -174,6 +217,23 @@ class Arguments {
                     Constants.typeText[dobj.getType()]);
         }
 
+        if (line.hasOption(ACTION)) {
+            String actionStr = line.getOptionValue(ACTION).toUpperCase();
+            int i = -1;
+            if (actionStr == null || actionStr.isEmpty()) {
+                actionStr = ""; // make it nice for error message
+            } else {
+                char action = actionStr.charAt(0);
+                for (i = 0; i < availableActions.length; i++) {
+                    if (availableActions[i] == action)
+                        break;
+                }
+            }
+
+            if (i < 0 || i == availableActions.length) {
+                throw new ParseException("No such action: '" + actionStr + "'");
+            }
+        }
         return true;
     }
 
