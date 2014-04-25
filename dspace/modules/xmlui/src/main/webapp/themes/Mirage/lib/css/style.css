@@ -2502,3 +2502,7 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 #aspect_submission_submit_OverviewStep_div_finalizedivision{
     padding-top: 6px;
 }
+
+#SpiderTrap p a{
+    color: transparent;
+}

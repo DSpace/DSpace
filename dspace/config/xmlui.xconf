@@ -86,6 +86,7 @@
 
 	    <aspect name="Shopping Cart" path="resource://aspects/PaymentSystem/"/>
 
+	    <aspect name="Spidert" path="resource://aspects/Spider/"/>
         <!--
             This aspect tests the various possible DRI features,
             it helps a theme developer create themes
