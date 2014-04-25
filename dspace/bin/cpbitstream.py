@@ -10,16 +10,10 @@ def doit():
     if (False and options.verbose): 
         print "DSPACE=" + str(DSPACE); 
         print "ARGS=" + str(options); 
+
     cmd = DSPACE['lister'].replace('ROOT', options.root) + " --type BITSTREAM --include object,mimeType,internalId"; 
-    cmdarray = cmd.split(); 
-    process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE); 
-    results =  process.communicate(); 
-    if (process.returncode != 0): 
-        sys.stderr.write("EXEC ERROR: " + cmd + "\n"); 
-        sys.stderr.write(results[1]); 
-        if (options.verbose): 
-            sys.stderr.write(results[0])
-        sys.exit(process.returncode); 
+    results = runCmd(cmd); 
+
     for line in results[0].split("\n"): 
        if (line.startswith("BITSTREAM")): 
             (bit, mime, internal) = line.split("\t"); 
@@ -29,12 +23,24 @@ def doit():
                     print "#SKIP " + line; 
             else:  
                 bitpath = topath(DSPACE, internal); 
-                tofile = options.dest + "/" + internal;
+                tofile = options.dest + "/" + bit;
                 print  "#COPY " + line + " " + tofile 
                 shutil.copy(bitpath, tofile); 
        elif (options.verbose): 
             print >> sys.stderr,  "#" + line; 
        
+
+def runCmd(cmd): 
+    cmdarray = cmd.split(); 
+    process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE); 
+    results =  process.communicate(); 
+    if (process.returncode != 0): 
+        sys.stderr.write("EXEC ERROR: " + cmd + "\n"); 
+        sys.stderr.write(results[1]); 
+        if (options.verbose): 
+            sys.stderr.write(results[0])
+        sys.exit(process.returncode); 
+    return results; 
 
 def topath(DSPACE, internalId): 
     internalId = internalId.rstrip(); 
