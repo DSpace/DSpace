@@ -23,7 +23,8 @@ def doit():
                     print "#SKIP " + line; 
             else:  
                 bitpath = topath(DSPACE, internal); 
-                tofile = options.dest + "/" + bit;
+                (what,ext) = mime.split("/")
+                tofile = options.dest + "/" + bit + "." + ext
                 print  "#COPY " + line + " " + tofile 
                 shutil.copy(bitpath, tofile); 
        elif (options.verbose): 
