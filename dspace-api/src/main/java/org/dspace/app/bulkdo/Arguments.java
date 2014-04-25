@@ -6,6 +6,7 @@ import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.app.util.Util;
+import org.dspace.eperson.EPerson;
 
 import java.sql.SQLException;
 
@@ -37,6 +38,9 @@ class Arguments {
 
     public static String ACTION = "a";
     public static String ACTION_LONG = "action";
+
+    public static String EPERSON = "e";
+    public static String EPERSON_LONG= "eperson";
 
     public static final String[] actionText = {"ADD", "DEL", "REPLACE", "LIST"};
 
@@ -81,6 +85,7 @@ class Arguments {
         }
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
+        options.addOption(EPERSON, EPERSON_LONG, true, "dspace user account - email or netid");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
         options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
@@ -134,7 +139,7 @@ class Arguments {
         System.out.println("");
 
         System.out.println("OPTION " + KEYS_LONG + ": ");
-        System.out.println("\tDefault: " + deepToString(defaultKeys));
+        System.out.println("\tDefault Print Keys: " + deepToString(defaultKeys));
         optionExplainKeys();
         System.out.println("");
 
@@ -234,6 +239,15 @@ class Arguments {
             if (i < 0 || i == availableActions.length) {
                 throw new ParseException("No such action: '" + actionStr + "'");
             }
+        }
+
+        if (line.hasOption(Arguments.EPERSON)) {
+            String person = line.getOptionValue(EPERSON);
+            EPerson user = (EPerson) DSpaceObject.fromString(getContext(), "EPerson." + person);
+            if (user == null) {
+                throw new ParseException("No such EPerson: " + person);
+            }
+            getContext().setCurrentUser(user);
         }
         return true;
     }

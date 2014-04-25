@@ -15,6 +15,13 @@
             <class>org.dspace.app.bulkdo.Lister</class>
         </step>
     </command>
+    <command>
+        <name>bulk-bitstream</name>
+        <description>Replace Bisttream File</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Bitstreams</class>
+        </step>
+    </command>
 
     <command>
         <name>checker</name>
