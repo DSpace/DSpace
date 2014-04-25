@@ -44,7 +44,7 @@ public class Policies {
 
     Policies(PolicyArguments args) throws SQLException {
         c = args.getContext();
-        action_id = args.action_id;
+        action_id = args.dspaceActionid;
         who = args.whoObj;
         verbose = args.getVerbose();
 
@@ -195,8 +195,8 @@ class PolicyArguments extends Arguments {
     public static String WHO = "w";
     public static String WHO_LONG = "who";
 
-    String action = Constants.actionText[Constants.READ];
-    int action_id;
+    String dspaceAction  = Constants.actionText[Constants.READ];
+    int dspaceActionid;
 
     String who = "GROUP." + Group.ANONYMOUS_ID;
     DSpaceObject whoObj; // EPerson or Group;
@@ -224,10 +224,10 @@ class PolicyArguments extends Arguments {
                 }
             }
             if (line.hasOption(DSPACE_ACTION)) {
-                action = line.getOptionValue(DSPACE_ACTION);
-                action_id = Constants.getActionID(action);
-                if (action_id < 0) {
-                    throw new ParseException(action + " is not a valid action");
+                dspaceAction = line.getOptionValue(DSPACE_ACTION);
+                dspaceActionid = Constants.getActionID(dspaceAction);
+                if (dspaceActionid < 0) {
+                    throw new ParseException(dspaceAction + " is not a valid action");
                 }
             }
 
