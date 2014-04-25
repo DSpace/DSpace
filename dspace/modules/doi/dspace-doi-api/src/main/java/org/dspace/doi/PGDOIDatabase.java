@@ -22,7 +22,7 @@ import org.dspace.storage.rdbms.*;
  */
 public class PGDOIDatabase implements org.springframework.beans.factory.InitializingBean{
     // This prefix is only used for test cases
-    final static String internalTestingPrefix = "10.5072-testprefix";
+    final static String INTERNAL_TESTING_PREFIX = "10.5072-testprefix";
 
     private static final String DOI_TABLE ="doi";
     private static final String COLUMN_DOI_ID = "doi_id";
@@ -209,7 +209,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
      * @throws SQLException 
      */
     private int deleteDOIRowsWithTestPrefix(Context context) throws SQLException {
-        int rowsDeleted = DatabaseManager.deleteByValue(context, DOI_TABLE, COLUMN_DOI_PREFIX, internalTestingPrefix);
+        int rowsDeleted = DatabaseManager.deleteByValue(context, DOI_TABLE, COLUMN_DOI_PREFIX, INTERNAL_TESTING_PREFIX);
         return rowsDeleted;
     }
 
