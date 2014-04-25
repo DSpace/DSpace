@@ -1,5 +1,8 @@
 package org.dspace.ark;
 
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,12 +12,6 @@ import java.net.URLConnection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import com.sun.tools.internal.ws.wsdl.document.jaxws.*;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-
-import javax.naming.ConfigurationException;
 
 /**
  * This class provides static methods for requesting ARK identifiers from
