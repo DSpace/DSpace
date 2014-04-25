@@ -206,7 +206,10 @@ public class ConfigurationManager
             // look in regular properties with module name prepended
             value = getProperty(module + "." + property);
         }
-
+        String retVal = (value != null) ? value.trim() : null;
+        if (log.isDebugEnabled()) {
+            log.debug(property + "=" + retVal);
+        }
         return (value != null) ? value.trim() : null;
     }
 
