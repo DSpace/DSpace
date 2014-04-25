@@ -112,7 +112,7 @@ class Arguments {
         return dobj;
     }
 
-    public int getAction() {
+    public char getAction() {
         return doAction;
     }
 
@@ -217,6 +217,7 @@ class Arguments {
                     Constants.typeText[dobj.getType()]);
         }
 
+        doAction = DO_LIST;
         if (line.hasOption(ACTION)) {
             String actionStr = line.getOptionValue(ACTION).toUpperCase();
             int i = -1;

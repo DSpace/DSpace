@@ -33,8 +33,8 @@ public class Policies {
 
     Context c;
 
-    int doit;
-    int action_id;
+    char action;
+    int dspaceActionId;
     DSpaceObject who;
 
     Boolean verbose;
@@ -44,17 +44,19 @@ public class Policies {
 
     Policies(PolicyArguments args) throws SQLException {
         c = args.getContext();
-        action_id = args.dspaceActionid;
+        dspaceActionId = args.dspaceActionid;
         who = args.whoObj;
         verbose = args.getVerbose();
 
-        propertyExists = "policy." + Constants.actionText[action_id];
-        if (doit != Arguments.DO_LIST) {
-            property = propertyExists + "." + doit;
+        action = args.getAction();
+
+        propertyExists = "policy." + Constants.actionText[dspaceActionId];
+        if (args.getAction() != Arguments.DO_LIST) {
+            property = propertyExists + "." + action;
             propertyBefore = propertyExists + "." + "before";
         }
 
-        switch (doit) {
+        switch (action) {
             case Arguments.DO_DEL:
             case Arguments.DO_ADD:
                 if (who == null || (who.getType() != Constants.EPERSON && who.getType() != Constants.GROUP)) {
@@ -68,9 +70,9 @@ public class Policies {
         if (targets == null || targets.length == 0) {
             log.info("Empty target/entity list");
         } else {
-            System.out.println("# " + doit + " policy." + Constants.actionText[action_id] +
+            System.out.println("# " + action + " policy." + Constants.actionText[dspaceActionId] +
                     " for " + targets.length + " DSPaceObjects");
-            switch (doit) {
+            switch (action) {
                 case Arguments.DO_ADD:
                 case Arguments.DO_DEL:
                     changePolicy(p, targets);
@@ -94,7 +96,7 @@ public class Policies {
     }
 
     private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), action_id);
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), dspaceActionId);
         HashMap<String, Object> map = target.toHashMap();
         map.put(prop, policies.toArray());
     }
@@ -113,7 +115,7 @@ public class Policies {
                 addPolicyInfo(targets[i],propertyBefore);
                 Object[] pols = (Object[]) map.get(propertyBefore);
 
-                if (doit == Arguments.DO_ADD) {
+                if (action == Arguments.DO_ADD) {
                     // see whether there is already a policy in place
                     int pi = 0;
                     for (; pi < pols.length; pi++) {
@@ -126,13 +128,13 @@ public class Policies {
                     if (pi == pols.length) {
                         // policy does not yet exist
                         if (who.getType() == Constants.EPERSON) {
-                            AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (EPerson) who);
+                            AuthorizeManager.addPolicy(c, targets[i].getObject(), dspaceActionId, (EPerson) who);
                         } else {
-                            AuthorizeManager.addPolicy(c, targets[i].getObject(), action_id, (Group) who);
+                            AuthorizeManager.addPolicy(c, targets[i].getObject(), dspaceActionId, (Group) who);
                         }
                         map.put(property, who);
                     }
-                } else if (doit == Arguments.DO_DEL) {
+                } else if (action == Arguments.DO_DEL) {
                     for (int pi = 0; pi < pols.length; pi++) {
                         ResourcePolicy pol = (ResourcePolicy) pols[pi];
                         if (pol.getGroup() == who || pol.getEPerson() == who) {
