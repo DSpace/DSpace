@@ -2,11 +2,11 @@ package org.dspace.app.bulkdo;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.*;
-import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by monikam on 4/11/14.
@@ -15,10 +15,12 @@ public class ActionTarget  {
 
     private DSpaceObject obj;
     private HashMap<String, Object> map;
+    private ActionTarget up;
 
-    ActionTarget(DSpaceObject o) {
+    ActionTarget(ActionTarget container, DSpaceObject o) {
         assert (o != null);
         obj = o;
+        up = container;
         map = null;
     }
 
@@ -26,17 +28,19 @@ public class ActionTarget  {
         return obj;
     }
 
-    public static ActionTarget create(DSpaceObject obj) {
+    public static ActionTarget create(ActionTarget container, DSpaceObject obj) {
         assert (obj != null);
         switch (obj.getType()) {
             case Constants.BITSTREAM:
-                return new BitstreamActionTarget(obj);
+                return new BitstreamActionTarget(container, obj);
             case Constants.BUNDLE:
-                return new BundleActionTarget(obj);
+                return new BundleActionTarget(container, obj);
             case Constants.ITEM:
-                return new ItemActionTarget(obj);
+                return new ItemActionTarget(container, obj);
             case Constants.COLLECTION:
-                return new CollectionActionTarget(obj);
+                return new CollectionActionTarget(container, obj);
+            case Constants.COMMUNITY:
+                return new ActionTarget(container, obj);
             default:
                 assert (false);
                 throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
@@ -62,19 +66,19 @@ public class ActionTarget  {
     }
 
 
-    public static ActionTarget[] createArray(DSpaceObject[] objArr) {
+    public static ArrayList<ActionTarget> createArray(ActionTarget up, DSpaceObject[] objArr) {
         assert (objArr != null);
-        ActionTarget[] arr = new ActionTarget[objArr.length];
+        ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.length);
         for (int i = 0; i < objArr.length; i++)
-            arr[i] = create(objArr[i]);
+            arr.add(create(up, objArr[i]));
         return arr;
     }
 
-    public static ActionTarget[] createsArray(ArrayList<DSpaceObject> objArr) {
+    public static ArrayList<ActionTarget> createsArray(ActionTarget up, ArrayList<DSpaceObject> objArr) {
         assert (objArr != null);
-        ActionTarget[] arr = new ActionTarget[objArr.size()];
+        ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.size());
         for (int i = 0; i < objArr.size(); i++)
-            arr[i] = create(objArr.get(i));
+            arr.add(create(up, objArr.get(i)));
         return arr;
     }
 
@@ -102,8 +106,8 @@ class CollectionActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"name", "template"};
 
-    CollectionActionTarget(DSpaceObject o) {
-        super(o);
+    CollectionActionTarget(ActionTarget up, DSpaceObject o) {
+        super(up, o);
         col = (Collection) o;
     }
 
@@ -125,8 +129,8 @@ class ItemActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"isWithdrawn", "name"};
 
-    ItemActionTarget(DSpaceObject o) {
-        super(o);
+    ItemActionTarget(ActionTarget up, DSpaceObject o) {
+        super(up, o);
         itm = (Item) o;
     }
 
@@ -135,6 +139,7 @@ class ItemActionTarget extends ActionTarget {
         HashMap<String, Object> map = super.toHashMap();
         map.put("isWithdrawn", itm.isWithdrawn());
         map.put("name", itm.getName());
+        System.err.println("toHashMap");
         return map;
     }
 }
@@ -144,8 +149,8 @@ class BundleActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"isWithdrawn", "isEmbargoed", "name"};
 
-    BundleActionTarget(DSpaceObject o) {
-        super(o);
+    BundleActionTarget(ActionTarget up, DSpaceObject o) {
+        super(up, o);
         bdl = (Bundle) o;
     }
 
@@ -167,8 +172,8 @@ class BitstreamActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"mimeType", "name", "size", "internalId", "checksum", "checksumAlgo"};
 
-    BitstreamActionTarget(DSpaceObject o) {
-        super(o);
+    BitstreamActionTarget(ActionTarget up, DSpaceObject o) {
+        super(up, o);
         bit = (Bitstream) o;
     }
 

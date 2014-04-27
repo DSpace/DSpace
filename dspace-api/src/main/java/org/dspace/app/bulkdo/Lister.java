@@ -8,13 +8,9 @@ import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
-
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import static java.util.Arrays.deepToString;
 
 /**
  * Created by monikam on 4/2/14.
@@ -29,7 +25,7 @@ public class Lister {
 
     // HACK
     public static final int NTARGETTYPE = 8;
-    ActionTarget[][] actionTargets = new ActionTarget[NTARGETTYPE][];
+    ArrayList<ActionTarget> actionTargets[] = new ArrayList[NTARGETTYPE];
 
     Lister(Context c, DSpaceObject root, int myType) throws SQLException {
         rootObject = root;
@@ -39,24 +35,24 @@ public class Lister {
         }
     }
 
-    public ActionTarget[] getTargets(int type, boolean workflowItems) throws SQLException {
+    public ArrayList<ActionTarget> getTargets(int type, boolean workflowItems) throws SQLException {
         assert (validType(type));
         if (null == actionTargets[type]) {
             switch (type) {
                 case Constants.COLLECTION:
-                    actionTargets[Constants.COLLECTION] = ActionTarget.createArray(listCollections());
+                    actionTargets[Constants.COLLECTION] = listCollections();
                     break;
                 case Constants.ITEM:
                     getTargets(Constants.COLLECTION, workflowItems);
-                    actionTargets[Constants.ITEM] = ActionTarget.createsArray(listItems(workflowItems));
+                    actionTargets[Constants.ITEM] = listItems(workflowItems);
                     break;
                 case Constants.BUNDLE:
                     getTargets(Constants.ITEM, workflowItems);
-                    actionTargets[Constants.BUNDLE] = ActionTarget.createsArray(listBundles());
+                    actionTargets[Constants.BUNDLE] = listBundles();
                     break;
                 case Constants.BITSTREAM:
                     getTargets(Constants.BUNDLE, workflowItems);
-                    actionTargets[Constants.BITSTREAM] = ActionTarget.createsArray(listBitstreams());
+                    actionTargets[Constants.BITSTREAM] = listBitstreams();
                     break;
                 default:
                     throw new RuntimeException("should never get here");
@@ -71,85 +67,81 @@ public class Lister {
 
     }
 
-    private Collection[] listCollections() throws SQLException {
-        Collection[] cols = null;
+    private ArrayList<ActionTarget>  listCollections() throws SQLException {
+        ArrayList<ActionTarget>  targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.COMMUNITY) {
             Community comm = (Community) rootObject;
-            cols = comm.getCollections();
+            Collection[] cols = comm.getCollections();
+            targets = ActionTarget.createArray(new ActionTarget(null, comm), cols);
         } else if (rootObject.getType() == Constants.COLLECTION) {
-            cols = new Collection[1];
-            cols[0] = (Collection) rootObject;
-        } else {
-            cols = new Collection[0];
+            targets.add(CollectionActionTarget.create(null, rootObject));
         }
-        log.info("Found " + cols.length + " collections");
-        return cols;
+        log.info("Found " + targets.size() + " collections");
+        return targets;
     }
 
-    private ArrayList<DSpaceObject> listItems(boolean workflowItem) throws SQLException {
-        ArrayList<DSpaceObject> items = null;
+    private ArrayList<ActionTarget> listItems(boolean workflowItem) throws SQLException {
+        ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.ITEM) {
              // TODO check whether  rootObj.is_workflowItem <==> workflowItem param
-            items = new ArrayList<DSpaceObject>(1);
-            items.add((Item) rootObject);
+            targets.add(new ItemActionTarget(null, rootObject));
         } else {
-            ActionTarget[] cols = actionTargets[Constants.COLLECTION];
-            items = new ArrayList<DSpaceObject>(cols.length * 4);
+            ArrayList<ActionTarget> cols = actionTargets[Constants.COLLECTION];
             if (workflowItem) {
-                for (int i = 0; i < cols.length; i++) {
-                    WorkspaceItem[] wis = WorkspaceItem.findByCollection(context, (Collection) cols[i].getObject());
+                for (int i = 0; i < cols.size(); i++) {
+                    WorkspaceItem[] wis = WorkspaceItem.findByCollection(context, (Collection) cols.get(i).getObject());
                     for (int j = 0; j < wis.length; j++) {
-                        items.add(wis[j].getItem());
+                        targets.add(ActionTarget.create(cols.get(i), wis[j].getItem()));
                     }
                 }
             } else {
-                for (int i = 0; i < cols.length; i++) {
+                for (int i = 0; i < cols.size(); i++) {
                     // items from collections and subcollections ???
-                    ItemIterator iter = ((Collection) cols[i].getObject()).getAllItems();
+                    ItemIterator iter = ((Collection) cols.get(i).getObject()).getAllItems();
                     while (iter.hasNext()) {
-                        items.add(iter.next());
+                        targets.add(ActionTarget.create(cols.get(i), iter.next()));
                     }
                 }
             }
         }
-        log.info("Found " + items.size() + " items");
-        return items;
+        log.info("Found " + targets.size() + " items");
+        return targets;
     }
 
-    private ArrayList<DSpaceObject> listBundles() throws SQLException {
-        ArrayList<DSpaceObject> bundles = null;
+    private ArrayList<ActionTarget> listBundles() throws SQLException {
+        ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.BUNDLE) {
-            bundles = new ArrayList<DSpaceObject>(1);
-            bundles.add((Bundle) rootObject);
+            targets.add(new BundleActionTarget(null, rootObject));
         } else {
-            ActionTarget[] items =actionTargets[Constants.ITEM];
+            ArrayList<ActionTarget> items = actionTargets[Constants.ITEM];
             // collect BUNDLES from items
-            bundles = new ArrayList<DSpaceObject>(items.length);
-            for (int i = 0; i < items.length; i++) {
-                Bundle[] bs = ((Item) items[i].getObject()).getBundles();
-                Collections.addAll(bundles, bs);
+            for (int i = 0; i < items.size(); i++) {
+                Bundle[] bundles = ((Item) items.get(i).getObject()).getBundles();
+                for (Bundle bdl : bundles) {
+                    targets.add(new BundleActionTarget(items.get(i), bdl));
+                }
             }
         }
-        log.info("Found " + bundles.size() + " bundles");
-        return bundles;
+        log.info("Found " + targets.size() + " bundles");
+        return targets;
     }
 
-    private ArrayList<DSpaceObject> listBitstreams() throws SQLException {
-        ArrayList<DSpaceObject> bitstreams = null;
+    private ArrayList<ActionTarget> listBitstreams() throws SQLException {
+        ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.BITSTREAM) {
-            bitstreams = new ArrayList<DSpaceObject>(1);
-            bitstreams.add((Bitstream) rootObject);
+            targets.add(new BitstreamActionTarget(null, rootObject));
         } else {
-            ActionTarget[] bundles = actionTargets[Constants.BUNDLE];
-            bitstreams = new ArrayList<DSpaceObject>(bundles.length);
+            ArrayList<ActionTarget>  bundles = actionTargets[Constants.BUNDLE];
             // collect BITSTREAMS from bundles
-            for (int i = 0; i < bundles.length; i++) {
-                Bitstream[] bits = ((Bundle) bundles[i].getObject()).getBitstreams();
-                Collections.addAll(bitstreams, bits);
+            for (ActionTarget bdl : bundles) {
+                Bitstream[] bits = ((Bundle) bdl.getObject()).getBitstreams();
+                for (Bitstream bit : bits) {
+                    targets.add(new BitstreamActionTarget(bdl, bit));
+                }
             }
         }
-        log.info("Found " + bitstreams.size() + " bitstreams");
-        return bitstreams;
+        log.info("Found " + targets.size() + " bitstreams");
+        return targets;
     }
 
 
@@ -163,12 +155,12 @@ public class Lister {
         try {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
-                ActionTarget[] targets = lister.getTargets(args.getType(), args.doWorkflowItems);
+                ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.doWorkflowItems);
 
-                log.debug("# " + targets.length + " type=" + args.getType());
+                log.debug("# " + targets.size() + " type=" + args.getType());
                 Printer p = args.getPrinter();
-                for (int i = 0; i < targets.length; i++)
-                    p.println(targets[i]);
+                for (int i = 0; i < targets.size(); i++)
+                    p.println(targets.get(i));
            }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");

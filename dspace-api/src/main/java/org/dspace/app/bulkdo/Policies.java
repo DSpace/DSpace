@@ -16,6 +16,7 @@ import org.dspace.eperson.Group;
 
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,12 +67,12 @@ public class Policies {
         }
     }
 
-    void apply(Printer p, ActionTarget[] targets) throws SQLException {
-        if (targets == null || targets.length == 0) {
+    void apply(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
+        if (targets == null || targets.size() == 0) {
             log.info("Empty target/entity list");
         } else {
             System.out.println("# " + action + " policy." + Constants.actionText[dspaceActionId] +
-                    " for " + targets.length + " DSPaceObjects");
+                    " for " + targets.size() + " DSPaceObjects");
             switch (action) {
                 case Arguments.DO_ADD:
                 case Arguments.DO_DEL:
@@ -86,11 +87,11 @@ public class Policies {
         }
     }
 
-    public void doList(Printer p, ActionTarget[] targets) throws SQLException {
+    public void doList(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
         p.addKey(propertyExists);
-        for (int i = 0; i < targets.length; i++) {
-            addPolicyInfo(targets[i], propertyExists);
-            p.println(targets[i]);
+        for (int i = 0; i < targets.size(); i++) {
+            addPolicyInfo(targets.get(i), propertyExists);
+            p.println(targets.get(i));
         }
         // TODO  p.delKey(propertyExists);
     }
@@ -101,18 +102,17 @@ public class Policies {
         map.put(prop, policies.toArray());
     }
 
-
-    private void changePolicy(Printer p, ActionTarget[] targets) throws SQLException {
+    private void changePolicy(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
         try {
             p.addKey(propertyExists);
             if (verbose) {
                 p.addKey(propertyBefore);
                 p.addKey(property);
             }
-            for (int i = 0; i < targets.length; i++) {
-                HashMap map = targets[i].toHashMap();
+            for (int i = 0; i < targets.size(); i++) {
+                HashMap map = targets.get(i).toHashMap();
 
-                addPolicyInfo(targets[i],propertyBefore);
+                addPolicyInfo(targets.get(i),propertyBefore);
                 Object[] pols = (Object[]) map.get(propertyBefore);
 
                 if (action == Arguments.DO_ADD) {
@@ -128,9 +128,9 @@ public class Policies {
                     if (pi == pols.length) {
                         // policy does not yet exist
                         if (who.getType() == Constants.EPERSON) {
-                            AuthorizeManager.addPolicy(c, targets[i].getObject(), dspaceActionId, (EPerson) who);
+                            AuthorizeManager.addPolicy(c, targets.get(i).getObject(), dspaceActionId, (EPerson) who);
                         } else {
-                            AuthorizeManager.addPolicy(c, targets[i].getObject(), dspaceActionId, (Group) who);
+                            AuthorizeManager.addPolicy(c, targets.get(i).getObject(), dspaceActionId, (Group) who);
                         }
                         map.put(property, who);
                     }
@@ -147,8 +147,8 @@ public class Policies {
                 } else {
                     map.put(property + "???should-never-happen!!!", who);
                 }
-                addPolicyInfo(targets[i],propertyExists);
-                p.println(targets[i]);
+                addPolicyInfo(targets.get(i),propertyExists);
+                p.println(targets.get(i));
             }
             c.complete();
         } catch (AuthorizeException e) {

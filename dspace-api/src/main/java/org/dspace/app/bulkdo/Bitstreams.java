@@ -51,7 +51,7 @@ public class Bitstreams {
         p.addKey("success");
         p.addKey("bundles");
 
-        BitstreamActionTarget target = new BitstreamActionTarget(bit);
+        BitstreamActionTarget target = new BitstreamActionTarget(null, bit);
         HashMap<String, Object> map = target.toHashMap();
         map.put("replace", filename);
         map.put("parent.handle", ((Item) map.get("parent")).getHandle());
