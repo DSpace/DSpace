@@ -18,7 +18,6 @@ public class ActionTarget  {
     private ActionTarget up;
 
     ActionTarget(ActionTarget container, DSpaceObject o) {
-        System.out.println("Create ActionTarget "  + o);
         assert (o != null);
         obj = o;
         up = container;
@@ -67,12 +66,11 @@ public class ActionTarget  {
                     up =null;
                     break;
                 default:
-                    assert (false);
                     throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
             }
             return create(null, up);
         } catch (SQLException e) {
-            return null;
+            throw new RuntimeException("should never happen???:  " + e.getMessage());
         }
     }
 

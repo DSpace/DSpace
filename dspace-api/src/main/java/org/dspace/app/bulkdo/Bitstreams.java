@@ -54,7 +54,6 @@ public class Bitstreams {
         BitstreamActionTarget target = new BitstreamActionTarget(null, bit);
         HashMap<String, Object> map = target.toHashMap();
         map.put("replace", filename);
-        map.put("replace", filename);
         String result = "";
         try {
             Bundle[] bdls = replaceBitstream();
@@ -70,11 +69,10 @@ public class Bitstreams {
     }
 
     private Bundle[] replaceBitstream() throws SQLException, IOException, AuthorizeException {
-        Item item = (Item) bit.getParentObject();
         if (! bit.getFormat().getMIMEType().equals(fileFormat) && !ignoreFormatMismatch) {
                 throw new RuntimeException("format mistmatch");
         }
-
+        Item item = (Item) bit.getParentObject();
         Bundle[] bundles = bit.getBundles();
         for (Bundle bdl : bundles) {
             Bitstream nBit = bdl.createBitstream(stream);
