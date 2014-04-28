@@ -5,12 +5,15 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by monikam on 4/25/14.
@@ -41,7 +44,12 @@ public class Bitstreams {
     }
 
     public String toString()  {
-        return filename + "(" + fileFormat.getMIMEType() + ") ->" + bit;
+
+        String me =  filename + "(" + fileFormat.getMIMEType() + ") --";
+        if (ignoreFormatMismatch) {
+            me += "ignoreFormat--";
+        }
+        return me + "> " + bit;
     }
 
     void apply(Printer p) {
@@ -58,7 +66,8 @@ public class Bitstreams {
             target.put("bundles", bdls);
             result = "SUCCESS";
         } catch (Exception e) {
-            result = "ERROR:" + e.getMessage().replaceAll(" ", "_");
+            result = "ERROR";
+            target.put("exception", e.getMessage().replaceAll(" ", "_"));
             e.printStackTrace();
         }
         target.put("replace", filename);
@@ -83,6 +92,9 @@ public class Bitstreams {
             nBit.setDescription(bit.getDescription());
             nBit.setSource(bit.getSource());
             nBit.setFormat(fileFormat);
+            List<ResourcePolicy> pols = AuthorizeManager.getPolicies(context, bit);
+            AuthorizeManager.removeAllPolicies(context, nBit);
+            AuthorizeManager.addPolicies(context, pols, nBit);
             bdl.removeBitstream(bit);
         }
         item.update();
