@@ -4,9 +4,6 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.util.Arrays.deepToString;
 
@@ -56,9 +53,8 @@ public class Printer extends PrintStream {
 
     public void println(ActionTarget at) {
             String txt = "";
-            HashMap<String,Object> map = at.toHashMap();
             for (Integer i = 0; i < keys.length; i++) {
-                txt = txt + " " + keys[i] + "=" + expandToString(map.get(keys[i]));
+                txt = txt + " " + keys[i] + "=" + expandToString(at.get(keys[i]));
             }
             println(txt);
     }
@@ -69,7 +65,7 @@ public class Printer extends PrintStream {
         if (obj.getClass().isArray()) {
             return deepToString((Object[]) obj);
         }
-        return obj.toString();
+        return obj.toString().replaceAll("\n", " ");
     }
 
 }
@@ -89,7 +85,6 @@ class TSVPrinter extends Printer {
     @Override
     public void println(ActionTarget at) {
         String txt = "";
-        HashMap<String, Object> map = at.toHashMap();
         if (keys.length > 0) {
             if (firstTime) {
                 // print header with key names
@@ -100,9 +95,9 @@ class TSVPrinter extends Printer {
                 println(txt);
             }
             firstTime = false;
-            txt = expandToString(map.get(keys[0]));
+            txt = expandToString(at.get(keys[0]));
             for (Integer i = 1; i < keys.length; i++) {
-                txt = txt + "\t" + expandToString(map.get(keys[i]));
+                txt = txt + "\t" + expandToString(at.get(keys[i]));
             }
             println(txt);
         }

@@ -82,6 +82,34 @@ public class ActionTarget  {
         return arr;
     }
 
+    public Object get(String key) {
+        HashMap<String, Object> map = toHashMap();
+        Object o = map.get(key);
+        if (o == null) {
+            int i = key.indexOf('.');
+            if (i != -1) {
+                String type = key.substring(0, i);
+                int tId = Constants.getTypeID(type);
+                System.err.println("type=" + type);
+                if (tId != -1) {
+                    key = key.substring(i+1, key.length());
+                    System.err.println("key=" + key);
+                    ActionTarget look = this;
+                    while  (look != null && look.obj.getType() != tId) {
+                        System.err.println("up=" + up.getObject() + " " );
+                        look = look.up;
+                    }
+                    if (look != null) {
+                        System.err.println("up=" + look );
+                        return look.toHashMap().get(key);
+                    }
+
+                }
+            }
+        }
+        return o;
+    }
+
     public HashMap<String, Object> toHashMap() {
         if (map == null) {
             map = new HashMap<String, Object>();
@@ -91,6 +119,7 @@ public class ActionTarget  {
                     map.put("type", obj.getType());
                     map.put("id", obj.getID());
                     map.put("parent", obj.getParentObject());
+                    map.put("up", up);
                     map.put("handle", obj.getHandle());
                 } catch (SQLException e) {
                     map.put("exception", e.getMessage());
