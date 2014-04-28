@@ -144,10 +144,14 @@ public class DCInputSet
     	{
     		return false;
     	}
-    	if (rowName.equals("date.issued") && ! addPublishedBefore )
-    	{
-    		return false;
-    	}
+    	/**
+    	 * DRUM: allow date.issued to be supplied even when user has checked
+    	 * not previously published or publicly distributed
+    	 */
+//    	if (rowName.equals("date.issued") && ! addPublishedBefore )
+//    	{
+//    		return false;
+//    	}
     	if (rowName.equals("publisher.null") && ! addPublishedBefore )
     	{
     		return false;

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class defining methods for sending new item e-mail alerts to users
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -62,7 +63,7 @@ public class Subscribe
     /**
      * Subscribe an e-person to a collection. An e-mail will be sent every day a
      * new item appears in the collection.
-     *
+     * 
      * @param context
      *            DSpace context
      * @param eperson
@@ -80,9 +81,9 @@ public class Subscribe
         {
             // already subscribed?
             TableRowIterator r = DatabaseManager.query(context,
-                    "SELECT * FROM subscription WHERE eperson_id= ? " +
-                    " AND collection_id= ? ",
-                    eperson.getID(),collection.getID());
+                    "SELECT * FROM subscription WHERE eperson_id= ? "
+                            + " AND collection_id= ? ", eperson.getID(),
+                    collection.getID());
 
             try
             {
@@ -116,10 +117,10 @@ public class Subscribe
     }
 
     /**
-     * Unsubscribe an e-person to a collection. Passing in <code>null</code>
-     * for the collection unsubscribes the e-person from all collections they
-     * are subscribed to.
-     *
+     * Unsubscribe an e-person to a collection. Passing in <code>null</code> for
+     * the collection unsubscribes the e-person from all collections they are
+     * subscribed to.
+     * 
      * @param context
      *            DSpace context
      * @param eperson
@@ -145,9 +146,9 @@ public class Subscribe
             else
             {
                 DatabaseManager.updateQuery(context,
-                        "DELETE FROM subscription WHERE eperson_id= ? " +
-                        "AND collection_id= ? ",
-                        eperson.getID(),collection.getID());
+                        "DELETE FROM subscription WHERE eperson_id= ? "
+                                + "AND collection_id= ? ", eperson.getID(),
+                        collection.getID());
 
                 log.info(LogManager.getHeader(context, "unsubscribe",
                         "eperson_id=" + eperson.getID() + ",collection_id="
@@ -163,7 +164,7 @@ public class Subscribe
 
     /**
      * Find out which collections an e-person is subscribed to
-     *
+     * 
      * @param context
      *            DSpace context
      * @param eperson
@@ -185,8 +186,8 @@ public class Subscribe
             {
                 TableRow row = tri.next();
 
-                collections.add(Collection.find(context, row
-                        .getIntColumn("collection_id")));
+                collections.add(Collection.find(context,
+                        row.getIntColumn("collection_id")));
             }
         }
         finally
@@ -204,41 +205,43 @@ public class Subscribe
     }
 
     /**
-     * Find out which collections the currently logged in e-person can subscribe to
-     *
+     * Find out which collections the currently logged in e-person can subscribe
+     * to
+     * 
      * @param context
      *            DSpace context
      * @param eperson
      *            EPerson
-     * @return array of collections the currently logged in e-person can subscribe to
+     * @return array of collections the currently logged in e-person can
+     *         subscribe to
      */
     public static Collection[] getAvailableSubscriptions(Context context)
             throws SQLException
     {
         return getAvailableSubscriptions(context, null);
     }
-    
+
     /**
      * Find out which collections an e-person can subscribe to
-     *
+     * 
      * @param context
      *            DSpace context
      * @param eperson
      *            EPerson
      * @return array of collections e-person can subscribe to
      */
-    public static Collection[] getAvailableSubscriptions(Context context, EPerson eperson)
-            throws SQLException
+    public static Collection[] getAvailableSubscriptions(Context context,
+            EPerson eperson) throws SQLException
     {
         Collection[] collections;
-        
+
         if (eperson != null)
         {
             context.setCurrentUser(eperson);
         }
-        
+
         Site site = (Site) Site.find(context, 0);
-        
+
         collections = Collection.findAuthorized(context, null, Constants.ADD);
 
         return collections;
@@ -246,7 +249,7 @@ public class Subscribe
 
     /**
      * Is that e-person subscribed to that collection?
-     *
+     * 
      * @param context
      *            DSpace context
      * @param eperson
@@ -258,10 +261,10 @@ public class Subscribe
     public static boolean isSubscribed(Context context, EPerson eperson,
             Collection collection) throws SQLException
     {
-    	TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT * FROM subscription WHERE eperson_id= ? " +
-                "AND collection_id= ? ",
-                eperson.getID(),collection.getID());
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT * FROM subscription WHERE eperson_id= ? "
+                        + "AND collection_id= ? ", eperson.getID(),
+                collection.getID());
 
         try
         {
@@ -289,13 +292,13 @@ public class Subscribe
      * <P>
      * For example, if today's date is 2002-10-10 (in UTC) items made available
      * during 2002-10-09 (UTC) will be included.
-     *
+     * 
      * @param context
      *            DSpace context object
      * @param test
      */
-    public static void processDaily(Context context, boolean test) throws SQLException,
-            IOException
+    public static void processDaily(Context context, boolean test)
+            throws SQLException, IOException
     {
         // Grab the subscriptions
         TableRowIterator tri = DatabaseManager.query(context,
@@ -322,7 +325,8 @@ public class Subscribe
 
                         try
                         {
-                            sendEmail(context, currentEPerson, collections, test);
+                            sendEmail(context, currentEPerson, collections,
+                                    test);
                         }
                         catch (MessagingException me)
                         {
@@ -332,13 +336,13 @@ public class Subscribe
                         }
                     }
 
-                    currentEPerson = EPerson.find(context, row
-                            .getIntColumn("eperson_id"));
+                    currentEPerson = EPerson.find(context,
+                            row.getIntColumn("eperson_id"));
                     collections = new ArrayList<Collection>();
                 }
 
-                collections.add(Collection.find(context, row
-                        .getIntColumn("collection_id")));
+                collections.add(Collection.find(context,
+                        row.getIntColumn("collection_id")));
             }
         }
         finally
@@ -370,7 +374,7 @@ public class Subscribe
      * Sends an email to the given e-person with details of new items in the
      * given collections, items that appeared yesterday. No e-mail is sent if
      * there aren't any new items in any of the collections.
-     *
+     * 
      * @param context
      *            DSpace context object
      * @param eperson
@@ -380,23 +384,41 @@ public class Subscribe
      * @param test
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List<Collection> collections, boolean test) throws IOException, MessagingException,
-            SQLException
+            List<Collection> collections, boolean test) throws IOException,
+            MessagingException, SQLException
     {
+        // Check for restricted eperson list
+        String epersonLimit = ConfigurationManager
+                .getProperty("eperson.subscription.limiteperson");
+        if (epersonLimit != null)
+        {
+            List l = Arrays.asList(epersonLimit.split(" *, *"));
+            if (!l.contains(eperson.getEmail()))
+            {
+                return;
+            }
+        }
+
+        log.debug("Checking subscriptions for " + eperson.getEmail());
         // Get a resource bundle according to the eperson language preferences
         Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-        ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
+        ResourceBundle labels = ResourceBundle.getBundle("Messages",
+                supportedLocale);
 
         // Get the start and end dates for yesterday
 
-        // The date should reflect the timezone as well. Otherwise we stand to lose that information
+        // The date should reflect the timezone as well. Otherwise we stand to
+        // lose that information
         // in truncation and roll to an earlier date than intended.
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
         cal.setTime(new Date());
 
-        // What we actually want to pass to Harvest is "Midnight of yesterday in my current timezone"
-        // Truncation will actually pass in "Midnight of yesterday in UTC", which will be,
-        // at least in CDT, "7pm, the day before yesterday, in my current timezone".
+        // What we actually want to pass to Harvest is
+        // "Midnight of yesterday in my current timezone"
+        // Truncation will actually pass in "Midnight of yesterday in UTC",
+        // which will be,
+        // at least in CDT,
+        // "7pm, the day before yesterday, in my current timezone".
         cal.add(Calendar.HOUR, -24);
         Date thisTimeYesterday = cal.getTime();
 
@@ -404,7 +426,6 @@ public class Subscribe
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date midnightYesterday = cal.getTime();
-
 
         // FIXME: text of email should be more configurable from an
         // i18n viewpoint
@@ -415,22 +436,26 @@ public class Subscribe
         {
             Collection c = collections.get(i);
 
-            try {
-                boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
+            try
+            {
+                boolean includeAll = ConfigurationManager.getBooleanProperty(
+                        "harvest.includerestricted.subscription", true);
 
                 // we harvest all the changed item from yesterday until now
-                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(midnightYesterday).toString(), null, 0, // Limit
-                                                                                    // and
-                                                                                    // offset
-                                                                                    // zero,
-                                                                                    // get
-                                                                                    // everything
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c,
+                        new DCDate(midnightYesterday).toString(), null, 0, // Limit
+                        // and
+                        // offset
+                        // zero,
+                        // get
+                        // everything
                         0, true, // Need item objects
                         false, // But not containers
                         false, // Or withdrawals
                         includeAll);
 
-                if (ConfigurationManager.getBooleanProperty("eperson.subscription.onlynew", false))
+                if (ConfigurationManager.getBooleanProperty(
+                        "eperson.subscription.onlynew", false))
                 {
                     // get only the items archived yesterday
                     itemInfos = filterOutModified(itemInfos);
@@ -455,17 +480,25 @@ public class Subscribe
                         isFirst = false;
                     }
 
-                    emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(" ").append(
-                            c.getMetadata("name")).append(": ").append(
-                            itemInfos.size()).append("\n\n");
+                    emailText
+                            .append(labels
+                                    .getString("org.dspace.eperson.Subscribe.new-items"))
+                            .append(" ").append(c.getMetadata("name"))
+                            .append(": ").append(itemInfos.size())
+                            .append("\n\n");
 
                     for (int j = 0; j < itemInfos.size(); j++)
                     {
                         HarvestedItemInfo hii = (HarvestedItemInfo) itemInfos
                                 .get(j);
 
-                        DCValue[] titles = hii.item.getDC("title", null, Item.ANY);
-                        emailText.append("      ").append(labels.getString("org.dspace.eperson.Subscribe.title")).append(" ");
+                        DCValue[] titles = hii.item.getDC("title", null,
+                                Item.ANY);
+                        emailText
+                                .append("      ")
+                                .append(labels
+                                        .getString("org.dspace.eperson.Subscribe.title"))
+                                .append(" ");
 
                         if (titles.length > 0)
                         {
@@ -473,16 +506,21 @@ public class Subscribe
                         }
                         else
                         {
-                            emailText.append(labels.getString("org.dspace.eperson.Subscribe.untitled"));
+                            emailText
+                                    .append(labels
+                                            .getString("org.dspace.eperson.Subscribe.untitled"));
                         }
 
-                        DCValue[] authors = hii.item.getDC("contributor", Item.ANY,
-                                Item.ANY);
+                        DCValue[] authors = hii.item.getDC("contributor",
+                                Item.ANY, Item.ANY);
 
                         if (authors.length > 0)
                         {
-                            emailText.append("\n    ").append(labels.getString("org.dspace.eperson.Subscribe.authors")).append(" ").append(
-                                    authors[0].value);
+                            emailText
+                                    .append("\n    ")
+                                    .append(labels
+                                            .getString("org.dspace.eperson.Subscribe.authors"))
+                                    .append(" ").append(authors[0].value);
 
                             for (int k = 1; k < authors.length; k++)
                             {
@@ -491,9 +529,14 @@ public class Subscribe
                             }
                         }
 
-                        emailText.append("\n         ").append(labels.getString("org.dspace.eperson.Subscribe.id")).append(" ").append(
-                                HandleManager.getCanonicalForm(hii.handle)).append(
-                                "\n\n");
+                        emailText
+                                .append("\n         ")
+                                .append(labels
+                                        .getString("org.dspace.eperson.Subscribe.id"))
+                                .append(" ")
+                                .append(HandleManager
+                                        .getCanonicalForm(hii.handle))
+                                .append("\n\n");
                     }
                 }
             }
@@ -507,29 +550,34 @@ public class Subscribe
         if (emailText.length() > 0)
         {
 
-            if(test)
+            if (test)
             {
-                log.info(LogManager.getHeader(context, "subscription:", "eperson=" + eperson.getEmail() ));
-                log.info(LogManager.getHeader(context, "subscription:", "text=" + emailText.toString() ));
+                log.info(LogManager.getHeader(context, "subscription:",
+                        "eperson=" + eperson.getEmail()));
+                log.info(LogManager.getHeader(context, "subscription:", "text="
+                        + emailText.toString()));
 
-            } else {
+            }
+            else
+            {
 
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(
+                        supportedLocale, "subscription"));
                 email.addRecipient(eperson.getEmail());
                 email.addArgument(emailText.toString());
                 email.send();
 
-                log.info(LogManager.getHeader(context, "sent_subscription", "eperson_id=" + eperson.getID() ));
+                log.info(LogManager.getHeader(context, "sent_subscription",
+                        "eperson_id=" + eperson.getID()));
 
             }
-
 
         }
     }
 
     /**
      * Method for invoking subscriptions via the command line
-     *
+     * 
      * @param argv
      *            command-line arguments, none used yet
      */
@@ -548,7 +596,8 @@ public class Subscribe
         }
 
         {
-            Option opt = new Option("h", "help", false, "Print this help message");
+            Option opt = new Option("h", "help", false,
+                    "Print this help message");
             opt.setRequired(false);
             options.addOption(opt);
         }
@@ -573,7 +622,7 @@ public class Subscribe
 
         boolean test = line.hasOption("t");
 
-        if(test)
+        if (test)
         {
             log.setLevel(Level.DEBUG);
         }
@@ -586,13 +635,13 @@ public class Subscribe
             processDaily(context, test);
             context.complete();
         }
-        catch( Exception e )
+        catch (Exception e)
         {
             log.fatal(e);
         }
         finally
         {
-            if( context != null && context.isValid() )
+            if (context != null && context.isValid())
             {
                 // Nothing is actually written
                 context.abort();
@@ -600,7 +649,8 @@ public class Subscribe
         }
     }
 
-    private static List<HarvestedItemInfo> filterOutToday(List<HarvestedItemInfo> completeList)
+    private static List<HarvestedItemInfo> filterOutToday(
+            List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all today item to leave new items list size="
                 + completeList.size());
@@ -665,9 +715,11 @@ public class Subscribe
         return filteredList;
     }
 
-    private static List<HarvestedItemInfo> filterOutModified(List<HarvestedItemInfo> completeList)
+    private static List<HarvestedItemInfo> filterOutModified(
+            List<HarvestedItemInfo> completeList)
     {
-        log.debug("Filtering out all modified to leave new items list size="+completeList.size());
+        log.debug("Filtering out all modified to leave new items list size="
+                + completeList.size());
         List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -678,29 +730,31 @@ public class Subscribe
 
         for (HarvestedItemInfo infoObject : completeList)
         {
-            DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
+            DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date",
+                    "accessioned", Item.ANY);
 
             if (dateAccArr != null && dateAccArr.length > 0)
             {
-                for(DCValue date : dateAccArr)
+                for (DCValue date : dateAccArr)
                 {
-                    if(date != null && date.value != null)
+                    if (date != null && date.value != null)
                     {
                         // if it has been archived yesterday
                         if (date.value.startsWith(yesterday))
                         {
                             filteredList.add(infoObject);
-                            log.debug("adding : " + dateAccArr[0].value +" : " + yesterday + " : " + infoObject.handle);
+                            log.debug("adding : " + dateAccArr[0].value + " : "
+                                    + yesterday + " : " + infoObject.handle);
                             break;
                         }
                         else
                         {
-                            log.debug("ignoring : " + dateAccArr[0].value +" : " + yesterday + " : " + infoObject.handle);
+                            log.debug("ignoring : " + dateAccArr[0].value
+                                    + " : " + yesterday + " : "
+                                    + infoObject.handle);
                         }
                     }
                 }
-
-
 
             }
             else

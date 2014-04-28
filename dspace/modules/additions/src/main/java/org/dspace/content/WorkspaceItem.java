@@ -585,6 +585,11 @@ public class WorkspaceItem implements InProgressSubmission
         // Need to delete the epersongroup2workspaceitem row first since it refers
         // to workspaceitem ID
         deleteEpersonGroup2WorkspaceItem();
+        
+        // delete additional mapped collections
+        DatabaseManager.updateQuery(ourContext,
+                "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
+        
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -616,6 +621,10 @@ public class WorkspaceItem implements InProgressSubmission
         // Remove from cache
         ourContext.removeCached(this, getID());
 
+        // delete additional mapped collections
+        DatabaseManager.updateQuery(ourContext,
+                "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
+        
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
@@ -666,4 +675,52 @@ public class WorkspaceItem implements InProgressSubmission
     {
         wiRow.setColumn("published_before", b);
     }
+    
+    /**
+     * Get the additional collections to map the item to.
+     * 
+     * @return array of collections
+     * @throws SQLException
+     */
+    public Collection[] getMapCollections() throws SQLException
+    {
+        String myQuery = 
+            "SELECT collection.collection_id FROM collection, collection2workspaceitem WHERE "
+            + "collection.collection_id=collection2workspaceitem.collection_id AND "
+            + "collection2workspaceitem.workspace_item_id=?"
+            ;
+
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "collection",
+                                                           myQuery, getID());
+
+        List collectionRows = rows.toList();
+
+        Collection[] collections = new Collection[collectionRows.size()];
+
+        for (int i = 0; i < collectionRows.size(); i++)
+        {
+            TableRow row = (TableRow) collectionRows.get(i);
+
+            collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
+
+        }
+
+        return collections;
+    }
+    /**
+     * Add an additional collection to map the item to.
+     * 
+     * @throws SQLException
+     */
+    public void addMapCollection(Collection collection) throws SQLException
+    {
+        // Create mapping
+        TableRow row = DatabaseManager.create(ourContext, "collection2workspaceitem");
+
+        row.setColumn("collection_id", collection.getID());
+        row.setColumn("workspace_item_id", getID());
+
+        DatabaseManager.update(ourContext, row);
+    }
+  
 }

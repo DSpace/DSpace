@@ -9,14 +9,13 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
@@ -27,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 
 /**
  * Servlet for editing groups
@@ -63,11 +63,14 @@ public class GroupEditServlet extends DSpaceServlet
             AuthorizeManager.authorizeAction(c, group, Constants.ADD);
 
             boolean submit_edit = (request.getParameter("submit_edit") != null);
-            boolean submit_group_update = (request.getParameter("submit_group_update") != null);
-            boolean submit_group_delete = (request.getParameter("submit_group_delete") != null);
-            boolean submit_confirm_delete = (request.getParameter("submit_confirm_delete") != null);
-            boolean submit_cancel_delete = (request.getParameter("submit_cancel_delete") != null);
-
+            boolean submit_group_update = (request
+                    .getParameter("submit_group_update") != null);
+            boolean submit_group_delete = (request
+                    .getParameter("submit_group_delete") != null);
+            boolean submit_confirm_delete = (request
+                    .getParameter("submit_confirm_delete") != null);
+            boolean submit_cancel_delete = (request
+                    .getParameter("submit_cancel_delete") != null);
 
             // just chosen a group to edit - get group and pass it to
             // group-edit.jsp
@@ -76,6 +79,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
@@ -129,8 +133,8 @@ public class GroupEditServlet extends DSpaceServlet
 
                         if (!memberSet.contains(currentID))
                         {
-                            group.addMember(EPerson.find(c, currentID
-                                    .intValue()));
+                            group.addMember(EPerson.find(c,
+                                    currentID.intValue()));
                         }
                     }
 
@@ -185,9 +189,7 @@ public class GroupEditServlet extends DSpaceServlet
 
                         if (!memberSet.contains(currentID))
                         {
-                            group
-                                    .addMember(Group.find(c, currentID
-                                            .intValue()));
+                            group.addMember(Group.find(c, currentID.intValue()));
                         }
                     }
 
@@ -217,6 +219,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
@@ -225,7 +228,8 @@ public class GroupEditServlet extends DSpaceServlet
             {
                 // direct to a confirmation step
                 request.setAttribute("group", group);
-                JSPManager.showJSP(request, response, "/dspace-admin/group-confirm-delete.jsp");
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/group-confirm-delete.jsp");
             }
             else if (submit_confirm_delete)
             {
@@ -248,6 +252,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
@@ -269,6 +274,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();

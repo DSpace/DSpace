@@ -171,6 +171,10 @@ public class WorkflowManager
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
         wfi.setPublishedBefore(wsi.isPublishedBefore());
 
+        Collection collections[] = wsi.getMapCollections();
+        for (int i=0; i < collections.length; i++) {
+            wfi.addMapCollection(collections[i]);
+        }
         // remove the WorkspaceItem
         wsi.deleteWrapper();
 
@@ -742,8 +746,17 @@ public class WorkflowManager
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
-
+   
+            // Get the email
+            String emailName = "submit_archive";
+            
+            Collection la = (Collection) HandleManager.resolveToObject(c, "1903/11324");
+            if (la != null && i.isOwningCollection(la)) {
+                emailName = "libraryaward_submit_archive";
+            }
+            
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
+            
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
 
@@ -807,6 +820,12 @@ public class WorkflowManager
         wi.setMultipleFiles(wfi.hasMultipleFiles());
         wi.setMultipleTitles(wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
+        
+        Collection collections[] = wfi.getMapCollections();
+        for (int i=0; i < collections.length; i++) {
+            wi.addMapCollection(collections[i]);
+        }
+        
         wi.update();
 
         //myitem.update();
@@ -814,9 +833,8 @@ public class WorkflowManager
                 "workflow_item_id=" + wfi.getID() + "workspace_item_id="
                         + wi.getID()));
 
-        // Now remove the workflow object manually from the database
-        DatabaseManager.updateQuery(c,
-                "DELETE FROM WorkflowItem WHERE workflow_id=" + wfi.getID());
+        // Now remove the workflow object
+    wfi.deleteWrapper();
 
         return wi;
     }
@@ -924,8 +942,6 @@ public class WorkflowManager
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
                                                                                   "flowtask_notify"));
                 email.addArgument(title);
-                email.addArgument(coll.getMetadata("name"));
-                email.addArgument(submitter);
                 email.addArgument(taskName);
                 email.addArgument(message);
                 email.addArgument(action);
@@ -973,8 +989,6 @@ public class WorkflowManager
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
-                    email.addArgument(coll.getMetadata("name"));
-                    email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
                     switch (wi.getState())
@@ -994,6 +1008,23 @@ public class WorkflowManager
 
                             break;
                     }
+
+                    StringBuffer sb = new StringBuffer();
+                    sb.append(coll.getMetadata("name"));
+                    Collection collections[] = wi.getMapCollections();
+                    if (collections.length > 0) {
+                      sb.append(" (");
+                      for (int j=0; j < collections.length; j++) {
+                        if (j > 0) {
+                          sb.append(", ");
+                        }
+                        sb.append(collections[j].getMetadata("name"));
+                      }
+                      sb.append(")");
+                    }
+                    email.addArgument(sb.toString());
+                            
+                    email.addArgument(submitter);
                     email.addArgument(message);
                     email.addArgument(getMyDSpaceLink());
                     email.addRecipient(epa[i].getEmail());
@@ -1030,7 +1061,14 @@ public class WorkflowManager
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+
+            String emailName = "submit_reject";
+            
+            if (coll.getHandle().equals("1903/11324")) {
+                emailName = "libraryaward_submit_reject";
+            }
+
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,emailName));
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);
