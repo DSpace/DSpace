@@ -133,6 +133,22 @@ class Arguments {
         return options;
     }
 
+    /*
+    * determine whether objects of 'one' type include DSPaceObjects objects of 'other' type
+    */
+    /* TODO: relying on Constants values - move to Constants class ?? */
+    static Boolean typeIncludes(int one, int other) {
+        if (one == other)
+            return true;
+        if (one <= Constants.COMMUNITY) {
+            return one > other;
+        }
+        if (one == Constants.GROUP) {
+            return other == Constants.EPERSON;
+        }
+        return false; // not quite sure what to say about SITE
+    }
+
     public void usage() {
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("Bulk Apply ActionTarget\n", options);

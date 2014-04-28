@@ -90,17 +90,13 @@ public class ActionTarget  {
             if (i != -1) {
                 String type = key.substring(0, i);
                 int tId = Constants.getTypeID(type);
-                System.err.println("type=" + type);
-                if (tId != -1) {
+                if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
                     key = key.substring(i+1, key.length());
-                    System.err.println("key=" + key);
                     ActionTarget look = this;
                     while  (look != null && look.obj.getType() != tId) {
-                        System.err.println("up=" + up.getObject() + " " );
                         look = look.up;
                     }
                     if (look != null) {
-                        System.err.println("up=" + look );
                         return look.toHashMap().get(key);
                     }
 
@@ -168,7 +164,6 @@ class ItemActionTarget extends ActionTarget {
         HashMap<String, Object> map = super.toHashMap();
         map.put("isWithdrawn", itm.isWithdrawn());
         map.put("name", itm.getName());
-        System.err.println("toHashMap");
         return map;
     }
 }
