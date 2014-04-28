@@ -58,9 +58,9 @@ public class Bitstreams {
         try {
             Bundle[] bdls = replaceBitstream();
             map.put("bundles", bdls);
-            result = "success";
+            result = "SUCCESS";
         } catch (Exception e) {
-            result = e.getMessage();
+            result = "ERROR:" + e.getMessage().replaceAll(" ", "_");
             e.printStackTrace();
         }
         map.put("replace", filename);
@@ -75,6 +75,9 @@ public class Bitstreams {
                 throw new RuntimeException("format mistmatch");
         }
         Item item = (Item) bit.getParentObject();
+        if (item == null) {
+            throw new RuntimeException(("refusing to replace file in orphaned bitstream " + bit));
+        }
         Bundle[] bundles = bit.getBundles();
         for (Bundle bdl : bundles) {
             Bitstream nBit = bdl.createBitstream(stream);

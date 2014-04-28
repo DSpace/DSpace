@@ -71,6 +71,8 @@ public class ActionTarget  {
             return create(null, up);
         } catch (SQLException e) {
             throw new RuntimeException("should never happen???:  " + e.getMessage());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
         }
     }
 
