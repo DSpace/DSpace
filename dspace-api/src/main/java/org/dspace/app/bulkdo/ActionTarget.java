@@ -18,6 +18,7 @@ public class ActionTarget  {
     private ActionTarget up;
 
     ActionTarget(ActionTarget container, DSpaceObject o) {
+        System.out.println("Create ActionTarget "  + o);
         assert (o != null);
         obj = o;
         up = container;
@@ -46,6 +47,35 @@ public class ActionTarget  {
                 throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
         }
     }
+
+    public static ActionTarget createUpFor(DSpaceObject obj) {
+        assert (obj != null);
+        try {
+            DSpaceObject up = null;
+            switch (obj.getType()) {
+                case Constants.BITSTREAM:
+                    up = ((Bitstream) obj).getBundles()[0];
+                    break;
+                case Constants.BUNDLE:
+                    up = ((Bundle) obj).getItems()[0];
+                    break;
+                case Constants.ITEM:
+                case Constants.COLLECTION:
+                    up = obj.getParentObject();
+                    break;
+                case Constants.COMMUNITY:
+                    up =null;
+                    break;
+                default:
+                    assert (false);
+                    throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
+            }
+            return create(null, up);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
 
     static String theAvailableKeys[] = {"object", "id", "type", "handle", "exception"};
 
@@ -93,13 +123,15 @@ public class ActionTarget  {
                 if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
                     key = key.substring(i+1, key.length());
                     ActionTarget look = this;
-                    while  (look != null && look.obj.getType() != tId) {
+                    while  (look != null && look.getObject().getType() !=  tId) {
+                        if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
+                            look.up = ActionTarget.createUpFor(look.getObject());
+                        }
                         look = look.up;
                     }
                     if (look != null) {
                         return look.toHashMap().get(key);
                     }
-
                 }
             }
         }
