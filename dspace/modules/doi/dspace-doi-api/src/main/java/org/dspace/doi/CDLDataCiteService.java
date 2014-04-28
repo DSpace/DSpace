@@ -192,7 +192,7 @@ public class CDLDataCiteService {
      * collections
      * @return true if item is in a dryad collection and archived or in blackout
      */
-    private static boolean shouldRegister(Item item) {
+    public static boolean shouldRegister(Item item) {
         // First check publication blackout
         // Items in publication blackout are not archived and are not yet in a
         // collection

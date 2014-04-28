@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.doi.CDLDataCiteService;
-import org.dspace.doi.DryadDOIRegistrationHelper;
 import org.jdom.input.SAXBuilder;
 import org.apache.xerces.parsers.SAXParser;
 import org.dspace.content.DCValue;
@@ -70,12 +69,9 @@ public class DataCiteXMLValidator extends AbstractCurationTask {
     protected void performItem(Item item) throws SQLException, IOException {
         // Get the item
         // Determine if it should be registered
-        Boolean shouldCheck = (
-                item.isArchived() ||
-                DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)
-                );
+        Boolean shouldCheck = CDLDataCiteService.shouldRegister(item);
         if(shouldCheck == false) {
-            report(item, Curator.CURATE_SKIP, "not archived or in blackout",null);
+            report(item, Curator.CURATE_SKIP, "skipping, shouldRegister returned false",null);
             return;
         }
         // crosswalk it to get xml
