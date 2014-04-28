@@ -267,40 +267,68 @@ $ mkdir /apps/dspace
 
 ####Initial Configuration
 
-Edit /apps/git/dspace/build.properties.  This properties file contains the basic settings necessary to actually build/install DSpace for the first time.
+Copy /apps/git/drum/local.properties.template to local.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
+
+The properties with value LOCAL in the local.properties file needs to updated with environment specific values.
+Please, pay attention to the value of the database password for the dspace user. You should replace it with the password you have given to the dspace user in the previous steps.
 
 
 * Configure initial properties
 
 ```
-$ /apps/git/dspace
-$ vi build.properties
+$ cd /apps/git/drum
+$ cp local.properties.template local.properties
+$ vi local.properties
 
 ```
-* Set the following properties
+* Set the following in local.properties file
 
 ```
-DSpace installation directory
+# DSpace installation directory
 
-dspace.install.dir=/apps/dspace
+dspace.install.dir=/apps/drum
+dspace.hostname = <HOSTNAME>
+dspace.baseUrl = <APPLICATION-BASE-URL>
 
-Solr Server location
+# Solr Server location
 
-solr.server=http://localhost:8080/solr
-Database properties
+solr.server = <SOLR-SERVER-URL>
 
-db.url=jdbc:postgresql://localhost:5432/dspace41
-db.username=dspace
-db.password=
+# CAS LDAP CONFIGURATION 
+ldap.bind.auth = <ENTER-UMD-LDAP-AUTH-INFO-HERE>
+ldap.bind.password = <ENTER-UMD-LDAP-PASSWORD-HERE>
 
+# Database properties
+
+db.url=<ENTER-YOUR-DSPACE-DATABASE-URL>
+db.username=<ENTER-YOUR-DSPACE-DATABASE-USERNAME-HERE>
+db.password=<ENTER-YOUR-DSPACE-DATABASE-PASSWORD-HERE>
+
+# EMAIL CONFIGURATION 
+
+mail.server = <SMTP-SERVER-IP>
+
+mail.server.username=<SMTP-USERNAME-IF-REQUIRED-BY-SMTP-SERVER>
+mail.server.password=<SMTP-PASSWORD-IF-REQUIRED-BY-SMTP-SERVER>
+
+mail.from.address = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.feedback.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.admin = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.alert.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.registration.notify = <ENTER-AN-EMAIL-ADDRESS-HERE>
+
+
+# HANDLE CONFIGURATION 
+handle.prefix = <HANDLE-PREFIX>
 ```
 
 ####Build the Installation Package
 
+The ```-Denv=local``` arguement will specify maven to use local.properties file instead of the default build.properties file while building dspace.
 
 ```
 $ cd /apps/git/dspace
-$ mvn package
+$ mvn -U -Denv=local clean package
 
 ```
 
