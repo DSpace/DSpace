@@ -113,28 +113,62 @@ public class ActionTarget {
         return arr;
     }
 
+    /**
+     *
+     *
+     * @param key
+     * @return
+     */
+
+    private Object getFromUp(String key) {
+        int i = key.indexOf('.');
+        if (i != -1) {
+
+            String type = key.substring(0, i);
+            int tId = Constants.getTypeID(type);
+            if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
+                key = key.substring(i + 1, key.length());
+                ActionTarget look = this;
+                while (look != null && look.getObject().getType() != tId) {
+                    if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
+                        look.up = ActionTarget.createUpFor(look.getObject());
+                    }
+                    look = look.up;
+                }
+                if (look != null) {
+                    return look.get(key);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Object getMetadateValue(String field) {
+        if (obj.getType() == Constants.ITEM) {
+            DCValue[] values =  ((Item) obj).getMetadata(field);
+            if (values.length == 0) {
+                return null;
+            }
+            if (values.length ==1 ) {
+                return values[0].value;
+            }
+            String vals[] = new String[values.length];
+            for (int i = 0; i < values.length; i++) {
+                vals[i] = values[i].value;
+            }
+            return vals;
+        }
+        return null;
+    }
+
     public Object get(String key) {
         toHashMap();
         Object o = map.get(key);
         if (o == null) {
-            int i = key.indexOf('.');
-            if (i != -1) {
-                String type = key.substring(0, i);
-                int tId = Constants.getTypeID(type);
-                if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
-                    key = key.substring(i + 1, key.length());
-                    ActionTarget look = this;
-                    while (look != null && look.getObject().getType() != tId) {
-                        if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
-                            look.up = ActionTarget.createUpFor(look.getObject());
-                        }
-                        look = look.up;
-                    }
-                    if (look != null) {
-                        return look.get(key);
-                    }
-                }
-            }
+            o = getFromUp(key);
+        }
+        if (o == null) {
+            o = getMetadateValue(key);
         }
         return o;
     }
