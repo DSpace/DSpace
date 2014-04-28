@@ -11,13 +11,14 @@ import java.util.HashMap;
 /**
  * Created by monikam on 4/11/14.
  */
-public class ActionTarget  {
+public class ActionTarget {
 
     private DSpaceObject obj;
     private HashMap<String, Object> map;
     private ActionTarget up;
 
     ActionTarget(ActionTarget container, DSpaceObject o) {
+        System.out.println("Create ActionTarget " + o);
         assert (o != null);
         obj = o;
         up = container;
@@ -63,7 +64,7 @@ public class ActionTarget  {
                     up = obj.getParentObject();
                     break;
                 case Constants.COMMUNITY:
-                    up =null;
+                    up = null;
                     break;
                 default:
                     throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
@@ -113,7 +114,7 @@ public class ActionTarget  {
     }
 
     public Object get(String key) {
-        HashMap<String, Object> map = toHashMap();
+        toHashMap();
         Object o = map.get(key);
         if (o == null) {
             int i = key.indexOf('.');
@@ -121,16 +122,16 @@ public class ActionTarget  {
                 String type = key.substring(0, i);
                 int tId = Constants.getTypeID(type);
                 if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
-                    key = key.substring(i+1, key.length());
+                    key = key.substring(i + 1, key.length());
                     ActionTarget look = this;
-                    while  (look != null && look.getObject().getType() !=  tId) {
+                    while (look != null && look.getObject().getType() != tId) {
                         if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
                             look.up = ActionTarget.createUpFor(look.getObject());
                         }
                         look = look.up;
                     }
                     if (look != null) {
-                        return look.toHashMap().get(key);
+                        return look.get(key);
                     }
                 }
             }
@@ -138,7 +139,12 @@ public class ActionTarget  {
         return o;
     }
 
-    public HashMap<String, Object> toHashMap() {
+    public void put(String key, Object obj) {
+        toHashMap();
+        map.put(key, obj);
+    }
+
+    protected boolean toHashMap() {
         if (map == null) {
             map = new HashMap<String, Object>();
             map.put("object", obj);
@@ -153,8 +159,9 @@ public class ActionTarget  {
                     map.put("exception", e.getMessage());
                 }
             }
+            return true;
         }
-        return map;
+        return false;
     }
 }
 
@@ -169,15 +176,17 @@ class CollectionActionTarget extends ActionTarget {
     }
 
     @Override
-    public HashMap<String, Object> toHashMap() {
-        HashMap<String, Object> map = super.toHashMap();
-        map.put("name", col.getName());
-        try {
-        map.put("template", col.getTemplateItem());
-        } catch (SQLException e) {
-            map.put("template", e.getMessage());
+    protected boolean toHashMap() {
+        boolean create = super.toHashMap();
+        if (create) {
+            put("name", col.getName());
+            try {
+                put("template", col.getTemplateItem());
+            } catch (SQLException e) {
+                put("template", e.getMessage());
+            }
         }
-        return map;
+        return create;
     }
 }
 
@@ -192,11 +201,13 @@ class ItemActionTarget extends ActionTarget {
     }
 
     @Override
-    public HashMap<String, Object> toHashMap() {
-        HashMap<String, Object> map = super.toHashMap();
-        map.put("isWithdrawn", itm.isWithdrawn());
-        map.put("name", itm.getName());
-        return map;
+    protected boolean toHashMap() {
+        boolean create = super.toHashMap();
+        if (create) {
+            put("isWithdrawn", itm.isWithdrawn());
+            put("name", itm.getName());
+        }
+        return create;
     }
 }
 
@@ -210,16 +221,17 @@ class BundleActionTarget extends ActionTarget {
         bdl = (Bundle) o;
     }
 
-    @Override
-    public HashMap<String, Object> toHashMap() {
-        HashMap<String, Object> map = super.toHashMap();
-        try {
-            map.put("isEmbargoed", bdl.isEmbargoed());
-        } catch (SQLException e) {
-            map.put("isEmbargoed", e.getMessage());
+    protected boolean toHashMap() {
+        boolean create = super.toHashMap();
+        if (create) {
+            try {
+                put("isEmbargoed", bdl.isEmbargoed());
+            } catch (SQLException e) {
+                put("isEmbargoed", e.getMessage());
+            }
+            put("name", bdl.getName());
         }
-        map.put("name", bdl.getName());
-        return map;
+        return create;
     }
 }
 
@@ -233,15 +245,16 @@ class BitstreamActionTarget extends ActionTarget {
         bit = (Bitstream) o;
     }
 
-    @Override
-    public HashMap<String, Object> toHashMap() {
-        HashMap<String, Object> map = super.toHashMap();
-        map.put("mimeType", bit.getFormat().getMIMEType());
-        map.put("name", bit.getName());
-        map.put("internalId", bit.getInternalId());
-        map.put("size", bit.getSize());
-        map.put("checksum", bit.getChecksum());
-        map.put("checksumAlgo", bit.getChecksumAlgorithm());
-        return map;
+    protected boolean toHashMap() {
+        boolean create = super.toHashMap();
+        if (create) {
+            put("mimeType", bit.getFormat().getMIMEType());
+            put("name", bit.getName());
+            put("internalId", bit.getInternalId());
+            put("size", bit.getSize());
+            put("checksum", bit.getChecksum());
+            put("checksumAlgo", bit.getChecksumAlgorithm());
+        }
+        return create;
     }
 }

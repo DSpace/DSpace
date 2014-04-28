@@ -11,7 +11,6 @@ import org.dspace.core.Context;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 /**
  * Created by monikam on 4/25/14.
@@ -53,19 +52,18 @@ public class Bitstreams {
         p.addKey("bundles");
 
         BitstreamActionTarget target = new BitstreamActionTarget(null, bit);
-        HashMap<String, Object> map = target.toHashMap();
         String result = "";
         try {
             Bundle[] bdls = replaceBitstream();
-            map.put("bundles", bdls);
+            target.put("bundles", bdls);
             result = "SUCCESS";
         } catch (Exception e) {
             result = "ERROR:" + e.getMessage().replaceAll(" ", "_");
             e.printStackTrace();
         }
-        map.put("replace", filename);
-        map.put("replace.mimeType", fileFormat.getMIMEType());
-        map.put("success", result);
+        target.put("replace", filename);
+        target.put("replace.mimeType", fileFormat.getMIMEType());
+        target.put("success", result);
         p.println(target);
 
     }

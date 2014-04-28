@@ -17,7 +17,6 @@ import org.dspace.eperson.Group;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.util.Arrays.deepToString;
@@ -98,8 +97,7 @@ public class Policies {
 
     private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
         List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), dspaceActionId);
-        HashMap<String, Object> map = target.toHashMap();
-        map.put(prop, policies.toArray());
+        target.put(prop, policies.toArray());
     }
 
     private void changePolicy(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
@@ -110,10 +108,10 @@ public class Policies {
                 p.addKey(property);
             }
             for (int i = 0; i < targets.size(); i++) {
-                HashMap map = targets.get(i).toHashMap();
+                ActionTarget target = targets.get(i);
 
                 addPolicyInfo(targets.get(i),propertyBefore);
-                Object[] pols = (Object[]) map.get(propertyBefore);
+                Object[] pols = (Object[]) target.get(propertyBefore);
 
                 if (action == Arguments.DO_ADD) {
                     // see whether there is already a policy in place
@@ -132,7 +130,7 @@ public class Policies {
                         } else {
                             AuthorizeManager.addPolicy(c, targets.get(i).getObject(), dspaceActionId, (Group) who);
                         }
-                        map.put(property, who);
+                        target.put(property, who);
                     }
                 } else if (action == Arguments.DO_DEL) {
                     for (int pi = 0; pi < pols.length; pi++) {
@@ -140,12 +138,12 @@ public class Policies {
                         if (pol.getGroup() == who || pol.getEPerson() == who) {
                             // found a matching policy ==> delete it
                             pol.delete();
-                            map.put(property, who);
+                            target.put(property, who);
                             // keep going there may be duplicate policies
                         }
                     }
                 } else {
-                    map.put(property + "???should-never-happen!!!", who);
+                    target.put(property + "???should-never-happen!!!", who);
                 }
                 addPolicyInfo(targets.get(i),propertyExists);
                 p.println(targets.get(i));
