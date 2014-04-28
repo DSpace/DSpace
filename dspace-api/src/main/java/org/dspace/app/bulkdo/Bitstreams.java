@@ -46,7 +46,7 @@ public class Bitstreams {
     }
 
     void apply(Printer p) {
-        p.addKey("parent.handle");
+        p.addKey("BUNDLE.object");
         p.addKey("replace");
         p.addKey("success");
         p.addKey("bundles");
@@ -54,7 +54,7 @@ public class Bitstreams {
         BitstreamActionTarget target = new BitstreamActionTarget(null, bit);
         HashMap<String, Object> map = target.toHashMap();
         map.put("replace", filename);
-        map.put("parent.handle", ((Item) map.get("parent")).getHandle());
+        map.put("replace", filename);
         String result = "";
         try {
             Bundle[] bdls = replaceBitstream();
@@ -71,19 +71,18 @@ public class Bitstreams {
 
     private Bundle[] replaceBitstream() throws SQLException, IOException, AuthorizeException {
         Item item = (Item) bit.getParentObject();
-        if (bit.getFormat().getMIMEType().equals(fileFormat) && !ignoreFormatMismatch) {
+        if (! bit.getFormat().getMIMEType().equals(fileFormat) && !ignoreFormatMismatch) {
                 throw new RuntimeException("format mistmatch");
         }
 
         Bundle[] bundles = bit.getBundles();
         for (Bundle bdl : bundles) {
             Bitstream nBit = bdl.createBitstream(stream);
-            nBit.setName("cp:" + bit.getName());
+            nBit.setName(bit.getName());
             nBit.setDescription(bit.getDescription());
             nBit.setSource(bit.getSource());
             nBit.setUserFormatDescription(bit.getFormatDescription());
-            nBit.setUserFormatDescription(bit.getFormatDescription());
-            // bdl.removeBitstream(bit);
+            bdl.removeBitstream(bit);
         }
         item.update();
         context.commit();
@@ -121,8 +120,8 @@ public class Bitstreams {
 
 class BitstreamsArguments extends Arguments {
 
-    public static String FILE = "f";
-    public static String FILE_LONG = "file";
+    public static String FILE = "b";
+    public static String FILE_LONG = "bitstream";
 
     public static String GOGO = "g";
     public static String GOGO_LONG = "GO-GO-GO";
@@ -152,14 +151,14 @@ class BitstreamsArguments extends Arguments {
                 throw new ParseException("Must give EPerson");
             }
 
-            // TODO - really shouldn't require type option - we know we need BITSTREAM
-            if (getType() != Constants.BITSTREAM) {
-                throw new ParseException("Sorry only BITSTREAM allowed for tyep argument");
-            }
-
             // make sure root is a BITSTREAM  - should adjust the help message
             if (getRoot().getType() != Constants.BITSTREAM) {
                 throw new ParseException(getRoot() + " is not a bitstream");
+            }
+
+            // TODO - really shouldn't require type option - we know we need BITSTREAM
+            if (getType() != Constants.BITSTREAM) {
+                throw new ParseException("Sorry only BITSTREAM allowed for tyep argument");
             }
 
             filename = line.getOptionValue(FILE);
