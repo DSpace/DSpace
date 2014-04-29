@@ -41,19 +41,22 @@ public class EtdUnit extends DSpaceObject
     private static Logger log = Logger.getLogger(EtdUnit.class);
 
     /** Our context */
-    private Context myContext;
+    private final Context myContext;
 
     /** The row in the table representing this object */
-    private TableRow myRow;
+    private final TableRow myRow;
 
     /** is this just a stub, or is all data loaded? */
-    private boolean isDataLoaded = false;
+    private final boolean isDataLoaded = false;
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
     /** The mapped collections */
-    private List<Collection> collections;
+    private final List<Collection> collections;
+
+    /** Our context */
+    private Context ourContext;
 
     /**
      * Construct a EtdUnit from a given context and tablerow
@@ -81,7 +84,7 @@ public class EtdUnit extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow r = (TableRow) tri.next();
+                TableRow r = tri.next();
 
                 // First check the cache
                 Collection fromCache = (Collection) context.fromCache(
@@ -143,6 +146,7 @@ public class EtdUnit extends DSpaceObject
      * 
      * @return id
      */
+    @Override
     public int getID()
     {
         return myRow.getIntColumn("etdunit_id");
@@ -153,6 +157,7 @@ public class EtdUnit extends DSpaceObject
      * 
      * @return name
      */
+    @Override
     public String getName()
     {
         return myRow.getStringColumn("name");
@@ -512,6 +517,7 @@ public class EtdUnit extends DSpaceObject
      * Update the etdunit - writing out etdunit object and EtdUnit list if
      * necessary
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // FIXME: Check authorisation
@@ -539,6 +545,7 @@ public class EtdUnit extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same etdunit
      *         as this object
      */
+    @Override
     public boolean equals(Object other)
     {
         if (!(other instanceof EtdUnit))
@@ -549,11 +556,13 @@ public class EtdUnit extends DSpaceObject
         return (getID() == ((EtdUnit) other).getID());
     }
 
+    @Override
     public int getType()
     {
         return Constants.ETDUNIT;
     }
 
+    @Override
     public String getHandle()
     {
         return null;
@@ -607,7 +616,7 @@ public class EtdUnit extends DSpaceObject
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
-        collectionArray = (Collection[]) collections.toArray(collectionArray);
+        collectionArray = collections.toArray(collectionArray);
 
         return collectionArray;
     }
@@ -626,7 +635,7 @@ public class EtdUnit extends DSpaceObject
         // First check that the collection isn't already in the list
         for (int i = 0; i < collections.size(); i++)
         {
-            Collection existing = (Collection) collections.get(i);
+            Collection existing = collections.get(i);
 
             if (b.getID() == existing.getID())
             {
@@ -726,7 +735,7 @@ public class EtdUnit extends DSpaceObject
                 tri.close();
         }
 
-        EtdUnit[] etdunitArray = (EtdUnit[]) etdunits.toArray(new EtdUnit[0]);
+        EtdUnit[] etdunitArray = etdunits.toArray(new EtdUnit[0]);
 
         return etdunitArray;
     }
@@ -734,7 +743,10 @@ public class EtdUnit extends DSpaceObject
     @Override
     public void updateLastModified()
     {
-        // TODO Auto-generated method stub
+
+        // Also fire a modified event since the EDTUNIT HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, getID(),
+                null));
 
     }
 
