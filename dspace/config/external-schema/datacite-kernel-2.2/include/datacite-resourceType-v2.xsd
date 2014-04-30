@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.0 - Created 2011-01-13 - FZ, TIB, Germany -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datacite.org/schema/kernel-2.2" targetNamespace="http://datacite.org/schema/kernel-2.2" elementFormDefault="qualified">
+	<xs:simpleType name="resourceType">
+		<xs:annotation>
+			<xs:documentation>The general type of a resource.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Collection"/>
+			<xs:enumeration value="Dataset"/>
+			<xs:enumeration value="Event"/>
+			<xs:enumeration value="Film"/>
+			<xs:enumeration value="Image"/>
+			<xs:enumeration value="InteractiveResource"/>
+			<xs:enumeration value="Model"/>
+			<xs:enumeration value="PhysicalObject"/>
+			<xs:enumeration value="Service"/>
+			<xs:enumeration value="Software"/>
+			<xs:enumeration value="Sound"/>
+			<xs:enumeration value="Text"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

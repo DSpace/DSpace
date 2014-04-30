@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.0 - Created 2011-01-13 - FZ, TIB, Germany -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datacite.org/schema/kernel-2.2" targetNamespace="http://datacite.org/schema/kernel-2.2" elementFormDefault="qualified">
+	<xs:simpleType name="relationType">
+		<xs:annotation>
+			<xs:documentation>Description of the relationship of the resource being registered (A) and the related resource (B).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IsCitedBy"/><!--indicates that B includes A in a citation-->
+			<xs:enumeration value="Cites"/><!--indicates that A includes B in a citation-->
+			<xs:enumeration value="IsSupplementTo"/><!--indicates that A is a supplement to B-->
+			<xs:enumeration value="IsSupplementedBy"/><!--indicates that B is a supplement to A-->
+			<xs:enumeration value="IsContinuedBy"/><!--indicates A is continued by the work B-->
+			<xs:enumeration value="Continues"/><!--indicates A is a continuation of the work B-->
+			<xs:enumeration value="IsNewVersionOf"/><!--indicates B is a new edition of A, where the new edition has been modified or updated-->
+			<xs:enumeration value="IsPreviousVersionOf"/><!--indicates B is a previous edition of A-->
+			<xs:enumeration value="IsPartOf"/><!--indicates A is a portion of B-->
+			<xs:enumeration value="HasPart"/><!--indicates A includes the part B-->
+			<xs:enumeration value="IsReferencedBy"/><!--indicates A is used as a source of information by B-->
+			<xs:enumeration value="References"/><!--indicates B is used as a source of information for A-->
+			<xs:enumeration value="IsDocumentedBy"/><!--indicates B is documentation about/explaining A-->
+			<xs:enumeration value="Documents"/><!--indicates A is documentation about/explaining B-->
+			<xs:enumeration value="IsCompiledBy"/><!--indicates B is used to compile or create A-->
+			<xs:enumeration value="Compiles"/><!--indicates B is the result of a compile or creation event using A-->
+			<xs:enumeration value="IsVariantFormOf"/><!--indicates B is a variant or different form of A, e.g. calculated or calibrated form or different packaging-->
+			<xs:enumeration value="IsOriginalFormOf"/><!--indicates B is the original form of A-->
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

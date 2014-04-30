@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Version 1.0 - Created 2011-01-13 - FZ, TIB, Germany -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://datacite.org/schema/kernel-2.2" targetNamespace="http://datacite.org/schema/kernel-2.2" elementFormDefault="qualified">
+	<xs:simpleType name="descriptionType">
+		<xs:annotation>
+			<xs:documentation>The type of the description.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Abstract"/>
+			<xs:enumeration value="SeriesInformation"/>
+			<xs:enumeration value="TableOfContents"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
