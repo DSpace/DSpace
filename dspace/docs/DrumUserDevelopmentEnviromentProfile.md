@@ -103,7 +103,7 @@ function dant() {
 }
 
 alias dup="dmvn -Denv=local clean package && dant update"
-alias dp="dmvn clean package"
+alias dp="dmvn -Denv=local clean package"
 
 
 ```
