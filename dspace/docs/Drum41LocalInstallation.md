@@ -376,7 +376,7 @@ dspace.baseUrl = http://localhost:8080
 
 # Solr Server location
 
-solr.server = http://localhost:8080/solr
+solr.server = http://localhost:8983/solr
 
 # CAS LDAP CONFIGURATION 
 ldap.bind.auth = <ENTER-UMD-LDAP-AUTH-INFO-HERE>
@@ -389,6 +389,9 @@ db.username=dspace
 db.password=<ENTER-YOUR-DSPACE-DATABASE-PASSWORD-HERE>
 
 # EMAIL CONFIGURATION (optional in local)
+# IMPORTANT NOTE: If you don't want to configure this section, 
+# make the values of these properties empty by deleting the 
+# "LOCAL" placeholder value in your local.properties file.
 
 mail.server = <SMTP-SERVER-IP>
 
@@ -440,34 +443,15 @@ $ cd /apps/git/drum/dspace/target/dspace-4.1-build
 $ ant -projecthelp
 ```
 
-#### Download and Configure DRUM 4.1 Solr Instance
+#### Setup Solr Environment for Drum
 
-You would need to copy solr.war and solr libs to the drum installation directory, and configure drum solr cores. 
+* Follow instructions in [solr-env local documentation](https://github.com/umd-lib/solr-env/tree/local) to setup the drum solr cores.
+* Start the solr server
 
-* Copy solr libraries to the drum solr instance
+Note: Unlike the other dspace webapps, the solr server need not be restarted after every ```ant update```. Solr server restart is necessary only when there is a change in solr configuration.
 
-```
-$ cd /apps/tools/
-$ mkdir solr
-$ cd solr
-$ curl -O https://archive.apache.org/dist/lucene/solr/4.4.0/solr-4.4.0.tgz
-$ tar -xzvf solr-4.4.0.tgz
-$ mv solr-4.4.0 solr44
-$ cd solr44/
-$ cd dist
-$ ls
-$ cp solr-4.4.0.war /apps/drum/solr/solr.war
-$ cp -R /apps/tools/solr/solr44/dist /apps/drum/solr
-$ cp -R /apps/tools/solr/solr44/contrib /apps/drum/solr
 
-```
 
-	
-* Copy solr libraries to the DRUM 4.1 Tomcat instance
-
-```
-$ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
-```
 
 ####Deploy Web Applications
 
@@ -476,7 +460,6 @@ $ cp -r /apps/tools/solr/solr44/example/lib/ext /apps/servers/drum/tomcat411/lib
 ```
 $ ln -s /apps/drum/webapps/jspui /apps/servers/drum/tomcat411/webapps/jspui
 $ ln -s /apps/drum/webapps/xmlui /apps/servers/drum/tomcat411/webapps/xmlui
-$ ln -s /apps/drum/webapps/solr /apps/servers/drum/tomcat411/webapps/solr
 $ ln -s /apps/drum/webapps/oai /apps/servers/drum/tomcat411/webapps/oai
 $ ln -s /apps/drum/webapps/lni /apps/servers/drum/tomcat411/webapps/lni
 $ ln -s /apps/drum/webapps/rest /apps/servers/drum/tomcat411/webapps/rest
