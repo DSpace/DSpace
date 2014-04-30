@@ -43,7 +43,7 @@ public class ActionTarget {
                 return new ActionTarget(container, obj);
             default:
                 assert (false);
-                throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
+                throw new RuntimeException("should never try to create ActionTarget from " + obj);
         }
     }
 
@@ -104,20 +104,13 @@ public class ActionTarget {
         return arr;
     }
 
-    public static ArrayList<ActionTarget> createsArray(ActionTarget up, ArrayList<DSpaceObject> objArr) {
+    private static ArrayList<ActionTarget> createsArray(ActionTarget up, ArrayList<DSpaceObject> objArr) {
         assert (objArr != null);
         ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.size());
         for (int i = 0; i < objArr.size(); i++)
             arr.add(create(up, objArr.get(i)));
         return arr;
     }
-
-    /**
-     *
-     *
-     * @param key
-     * @return
-     */
 
     private Object getFromUp(String key) {
         int i = key.indexOf('.');
@@ -248,7 +241,7 @@ class ItemActionTarget extends ActionTarget {
 class BundleActionTarget extends ActionTarget {
     Bundle bdl;
 
-    static String[] theAvailableKeys = {"isWithdrawn", "isEmbargoed", "name"};
+    static String[] theAvailableKeys = {"isEmbargoed", "name"};
 
     BundleActionTarget(ActionTarget up, DSpaceObject o) {
         super(up, o);
