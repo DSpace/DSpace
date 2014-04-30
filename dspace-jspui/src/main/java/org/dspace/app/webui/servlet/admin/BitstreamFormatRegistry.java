@@ -63,13 +63,15 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         if (button.equals("submit_update"))
         {
             // Update the metadata for a bitstream format
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                    UIUtil.getIntParameter(request, "format_id"));
+            BitstreamFormat bf = BitstreamFormat.find(context, UIUtil
+                    .getIntParameter(request, "format_id"));
 
             bf.setMIMEType(request.getParameter("mimetype"));
             bf.setShortDescription(request.getParameter("short_description"));
             bf.setDescription(request.getParameter("description"));
-            bf.setSupportLevel(UIUtil.getIntParameter(request, "support_level"));
+            bf
+                    .setSupportLevel(UIUtil.getIntParameter(request,
+                            "support_level"));
             bf.setInternal((request.getParameter("internal") != null)
                     && request.getParameter("internal").equals("true"));
 
@@ -123,8 +125,8 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                    UIUtil.getIntParameter(request, "format_id"));
+            BitstreamFormat bf = BitstreamFormat.find(context, UIUtil
+                    .getIntParameter(request, "format_id"));
             request.setAttribute("format", bf);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-format.jsp");
@@ -132,8 +134,8 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of format
-            BitstreamFormat bf = BitstreamFormat.find(context,
-                    UIUtil.getIntParameter(request, "format_id"));
+            BitstreamFormat bf = BitstreamFormat.find(context, UIUtil
+                    .getIntParameter(request, "format_id"));
             bf.delete();
 
             showFormats(context, request, response);

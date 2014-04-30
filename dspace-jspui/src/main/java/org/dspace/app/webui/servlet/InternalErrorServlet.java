@@ -22,7 +22,7 @@ import org.dspace.app.webui.util.UIUtil;
  * Servlet for handling an internal server error
  * 
  * @author Robert Tansley
- * @version $Revision: 5845 $
+ * @version $Revision$
  */
 public class InternalErrorServlet extends HttpServlet
 {

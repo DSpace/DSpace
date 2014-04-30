@@ -7,13 +7,12 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.net.URL;
-import java.net.URLConnection;
-
-import javax.servlet.http.HttpServlet;
-
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+
+import javax.servlet.http.HttpServlet;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Simple servlet to load in DSpace and log4j configurations. Should always be
@@ -26,7 +25,7 @@ import org.dspace.core.ConfigurationManager;
  * local DSpace 1.5.x customized overlays.
  * 
  * TODO: Remove in trunk
- * 
+ *
  * @deprecated Use Servlet Context Listener provided in dspace-api (remove in >
  *             1.5.x)
  * @author Robert Tansley
@@ -38,10 +37,8 @@ public class LoadDSpaceConfig extends HttpServlet
 
     public void init()
     {
-        // On Windows, URL caches can cause problems, particularly with
-        // undeployment
-        // So, here we attempt to disable them if we detect that we are running
-        // on Windows
+        // On Windows, URL caches can cause problems, particularly with undeployment
+        // So, here we attempt to disable them if we detect that we are running on Windows
         try
         {
             String osName = System.getProperty("os.name");
@@ -68,11 +65,10 @@ public class LoadDSpaceConfig extends HttpServlet
             LOG.error(e.getMessage(), e);
         }
 
-        if (!ConfigurationManager.isConfigured())
+        if(!ConfigurationManager.isConfigured())
         {
             // Get config parameter
-            String config = getServletContext().getInitParameter(
-                    "dspace-config");
+            String config = getServletContext().getInitParameter("dspace-config");
 
             // Load in DSpace config
             ConfigurationManager.loadConfig(config);

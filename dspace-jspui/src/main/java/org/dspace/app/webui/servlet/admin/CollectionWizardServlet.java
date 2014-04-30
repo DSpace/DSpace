@@ -18,8 +18,8 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -152,50 +152,43 @@ public class CollectionWizardServlet extends DSpaceServlet
                 // set a variable to show all buttons
                 request.setAttribute("sysadmin_button", Boolean.TRUE);
             }
-
-            try
+            
+            try 
             {
-                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);
+                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);                
                 request.setAttribute("admin_create_button", Boolean.TRUE);
             }
-            catch (AuthorizeException authex)
-            {
+            catch (AuthorizeException authex) {
                 request.setAttribute("admin_create_button", Boolean.FALSE);
             }
-
-            try
+            
+            try 
             {
-                AuthorizeUtil.authorizeManageSubmittersGroup(context,
-                        newCollection);
+                AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);                
                 request.setAttribute("submitters_button", Boolean.TRUE);
             }
-            catch (AuthorizeException authex)
-            {
+            catch (AuthorizeException authex) {
                 request.setAttribute("submitters_button", Boolean.FALSE);
             }
-
-            try
+            
+            try 
             {
-                AuthorizeUtil.authorizeManageWorkflowsGroup(context,
-                        newCollection);
+                AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);                
                 request.setAttribute("workflows_button", Boolean.TRUE);
             }
-            catch (AuthorizeException authex)
-            {
+            catch (AuthorizeException authex) {
                 request.setAttribute("workflows_button", Boolean.FALSE);
             }
-
-            try
+            
+            try 
             {
-                AuthorizeUtil.authorizeManageTemplateItem(context,
-                        newCollection);
+                AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);                
                 request.setAttribute("template_button", Boolean.TRUE);
             }
-            catch (AuthorizeException authex)
-            {
+            catch (AuthorizeException authex) {
                 request.setAttribute("template_button", Boolean.FALSE);
             }
-
+            
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
             context.complete();
@@ -222,8 +215,8 @@ public class CollectionWizardServlet extends DSpaceServlet
             }
 
             // All pages will need this attribute
-            request.setAttribute("collection.id",
-                    String.valueOf(collection.getID()));
+            request.setAttribute("collection.id", String.valueOf(collection
+                    .getID()));
 
             switch (stage)
             {
@@ -360,7 +353,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             }
         }
 
-        // We need to add the selected people to the group.
+        //We need to add the selected people to the group.
         // First, get the relevant group
         Group g = null;
 
@@ -372,7 +365,9 @@ public class CollectionWizardServlet extends DSpaceServlet
             g = Group.create(context);
 
             // Name it according to our conventions
-            g.setName("COLLECTION_" + collection.getID() + "_DEFAULT_ITEM_READ");
+            g
+                    .setName("COLLECTION_" + collection.getID()
+                            + "_DEFAULT_ITEM_READ");
 
             // Give it the needed permission
             AuthorizeManager.addPolicy(context, collection,
@@ -411,7 +406,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         // Add people and groups from the form to the group
         int[] epersonIds = UIUtil.getIntParameters(request, "eperson_id");
         int[] groupIds = UIUtil.getIntParameters(request, "group_ids");
-
+        
         if (epersonIds != null)
         {
             for (int i = 0; i < epersonIds.length; i++)
@@ -424,19 +419,20 @@ public class CollectionWizardServlet extends DSpaceServlet
                 }
             }
         }
-
+        
         if (groupIds != null)
         {
             for (int i = 0; i < groupIds.length; i++)
             {
                 Group group = Group.find(context, groupIds[i]);
-
+            
                 if (group != null)
                 {
                     g.addMember(group);
                 }
             }
         }
+        
 
         // Update group
         g.update();
@@ -462,16 +458,13 @@ public class CollectionWizardServlet extends DSpaceServlet
             HttpServletResponse response) throws SQLException,
             ServletException, IOException, AuthorizeException
     {
-        try
-        {
+        try {
             // Wrap multipart request to get the submission info
             FileUploadRequest wrapper = new FileUploadRequest(request);
-            Collection collection = Collection.find(context,
-                    UIUtil.getIntParameter(wrapper, "collection_id"));
+            Collection collection = Collection.find(context, UIUtil.getIntParameter(wrapper, "collection_id"));
             if (collection == null)
             {
-                log.warn(LogManager.getHeader(context, "integrity_error",
-                        UIUtil.getRequestLogInfo(wrapper)));
+                log.warn(LogManager.getHeader(context, "integrity_error", UIUtil.getRequestLogInfo(wrapper)));
                 JSPManager.showIntegrityError(request, response);
 
                 return;
@@ -479,16 +472,11 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             // Get metadata
             collection.setMetadata("name", wrapper.getParameter("name"));
-            collection.setMetadata("short_description",
-                    wrapper.getParameter("short_description"));
-            collection.setMetadata("introductory_text",
-                    wrapper.getParameter("introductory_text"));
-            collection.setMetadata("copyright_text",
-                    wrapper.getParameter("copyright_text"));
-            collection.setMetadata("side_bar_text",
-                    wrapper.getParameter("side_bar_text"));
-            collection.setMetadata("provenance_description",
-                    wrapper.getParameter("provenance_description"));
+            collection.setMetadata("short_description", wrapper.getParameter("short_description"));
+            collection.setMetadata("introductory_text", wrapper.getParameter("introductory_text"));
+            collection.setMetadata("copyright_text", wrapper.getParameter("copyright_text"));
+            collection.setMetadata("side_bar_text", wrapper.getParameter("side_bar_text"));
+            collection.setMetadata("provenance_description", wrapper.getParameter("provenance_description"));
             // Need to be more careful about license -- make sure it's null if
             // nothing was entered
             String license = wrapper.getParameter("license");
@@ -503,8 +491,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (temp != null)
             {
                 // Read the temp file as logo
-                InputStream is = new BufferedInputStream(new FileInputStream(
-                        temp));
+                InputStream is = new BufferedInputStream(new FileInputStream(temp));
                 Bitstream logoBS = collection.setLogo(is);
 
                 // Strip all but the last filename. It would be nice
@@ -525,11 +512,9 @@ public class CollectionWizardServlet extends DSpaceServlet
                 logoBS.setSource(wrapper.getFilesystemName("file"));
 
                 // Identify the format
-                BitstreamFormat bf = FormatIdentifier.guessFormat(context,
-                        logoBS);
+                BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
                 logoBS.setFormat(bf);
-                AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE,
-                        context.getCurrentUser());
+                AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
                 logoBS.update();
 
                 // Remove temp file
@@ -545,12 +530,10 @@ public class CollectionWizardServlet extends DSpaceServlet
             showNextPage(context, request, response, collection, BASIC_INFO);
 
             context.complete();
-        }
-        catch (FileSizeLimitExceededException ex)
+        } catch (FileSizeLimitExceededException ex)
         {
             log.warn("Upload exceeded upload.max");
-            JSPManager.showFileSizeLimitExceededError(request, response,
-                    ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
+            JSPManager.showFileSizeLimitExceededError(request, response, ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
         }
     }
 
@@ -581,11 +564,9 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             if ((dcTypeID != -1) && (value != null) && !value.equals(""))
             {
-                MetadataField field = MetadataField.find(context, dcTypeID);
-                MetadataSchema schema = MetadataSchema.find(context,
-                        field.getSchemaID());
-                item.addMetadata(schema.getName(), field.getElement(),
-                        field.getQualifier(), lang, value);
+                MetadataField field = MetadataField.find(context,dcTypeID);
+                MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+                item.addMetadata(schema.getName(),field.getElement(), field.getQualifier(), lang, value);
             }
         }
 
@@ -634,9 +615,8 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             // Next page is 'permission to read' page iff ITEM_DEFAULT_READ
             // for anonymous group is NOT there
-            List<ResourcePolicy> anonReadPols = AuthorizeManager
-                    .getPoliciesActionFilter(context, collection,
-                            Constants.DEFAULT_ITEM_READ);
+            List<ResourcePolicy> anonReadPols = AuthorizeManager.getPoliciesActionFilter(
+                    context, collection, Constants.DEFAULT_ITEM_READ);
 
             // At this stage, if there's any ITEM_DEFAULT_READ, it can only
             // be an anonymous one.
@@ -738,8 +718,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 Community[] communities = collection.getCommunities();
                 request.setAttribute("community", communities[0]);
 
-                EditCommunitiesServlet.storeAuthorizeAttributeCollectionEdit(
-                        context, request, collection);
+                EditCommunitiesServlet.storeAuthorizeAttributeCollectionEdit(context, request, collection);
             }
 
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");

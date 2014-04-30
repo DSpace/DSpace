@@ -31,9 +31,9 @@ import org.dspace.core.LogManager;
  * <code>/login/password.jsp</code> on a GET, otherwise process the parameters
  * as an email and password.
  * 
- * Calls stackable authentication to give credentials to all authentication
- * methods that can make use of them, not just DSpace-internal.
- * 
+ * Calls stackable authentication to give credentials to all
+ * authentication methods that can make use of them, not just DSpace-internal.
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -60,26 +60,26 @@ public class PasswordServlet extends DSpaceServlet
         String jsp = null;
 
         // Locate the eperson
-        int status = AuthenticationManager.authenticate(context, email,
-                password, null, request);
-
+        int status = AuthenticationManager.authenticate(context, email, password,
+                        null, request);
+ 
+       
         if (status == AuthenticationMethod.SUCCESS)
         {
             // Logged in OK.
             Authenticate.loggedIn(context, request, context.getCurrentUser());
 
             // Set the Locale according to user preferences
-            Locale epersonLocale = I18nUtil.getEPersonLocale(context
-                    .getCurrentUser());
+            Locale epersonLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             context.setCurrentLocale(epersonLocale);
             Config.set(request.getSession(), Config.FMT_LOCALE, epersonLocale);
 
             log.info(LogManager.getHeader(context, "login", "type=explicit"));
 
-            // resume previous request
-            Authenticate.resumeInterruptedRequest(request, response);
+                // resume previous request
+                Authenticate.resumeInterruptedRequest(request, response);
 
-            return;
+                return;
         }
         else if (status == AuthenticationMethod.CERT_REQUIRED)
         {
@@ -91,8 +91,8 @@ public class PasswordServlet extends DSpaceServlet
         }
 
         // If we reach here, supplied email/password was duff.
-        log.info(LogManager.getHeader(context, "failed_login", "email=" + email
-                + ", result=" + String.valueOf(status)));
+        log.info(LogManager.getHeader(context, "failed_login",
+                "email=" + email + ", result=" + String.valueOf(status)));
         JSPManager.showJSP(request, response, jsp);
     }
 }

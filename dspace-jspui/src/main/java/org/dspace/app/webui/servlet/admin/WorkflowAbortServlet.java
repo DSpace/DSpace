@@ -47,8 +47,8 @@ public class WorkflowAbortServlet extends DSpaceServlet
         if (button.equals("submit_abort"))
         {
             // bring up the confirm page
-            WorkflowItem wi = WorkflowItem.find(c,
-                    UIUtil.getIntParameter(request, "workflow_id"));
+            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+                    request, "workflow_id"));
 
             request.setAttribute("workflow", wi);
             JSPManager.showJSP(request, response,
@@ -57,8 +57,8 @@ public class WorkflowAbortServlet extends DSpaceServlet
         else if (button.equals("submit_abort_confirm"))
         {
             // do the actual abort
-            WorkflowItem wi = WorkflowItem.find(c,
-                    UIUtil.getIntParameter(request, "workflow_id"));
+            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+                    request, "workflow_id"));
 
             WorkflowManager.abort(c, wi, c.getCurrentUser());
 

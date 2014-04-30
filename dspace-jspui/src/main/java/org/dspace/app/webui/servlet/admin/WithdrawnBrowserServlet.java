@@ -15,13 +15,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.servlet.AbstractBrowserServlet;
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
 import org.dspace.core.Context;
+
+import org.dspace.app.webui.servlet.AbstractBrowserServlet;
+import org.dspace.app.webui.util.JSPManager;
 
 /**
  * Servlet for browsing through withdrawn items:
@@ -35,22 +36,20 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
     private static Logger log = Logger.getLogger(WithdrawnBrowserServlet.class);
 
     /**
-     * Do the usual DSpace GET method. You will notice that browse does not
-     * currently respond to POST requests.
+     * Do the usual DSpace GET method.  You will notice that browse does not currently
+     * respond to POST requests.
      */
-    protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         try
         {
             // all browse requests currently come to GET.
-            BrowserScope scope = getBrowserScopeForRequest(context, request,
-                    response);
-
+            BrowserScope scope = getBrowserScopeForRequest(context, request, response);
+    
             // Check that we are doing an item browse
-            if (scope.getBrowseIndex() == null
-                    || scope.getBrowseIndex().isItemIndex())
+            if (scope.getBrowseIndex() == null || scope.getBrowseIndex().isItemIndex())
             {
                 // And override the index in the scope with the withdrawn items
                 scope.setBrowseIndex(BrowseIndex.getWithdrawnBrowseIndex());
@@ -59,7 +58,7 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
             {
                 showError(context, request, response);
             }
-
+            
             // execute browse request
             processBrowse(context, scope, request, response);
         }
@@ -70,6 +69,7 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
         }
     }
 
+    
     /**
      * Display the error page
      * 
@@ -81,9 +81,9 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
-    protected void showError(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    protected void showError(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         request.setAttribute("useAdminLayout", "yes");
 
@@ -101,20 +101,19 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
-    protected void showNoResultsPage(Context context,
-            HttpServletRequest request, HttpServletResponse response)
+    protected void showNoResultsPage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
         request.setAttribute("browseWithdrawn", "yes");
-
+        
         JSPManager.showJSP(request, response, "/browse/no-results.jsp");
     }
 
     /**
-     * Display the single page. This is the page which lists just the single
-     * values of a metadata browse, not individual items. Single values are
-     * links through to all the items that match that metadata value
+     * Display the single page.  This is the page which lists just the single values of a 
+     * metadata browse, not individual items.  Single values are links through to all the items
+     * that match that metadata value
      * 
      * @param context
      * @param request
@@ -124,9 +123,9 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
-    protected void showSinglePage(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    protected void showSinglePage(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         // Show an error as this currently isn't supported
         showError(context, request, response);
@@ -143,12 +142,12 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
-    protected void showFullPage(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    protected void showFullPage(Context context, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
     {
         request.setAttribute("browseWithdrawn", "yes");
-
+        
         JSPManager.showJSP(request, response, "/browse/full.jsp");
     }
 }

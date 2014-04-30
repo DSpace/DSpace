@@ -67,8 +67,8 @@ public class PopupTag extends BodyTagSupport
          * appropriately:
          * 
          * <script type="text/javascript"> <!-- document.write(' <a href="#"
-         * onClick="var popupwin = window.open(\
-         * 'PAGE\',\'dspacepopup\',\'height=600,width=550,resizable,scrollbars\');popupwin.focus();return
+         * onClick="var popupwin =
+         * window.open(\'PAGE\',\'dspacepopup\',\'height=600,width=550,resizable,scrollbars\');popupwin.focus();return
          * false;">TEXT <\/a>'); // --> </script> <noscript> <a href="PAGE"
          * target="dspacepopup">TEXT </a>. </noscript>
          * 
@@ -88,7 +88,7 @@ public class PopupTag extends BodyTagSupport
                 + "<!-- Javascript starts here\n"
                 + "document.write('<a href=\"#\" onClick=\"var popupwin = window.open(\\'"
                 + actualPage
-                + "\\',\\'dspacepopup\\',\\'height=600,width=550,menubar,status,location,toolbar,resizable,scrollbars\\');popupwin.focus();return false;\">"
+                + "\\',\\'dspacepopup\\',\\'height=600,width=550,resizable,scrollbars\\');popupwin.focus();return false;\">"
                 + linkText + "<\\/a>');\n" + "// -->\n"
                 + "</script><noscript><a href=\"" + actualPage
                 + "\" target=\"dspacepopup\">" + linkText + "</a></noscript>";

@@ -163,12 +163,15 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
                 if (!publishedBefore)
                 {
+                    DCValue[] dateIssued = subInfo.getSubmissionItem().getItem()
+                            .getDC("date", "issued", Item.ANY);
                     DCValue[] citation = subInfo.getSubmissionItem().getItem()
                             .getDC("identifier", "citation", Item.ANY);
                     DCValue[] publisher = subInfo.getSubmissionItem().getItem()
                             .getDC("publisher", null, Item.ANY);
 
-                    willRemoveDate = (citation.length > 0) || (publisher.length > 0);
+                    willRemoveDate = (dateIssued.length > 0)
+                            || (citation.length > 0) || (publisher.length > 0);
                 }
 
                 if (!multipleFiles)
@@ -296,6 +299,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
         if (!publishedBefore && subInfo.getSubmissionItem().isPublishedBefore())
         {
+            item.clearDC("date", "issued", Item.ANY);
             item.clearDC("identifier", "citation", Item.ANY);
             item.clearDC("publisher", null, Item.ANY);
         }

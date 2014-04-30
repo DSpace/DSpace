@@ -123,7 +123,7 @@ public class SitemapServlet extends DSpaceServlet
         {
             is.close();
         }
-
+        
         response.getOutputStream().flush();
     }
 }

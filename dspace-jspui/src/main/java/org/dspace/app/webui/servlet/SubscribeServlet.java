@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -44,8 +45,8 @@ public class SubscribeServlet extends DSpaceServlet
     {
         /*
          * Parameters: submit_unsubscribe - unsubscribe from a collection
-         * submit_clear - clear all subscriptions submit_cancel - cancel update
-         * - go to My DSpace.
+         * submit_clear - clear all subscriptions submit_cancel - cancel update -
+         * go to My DSpace.
          */
         String submit = UIUtil.getSubmitButton(request, "submit");
         EPerson e = context.getCurrentUser();
@@ -96,7 +97,8 @@ public class SubscribeServlet extends DSpaceServlet
         {
             // Back to "My DSpace"
             response.sendRedirect(response.encodeRedirectURL(request
-                    .getContextPath() + "/mydspace"));
+                    .getContextPath()
+                    + "/mydspace"));
         }
     }
 
@@ -110,8 +112,8 @@ public class SubscribeServlet extends DSpaceServlet
      * @param response
      *            HTTP response
      * @param updated
-     *            if <code>true</code>, write a message indicating that updated
-     *            subscriptions have been stored
+     *            if <code>true</code>, write a message indicating that
+     *            updated subscriptions have been stored
      */
     private void showSubscriptions(Context context, HttpServletRequest request,
             HttpServletResponse response, boolean updated)
@@ -119,10 +121,10 @@ public class SubscribeServlet extends DSpaceServlet
     {
         // collections the currently logged in user can subscribe to
         Collection[] avail = Subscribe.getAvailableSubscriptions(context);
-
+        
         // Subscribed collections
-        Collection[] subs = Subscribe.getSubscriptions(context,
-                context.getCurrentUser());
+        Collection[] subs = Subscribe.getSubscriptions(context, context
+                .getCurrentUser());
 
         request.setAttribute("availableSubscriptions", avail);
         request.setAttribute("subscriptions", subs);

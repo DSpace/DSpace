@@ -11,19 +11,17 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.MissingResourceException;
-
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -31,11 +29,15 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+import org.dspace.content.Item;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+
 
 /**
  * Servlet for handling user email recommendations
- * 
- * @author Arnaldo Dantas
+ *
+ * @author  Arnaldo Dantas
  * @version $Revision$
  */
 public class SuggestServlet extends DSpaceServlet
@@ -44,8 +46,8 @@ public class SuggestServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(SuggestServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    					   HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Obtain information from request
         // The page where the user came from
@@ -62,12 +64,10 @@ public class SuggestServlet extends DSpaceServlet
         }
         else
         {
-            // cut off all but the hostname, to cover cases where more than one
-            // URL
+            // cut off all but the hostname, to cover cases where more than one URL
             // arrives at the installation; e.g. presence or absence of "www"
             int lastDot = host.lastIndexOf('.');
-            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf(
-                    "."));
+            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf("."));
         }
 
         if (fromPage == null || fromPage.indexOf(basicHost) == -1)
@@ -97,19 +97,18 @@ public class SuggestServlet extends DSpaceServlet
         }
         else
         {
-            String path = request.getPathInfo();
-            log.info(LogManager
-                    .getHeader(context, "invalid_id", "path=" + path));
+        	String path = request.getPathInfo();
+            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
             JSPManager.showInvalidIDError(request, response, path, -1);
             return;
         }
         if (title == null)
         {
-            title = "";
+        	title = "";
         }
-        if (collName == null)
+        if(collName == null)
         {
-            collName = "";
+        	collName = "";
         }
         request.setAttribute("suggest.title", title);
 
@@ -126,131 +125,114 @@ public class SuggestServlet extends DSpaceServlet
 
         if (request.getParameter("submit") != null)
         {
-            String recipAddr = request.getParameter("recip_email");
+        	String recipAddr = request.getParameter("recip_email");
             // the only required field is recipient email address
             if (recipAddr == null || recipAddr.equals(""))
             {
                 log.info(LogManager.getHeader(context, "show_suggest_form",
-                        "problem=true"));
+                    	 "problem=true"));
                 request.setAttribute("suggest.problem", Boolean.TRUE);
                 JSPManager.showJSP(request, response, "/suggest/suggest.jsp");
                 return;
             }
-            String recipName = request.getParameter("recip_name");
-            if (recipName == null || "".equals(recipName))
-            {
+        	String recipName = request.getParameter("recip_name");
+        	if (recipName == null || "".equals(recipName))
+        	{
                 try
                 {
-                    recipName = I18nUtil
-                            .getMessage(
-                                    "org.dspace.app.webui.servlet.SuggestServlet.recipient",
-                                    context);
+                recipName = I18nUtil.getMessage("org.dspace.app.webui.servlet.SuggestServlet.recipient", context);
                 }
                 catch (MissingResourceException e)
                 {
-                    log.warn(LogManager
-                            .getHeader(context, "show_suggest_form",
-                                    "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
+                    log.warn(LogManager.getHeader(context, "show_suggest_form", "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
                     recipName = "colleague";
                 }
-            }
+        	}
             String senderName = request.getParameter("sender_name");
-            if (senderName == null || "".equals(senderName))
+            if (senderName == null || "".equals(senderName) )
             {
-                // use userName if available
-                if (userName != null)
-                {
-                    senderName = userName;
-                }
-                else
-                {
-                    try
+            	// use userName if available
+            	if (userName != null)
+            	{
+            		senderName = userName;
+            	}
+            	else
+            	{
+            		try
                     {
-                        senderName = I18nUtil
-                                .getMessage(
-                                        "org.dspace.app.webui.servlet.SuggestServlet.sender",
-                                        context);
+            		senderName = I18nUtil.getMessage("org.dspace.app.webui.servlet.SuggestServlet.sender", context);
                     }
                     catch (MissingResourceException e)
                     {
-                        log.warn(LogManager
-                                .getHeader(context, "show_suggest_form",
-                                        "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
+                        log.warn(LogManager.getHeader(context, "show_suggest_form", "Missing Resource: org.dspace.app.webui.servlet.SuggestServlet.sender"));
                         senderName = "A DSpace User";
                     }
-                }
+            	}
             }
             String senderAddr = request.getParameter("sender_email");
             if (StringUtils.isEmpty(senderAddr) && authEmail != null)
             {
-                // use authEmail if available
+            	// use authEmail if available
                 senderAddr = authEmail;
             }
             String itemUri = HandleManager.getCanonicalForm(handle);
-            String itemUrl = HandleManager.resolveToURL(context, handle);
+            String itemUrl = HandleManager.resolveToURL(context,handle);
             String message = request.getParameter("message");
             String siteName = ConfigurationManager.getProperty("dspace.name");
 
             // All data is there, send the email
             try
             {
-                Email email = Email.getEmail(I18nUtil.getEmailFilename(
-                        context.getCurrentLocale(), "suggest"));
-                email.addRecipient(recipAddr); // recipient address
-                email.addArgument(recipName); // 1st arg - recipient name
-                email.addArgument(senderName); // 2nd arg - sender name
-                email.addArgument(siteName); // 3rd arg - repository name
-                email.addArgument(title); // 4th arg - item title
-                email.addArgument(itemUri); // 5th arg - item handle URI
-                email.addArgument(itemUrl); // 6th arg - item local URL
-                email.addArgument(collName); // 7th arg - collection name
-                email.addArgument(message); // 8th arg - user comments
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "suggest"));
+                email.addRecipient(recipAddr);	 // recipient address
+                email.addArgument(recipName);    // 1st arg - recipient name
+                email.addArgument(senderName);   // 2nd arg - sender name
+                email.addArgument(siteName);     // 3rd arg - repository name
+                email.addArgument(title);        // 4th arg - item title
+                email.addArgument(itemUri);      // 5th arg - item handle URI
+                email.addArgument(itemUrl);      // 6th arg - item local URL
+                email.addArgument(collName);     // 7th arg - collection name
+                email.addArgument(message);      // 8th arg - user comments
 
                 // Set sender's address as 'reply-to' address if supplied
-                if (senderAddr != null && !"".equals(senderAddr))
+                if ( senderAddr != null && ! "".equals(senderAddr))
                 {
-                    email.setReplyTo(senderAddr);
+                	email.setReplyTo(senderAddr);
                 }
 
                 // Only actually send the email if feature is enabled
-                if (ConfigurationManager.getBooleanProperty(
-                        "webui.suggest.enable", false))
+                if (ConfigurationManager.getBooleanProperty("webui.suggest.enable", false))
                 {
                     email.send();
-                }
-                else
+                } else
                 {
-                    throw new MessagingException(
-                            "Suggest item email not sent - webui.suggest.enable = false");
+                    throw new MessagingException("Suggest item email not sent - webui.suggest.enable = false");
                 }
 
-                log.info(LogManager.getHeader(context, "sent_suggest", "from="
-                        + senderAddr));
+                log.info(LogManager.getHeader(context, "sent_suggest",
+                		                      "from=" + senderAddr));
 
-                JSPManager
-                        .showJSP(request, response, "/suggest/suggest_ok.jsp");
+                JSPManager.showJSP(request, response, "/suggest/suggest_ok.jsp");
             }
             catch (MessagingException me)
             {
-                log.warn(LogManager.getHeader(context, "error_mailing_suggest",
-                        ""), me);
+                log.warn(LogManager.getHeader(context, "error_mailing_suggest", ""), me);
                 JSPManager.showInternalError(request, response);
             }
         }
         else
         {
             // Display suggest form
-            log.info(LogManager.getHeader(context, "show_suggest_form",
-                    "problem=false"));
+            log.info(LogManager.getHeader(context, "show_suggest_form", "problem=false"));
             request.setAttribute("authenticated.email", authEmail);
             request.setAttribute("eperson.name", userName);
-            JSPManager.showJSP(request, response, "/suggest/suggest.jsp"); // asd
+            JSPManager.showJSP(request, response, "/suggest/suggest.jsp"); //asd
         }
-    }
+   }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+    						HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Treat as a GET
         doDSGet(context, request, response);

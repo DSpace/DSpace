@@ -25,9 +25,10 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
- * X509 certificate authentication servlet. This is an access point for
- * interactive certificate auth that will not be implicit (i.e. not immediately
- * performed because the resource is being accessed via HTTP
+ * X509 certificate authentication servlet. This is an
+ * access point for interactive certificate auth that will
+ * not be implicit (i.e. not immediately performed
+ * because the resource is being accessed via HTTP
  * 
  * @author Robert Tansley
  * @author Mark Diggory
@@ -37,7 +38,7 @@ public class X509CertificateServlet extends DSpaceServlet
 {
     /** serialization id */
     private static final long serialVersionUID = -3571151231655696793L;
-
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(X509CertificateServlet.class);
 

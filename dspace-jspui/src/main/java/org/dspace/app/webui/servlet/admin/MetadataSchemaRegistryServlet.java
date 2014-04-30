@@ -27,16 +27,14 @@ import org.dspace.core.Context;
 
 /**
  * Servlet for editing the Dublin Core schema registry.
- * 
+ *
  * @author Martin Hald
  * @version $Revision$
  */
 public class MetadataSchemaRegistryServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger
-            .getLogger(MetadataSchemaRegistryServlet.class);
-
+    private static Logger log = Logger.getLogger(MetadataSchemaRegistryServlet.class);
     private String clazz = "org.dspace.app.webui.servlet.admin.MetadataSchemaRegistryServlet";
 
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -103,8 +101,8 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            MetadataSchema schema = MetadataSchema.find(context,
-                    UIUtil.getIntParameter(request, "dc_schema_id"));
+            MetadataSchema schema = MetadataSchema.find(context, UIUtil
+                    .getIntParameter(request, "dc_schema_id"));
             request.setAttribute("schema", schema);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-mdschema.jsp");
@@ -112,8 +110,8 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
-            MetadataSchema dc = MetadataSchema.find(context,
-                    UIUtil.getIntParameter(request, "dc_schema_id"));
+            MetadataSchema dc = MetadataSchema.find(context, UIUtil
+                    .getIntParameter(request, "dc_schema_id"));
             dc.delete(context);
             showSchemas(context, request, response);
             context.complete();
@@ -129,37 +127,39 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
      * Return false if the schema arguments fail to pass the constraints. If
      * there is an error the request error String will be updated with an error
      * description.
-     * 
+     *
      * @param request
      * @return true of false
      */
     private boolean sanityCheck(HttpServletRequest request)
     {
         Locale locale = request.getLocale();
-        ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
-
+        ResourceBundle labels =
+            ResourceBundle.getBundle("Messages", locale);
+        
         // TODO: add more namespace checks
         String namespace = request.getParameter("namespace");
         if (namespace.length() == 0)
         {
-            return error(request, labels.getString(clazz + ".emptynamespace"));
+            return error(request, labels.getString(clazz  + ".emptynamespace"));
         }
 
         String name = request.getParameter("short_name");
         if (name.length() == 0)
         {
-            return error(request, labels.getString(clazz + ".emptyname"));
+            return error(request, labels.getString(clazz  + ".emptyname"));
         }
         if (name.length() > 32)
         {
-            return error(request, labels.getString(clazz + ".nametolong"));
+            return error(request, labels.getString(clazz  + ".nametolong"));
         }
         for (int ii = 0; ii < name.length(); ii++)
         {
             if (name.charAt(ii) == ' ' || name.charAt(ii) == '_'
                     || name.charAt(ii) == '.')
             {
-                return error(request, labels.getString(clazz + ".illegalchar"));
+                return error(request,
+                        labels.getString(clazz  + ".illegalchar"));
             }
         }
 
@@ -168,7 +168,7 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
 
     /**
      * Bind the error text to the request object.
-     * 
+     *
      * @param request
      * @param text
      * @return false
@@ -181,7 +181,7 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
 
     /**
      * Show list of DC type
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param request

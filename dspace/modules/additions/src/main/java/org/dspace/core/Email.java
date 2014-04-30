@@ -119,7 +119,9 @@ public class Email
     private String replyTo;
 
     private List<FileAttachment> attachments;
+    private List<MimeBodyPart> attachmentsMimeBodyPart;
     private List<InputStreamAttachment> moreAttachments;
+    
 
     /** The character set this message will be sent in */
     private String charset;
@@ -134,6 +136,7 @@ public class Email
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
+        attachmentsMimeBodyPart = new ArrayList<MimeBodyPart>(10);
         moreAttachments = new ArrayList<InputStreamAttachment>(10);
         subject = "";
         content = "";
@@ -189,7 +192,7 @@ public class Email
     }
 
     /**
-     * Fill out the next argument in the template
+     * Fill out the next argument in if (attachments.isEmpty()the template
      *
      * @param arg
      *            the value for the next argument
@@ -208,6 +211,11 @@ public class Email
         moreAttachments.add(new InputStreamAttachment(is, name,mimetype));
     }
 
+    public void addAttachment(MimeBodyPart attachment)
+       {
+           attachmentsMimeBodyPart.add(attachment);
+       }
+    
     public void setCharset(String cs)
     {
         charset = cs;
@@ -282,7 +290,10 @@ public class Email
         }
 
         // Add attachments
-        if (attachments.isEmpty() && moreAttachments.isEmpty())
+      
+      // DRUM Note: local customizations
+    //  if (attachments.isEmpty() && moreAttachments.isEmpty())
+        if (attachments.isEmpty() && attachmentsMimeBodyPart.isEmpty())
         {
             // If a character set has been specified, or a default exists
             if (charset != null)
@@ -311,6 +322,11 @@ public class Email
 	                messageBodyPart.setFileName(f.name);
 	                multipart.addBodyPart(messageBodyPart);
 	            }
+	                        
+	                        for (MimeBodyPart attachment : attachmentsMimeBodyPart) {
+	                           multipart.addBodyPart(attachment);
+	                        }
+	                        
 	            message.setContent(multipart);
         	 }
         	 if(!moreAttachments.isEmpty()){
