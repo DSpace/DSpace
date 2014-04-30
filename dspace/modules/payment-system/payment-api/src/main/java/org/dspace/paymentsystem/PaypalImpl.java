@@ -33,9 +33,14 @@ import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 
 import javax.mail.MessagingException;
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -70,101 +75,81 @@ public class PaypalImpl implements PaypalService{
         String requestUrl = ConfigurationManager.getProperty("payment-system","paypal.payflow.link");
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-            PostMethod post = new PostMethod(requestUrl);
+            Item item =Item.find(context, shoppingCart.getItem());
+            String url = requestUrl;
+            URL obj = new URL(url);
+            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
-            post.addParameter("SECURETOKENID",secureTokenId);
-            post.addParameter("CREATESECURETOKEN","Y");
-            post.addParameter("MODE",ConfigurationManager.getProperty("payment-system","paypal.mode"));
-            post.addParameter("PARTNER",ConfigurationManager.getProperty("payment-system","paypal.partner"));
+            //add reuqest header
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-            post.addParameter("VENDOR",ConfigurationManager.getProperty("payment-system","paypal.vendor"));
-            post.addParameter("USER",ConfigurationManager.getProperty("payment-system","paypal.user"));
-            post.addParameter("PWD", ConfigurationManager.getProperty("payment-system","paypal.pwd"));
-            //get.addParameter("RETURNURL", URLEncoder.encode("http://us.atmire.com:8080/submit-paypal-checkout"));
-            if(ConfigurationManager.getProperty("payment-system","paypal.returnurl").length()>0)
-            post.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
-            post.addParameter("TENDER", "C");
-            post.addParameter("TRXTYPE", type);
-            if(type.equals("S")){
-                //generate reauthorization form
-                post.addParameter("AMT", Double.toString(shoppingCart.getTotal()));
-            }
-            else
-            {
-                //generate reference transaction form for a later charge
-                post.addParameter("AMT", "0.00");
-            }
-            //TODO:add currency from shopping cart
-            post.addParameter("CURRENCY", shoppingCart.getCurrency());
-
-            Item item = Item.find(context,shoppingCart.getItem());
 
             String userFirstName = "";
-
             String userLastName = "";
-
             String userEmail = "";
-
             String userName = "";
-
             try{
-                    userFirstName = item.getSubmitter().getFirstName();
 
-                    userLastName = item.getSubmitter().getLastName();
-
-                    userEmail = item.getSubmitter().getEmail();
-
-                    userName = item.getSubmitter().getFullName();
-
-                }catch (Exception e)
-
+                userFirstName = item.getSubmitter().getFirstName();
+                userLastName = item.getSubmitter().getLastName();
+                userEmail = item.getSubmitter().getEmail();
+                userName = item.getSubmitter().getFullName();
+            }catch (Exception e)
             {
-
                 log.error("cant get submitter's user name for paypal transaction");
+            }
+            String amount = "0.00";
 
+            if(type.equals("S")){
+                //generate reauthorization form
+                amount = Double.toString(shoppingCart.getTotal());
             }
 
-            post.addParameter("FIRSTNAME",userFirstName);
+            String urlParameters ="SECURETOKENID="+secureTokenId+"&CREATESECURETOKEN=Y"+"&MODE="+ConfigurationManager.getProperty("payment-system","paypal.mode")+"&PARTNER="+ConfigurationManager.getProperty("payment-system","paypal.partner")+"&VENDOR="+ConfigurationManager.getProperty("payment-system","paypal.vendor")+"&USER="+ConfigurationManager.getProperty("payment-system","paypal.user")+"&PWD="+ConfigurationManager.getProperty("payment-system","paypal.pwd")+"&TENDER="+type+"&TRXTYPE="+type+"&FIRSTNAME="+userFirstName+"&LASTNAME="+userLastName+"&COMMENT1="+userName+"&COMMENT2="+userEmail+"&AMT="+amount+"&CURRENCY="+shoppingCart.getCurrency();
 
-            post.addParameter("LASTNAME",userLastName);
+            // Send post request
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
 
-            post.addParameter("COMMENT1","Submitter's name :"+userName);
+            int responseCode = con.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Post parameters : " + urlParameters);
+            System.out.println("Response Code : " + responseCode);
 
-            post.addParameter("COMMENT2","Submitter's email :"+userEmail);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
 
-	    log.debug("paypal request URL " + post);
-            switch (new HttpClient().executeMethod(post)) {
-                case 200:
-                case 201:
-                case 202:
-                    String string = post.getResponseBodyAsString();
-                    String[] results = string.split("&");
-                    for(String temp:results)
-                    {
-                        String[] result = temp.split("=");
-                        if(result[0].contains("RESULT")&&!result[1].equals("0"))
-                        {
-                            //failed to get a secure token
-                            log.error("Failed to get a secure token from paypal:"+string);
-                            log.error("Failed to get a secure token from paypal:"+post);
-                            break;
-                        }
-                        if(result[0].equals("SECURETOKEN"))
-                        {
-                            secureToken=result[1];
-                        }
-                    }
-
-
+            String[] results = response.toString().split("&");
+            for(String temp:results)
+            {
+                String[] result = temp.split("=");
+                if(result[0].contains("RESULT")&&!result[1].equals("0"))
+                {
+                    //failed to get a secure token
+                    log.error("Failed to get a secure token from paypal:"+response.toString());
                     break;
-                default:
-                    log.error("get paypal secure token error");
+                }
+                if(result[0].equals("SECURETOKEN"))
+                {
+                    secureToken=result[1];
+                    break;
+                }
             }
 
-            post.releaseConnection();
+
+//            if(ConfigurationManager.getProperty("payment-system","paypal.returnurl").length()>0)
+//            get.addParameter("RETURNURL", ConfigurationManager.getProperty("payment-system","paypal.returnurl"));
         }
         catch (Exception e) {
             log.error("get paypal secure token error:",e);
