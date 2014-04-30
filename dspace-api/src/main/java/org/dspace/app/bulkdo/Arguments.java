@@ -56,7 +56,7 @@ class Arguments {
     private DSpaceObject dobj = null;
     private int myType = -1;
     private int format = Printer.TXT_FORMAT;
-    private static String[] defaultKeys = {"object", "handle", "parent", "name"};
+    private static String[] defaultKeys = {"object", "parent"};
     private String[] keys = defaultKeys;
     private boolean verbose;
     private char doAction;

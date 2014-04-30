@@ -18,7 +18,6 @@ public class ActionTarget {
     private ActionTarget up;
 
     ActionTarget(ActionTarget container, DSpaceObject o) {
-        System.out.println("Create ActionTarget " + o);
         assert (o != null);
         obj = o;
         up = container;
@@ -78,7 +77,7 @@ public class ActionTarget {
     }
 
 
-    static String theAvailableKeys[] = {"object", "id", "type", "handle", "exception"};
+    static String theAvailableKeys[] = {"object", "id", "type", "exception"};
 
     public static String[] availableKeys(int type) {
         switch (type) {
@@ -188,7 +187,6 @@ public class ActionTarget {
                     map.put("id", obj.getID());
                     map.put("parent", obj.getParentObject());
                     map.put("up", up);
-                    map.put("handle", obj.getHandle());
                 } catch (SQLException e) {
                     map.put("exception", e.getMessage());
                 }
@@ -202,7 +200,7 @@ public class ActionTarget {
 class CollectionActionTarget extends ActionTarget {
     Collection col;
 
-    static String[] theAvailableKeys = {"name", "template"};
+    static String[] theAvailableKeys = {"name", "handle", "template"};
 
     CollectionActionTarget(ActionTarget up, DSpaceObject o) {
         super(up, o);
@@ -214,6 +212,7 @@ class CollectionActionTarget extends ActionTarget {
         boolean create = super.toHashMap();
         if (create) {
             put("name", col.getName());
+            put("handle", getObject().getHandle());
             try {
                 put("template", col.getTemplateItem());
             } catch (SQLException e) {
@@ -227,7 +226,7 @@ class CollectionActionTarget extends ActionTarget {
 class ItemActionTarget extends ActionTarget {
     Item itm;
 
-    static String[] theAvailableKeys = {"isWithdrawn", "name"};
+    static String[] theAvailableKeys = {"isWithdrawn", "handle", "name"};
 
     ItemActionTarget(ActionTarget up, DSpaceObject o) {
         super(up, o);
@@ -240,6 +239,7 @@ class ItemActionTarget extends ActionTarget {
         if (create) {
             put("isWithdrawn", itm.isWithdrawn());
             put("name", itm.getName());
+            put("handle", getObject().getHandle());
         }
         return create;
     }
