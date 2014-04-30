@@ -76,6 +76,22 @@
         <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/choice-support.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/jplayer/jquery.jplayer.min.js"></script>
         
+        <!-- AddThis scripts for social media -->
+        <!-- AddThis Smart Layers BEGIN -->
+        <!-- Go to http://www.addthis.com/get/smart-layers to customize -->
+        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4e8dda135264b2f8"></script>
+        <script type="text/javascript">
+          addthis.layers({
+            'theme' : 'transparent',
+            'share' : {
+              'position' : 'left',
+              'numPreferredServices' : 4,
+              'services': 'facebook,twitter,google_plusone_share,more'
+            }   
+          });
+        </script>
+        <!-- AddThis Smart Layers END -->
+        
         <!-- Custom scripsts -->
         <script src="<%= request.getContextPath() %>/static/js/app.js"></script>
 <% 
