@@ -53,7 +53,7 @@ public class Bitstreams {
     }
 
     void apply(Printer p) {
-        p.addKey("BUNDLE.object");
+        p.addKey("BUNDLE.name");
         p.addKey("replace");
         p.addKey("replace.mimeType");
         p.addKey("success");
@@ -116,9 +116,6 @@ public class Bitstreams {
                 Bitstreams bitActor = new Bitstreams(args);
                 Printer p = args.getPrinter();
                 bitActor.apply(p);
-
-
-
             }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");
@@ -171,7 +168,7 @@ class BitstreamsArguments extends Arguments {
 
             // TODO - really shouldn't require type option - we know we need BITSTREAM
             if (getType() != Constants.BITSTREAM) {
-                throw new ParseException("Sorry only BITSTREAM allowed for tyep argument");
+                throw new ParseException("Sorry only working on single BITSTREAMs");
             }
 
             filename = line.getOptionValue(FILE);

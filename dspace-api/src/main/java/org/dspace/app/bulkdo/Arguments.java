@@ -133,7 +133,7 @@ class Arguments {
         return options;
     }
 
-    /*
+    /**
     * determine whether objects of 'one' type include DSPaceObjects objects of 'other' type
     */
     /* TODO: relying on Constants values - move to Constants class ?? */
@@ -232,8 +232,7 @@ class Arguments {
             }
         }
 
-        // HACK: relying on const values
-        if (myType > dobj.getType()) {
+        if (! typeIncludes(myType, dobj.getType())) {
             throw new ParseException(Constants.typeText[myType] + "s are not nested inside " +
                     Constants.typeText[dobj.getType()]);
         }
