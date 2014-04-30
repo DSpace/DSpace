@@ -2,12 +2,13 @@ package org.dspace.app.bulkdo;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.*;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.app.util.Util;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
+import java.io.PrintStream;
 import java.sql.SQLException;
 
 import static java.util.Arrays.deepToString;
@@ -17,6 +18,23 @@ import static java.util.Arrays.deepToString;
  * Created by monikam on 4/2/14.
  */
 class Arguments {
+    public static String ACTION = "a";
+    public static String ACTION_LONG = "action";
+
+    public static String DSPACE_ACTION = "d";
+    public static String DSPACE_ACTION_LONG = "dspace_action";
+
+    public static String EPERSON = "e";
+    public static String EPERSON_LONG = "eperson";
+
+    public static String FORMAT = "f";
+    public static String FORMAT_LONG = "format";
+
+    public static String HELP = "h";
+    public static String HELP_LONG = "help";
+
+    public static String KEYS = "i";
+    public static String KEYS_LONG = "include";
 
     public static String ROOT = "r";
     public static String ROOT_LONG = "root";
@@ -24,26 +42,13 @@ class Arguments {
     public static String TYPE = "t";
     public static String TYPE_LONG = "type";
 
-    public static String HELP = "h";
-    public static String HELP_LONG = "help";
-
-    public static String FORMAT = "f";
-    public static String FORMAT_LONG = "format";
-
-    public static String KEYS = "i";
-    public static String KEYS_LONG = "include";
-
     public static String VERBOSE = "v";
     public static String VERBOSE_LONG = "verbose";
 
-    public static String ACTION = "a";
-    public static String ACTION_LONG = "action";
-
-    public static String EPERSON = "e";
-    public static String EPERSON_LONG= "eperson";
+    public static String WHO = "w";
+    public static String WHO_LONG = "who";
 
     public static final String[] actionText = {"ADD", "DEL", "REPLACE", "LIST"};
-
     public static final char DO_ADD = 'A';
     public static final char DO_DEL = 'D';
     public static final char DO_REPLACE = 'R';
@@ -58,9 +63,17 @@ class Arguments {
     private int format = Printer.TXT_FORMAT;
     private static String[] defaultKeys = {"object", "parent"};
     private String[] keys = defaultKeys;
+
     private boolean verbose;
+
     private char doAction;
     private char[] availableActions;
+
+    private String dspaceAction = Constants.actionText[Constants.READ];
+    private int dspaceActionid;
+
+    String who = "GROUP." + Group.ANONYMOUS_ID;
+    DSpaceObject whoObj; // EPerson or Group;
 
     Arguments() {
         this(null);
@@ -80,12 +93,14 @@ class Arguments {
                         availableActionStrings += ", ";
                     availableActionStrings += getActionString(myAvailableActions[j]);
                 }
-                options.addOption(ACTION, ACTION_LONG, true, "what to do, available " + availableActionStrings);
+                options.addOption(ACTION, ACTION_LONG, true, "what to do, available " + availableActionStrings + " default is '" + doAction + "'");
             }
         }
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
-        options.addOption(EPERSON, EPERSON_LONG, true, "dspace user account - email or netid");
+        options.addOption(EPERSON, EPERSON_LONG, true, "dspace user account (email or netid) used for authorization to dspace app");
+        options.addOption(DSPACE_ACTION, DSPACE_ACTION_LONG, true, "one of " + deepToString(Constants.actionText) + " default is " + Constants.actionText[Constants.READ]);
+        options.addOption(WHO, WHO_LONG, true, "group/eperson used in policies, give as GROUP.<name>, EPERSON.<netid>, or EPERSON.<email>");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
         options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
@@ -121,6 +136,14 @@ class Arguments {
         return doAction;
     }
 
+    public String getActionString() {
+        return getActionString(doAction);
+    }
+
+    public int getDSpaceAction() {
+        return dspaceActionid;
+    }
+
     public boolean getVerbose() {
         return verbose;
     }
@@ -134,8 +157,8 @@ class Arguments {
     }
 
     /**
-    * determine whether objects of 'one' type include DSPaceObjects objects of 'other' type
-    */
+     * determine whether objects of 'one' type include DSPaceObjects objects of 'other' type
+     */
     /* TODO: relying on Constants values - move to Constants class ?? */
     static Boolean typeIncludes(int one, int other) {
         if (one == other)
@@ -171,106 +194,138 @@ class Arguments {
     }
 
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
-        CommandLineParser parser = new PosixParser();
-        line = parser.parse(options, argv);
-        if (line.hasOption(HELP)) {
-            usage();
-            return false;
-        }
-
-        verbose = line.hasOption(VERBOSE);
-
         try {
-            c = new Context();
-        } catch (SQLException e) {
-            throw new ParseException("Could not access database");
-        }
-
-        String rootObj = line.getOptionValue(ROOT);
-        if (rootObj == null || rootObj.isEmpty())
-            throw new ParseException("Missing root object argument");
-        dobj = DSpaceObject.fromString(c, rootObj);
-        if (dobj == null)
-            throw new ParseException(rootObj + " is not a valid DSpaceObject");
-
-        if (dobj.getType() != Constants.COMMUNITY &&
-                dobj.getType() != Constants.COLLECTION &&
-                dobj.getType() != Constants.ITEM &&
-                dobj.getType() != Constants.BUNDLE &&
-                dobj.getType() != Constants.BITSTREAM) {
-            throw new ParseException(dobj + " is not a community, collection, item, bundle or bitstream");
-        }
-
-        if (line.hasOption(TYPE)) {
-            String typeString = line.getOptionValue(TYPE);
-            if (typeString == null || typeString.isEmpty())
-                throw new ParseException("Missing type argument");
-            myType = Constants.getTypeID(typeString.toUpperCase());
-        } else {
-            // default to type of root arg
-            myType = dobj.getType();
-        }
-        if (myType != Constants.COLLECTION &&
-                myType != Constants.ITEM &&
-                myType != Constants.BUNDLE &&
-                myType != Constants.BITSTREAM)
-            throw new ParseException("type must be collection, item, bundle, or bitstream");
-
-        if (line.hasOption(FORMAT)) {
-            format = Printer.getFormat(line.getOptionValue(FORMAT).toUpperCase());
-        }
-
-        if (line.hasOption(KEYS)) {
-            String[] keyList = StringUtils.split(line.getOptionValue(KEYS), ",");
-            if (keyList.length > 0) {
-                for (int i = 0; i < keyList.length; i++) {
-                    keyList[i] = keyList[i].trim();
-                }
-                keys = keyList;
-            } else {
-                throw new ParseException("Invalid " + KEYS_LONG + " option: " + line.getOptionValue(KEYS));
+            CommandLineParser parser = new PosixParser();
+            line = parser.parse(options, argv);
+            if (line.hasOption(HELP)) {
+                usage();
+                return false;
             }
-        }
 
-        if (! typeIncludes(myType, dobj.getType())) {
-            throw new ParseException(Constants.typeText[myType] + "s are not nested inside " +
-                    Constants.typeText[dobj.getType()]);
-        }
+            verbose = line.hasOption(VERBOSE);
 
-        doAction = DO_LIST;
-        if (line.hasOption(ACTION)) {
-            String actionStr = line.getOptionValue(ACTION).toUpperCase();
-            int i = -1;
-            if (actionStr == null || actionStr.isEmpty()) {
-                actionStr = ""; // make it nice for error message
+            try {
+                c = new Context();
+            } catch (SQLException e) {
+                throw new ParseException("Could not access database");
+            }
+
+            String rootObj = line.getOptionValue(ROOT);
+            if (rootObj == null || rootObj.isEmpty())
+                throw new ParseException("Missing root object argument");
+            dobj = DSpaceObject.fromString(c, rootObj);
+            if (dobj == null)
+                throw new ParseException(rootObj + " is not a valid DSpaceObject");
+
+            if (dobj.getType() != Constants.COMMUNITY &&
+                    dobj.getType() != Constants.COLLECTION &&
+                    dobj.getType() != Constants.ITEM &&
+                    dobj.getType() != Constants.BUNDLE &&
+                    dobj.getType() != Constants.BITSTREAM) {
+                throw new ParseException(dobj + " is not a community, collection, item, bundle or bitstream");
+            }
+
+            if (line.hasOption(TYPE)) {
+                String typeString = line.getOptionValue(TYPE);
+                if (typeString == null || typeString.isEmpty())
+                    throw new ParseException("Missing type argument");
+                myType = Constants.getTypeID(typeString.toUpperCase());
             } else {
-                char action = actionStr.charAt(0);
-                for (i = 0; i < availableActions.length; i++) {
-                    if (availableActions[i] == action)
-                        break;
+                // default to type of root arg
+                myType = dobj.getType();
+            }
+
+            if (myType != Constants.COLLECTION &&
+                    myType != Constants.ITEM &&
+                    myType != Constants.BUNDLE &&
+                    myType != Constants.BITSTREAM)
+                throw new ParseException("type must be collection, item, bundle, or bitstream");
+
+            if (!typeIncludes(dobj.getType(), myType)) {
+                throw new ParseException(Constants.typeText[myType] + "s are not nested inside " +
+                        Constants.typeText[dobj.getType()]);
+            }
+
+            if (line.hasOption(WHO)) {
+                who = line.getOptionValue(WHO);
+                whoObj = DSpaceObject.fromString(getContext(), who);
+                System.out.println((whoObj == null) ? "null" : whoObj);
+                if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
+                    throw new ParseException(who + " is not a known Group or EPerson");
                 }
             }
 
-            if (i < 0 || i == availableActions.length) {
-                throw new ParseException("No such action: '" + actionStr + "'");
+            dspaceAction = Constants.actionText[Constants.READ];
+            if (line.hasOption(DSPACE_ACTION)) {
+                dspaceAction = line.getOptionValue(DSPACE_ACTION);
             }
-        }
+            dspaceActionid = Constants.getActionID(dspaceAction);
+            if (dspaceActionid < 0) {
+                throw new ParseException(dspaceAction + " is not a valid action");
+            }
 
-        if (line.hasOption(Arguments.EPERSON)) {
-            String person = line.getOptionValue(EPERSON);
-            EPerson user = (EPerson) DSpaceObject.fromString(getContext(), "EPerson." + person);
-            if (user == null) {
-                throw new ParseException("No such EPerson: " + person);
+            if (line.hasOption(FORMAT)) {
+                format = Printer.getFormat(line.getOptionValue(FORMAT).toUpperCase());
             }
-            getContext().setCurrentUser(user);
+
+            if (line.hasOption(KEYS)) {
+                String[] keyList = StringUtils.split(line.getOptionValue(KEYS), ",");
+                if (keyList.length > 0) {
+                    for (int i = 0; i < keyList.length; i++) {
+                        keyList[i] = keyList[i].trim();
+                    }
+                    keys = keyList;
+                } else {
+                    throw new ParseException("Invalid " + KEYS_LONG + " option: " + line.getOptionValue(KEYS));
+                }
+            }
+
+            if (line.hasOption(ACTION)) {
+                String actionStr = line.getOptionValue(ACTION).toUpperCase();
+                int i = -1;
+                if (actionStr == null || actionStr.isEmpty()) {
+                    actionStr = ""; // make it nice for error message
+                } else {
+                    char action = actionStr.charAt(0);
+                    for (i = 0; i < availableActions.length; i++) {
+                        if (availableActions[i] == action)
+                            break;
+                    }
+                }
+                if (i < 0 || i == availableActions.length) {
+                    throw new ParseException("No such action: '" + actionStr + "'");
+                }
+                doAction = availableActions[i];
+            }
+
+            if (line.hasOption(Arguments.EPERSON)) {
+                String person = line.getOptionValue(EPERSON);
+                EPerson user = (EPerson) DSpaceObject.fromString(getContext(), "EPerson." + person);
+                if (user == null) {
+                    throw new ParseException("No such EPerson: " + person);
+                }
+                getContext().setCurrentUser(user);
+            }
+            return true;
+        } finally {
+            if (verbose)
+                printArgs(System.out, "");
         }
-        return true;
     }
 
-    public String toString() {
-        String root = Util.toString(dobj, "NULL");
-        return ROOT_LONG + "=" + root + " " + TYPE_LONG + "=" + Constants.typeText[myType] +
-                " " + FORMAT_LONG + "=" + Printer.formatText[format];
+    public void printArgs(PrintStream out, String prefix) {
+        out.println(prefix + " " + ROOT_LONG + "=" + dobj);
+        out.println(prefix + " " + TYPE_LONG + "=" + Constants.typeText[myType]);
+        out.println(prefix + " " + ACTION_LONG + "=" + getAction() + " " + getActionString());
+        out.println(prefix + " ");
+        out.println(prefix + " " + DSPACE_ACTION_LONG + "=" + Constants.actionText[getDSpaceAction()]);
+        out.println(prefix + " " + WHO_LONG + "=" + who);
+        out.println(prefix + " ");
+        out.println(prefix + " " + FORMAT_LONG + "=" + getFormat());
+        out.println(prefix + " " + KEYS_LONG + "=" + deepToString(keys));
+        out.println(prefix + " " + VERBOSE_LONG + "=" + verbose);
+        out.println(prefix + " ");
+        out.println(prefix + " " + EPERSON_LONG + "=" + line.getOptionValue(EPERSON));
     }
 }
 

@@ -4,7 +4,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.deepToString;
-
 /**
  * Created by monikam on 4/2/14.
  */
@@ -33,8 +30,6 @@ public class Policies {
 
     Context c;
 
-    char action;
-    int dspaceActionId;
     DSpaceObject who;
 
     Boolean verbose;
@@ -42,28 +37,20 @@ public class Policies {
     String propertyExists;
     String propertyBefore;
 
+    char action;
+    int dspaceActionId;
+
     Policies(PolicyArguments args) throws SQLException {
         c = args.getContext();
-        dspaceActionId = args.dspaceActionid;
         who = args.whoObj;
         verbose = args.getVerbose();
 
         action = args.getAction();
+        dspaceActionId = args.getDSpaceAction();
 
-        propertyExists = "policy." + Constants.actionText[dspaceActionId];
-        if (args.getAction() != Arguments.DO_LIST) {
-            property = propertyExists + "." + action;
-            propertyBefore = propertyExists + "." + "before";
-        }
-
-        switch (action) {
-            case Arguments.DO_DEL:
-            case Arguments.DO_ADD:
-                if (who == null || (who.getType() != Constants.EPERSON && who.getType() != Constants.GROUP)) {
-                    log.error(Util.toString(who, "null") + " is not a group or eperson");
-                }
-                break;
-        }
+        propertyExists = ActionTarget.POLICY + "."  + Constants.actionText[dspaceActionId];
+        property = propertyExists + "." + args.getActionString();
+        propertyBefore = propertyExists + "." + "before";
     }
 
     void apply(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
@@ -77,22 +64,10 @@ public class Policies {
                 case Arguments.DO_DEL:
                     changePolicy(p, targets);
                     break;
-                case Arguments.DO_LIST:
-                    doList(p, targets);
-                    break;
                 default:
                     log.error("DO WHICH ACTION ?");
             }
         }
-    }
-
-    public void doList(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
-        p.addKey(propertyExists);
-        for (int i = 0; i < targets.size(); i++) {
-            addPolicyInfo(targets.get(i), propertyExists);
-            p.println(targets.get(i));
-        }
-        // TODO  p.delKey(propertyExists);
     }
 
     private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
@@ -169,7 +144,6 @@ public class Policies {
         try {
             if (args.parseArgs(argv)) {
                 Policies pols = new Policies(args);
-
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
                 Printer p = args.getPrinter();
                 pols.apply(p, lister.getTargets(args.getType(), false));
@@ -188,49 +162,16 @@ public class Policies {
 }
 
 class PolicyArguments extends Arguments {
-
-    public static String DSPACE_ACTION = "d";
-    public static String DSPACE_ACTION_LONG = "dspace_action";
-
-    public static String WHO = "w";
-    public static String WHO_LONG = "who";
-
-    String dspaceAction  = Constants.actionText[Constants.READ];
-    int dspaceActionid;
-
-    String who = "GROUP." + Group.ANONYMOUS_ID;
-    DSpaceObject whoObj; // EPerson or Group;
-
     PolicyArguments() {
-        super(new char[]{Arguments.DO_LIST, Arguments.DO_ADD, Arguments.DO_DEL});
-        String available = deepToString(Constants.actionText);
-        options.addOption(DSPACE_ACTION, DSPACE_ACTION_LONG, true, "one of " + available);
-        options.addOption(WHO, WHO_LONG, true, "group/eperson (ignored if doing LIST)");
+        super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
     }
 
     @Override
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
         if (super.parseArgs(argv)) {
-            if (getAction() != Arguments.DO_LIST) {
-                if (line.hasOption(WHO)) {
-                    who = line.getOptionValue(WHO);
-                    whoObj = DSpaceObject.fromString(getContext(), who);
-                    System.out.println((whoObj == null) ? "null" : whoObj);
-                    if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
-                        throw new ParseException(who + " is not a known Group or EPerson");
-                    }
-                } else {
+            if (whoObj == null) {
                     throw new ParseException("Missing " + WHO_LONG + " option");
-                }
             }
-            if (line.hasOption(DSPACE_ACTION)) {
-                dspaceAction = line.getOptionValue(DSPACE_ACTION);
-                dspaceActionid = Constants.getActionID(dspaceAction);
-                if (dspaceActionid < 0) {
-                    throw new ParseException(dspaceAction + " is not a valid action");
-                }
-            }
-
             return true;
         }
         return false;

@@ -59,7 +59,7 @@ public class Bitstreams {
         p.addKey("success");
         p.addKey("bundles");
 
-        BitstreamActionTarget target = new BitstreamActionTarget(null, bit);
+        BitstreamActionTarget target = new BitstreamActionTarget(context, null, bit);
         String result = "";
         try {
             Bundle[] bdls = replaceBitstream();

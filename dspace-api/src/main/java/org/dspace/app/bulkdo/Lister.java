@@ -72,9 +72,9 @@ public class Lister {
         if (rootObject.getType() == Constants.COMMUNITY) {
             Community comm = (Community) rootObject;
             Collection[] cols = comm.getCollections();
-            targets = ActionTarget.createArray(new ActionTarget(null, comm), cols);
+            targets = ActionTarget.createArray(context, new ActionTarget(context, null, comm), cols);
         } else if (rootObject.getType() == Constants.COLLECTION) {
-            targets.add(CollectionActionTarget.create(null, rootObject));
+            targets.add(CollectionActionTarget.create(context, null, rootObject));
         }
         log.info("Found " + targets.size() + " collections");
         return targets;
@@ -84,14 +84,14 @@ public class Lister {
         ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.ITEM) {
              // TODO check whether  rootObj.is_workflowItem <==> workflowItem param
-            targets.add(new ItemActionTarget(null, rootObject));
+            targets.add(new ItemActionTarget(context, null, rootObject));
         } else {
             ArrayList<ActionTarget> cols = actionTargets[Constants.COLLECTION];
             if (workflowItem) {
                 for (int i = 0; i < cols.size(); i++) {
                     WorkspaceItem[] wis = WorkspaceItem.findByCollection(context, (Collection) cols.get(i).getObject());
                     for (int j = 0; j < wis.length; j++) {
-                        targets.add(ActionTarget.create(cols.get(i), wis[j].getItem()));
+                        targets.add(ActionTarget.create(context, cols.get(i), wis[j].getItem()));
                     }
                 }
             } else {
@@ -99,7 +99,7 @@ public class Lister {
                     // items from collections and subcollections ???
                     ItemIterator iter = ((Collection) cols.get(i).getObject()).getAllItems();
                     while (iter.hasNext()) {
-                        targets.add(ActionTarget.create(cols.get(i), iter.next()));
+                        targets.add(ActionTarget.create(context, cols.get(i), iter.next()));
                     }
                 }
             }
@@ -111,14 +111,14 @@ public class Lister {
     private ArrayList<ActionTarget> listBundles() throws SQLException {
         ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.BUNDLE) {
-            targets.add(new BundleActionTarget(null, rootObject));
+            targets.add(new BundleActionTarget(context, null, rootObject));
         } else {
             ArrayList<ActionTarget> items = actionTargets[Constants.ITEM];
             // collect BUNDLES from items
             for (int i = 0; i < items.size(); i++) {
                 Bundle[] bundles = ((Item) items.get(i).getObject()).getBundles();
                 for (Bundle bdl : bundles) {
-                    targets.add(new BundleActionTarget(items.get(i), bdl));
+                    targets.add(new BundleActionTarget(context, items.get(i), bdl));
                 }
             }
         }
@@ -129,14 +129,14 @@ public class Lister {
     private ArrayList<ActionTarget> listBitstreams() throws SQLException {
         ArrayList<ActionTarget> targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.BITSTREAM) {
-            targets.add(new BitstreamActionTarget(null, rootObject));
+            targets.add(new BitstreamActionTarget(context, null, rootObject));
         } else {
             ArrayList<ActionTarget>  bundles = actionTargets[Constants.BUNDLE];
             // collect BITSTREAMS from bundles
             for (ActionTarget bdl : bundles) {
                 Bitstream[] bits = ((Bundle) bdl.getObject()).getBitstreams();
                 for (Bitstream bit : bits) {
-                    targets.add(new BitstreamActionTarget(bdl, bit));
+                    targets.add(new BitstreamActionTarget(context, bdl, bit));
                 }
             }
         }
@@ -175,7 +175,7 @@ public class Lister {
 }
 
 class ListerArguments extends Arguments {
-    static String WORKFLOW_ITEM = "w";
+    static String WORKFLOW_ITEM = "W";
     static String WORKFLOW_ITEM_LONG = "doWorkSpaceItems";
 
     boolean doWorkflowItems = false;

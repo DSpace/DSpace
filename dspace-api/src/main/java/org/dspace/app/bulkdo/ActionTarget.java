@@ -1,8 +1,10 @@
 package org.dspace.app.bulkdo;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,12 +15,16 @@ import java.util.HashMap;
  */
 public class ActionTarget {
 
+    private Context context;
     private DSpaceObject obj;
     private HashMap<String, Object> map;
     private ActionTarget up;
 
-    ActionTarget(ActionTarget container, DSpaceObject o) {
+    public static final String POLICY = "POLICY";
+
+    ActionTarget(Context contxt, ActionTarget container, DSpaceObject o) {
         assert (o != null);
+        context = contxt;
         obj = o;
         up = container;
         map = null;
@@ -28,26 +34,26 @@ public class ActionTarget {
         return obj;
     }
 
-    public static ActionTarget create(ActionTarget container, DSpaceObject obj) {
+    public static ActionTarget create(Context context, ActionTarget container, DSpaceObject obj) {
         assert (obj != null);
         switch (obj.getType()) {
             case Constants.BITSTREAM:
-                return new BitstreamActionTarget(container, obj);
+                return new BitstreamActionTarget(context, container, obj);
             case Constants.BUNDLE:
-                return new BundleActionTarget(container, obj);
+                return new BundleActionTarget(context, container, obj);
             case Constants.ITEM:
-                return new ItemActionTarget(container, obj);
+                return new ItemActionTarget(context, container, obj);
             case Constants.COLLECTION:
-                return new CollectionActionTarget(container, obj);
+                return new CollectionActionTarget(context, container, obj);
             case Constants.COMMUNITY:
-                return new ActionTarget(container, obj);
+                return new ActionTarget(context, container, obj);
             default:
                 assert (false);
                 throw new RuntimeException("should never try to create ActionTarget from " + obj);
         }
     }
 
-    public static ActionTarget createUpFor(DSpaceObject obj) {
+    public static ActionTarget createUpFor(Context context, DSpaceObject obj) {
         assert (obj != null);
         try {
             DSpaceObject up = null;
@@ -68,7 +74,7 @@ public class ActionTarget {
                 default:
                     throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
             }
-            return create(null, up);
+            return create(context, null, up);
         } catch (SQLException e) {
             throw new RuntimeException("should never happen???:  " + e.getMessage());
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -96,40 +102,33 @@ public class ActionTarget {
     }
 
 
-    public static ArrayList<ActionTarget> createArray(ActionTarget up, DSpaceObject[] objArr) {
+    public static ArrayList<ActionTarget> createArray(Context context, ActionTarget up, DSpaceObject[] objArr) {
         assert (objArr != null);
         ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.length);
         for (int i = 0; i < objArr.length; i++)
-            arr.add(create(up, objArr[i]));
+            arr.add(create(context, up, objArr[i]));
         return arr;
     }
 
-    private static ArrayList<ActionTarget> createsArray(ActionTarget up, ArrayList<DSpaceObject> objArr) {
+    private static ArrayList<ActionTarget> createsArray(Context context, ActionTarget up, ArrayList<DSpaceObject> objArr) {
         assert (objArr != null);
         ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.size());
         for (int i = 0; i < objArr.size(); i++)
-            arr.add(create(up, objArr.get(i)));
+            arr.add(create(context, up, objArr.get(i)));
         return arr;
     }
 
-    private Object getFromUp(String key) {
-        int i = key.indexOf('.');
-        if (i != -1) {
-
-            String type = key.substring(0, i);
-            int tId = Constants.getTypeID(type);
-            if (tId != -1 && Arguments.typeIncludes(tId, getObject().getType())) {
-                key = key.substring(i + 1, key.length());
-                ActionTarget look = this;
-                while (look != null && look.getObject().getType() != tId) {
-                    if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
-                        look.up = ActionTarget.createUpFor(look.getObject());
-                    }
-                    look = look.up;
+    private Object getFromUp(int tId, String key) {
+        if (Arguments.typeIncludes(tId, getObject().getType())) {
+            ActionTarget look = this;
+            while (look != null && look.getObject().getType() != tId) {
+                if (look.up == null && Arguments.typeIncludes(tId, look.getObject().getType())) {
+                    look.up = ActionTarget.createUpFor(context, look.getObject());
                 }
-                if (look != null) {
-                    return look.get(key);
-                }
+                look = look.up;
+            }
+            if (look != null) {
+                return look.get(key);
             }
         }
         return null;
@@ -153,11 +152,37 @@ public class ActionTarget {
         return null;
     }
 
+    private Object getPolicy(String whatPol) throws SQLException {
+        int pol = Constants.getActionID(whatPol);
+        if (pol != -1) {
+            return AuthorizeManager.getPoliciesActionFilter(context, obj, pol);
+        }
+        return null;
+    }
+
     public Object get(String key) {
         toHashMap();
         Object o = map.get(key);
-        if (o == null) {
-            o = getFromUp(key);
+        if (o != null)
+            return o;
+
+        int i = key.indexOf('.');
+        if (i != -1) {
+            String kind = key.substring(0, i);
+            String keyForKind = key.substring(i + 1, key.length());
+            int tId = Constants.getTypeID(kind);
+            if (tId != -1) {
+                // its a DSpaceObject type - look up
+                o = getFromUp(tId, keyForKind);
+            } else {
+                try {
+                    if (kind.equals(POLICY)) {
+                        o = getPolicy(keyForKind);
+                    }
+                } catch (SQLException e) {
+                    return "ERROR:" + e.getMessage();
+                }
+            }
         }
         if (o == null) {
             o = getMetadateValue(key);
@@ -195,8 +220,8 @@ class CollectionActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"name", "handle", "template"};
 
-    CollectionActionTarget(ActionTarget up, DSpaceObject o) {
-        super(up, o);
+    CollectionActionTarget(Context context, ActionTarget up, DSpaceObject o) {
+        super(context, up, o);
         col = (Collection) o;
     }
 
@@ -221,8 +246,8 @@ class ItemActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"isWithdrawn", "handle", "name"};
 
-    ItemActionTarget(ActionTarget up, DSpaceObject o) {
-        super(up, o);
+    ItemActionTarget(Context context, ActionTarget up, DSpaceObject o) {
+        super(context, up, o);
         itm = (Item) o;
     }
 
@@ -243,8 +268,8 @@ class BundleActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"isEmbargoed", "name"};
 
-    BundleActionTarget(ActionTarget up, DSpaceObject o) {
-        super(up, o);
+    BundleActionTarget(Context context, ActionTarget up, DSpaceObject o) {
+        super(context, up, o);
         bdl = (Bundle) o;
     }
 
@@ -267,8 +292,8 @@ class BitstreamActionTarget extends ActionTarget {
 
     static String[] theAvailableKeys = {"mimeType", "name", "size", "internalId", "checksum", "checksumAlgo"};
 
-    BitstreamActionTarget(ActionTarget up, DSpaceObject o) {
-        super(up, o);
+    BitstreamActionTarget(Context context, ActionTarget up, DSpaceObject o) {
+        super(context, up, o);
         bit = (Bitstream) o;
     }
 
