@@ -201,6 +201,15 @@ public class CuratorEditMetadataForm extends AbstractDSpaceTransformer {
         actions = main.addPara(null,"edit-metadata-actions bottom" );
         actions.addButton("submit_update").setValue(T_submit_update);
         actions.addButton("submit_return").setValue(T_submit_return);
+
+        // Handle submit by clicking "Propagate" button
+        String propagateMetadataFieldName = request.getParameter("propagate_md_field_name");
+        if(propagateMetadataFieldName != null) {
+            // User clicked "Propagate" button and not "Update" button
+            main.addHidden("propagate_show_popup").setValue("1");
+            main.addHidden("propagate_md_field").setValue(propagateMetadataFieldName);
+            // Client-side javascript will take care of opening the window
+        }
     }
 
 

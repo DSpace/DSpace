@@ -1342,4 +1342,59 @@ parameter that is being used (see variable defined above) -->
         </a>
     </xsl:template>
 
+    <!-- Add 'return' link to propagate-metadata form-->
+    <xsl:template match="dri:field[@id='aspect.administrative.item.PropagateItemMetadataForm.field.submit_return']" mode="normalField">
+        <a href="#">
+            <xsl:attribute name="onclick">
+                <xsl:text>javascript:DryadClosePropagate()</xsl:text>
+            </xsl:attribute>
+                <i18n:text>
+                    <xsl:value-of select="."/>
+                </i18n:text>
+        </a>
+    </xsl:template>
+
+  <xsl:template match="dri:p[@rend='edit-metadata-actions bottom']">
+    <xsl:apply-templates />
+    <!-- Propagate metadata buttons can be clicked from either admin or curator edit metdata interfaces -->
+    <!-- The DRI structure is similar but the elements have different IDs -->
+    <xsl:variable name="propagateShowPopupAdmin" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
+    <xsl:variable name="propagateShowPopupCurator" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_show_popup']/dri:value[@type='raw']"></xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$propagateShowPopupAdmin = '1'">
+        <xsl:call-template name="popupPropagateMetadata">
+          <xsl:with-param name="packageDoi" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:with-param>
+          <xsl:with-param name="fileDois" select="//dri:row[@id='aspect.administrative.item.EditItemMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:with-param>
+          <xsl:with-param name="metadataFieldName" select="//dri:field[@id='aspect.administrative.item.EditItemMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$propagateShowPopupCurator = '1'">
+        <xsl:call-template name="popupPropagateMetadata">
+          <xsl:with-param name="packageDoi" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_identifier']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:with-param>
+          <xsl:with-param name="fileDois" select="//dri:row[@id='aspect.submission.submit.CuratorEditMetadataForm.row.dc_relation_haspart']/dri:cell/dri:field[@type='textarea']/dri:value[@type='raw']"></xsl:with-param>
+          <xsl:with-param name="metadataFieldName" select="//dri:field[@id='aspect.submission.submit.CuratorEditMetadataForm.field.propagate_md_field']/dri:value[@type='raw']"></xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template name="popupPropagateMetadata">
+    <xsl:param name="fileDois"/>
+    <xsl:param name="metadataFieldName"/>
+    <xsl:param name="packageDoi"/>
+      <xsl:if test="count($fileDois) > 0">
+        <script>
+          <xsl:attribute name="type"><xsl:text>text/javascript</xsl:text></xsl:attribute>
+          <xsl:text>runAfterJSImports.add( function() { DryadShowPropagateMetadata('</xsl:text>
+          <xsl:value-of select="concat($context-path,'/admin/item/propagate-metadata')" />
+          <xsl:text>','</xsl:text>
+          <xsl:value-of select="$metadataFieldName" />
+          <xsl:text>','</xsl:text>
+          <xsl:value-of select="$packageDoi" />
+          <xsl:text>'); } );</xsl:text>
+        </script>
+      </xsl:if>
+  
+  </xsl:template>
+  
 </xsl:stylesheet>

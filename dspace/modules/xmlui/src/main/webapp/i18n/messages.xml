@@ -3544,4 +3544,15 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.EPerson.TermsOfService.help">Please use the button below to update your profile.</message>
     <message key="xmlui.EPerson.TermsOfService.button">Update Your Dryad Profile</message>
 
+    <!-- Propagate metadata -->
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.title">Propagation of Metadata</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.name">Field</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.file">File</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.current_value">Current</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.new_value">New</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.select">Propagate</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.no_value">No Value</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.update">Update</message>
+    <message key="xmlui.administrative.item.PropagateItemMetadataForm.return">Return</message>
+
 </catalogue>
