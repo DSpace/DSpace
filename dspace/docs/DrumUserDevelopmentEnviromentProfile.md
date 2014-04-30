@@ -97,11 +97,12 @@ function dant() {
   (/apps/servers/drum/tomcat411/control stop;
    cd /apps/git/drum/dspace/target/dspace-*.*-build/;
    ant "$@";
+   sleep 20;
    rm -rf /apps/servers/drum/tomcat411/work/Catalina/localhost;
    /apps/servers/drum/tomcat411/control start)
 }
 
-alias dup="dmvn clean package && dant update"
+alias dup="dmvn -Denv=local clean package && dant update"
 alias dp="dmvn clean package"
 
 
