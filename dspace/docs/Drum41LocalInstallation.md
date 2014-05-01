@@ -467,6 +467,13 @@ $ ln -s /apps/drum/webapps/sword /apps/servers/drum/tomcat411/webapps/sword
 $ ln -s /apps/drum/webapps/swordv2 /apps/servers/drum/tomcat411/webapps/swordv2
 ```
 
+### Create directories to be accessed by webapps 
+
+```
+$ mkdir /apps/drum/upload
+$ mkdir -p /apps/drum/stats/monthly
+```
+
 ###Start DRUM 4.1 Tomcat Instance
 
 ```
