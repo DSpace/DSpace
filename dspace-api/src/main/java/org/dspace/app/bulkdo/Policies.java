@@ -14,6 +14,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class Policies {
         verbose = args.getVerbose();
 
         action = args.getAction();
-        dspaceActionId = args.getDSpaceAction();
+        dspaceActionId = args.dspaceActionid;
 
         propertyExists = ActionTarget.POLICY + "."  + Constants.actionText[dspaceActionId];
         property = propertyExists + "." + args.getActionString();
@@ -162,6 +163,10 @@ public class Policies {
 }
 
 class PolicyArguments extends Arguments {
+
+    DSpaceObject whoObj;
+    int dspaceActionid;
+
     PolicyArguments() {
         super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
     }
@@ -169,12 +174,42 @@ class PolicyArguments extends Arguments {
     @Override
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
         if (super.parseArgs(argv)) {
-            if (whoObj == null) {
-                    throw new ParseException("Missing " + WHO_LONG + " option");
+            if (!line.hasOption(ACTION)) {
+                throw new ParseException("Missing " + ACTION_LONG + " option");
             }
+            String who = "UNKNOWN";
+            if (!line.hasOption(WHO)) {
+                throw new ParseException("Missing " + WHO_LONG + " option");
+            } else {
+                who = line.getOptionValue(WHO);
+            }
+            whoObj = DSpaceObject.fromString(getContext(), who);
+            if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
+                throw new ParseException(who + " is not a known Group or EPerson");
+            }
+            if (whoObj == null) {
+                throw new ParseException("Missing " + WHO_LONG + " option");
+            }
+
+            String dspaceAction = Constants.actionText[Constants.READ];
+            if (line.hasOption(DSPACE_ACTION)) {
+                dspaceAction = line.getOptionValue(DSPACE_ACTION);
+            }
+            dspaceActionid = Constants.getActionID(dspaceAction);
+            if (dspaceActionid < 0) {
+                throw new ParseException(dspaceAction + " is not a valid action");
+            }
+
             return true;
         }
         return false;
     }
 
+    @Override
+    public void printArgs(PrintStream out, String prefix) {
+        super.printArgs(out, prefix);
+        out.println(prefix + " " + DSPACE_ACTION_LONG + "=" + Constants.actionText[dspaceActionid]);
+        out.println(prefix + " " + WHO_LONG + "=" + whoObj);
+        out.println(prefix + " ");
+    }
 }

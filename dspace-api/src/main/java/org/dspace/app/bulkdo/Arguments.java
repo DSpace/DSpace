@@ -6,7 +6,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 
 import java.io.PrintStream;
 import java.sql.SQLException;
@@ -69,12 +68,6 @@ class Arguments {
     private char doAction;
     private char[] availableActions;
 
-    private String dspaceAction = Constants.actionText[Constants.READ];
-    private int dspaceActionid;
-
-    String who = "GROUP." + Group.ANONYMOUS_ID;
-    DSpaceObject whoObj; // EPerson or Group;
-
     Arguments() {
         this(null);
     }
@@ -82,9 +75,8 @@ class Arguments {
     Arguments(char[] myAvailableActions) {
         options = new Options();
         availableActions = myAvailableActions;
-        doAction = DO_LIST;
+        doAction = '?';
         if (myAvailableActions != null && myAvailableActions.length > 0) {
-            doAction = myAvailableActions[0]; // the first is the default
             if (myAvailableActions.length > 1) {
                 // there is actually a choice of what to do
                 String availableActionStrings = "";
@@ -93,8 +85,13 @@ class Arguments {
                         availableActionStrings += ", ";
                     availableActionStrings += getActionString(myAvailableActions[j]);
                 }
-                options.addOption(ACTION, ACTION_LONG, true, "what to do, available " + availableActionStrings + " default is '" + doAction + "'");
+                options.addOption(ACTION, ACTION_LONG, true, "what to do, available " + availableActionStrings);
+            } else {
+                doAction = myAvailableActions[0]; // its the oly option
             }
+        } else {
+            // no availableActions
+            doAction = DO_LIST;
         }
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
@@ -140,16 +137,15 @@ class Arguments {
         return getActionString(doAction);
     }
 
-    public int getDSpaceAction() {
-        return dspaceActionid;
-    }
-
     public boolean getVerbose() {
         return verbose;
     }
 
     public Printer getPrinter() {
-        return Printer.create(System.out, getFormat(), keys);
+        Printer p =  Printer.create(System.out, getFormat(), keys);
+        if (verbose)
+            printArgs(p, "# ");
+        return p;
     }
 
     public Options getOptions() {
@@ -194,7 +190,6 @@ class Arguments {
     }
 
     public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
-        try {
             CommandLineParser parser = new PosixParser();
             line = parser.parse(options, argv);
             if (line.hasOption(HELP)) {
@@ -246,24 +241,6 @@ class Arguments {
                         Constants.typeText[dobj.getType()]);
             }
 
-            if (line.hasOption(WHO)) {
-                who = line.getOptionValue(WHO);
-                whoObj = DSpaceObject.fromString(getContext(), who);
-                System.out.println((whoObj == null) ? "null" : whoObj);
-                if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
-                    throw new ParseException(who + " is not a known Group or EPerson");
-                }
-            }
-
-            dspaceAction = Constants.actionText[Constants.READ];
-            if (line.hasOption(DSPACE_ACTION)) {
-                dspaceAction = line.getOptionValue(DSPACE_ACTION);
-            }
-            dspaceActionid = Constants.getActionID(dspaceAction);
-            if (dspaceActionid < 0) {
-                throw new ParseException(dspaceAction + " is not a valid action");
-            }
-
             if (line.hasOption(FORMAT)) {
                 format = Printer.getFormat(line.getOptionValue(FORMAT).toUpperCase());
             }
@@ -307,24 +284,14 @@ class Arguments {
                 getContext().setCurrentUser(user);
             }
             return true;
-        } finally {
-            if (verbose)
-                printArgs(System.out, "");
-        }
     }
 
     public void printArgs(PrintStream out, String prefix) {
         out.println(prefix + " " + ROOT_LONG + "=" + dobj);
         out.println(prefix + " " + TYPE_LONG + "=" + Constants.typeText[myType]);
         out.println(prefix + " " + ACTION_LONG + "=" + getAction() + " " + getActionString());
-        out.println(prefix + " ");
-        out.println(prefix + " " + DSPACE_ACTION_LONG + "=" + Constants.actionText[getDSpaceAction()]);
-        out.println(prefix + " " + WHO_LONG + "=" + who);
-        out.println(prefix + " ");
         out.println(prefix + " " + FORMAT_LONG + "=" + getFormat());
         out.println(prefix + " " + KEYS_LONG + "=" + deepToString(keys));
-        out.println(prefix + " " + VERBOSE_LONG + "=" + verbose);
-        out.println(prefix + " ");
         out.println(prefix + " " + EPERSON_LONG + "=" + line.getOptionValue(EPERSON));
     }
 }
