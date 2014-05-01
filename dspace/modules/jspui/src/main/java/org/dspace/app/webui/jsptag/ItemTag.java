@@ -198,6 +198,12 @@ public class ItemTag extends TagSupport
 
     /** Whether to show preview thumbs on the item page */
     private boolean showThumbs;
+    
+    /** Display bitstreams in all bundles? */
+    private boolean allBundles = false;
+    
+    /** Display the name of the bitstream bundle? */
+    private boolean bundleName = false;
 
     /** Default DC fields to display, in absence of configuration */
     private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
@@ -374,6 +380,29 @@ public class ItemTag extends TagSupport
         style = "default";
         item = null;
         collections = null;
+        allBundles = false;
+    }
+    
+    public String getAllbundles() {
+    	String result = "" + allBundles;
+    	log.debug("getAllbundles: " + result);
+    	return result;
+    }
+    
+    public void setAllbundles(String allbundlesIn) {
+    	allBundles = (allbundlesIn != null && allbundlesIn.equals("true"));
+    	log.debug("setAllbundles: " + allbundlesIn + " ->  " + allBundles);
+    }
+
+    public String getBundlename() {
+    	String result = "" + bundleName;
+    	log.debug("getBundlename: " + result);
+    	return result;
+    }
+    
+    public void setBundlename(String bundlenameIn) {
+    	bundleName = (bundlenameIn != null && bundlenameIn.equals("true"));
+    	log.debug("setBundlename: " + bundlenameIn + " -> " + allBundles);
     }
 
     /**
@@ -768,8 +797,17 @@ public class ItemTag extends TagSupport
 
         try
         {
-        	Bundle[] bundles = item.getBundles("ORIGINAL");
-
+        	List<Bundle> bundlesList = new ArrayList<Bundle>();
+        	for (Bundle bundle : item.getBundles()) {
+        		log.debug("looking at " + bundle.getName() + " " + bundle.getClass().getName());
+        		if (allBundles || bundle.getName().equals("ORIGINAL")) {
+        			log.debug("adding " + bundle.getName());
+        			bundlesList.add(bundle);
+        		}
+        	}
+        	
+        	Bundle[] bundles = (Bundle[]) bundlesList.toArray(new Bundle[bundlesList.size()]);
+        	
         	boolean filesExist = false;
             
             for (Bundle bnd : bundles)
@@ -795,7 +833,16 @@ public class ItemTag extends TagSupport
         		String handle = item.getHandle();
         		Bitstream primaryBitstream = null;
 
-        		Bundle[] bunds = item.getBundles("ORIGINAL");
+        		List<Bundle> bundsList = new ArrayList<Bundle>();
+            	for (Bundle bundle : item.getBundles()) {
+            		if (! bundle.getName().equals("THUMBNAIL")) {
+            			if (allBundles || bundle.getName().equals("ORIGINAL")) {
+            				bundsList.add(bundle);
+            			}
+            		}
+            	}
+            	
+            	Bundle[] bunds = (Bundle[]) bundsList.toArray(new Bundle[bundsList.size()]);
         		Bundle[] thumbs = item.getBundles("THUMBNAIL");
 
         		// if item contains multiple bitstreams, display bitstream
@@ -827,7 +874,9 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table class=\"table panel-body\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table cellpadding=\"6\"><tr>"
+        	                + (bundleName ? "<th id=\"t0\" class=\"standard\">Bundle</th>" : "")	
+                    		+ "<th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
