@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
-import org.dspace.app.requestitem.RequestItemEmailUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
@@ -107,20 +106,15 @@ public class SendItemRequestAction extends AbstractAction
         	title=titleDC[0].value;
         }
         
-		RequestItemAuthor author = new DSpace()
+		RequestItemAuthor requestItemAuthor = new DSpace()
 				.getServiceManager()
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);
-
-		String authorEmail = author.getEmail();
-		String authorName = author.getFullName();
-		
-		String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
 		
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
-        email.addRecipient(emailRequest);
+        email.addRecipient(requestItemAuthor.getEmail());
 
         email.addArgument(requesterName);    
         email.addArgument(requesterEmail);   
@@ -129,8 +123,8 @@ public class SendItemRequestAction extends AbstractAction
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
         email.addArgument(getLinkTokenEmail(context,request, bitstreamId, item.getID(), requesterEmail, requesterName, Boolean.parseBoolean(allFiles)));    
-        email.addArgument(authorName);    //   corresponding author name
-        email.addArgument(authorEmail);    //   corresponding author email
+        email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
+        email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
         email.addArgument(ConfigurationManager.getProperty("dspace.name"));
         email.addArgument(ConfigurationManager.getProperty("mail.helpdesk"));
 

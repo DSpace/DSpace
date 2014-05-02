@@ -7,14 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.mail.MessagingException;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -23,7 +15,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.requestitem.RequestItemEmailUtil;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -36,6 +29,14 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -120,10 +121,16 @@ public class ItemRequestResponseAction extends AbstractAction
     private boolean processOpenAccessRequest(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
     	String name = request.getParameter("name");
     	String mail = request.getParameter("email");
+
     	if(StringUtils.isNotEmpty(name)&&StringUtils.isNotEmpty(mail)){
-    	    String emailRequest = RequestItemEmailUtil.getSubmitterOrHelpdeskEmail(item);
+            RequestItemAuthor requestItemAuthor = new DSpace()
+                    .getServiceManager()
+                    .getServiceByName(RequestItemAuthorExtractor.class.getName(),
+                            RequestItemAuthorExtractor.class)
+                    .getRequestItemAuthor(context, item);
+
 	    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
-	        email.addRecipient(emailRequest);
+	        email.addRecipient(requestItemAuthor.getEmail());
 	        
 	        email.addArgument(Bitstream.find(context,requestItem.getIntColumn("bitstream_id")).getName());
 	        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));
