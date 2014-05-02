@@ -106,8 +106,6 @@ class Arguments {
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
         options.addOption(EPERSON, EPERSON_LONG, true, "dspace user account (email or netid) used for authorization to dspace app");
-        options.addOption(DSPACE_ACTION, DSPACE_ACTION_LONG, true, "one of " + deepToString(Constants.actionText) + " default is " + Constants.actionText[Constants.READ]);
-        options.addOption(WHO, WHO_LONG, true, "group/eperson used in policies, give as GROUP.<name>, EPERSON.<netid>, or EPERSON.<email>");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
         options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");

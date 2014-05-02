@@ -19,6 +19,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.deepToString;
+
 /**
  * Created by monikam on 4/2/14.
  */
@@ -167,6 +169,8 @@ class PolicyArguments extends Arguments {
 
     PolicyArguments() {
         super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
+        options.addOption(DSPACE_ACTION, DSPACE_ACTION_LONG, true, "one of " + deepToString(Constants.actionText) + " default is " + Constants.actionText[Constants.READ]);
+        options.addOption(WHO, WHO_LONG, true, "group/eperson used in policies, give as GROUP.<name>, EPERSON.<netid>, or EPERSON.<email>");
     }
 
     @Override
