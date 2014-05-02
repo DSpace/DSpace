@@ -535,7 +535,7 @@ $ dup
 	* [oai](http://localhost:8080/oai/request?verb=Identify)
 	
 * Check DRUM Solr Instance
-	* [DRUM 4.1 Solr](http://localhost:8080/solr/#/)
+	* [DRUM 4.1 Solr](http://localhost:8983/solr/#/)
 	* Look at the Solr Core Tab (ensure all cores: search, statistics, oai are running)
 	* Consult Tomcat/Solr/Dspace logs if needed
 	
