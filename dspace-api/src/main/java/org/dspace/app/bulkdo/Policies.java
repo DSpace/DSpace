@@ -29,11 +29,8 @@ public class Policies {
      */
     private static Logger log = Logger.getLogger(Policies.class);
 
-    Context c;
+    PolicyArguments args;
 
-    DSpaceObject who;
-
-    Boolean verbose;
     String property;
     String propertyExists;
     String propertyBefore;
@@ -41,11 +38,9 @@ public class Policies {
     char action;
     int dspaceActionId;
 
-    Policies(PolicyArguments args) throws SQLException {
-        c = args.getContext();
-        who = args.whoObj;
-        verbose = args.getVerbose();
+    Policies(PolicyArguments arguments) throws SQLException {
 
+        args = arguments;
         action = args.getAction();
         dspaceActionId = args.dspaceActionid;
 
@@ -72,17 +67,19 @@ public class Policies {
     }
 
     private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, target.getObject(), dspaceActionId);
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(args.getContext(), target.getObject(), dspaceActionId);
         target.put(prop, policies.toArray());
     }
 
     private void changePolicy(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
         try {
             p.addKey(propertyExists);
-            if (verbose) {
+            if (args.getVerbose()) {
                 p.addKey(propertyBefore);
                 p.addKey(property);
             }
+            DSpaceObject who = args.whoObj;
+            Context c = args.getContext();
             for (int i = 0; i < targets.size(); i++) {
                 ActionTarget target = targets.get(i);
 
@@ -124,7 +121,8 @@ public class Policies {
                 addPolicyInfo(targets.get(i),propertyExists);
                 p.println(targets.get(i));
             }
-            c.complete();
+            if (!args.getDryRun())
+               args.getContext().complete();
         } catch (AuthorizeException e) {
             e.printStackTrace();
         } finally {

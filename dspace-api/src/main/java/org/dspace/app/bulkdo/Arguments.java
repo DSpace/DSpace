@@ -20,6 +20,9 @@ class Arguments {
     public static String ACTION = "a";
     public static String ACTION_LONG = "action";
 
+    public static String BITSTREAM_FILE = "b";
+    public static String BITSTREAM_FILE_LONG = "bitstream";
+
     public static String DSPACE_ACTION = "d";
     public static String DSPACE_ACTION_LONG = "dspace_action";
 
@@ -28,6 +31,9 @@ class Arguments {
 
     public static String FORMAT = "f";
     public static String FORMAT_LONG = "format";
+
+    public static String GOGO = "g";
+    public static String GOGO_LONG = "GO-GO-GO";
 
     public static String HELP = "h";
     public static String HELP_LONG = "help";
@@ -47,6 +53,9 @@ class Arguments {
     public static String WHO = "w";
     public static String WHO_LONG = "who";
 
+    public static String DRYRUN  = "y";
+    public static String DRYRUN_LONG = "dryrun";
+
     public static final String[] actionText = {"ADD", "DEL", "REPLACE", "LIST"};
     public static final char DO_ADD = 'A';
     public static final char DO_DEL = 'D';
@@ -64,6 +73,7 @@ class Arguments {
     private String[] keys = defaultKeys;
 
     private boolean verbose;
+    private boolean dryRun;
 
     private char doAction;
     private char[] availableActions;
@@ -101,6 +111,7 @@ class Arguments {
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
         options.addOption(VERBOSE, VERBOSE_LONG, false, "verbose");
+        options.addOption(DRYRUN, DRYRUN_LONG, false, "dryrun - do not actually change anything; default is false");
         options.addOption(HELP, HELP_LONG, false, "help");
     }
 
@@ -137,8 +148,10 @@ class Arguments {
         return getActionString(doAction);
     }
 
-    public boolean getVerbose() {
-        return verbose;
+    public boolean getVerbose() {  return verbose;  }
+
+    public boolean getDryRun() {
+        return dryRun;
     }
 
     public Printer getPrinter() {
@@ -198,6 +211,7 @@ class Arguments {
             }
 
             verbose = line.hasOption(VERBOSE);
+            dryRun = line.hasOption(DRYRUN);
 
             try {
                 c = new Context();
@@ -293,6 +307,7 @@ class Arguments {
         out.println(prefix + " " + FORMAT_LONG + "=" + getFormat());
         out.println(prefix + " " + KEYS_LONG + "=" + deepToString(keys));
         out.println(prefix + " " + EPERSON_LONG + "=" + line.getOptionValue(EPERSON));
+        out.println(prefix + " " + DRYRUN_LONG + "=" + dryRun);
     }
 }
 

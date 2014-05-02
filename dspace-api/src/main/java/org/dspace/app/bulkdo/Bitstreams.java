@@ -9,7 +9,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -25,44 +24,32 @@ public class Bitstreams {
      */
     private static Logger log = Logger.getLogger(Bitstreams.class);
 
-    Context context;
-    Bitstream bit;
-    String filename;
-    InputStream stream;
-    BitstreamFormat  fileFormat;
-    boolean ignoreFormatMismatch;
+    BitstreamsArguments args;
 
-    Bitstreams(BitstreamsArguments args) {
-        context = args.getContext();
-        bit = (Bitstream) args.getRoot();
-        filename = args.filename;
-        stream = args.stream;
-        fileFormat = args.format;
-        ignoreFormatMismatch = args.gogo;
-
+    Bitstreams(BitstreamsArguments arguments) {
+        args = arguments;
         log.debug(this);
     }
 
     public String toString()  {
-
-        String me =  filename + "(" + fileFormat.getMIMEType() + ") --";
-        if (ignoreFormatMismatch) {
+        String me =  args.filename + "(" + args.format.getMIMEType() + ") --";
+        if (args.gogo) {
             me += "ignoreFormat--";
         }
-        return me + "> " + bit;
+        return me + "> " + args.getRoot();
     }
 
-    void apply(Printer p) {
+    void apply(Printer p, boolean dryRun) {
         p.addKey("BUNDLE.name");
         p.addKey("replace");
         p.addKey("replace.mimeType");
         p.addKey("success");
         p.addKey("bundles");
 
-        BitstreamActionTarget target = new BitstreamActionTarget(context, null, bit);
+        BitstreamActionTarget target = new BitstreamActionTarget(args.getContext(), null, (Bitstream) args.getRoot());
         String result = "";
         try {
-            Bundle[] bdls = replaceBitstream();
+            Bundle[] bdls = replaceBitstream(dryRun);
             target.put("bundles", bdls);
             result = "SUCCESS";
         } catch (Exception e) {
@@ -70,16 +57,17 @@ public class Bitstreams {
             target.put("exception", e.getMessage().replaceAll(" ", "_"));
             e.printStackTrace();
         }
-        target.put("replace", filename);
-        target.put("replace.mimeType", fileFormat.getMIMEType());
+        target.put("replace", args.filename);
+        target.put("replace.mimeType", args.format.getMIMEType());
         target.put("success", result);
         p.println(target);
 
     }
 
-    private Bundle[] replaceBitstream() throws SQLException, IOException, AuthorizeException {
-        if (! bit.getFormat().getMIMEType().equals(fileFormat.getMIMEType()) && !ignoreFormatMismatch) {
-                throw new RuntimeException("format mistmatch");
+    private Bundle[] replaceBitstream(boolean dryRun) throws SQLException, IOException, AuthorizeException {
+        Bitstream bit = (Bitstream)  args.getRoot();
+        if (!bit.getFormat().getMIMEType().equals(args.format.getMIMEType()) && !args.gogo) {
+            throw new RuntimeException("format mistmatch");
         }
         Item item = (Item) bit.getParentObject();
         if (item == null) {
@@ -87,18 +75,20 @@ public class Bitstreams {
         }
         Bundle[] bundles = bit.getBundles();
         for (Bundle bdl : bundles) {
-            Bitstream nBit = bdl.createBitstream(stream);
+            Bitstream nBit = bdl.createBitstream(args.stream);
             nBit.setName(bit.getName());
             nBit.setDescription(bit.getDescription());
             nBit.setSource(bit.getSource());
-            nBit.setFormat(fileFormat);
-            List<ResourcePolicy> pols = AuthorizeManager.getPolicies(context, bit);
-            AuthorizeManager.removeAllPolicies(context, nBit);
-            AuthorizeManager.addPolicies(context, pols, nBit);
+            nBit.setFormat(args.format);
+            List<ResourcePolicy> pols = AuthorizeManager.getPolicies(args.getContext(), bit);
+            AuthorizeManager.removeAllPolicies(args.getContext(), nBit);
+            AuthorizeManager.addPolicies(args.getContext(), pols, nBit);
             bdl.removeBitstream(bit);
         }
         item.update();
-        context.commit();
+        if (!dryRun) {
+            args.getContext().commit();
+        }
         return bundles;
     }
 
@@ -115,7 +105,7 @@ public class Bitstreams {
             if (args.parseArgs(argv)) {
                 Bitstreams bitActor = new Bitstreams(args);
                 Printer p = args.getPrinter();
-                bitActor.apply(p);
+                bitActor.apply(p, args.getDryRun());
             }
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");
@@ -129,14 +119,6 @@ public class Bitstreams {
 }
 
 class BitstreamsArguments extends Arguments {
-
-    public static String FILE = "b";
-    public static String FILE_LONG = "bitstream";
-
-    public static String GOGO = "g";
-    public static String GOGO_LONG = "GO-GO-GO";
-
-
     String filename;
     InputStream stream;
     BitstreamFormat format;
@@ -144,8 +126,8 @@ class BitstreamsArguments extends Arguments {
 
     BitstreamsArguments() {
         super(new char[]{Arguments.DO_REPLACE});
-        options.addOption(FILE, FILE_LONG, true, "file to replace given bitstream");
-        options.addOption(GOGO, GOGO_LONG, false, "ignore file format incompatibilities");
+        options.addOption(Arguments.BITSTREAM_FILE, Arguments.BITSTREAM_FILE_LONG, true, "file to replace given bitstream");
+        options.addOption(Arguments.GOGO, Arguments.GOGO_LONG, false, "ignore file format incompatibilities");
     }
 
     @Override
@@ -153,25 +135,30 @@ class BitstreamsArguments extends Arguments {
         if (super.parseArgs(argv)) {
             gogo = line.hasOption(GOGO);
 
-            if (!line.hasOption(FILE)) {
-                throw new ParseException("must give a filename");
+            if (!line.hasOption(Arguments.BITSTREAM_FILE)) {
+                throw new ParseException("missing " + Arguments.BITSTREAM_FILE_LONG + " option");
             }
 
-            if (! line.hasOption(Arguments.EPERSON)) {
-                throw new ParseException("Must give EPerson");
+            if (!line.hasOption(Arguments.EPERSON)) {
+                throw new ParseException("missing " + Arguments.EPERSON_LONG + " option");
             }
 
-            // make sure root is a BITSTREAM  - should adjust the help message
+            // make action is replace
+            if (getAction() != Arguments.DO_REPLACE) {
+                throw new ParseException("Can only " + Arguments.actionText[Arguments.DO_REPLACE] + " bitstreams");
+            }
+
+            // make sure root is a BITSTREAM
             if (getRoot().getType() != Constants.BITSTREAM) {
                 throw new ParseException(getRoot() + " is not a bitstream");
             }
 
-            // TODO - really shouldn't require type option - we know we need BITSTREAM
+            // TODO - really shouldn't allow type option - we know we need BITSTREAM
             if (getType() != Constants.BITSTREAM) {
                 throw new ParseException("Sorry only working on single BITSTREAMs");
             }
 
-            filename = line.getOptionValue(FILE);
+            filename = line.getOptionValue(Arguments.BITSTREAM_FILE);
             // see whether we can open file
             try {
                 stream = new BufferedInputStream(new FileInputStream(filename));
@@ -188,4 +175,8 @@ class BitstreamsArguments extends Arguments {
         return false;
     }
 
+    public void printArgs(PrintStream out, String prefix) {
+        super.printArgs(out, prefix);
+        out.println(prefix + " " + Arguments.BITSTREAM_FILE_LONG + "=" + filename);
+    }
 }
