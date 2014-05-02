@@ -17,6 +17,9 @@ import static java.util.Arrays.deepToString;
  * Created by monikam on 4/2/14.
  */
 class Arguments {
+
+    // declare all option constants here to avoid accidental name clashes
+
     public static String ACTION = "a";
     public static String ACTION_LONG = "action";
 

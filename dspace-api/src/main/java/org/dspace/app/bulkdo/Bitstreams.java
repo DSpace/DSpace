@@ -55,7 +55,8 @@ public class Bitstreams {
         } catch (Exception e) {
             result = "ERROR";
             target.put("exception", e.getMessage().replaceAll(" ", "_"));
-            e.printStackTrace();
+            if (args.getVerbose())
+                e.printStackTrace();
         }
         target.put("replace", args.filename);
         target.put("replace.mimeType", args.format.getMIMEType());
