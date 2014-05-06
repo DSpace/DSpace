@@ -1396,5 +1396,22 @@ parameter that is being used (see variable defined above) -->
       </xsl:if>
   
   </xsl:template>
-  
+
+
+    <xsl:template match="//dri:item[@rend='total']">
+        <li xmlns:i18n="http://apache.org/cocoon/i18n/2.1" class="ds-form-item odd total">
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(@id,'.','_')"/>
+            </xsl:attribute>
+            <span class="ds-form-label">Your total
+                <img src="/themes/Mirage/images/help.jpg" class="label-mark">
+                    <xsl:attribute name="title">xmlui.PaymentSystem.shoppingcart.order.help.title</xsl:attribute>
+                    <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">title</xsl:attribute>
+                </img>
+                :
+            </span>
+            <div class="ds-form-content"><xsl:value-of select="."/></div>
+        </li>
+    </xsl:template>
+
 </xsl:stylesheet>
