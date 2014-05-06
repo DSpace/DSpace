@@ -185,16 +185,18 @@ Add capability to login with the university directory id using CAS autentication
 
 *Java Source*
 
-* [CASAuthentication.java](../../dspace-api/src/main/java/org/dspace/authenticate/CASAuthentication.java) - get directory information for all CAS logins
-* [Ldap.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/authenticate/Ldap.java)
-* [Unit.java](../../dspace-api/src/main/java/org/dspace/eperson/Unit.java) - add faculty_only option on Unit object
-* [UnitEditServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/admin/UnitEditServlet.java) - add faculty_only editing in admin interface for Units
+* [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - get directory information for all CAS logins
+* [Ldap.java](../modules/additions/src/main/java/edu/umd/lib/dspace/authenticate/Ldap.java)
+* [Unit.java](../modules/additions/src/main/java/org/dspace/eperson/Unit.java) - add faculty_only option on Unit object
+* [UnitEditServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/admin/UnitEditServlet.java) - add faculty_only editing in admin interface for Units
+* [EPersonAdminServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/admin/EPersonAdminServlet.java
+) - add Ldap information to EPerson edit page
 
 *JSPUI webapp*
  
-* [unit-edit.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/unit-edit.jsp) - add Ldap.getGroups() to gather Group mappings for all units
+* [unit-edit.jsp](../modules/jspui/src/main/webapp/tools/unit-edit.jsp) - add Ldap.getGroups() to gather Group mappings for all units
 
-* [eperson-edit.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/eperson-edit.jsp) - add faculty_only editing in admin interface for Units
+* [eperson-edit.jsp](../modules/jspui/src/main/webapp/dspace-admin/eperson-edit.jsp) - add faculty_only editing in admin interface for Units
 
 *Scripts*
 
@@ -207,7 +209,7 @@ Add capability to login with the university directory id using CAS autentication
  
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - login messages for JSP
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - login messages for JSP
 
 
 *Database Schema*
