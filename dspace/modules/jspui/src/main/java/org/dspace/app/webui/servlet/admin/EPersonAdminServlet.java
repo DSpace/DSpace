@@ -35,6 +35,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
 import org.dspace.eperson.Group;
 
+import edu.umd.lib.dspace.authenticate.Ldap;
+
 /**
  * Servlet for editing and creating e-people
  * 
@@ -96,6 +98,25 @@ public class EPersonAdminServlet extends DSpaceServlet
 	            request.setAttribute("eperson", e);
 	            request.setAttribute("group.memberships", groupMemberships);
 	
+                    // Add Ldap information
+                    String netid = e.getNetid();
+
+                    if (netid != null && !netid.equals("")) {
+                      Ldap ldap = null;
+                      try {
+                        ldap = new Ldap(context);
+                        if (ldap.checkUid(netid)) {
+                          request.setAttribute("eperson.ldap", ldap);
+                        }
+                      }
+                      catch (Exception ex) {
+                        log.error("Error opening Ldap connection: " + ex.getMessage());
+                      }
+                      finally {
+                        if (ldap != null) ldap.close();
+                      }
+                    }
+
 	            JSPManager.showJSP(request, response,
 	                    "/dspace-admin/eperson-edit.jsp");
 	
