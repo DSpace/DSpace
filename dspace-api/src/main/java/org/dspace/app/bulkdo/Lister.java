@@ -151,11 +151,11 @@ public class Lister {
         ca.setLayout(new PatternLayout("# %c: %m%n"));
         log.addAppender(ca);
 
-        ListerArguments args = new ListerArguments();
+        Arguments args = new Arguments();
         try {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
-                ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.doWorkflowItems);
+                ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.getWorkflowItemsOnly());
 
                 log.debug("# " + targets.size() + " type=" + args.getType());
                 Printer p = args.getPrinter();
@@ -174,22 +174,3 @@ public class Lister {
 
 }
 
-class ListerArguments extends Arguments {
-    static String WORKFLOW_ITEM = "W";
-    static String WORKFLOW_ITEM_LONG = "doWorkSpaceItems";
-
-    boolean doWorkflowItems = false;
-
-    ListerArguments() {
-        super();
-        options.addOption(WORKFLOW_ITEM, WORKFLOW_ITEM_LONG, false, "list items in workflow");
-    }
-
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
-        if (super.parseArgs(argv)) {
-            doWorkflowItems = line.hasOption(WORKFLOW_ITEM);
-            return true;
-        }
-        return false;
-    }
-}

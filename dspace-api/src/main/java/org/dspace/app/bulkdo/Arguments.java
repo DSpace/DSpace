@@ -44,6 +44,9 @@ class Arguments {
     public static String KEYS = "i";
     public static String KEYS_LONG = "include";
 
+    public static String METADATA = "m";
+    public static String METADATA_LONG = "meta_data";
+
     public static String ROOT = "r";
     public static String ROOT_LONG = "root";
 
@@ -52,6 +55,9 @@ class Arguments {
 
     public static String VERBOSE = "v";
     public static String VERBOSE_LONG = "verbose";
+
+    static String WORKFLOW_ITEM = "W";
+    static String WORKFLOW_ITEM_LONG = "doWorkSpaceItems";
 
     public static String WHO = "w";
     public static String WHO_LONG = "who";
@@ -77,6 +83,7 @@ class Arguments {
 
     private boolean verbose;
     private boolean dryRun;
+    private boolean doWorkflowItems;
 
     private char doAction;
     private char[] availableActions;
@@ -108,6 +115,7 @@ class Arguments {
         }
         options.addOption(ROOT, ROOT_LONG, true, "handle / type.ID");
         options.addOption(TYPE, TYPE_LONG, true, "type: collection, item, bundle, or bitstream ");
+        options.addOption(WORKFLOW_ITEM, WORKFLOW_ITEM_LONG, false, "list items in workflow");
         options.addOption(EPERSON, EPERSON_LONG, true, "dspace user account (email or netid) used for authorization to dspace app");
         options.addOption(FORMAT, FORMAT_LONG, true, "output format: tsv or txt");
         options.addOption(KEYS, KEYS_LONG, true, "include listed object keys/properties in output; give as comma separated list");
@@ -148,6 +156,8 @@ class Arguments {
     public String getActionString() {
         return getActionString(doAction);
     }
+
+    public boolean getWorkflowItemsOnly() { return doWorkflowItems; }
 
     public boolean getVerbose() {  return verbose;  }
 
@@ -213,6 +223,7 @@ class Arguments {
 
             verbose = line.hasOption(VERBOSE);
             dryRun = line.hasOption(DRYRUN);
+            doWorkflowItems = line.hasOption(WORKFLOW_ITEM);
 
             try {
                 c = new Context();
@@ -305,6 +316,7 @@ class Arguments {
         out.println(prefix + " " + ROOT_LONG + "=" + dobj);
         out.println(prefix + " " + TYPE_LONG + "=" + Constants.typeText[myType]);
         out.println(prefix + " " + ACTION_LONG + "=" + getAction() + " " + getActionString());
+        out.println(prefix + " " + WORKFLOW_ITEM_LONG + "=" + String.valueOf(doWorkflowItems));
         out.println(prefix + " " + FORMAT_LONG + "=" + getFormat());
         out.println(prefix + " " + KEYS_LONG + "=" + deepToString(keys));
         out.println(prefix + " " + EPERSON_LONG + "=" + line.getOptionValue(EPERSON));

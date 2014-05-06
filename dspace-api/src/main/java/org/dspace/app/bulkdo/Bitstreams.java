@@ -97,7 +97,7 @@ public class Bitstreams {
     public static void main(String argv[]) {
         ConsoleAppender ca = new ConsoleAppender();
         ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%c: %m%n"));
+        ca.setLayout(new PatternLayout("# %c: %m%n"));
         log.addAppender(ca);
 
         BitstreamsArguments args = new BitstreamsArguments();

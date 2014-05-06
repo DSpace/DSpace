@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <commands>
 
+
     <command>
-        <name>bulk-pols</name>
-        <description>Apply Action in Bulk</description>
+        <name>bulk-bitstream</name>
+        <description>Replace Bisttream File in a Single Bitstream Object</description>
         <step>
-            <class>org.dspace.app.bulkdo.Policies</class>
+            <class>org.dspace.app.bulkdo.Bitstreams</class>
         </step>
     </command>
     <command>
@@ -16,10 +17,17 @@
         </step>
     </command>
     <command>
-        <name>bulk-bitstream</name>
-        <description>Replace Bisttream File</description>
+        <name>bulk-meta-data</name>
+        <description>Bulk Replace a MetaData Value in Items</description>
         <step>
-            <class>org.dspace.app.bulkdo.Bitstreams</class>
+            <class>org.dspace.app.bulkdo.MetaData</class>
+        </step>
+    </command>
+    <command>
+        <name>bulk-pols</name>
+        <description>Bulk Add or Delete a Policy on a DSpaceObject</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Policies</class>
         </step>
     </command>
 

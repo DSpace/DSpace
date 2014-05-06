@@ -13,7 +13,7 @@ import java.util.HashMap;
 /**
  * Created by monikam on 4/11/14.
  */
-public class ActionTarget {
+class ActionTarget {
 
     private Context context;
     private DSpaceObject obj;
@@ -137,17 +137,7 @@ public class ActionTarget {
     private Object getMetadateValue(String field) {
         if (obj.getType() == Constants.ITEM) {
             DCValue[] values =  ((Item) obj).getMetadata(field);
-            if (values.length == 0) {
-                return null;
-            }
-            if (values.length ==1 ) {
-                return values[0].value;
-            }
-            String vals[] = new String[values.length];
-            for (int i = 0; i < values.length; i++) {
-                vals[i] = values[i].value;
-            }
-            return vals;
+            return DCValue.valuesFor(values);
         }
         return null;
     }
@@ -190,9 +180,9 @@ public class ActionTarget {
         return o;
     }
 
-    public void put(String key, Object obj) {
+    public void put(String key, Object put) {
         toHashMap();
-        map.put(key, obj);
+        map.put(key, put);
     }
 
     protected boolean toHashMap() {

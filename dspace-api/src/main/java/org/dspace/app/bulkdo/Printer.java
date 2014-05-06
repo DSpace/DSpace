@@ -4,6 +4,7 @@ import org.apache.commons.lang.ArrayUtils;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.deepToString;
 
@@ -48,6 +49,10 @@ public class Printer extends PrintStream {
     }
 
     protected void addKey(String key) {
+        for (String k : keys) {
+            if (k.equals(key))
+                return;
+        }
         keys = (String[]) ArrayUtils.add(keys, key);
     }
 
@@ -78,10 +83,16 @@ class TSVPrinter extends Printer {
         super(out, keys);
     }
 
-    /**
-     * sloppy TSV output
-     * @param at
-     */
+    private static Pattern pattern = Pattern.compile("\\s");
+
+    public static String expandToString(Object obj) {
+        String str = Printer.expandToString(obj);
+        if (pattern.matcher(str).find()) {
+            str = "\"" + str.replaceAll("\"", "\"\"") + "\"";
+        }
+        return str;
+    }
+
     @Override
     public void println(ActionTarget at) {
         String txt = "";
