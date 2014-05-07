@@ -353,7 +353,7 @@ $ mkdir /apps/drum
 
 Copy /apps/git/drum/local.properties.template to local.properties.  This properties file contains the basic settings necessary to actually build/install DRUM for the first time.
 
-The properties with value LOCAL in the local.properties file needs to updated with environment specific values.
+The properties in local.properties file needs to updated with environment specific values.
 Please, pay attention to the value of the database password for the dspace user. You should replace it with the password you have given to the dspace user in the previous steps.
 
 
@@ -389,9 +389,7 @@ db.username=dspace
 db.password=<ENTER-YOUR-DSPACE-DATABASE-PASSWORD-HERE>
 
 # EMAIL CONFIGURATION (optional in local)
-# IMPORTANT NOTE: If you don't want to configure this section, 
-# make the values of these properties empty by deleting the 
-# "LOCAL" placeholder value in your local.properties file.
+
 
 mail.server = <SMTP-SERVER-IP>
 

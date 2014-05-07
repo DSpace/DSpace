@@ -25,28 +25,31 @@
 dspace.install.dir=/apps/drum
 
 # DSpace host name - should match base URL.  Do not include port number
-dspace.hostname = LOCAL
+dspace.hostname = 
 
 # DSpace base host URL.  Include port number etc.
-dspace.baseUrl = LOCAL
+dspace.baseUrl = 
 
 # Name of the site
 dspace.name = DRUM 4.1
 
 # Solr server
-solr.server = LOCAL
+solr.server = 
 
 # Default language for metadata values
 default.language = en_US
 
-
+# additional asset stores
+assetstore.dir.1 = 
+assetstore.dir.2 = 
+assetstore.dir.3 =
 
 ##########################
 # CAS LDAP CONFIGURATION #
 ##########################
 
-ldap.bind.auth = LOCAL
-ldap.bind.password = LOCAL
+ldap.bind.auth = 
+ldap.bind.password = 
 
 
 ##########################
@@ -61,10 +64,10 @@ db.name=postgres
 db.driver=org.postgresql.Driver
 
 #db.url example: db.url=jdbc:postgresql://localhost:5432/dspace411
-db.url=LOCAL
+db.url=
 
-db.username=LOCAL
-db.password=LOCAL
+db.username=
+db.password=
 
 # oracle
 #db.driver= oracle.jdbc.OracleDriver
@@ -98,7 +101,7 @@ db.poolname = dspacepool
 #######################
 
 # SMTP mail server
-mail.server = LOCAL
+mail.server = 
 
 # SMTP mail server authentication username and password (if required)
 # mail.server.username = myusername
@@ -110,21 +113,21 @@ mail.server.password=
 mail.server.port = 25
 
 # From address for mail
-mail.from.address = LOCAL 
+mail.from.address = 
 
 # Currently limited to one recipient!
-mail.feedback.recipient = LOCAL
+mail.feedback.recipient = 
 
 # General site administration (Webmaster) e-mail
-mail.admin = LOCAL
+mail.admin = 
 
 # Recipient for server errors and alerts
 #mail.alert.recipient = email-address-here
-mail.alert.recipient = LOCAL
+mail.alert.recipient = 
 
 # Recipient for new user registration emails
 #mail.registration.notify = email-address-here
-mail.registration.notify = LOCAL
+mail.registration.notify = 
 
 
 ########################
@@ -151,7 +154,7 @@ mail.registration.notify = LOCAL
 handle.canonical.prefix = http://hdl.handle.net/
 
 # CNRI Handle prefix
-handle.prefix = LOCAL
+handle.prefix = 
 
 #######################
 # PROXY CONFIGURATION #
