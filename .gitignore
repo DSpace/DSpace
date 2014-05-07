@@ -9,6 +9,8 @@ release.properties
 .settings/
 .project
 .classpath
+.tomcatplugin
+
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
