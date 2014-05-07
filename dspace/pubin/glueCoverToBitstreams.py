@@ -6,8 +6,8 @@ from optparse import OptionParser
 DSPACE_METADATA_ELEMENT = "pu.pdf.coverpage"; 
 DSPACE_HOME = os.environ.get('DSPACE_HOME') or  "/dspace";
 DSPACE_CMD =  "/bin/dspace"
-DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,BUNDLE.id,mimeType,name," + \
-              "ITEM." + DSPACE_METADATA_ELEMENT +  " " + \
+DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,BUNDLE.id,mimeType," + \
+              "ITEM." + DSPACE_METADATA_ELEMENT +  ",name " + \
                "--format TXT "
 DSPACE_LIST =      " bulk-list --root ROOT --type BITSTREAM " +  DSPACE_OPTS; 
 DSPACE_BITSTREAM = " bulk-bitstream --root ROOT --eperson EPERSON --bitstream COVEREDBITSTREAM " +  DSPACE_OPTS 
@@ -26,18 +26,23 @@ def doit():
             if (line[0] == '#'):
                 continue;  # skip comment lines 
 
+            doLog("", options.log_file) 
+            doLog("# " + line, options.log_file) 
             bitstream = digestLine(line);  
-            if ((bitstream['mimeType'] != "application/pdf") or (bitstream['BUNDLE.name'] != "ORIGINAL")):
-                continue;  # skip ; only consider pdf bitstreams in ORIGINAL bundles 
+            if (bitstream == None): 
+                doLog("ERROR: Can digest line", options.log_file); 
+                continue;
 
-            stages = [];
-            result = "NOTHING-TO-DO";
-            bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
-            bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + \
-                                       "BUNDLE."  + bitstream['BUNDLE.id'] +":" + bitstream['name']
+            if ((bitstream['mimeType'] != "application/pdf") or (bitstream['BUNDLE.name'] != "ORIGINAL")):
+                   continue;  # skip ; only consider pdf bitstreams in ORIGINAL bundles 
 
             try: 
-               doLog("", options.log_file) 
+               stages = [];
+               result = "NOTHING-TO-DO";
+               bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
+               bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + \
+                                          "BUNDLE."  + bitstream['BUNDLE.id'] +":" + bitstream['name']
+
                doLog(bitstream['pdfFileName'] + " checkMetaData " + line, options.log_file) 
                stages.append("checkMetaData");
                if (bitstream['ITEM.' + DSPACE_METADATA_ELEMENT ] != ''): 
@@ -86,11 +91,18 @@ def doit():
 
 
 def digestLine(line): 
-    object = {};
-    for prop in line.split():
-        (name,value)= prop.split('=');
-        object[name] = value;
-    return object;
+    try: 
+       object = {};
+       # name is last 
+       i = line.rfind(" name=")
+       for prop in line[:i].split():
+           (name,value)= prop.split('=');
+           object[name] = value;
+       (name,value)= line[i+1:].split('=');
+       object[name] = value.replace(" ", "_"); 
+       return object;
+    except: 
+        return None;
 
 def getDSpaceFileName(assetstore, internalId): 
    dr = "/%s/%s/%s/" % (internalId[0:2], internalId[2:4], internalId[4:6])
