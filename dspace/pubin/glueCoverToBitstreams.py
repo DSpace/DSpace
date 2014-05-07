@@ -1,14 +1,17 @@
 #!/usr/bin/env python
-import sys, os, subprocess,  commands, shutil; 
+import sys, os, subprocess,  commands, shutil, string; 
 from optparse import OptionParser
 
 # 88435/dsp01qf85nb30h
+DSPACE_METADATA_ELEMENT = "pu.pdf.coverpage"; 
 DSPACE_HOME = os.environ.get('DSPACE_HOME') or  "/dspace";
 DSPACE_CMD =  "/bin/dspace"
-DSPACE_OPTS = " --include object,ITEM.handle,COLLECTION.id,COMMUNITY.id,internalId,BUNDLE.name,mimeType,ITEM.pu.pdf.coverpage " +  \
+DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,mimeType," + \
+              "ITEM." + DSPACE_METADATA_ELEMENT +  " " + \
                "--format TXT "
 DSPACE_LIST = " bulk-list --root ROOT --type BITSTREAM " +  DSPACE_OPTS; 
 DSPACE_BITSTREAM = " bulk-bitstream --root ROOT --eperson EPERSON --bitstream COVEREDBITSTREAM " +  DSPACE_OPTS 
+DSPACE_METADATA  = " bulk-meta-data --root ITEM --eperson EPERSON --action ADD --meta_data " + DSPACE_METADATA_ELEMENT + "=METADATA"; 
 
 TMP_DIR = "tmp";
 
@@ -16,6 +19,7 @@ def doit():
     cmd = '';
     options = parseargs(); 
     if (options != None): 
+        # iter over relevant bitstreams 
         cmd =  options.dspace_cmd +  DSPACE_LIST.replace("ROOT", options.root);
         output = execCommand(cmd, options.verbose); 
         for line in output.split("\n"): 
@@ -31,32 +35,44 @@ def doit():
             if (bitstream['ITEM.pu.pdf.coverpage'] != ''): 
                continue;   # skip   - already has cover page
 
-            ## add coverpage 
+            stages = [];
+            result = ""; 
             bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
             bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + bitstream['object'] + ".pdf"
-            cmd = options.pdfAddCoverCmd;
-            cmd = cmd.replace("ASSETSTOREFILE" ,  bitstream['fileName']); 
-            cmd = cmd.replace("BITSTREAM" ,  bitstream['pdfFileName']); 
             try: 
+               ## add coverpage  - always regardless of dryrun options
+               stages.append("pdfTk"); 
+               cmd = options.pdfAddCoverCmd;
+               cmd = cmd.replace("ASSETSTOREFILE" ,  bitstream['fileName']); 
+               cmd = cmd.replace("BITSTREAM" ,  bitstream['pdfFileName']); 
                execCommand(cmd, options.verbose); 
-               line = line + " pdf.COMMAND=SUCCESS" + " pdf.BITSTREAM=" + bitstream['pdfFileName']; 
+               line = line + " pdf.BITSTREAM=" + bitstream['pdfFileName']; 
+
+               ## import covered bitstream  - dryrun if necessary 
+               stages.append("importBitstream"); 
+               cmd = options.dspace_cmd + " " + DSPACE_BITSTREAM.replace("COVEREDBITSTREAM", bitstream['pdfFileName']); 
+               cmd = cmd.replace("ROOT", bitstream['object']); 
+               cmd = cmd.replace("EPERSON", options.eperson);
+               if (options.dryrun):
+                  cmd = cmd + " --dryrun"; 
+               execCommand(cmd, options.verbose); 
+
+               ## set metadata value 
+               stages.append("metadata"); 
+               cmd = options.dspace_cmd + " " + DSPACE_METADATA.replace("ITEM", bitstream['ITEM.handle']); 
+               cmd = cmd.replace("METADATA", options.metavalue); 
+               cmd = cmd.replace("EPERSON", options.eperson);
+               if (options.dryrun):
+                  cmd = cmd + " --dryrun"; 
+               execCommand(cmd, options.verbose)
+
+               result =  "SUCCESS"; 
             except Exception, e: 
-               prtFile(options.bitstream_covered_file, line +  " pdf.COMMAND=ERROR\n", options.verbose); 
-               continue; 
+               result = e.message; 
+            finally: 
+               prtFile(options.bitstream_covered_file, \
+                    line + " stages=" + string.join(stages,",") + " RESULT=" + result + "\n", options.verbose); 
 
-            ## import covered bitstream 
-            cmd = options.dspace_cmd + " " + DSPACE_BITSTREAM.replace("COVEREDBITSTREAM", bitstream['pdfFileName']); 
-            cmd = cmd.replace("ROOT", bitstream['object']); 
-            cmd = cmd.replace("EPERSON", options.eperson);
-            try: 
-               execCommand(cmd, options.verbose); 
-               prtFile(options.bitstream_covered_file, line +  " import.BITSTREAM=SUCCESS" + "\n", options.verbose); 
-            except: 
-               prtFile(options.bitstream_covered_file, line +  " import.BITSTREAM=ERROR" + "\n", options.verbose); 
-               continue; 
-
-
-               
 
 def digestLine(line): 
     object = {};
@@ -71,11 +87,11 @@ def getDSpaceFileName(assetstore, internalId):
  
 def prtFile(fle, txt, verbose):
     fle.write(txt); 
-    if (False and verbose): 
+    if (verbose): 
         print txt;
     
 def execCommand(cmd, verbose):    
-        if (verbose): 
+        if (verbose):
             print "# " + cmd; 
         (status, output) = commands.getstatusoutput( cmd ); 
         if (status != 0): 
@@ -110,11 +126,6 @@ def runCmd(cmd, outfile,  verbose):
 
 def parseargs(): 
     parser = OptionParser()
-    parser.add_option("-t", "--tmp", dest="tmpdir",
-                  default=TMP_DIR,
-                  help="directory containing tempoarry files, default: " + TMP_DIR); 
-    parser.add_option("-r", "--root", dest="root",
-                  help="DSpace community, collection, or itemf"); 
     parser.add_option("-c", "--cover", dest="cover",
                   help="Cover page pdf"); 
     parser.add_option("-d", "--dspace", dest="dhome",
@@ -122,6 +133,15 @@ def parseargs():
                   help="DSPACE installation directory, default: " + DSPACE_HOME);
     parser.add_option("-e", "--eperson", dest="eperson",
                   help="DSPACE EPerson to be associated with operations ")
+    parser.add_option("-m", "--metavalue", dest="metavalue",
+                  help="Metadata Value for " + DSPACE_METADATA_ELEMENT  + ", default derives fomr --cover options")
+    parser.add_option("-r", "--root", dest="root",
+                  help="DSpace community, collection, or item"); 
+    parser.add_option("-t", "--tmp", dest="tmpdir",
+                  help="directory containing temporary files, default: " + TMP_DIR  + "/<ROOT_PARAM>" )
+    parser.add_option("-y", "--dryrun", 
+                  action="store_true", dest="dryrun", default=False,
+                  help="Dryrun only "); 
     parser.add_option("-v", "--verbose",
                   action="store_true", dest="verbose", default=False,
                   help="be verbose")
@@ -143,12 +163,19 @@ def parseargs():
         if (not os.path.isdir(options.assetstore)): 
             raise Exception, "Can't see assetstore " +  options.assetstore; 
 
+        if (not options.tmpdir): 
+            options.tmpdir = TMP_DIR + "/" + options.root; 
         if (not os.path.isdir(options.tmpdir)): 
             if (options.verbose): 
                 print "Creating temp directory " + options.tmpdir
-            os.mkdir(options.tmpdir)
+            os.makedirs(options.tmpdir); 
         options.bitstream_file =  open(options.tmpdir + "/bitstreams-original-pdf.txt", "w"); 
         options.bitstream_covered_file =  open(options.tmpdir + "/bitstreams-original-pdf_covered.txt", "w"); 
+
+        if (not options.metavalue):
+            options.metavalue = os.path.splitext(os.path.basename(options.cover))[0];
+        if (0 == len(options.metavalue)): 
+            raise Exception, "Can't derive metadata value from " + options.cover; 
 
         options.bitstream_covered_dir =  options.tmpdir + "/bitstreams"; 
         if (not os.path.isdir(options.bitstream_covered_dir)): 
@@ -165,6 +192,8 @@ def parseargs():
         if (options.verbose): 
             print "# Root:\t" + options.root; 
             print "# Cover:\t" + options.cover; 
+            print "# CoverMetaDataValue:\t" + options.metavalue; 
+            print "# Dryrun:\t\t" + str(options.dryrun); 
             print "# DSPACE:\t" + options.dhome; 
             print "# DSPACE_cmd:\t" + options.dspace_cmd; 
             print "# Temp Dir:\t" + options.tmpdir; 
