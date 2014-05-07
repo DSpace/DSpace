@@ -108,6 +108,7 @@ public class MetaData {
         } catch (ParseException pe) {
             System.err.println("ERROR: " + pe.getMessage() + "\n");
             args.usage();
+            System.exit(1);
         } catch (AuthorizeException ae) {
             System.err.println("ERROR: " + ae.getMessage() + "\n");
             System.exit(1);
