@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+  <dspace-header>
+    <title>PRISM Registry</title>
+    <contributor.author>Dan Leehr</contributor.author>
+  </dspace-header>
+
+    <dc-schema>
+            <name>prism</name>
+            <namespace>http://prismstandard.org/namespaces/basic/2.0/</namespace>
+    </dc-schema>
+
+    <dc-type>
+      <schema>prism</schema>
+      <element>publicationName</element>
+      <scope_note>Title of the magazine, or other publication, in which a resource was/will be published.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
+
