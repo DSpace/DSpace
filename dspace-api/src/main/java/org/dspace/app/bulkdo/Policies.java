@@ -174,37 +174,41 @@ class PolicyArguments extends Arguments {
     }
 
     @Override
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
-        if (super.parseArgs(argv)) {
-            if (!line.hasOption(ACTION)) {
-                throw new ParseException("Missing " + ACTION_LONG + " option");
-            }
-            String who = "UNKNOWN";
-            if (!line.hasOption(WHO)) {
-                throw new ParseException("Missing " + WHO_LONG + " option");
-            } else {
-                who = line.getOptionValue(WHO);
-            }
-            whoObj = DSpaceObject.fromString(getContext(), who);
-            if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
-                throw new ParseException(who + " is not a known Group or EPerson");
-            }
-            if (whoObj == null) {
-                throw new ParseException("Missing " + WHO_LONG + " option");
-            }
+    public Boolean parseArgs(String[] argv) throws ParseException {
+        try {
+            if (super.parseArgs(argv)) {
+                if (!line.hasOption(ACTION)) {
+                    throw new ParseException("Missing " + ACTION_LONG + " option");
+                }
+                String who = "UNKNOWN";
+                if (!line.hasOption(WHO)) {
+                    throw new ParseException("Missing " + WHO_LONG + " option");
+                } else {
+                    who = line.getOptionValue(WHO);
+                }
+                whoObj = DSpaceObject.fromString(getContext(), who);
+                if (whoObj == null || (whoObj.getType() != Constants.GROUP && whoObj.getType() != Constants.EPERSON)) {
+                    throw new ParseException(who + " is not a known Group or EPerson");
+                }
+                if (whoObj == null) {
+                    throw new ParseException("Missing " + WHO_LONG + " option");
+                }
 
-            String dspaceAction = Constants.actionText[Constants.READ];
-            if (line.hasOption(DSPACE_ACTION)) {
-                dspaceAction = line.getOptionValue(DSPACE_ACTION);
-            }
-            dspaceActionid = Constants.getActionID(dspaceAction);
-            if (dspaceActionid < 0) {
-                throw new ParseException(dspaceAction + " is not a valid action");
-            }
+                String dspaceAction = Constants.actionText[Constants.READ];
+                if (line.hasOption(DSPACE_ACTION)) {
+                    dspaceAction = line.getOptionValue(DSPACE_ACTION);
+                }
+                dspaceActionid = Constants.getActionID(dspaceAction);
+                if (dspaceActionid < 0) {
+                    throw new ParseException(dspaceAction + " is not a valid action");
+                }
 
-            return true;
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new ParseException("Configuration Error: " + e.getMessage());
         }
-        return false;
     }
 
     @Override

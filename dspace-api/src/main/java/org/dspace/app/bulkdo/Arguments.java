@@ -213,7 +213,8 @@ class Arguments {
         System.out.println("\t\t" + Constants.typeText[Constants.BITSTREAM] + ":" + deepToString(ActionTarget.availableKeys(Constants.BITSTREAM)));
     }
 
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
+    public Boolean parseArgs(String[] argv) throws ParseException {
+        try {
             CommandLineParser parser = new PosixParser();
             line = parser.parse(options, argv);
             if (line.hasOption(HELP)) {
@@ -310,6 +311,9 @@ class Arguments {
                 getContext().setCurrentUser(user);
             }
             return true;
+        } catch (SQLException e) {
+            throw new ParseException("Configuration error: " + e.getMessage());
+        }
     }
 
     public void printArgs(PrintStream out, String prefix) {

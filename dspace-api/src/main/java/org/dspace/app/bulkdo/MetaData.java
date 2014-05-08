@@ -105,12 +105,12 @@ public class MetaData {
         } catch (SQLException se) {
             System.err.println("ERROR: " + se.getMessage() + "\n");
             System.exit(1);
+        } catch (AuthorizeException ae) {
+            System.err.println("ERROR: " + ae.getMessage() + "\n");
+            System.exit(1);
         } catch (ParseException pe) {
             System.err.println("ERROR: " + pe.getMessage() + "\n");
             args.usage();
-            System.exit(1);
-        } catch (AuthorizeException ae) {
-            System.err.println("ERROR: " + ae.getMessage() + "\n");
             System.exit(1);
         }
     }
@@ -123,12 +123,11 @@ class MetaDataArguments extends  Arguments {
 
     MetaDataArguments() {
         super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
-        options.addOption(Arguments.METADATA, Arguments.METADATA_LONG, true,
-                "metadata setting of the form 'schema.ualifier.name=value'");
+        options.addOption(Arguments.METADATA, Arguments.METADATA_LONG, true, "metadata setting of the form 'schema.ualifier.name=value'");
     }
 
     @Override
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
+    public Boolean parseArgs(String[] argv) throws ParseException {
         if (super.parseArgs(argv)) {
             if (!line.hasOption(Arguments.ACTION)) {
                 throw new ParseException("Missing " + Arguments.ACTION_LONG + " argument");
@@ -173,7 +172,7 @@ class MetaDataArguments extends  Arguments {
     public  void  printArgs(PrintStream out, String prefix) {
         super.printArgs(out, prefix);
         out.println(prefix + " " + Arguments.METADATA_LONG + "=" + metaData_name + "(" +
-                        schema + "." + element + "." + String.valueOf(qualifier) + ") " +
+                schema + "." + element + "." + String.valueOf(qualifier) + ") " +
                 "=" + metaData_value);
    }
 }

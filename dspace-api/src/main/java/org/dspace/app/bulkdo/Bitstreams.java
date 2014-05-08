@@ -31,15 +31,15 @@ public class Bitstreams {
         log.debug(this);
     }
 
-    public String toString()  {
-        String me =  args.filename + "(" + args.format.getMIMEType() + ") --";
+    public String toString() {
+        String me = args.filename + "(" + args.format.getMIMEType() + ") --";
         if (args.gogo) {
             me += "ignoreFormat--";
         }
         return me + "> " + args.getRoot();
     }
 
-    void apply(Printer p, boolean dryRun) {
+    int apply(Printer p, boolean dryRun) {
         p.addKey("BUNDLE.name");
         p.addKey("replace");
         p.addKey("replace.mimeType");
@@ -47,26 +47,27 @@ public class Bitstreams {
         p.addKey("bundles");
 
         BitstreamActionTarget target = new BitstreamActionTarget(args.getContext(), null, (Bitstream) args.getRoot());
-        String result = "";
+        int retCode = 0;
         try {
             Bundle[] bdls = replaceBitstream(dryRun);
             target.put("bundles", bdls);
-            result = "SUCCESS";
         } catch (Exception e) {
-            result = "ERROR";
             target.put("exception", e.getMessage().replaceAll(" ", "_"));
-            if (args.getVerbose())
+            p.addKey("exception");
+            if (args.getVerbose()) {
                 e.printStackTrace();
+            }
+            retCode = 1;
         }
         target.put("replace", args.filename);
         target.put("replace.mimeType", args.format.getMIMEType());
-        target.put("success", result);
+        target.put("success", (retCode == 0) ? " SUCCESS" : "ERROR");
         p.println(target);
-
+        return retCode;
     }
 
     private Bundle[] replaceBitstream(boolean dryRun) throws SQLException, IOException, AuthorizeException {
-        Bitstream bit = (Bitstream)  args.getRoot();
+        Bitstream bit = (Bitstream) args.getRoot();
         if (!bit.getFormat().getMIMEType().equals(args.format.getMIMEType()) && !args.gogo) {
             throw new RuntimeException("format mistmatch");
         }
@@ -101,21 +102,19 @@ public class Bitstreams {
         log.addAppender(ca);
 
         BitstreamsArguments args = new BitstreamsArguments();
+        int retCode = 0;
         try {
-
             if (args.parseArgs(argv)) {
                 Bitstreams bitActor = new Bitstreams(args);
                 Printer p = args.getPrinter();
-                bitActor.apply(p, args.getDryRun());
+                retCode = bitActor.apply(p, args.getDryRun());
             }
-        } catch (SQLException se) {
-            System.err.println("ERROR: " + se.getMessage() + "\n");
-            System.exit(1);
         } catch (ParseException pe) {
             System.err.println("ERROR: " + pe.getMessage() + "\n");
             args.usage();
-            System.exit(1);
+            retCode = 0;
         }
+        System.exit(retCode);
     }
 }
 
@@ -132,48 +131,51 @@ class BitstreamsArguments extends Arguments {
     }
 
     @Override
-    public Boolean parseArgs(String[] argv) throws ParseException, SQLException {
-        if (super.parseArgs(argv)) {
-            gogo = line.hasOption(GOGO);
+    public Boolean parseArgs(String[] argv) throws ParseException {
+        try {
+            if (super.parseArgs(argv)) {
+                gogo = line.hasOption(GOGO);
 
-            if (!line.hasOption(Arguments.BITSTREAM_FILE)) {
-                throw new ParseException("missing " + Arguments.BITSTREAM_FILE_LONG + " option");
-            }
+                if (!line.hasOption(Arguments.BITSTREAM_FILE)) {
+                    throw new ParseException("missing " + Arguments.BITSTREAM_FILE_LONG + " option");
+                }
 
-            if (!line.hasOption(Arguments.EPERSON)) {
-                throw new ParseException("missing " + Arguments.EPERSON_LONG + " option");
-            }
+                if (!line.hasOption(Arguments.EPERSON)) {
+                    throw new ParseException("missing " + Arguments.EPERSON_LONG + " option");
+                }
 
-            // make action is replace
-            if (getAction() != Arguments.DO_REPLACE) {
-                throw new ParseException("Can only " + Arguments.actionText[Arguments.DO_REPLACE] + " bitstreams");
-            }
+                // make action is replace
+                if (getAction() != Arguments.DO_REPLACE) {
+                    throw new ParseException("Can only " + Arguments.actionText[Arguments.DO_REPLACE] + " bitstreams");
+                }
 
-            // make sure root is a BITSTREAM
-            if (getRoot().getType() != Constants.BITSTREAM) {
-                throw new ParseException(getRoot() + " is not a bitstream");
-            }
+                // make sure root is a BITSTREAM
+                if (getRoot().getType() != Constants.BITSTREAM) {
+                    throw new ParseException(getRoot() + " is not a bitstream");
+                }
 
-            // TODO - really shouldn't allow type option - we know we need BITSTREAM
-            if (getType() != Constants.BITSTREAM) {
-                throw new ParseException("Sorry only working on single BITSTREAMs");
-            }
+                // TODO - really shouldn't allow type option - we know we need BITSTREAM
+                if (getType() != Constants.BITSTREAM) {
+                    throw new ParseException("Sorry only working on single BITSTREAMs");
+                }
 
-            filename = line.getOptionValue(Arguments.BITSTREAM_FILE);
-            // see whether we can open file
-            try {
-                stream = new BufferedInputStream(new FileInputStream(filename));
-            } catch (FileNotFoundException e) {
-                throw new ParseException("Can't open file " + filename);
-            }
-            format = FormatIdentifier.guessFormat(getContext(), filename);
-            if (format == null) {
-                throw new ParseException("Can't guess file format for " + filename);
-            }
+                filename = line.getOptionValue(Arguments.BITSTREAM_FILE);
+                // see whether we can open file
+                try {
+                    stream = new BufferedInputStream(new FileInputStream(filename));
+                } catch (FileNotFoundException e) {
+                    throw new ParseException("Can't open file " + filename);
+                }
+                format = FormatIdentifier.guessFormat(getContext(), filename);
+                if (format == null) {
+                    throw new ParseException("Can't guess file format for " + filename);
+                }
 
-            return true;
+                return true;
+            } return false;
+        } catch (SQLException ex) {
+            throw new ParseException("Configuration error: " + ex.getMessage());
         }
-        return false;
     }
 
     public void printArgs(PrintStream out, String prefix) {
