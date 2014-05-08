@@ -18,13 +18,14 @@ STORE_DIR = "glued"
 def doit(): 
     cmd = '';
     options = parseargs(); 
-    doLog("", options.log_file); 
-    doLog("# Date " +  str(datetime.datetime.now()), options.log_file); 
-    doLog("# CWD " +   os.path.realpath(os.curdir), options.log_file); 
-    doLog("# LogFile " +   options.log_file.name, options.log_file); 
-    doLog("", options.log_file); 
 
     if (options != None): 
+        doLog("", options.log_file); 
+        doLog("# Date " +  str(datetime.datetime.now()), options.log_file); 
+        doLog("# CWD " +   os.path.realpath(os.curdir), options.log_file); 
+        doLog("# LogFile " +   options.log_file.name, options.log_file); 
+        doLog("", options.log_file); 
+
         # iter over relevant bitstreams 
         cmd =  options.dspace_cmd +  DSPACE_LIST.replace("ROOT", options.root);
         output = execCommand(cmd, options.verbose); 
@@ -95,9 +96,10 @@ def doit():
                execCommand(cmd, options.verbose)
 
                result = "SUCCESS"; 
+               doLog(bitstream['pdfFileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
+               doLog(bitstream['pdfFileName'] + " RESULT=" + result, options.log_file);
             except Exception, e: 
                result = "ERROR: " + str(e.message); 
-            finally: 
                doLog(bitstream['pdfFileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
                doLog(bitstream['pdfFileName'] + " RESULT=" + result, options.log_file);
 
@@ -229,13 +231,12 @@ def parseargs():
 
         options.pdfAddCoverCmd = "pdftk %s ASSETSTOREFILE  output BITSTREAM" % (options.cover) 
         prtOptions(options.log_file, options); 
+        if (options.verbose): 
+            prtOptions(sys.stdout, options); 
     except Exception, ex: 
         print ex; 
         parser.print_help(); 
         return None;
-    finally: 
-        if (options.verbose): 
-            prtOptions(sys.stdout, options); 
     return options; 
 
 def prtOptions(dest, options): 
