@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, subprocess,  commands, shutil, string; 
+import sys, os, subprocess,  commands, shutil, string, datetime; 
 from optparse import OptionParser
 
 # 88435/dsp01qf85nb30h
@@ -18,6 +18,12 @@ STORE_DIR = "glued"
 def doit(): 
     cmd = '';
     options = parseargs(); 
+    doLog("", options.log_file); 
+    doLog("# Date " +  str(datetime.datetime.now()), options.log_file); 
+    doLog("# CWD " +   os.path.realpath(os.curdir), options.log_file); 
+    doLog("# LogFile " +   options.log_file.name, options.log_file); 
+    doLog("", options.log_file); 
+
     if (options != None): 
         # iter over relevant bitstreams 
         cmd =  options.dspace_cmd +  DSPACE_LIST.replace("ROOT", options.root);
@@ -42,19 +48,25 @@ def doit():
                bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
                bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + \
                                           "BUNDLE."  + bitstream['BUNDLE.id'] +":" + bitstream['name']
-
                doLog(bitstream['pdfFileName'] + " checkMetaData " + line, options.log_file) 
                stages.append("checkMetaData");
-               if (bitstream['ITEM.' + DSPACE_METADATA_ELEMENT ] != ''): 
-                  continue;   # skip   - already has cover page
-
+               hasMetaData = (bitstream['ITEM.' + DSPACE_METADATA_ELEMENT ] != '')
+               
                ## check whether  bitstream['pdfFileName'] already exists 
-               ## if so - this may indicate inconsistent state - 
-               ## a coverred bitstream in the system without a DSPACE_METADATA_ELEMENT setting 
+               ## if hasMetData - should see file 
+               ## if not hasMetData - there should not be a file 
+               ## otherwise - there maybe a problem 
                doLog(bitstream['pdfFileName'] + " checkFileExists ", options.log_file); 
                stages.append("checkFileExists"); 
-               if (os.path.isfile(bitstream['pdfFileName'])):   
-                   raise Exception, "ERROR: " + bitstream['pdfFileName'] + " exists but " + DSPACE_METADATA_ELEMENT + " undefined; afraid to double cover"
+               fileExists = os.path.isfile(bitstream['pdfFileName']) 
+               if (fileExists and not hasMetaData): 
+                   raise Exception,  bitstream['pdfFileName'] + " exists but " + DSPACE_METADATA_ELEMENT + " undefined; " + \
+                                                                "afraid to double cover"
+               if (not fileExists and hasMetaData): 
+                   raise Exception, bitstream['pdfFileName'] + " does not exist but " + DSPACE_METADATA_ELEMENT + " is set; " + \
+                                                                "may have missed this bitstream "; 
+               if (hasMetaData): 
+                  continue;
  
                ## add coverpage 
                doLog(bitstream['pdfFileName'] + " addCover " + options.cover , options.log_file); 
@@ -82,9 +94,9 @@ def doit():
                   cmd = cmd + " --dryrun"; 
                execCommand(cmd, options.verbose)
 
-               result =  "SUCCESS"; 
+               result = "SUCCESS"; 
             except Exception, e: 
-               result = str(e.message); 
+               result = "ERROR: " + str(e.message); 
             finally: 
                doLog(bitstream['pdfFileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
                doLog(bitstream['pdfFileName'] + " RESULT=" + result, options.log_file);
@@ -156,16 +168,16 @@ def runCmd(cmd, outfile,  verbose):
 def parseargs(): 
     parser = OptionParser()
     parser.add_option("-c", "--cover", dest="cover",
-                  help="Cover page pdf"); 
+                  help="Required: Cover page pdf"); 
     parser.add_option("-d", "--dspace", dest="dhome",
                   default=DSPACE_HOME, 
                   help="DSPACE installation directory, default: " + DSPACE_HOME);
     parser.add_option("-e", "--eperson", dest="eperson",
-                  help="DSPACE EPerson to be associated with operations ")
+                  help="Required: DSPACE EPerson to be associated with operations ")
     parser.add_option("-m", "--metavalue", dest="metavalue",
-                  help="Metadata Value for " + DSPACE_METADATA_ELEMENT  + ", default derives fomr --cover options")
+                  help="Metadata Value for " + DSPACE_METADATA_ELEMENT  + ", default derives from --cover options")
     parser.add_option("-r", "--root", dest="root",
-                  help="DSpace community, collection, or item"); 
+                  help="Required: DSpace community, collection, or item"); 
     parser.add_option("-s", "--store", dest="storedir",
                   help="directory containing trace files and generated bitstreams, default: " + STORE_DIR  + "/<ROOT_PARAM>" )
     parser.add_option("-y", "--dryrun", 
@@ -197,12 +209,12 @@ def parseargs():
 
         if (not options.storedir): 
             options.storedir = STORE_DIR; 
-        logdir = options.storedir  + "/" + options.root; 
-        if (not os.path.isdir(logdir)): 
+        if (not os.path.isdir(options.storedir)): 
             if (options.verbose): 
-                print "Creating directory " + logdir
-            os.makedirs(logdir);
-        options.log_file =  open(logdir + "/log" + str(os.getpid()) + ".log", "w"); 
+                print "Creating directory " + options.storedir
+            os.makedirs(options.storedir);
+        log_file =  options.storedir + "/log-root=" + options.root.replace("/","_") + "-pid=" + str(os.getpid()) + ".log"
+        options.log_file =  open(log_file,  "w"); 
 
         if (not options.metavalue):
             options.metavalue = os.path.splitext(os.path.basename(options.cover))[0];
@@ -216,24 +228,27 @@ def parseargs():
             os.mkdir(options.bitstream_covered_dir)
 
         options.pdfAddCoverCmd = "pdftk %s ASSETSTOREFILE  output BITSTREAM" % (options.cover) 
+        prtOptions(options.log_file, options); 
     except Exception, ex: 
         print ex; 
         parser.print_help(); 
         return None;
     finally: 
         if (options.verbose): 
-            print "# Root:\t" + str(options.root); 
-            print "# Cover:\t" + str(options.cover); 
-            print "# CoverMetaDataValue:\t" + str(options.metavalue); 
-            print "# Dryrun:\t\t" + str(options.dryrun); 
-            print "# DSPACE:\t" + str(options.dhome); 
-            print "# DSPACE_cmd:\t" + str(options.dspace_cmd); 
-            print "# Store Dir:\t" + str(options.storedir); 
-            print "# Store Dir for Bitstreams:\t" + str(options.bitstream_covered_dir); 
-            print "# Log File:\t" + str(options.log_file); 
-            print "# pdfAddCover command template:\t" + str(options.pdfAddCoverCmd); 
-
+            prtOptions(sys.stdout, options); 
     return options; 
+
+def prtOptions(dest, options): 
+            print >> dest, "# Root:\t" + str(options.root); 
+            print >> dest, "# Cover:\t" + str(options.cover); 
+            print >> dest, "# CoverMetaDataValue:\t" + str(options.metavalue); 
+            print >> dest, "# Dryrun:\t\t" + str(options.dryrun); 
+            print >> dest, "# DSPACE:\t" + str(options.dhome); 
+            print >> dest, "# DSPACE_cmd:\t" + str(options.dspace_cmd); 
+            print >> dest, "# Store Dir:\t" + str(options.storedir); 
+            print >> dest, "# Store Dir for Bitstreams:\t" + str(options.bitstream_covered_dir); 
+            print >> dest, "# Log File:\t" + str(options.log_file); 
+            print >> dest, "# pdfAddCover command template:\t" + str(options.pdfAddCoverCmd); 
 
 if __name__ == "__main__": 
     doit(); 
