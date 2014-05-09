@@ -3,15 +3,15 @@ import sys, os, subprocess,  commands, shutil, string, datetime;
 from optparse import OptionParser
 
 # 88435/dsp01qf85nb30h
-DSPACE_METADATA_ELEMENT = "pu.pdf.coverpage"; 
+DSPACE_METADATA_ELEM = "pu.pdf.coverpage"; 
 DSPACE_HOME = os.environ.get('DSPACE_HOME') or  "/dspace";
 DSPACE_CMD =  "/bin/dspace"
-DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,BUNDLE.id,mimeType," + \
-              "ITEM." + DSPACE_METADATA_ELEMENT +  ",name " + \
+DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,BUNDLE.id,mimeType,checksum,checksumAlgo," + \
+              "ITEM." + DSPACE_METADATA_ELEM +  ",name " + \
                "--format TXT "
 DSPACE_LIST =      " bulk-list --root ROOT --type BITSTREAM " +  DSPACE_OPTS; 
 DSPACE_BITSTREAM = " bulk-bitstream --root ROOT --eperson EPERSON --bitstream COVEREDBITSTREAM " +  DSPACE_OPTS 
-DSPACE_METADATA  = " bulk-meta-data --root ITEM --eperson EPERSON --action ADD --meta_data " + DSPACE_METADATA_ELEMENT + "=METADATA"; 
+DSPACE_METADATA  = " bulk-meta-data --root ITEM --eperson EPERSON --action ADD --meta_data " + DSPACE_METADATA_ELEM + "=METADATA"; 
 
 STORE_DIR = "glued"
 
@@ -49,59 +49,84 @@ def doit():
                bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
                bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + \
                                           "BUNDLE."  + bitstream['BUNDLE.id'] +":" + bitstream['name']
-               doLog(bitstream['pdfFileName'] + " checkMetaData " + line, options.log_file) 
+               bitstream['md5FileName'] = os.path.splitext(bitstream['pdfFileName'])[0] + ".md5"; 
+               doLog(bitstream['md5FileName'] + " checkMetaData " + bitstream['ITEM.handle'], options.log_file) 
                stages.append("checkMetaData");
-               hasMetaData = (bitstream['ITEM.' + DSPACE_METADATA_ELEMENT ] != '')
+               hasMetaData = (bitstream['ITEM.' + DSPACE_METADATA_ELEM ] != '')
                
-               ## check whether  bitstream['pdfFileName'] already exists 
+               ## check whether  bitstream['md5FileName'] already exists 
                ## if hasMetData - should see file 
                ## if not hasMetData - there should not be a file 
                ## otherwise - there maybe a problem 
-               doLog(bitstream['pdfFileName'] + " checkFileExists ", options.log_file); 
+               doLog(bitstream['md5FileName'] + " checkFileExists ", options.log_file); 
                stages.append("checkFileExists"); 
-               fileExists = os.path.isfile(bitstream['pdfFileName']) 
+               fileExists = os.path.isfile(bitstream['md5FileName']) 
                if (fileExists and not hasMetaData): 
-                   raise Exception,  bitstream['pdfFileName'] + " exists but " + DSPACE_METADATA_ELEMENT + " undefined; " + \
+                   doLog(bitstream['md5FileName'] + " " + open(bitstream['md5FileName']).read().rstrip(), options.log_file); 
+                   raise Exception,  bitstream['md5FileName'] + " exists but " + DSPACE_METADATA_ELEM + " undefined; " + \
                                                                 "afraid to double cover"
                if (not fileExists and hasMetaData): 
-                   raise Exception, bitstream['pdfFileName'] + " does not exist but " + DSPACE_METADATA_ELEMENT + " is set; " + \
+                   raise Exception, bitstream['md5FileName'] + " does not exist but " + DSPACE_METADATA_ELEM + " is set; " + \
                                                                 "may have missed this bitstream "; 
                if (hasMetaData): 
+                  doLog(bitstream['md5FileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
+                  doLog(bitstream['md5FileName'] + " RESULT=" + result, options.log_file);
                   continue;
  
                ## add coverpage 
-               doLog(bitstream['pdfFileName'] + " addCover " + options.cover , options.log_file); 
+               doLog(bitstream['md5FileName'] + " addCover " + options.cover , options.log_file); 
                stages.append("addCover"); 
                cmd = options.pdfAddCoverCmd;
                cmd = cmd.replace("ASSETSTOREFILE" ,  bitstream['fileName']); 
                cmd = cmd.replace("BITSTREAM" ,  bitstream['pdfFileName']); 
-               execCommand(cmd, options.verbose, options.dryrun); 
+               out = execCommand(cmd, options.verbose, options.dryrun); 
+               if (not options.dryrun): 
+                  if (options.verbose): 
+                      doLogOut(out, options.log_file);  
+                  if (not os.path.isfile(bitstream['pdfFileName'])): 
+                      raise Exception,  "pdftk failed to create " + bitstream['pdfFileName']; 
+                  out = execCommand("md5sum " + bitstream['pdfFileName'], options.verbose) 
+                  open(bitstream['md5FileName'], "w").write(out + "\n");  
+                  doLog(bitstream['md5FileName'] + " " + out, options.log_file); 
+               else: 
+                  doLog(bitstream['md5FileName'] + " dryrun - can't compute md5", options.log_file); 
+                  
 
                ## import covered bitstream  - dryrun if necessary 
-               doLog(bitstream['pdfFileName'] + " importBitstream ", options.log_file); 
+               # can't execute with dryrun options - do not have covered bitstream file 
+               doLog(bitstream['md5FileName'] + " importBitstream " + bitstream['pdfFileName'], options.log_file); 
                stages.append("importBitstream"); 
                cmd = options.dspace_cmd + " " + DSPACE_BITSTREAM.replace("COVEREDBITSTREAM", bitstream['pdfFileName']); 
                cmd = cmd.replace("ROOT", bitstream['object']); 
                cmd = cmd.replace("EPERSON", options.eperson);
-               execCommand(cmd, options.verbose, options.dryrun);  # can't execute with dryrun options - do not have covered bitstream file 
+               out = execCommand(cmd, options.verbose, options.dryrun);  
+               if (options.verbose): 
+                   doLogOut(out, options.log_file);  
 
                ## set metadata value 
-               doLog(bitstream['pdfFileName'] + " setMetaData " + DSPACE_METADATA_ELEMENT + "=" + options.metavalue, options.log_file); 
+               doLog(bitstream['md5FileName'] + " setMetaData " + DSPACE_METADATA_ELEM + "=" + options.metavalue, options.log_file); 
                stages.append("setMetaData"); 
                cmd = options.dspace_cmd + " " + DSPACE_METADATA.replace("ITEM", bitstream['ITEM.handle']); 
                cmd = cmd.replace("METADATA", options.metavalue); 
                cmd = cmd.replace("EPERSON", options.eperson);
                if (options.dryrun):
                   cmd = cmd + " --dryrun"; 
-               execCommand(cmd, options.verbose)
+               out = execCommand(cmd, options.verbose)
+               if (options.verbose): 
+                   doLogOut(out, options.log_file);  
+
+               ## del covered pdf 
+               doLog(bitstream['md5FileName'] + " deleteCoveredPdf " + bitstream['pdfFileName'], options.log_file); 
+               stages.append("deleteCoveredPdf"); 
+               out = execCommand("rm " + bitstream['pdfFileName'], options.verbose, options.dryrun); 
 
                result = "SUCCESS"; 
-               doLog(bitstream['pdfFileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
-               doLog(bitstream['pdfFileName'] + " RESULT=" + result, options.log_file);
+               doLog(bitstream['md5FileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
+               doLog(bitstream['md5FileName'] + " RESULT=" + result, options.log_file);
             except Exception, e: 
                result = "ERROR: " + str(e.message); 
-               doLog(bitstream['pdfFileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
-               doLog(bitstream['pdfFileName'] + " RESULT=" + result, options.log_file);
+               doLog(bitstream['md5FileName'] + " STAGES=" + string.join(stages, ","), options.log_file);
+               doLog(bitstream['md5FileName'] + " RESULT=" + result, options.log_file);
 
 
 def digestLine(line): 
@@ -122,6 +147,12 @@ def getDSpaceFileName(assetstore, internalId):
    dr = "/%s/%s/%s/" % (internalId[0:2], internalId[2:4], internalId[4:6])
    return assetstore  + dr + internalId; 
  
+def doLogOut(out, fle):
+    if (len(out) > 0): 
+       out = out.replace("\n", "\n# "); 
+       fle.write(out + "\n"); 
+       print out; 
+
 def doLog(txt, fle):
     fle.write(txt + "\n"); 
     print txt; 
@@ -177,7 +208,7 @@ def parseargs():
     parser.add_option("-e", "--eperson", dest="eperson",
                   help="Required: DSPACE EPerson to be associated with operations ")
     parser.add_option("-m", "--metavalue", dest="metavalue",
-                  help="Metadata Value for " + DSPACE_METADATA_ELEMENT  + ", default derives from --cover options")
+                  help="Metadata Value for " + DSPACE_METADATA_ELEM  + ", default derives from --cover options")
     parser.add_option("-r", "--root", dest="root",
                   help="Required: DSpace community, collection, or item"); 
     parser.add_option("-s", "--store", dest="storedir",
