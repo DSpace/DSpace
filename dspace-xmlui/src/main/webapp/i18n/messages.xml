@@ -339,7 +339,9 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.head">Document copy request</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para1">IF YOU ARE THE AUTHOR (OR AN AUTHOR) OF DOCUMENT "{0}" use the buttons to answer the user's request.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para2">This repository will propose an appropriate model reply, which you may edit.</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Send copy</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactRequester">Initial reply to requester</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactAuthor"> Author permission request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Send copy</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend">Don't send copy</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseTrueForm.java -->
@@ -379,6 +381,36 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.head">Your request to change permissions has been sent</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para1">Your request has been sent to the administrator</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para2">Thanks</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestContactRequester.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.title">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.trail">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.head">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.para1">Initial communication with the requester, to let them know their request is being processed.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.toEmail">To</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.message">Message</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.mail">Send</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestContactAuthor.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.title">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.trail">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.head">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.para1">This is the text to be sent to the applicant (together with the document).</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.toEmail">To</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.message">Message</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.mail">Send</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseSent.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.title">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.trail">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.head">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.para1">Your response has been sent.</message>
+
+
 	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

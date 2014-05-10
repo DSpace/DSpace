@@ -7,6 +7,8 @@
  */
 package org.dspace.content.service;
 
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.content.Bitstream;
@@ -48,5 +50,14 @@ public class ItemService
         }
 
         return null;
+    }
+
+    public static String getFirstMetadataValue(Item item, String metadataKey) {
+        DCValue[] dcValue = item.getMetadata(metadataKey);
+        if(dcValue.length > 0) {
+            return dcValue[0].value;
+        } else {
+            return "";
+        }
     }
 }

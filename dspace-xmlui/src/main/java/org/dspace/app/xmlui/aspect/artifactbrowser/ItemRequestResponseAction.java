@@ -60,6 +60,10 @@ public class ItemRequestResponseAction extends AbstractAction
         String decision = request.getParameter("decision");
         String isSent = request.getParameter("isSent");
         String message = request.getParameter("message");
+
+        //contactPerson:requester or contactPerson:author
+        String contactPerson = request.getParameter("contactPerson");
+
         Context context = ContextUtil.obtainContext(objectModel);
         request.setAttribute("token", token);
         
@@ -73,14 +77,19 @@ public class ItemRequestResponseAction extends AbstractAction
         	title="untitled";
         
         String button="";
-        // Botones de las paginas:
+        // Buttons on the page
         if(request.getParameter("send")!=null){
         	decision="true";
         	button="send";
-        }else if(request.getParameter("dontSend")!=null){
+        } else if(request.getParameter("dontSend")!=null){
         	decision="false";
         	button="dontSend";
+        } else if(request.getParameter("contactRequester") !=null) {
+            button = "contactRequester";
+        } else if (request.getParameter("contactAuthor") != null) {
+            button = "contactAuthor";
         }
+
         if(request.getParameter("mail")!=null){
         	button="mail";
         }else if(request.getParameter("back")!=null){
@@ -90,19 +99,40 @@ public class ItemRequestResponseAction extends AbstractAction
         	button="openAccess";
         }
          
-        if(button.equals("mail")&& StringUtils.isNotEmpty(decision) && decision.equals("true")){
-        	processSendDocuments(context,request,requestItem,item,title);
-        	isSent="true";
-        }else if(button.equals("mail")&& StringUtils.isNotEmpty(decision) && decision.equals("false")){
-        	processDeny(context,request,requestItem,item,title);
-        	isSent="true";
-        }else if(button.equals("openAccess")){
+        if(button.equals("mail")) {
+            //Send mail
+            if(StringUtils.isNotEmpty(decision) && decision.equals("true")){
+        	    processSendDocuments(context,request,requestItem,item,title);
+        	    isSent="true";
+            } else if(StringUtils.isNotEmpty(decision) && decision.equals("false")) {
+                processDeny(context, request, requestItem, item, title);
+                isSent = "true";
+            } else if(StringUtils.isNotEmpty(contactPerson) && contactPerson.equals("requester")) {
+                log.info("ContactRequester");
+                processContactRequester(request, requestItem);
+                decision = null;
+                isSent = "notify";
+            } else if(StringUtils.isNotEmpty(contactPerson) && contactPerson.equals("author")) {
+                processContactAuthor(request);
+                decision = null;
+                isSent = "notify";
+            }
+        } else if(button.equals("openAccess")){
         	if(processOpenAccessRequest(context,request,requestItem,item,title)){
             	// se acabo el flujo
             	return null;
         	}
         }else if(button.equals("back")){
         	decision=null;
+            contactPerson=null;
+        } else if(button.equals("contactRequester")) {
+            decision=null;
+            isSent=null;
+            contactPerson = "requester";
+        } else if(button.equals("contactAuthor")) {
+            decision=null;
+            isSent=null;
+            contactPerson = "author";
         }
 
         
@@ -110,6 +140,7 @@ public class ItemRequestResponseAction extends AbstractAction
 		map.put("decision", decision);
 		map.put("token", token);
 		map.put("isSent", isSent);
+        map.put("contactPerson", contactPerson);
 		map.put("title", title);
 		map.put("name", request.getParameter("name"));
 		map.put("email",request.getParameter("email"));
@@ -190,4 +221,45 @@ public class ItemRequestResponseAction extends AbstractAction
         requestItem.setColumn("accept_request",false);
         DatabaseManager.update(context, requestItem);
 	}
+
+    /**
+     * Send an email back to the requester, letting them know request is being processed.
+     * Use case is for helpdesk user to contact requester
+     * @param request
+     * @param requestItem
+     * @throws IOException
+     * @throws MessagingException
+     */
+    private void processContactRequester(Request request, TableRow requestItem) throws IOException, MessagingException {
+        String message = request.getParameter("message");
+        String subject = request.getParameter("subject");
+
+        Email email = new Email();
+        email.setSubject(subject);
+        email.setContent("{0}");
+        email.addRecipient(requestItem.getStringColumn("request_email"));
+        email.addArgument(message);
+
+        email.send();
+    }
+
+    /**
+     * Send an email to the author, asking them to consider allowing access.
+     * Use case is for helpdesk user to contact author
+     * @param request
+     * @throws IOException
+     * @throws MessagingException
+     */
+    private void processContactAuthor(Request request) throws IOException, MessagingException {
+        String message = request.getParameter("message");
+        String subject = request.getParameter("subject");
+
+        Email email = new Email();
+        email.setSubject(subject);
+        email.setContent("{0}");
+        email.addRecipient(request.getParameter("toEmail"));
+        email.addArgument(message);
+
+        email.send();
+    }
 }
