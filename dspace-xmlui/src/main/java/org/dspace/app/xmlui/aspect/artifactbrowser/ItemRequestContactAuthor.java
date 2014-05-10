@@ -7,6 +7,7 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -21,8 +22,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -105,10 +104,10 @@ public class ItemRequestContactAuthor extends AbstractDSpaceTransformer implemen
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
 
-        TableRow requestItem = DatabaseManager.findByUnique(context,
-                "requestitem", "token", (String) request.getAttribute("token"));
+        String token = (String) request.getAttribute("token");
+        RequestItem requestItem = RequestItem.findByToken(context, token);
 
-        Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+        Item item = Item.find(context, requestItem.getItemID());
 
         RequestItemAuthor requestItemAuthor = new DSpace()
                 .getServiceManager()
@@ -122,9 +121,9 @@ public class ItemRequestContactAuthor extends AbstractDSpaceTransformer implemen
                 HandleManager.getCanonicalForm(item.getHandle()),
                 requestItemAuthor.getFullName(),
                 requestItemAuthor.getEmail(),
-                requestItem.getStringColumn("request_name"),
-                requestItem.getStringColumn("request_email"),
-                "Not Yet Implemented"
+                requestItem.getReqName(),
+                requestItem.getReqEmail(),
+                requestItem.getReqMessage()
         };
 
         String subject = I18nUtil.getMessage("itemRequest.response.subject.contactAuthor");

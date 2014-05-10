@@ -6,7 +6,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
-import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -19,8 +19,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -34,8 +32,6 @@ import java.text.MessageFormat;
  */
 public class ItemRequestContactRequester extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    //private static Logger log = Logger.getLogger(ItemRequestContactRequester.class);
-
     /** Language Strings */
     private static final Message T_title =
             message("xmlui.ArtifactBrowser.ItemRequestContactRequester.title");
@@ -103,10 +99,10 @@ public class ItemRequestContactRequester extends AbstractDSpaceTransformer imple
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
 
-        TableRow requestItem = DatabaseManager.findByUnique(context,
-                "requestitem", "token", (String) request.getAttribute("token"));
+        String token = (String) request.getAttribute("token");
+        RequestItem requestItem = RequestItem.findByToken(context, token);
 
-        Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+        Item item = Item.find(context, requestItem.getItemID());
 
         RequestItemAuthor requestItemAuthor = new DSpace()
                 .getServiceManager()
@@ -115,7 +111,7 @@ public class ItemRequestContactRequester extends AbstractDSpaceTransformer imple
                 .getRequestItemAuthor(context, item);
 
         Object[] args = new String[]{
-                requestItem.getStringColumn("request_name"),
+                requestItem.getReqName(),
                 requestItemAuthor.getFullName(),
                 requestItemAuthor.getEmail()
         };
@@ -133,7 +129,7 @@ public class ItemRequestContactRequester extends AbstractDSpaceTransformer imple
 
         Text toEmail = form.addItem().addText("to");
         toEmail.setLabel(T_toEmail);
-        toEmail.setValue(requestItem.getStringColumn("request_email"));
+        toEmail.setValue(requestItem.getReqEmail());
         toEmail.setDisabled(true);
 
         Text subj = form.addItem().addText("subject");

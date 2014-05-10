@@ -15,6 +15,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -27,8 +28,6 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 
 import javax.mail.MessagingException;
@@ -66,10 +65,10 @@ public class ItemRequestResponseAction extends AbstractAction
 
         Context context = ContextUtil.obtainContext(objectModel);
         request.setAttribute("token", token);
-        
-        TableRow requestItem = DatabaseManager.findByUnique(context, "requestitem", "token", token);
+
+        RequestItem requestItem = RequestItem.findByToken(context, token);
         String title;
-        Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+        Item item = Item.find(context, requestItem.getItemID());
         DCValue[] titleDC = item.getDC("title", null, Item.ANY);
         if (titleDC != null || titleDC.length > 0) 
         	title=titleDC[0].value; 
@@ -149,7 +148,7 @@ public class ItemRequestResponseAction extends AbstractAction
 
 
 
-    private boolean processOpenAccessRequest(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
+    private boolean processOpenAccessRequest(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
     	String name = request.getParameter("name");
     	String mail = request.getParameter("email");
 
@@ -163,9 +162,9 @@ public class ItemRequestResponseAction extends AbstractAction
 	    	Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.admin"));
 	        email.addRecipient(requestItemAuthor.getEmail());
 	        
-	        email.addArgument(Bitstream.find(context,requestItem.getIntColumn("bitstream_id")).getName());
+	        email.addArgument(Bitstream.find(context,requestItem.getBitstreamId()).getName());
 	        email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));
-	        email.addArgument(requestItem.getStringColumn("token"));
+	        email.addArgument(requestItem.getToken());
 	        email.addArgument(name);    
 	        email.addArgument(mail);   
 	        
@@ -175,17 +174,17 @@ public class ItemRequestResponseAction extends AbstractAction
     	return false;
 	}
 
-	private void processSendDocuments(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, MessagingException, IOException {
+	private void processSendDocuments(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, MessagingException, IOException {
     	String message = request.getParameter("message");
     	String subject = request.getParameter("subject");
     	
     	Email email = new Email();
         email.setSubject(subject);
         email.setContent("{0}");
-		email.addRecipient(requestItem.getStringColumn("request_email"));
+		email.addRecipient(requestItem.getReqEmail());
         email.addArgument(message);
        
-        if (requestItem.getBooleanColumn("allfiles")){
+        if (requestItem.isAllfiles()){
             Bundle[] bundles = item.getBundles("ORIGINAL");
             for (int i = 0; i < bundles.length; i++){
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -196,30 +195,31 @@ public class ItemRequestResponseAction extends AbstractAction
                 }
             }
         } else {
-            Bitstream bit = Bitstream.find(context,requestItem.getIntColumn("bitstream_id"));
-            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getIntColumn("bitstream_id")), bit.getName(), bit.getFormat().getMIMEType());
+            Bitstream bit = Bitstream.find(context,requestItem.getBitstreamId());
+            email.addAttachment(BitstreamStorageManager.retrieve(context, requestItem.getBitstreamId()), bit.getName(), bit.getFormat().getMIMEType());
         }     
         
         email.send();
-        requestItem.setColumn("decision_date",new Date());
-        requestItem.setColumn("accept_request",true);
-        DatabaseManager.update(context, requestItem);
+
+        requestItem.setDecision_date(new Date());
+        requestItem.setAccept_request(true);
+        requestItem.update(context);
 	}
 
-	private void processDeny(Context context,Request request, TableRow requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
+	private void processDeny(Context context,Request request, RequestItem requestItem,Item item,String title) throws SQLException, IOException, MessagingException {
 		String message = request.getParameter("message");
     	String subject = request.getParameter("subject");
     	        
     	Email email = new Email();
         email.setSubject(subject);
         email.setContent("{0}");
-		email.addRecipient(requestItem.getStringColumn("request_email"));
+		email.addRecipient(requestItem.getReqEmail());
         email.addArgument(message);
         email.send();
         
-        requestItem.setColumn("decision_date",new Date());
-        requestItem.setColumn("accept_request",false);
-        DatabaseManager.update(context, requestItem);
+        requestItem.setDecision_date(new Date());
+        requestItem.setAccept_request(false);
+        requestItem.update(context);
 	}
 
     /**
@@ -230,14 +230,14 @@ public class ItemRequestResponseAction extends AbstractAction
      * @throws IOException
      * @throws MessagingException
      */
-    private void processContactRequester(Request request, TableRow requestItem) throws IOException, MessagingException {
+    private void processContactRequester(Request request, RequestItem requestItem) throws IOException, MessagingException {
         String message = request.getParameter("message");
         String subject = request.getParameter("subject");
 
         Email email = new Email();
         email.setSubject(subject);
         email.setContent("{0}");
-        email.addRecipient(requestItem.getStringColumn("request_email"));
+        email.addRecipient(requestItem.getReqEmail());
         email.addArgument(message);
 
         email.send();

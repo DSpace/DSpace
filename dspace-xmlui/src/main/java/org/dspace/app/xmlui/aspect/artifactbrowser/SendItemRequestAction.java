@@ -20,6 +20,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -111,7 +112,9 @@ public class SendItemRequestAction extends AbstractAction
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);
-		
+
+        RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
+
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
         email.addRecipient(requestItemAuthor.getEmail());
@@ -122,7 +125,7 @@ public class SendItemRequestAction extends AbstractAction
         email.addArgument(HandleManager.getCanonicalForm(item.getHandle()));      
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
-        email.addArgument(getLinkTokenEmail(context,request, bitstreamId, item.getID(), requesterEmail, requesterName, Boolean.parseBoolean(allFiles)));    
+        email.addArgument(getLinkTokenEmail(context,requestItem));
         email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
         email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
         email.addArgument(ConfigurationManager.getProperty("dspace.name"));
@@ -137,62 +140,22 @@ public class SendItemRequestAction extends AbstractAction
 
     /**
      * Get the link to the author in RequestLink email.
-     * 
-     * @param email
-     *            The email address to mail to
-     *
-     * @exception SQLExeption
-     *
-     */
-    protected String getLinkTokenEmail(Context context,Request request, String bitstreamId
-            , int itemID, String reqEmail, String reqName, boolean allfiles)
-            throws SQLException
-    {
-        String base = ConfigurationManager.getProperty("dspace.url");
-        
-        request.getPathInfo();
-        String specialLink = (new StringBuffer()).append(base).append(
-                base.endsWith("/") ? "" : "/").append(
-                "itemRequestResponse/").append(getNewToken(context, Integer.parseInt(bitstreamId), itemID, reqEmail, reqName, allfiles))
-                .toString()+"/";
-        
-        return specialLink;
-    }
-    /**
-     * Generate a unique id of the request and put it into the ddbb 
      * @param context
-     * @param bitstreamId
-     * @param itemID
-     * @param reqEmail
-     * @param reqName
-     * @param allfiles
+     * @param requestItem
      * @return
      * @throws SQLException
      */
-    protected String getNewToken(Context context, int bitstreamId, int itemID, String reqEmail, String reqName, boolean allfiles) throws SQLException
+    protected String getLinkTokenEmail(Context context, RequestItem requestItem)
+            throws SQLException
     {
-        TableRow rd = DatabaseManager.create(context, "requestitem");
-        rd.setColumn("token", Utils.generateHexKey());
-        rd.setColumn("bitstream_id", bitstreamId);
-        rd.setColumn("item_id",itemID);
-        rd.setColumn("allfiles", allfiles);
-        rd.setColumn("request_email", reqEmail);
-        rd.setColumn("request_name", reqName);
-        rd.setColumnNull("accept_request");
-        rd.setColumn("request_date", new Date());
-        rd.setColumnNull("decision_date");
-        rd.setColumnNull("expires");
+        String base = ConfigurationManager.getProperty("dspace.url");
 
-        DatabaseManager.update(context, rd);
+        String specialLink = (new StringBuffer()).append(base).append(
+                base.endsWith("/") ? "" : "/").append(
+                "itemRequestResponse/").append(requestItem.getNewToken(context))
+                .toString()+"/";
 
-        if (log.isDebugEnabled())
-        {
-            log.debug("Created requestitem_token "
-                    + rd.getIntColumn("requestitem_id")
-                    + " with token " + rd.getStringColumn("token")
-                    +  "\"");
-        }
-        return rd.getStringColumn("token");
-         
+        return specialLink;
     }
+
 }
