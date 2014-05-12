@@ -2433,11 +2433,11 @@
                 <stored-value>workingPaper</stored-value>
             </pair>
             <pair>
-                <displayed-value>Documento Institucional</displayed-value>
+                <displayed-value>Documento institucional</displayed-value>
                 <stored-value>institutionalDocument</stored-value>
             </pair>
             <pair>
-                <displayed-value>Documento Histórico</displayed-value>
+                <displayed-value>Documento histórico</displayed-value>
                 <stored-value>historicalDocument</stored-value>
             </pair>
             <pair>
@@ -2457,7 +2457,7 @@
                 <stored-value>learningObject</stored-value>
             </pair>
             <pair>
-                <displayed-value>Parte de Libro</displayed-value>
+                <displayed-value>Parte de libro</displayed-value>
                 <stored-value>bookPart</stored-value>
             </pair>
             <pair>
@@ -2497,11 +2497,11 @@
                 <stored-value>sound</stored-value>
             </pair>
             <pair>
-                <displayed-value>Tesis Doctoral</displayed-value>
+                <displayed-value>Tesis doctoral</displayed-value>
                 <stored-value>doctoralThesis</stored-value>
             </pair>
             <pair>
-                <displayed-value>Tesis Maestría</displayed-value>
+                <displayed-value>Tesis de maestría</displayed-value>
                 <stored-value>masterThesis</stored-value>
             </pair>
             <pair>
@@ -2553,12 +2553,12 @@
                 <stored-value>Documento de trabajo</stored-value>
             </pair>
             <pair>
-                <displayed-value>Documento Institucional</displayed-value>
-                <stored-value>Documento Institucional</stored-value>
+                <displayed-value>Documento institucional</displayed-value>
+                <stored-value>Documento institucional</stored-value>
             </pair>
             <pair>
-                <displayed-value>Documento Histórico</displayed-value>
-                <stored-value>Documento Histórico</stored-value>
+                <displayed-value>Documento histórico</displayed-value>
+                <stored-value>Documento histórico</stored-value>
             </pair>
             <pair>
                 <displayed-value>Imagen</displayed-value>
@@ -2574,11 +2574,11 @@
             </pair>
             <pair>
                 <displayed-value>Objeto de aprendizaje (LOM)</displayed-value>
-                <stored-value>Objeto de aprendizaje (LOM)</stored-value>
+                <stored-value>Objeto de aprendizaje</stored-value>
             </pair>
             <pair>
-                <displayed-value>Parte de Libro</displayed-value>
-                <stored-value>Parte de Libro</stored-value>
+                <displayed-value>Parte de libro</displayed-value>
+                <stored-value>Parte de libro</stored-value>
             </pair>
             <pair>
                 <displayed-value>Patente</displayed-value>
@@ -2617,16 +2617,16 @@
                 <stored-value>Sonido</stored-value>
             </pair>
             <pair>
-                <displayed-value>Tesis Doctoral</displayed-value>
-                <stored-value>Tesis Doctoral</stored-value>
+                <displayed-value>Tesis doctoral</displayed-value>
+                <stored-value>Tesis doctoral</stored-value>
             </pair>
             <pair>
-                <displayed-value>Tesis Maestría</displayed-value>
-                <stored-value>Tesis Maestría</stored-value>
+                <displayed-value>Tesis de maestría</displayed-value>
+                <stored-value>Tesis de maestría</stored-value>
             </pair>
             <pair>
-                <displayed-value>Trabajo de Grado</displayed-value>
-                <stored-value>Trabajo de Grado</stored-value>
+                <displayed-value>Trabajo de grado</displayed-value>
+                <stored-value>Trabajo de grado</stored-value>
             </pair>
             <pair>
                 <displayed-value>Video</displayed-value>
