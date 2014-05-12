@@ -909,7 +909,7 @@
                             <!--<xsl:with-param name="doiIdentifier" select="$my_doi"/>-->
                             <!--</xsl:call-template>-->
                             <!--</xsl:attribute>-->
-                            <xsl:value-of select="$my_doi"/>
+                            <xsl:value-of select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
                             <!--</a>-->
                         </xsl:when>
                         <xsl:when test="$my_uri">
