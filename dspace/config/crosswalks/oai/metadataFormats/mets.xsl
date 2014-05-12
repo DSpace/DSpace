@@ -92,6 +92,9 @@
 								<xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
 							</mods:identifier>
 							</xsl:for-each>
+                                                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element">
+                                                            <mods:note><xsl:value-of select="doc:field[@name='value']/text()" /></mods:note>
+                                                        </xsl:for-each>
 							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element">
 							<mods:abstract>
 								<xsl:value-of select="doc:field[@name='value']/text()" />
@@ -115,6 +118,21 @@
 							</mods:titleInfo>
                                                         </xsl:for-each>
 							<mods:genre><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']"></xsl:value-of></mods:genre>
+                                                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element">
+							<mods:originInfo>
+								<mods:publisher>
+									<xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
+								</mods:publisher>>
+							</mods:originInfo>
+							</xsl:for-each>
+                                                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='citation']">
+                                                        <mods:relatedItem type="host">
+                                                            <mods:part>
+                                                                <mods:text>
+                                                                    <xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
+                                                                </mods:text>
+                                                            </mods:part>
+                                                        </mods:relatedItem>
 						</mods:mods>
 					</xmlData>
 				</mdWrap>
