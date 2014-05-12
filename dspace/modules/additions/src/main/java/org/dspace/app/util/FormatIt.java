@@ -68,8 +68,14 @@ public class FormatIt
             return getIcontecAuthor(value);
         }else if(formatit.equalsIgnoreCase("month-year")){
             return getMonthYear(value);
+        }else if(formatit.equalsIgnoreCase("year-month")){    
+            return getYearMonth(value);
         }else if(formatit.equalsIgnoreCase("news-dates")){
             return getNewsDates(value);
+        }else if (formatit.equalsIgnoreCase("apa-author")){
+            return getAPAAuthor(value);
+        }else if (formatit.equalsIgnoreCase("thesis-type")){
+            return getThesisType(value);
         }else{    
             // do nothing
             return value;
@@ -188,10 +194,10 @@ public class FormatIt
      * get the first name initial only, e.g. F. N. Lastname
      *
      * @param name  full name
-     * @return name with the firstname initial only
+     * @return name with the givenname initial only
      */
     private static String getFirstNameInitials(String name){
-        // seperate the firstname and lastname
+        // seperate the givenname and lastname
         int cn = name.indexOf(",");
         if(cn != -1 ){
             String lastname = name.substring(0, cn);
@@ -216,7 +222,6 @@ public class FormatIt
      * @param name nombre completo del autor
      * @return nombre completo del autor con el apellido en mayúscula sostenida
      */
-
     private static String getIcontecAuthor(String name) {
         //separar el nombre del apellidio
         int cn=name.indexOf(",");
@@ -264,6 +269,39 @@ public class FormatIt
     }
     
     /**
+     * Generates a date in Year, Month format. e.g (2011, January)
+     * 
+     * @param date An string with the partial or complete dublin core date to be formated
+     * @return A date in Year, Month format. e.g (2011, January)
+     */
+    private static String getYearMonth(String date) {
+        if(date.length() <= 4){
+            return date;
+        }else{
+            try{
+                SimpleDateFormat df = null;
+                // solo se tiene el més y el año
+                if(date.length()<=7){
+                    df=new SimpleDateFormat("yyyy-MM");
+                }else{
+                    //la fecha esta completa
+                    df=new SimpleDateFormat("yyyy-MM-dd");
+                }
+                Date myDate=df.parse(date);
+                SimpleDateFormat sdf=new SimpleDateFormat("MMMMM");
+                String month=sdf.format(myDate);
+                sdf=new SimpleDateFormat("yyyy");
+                String year=sdf.format(myDate);
+                String dateString=year+", "+month;
+                return dateString;
+            }catch(Exception e){
+                log.info("Error en el formato de fecha "+e.getMessage());
+            }
+        }
+        return date;
+    }
+    
+    /**
      * Obtiene la fecha en formato dia, mes, año. e.g (01, Enero, 2011)
      * 
      * @param date La cadena de fehca guardada en el registro dublicore del item
@@ -291,6 +329,62 @@ public class FormatIt
             }
         }
         return date;
+    }
+
+    /**
+     * This method generates the APA formated name of an author based on the 
+     * complete name registered in dc metadata
+     * 
+     * @param value Complete author's name
+     * @return Auhtor's APA formated name
+     */
+    private static String getAPAAuthor(String value) {
+        //separate lastname and given name, by defualt DSpace creates auhtors' name in lastname, givenname format
+        int cn=value.indexOf(",");
+        if(cn!=-1){
+            String lastname=value.substring(0,cn+1);
+            String givenname=value.substring(cn+1);
+            
+            // Get initials for each part of given name
+            String[] gns = givenname.trim().split(" ");
+            String initialFirstname = "";
+
+            for(int i=0; i<gns.length; i++){
+                log.debug("part"+i+": "+gns[i]);
+                if(gns[i]!=null && !gns[i].equalsIgnoreCase("")){
+                  initialFirstname += gns[i].trim().substring(0, 1).toUpperCase();
+                }
+              
+                if(initialFirstname.length()> 0){
+                  initialFirstname += ". ";
+                }
+                log.debug("iniciales: "+initialFirstname);
+            }
+            
+            String fullname=lastname+" "+initialFirstname;
+            return fullname;
+        }
+        
+        // If it isn't possible to separate lastname and givenname then return the registered value
+        return value;
+    }
+
+    /**
+     * This method return the human friendly thesis type value for a registered dc thesis type
+     * 
+     * @param  value The registered dc thesis type e.g (bachelorThesis)
+     * @returns Human friendly thesis type e.g (Bachelor Thesis). 
+     */
+    private static String getThesisType(String value) {
+        if(value.equalsIgnoreCase("bachelorThesis")){
+            return "Bachelor Thesis";
+        }else if(value.equalsIgnoreCase("masterThesis")){
+            return "Master Thesis";
+        }else if(value.equalsIgnoreCase("doctoralThesis")){
+            return "Doctoral Thesis";
+        }else{
+            return value;
+        }
     }
 
 }

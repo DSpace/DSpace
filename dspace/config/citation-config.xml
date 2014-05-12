@@ -28,125 +28,8 @@
 
     -->
     <citation-map>
-        <!-- configuración para cada comunidad-->
-        
-        <!-- Archivo del patrimonio fotográfico y filmico del valle del cauca --> 
-        <name-map scope="10906/5698" citation-name="default"></name-map>
-        
-		<!-- Artes, letras y diseño -->		
-        <name-map scope="10906/1970" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 <!-- Ciencias -->
-        <name-map scope="10906/1950" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Ciencias administrativas -->
-        <name-map scope="10906/1962" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Derecho -->
-        <name-map scope="10906/1979" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Economía -->
-        <name-map scope="10906/1985" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Empresa -->
-        <name-map scope="10906/1986" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Humanidades y ciencias sociales -->
-        <name-map scope="10906/1940" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Salud -->
-        <name-map scope="10906/1990" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-		 
-		 <!-- Tecnología -->
-        <name-map scope="10906/1957" citation-name="default">
-            <map-type document-type="journal" citation-name="icontec-journals"/>
-            <map-type document-type="article" citation-name="icontec-articles"/>
-            <map-type document-type="preprint" citation-name="icontec-articles"/>
-            <map-type document-type="review" citation-name="icontec-articles"/>
-            <map-type document-type="newspaper" citation-name="icontec-newspapers"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="masterThesis" citation-name="icontec-thesis"/>
-            <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
-        </name-map>
-            <!-- Archivo fílmico-->
-        <name-map scope="10906/6643" citation-name="default">            
-        </name-map>
-		 
-        
-        
-		<!-- Por defecto ponemos icontec-default -->
-		<!--
+        <!-- Por defecto ponemos icontec-default -->
+	<!--
         <name-map scope="default" citation-name="icontec-default">
             <map-type document-type="journal" citation-name="icontec-journals"/>
             <map-type document-type="article" citation-name="icontec-articles"/>
@@ -158,524 +41,736 @@
             <map-type document-type="doctoralThesis" citation-name="icontec-thesis"/>
         </name-map>
         -->
+        
+        <!-- configuración para cada comunidad-->
+        
+        <!-- Archivo del patrimonio fotográfico y filmico del valle del cauca --> 
+        <!--<name-map scope="10906/5698" citation-name="default"></name-map>-->
+        <name-map scope="10906/5698" citation-name="apa-book"></name-map>
+        
+	<!-- Artes, letras y diseño -->		
+        <name-map scope="10906/1970" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+        
+        <!-- Centro de Información sobre la Cooperación Internacional América Latina y el Caribe -->		
+        <name-map scope="10906/1970" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+	
+        <!-- Ciencias -->
+        <name-map scope="10906/1950" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Ciencias administrativas -->
+        <name-map scope="10906/1962" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Derecho -->
+        <name-map scope="10906/1979" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Economía -->
+        <name-map scope="10906/1985" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Empresa -->
+        <name-map scope="10906/1986" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Humanidades y ciencias sociales -->
+        <name-map scope="10906/1940" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Salud -->
+        <name-map scope="10906/1990" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+		 
+	<!-- Tecnología -->
+        <name-map scope="10906/1957" citation-name="apa-book">
+            <map-type document-type="journal" citation-name="apa-journals"/>
+            <map-type document-type="article" citation-name="apa-articles"/>
+            <map-type document-type="preprint" citation-name="apa-prepint"/>
+            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
+            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="masterThesis" citation-name="apa-thesis"/>
+            <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
+            <map-type document-type="bookPart" citation-name="apa-bookpart"/>
+            <map-type document-type="bookChapter" citation-name="apa-bookpart"/>
+            <map-type document-type="report" citation-name="apa-report"/>
+            <map-type document-type="technicalReport" citation-name="apa-report"/>
+            <map-type document-type="patent" citation-name="apa-report"/>
+            <map-type document-type="conferencePoster" citation-name="apa-presentation"/>
+            <map-type document-type="conferencePaper" citation-name="apa-presentation"/>
+            <map-type document-type="presentation" citation-name="apa-presentation"/>
+        </name-map>
+        
+        <!-- Archivo fílmico-->
+        <name-map scope="10906/6643" citation-name="apa-book"></name-map>
+        
+	
         <!-- citation para colecciones de artículos y revistas-->
-        <name-map scope="10906/1005" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1005" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1048" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1048" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1077" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1077" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1111" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1111" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1169" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1169" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1189" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1189" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1269" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1269" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1410" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1410" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1470" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1470" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1635" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1635" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/166" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/166" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/167" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/167" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1720" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1720" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1744" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1744" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1797" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1797" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1835" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1835" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1849" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1849" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1858" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1858" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1859" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1859" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/1916" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/1916" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2050" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2050" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2051" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2051" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2072" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2072" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2082" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2082" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2094" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2094" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/210" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/210" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2118" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2118" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2130" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2130" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2139" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2139" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2140" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2140" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2141" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2141" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2144" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2144" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2170" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2170" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/218" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/218" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2180" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2180" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/219" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/219" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/220" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/220" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/221" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/221" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/222" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/222" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/223" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/223" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2233" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2233" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/224" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/224" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2247" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2247" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/225" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/225" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/226" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/226" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/227" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/227" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2271" citation-name="icontec-articles" />
-        <name-map scope="10906/228" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2271" citation-name="apa-articles" />
+        <name-map scope="10906/228" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2280" citation-name="icontec-articles" />
-        <name-map scope="10906/2285" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2280" citation-name="apa-articles" />
+        <name-map scope="10906/2285" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/229" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/229" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2292" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2292" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/230" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/230" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/231" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/231" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2334" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2334" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2342" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2342" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2343" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2343" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2349" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2349" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2371" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2371" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2381" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2381" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2401" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2401" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2406" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2406" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2407" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2407" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2425" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2425" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2431" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2431" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2432" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2432" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2441" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2441" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2447" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2447" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2458" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2458" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2470" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2470" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2476" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2476" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2480" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2480" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2488" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2488" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2495" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2495" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2510" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2510" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2523" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2523" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2530" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2530" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2544" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2544" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2547" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2547" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2561" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2561" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2575" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2575" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2590" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2590" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2609" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2609" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2618" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2618" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2622" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2622" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2626" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2626" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2628" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2628" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2636" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2636" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2641" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2641" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2642" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2642" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2652" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2652" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2659" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2659" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2673" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2673" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2681" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2681" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2690" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2690" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/2700" citation-name="icontec-articles" />
-        <name-map scope="10906/2701" citation-name="icontec-articles" />
-        <name-map scope="10906/314" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/2700" citation-name="apa-articles" />
+        <name-map scope="10906/2701" citation-name="apa-articles" />
+        <name-map scope="10906/314" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/315" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/315" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/316" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/316" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/317" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/317" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/318" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/318" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/319" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/319" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/320" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/320" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/321" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/321" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/363" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/363" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/364" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/364" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/365" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/365" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/366" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/366" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3748" citation-name="icontec-articles" />
-        <name-map scope="10906/3764" citation-name="icontec-articles" />
-        <name-map scope="10906/3813" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3748" citation-name="apa-articles" />
+        <name-map scope="10906/3764" citation-name="apa-articles" />
+        <name-map scope="10906/3813" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3816" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3816" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3819" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3819" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3822" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3822" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3825" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3825" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3828" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3828" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3831" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3831" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3834" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3834" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3837" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3837" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3840" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3840" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3843" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3843" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3848" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3848" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3855" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3855" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3861" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3861" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3876" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3876" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3883" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3883" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3892" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3892" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3900" citation-name="icontec-articles" />
-        <name-map scope="10906/3901" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3900" citation-name="apa-articles" />
+        <name-map scope="10906/3901" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3909" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3909" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3938" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3938" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3943" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3943" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/3982" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/3982" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4005" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4005" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4014" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4014" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4044" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4044" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4086" citation-name="icontec-articles" />
-        <name-map scope="10906/410" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4086" citation-name="apa-articles" />
+        <name-map scope="10906/410" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/411" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/411" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/412" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/412" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4199" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4199" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4214" citation-name="icontec-articles" />
-        <name-map scope="10906/4377" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4214" citation-name="apa-articles" />
+        <name-map scope="10906/4377" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4571" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4571" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4627" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4627" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/4643" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/4643" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5189" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5189" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5263" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5263" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5279" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5279" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5299" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5299" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5305" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5305" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5324" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5324" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5336" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5336" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5566" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5566" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5572" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5572" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5591" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5591" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5604" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5604" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/5712" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/5712" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/793" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/793" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/801" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/801" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/802" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/802" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/825" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/825" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/832" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/832" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/838" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/838" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/943" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/943" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/987" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/987" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
-        <name-map scope="10906/996" citation-name="icontec-articles" >
-            <map-type document-type="journal" citation-name="icontec-journals"/>
+        <name-map scope="10906/996" citation-name="apa-articles" >
+            <map-type document-type="journal" citation-name="apa-journals"/>
         </name-map>
         
         <!-- Para colecciones de tesis-->
-        <name-map scope="10906/2278" citation-name="icontec-thesis" />
-        <name-map scope="10906/2704" citation-name="icontec-thesis" />
-        <name-map scope="10906/3765" citation-name="icontec-thesis" />
-        <name-map scope="10906/3927" citation-name="icontec-thesis" />
-        <name-map scope="10906/5364" citation-name="icontec-thesis" />
-        <name-map scope="10906/5370" citation-name="icontec-thesis" />
-        <name-map scope="10906/5396" citation-name="icontec-thesis" />
-        <name-map scope="10906/5427" citation-name="icontec-thesis" />
-        <name-map scope="10906/5445" citation-name="icontec-thesis" />
-        <name-map scope="10906/5496" citation-name="icontec-thesis" />
-        <name-map scope="10906/5505" citation-name="icontec-thesis" />
-        <name-map scope="10906/5516" citation-name="icontec-thesis" />
-        <name-map scope="10906/5616" citation-name="icontec-thesis" />
+        <name-map scope="10906/2278" citation-name="apa-thesis" />
+        <name-map scope="10906/2704" citation-name="apa-thesis" />
+        <name-map scope="10906/3765" citation-name="apa-thesis" />
+        <name-map scope="10906/3927" citation-name="apa-thesis" />
+        <name-map scope="10906/5364" citation-name="apa-thesis" />
+        <name-map scope="10906/5370" citation-name="apa-thesis" />
+        <name-map scope="10906/5396" citation-name="apa-thesis" />
+        <name-map scope="10906/5427" citation-name="apa-thesis" />
+        <name-map scope="10906/5445" citation-name="apa-thesis" />
+        <name-map scope="10906/5496" citation-name="apa-thesis" />
+        <name-map scope="10906/5505" citation-name="apa-thesis" />
+        <name-map scope="10906/5516" citation-name="apa-thesis" />
+        <name-map scope="10906/5616" citation-name="apa-thesis" />
 
 
-        
+        <!-- This secction explains how to use de citation mapping -->
 
-        <!-- ECE publications -->
+        <!-- ECE publications
         <name-map scope="1911/10563" citation-name="ece-default">
             <map-type document-type="Conference Paper" citation-name="ece-conference"/>
         </name-map>
-
-	<!-- Americas Original Documents -->
+        -->
+	
+        <!-- Americas Original Documents 
         <name-map scope="1911/5952" citation-name="americas-original"/>
-        
-        
-        
-        <!-- Americas Mora -->
+        -->
+               
+        <!-- Americas Mora 
         <name-map scope="1911/21844" citation-name="americas-mora"/>
+        -->
     </citation-map>
 
     <citation-definitions>
@@ -739,10 +834,636 @@
     *************************************************************************  -->
         
         <!-- *******************************************************************
+            Tipos de citación APA
+        ******************************************************************** -->
+        
+        <!-- This default citation is used for books, annotations and other -->
+        <citation name="default">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Book title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Publication place -->
+            <field show-if-exist="dc.pubplace">
+                <dc-schema>dc</dc-schema>
+                <dc-element>pubplace</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@:</display-format>
+            </field>
+            
+            <!-- Editor -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>publisher</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- This citation is used for journal and newspapers -->
+        <citation name="apa-journals">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Journal volume -->
+            <field show-if-exist="dc.citation.volume">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>volume</dc-qualifier>
+                <display-format>, @field@</display-format>
+            </field>
+            
+            <!-- Journal issue -->
+            <field show-if-exist="dc.citation.issue">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>issue</dc-qualifier>
+                <display-format>(@field@)</display-format>
+            </field>
+            
+            <!-- Juornal page range -->
+            <field show-if-exist="dc.citation.spage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>spage</dc-qualifier>
+                <display-format>, @field@</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="AND">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>-</display-format>
+            </field>
+            <field show-if-exist="dc.citation.epage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>epage</dc-qualifier>
+                <display-format>@field@</display-format>
+            </field>
+            
+            <!-- End title information sentence -->
+            <field show-if-exist="dc.title">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+            
+        </citation>
+        
+        <!-- This citation is used for articles -->
+        <citation name="apa-article">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Article title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Journal title -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartof</dc-qualifier>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Journal volume -->
+            <field show-if-exist="dc.citation.volume">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>volume</dc-qualifier>
+                <display-format>, @field@</display-format>
+            </field>
+            
+            <!-- Journal issue -->
+            <field show-if-exist="dc.citation.issue">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>issue</dc-qualifier>
+                <display-format>(@field@)</display-format>
+            </field>
+            
+            <!-- Journal page range -->
+            <field show-if-exist="dc.citation.spage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>spage</dc-qualifier>
+                <display-format>, @field@</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="AND">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>-</display-format>
+            </field>
+            <field show-if-exist="dc.citation.epage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>epage</dc-qualifier>
+                <display-format>@field@</display-format>
+            </field>
+            
+            <!-- End title information sentence -->
+            <field show-if-exist="dc.title">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+            
+        </citation>
+        
+        <!-- This citation is used for preprint and workingPaper -->
+        <citation name="apa-preprint">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- In press -->
+            <field>
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format format-it="year-only"> (in press).</display-format>
+            </field>
+            
+            <!-- Article title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Journal title -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartof</dc-qualifier>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+            
+        </citation>
+        
+        <!-- This citation is used for books, annotations and other -->
+        <citation name="apa-book">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Book title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Publication place -->
+            <field show-if-exist="dc.pubplace">
+                <dc-schema>dc</dc-schema>
+                <dc-element>pubplace</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@:</display-format>
+            </field>
+            
+            <!-- Editor -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>publisher</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- This citation is used for book chapters and book parts -->
+        <citation name="apa-bookpart">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Bookpart title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format> In</display-format>
+            </field>
+            
+            <!-- Contributors --> 
+            <field show-if-exist="dc.contributor" max-n-value="3" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>contributor</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@.</display-format>
+            </field>
+            
+            <field show-if-exist="dc.contributor">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format> (Eds.),</display-format>
+            </field>
+            
+            <!-- Book title -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartof</dc-qualifier>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Book part page range -->
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="OR">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>(pp.</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>spage</dc-qualifier>
+                <display-format>@field@</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="AND">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>-</display-format>
+            </field>
+            <field show-if-exist="dc.citation.epage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>epage</dc-qualifier>
+                <display-format>@field@</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="OR">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>)</display-format>
+            </field>
+            
+            <!-- Book title -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>.</display-format>
+            </field>
+            
+            <!-- Publication place -->
+            <field show-if-exist="dc.pubplace">
+                <dc-schema>dc</dc-schema>
+                <dc-element>pubplace</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@:</display-format>
+            </field>
+            
+            <!-- Editor -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>publisher</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- This citation is used for reports, technical reports and patents -->
+        <citation name="apa-report">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Report title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Report ID -->
+            <field show-if-exist="dc.identifier.other">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>other</dc-qualifier>
+                <display-format>Report No.(@field@)</display-format>
+            </field>
+            
+            <field show-if-exist="dc.identifier.govdoc">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>govdoc</dc-qualifier>
+                <display-format>Report No.(@field@)</display-format>
+            </field>
+           
+            <field show-if-exist="dc.title">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>.</display-format>
+            </field>
+            
+            <!-- Publication place -->
+            <field show-if-exist="dc.pubplace">
+                <dc-schema>dc</dc-schema>
+                <dc-element>pubplace</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@:</display-format>
+            </field>
+            
+            <!-- Editor -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>publisher</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- This citation is used for presentations, conferences posters and conference papers -->
+        <citation name="apa-presentation">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-month"> (@field@).</display-format>
+            </field>
+            
+            <!-- Presentation title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@.</display-format>
+            </field>
+            
+            <!-- Event title -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema>dc</dc-schema>
+                <dc-element>relation</dc-element>
+                <dc-qualifier>ispartof</dc-qualifier>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Juornal page range -->
+            <field show-if-exist="dc.citation.spage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>spage</dc-qualifier>
+                <display-format>, @field@</display-format>
+            </field>
+            <field show-if-exist="dc.citation.spage;dc.citation.epage" op="AND">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>-</display-format>
+            </field>
+            <field show-if-exist="dc.citation.epage">
+                <dc-schema>dc</dc-schema>
+                <dc-element>citation</dc-element>
+                <dc-qualifier>epage</dc-qualifier>
+                <display-format>@field@</display-format>
+            </field>
+            
+            <!-- End event title information sentence -->
+            <field show-if-exist="dc.relation.ispartof">
+                <dc-schema/>
+                <dc-element/>
+                <dc-qualifier/>
+                <display-format>.</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- This citation is used for bachelor, master and doctoral thesis -->
+        <citation name="apa-thesis">
+            <!-- Authors --> 
+            <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
+                <dc-schema>dc</dc-schema>
+                <dc-element>creator</dc-element>
+                <dc-qualifier/>
+                <display-format multiple-value-seperator="," format-it="apa-author">@field@</display-format>
+            </field>
+            
+            <!-- Publication Date -->
+            <field show-if-exist="dc.date.issued">
+                <dc-schema>dc</dc-schema>
+                <dc-element>date</dc-element>
+                <dc-qualifier>issued</dc-qualifier>
+                <display-format format-it="year-only"> (@field@).</display-format>
+            </field>
+            
+            <!-- Thesis title -->
+            <field show-if-exist="dc.title">
+                <dc-schema>dc</dc-schema>
+                <dc-element>title</dc-element>
+                <dc-qualifier/>
+                <display-format> @field@</display-format>
+            </field>
+            
+            <!-- Thesis type -->
+            <field show-if-exist="dc.type">
+                <dc-schema>dc</dc-schema>
+                <dc-element>type</dc-element>
+                <dc-qualifier/>
+                <display-format format-it="thesis-type"> (@field@).</display-format>
+            </field>
+            
+            <!-- Source -->
+            <field show-if-exist="dc.identifier.uri">
+                <dc-schema>dc</dc-schema>
+                <dc-element>identifier</dc-element>
+                <dc-qualifier>uri</dc-qualifier>
+                <display-format> Retrieved from (@field@)</display-format>
+            </field>
+        </citation>
+        
+        <!-- *******************************************************************
             Tipos de citación icontec
         ******************************************************************** -->
         <!-- Icontec estandar citación por defecto para todos los elementos-->
-        <citation name="default">
+        <citation name="icontec-default">
             <!-- Autor --> 
             <field show-if-exist="dc.creator" max-n-value="3" max-n-ending="et al.">
                 <dc-schema>dc</dc-schema>

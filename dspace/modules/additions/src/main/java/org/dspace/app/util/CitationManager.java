@@ -644,7 +644,7 @@ public class CitationManager {
                                         fieldValue += values[k].value;
                                     }
                                     if (k == (values.length - 2)) {
-                                        fieldValue += " y ";
+                                        fieldValue += " & ";
                                     } else if (k < (values.length - 1)) {
                                         fieldValue += seperator + " ";
                                     }
