@@ -178,7 +178,7 @@
                     <xsl:variable name="id"
                                   select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
                     <xsl:if test="$id[starts-with(., 'doi')]">
-                        <xsl:value-of select="$id"/>
+                      <xsl:value-of select="concat('http://dx.doi.org/',substring-after($id,'doi:'))"/>
                     </xsl:if>
                 </span>
             </xsl:element>
