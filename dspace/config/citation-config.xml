@@ -52,9 +52,9 @@
         <name-map scope="10906/1970" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -72,9 +72,9 @@
         <name-map scope="10906/1970" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -92,9 +92,9 @@
         <name-map scope="10906/1950" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -112,9 +112,9 @@
         <name-map scope="10906/1962" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -132,9 +132,9 @@
         <name-map scope="10906/1979" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -152,9 +152,9 @@
         <name-map scope="10906/1985" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -172,9 +172,9 @@
         <name-map scope="10906/1986" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -192,9 +192,9 @@
         <name-map scope="10906/1940" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -212,9 +212,9 @@
         <name-map scope="10906/1990" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -232,9 +232,9 @@
         <name-map scope="10906/1957" citation-name="apa-book">
             <map-type document-type="journal" citation-name="apa-journals"/>
             <map-type document-type="article" citation-name="apa-articles"/>
-            <map-type document-type="preprint" citation-name="apa-prepint"/>
-            <map-type document-type="workingPaper" citation-name="apa-prepint"/>
-            <map-type document-type="newspaper" citation-name="apa-journal"/>
+            <map-type document-type="preprint" citation-name="apa-preprint"/>
+            <map-type document-type="workingPaper" citation-name="apa-preprint"/>
+            <map-type document-type="newspaper" citation-name="apa-journals"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
             <map-type document-type="masterThesis" citation-name="apa-thesis"/>
             <map-type document-type="doctoralThesis" citation-name="apa-thesis"/>
@@ -969,7 +969,7 @@
         </citation>
         
         <!-- This citation is used for articles -->
-        <citation name="apa-article">
+        <citation name="apa-articles">
             <!-- Authors --> 
             <field show-if-exist="dc.creator" max-n-value="7" max-n-ending="et al.">
                 <dc-schema>dc</dc-schema>
