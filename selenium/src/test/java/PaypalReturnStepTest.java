@@ -1,17 +1,14 @@
 package test;
 
-import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.Select;
 
 /**
  * Tests that the payment endpoint /submit-paypal-checkout is responding
