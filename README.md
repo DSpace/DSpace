@@ -14,23 +14,13 @@ Este repositorio se creó para punto de transición para la actualización de SE
 
 ![Screenshot](screenshot_sedici.png?raw=true)
 
-### Dependencias
-
-1. 
-2. 
-
-
 ### Instalación
 
-1. 
-  - 
-  - 
-2. 
-
-...
-
-
-# Development
+git clone git@github.com:sedici/DSpace-SEDICI-svn.git DSpace-SEDICI-svn
+cd DSpace-SEDICI-svn/
+svn co https://svn.duraspace.org/dspace/dspace/tags/dspace-1.8.2/dspace distribution/dspace-tag-files
+mvn eclipse:eclipse
+./build.bash install
 
 # License
 [Apache License v2](http://www.apache.org/licenses/LICENSE-2.0.html)
