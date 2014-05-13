@@ -1209,4 +1209,21 @@
         </xsl:if>
     </xsl:template>
     
+    <xsl:template name="addPropagateButton">
+      <xsl:param name="packageDoi"/>
+      <xsl:param name="metadataFieldName"/>
+      <br/>
+      <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
+        <xsl:attribute name="value">
+          <xsl:text>Propagate</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="onClick">
+          <xsl:text>javascript:DryadEditMetadataAndPropagate('</xsl:text>
+          <!-- Metadata Field -->
+          <xsl:value-of select="$metadataFieldName"/>
+          <xsl:text>');</xsl:text>
+        </xsl:attribute>
+      </input>
+    </xsl:template>
+
 </xsl:stylesheet>
