@@ -109,8 +109,8 @@
 					<xsl:value-of select="epdcx:valueString"/>
 				</dim:field>
 			</xsl:when>
-			<xsl:otherwise mdschema="sedici" element="identifier" qualifier="other">
-				<dim:field>
+			<xsl:otherwise>
+				<dim:field mdschema="sedici" element="identifier" qualifier="other">
 					<xsl:value-of select="epdcx:valueString"/>
 				</dim:field>
 			</xsl:otherwise>
