@@ -1,0 +1,3 @@
+[submodule "distribution/overwritten-files/modules/sedici-2003"]
+	path = distribution/overwritten-files/modules/sedici-2003
+	url = https://github.com/sedici/SEDICI2003-Roo.git
