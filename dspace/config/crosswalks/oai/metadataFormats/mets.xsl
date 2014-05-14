@@ -121,18 +121,20 @@
                                                         <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element">
 							<mods:originInfo>
 								<mods:publisher>
-									<xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
+									<xsl:value-of select="doc:field[@name='value']/text()" />
 								</mods:publisher>>
 							</mods:originInfo>
 							</xsl:for-each>
-                                                        <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='citation']">
-                                                        <mods:relatedItem type="host">
-                                                            <mods:part>
-                                                                <mods:text>
-                                                                    <xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
-                                                                </mods:text>
-                                                            </mods:part>
-                                                        </mods:relatedItem>
+                                                        <xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element[@name='ispartofseries']/doc:element/doc:field[@name='value']">
+                                                            <mods:relatedItem type="series">
+                                                                    <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element[@name='ispartofseries']/doc:element/doc:field[@name='value']/text()"></xsl:value-of>
+                                                            </mods:relatedItem>
+                                                        </xsl:if>
+                                                        <xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element[@name='ispartof']/doc:element/doc:field[@name='value']">
+                                                            <mods:relatedItem type="series">
+                                                                    <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element[@name='ispartof']/doc:element/doc:field[@name='value']/text()"></xsl:value-of>
+                                                            </mods:relatedItem>
+                                                        </xsl:if>
 						</mods:mods>
 					</xmlData>
 				</mdWrap>
