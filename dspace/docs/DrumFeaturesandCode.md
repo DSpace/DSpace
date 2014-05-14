@@ -31,62 +31,62 @@ Ability to select unmapped collections
 	    
 *Java Source*
 
-* [Community.java](../../dspace-api/src/main/java/org/dspace/content/Community.java) -  _getCollectionsUnmapped()_
+* [Community.java](../modules/additions/src/main/java/org/dspace/content/Community.java) -  _getCollectionsUnmapped()_
 
-* [Collection.java](../../dspace-api/src/main/java/org/dspace/content/Collection.java)
+* [Collection.java](../modules/additions/src/main/java/org/dspace/content/Collection.java)
 
-* [SelectCollectionTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/jsptag/SelectCollectionTag.java)
+* [SelectCollectionTag.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/jsptag/SelectCollectionTag.java)
 
-* [CollectionListServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionListServlet.java)
+* [CollectionListServlet.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionListServlet.java)
 
-* [Community.java](../../dspace-api/src/main/java/org/dspace/content/Community.java) - updates in _findByCommunityGroupTop()_
+* [Community.java](../modules/additions/src/main/java/org/dspace/content/Community.java) - updates in _findByCommunityGroupTop()_
 	
-* [CollectionMappingServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionMappingServlet.java) -  new class _CollectionMappingServlet_
+* [CollectionMappingServlet.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionMappingServlet.java) -  new class _CollectionMappingServlet_
 
 * Workflow submission fixes:
 
-    * [WorkflowItem.java](../../dspace-api/src/main/java/org/dspace/workflow/WorkflowItem.java
+    * [WorkflowItem.java](../modules/additions/src/main/java/org/dspace/workflow/WorkflowItem.java
 )
-    * [WorkspaceItem](../../dspace-api/src/main/java/org/dspace/content/WorkspaceItem.java
+    * [WorkspaceItem](../modules/additions/src/main/java/org/dspace/content/WorkspaceItem.java
 )
 
 * Updates to the selection of collection step:
 
-    * [SelectCollectionStep.java](../../dspace-api/src/main/java/org/dspace/submit/step/SelectCollectionStep.java) 
-    * [JSPSelectCollectionStep.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/submit/step/JSPSelectCollectionStep.java)
-    * [InitialQuestionsStep.java](../../dspace-api/src/main/java/org/dspace/submit/step/InitialQuestionsStep.java)				   	   
-* [DCInputSet.java](../../dspace-api/src/main/java/org/dspace/app/util/DCInputSet.java)			
+    * [SelectCollectionStep.java](../modules/additions/src/main/java/org/dspace/submit/step/SelectCollectionStep.java) 
+    * [JSPSelectCollectionStep.java](../modules/jspui/src/main/java/org/dspace/app/webui/submit/step/JSPSelectCollectionStep.java)
+    * [InitialQuestionsStep.java](../modules/additions/src/main/java/org/dspace/submit/step/InitialQuestionsStep.java)				   	   
+* [DCInputSet.java](../modules/additions/src/main/java/org/dspace/app/util/DCInputSet.java)			
 
 				
 *JSPUI webapp*					
 
-*	[mapcollections.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp)
+*	[mapcollections.jsp](../modules/jspui/src/main/webapp/community-home.jsp)
 
-*	[confirm-mapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-mapcollection.jsp)
+*	[confirm-mapcollection.jsp](../modules/jspui/src/main/webapp/tools/confirm-mapcollection.jsp)
 
-*	[confirm-unmapcollection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/confirm-unmapcollection.jsp)
+*	[confirm-unmapcollection.jsp](../modules/jspui/src/main/webapp/tools/confirm-unmapcollection.jsp)
 
-*	[community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/mapcollections.jsp)
+*	[community-home.jsp](../modules/jspui/src/main/webapp/tools/mapcollections.jsp)
 
-*   [my dspace.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp)
+*   [my dspace.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp)
 
-*   [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp)
+*   [select-collection.jsp](../modules/jspui/src/main/webapp/submit/select-collection.jsp)
 
-*   [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp)
+*   [collection-home.jsp](../modules/jspui/src/main/webapp/collection-home.jsp)
 
-*   [collection-select-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/collection-select-list.jsp)
+*   [collection-select-list.jsp](../modules/jspui/src/main/webapp/tools/collection-select-list.jsp)
 
 *Configuration*
 	
-* [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml)	
+* [web.xml](../modules/jspui/src/main/webapp/WEB-INF/web.xml)	
 	
-* [input-forms.xml](../../dspace/config/input-forms.xml)
+* [input-forms.xml](../config/input-forms.xml)
 		
-* [Message Properties](../../dspace-api/src/main/resources/Messages.properties)
+* [Message Properties](../modules/additions/src/main/resources/Messages.properties)
 
-* [utils.js](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/utils.js)
+* [utils.js](../modules/jspui/src/main/webapp/utils.js)
 
-* [dspace-tags.tld](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/dspace-tags.tld)
+* [dspace-tags.tld](../modules/jspui/src/main/webapp/WEB-INF/dspace-tags.tld)
 
 
 ### Select/Display the bundle of a bitstream
@@ -95,7 +95,7 @@ Ability to view the bundle of a bitstream in the Administrator mode.
 
 *JSPUI webapp*
 
-* [upload-file-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/upload-file-list.jsp) - allow bitstreams to be added and deleted during workflow processing
+* [upload-file-list.jsp](../modules/jspui/src/main/webapp/submit/upload-file-list.jsp) - allow bitstreams to be added and deleted during workflow processing
 
 
 ### Add preservation bundle
@@ -106,16 +106,16 @@ Add custom preservation bundle.
 
  * Assign Letter of Support to a PRESERVATION bundle
 
-   * [LibraryAwardUploadStep.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/submit/step/LibraryAwardUploadStep.java) 
+   * [LibraryAwardUploadStep.java](../modules/additions/src/main/java/edu/umd/lib/dspace/submit/step/LibraryAwardUploadStep.java) 
 
-   * [JSPLibraryAwardUploadStep.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/submit/step/JSPLibraryAwardUploadStep.java) 
+   * [JSPLibraryAwardUploadStep.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/submit/step/JSPLibraryAwardUploadStep.java) 
 
-* [Item.java](../../dspace-api/src/main/java/org/dspace/content/Item.java) - fix bug during file upload
+* [Item.java](../modules/additions/src/main/java/org/dspace/content/Item.java) - fix bug during file upload
 
 
 *JSPUI webapp*
 
-* [upload-bitstream.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/upload-bitstream.jsp) - add Preservation bundle as an option for uploading new bitstreams
+* [upload-bitstream.jsp](../modules/jspui/src/main/webapp/tools/upload-bitstream.jsp) - add Preservation bundle as an option for uploading new bitstreams
 
 <a name="authentication"></a>
 ## Authentication/Authorization
@@ -126,17 +126,17 @@ Add capability to login with the university directory id using CAS autentication
 
 *Java Source*
   
- * [CASAuthentication.java](../../dspace-api/src/main/java/org/dspace/authenticate/CASAuthentication.java) - setup mechanics of dual authentication
+ * [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - setup mechanics of dual authentication
  
 *JSPUI webapp*
 
- * [chooser.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/login/chooser.jsp) - setup mechanics of dual authentication
+ * [chooser.jsp](../modules/jspui/src/main/webapp/login/chooser.jsp) - setup mechanics of dual authentication
 
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - login messages for JSP
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - login messages for JSP
 
-* [dspace.cfg](../../dspace/config/dspace.cfg) - CAS section for login, login preference section
+* [dspace.cfg](../config/dspace.cfg) - CAS section for login, login preference section
 
 ### CAS Authentication
 
@@ -149,31 +149,31 @@ Add capability to login with the university directory id using CAS autentication
 
 *Java Source*
 
-* [PasswordServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/PasswordServlet.java) - change directory id login to use oit CAS
-* [LogoutServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/LogoutServlet.java) - when logging out of DRUM, and user logged in using CAS, log out of CAS requires new cas.logoutUrl in the config file
-* [CASAuthentication.java](../../dspace-api/src/main/java/org/dspace/authenticate/CASAuthentication.java) - add CAS authentication patch from Naveed Hashmi, University of Bristol
-* [Ldap.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/authenticate/Ldap.java) - add self registration for CAS logins
+* [PasswordServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/PasswordServlet.java) - change directory id login to use oit CAS
+* [LogoutServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/LogoutServlet.java) - when logging out of DRUM, and user logged in using CAS, log out of CAS requires new cas.logoutUrl in the config file
+* [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - add CAS authentication patch from Naveed Hashmi, University of Bristol
+* [Ldap.java](../modules/additions/src/main/java/edu/umd/lib/dspace/authenticate/Ldap.java) - add self registration for CAS logins
 
 *JSPUI webapp*
  
-* [chooser.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/login/chooser.jsp)
+* [chooser.jsp](../modules/jspui/src/main/webapp/login/chooser.jsp)
 
-* [incorrect.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/login/incorrect.jsp)
+* [incorrect.jsp](../modules/jspui/src/main/webapp/login/incorrect.jsp)
 
-* [password.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/login/password.jsp)
+* [password.jsp](../modules/jspui/src/main/webapp/login/password.jsp)
 
-* [edit-profile.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/register/edit-profile.jsp) - don't allow password changes for CAS logins
+* [edit-profile.jsp](../modules/jspui/src/main/webapp/register/edit-profile.jsp) - don't allow password changes for CAS logins
 
-* [utils.js](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/utils.js)
+* [utils.js](../modules/jspui/src/main/webapp/utils.js)
 
 
 *Configuration*
 
 * CAS dependencies
-	* [pom.xml](../../dspace-api/pom.xml) - dspace-api pom
+	* [pom.xml](../modules/additions/pom.xml) - dspace-api pom
 	* [pom.xml](../../pom.xml) - project parent pom
 	
-* [dspace.cfg](../../dspace/config/dspace.cfg) 
+* [dspace.cfg](../config/dspace.cfg) 
 
 
 ### LDAP Authorization
@@ -200,11 +200,11 @@ Add capability to login with the university directory id using CAS autentication
 
 *Scripts*
 
-* [loadunits_faculty_only.groovy](../../dspace/bin/loadunits_faculty_only.groovy) - cant'find
+* [loadunits_faculty_only.groovy](../bin/loadunits_faculty_only.groovy) - cant'find
 
-* [showunits.groovy](../../dspace/bin/showunits.groovy) - can't find
+* [showunits.groovy](../bin/showunits.groovy) - can't find
 
-* [showldap.groovy](../../dspace/bin/showldap.groovy) 
+* [showldap.groovy](../bin/showldap.groovy) 
 
  
 *Configuration*
@@ -214,9 +214,9 @@ Add capability to login with the university directory id using CAS autentication
 
 *Database Schema*
 
-* [database_schema_unit.sql](../../dspace/etc/database_schema_unit.sql) - add Unit to Group mapping
+* [database_schema_unit.sql](../etc/database_schema_unit.sql) - add Unit to Group mapping
 
-* [database_schema_etdunit.sql](../../dspace/etc/database_schema_unit_add_faculty_only.sql) - add faculty_only option on Unit table
+* [database_schema_etdunit.sql](../etc/database_schema_unit_add_faculty_only.sql) - add faculty_only option on Unit table
 
 
 
@@ -230,7 +230,7 @@ Add display of start and end date for ResourcePolicy on "Policies for Item" edit
 
 *JSPUI webapp*
 
-* [authorize-item-edit.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/authorize-item-edit.jsp)
+* [authorize-item-edit.jsp](../modules/jspui/src/main/webapp/dspace-admin/authorize-item-edit.jsp)
 
 ### Custom embargoed bitstream messaging
 
@@ -238,25 +238,25 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 
 *Java Source*
 
-* [Bitstream.java](../../dspace-api/src/main/java/org/dspace/content/Bitstream.java) - new methods getETDEmbargo(), isETDEmbargo(), getMetadata(String), getIntMetadata(String), setMetadata(String, String), setMetadata(String, int)
-* [ItemTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - listBistreams() add 'RESTRICTED ACCESS' to the Bitstream description
-* [BitstreamServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/BitstreamServlet.java) - doDSGet() if not authorized and is ETD embargo then redirect to /error/authorize-etd-embargo.jsp
+* [Bitstream.java](../modules/additions/src/main/java/org/dspace/content/Bitstream.java) - new methods getETDEmbargo(), isETDEmbargo(), getMetadata(String), getIntMetadata(String), setMetadata(String, String), setMetadata(String, int)
+* [ItemTag.java](../modules/jspui/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - listBistreams() add 'RESTRICTED ACCESS' to the Bitstream description
+* [BitstreamServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/BitstreamServlet.java) - doDSGet() if not authorized and is ETD embargo then redirect to /error/authorize-etd-embargo.jsp
 
 *JSPUI webapp*
 
-* [authorize-etd-embargo](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/error/authorize-etd-embargo.jsp) - customized message based on embargo dates
+* [authorize-etd-embargo](../modules/jspui/src/main/webapp/error/authorize-etd-embargo.jsp) - customized message based on embargo dates
 
 ### Embargoed Item Statistics
 
 *JSPUI webapp*
 
-* [statistics.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics.jsp) - link from custom statistics page to embargo-list.jsp
+* [statistics.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics.jsp) - link from custom statistics page to embargo-list.jsp
 
-* [embargo-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - page display of embargo list
+* [embargo-list.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - page display of embargo list
 
-* [embargo-list-csv.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - CSV export of embargo list
+* [embargo-list-csv.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - CSV export of embargo list
 
-* [embargo-list-sql.jspf](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - SQL for embargo query
+* [embargo-list-sql.jspf](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - SQL for embargo query
  
 ### Loader
         transform Proquest metadata to dublin core
@@ -267,13 +267,13 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
  
 *Scripts*
 
-* [load-etd-nightly](../../dspace/bin/load-etd-nightly) - nightly check for new etd zip files
+* [load-etd-nightly](../bin/load-etd-nightly) - nightly check for new etd zip files
 
-* [load-etd](../../dspace/bin/load-etd) - load one etd zip file
+* [load-etd](../bin/load-etd) - load one etd zip file
 
-* [etd2marc-mail](../../dspace/bin/etd2marc-mail) - email notice of Marc file to Technical Services
+* [etd2marc-mail](../bin/etd2marc-mail) - email notice of Marc file to Technical Services
 
-* [etd2marc-transfer](../../dspace/bin/etd2marc-transfer) - transfer Marc file to Technical Services (LAN)
+* [etd2marc-transfer](../bin/etd2marc-transfer) - transfer Marc file to Technical Services (LAN)
 
 *Configuration*
 
@@ -285,7 +285,7 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 
 *Java Source*
 
-* [EtdLoader.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/EtdLoader.java) - main loader control class
+* [EtdLoader.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/EtdLoader.java) - main loader control class
 
         Get command line parameters
         Get properties
@@ -315,28 +315,28 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
 
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - etdunit messages for JSP
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - etdunit messages for JSP
 
 *Database Schema*
 
-* [database_schema_etdunit.sql](../../dspace/etc/database_schema_etdunit.sql) - add EtdUnit and Collection2EtdUnit tables
+* [database_schema_etdunit.sql](../etc/database_schema_etdunit.sql) - add EtdUnit and Collection2EtdUnit tables
 
 *Java Source*
 
-* [EtdUnit.java](../../dspace-api/src/main/java/org/dspace/content/EtdUnit.java) - EtdUnit table Controller
+* [EtdUnit.java](../modules/additions/src/main/java/org/dspace/content/EtdUnit.java) - EtdUnit table Controller
 
-* [EtdUnitEditServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/admin/EtdUnitEditServlet.java) - servlet controller for EtdUnit administrat
+* [EtdUnitEditServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/admin/EtdUnitEditServlet.java) - servlet controller for EtdUnit administrat
 
 
 *JSPUI webapp*
 
 * add EtdUnit table editing to dspace-admin
 
-    * [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml) - add /tools/etdunit-edit servlet handling
-    * [etdunit-confirm-delete.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/etdunit-confirm-delete.jsp) - confirm deletion of an EtdUnit
-    * [navbar-admin.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-admin.jsp) - navbar link to /tools/etdunit-edit
-    * [etdunit-edit](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/etdunit-edit.jsp) - edit single EtdUnit page
-    * [etdunit-list](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/tools/etdunit-list.jsp) - list of all EtdUnit
+    * [web.xml](../modules/jspui/src/main/webapp/WEB-INF/web.xml) - add /tools/etdunit-edit servlet handling
+    * [etdunit-confirm-delete.jsp](../modules/jspui/src/main/webapp/dspace-admin/etdunit-confirm-delete.jsp) - confirm deletion of an EtdUnit
+    * [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp) - navbar link to /tools/etdunit-edit
+    * [etdunit-edit](../modules/jspui/src/main/webapp/tools/etdunit-edit.jsp) - edit single EtdUnit page
+    * [etdunit-list](../modules/jspui/src/main/webapp/tools/etdunit-list.jsp) - list of all EtdUnit
 
 
 <a name="item-collection-community"></a>
@@ -350,31 +350,31 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
 
 *Java Source*
 
-* [UpdateStats.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/UpdateStats.java) - add item and bitstream statistics
-* [ItemTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - add item and bitstream statistics
-* [Bitstream.java](../../dspace-api/src/main/java/org/dspace/content/Bitstream.java) - add item and bitstream statistics
-* [Item.java](../../dspace-api/src/main/java/org/dspace/content/Item.java) - add item and bitstream statistics
+* [UpdateStats.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/UpdateStats.java) - add item and bitstream statistics
+* [ItemTag.java](../modules/jspui/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - add item and bitstream statistics
+* [Bitstream.java](../modules/additions/src/main/java/org/dspace/content/Bitstream.java) - add item and bitstream statistics
+* [Item.java](../modules/additions/src/main/java/org/dspace/content/Item.java) - add item and bitstream statistics
 
 *JSPUI webapp*
 
-* [about_submitting.html](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/help/about_submitting.html) - eliminate hardcoded references to /dspace in links
+* [about_submitting.html](../modules/jspui/src/main/webapp/help/about_submitting.html) - eliminate hardcoded references to /dspace in links
 
-* [how_to.html](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/help/how_to.html) - eliminate hardcoded references to /dspace in links
+* [how_to.html](../modules/jspui/src/main/webapp/help/how_to.html) - eliminate hardcoded references to /dspace in links
 
-* [index.html](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/help/index.html) - eliminate hardcoded references to /dspace in links
+* [index.html](../modules/jspui/src/main/webapp/help/index.html) - eliminate hardcoded references to /dspace in links
 
-* [navbar-default.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-default.jsp) - eliminate hardcoded references to /dspace in links
+* [navbar-default.jsp](../modules/jspui/src/main/webapp/layout/navbar-default.jsp) - eliminate hardcoded references to /dspace in links
 
-* [main.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp) - eliminate hardcoded references to /dspace in links
+* [main.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp) - eliminate hardcoded references to /dspace in links
 
 
 *Scripts*
 
-* [update-stats](../../dspace/bin/update-stats) - add item and bitstream statistics
+* [update-stats](../bin/update-stats) - add item and bitstream statistics
 
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - add view stats to bitstream display
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - add view stats to bitstream display
 
 
 <a name="loaders-others"></a>
@@ -390,14 +390,14 @@ legacy, single-use loaders; do not need testing
 
 *Java Source*
 
-* [Extract.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/isr/Extract.java)
-* [Loader.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/isr/Loader.java)
+* [Extract.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/isr/Extract.java)
+* [Loader.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/isr/Loader.java)
 
 * CISSM Tech Reports
 
 *Java Source*
 
-* [CissmLoader.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/CissmLoader.java)
+* [CissmLoader.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/CissmLoader.java)
 
 
 <a name="navigation"></a>
@@ -412,25 +412,25 @@ legacy, single-use loaders; do not need testing
 
 *Java Source*
 
-* [Community.java](../../dspace-api/src/main/java/org/dspace/content/Community.java) - fix Community.findByCommunityGroupTop()
-* [FeedServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/FeedServlet.java) - for feeds, use 'name' field instead of 'short_description' for Community/Collection feed title
-* [EditCommunitiesServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java) - set the CommunityGroups 'groups' attribute before calling processUploadLogo()
+* [Community.java](../modules/additions/src/main/java/org/dspace/content/Community.java) - fix Community.findByCommunityGroupTop()
+* [FeedServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/FeedServlet.java) - for feeds, use 'name' field instead of 'short_description' for Community/Collection feed title
+* [EditCommunitiesServlet.java](../modules/jspui/src/main/java/org/dspace/app/webui/servlet/admin/EditCommunitiesServlet.java) - set the CommunityGroups 'groups' attribute before calling processUploadLogo()
 
 *JSPUI webapp*
 
-* [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp) - eliminate hardcoded references to /dspace in links
+* [collection-home.jsp](../modules/jspui/src/main/webapp/collection-home.jsp) - eliminate hardcoded references to /dspace in links
 
-* [community-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/community-home.jsp) - eliminate hardcoded references to /dspace in links
+* [community-home.jsp](../modules/jspui/src/main/webapp/community-home.jsp) - eliminate hardcoded references to /dspace in links
 
-* [display-item.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/display-item.jsp) - remove link to statistics on Community, Collection, Record pages
+* [display-item.jsp](../modules/jspui/src/main/webapp/display-item.jsp) - remove link to statistics on Community, Collection, Record pages
 
-* [index.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/index.jsp) - remove /index.jsp from url
+* [index.jsp](../modules/jspui/src/main/webapp/index.jsp) - remove /index.jsp from url
 
-* [main.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp) - fix task list on mydspace page
+* [main.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp) - fix task list on mydspace page
 
-* [navbar-default.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-default.jsp) - navbar fixups
+* [navbar-default.jsp](../modules/jspui/src/main/webapp/layout/navbar-default.jsp) - navbar fixups
 
-* [navbar-admin.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-admin.jsp) - admin navbar fixups
+* [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp) - admin navbar fixups
 
 <a name="miscellaneous"></a>
 ## Miscellaneous
@@ -447,17 +447,17 @@ legacy, single-use loaders; do not need testing
 		
 *Java Source*
 
-* [EtdLoader.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/EtdLoader.java) - fix duplicate title detection in EtdLoader
+* [EtdLoader.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/EtdLoader.java) - fix duplicate title detection in EtdLoader
 
-* [SimpleDataSource.java](../../dspace-api/src/main/java/edu/umd/lib/activation/SimpleDataSource.java) - add ability to add attachments to email
+* [SimpleDataSource.java](../modules/additions/src/main/java/edu/umd/lib/activation/SimpleDataSource.java) - add ability to add attachments to email
 
-* [Email.java](../../dspace-api/src/main/java/org/dspace/core/Email.java) - add ability to add attachments to email
+* [Email.java](../modules/additions/src/main/java/org/dspace/core/Email.java) - add ability to add attachments to email
 
 *Configuration*
 
-* [oaicat.properties](../../dspace/config/oaicat.properties) - update oai-pmh properties
+* [oaicat.properties](../config/oaicat.properties) - update oai-pmh properties
 
-* [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml) - change oai-pmh url (remove /request)
+* [web.xml](../modules/jspui/src/main/webapp/WEB-INF/web.xml) - change oai-pmh url (remove /request)
 
 handle-6.2.jar - add handle 6.2 to the lib folder
 
@@ -473,11 +473,11 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 		
 *Java Source*
 
-* [StripDiacriticSynonymFilter.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/search/StripDiacriticSynonymFilter.java) - fix location of edu.umd.lims.dspace.search.StripDiacriticSynonymFilter source file
+* [StripDiacriticSynonymFilter.java](../modules/additions/src/main/java/edu/umd/lib/dspace/search/StripDiacriticSynonymFilter.java) - fix location of edu.umd.lims.dspace.search.StripDiacriticSynonymFilter source file
 		
 *Configuration*
 
-* [dspace.cfg](../../dspace/config/dspace.cfg) - Addition to Advanced Search Dropdown [LIBDRUM-98](https://issues.umd.edu/browse/LIBDRUM-98); display only contributor.author in browse results
+* [dspace.cfg](../config/dspace.cfg) - Addition to Advanced Search Dropdown [LIBDRUM-98](https://issues.umd.edu/browse/LIBDRUM-98); display only contributor.author in browse results
 
 <a name="statistics"></a>
 ## Statistics
@@ -490,42 +490,42 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 			
 *Java Source*
 
-* [Item.java](../../dspace-api/src/main/java/org/dspace/content/Item.java) - add item and bitstream statistics
+* [Item.java](../modules/additions/src/main/java/org/dspace/content/Item.java) - add item and bitstream statistics
 
-* [Bitstream.java](../../dspace-api/src/main/java/org/dspace/content/Bitstream.java) - add item and bitstream statistics
+* [Bitstream.java](../modules/additions/src/main/java/org/dspace/content/Bitstream.java) - add item and bitstream statistics
 
-* [ItemTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - add item and bitstream statistics
+* [ItemTag.java](../modules/jspui/src/main/java/org/dspace/app/webui/jsptag/ItemTag.java) - add item and bitstream statistics
 
-* [UpdateStats.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/app/UpdateStats.java) - add item and bitstream statistics
+* [UpdateStats.java](../modules/additions/src/main/java/edu/umd/lib/dspace/app/UpdateStats.java) - add item and bitstream statistics
 
 *JSPUI webapp*
 
-* [monthly.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/monthly.jsp) - move monthly stats dir outside of the webapp; ant update wipes out the webapp
+* [monthly.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/monthly.jsp) - move monthly stats dir outside of the webapp; ant update wipes out the webapp
 
-* [statistics.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics.jsp) - add new admin statistics page
+* [statistics.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics.jsp) - add new admin statistics page
 
-* [embargo-list-csv.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - add CSV version of the embargo list
+* [embargo-list-csv.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - add CSV version of the embargo list
 
-* [embargo-list-sql.jspf](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - add CSV version of the embargo list
+* [embargo-list-sql.jspf](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - add CSV version of the embargo list
 
-* [embargo-list.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - add a list of all current embargoes to the statistics page
+* [embargo-list.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - add a list of all current embargoes to the statistics page
 
-* [navbar-admin.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/layout/navbar-admin.jsp)
+* [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp)
 
 
 *Database Schema*
 
-* [statistics.sql](../../dspace/etc/statistics.sql) - add sql to setup the statistics in the database
+* [statistics.sql](../etc/statistics.sql) - add sql to setup the statistics in the database
 
 *Scripts*
 
-* [update-stats](../../dspace/bin/update-stats) - add item and bitstream statistics
+* [update-stats](../bin/update-stats) - add item and bitstream statistics
 
-* [stats_report_generator](../../dspace/bin/stats_report_generator) - update stats_report_generator with new stats dir (cf r320)
+* [stats_report_generator](../bin/stats_report_generator) - update stats_report_generator with new stats dir (cf r320)
 
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - add view stats to bitstream display
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - add view stats to bitstream display
 
 
 <a name="submission"></a>
@@ -543,52 +543,52 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 		
 *Java Source*
 
-* [SelectCollectionStep.java](../../dspace-api/src/main/java/org/dspace/submit/step/SelectCollectionStep.java) - submission fixes for selecting multiple collections
+* [SelectCollectionStep.java](../modules/additions/src/main/java/org/dspace/submit/step/SelectCollectionStep.java) - submission fixes for selecting multiple collections
 
-* [SelectCollectionStep.java](../../dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/submit/step/JSPSelectCollectionStep.java) - submission fixes for selecting multiple collections; fix "Submit to This Collection"
+* [SelectCollectionStep.java](../modules/jspui/src/main/java/org/dspace/app/webui/submit/step/JSPSelectCollectionStep.java) - submission fixes for selecting multiple collections; fix "Submit to This Collection"
 
-* [SelectCollectionTag.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/jsptag/SelectCollectionTag.java) - add selectcollection jsp tag to selecting multiple collections from a popup window
+* [SelectCollectionTag.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/jsptag/SelectCollectionTag.java) - add selectcollection jsp tag to selecting multiple collections from a popup window
 
-* [CollectionListServlet.java](../../dspace-jspui/dspace-jspui-api/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionListServlet.java) - submission fixes for selecting multiple collections
+* [CollectionListServlet.java](../modules/jspui/src/main/java/edu/umd/lib/dspace/app/webui/servlet/admin/CollectionListServlet.java) - submission fixes for selecting multiple collections
 
-* [LibraryAwardCompleteStep.java](../../dspace-api/src/main/java/edu/umd/lib/dspace/submit/step/LibraryAwardCompleteStep.java) - LibraryAward: set dc.date.issued to the submission date
+* [LibraryAwardCompleteStep.java](../modules/additions/src/main/java/edu/umd/lib/dspace/submit/step/LibraryAwardCompleteStep.java) - LibraryAward: set dc.date.issued to the submission date
 
-* [WorkflowItem.java](../../dspace-api/src/main/java/org/dspace/workflow/WorkflowItem.java
+* [WorkflowItem.java](../modules/additions/src/main/java/org/dspace/workflow/WorkflowItem.java
 ) - fix queries for mapped collections in submission process
 
-* [WorkspaceItem.java](../../dspace-api/src/main/java/org/dspace/content/WorkspaceItem.java
+* [WorkspaceItem.java](../modules/additions/src/main/java/org/dspace/content/WorkspaceItem.java
 ) - fix queries for mapped collections in submission process
 
-* [WorkflowManager.java](../../dspace-api/src/main/java/org/dspace/workflow/WorkflowManager.java
+* [WorkflowManager.java](../modules/additions/src/main/java/org/dspace/workflow/WorkflowManager.java
 ) - [Library Award: new email notices for submission approved/rejected](https://issues.umd.edu/browse/LIBDRUM-60); fix submit_task email in workflow
 
 	
 *JSPUI webapp*
 
-* [monthly.jsp](../../dspace-jspui-webapp/src/main/webapp/mydspace/main.jsp) - submission fixes for selecting multiple collections
+* [monthly.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp) - submission fixes for selecting multiple collections
 
-* [select-collection.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/select-collection.jsp) - submission fixes for selecting multiple collections	
+* [select-collection.jsp](../modules/jspui/src/main/webapp/submit/select-collection.jsp) - submission fixes for selecting multiple collections	
 
-* [collection-home.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/collection-home.jsp) - fix "Submit to This Collection"; broken by submit to multiple collections functionality	
+* [collection-home.jsp](../modules/jspui/src/main/webapp/collection-home.jsp) - fix "Submit to This Collection"; broken by submit to multiple collections functionality	
 
-* [styles.css.3col.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/styles.css.3col.jsp) - mark required elements during submission
+* [styles.css.3col.jsp](../modules/jspui/src/main/webapp/styles.css.3col.jsp) - mark required elements during submission
 
-* [edit-metadata.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/edit-metadata.jsp) - mark required elements during submission
+* [edit-metadata.jsp](../modules/jspui/src/main/webapp/submit/edit-metadata.jsp) - mark required elements during submission
 
-* [review-upload.jsp](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/submit/review-upload.jsp) - show bitstream description when reviewing submission
+* [review-upload.jsp](../modules/jspui/src/main/webapp/submit/review-upload.jsp) - show bitstream description when reviewing submission
 
-* [complete.jsp](../../space-jspui/dspace-jspui-webapp/src/main/webapp/submit/complete.jsp) - remove Submit to Collection link when submission is complete
+* [complete.jsp](../modules/jspui/src/main/webapp/submit/complete.jsp) - remove Submit to Collection link when submission is complete
 
 *Configuration*
 
-* [Messages.properties](../../dspace-api/src/main/resources/Messages.properties) - submission fixes for selecting multiple collections
+* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - submission fixes for selecting multiple collections
 
-* [web.xml](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/web.xml) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
+* [web.xml](../modules/jspui/src/main/webapp/WEB-INF/web.xml) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
 
-* [utils.js](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/utils.js) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
+* [utils.js](../modules/jspui/src/main/webapp/utils.js) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
 
-* [dspace-tags.tld](../../dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/dspace-tags.tld) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
+* [dspace-tags.tld](../modules/jspui/src/main/webapp/WEB-INF/dspace-tags.tld) - fix "Submit to This Collection"; broken by submit to multiple collections functionality
 
-* [dspace.cfg](../../dspace/config/dspace.cfg) - display only contributor.author in browse results; add contributor.advisor
+* [dspace.cfg](../config/dspace.cfg) - display only contributor.author in browse results; add contributor.advisor
 
-* [item-submission.xml](../../dspace/config/item-submission.xml) - LibraryAward: set dc.date.issued to the submission date
+* [item-submission.xml](../config/item-submission.xml) - LibraryAward: set dc.date.issued to the submission date
