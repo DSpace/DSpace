@@ -94,7 +94,7 @@
               <a>
                 <!-- Download Link -->
                 <xsl:attribute name="href">
-                    <xsl:value-of select="mets:FLocat/@xlink:href"/>
+                    <xsl:value-of select="www.google.com"/>
                 </xsl:attribute>
 
                 <xsl:value-of select="mets:FLocat/@xlink:title"/>
