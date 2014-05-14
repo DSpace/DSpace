@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE input-forms SYSTEM "input-forms.dtd">
 
 
@@ -505,9 +505,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>bibliography</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Bibliografía en el documento</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Ingrese la tabla de bibliografía en el documento</hint>
                     <required></required>
                 </field>
@@ -909,9 +909,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>bibliography</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Bibliografía en el documento</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Ingrese la tabla de bibliografía en el documento</hint>
                     <required></required>
                 </field>
@@ -1267,9 +1267,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>bibliography</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Bibliografía en el documento</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Ingrese la tabla de bibliografía en el documento</hint>
                     <required></required>
                 </field>
@@ -1627,9 +1627,9 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <dc-qualifier>bibliography</dc-qualifier>
-                    <repeatable>false</repeatable>
+                    <repeatable>true</repeatable>
                     <label>Bibliografía en el documento</label>
-                    <input-type>textarea</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Ingrese la tabla de bibliografía en el documento</hint>
                     <required></required>
                 </field>
