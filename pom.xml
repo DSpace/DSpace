@@ -41,7 +41,6 @@
 
 
 	<modules>
-		<module>plugins</module>
 		<module>distribution</module>
 		<module>dspace-xoai</module>
 	</modules>
