@@ -246,6 +246,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
         Long allowedSizeT=PaymentSystemConfigurationManager.getMaxFileSize();
         long allowedSize = allowedSizeT;
+        String currency = shoppingcart.getCurrency();
+        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
 
         double totalSurcharge=0;
         long totalSizeDataFile=0;
@@ -272,7 +274,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 Long overSize = (totalSizeDataFile-allowedSize)/UNITSIZE;
                 unit = overSize.intValue();
             }
-            totalSurcharge = totalSurcharge+shoppingcart.getSurcharge()*unit;
+            totalSurcharge = totalSurcharge+fileSizeFeeAfter*unit;
 
         }
 

@@ -157,6 +157,11 @@ public class PaymentSystemConfigurationManager {
         return value;
     }
 
+    public static Double getAllSizeFileFeeAfterProperty(String property)
+    {
+        Double value = Double.parseDouble(sizeFileFeeAfter.getProperty(property));
+        return value;
+    }
 
     public static Properties getAllCountryProperty()
     {
