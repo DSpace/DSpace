@@ -29,31 +29,6 @@
 		</repository>
 	</repositories>
 	
-	<profiles>
-		<profile>
-			<id>sedici.fulldistribution</id>
-			<activation>
-				<property>
-					<name>!sedici.min_package</name>
-				</property>
-			</activation>
-			<modules>
-				<module>sedici2003</module>
-			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.mycila.maven-license-plugin</groupId>
-						<artifactId>maven-license-plugin</artifactId>
-						<configuration>
-							<header>src/main/resources/header.txt</header>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-
-		</profile>
-	</profiles>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -69,6 +69,7 @@
 	</build>
 		
 	<modules>
+		<module>overwritten-files/modules/sedici-2003</module>
 		<module>dspace-tag-files/modules/solr</module>
  		<module>overwritten-files/modules/oai</module> 
  		<module>overwritten-files/modules/xoai</module>
