@@ -33,6 +33,17 @@ public interface IdentifierService {
      *  is a Site, or null if no matching identifier is found.
      */
     String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier);
+    
+    /**
+     * Gets the identifiers all registered IdentifierProvider returns if asked 
+     * to lookup the provided DSpaceObject.
+     *
+     * @param context
+     * @param dso the object to be identified.
+     * @return the matching identifiers, or the site identifier if the object
+     *  is a Site, or an empty array if no matching identifier is found.
+     */
+    String[] lookup(Context contex, DSpaceObject dso);
 
     /**
      *

@@ -279,7 +279,8 @@ public class Collection extends DSpaceObject
         myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        context.addEvent(new Event(Event.CREATE, Constants.COLLECTION, c.getID(), c.handle));
+        context.addEvent(new Event(Event.CREATE, Constants.COLLECTION, 
+                c.getID(), c.handle, c.lookupIdentifiers(context)));
 
         log.info(LogManager.getHeader(context, "create_collection",
                 "collection_id=" + row.getIntColumn("collection_id"))
@@ -969,7 +970,8 @@ public class Collection extends DSpaceObject
             template = null;
         }
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, 
+                getID(), "remove_template_item", lookupIdentifiers(ourContext)));
     }
 
     /**
@@ -999,7 +1001,9 @@ public class Collection extends DSpaceObject
 
         DatabaseManager.insert(ourContext, row);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
+        ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), 
+                Constants.ITEM, item.getID(), item.getHandle(), 
+                lookupIdentifiers(ourContext)));
     }
 
     /**
@@ -1037,7 +1041,9 @@ public class Collection extends DSpaceObject
                 getID(), item.getID());
         DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, 
+                getID(), Constants.ITEM, item.getID(), item.getHandle(),
+                lookupIdentifiers(ourContext)));
     }
 
     /**
@@ -1060,12 +1066,15 @@ public class Collection extends DSpaceObject
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, 
+                    getID(), null, lookupIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, 
+                    Constants.COLLECTION, getID(), getDetails(), 
+                    lookupIdentifiers(ourContext)));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -1131,7 +1140,8 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_collection",
                 "collection_id=" + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, getID(), getHandle()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, 
+                getID(), getHandle(), lookupIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -1566,6 +1576,7 @@ public class Collection extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the collection HAS been modified
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, 
+                getID(), null, lookupIdentifiers(ourContext)));
     }
 }

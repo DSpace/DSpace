@@ -8,18 +8,24 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
 
 /**
  * Abstract base class for DSpace objects
  */
 public abstract class DSpaceObject
 {
+    private static final Logger log = Logger.getLogger(DSpaceObject.class);
+    
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     private StringBuffer eventDetails = null;
@@ -98,6 +104,32 @@ public abstract class DSpaceObject
      *         one
      */
     public abstract String getName();
+    
+    /**
+     * Tries to lookup all Identifiers of this DSpaceObject.
+     * @return An array containing all found identifiers or an array with a length of 0.
+     */
+    public String[] lookupIdentifiers(Context context)
+    {
+        String[] identifiers = new String[0];
+        IdentifierService identifierService = 
+                new DSpace().getSingletonService(IdentifierService.class);
+        
+        if (identifierService != null)
+        {
+            return identifierService.lookup(context, this);
+        }
+        
+        log.warn("No IdentifierService found, will return an array containing "
+                + "the Handle only.");
+        
+        if (getHandle() != null)
+        {
+            return new String[] { HandleManager.getCanonicalForm(getHandle()) };
+        }
+
+        return new String[0];
+    }
 
     /**
      * Generic find for when the precise type of a DSO is not known, just the
