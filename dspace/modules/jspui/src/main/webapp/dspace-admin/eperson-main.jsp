@@ -66,34 +66,35 @@
 	     <fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.success_notice"/>
 	   </p>
 <%  } %>    
-    <form name="epersongroup" method="post" action="">    
-			<div class="row">
+<form name="epersongroup" method="post" action="">    
+    <div class="row">
+        <div class="col-md-6">
             <%-- <input type="submit" name="submit_add" value="Add EPerson..."> --%>
-            	<input class="btn btn-success col-md-2 col-md-offset-5" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>" />
-			</div>
-			<br/>
-
-	        <fmt:message key="jsp.dspace-admin.eperson-main.or"/>
-			
+            <input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>" />
+        </div>
+        <div class="col-md-6">
             <div class="row">
-	            <div class="col-md-6">
-	            <dspace:selecteperson multiple="false" />
-	            </div>
-            
-            <%-- then&nbsp;<input type="submit" name="submit_edit" value="Edit..." onclick="javascript:finishEPerson();"> --%>
-			<div class="col-md-2">
-						<fmt:message key="jsp.dspace-admin.eperson-main.then"/>
-			</div>
-			<div class="col-md-4">
-			<input type="submit" class="btn btn-default col-md-4" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>
-						
-            <% if(loginAs) { %>&nbsp;<input type="submit" class="btn btn-default col-md-4" name="submit_login_as" value="<fmt:message key="jsp.dspace-admin.eperson-main.LoginAs.submit"/>" onclick="javascript:finishEPerson();"/> <% } %>
-            
-            <%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
-            <input type="submit" class="btn btn-danger col-md-4" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" onclick="javascript:finishEPerson();"/>
-            
+                <div class="col-md-12">
+                    <fmt:message key="jsp.dspace-admin.eperson-main.or"/>
+                    <dspace:selecteperson multiple="false" />
+                </div>
             </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <fmt:message key="jsp.dspace-admin.eperson-main.then"/>
+                </div>
+                <div class="col-md-10">
+                    <input type="submit" class="btn btn-default" name="submit_edit" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" onclick="javascript:finishEPerson();"/>
+
+                    <% if (loginAs) { %>&nbsp;<input type="submit" class="btn btn-default" name="submit_login_as" value="<fmt:message key="jsp.dspace-admin.eperson-main.LoginAs.submit"/>" onclick="javascript:finishEPerson();"/> <% }%>
+
+                    <%-- <input type="submit" name="submit_delete" value="Delete..." onclick="javascript:finishEPerson();"> --%>
+                    <input type="submit" class="btn btn-danger" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>" onclick="javascript:finishEPerson();"/>
+                </div>
             </div>
-    </form>
+        </div>
+    </div>
+    <br/>
+</form>
  
 </dspace:layout>
