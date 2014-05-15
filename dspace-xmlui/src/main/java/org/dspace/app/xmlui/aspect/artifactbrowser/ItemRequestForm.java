@@ -155,14 +155,13 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 		Division itemRequest = body.addInteractiveDivision("itemRequest-form",
 				request.getRequestURI(), Division.METHOD_POST, "primary");
 		itemRequest.setHead(T_head);
-		itemRequest.addPara(T_para1);
 
         // add a login link if user !loggedIn
         if (context.getCurrentUser() == null)
         {
             Para loginPara = itemRequest.addPara();
             loginPara.addContent(T_login_para);
-            loginPara.addXref(contextPath + "/login", T_login);
+            itemRequest.addPara().addXref(contextPath + "/login", T_login);
 
             // Interrupt request if the user is not authenticated, so they may come back to
             // the restricted resource afterwards.
@@ -190,6 +189,8 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
                 log.error(e.getMessage());
             }
         }
+
+        itemRequest.addPara(T_para1);
 
 		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
 		if (titleDC != null && titleDC.length > 0)
