@@ -616,8 +616,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         }
                         break;
                     default:
-                        //Partial match allowed, only render the highlighted part
-                        if(value.contains(highlight.replaceAll("</?em>", "")))
+                        //Partial match allowed, only render the highlighted part (will also remove \r since this char is not indexed in solr & will cause issues
+                        if(value.replace("\r", "").contains(highlight.replaceAll("</?em>", "")))
                         {
                             value = highlight;
                         }
