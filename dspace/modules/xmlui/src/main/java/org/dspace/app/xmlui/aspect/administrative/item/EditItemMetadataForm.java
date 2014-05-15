@@ -184,11 +184,8 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 Composite addComposite = addForm.addItem().addComposite("value");
                 addComposite.setLabel(T_value_label);
                 TextArea addValue = addComposite.addTextArea("value");
-                Text addLang = addComposite.addText("language");
 
                 addValue.setSize(4, 35);
-                addLang.setLabel(T_lang_label);
-                addLang.setSize(6);
 
                 addForm.addItem().addButton("submit_add").setValue(T_submit_add);
 
