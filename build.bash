@@ -242,11 +242,10 @@ case "$1" in
     	;;        
 esac
 
-echo "Limpiando un poco. Se empaqueta de vuelta xmlui , para que quede xmlui/target filtrado..."
-cd $BASE_DIR/xmlui
-mvn clean package -Ddspace.dir=$INSTALL_DIR -q
+echo "Limpiando un poco"
+mvn clean
 
-#fixme, esto deberia hacerse antes de los exit en caso de error
+
 cd $OLD_CWD 
 
 print_sec "A-leluia, a-lelu, a-leluia, a-leuia, a-leluuu-ia! "
