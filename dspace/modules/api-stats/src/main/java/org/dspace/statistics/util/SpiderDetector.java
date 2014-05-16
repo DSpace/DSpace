@@ -336,7 +336,12 @@ public class SpiderDetector {
                     patterns.add(line);
                 }
             } else {
-                // ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
+                try{
+                patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                }catch (Exception e)
+                {
+                    log.error("error loading user agents" + line);
+                }
                 // ... add this functionality later
             }
         }
