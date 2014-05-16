@@ -656,15 +656,15 @@ public class BitstreamStorageManager
 
             // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
             TableRow duplicateBitRow = DatabaseManager.querySingleTable(context, "Bitstream", "SELECT * FROM Bitstream WHERE internal_id = ? AND bitstream_id <> ?", row.getStringColumn("internal_id"), bid);
-                if(duplicateBitRow == null)
-                {
-                    boolean success = file.delete();
+            if(duplicateBitRow == null)
+            {
+                success = file.delete();
 
-                    String message = ("Deleted bitstream " + bid + " (file "
+                String message = ("Deleted bitstream " + bid + " (file "
                                 + file.getAbsolutePath() + ") with result "
                                 + success);
-                    if (log.isDebugEnabled())
-                    {
+                if (log.isDebugEnabled())
+                {
                     log.debug(message);
                 }
                 if (verbose) {
