@@ -145,7 +145,16 @@
 </header>
 
 <main id="content" role="main">
-<div class="container banner">
+
+<%-- Page contents --%>
+<div class="container">
+
+<% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
+    <div class="row">
+        <div class="col-md-9">
+<% } %>
+
+<div class="banner">
 	<div class="row">
 		<div class="col-md-9 brand">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
@@ -156,22 +165,9 @@
 	</div>
 </div>	
 <br/>
-                <%-- Location bar --%>
-<%
-    if (locbar)
-    {
-%>
-<div class="container">
-                <dspace:include page="/layout/location-bar.jsp" />
-</div>                
-<%
-    }
-%>
 
+<%-- Location bar --%>
+<% if (locbar) { %>
+    <dspace:include page="/layout/location-bar.jsp" />
+<% } %>
 
-        <%-- Page contents --%>
-<div class="container">
-<% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
-	<div class="row">
-		<div class="col-md-9">
-<% } %>		

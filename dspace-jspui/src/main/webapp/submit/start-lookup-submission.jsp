@@ -214,7 +214,7 @@
 	<% if (fileLoaders != null && fileLoaders.size()>0) {
 	%>
 	<h3><a href="#"><fmt:message key="jsp.submit.start-lookup-submission.byfile"/></a></h3>
-	<div id="file-accordion" class="container">	
+	<div id="file-accordion">
 	<form class="form-horizontal" id="form-submission-loader" action="" method="post">
 		<input type="hidden" id="suuid-loader" name="suuid" value="<%= uuid %>"/>
 		<input type="hidden" id="iuuid-loader" name="iuuid" value=""/>
@@ -245,7 +245,7 @@
 			</div>
 	</div>
 	
-	<div class="container checkbox">
+	<div class="checkbox">
       <input class="submission-file-loader submission-preview-loader" type="checkbox" name="preview_loader" id="preview_loader" value="<%= Boolean.TRUE%>"/><span class="help-block"><fmt:message key="jsp.submit.start-lookup-submission.byfile.filepreview"/></span>
   	</div>
   

@@ -96,7 +96,7 @@
     {
 %>
 		<div class="panel panel-info"><div class="panel-heading"><fmt:message key="jsp.submit.access.plist.heading"/></div>
-		<div id="policies-help" class="container help-block"><fmt:message key="jsp.submit.access.policy_setting.help"/></div>
+		<div id="policies-help" class="help-block"><fmt:message key="jsp.submit.access.policy_setting.help"/></div>
         <dspace:policieslist policies="<%= policies %>" />
         </div>
 <%

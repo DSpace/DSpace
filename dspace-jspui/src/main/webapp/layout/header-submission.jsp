@@ -145,21 +145,15 @@
 </header>
 
 <main id="content" role="main">
-                <%-- Location bar --%>
-<%
-    if (locbar)
-    {
-%>
-<div class="container">
-                <dspace:include page="/layout/location-bar.jsp" />
-</div>                
-<%
-    }
-%>
 
-
-        <%-- Page contents --%>
+<%-- Page contents --%>
 <div class="container">
+
+<%-- Location bar --%>
+<% if (locbar) { %>
+   <dspace:include page="/layout/location-bar.jsp" />
+<% } %>
+
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
 		<div class="col-md-9">
