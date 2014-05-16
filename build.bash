@@ -163,7 +163,7 @@ do_install()
 	createdb -h $pg_connection_host -U $dspace_dbuser -E UNICODE $dspace_dbname
 
 	print_sec "INSTALANDO DSPACE@SEDICI"
-	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
+	cd $BASE_DIR/dspace/target/dspace-sedici-distribution-bin
 	ant -Ddspace.dir=$INSTALL_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz
 
 	echo -e "Personalizando los metadatos"
@@ -212,7 +212,7 @@ do_update(){
 	mvn clean license:format install $MVN_ARGS
 
 	echo -e "\n==========ACTUALIZANDO DSPACE@SEDICI"
-	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
+	cd $BASE_DIR/dspace/target/dspace-sedici-distribution-bin
 	 
 	if [ ! "`id $current_user 2>/dev/null  | grep $dspace_group`" ]; then
 		print_err "El usuario que está ejecutando el script ($current_user) no es miembro del dspace_group $dspace_group. Por lo tanto no podrá modificar el directorio $INSTALL_DIR"

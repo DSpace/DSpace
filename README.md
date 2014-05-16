@@ -18,7 +18,7 @@ Este repositorio se creó para punto de transición para la actualización de SE
 
 git clone git@github.com:sedici/DSpace-SEDICI-svn.git DSpace-SEDICI-svn
 cd DSpace-SEDICI-svn/
-svn co https://svn.duraspace.org/dspace/dspace/tags/dspace-1.8.2/dspace distribution/dspace-tag-files
+svn co https://svn.duraspace.org/dspace/dspace/tags/dspace-1.8.2/dspace dspace/dspace-tag-files
 mvn eclipse:eclipse
 ./build.bash install
 

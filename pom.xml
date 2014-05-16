@@ -41,7 +41,7 @@
 
 
 	<modules>
-		<module>distribution</module>
+		<module>dspace</module>
 	</modules>
 
 	<dependencies>
