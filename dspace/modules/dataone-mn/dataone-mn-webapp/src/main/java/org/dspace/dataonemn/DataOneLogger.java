@@ -181,10 +181,6 @@ public class DataOneLogger {
             log.error("Solr server threw an exception while retreiving log records: ",e);
             log.info("Solr query was: " + solrQuery.getQuery());
         }
-        if (matchingEntries.size() == 0){
-            // is this necessary, or correct?
-           return new LogResults(HttpServletResponse.SC_OK,0,emptyResults);
-        }
         final StringBuffer entryResults = new StringBuffer(200);
         for(LogEntry le : matchingEntries){
             entryResults.append(le.getXml());
