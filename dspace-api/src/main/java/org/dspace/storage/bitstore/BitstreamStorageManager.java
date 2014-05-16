@@ -108,6 +108,8 @@ public class BitstreamStorageManager
 	 */
 	private static final String REGISTERED_FLAG = "-R";
 
+    private static BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
+
     /* Read in the asset stores from the config. */
     static
     {
@@ -561,85 +563,99 @@ public class BitstreamStorageManager
      * be undone.
      * 
      * @param deleteDbRecords if true deletes the database records otherwise it
-     * 	           only deletes the files and directories in the assetstore  
-     * @exception IOException
-     *                If a problem occurs while cleaning up
+     * 	           only deletes the files and directories in the assetstore
      * @exception SQLException
      *                If a problem occurs accessing the RDBMS
      */
-    public static void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException
-    {
+    public static void cleanup(boolean deleteDbRecords, int commitBatchSize, boolean verbose) throws SQLException {
         Context context = null;
-        BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
         int commitCounter = 0;
+        List<TableRow> storage = null;
 
-        try
-        {
-            context = new Context();
+        context = new Context();
+        String myQuery = "select * from Bitstream where deleted = '1'";
+        storage = DatabaseManager.queryTable(context, "Bitstream", myQuery).toList();
 
-            String myQuery = "select * from Bitstream where deleted = '1'";
-
-            List<TableRow> storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
-                    .toList();
-
-            for (Iterator<TableRow> iterator = storage.iterator(); iterator.hasNext();)
-            {
-                TableRow row = iterator.next();
-                int bid = row.getIntColumn("bitstream_id");
-
-				GeneralFile file = getFile(row);
-
-                // Make sure entries which do not exist are removed
-                if (file == null || !file.exists())
-                {
-                    log.debug("file is null");
-                    if (deleteDbRecords)
-                    {
-                        log.debug("deleting record");
-                        if (verbose)
-                        {
-                            System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
-                        }
-                        bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                        if (verbose)
-                        {
-                            System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
-                        }
-                        DatabaseManager.delete(context, "Bitstream", bid);
+        for (Iterator<TableRow> iterator = storage.iterator(); iterator.hasNext(); ) {
+            if (cleanupBitstream(context, iterator.next(), deleteDbRecords, verbose)) {
+                // Make sure to commit our outstanding work every 100
+                // iterations. Otherwise you risk losing the entire transaction
+                // if we hit an exception, which isn't useful at all for large
+                // amounts of bitstreams.
+                if (deleteDbRecords) {
+                    commitCounter++;
+                    if (commitCounter % commitBatchSize == 0) {
+                        context = commitBatch(context);
                     }
-                    continue;
                 }
-
-                // This is a small chance that this is a file which is
-                // being stored -- get it next time.
-                if (isRecent(file))
-                {
-                	log.debug("file is recent");
-                    continue;
+            } else {
+                if (deleteDbRecords) {
+                    context = commitBatch(context);
                 }
+            }
+        }
+        context = commitBatch(context);
+        context.complete();
+    }
 
-                if (deleteDbRecords)
-                {
-                    log.debug("deleting db record");
-                    if (verbose)
-                    {
-                        System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
-                    }
-                    bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                    if (verbose)
-                    {
-                        System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
-                    }
-                    DatabaseManager.delete(context, "Bitstream", bid);
-                }
-
-				if (isRegisteredBitstream(row.getStringColumn("internal_id"))) {
-				    continue;			// do not delete registered bitstreams
-				}
+     private static Context commitBatch(Context context) throws  SQLException {
+         System.out.print("Committing changes to the database...");
+         try {
+             context.commit();
+             System.out.println(" Done!");
+         } catch (SQLException sqe) {
+             System.out.println(" Done but Failed!");
+             System.err.println(sqe);
+             context.complete();
+             context = new Context();
+         }
+         return context;
+     }
 
 
-                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
-                TableRow duplicateBitRow = DatabaseManager.querySingleTable(context, "Bitstream", "SELECT * FROM Bitstream WHERE internal_id = ? AND bitstream_id <> ?", row.getStringColumn("internal_id"), bid);
+    /**
+     * Clean up the database entries and file associated with given bitstream.
+     * bitstreamarea. This method deletes any bitstreams which are more than 1 hour old and marked deleted.
+     * The deletions cannot be undone.
+     * @param context   the db context
+     * @param row   bitstream TableRow
+     * @param deleteDbRecords if true deletes the database bitstream's database record otherwise it
+     * 	           only deletes the files and directories in the assetstore
+     * @param verbose whether to trace actions on System.out
+     * @return false if encountering an exception  or problem with file deletion
+     */
+    private static boolean cleanupBitstream(Context context, TableRow row, boolean deleteDbRecords, boolean verbose) {
+        int bid = row.getIntColumn("bitstream_id");
+        boolean success = true;
+        try {
+            GeneralFile file = getFile(row);
+
+            // Make sure db entries for files that do not exist are removed
+            if (deleteDbRecords && (file == null || !file.exists())) {
+                deleteBitstream(context, bid, verbose);
+                return true;
+            }
+
+            // This is a small chance that this is a file which is
+            // being stored -- get it next time.
+            if (isRecent(file)) {
+                if (log.isDebugEnabled())
+                    log.debug("file for BITSTREAM." + bid +  " (file " + file.getAbsolutePath() + ")  is recent file ==> skip ");
+                if (verbose)
+                    System.out.println("file for BITSTREAM." + bid +  " (file " + file.getAbsolutePath() + ")  is recent file ==> skip ");
+                return true;
+            }
+
+            if (deleteDbRecords)
+                deleteBitstream(context, bid, verbose);
+
+            if (isRegisteredBitstream(row.getStringColumn("internal_id"))) {
+                return true;
+            }
+
+
+            // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
+            TableRow duplicateBitRow = DatabaseManager.querySingleTable(context, "Bitstream", "SELECT * FROM Bitstream WHERE internal_id = ? AND bitstream_id <> ?", row.getStringColumn("internal_id"), bid);
                 if(duplicateBitRow == null)
                 {
                     boolean success = file.delete();
@@ -649,62 +665,53 @@ public class BitstreamStorageManager
                                 + success);
                     if (log.isDebugEnabled())
                     {
-                        log.debug(message);
-                    }
-                    if (verbose)
-                    {
-                        System.out.println(message);
-                    }
-
-                    // if the file was deleted then
-                    // try deleting the parents
-                    // Otherwise the cleanup script is set to
-                    // leave the db records then the file
-                    // and directories have already been deleted
-                    // if this is turned off then it still looks like the
-                    // file exists
-                    if( success )
-                    {
-                        deleteParents(file);
-                    }
+                    log.debug(message);
+                }
+                if (verbose) {
+                    System.out.println(message);
                 }
 
-                // Make sure to commit our outstanding work every 100
-                // iterations. Otherwise you risk losing the entire transaction
-                // if we hit an exception, which isn't useful at all for large
-                // amounts of bitstreams.
-                commitCounter++;
-                if (commitCounter % 100 == 0)
-                {
-                	System.out.print("Committing changes to the database...");
-                    context.commit();
-                    System.out.println(" Done!");
+                // if the file was deleted then
+                // try deleting the parents
+                // Otherwise the cleanup script is set to
+                // leave the db records then the file
+                // and directories have already been deleted
+                // if this is turned off then it still looks like the
+                // file exists
+                if (success) {
+                    deleteParents(file);
                 }
             }
-
-            context.complete();
         }
         // Aborting will leave the DB objects around, even if the
-        // bitstreams are deleted. This is OK; deleting them next
-        // time around will be a no-op.
-        catch (SQLException sqle)
-        {
+        // bitstreams are deleted. This is OK; they will be deleted
+        // next time around
+        catch (SQLException sqle) {
+            System.err.println("Error: " + sqle.getMessage());
             if (verbose)
-            {
-                System.err.println("Error: " + sqle.getMessage());
-            }
-            context.abort();
-            throw sqle;
-        }
-        catch (IOException ioe)
-        {
+                System.err.println(sqle);
+            success = false;
+        } catch (IOException ioe) {
+            System.err.println("Error: " + ioe.getMessage());
             if (verbose)
-            {
-                System.err.println("Error: " + ioe.getMessage());
-            }
-            context.abort();
-            throw ioe;
+                System.err.println(ioe);
+            success = false;
         }
+        return success;
+    }
+
+    private static void deleteBitstream(Context context, int bid, boolean verbose) throws SQLException {
+        if (log.isDebugEnabled()) {
+            log.debug("Delete BITSTREAM." + bid + " " );
+        }
+        if (verbose) {
+            System.out.println(" - Deleting checksum_history for BITSTREAM." + bid );
+        }
+        bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
+        if (verbose) {
+            System.out.println(" - Deleting BITSTREAM." + bid );
+        }
+        DatabaseManager.delete(context, "Bitstream", bid);
     }
 
     /**
