@@ -42,7 +42,6 @@
 
 	<modules>
 		<module>distribution</module>
-		<module>dspace-xoai</module>
 	</modules>
 
 	<dependencies>

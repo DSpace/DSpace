@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>dspace-sedici</artifactId>
+		<artifactId>modules</artifactId>
 		<groupId>ar.edu.unlp.sedici</groupId>
 		<version>1.8.2</version>
 		<relativePath>..</relativePath>
@@ -10,41 +10,41 @@
 	<artifactId>xmlui</artifactId>
 	<packaging>war</packaging>
 	<name>Dspace@SeDiCI XMLUI</name>
-	<description>desc</description>
+	<description>XMLUI frontend for sedici.unlp.edu.ar</description>
+	
 	<dependencies>
-
 		<dependency>
 			<groupId>org.dspace.modules</groupId>
 			<artifactId>xmlui</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
-		
-	   <!-- Wing framework -->
-       <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
-            <exclusions>
-            	<exclusion>
-            		<groupId>org.slf4j</groupId>
+
+		<!-- Wing framework -->
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-xmlui-wing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-xmlui-api</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
-            	</exclusion>
-            	<exclusion>
-            		<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
-            	</exclusion>
-            </exclusions>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>ar.edu.unlp.sedici</groupId>
@@ -79,7 +79,7 @@
 		</resources>
 
 		<plugins>
-		
+
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>maven-jetty-plugin</artifactId>
@@ -111,18 +111,18 @@
 					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 					<webXml>${project.build.directory}/${project.build.finalName}/webxml/WEB-INF/web.xml</webXml>
 
-<!-- 					<webResources> -->
-<!-- 						<resource> -->
-<!-- 							<filtering>true</filtering> -->
-<!-- 							<directory>${basedir}/src/main/webapp</directory> -->
-<!-- 							<includes> -->
-<!-- 								<include>**/*.xml</include> -->
-<!-- 							</includes> -->
-<!-- 							<excludes>	 -->
-<!-- 								<exclude>**/messages*.xml</exclude> -->
-<!-- 							</excludes> -->
-<!-- 						</resource> -->
-<!-- 					</webResources> -->
+					<!-- <webResources> -->
+					<!-- <resource> -->
+					<!-- <filtering>true</filtering> -->
+					<!-- <directory>${basedir}/src/main/webapp</directory> -->
+					<!-- <includes> -->
+					<!-- <include>**/*.xml</include> -->
+					<!-- </includes> -->
+					<!-- <excludes> -->
+					<!-- <exclude>**/messages*.xml</exclude> -->
+					<!-- </excludes> -->
+					<!-- </resource> -->
+					<!-- </webResources> -->
 
 					<overlays>
 						<!-- Se extrae web.xml para filtrar por separado -->
@@ -135,9 +135,10 @@
 							<targetPath>webxml/</targetPath>
 						</overlay>
 
-						<!-- Se copia los archivos del proyecto para que tengan prioridad sobre los archivos de dspace:xmlui -->
+						<!-- Se copia los archivos del proyecto para que tengan prioridad sobre 
+							los archivos de dspace:xmlui -->
 						<overlay>
-<!-- 							empty groupId/artifactId represents the current build -->
+							<!-- empty groupId/artifactId represents the current build -->
 						</overlay>
 
 						<!-- Se copian los archivos de dspace:xmlui (sin el web.xml) -->
