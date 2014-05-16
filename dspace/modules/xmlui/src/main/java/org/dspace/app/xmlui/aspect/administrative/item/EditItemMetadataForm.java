@@ -70,7 +70,6 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_head1 = message("xmlui.administrative.item.EditItemMetadataForm.head1");
         private static final Message T_name_label = message("xmlui.administrative.item.EditItemMetadataForm.name_label");
         private static final Message T_value_label = message("xmlui.administrative.item.EditItemMetadataForm.value_label");
-        private static final Message T_lang_label = message("xmlui.administrative.item.EditItemMetadataForm.lang_label");
         private static final Message T_submit_add = message("xmlui.administrative.item.EditItemMetadataForm.submit_add");
         private static final Message T_para1 = message("xmlui.administrative.item.EditItemMetadataForm.para1");
 
@@ -184,9 +183,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 Composite addComposite = addForm.addItem().addComposite("value");
                 addComposite.setLabel(T_value_label);
                 TextArea addValue = addComposite.addTextArea("value");
-
                 addValue.setSize(4, 35);
-
                 addForm.addItem().addButton("submit_add").setValue(T_submit_add);
 
                 
