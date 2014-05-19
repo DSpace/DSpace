@@ -300,7 +300,7 @@
 			</form>
 		</div>	
 	</div>
-	<div class="row container">
+	<div class="row">
         <button type="button" class="btn btn-default col-md-2 pull-right exit"><fmt:message key="jsp.submit.start-lookup-submission.exit"/></button>
     </div>
 </div>
