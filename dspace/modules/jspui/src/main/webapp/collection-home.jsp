@@ -102,6 +102,17 @@
 
     Boolean showItems = (Boolean)request.getAttribute("show.items");
     boolean show_items = showItems != null ? showItems.booleanValue() : false;
+    
+    String collectionHandle = "@";
+    boolean isImageCollection = false;
+    
+    if (collection != null){
+      collectionHandle = collection.getHandle();
+    }
+    if(ConfigurationManager.getProperty("image-galleries","webui.imagedisplay").indexOf(collectionHandle) >= 0)
+    {
+        isImageCollection = true;
+    }
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -206,20 +217,30 @@
         }
 %>
         </div>
-
+<%
+        if(isImageCollection){
+%>
+        <div class="row">
+            <dspace:imagelist browseInfo="<%= bi %>" />
+        </div>
+<%
+        }else{
+%>
+        
         <%-- output the results using the browselist tag --%>
 <%
-        if (bix.isMetadataIndex())
-        {
+            if (bix.isMetadataIndex())
+            {
 %>
         <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
 <%
-        }
-        else
-        {
+            }
+            else
+            {
 %>
         <dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" />
 <%
+            }
         }
 %>
         <%-- give us the bottom report on what we are looking at --%>

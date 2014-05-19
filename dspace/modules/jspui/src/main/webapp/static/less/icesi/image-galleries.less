@@ -1,0 +1,51 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 16-may-2014, 12:02:28
+    Author     : David Andrés Maznzano Herrera <damanzano>
+*/
+
+.ds-gallery-container{
+    /*position: relative;*/
+    -moz-column-width: 18em;
+    -webkit-column-width: 18em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em;
+    column-width:18em;
+    column-gap:1em;
+
+    .ds-gallery-item{
+        display: inline-block;
+        -webkit-transition: top 1s ease, left 1s ease;
+        -moz-transition: top 1s ease, left 1s ease;
+        -o-transition: top 1s ease, left 1s ease;
+        -ms-transition: top 1s ease, left 1s ease;
+        
+        .artifact-preview{
+            text-align: center;
+        }
+
+        .well {
+            position:relative;
+            display: block;
+        }
+
+        .meta{
+            text-align:right;
+            color:#777;
+            font-style:italic;
+        }
+        .imgholder img{
+            max-width:100%;
+            background:#ccc;
+            display:block;
+        }
+    }
+
+
+}
+
+

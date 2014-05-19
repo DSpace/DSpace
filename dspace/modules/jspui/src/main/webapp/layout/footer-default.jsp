@@ -75,7 +75,6 @@
         <script type="text/javascript" src="<%= request.getContextPath()%>/utils.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/choice-support.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/static/js/jplayer/jquery.jplayer.min.js"></script>
-        
         <!-- AddThis scripts for social media -->
         <!-- AddThis Smart Layers BEGIN -->
         <!-- Go to http://www.addthis.com/get/smart-layers to customize -->
