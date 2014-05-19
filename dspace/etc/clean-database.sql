@@ -80,6 +80,8 @@ DROP TABLE harvested_item;
 DROP TABLE Group2GroupCache;
 DROP TABLE Group2Group;
 DROP TABLE FileExtension;
+DROP TABLE webapp;
+DROP TABLE requestitem;
 -- Drop main object tables near end as many other tables have dependencies on them
 DROP TABLE versionitem;
 DROP TABLE versionhistory;
@@ -132,6 +134,8 @@ DROP SEQUENCE harvested_collection_seq;
 DROP SEQUENCE harvested_item_seq;
 DROP SEQUENCE versionhistory_seq;
 DROP SEQUENCE versionitem_seq;
+DROP SEQUENCE webapp_seq;
+DROP SEQUENCE requestitem_seq;
 
 -- Drop the getnextid() function
 DROP FUNCTION getnextid;
