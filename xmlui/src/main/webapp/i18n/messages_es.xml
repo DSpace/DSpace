@@ -2273,12 +2273,12 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Seleccione una licencia:</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Sin licencia</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Atribución</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Atribución-NoComercial</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Atribución-NoComercial-SinDerivadas</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Atribución-NoComercial-CompartirIgual</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Atribución-SinDerivadas</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Atribución-CompartirIgual</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Atribución 2.5 Argentina (CC BY 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Atribución-NoComercial 2.5 Argentina (CC BY-NC 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Atribución-NoComercial-SinDerivadas 2.5 Argentina (CC BY-NC-ND 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Atribución-NoComercial-CompartirIgual 2.5 Argentina (CC BY-NC-SA 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Atribución-SinDerivadas 2.5 Argentina (CC BY-ND 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Atribución-CompartirIgual 2.5 Argentina (CC BY-SA 2.5)</message>
 
 <!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>

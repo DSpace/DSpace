@@ -170,6 +170,7 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
     	HttpSession session = request.getSession();
     	String licenseUri;
     	String licenseDescription;
+    	String postfixLicenseDescription;
     	
        if (AuthorizeManager.isAdmin(context, item) || AuthorizeManager.isAdmin(context, coleccion)){
     	   //es administrador de la coleccion a la que se está agregando el item, hay un select
@@ -189,22 +190,28 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	arreglo.put("by", 6);
 		    	switch (arreglo.get(cc_license)) {
 				case 1:
-					licenseDescription="Atribución-NoComercial-SinDerivadas";
+					licenseDescription="Creative Commons Atribución-NoComercial-SinDerivadas";
+					postfixLicenseDescription="(CC BY-NC-ND 2.5)";
 					break;
 				case 2:
-					licenseDescription="Atribución-NoComercial-CompartirIgual";
+					licenseDescription="Creative Commons Atribución-NoComercial-CompartirIgual";
+					postfixLicenseDescription="(CC BY-NC-SA 2.5)";
 					break;
 				case 3:
-					licenseDescription="Atribución-NoComercial";
+					licenseDescription="Creative Commons Atribución-NoComercial";
+					postfixLicenseDescription="(CC BY-NC 2.5)";
 					break;
 				case 4:
-					licenseDescription="Atribución-SinDerivadas";
+					licenseDescription="Creative Commons Atribución-SinDerivadas";
+					postfixLicenseDescription="(CC BY-ND 2.5)";
 					break;
 				case 5:
-					licenseDescription="Atribución-CompartirIgual";
+					licenseDescription="Creative Commons Atribución-CompartirIgual";
+					postfixLicenseDescription="(CC BY-SA 2.5)";
 					break;
 				default:
-					licenseDescription="Atribución";
+					licenseDescription="Creative Commons Atribución";
+					postfixLicenseDescription="(CC BY 2.5)";
 					break;
 				}
 		    	//agrego la version y la jurisdiccion
@@ -214,6 +221,7 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    		licenseUri=licenseUri+jurisdictionId+"/";
 		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
 		    	};
+		    	licenseDescription+=" "+postfixLicenseDescription;
 		    	//agrego los metadatos
 		    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
 		    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
@@ -227,6 +235,8 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
             //si no es administrador trato los campos por separado
 	    	String commercial = request.getParameter("commercial_chooser");
 	        String derivatives = request.getParameter("derivatives_chooser");
+	        postfixLicenseDescription = "(cc by";
+	        String ccVersion="2.5";
 	       
 	        if (commercial!=null && derivatives!=null){
 	        
@@ -236,26 +246,30 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	
 		    	//cargo los nuevos valores para el metadata 
 		    	licenseUri="http://creativecommons.org/licenses/by";
-		    	licenseDescription="Atribución";
+		    	licenseDescription="Creative Commons Atribución";
 		    	
 		    	if (!commercial.equals("y")){
-		    		licenseUri=licenseUri+"-"+commercial; 
+		    		licenseUri=licenseUri+"-"+commercial;
+		    		postfixLicenseDescription+="-"+commercial;
 		    		licenseDescription=licenseDescription+"-NoComercial";
 		    	}
 		    	if (!derivatives.equals("y")){
-		    		licenseUri=licenseUri + "-" + derivatives; 
+		    		licenseUri=licenseUri + "-" + derivatives;
+		    		postfixLicenseDescription+="-"+derivatives;
 		    		if (derivatives=="nd"){
 		    			licenseDescription=licenseDescription+"-SinDerivadas";
 		    		} else {
 		    			licenseDescription=licenseDescription+"-CompartirIgual";
 		    		}
 		    	};
-		    	licenseUri=licenseUri+"/2.5/";
-		    	licenseDescription=licenseDescription+" 2.5";
+		    	licenseUri=licenseUri+"/"+ ccVersion +"/";
+		    	postfixLicenseDescription+=" "+ccVersion+")";
+		    	licenseDescription=licenseDescription+" "+ccVersion;
 		    	if (!jurisdictionId.equals("")){
 		    		licenseUri=licenseUri+jurisdictionId+"/";
 		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
 		    	};
+		    	licenseDescription+= " "+postfixLicenseDescription.toUpperCase();
 		    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
 		    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
 		    	
