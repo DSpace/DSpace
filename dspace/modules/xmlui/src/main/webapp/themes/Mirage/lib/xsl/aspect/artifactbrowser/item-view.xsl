@@ -484,10 +484,10 @@
                          <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
                            <xsl:choose>
                              <xsl:when test="starts-with(mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'//')">
-                               <xsl:value-of select="concat('http:',mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'?format=html')"/>
+                               <xsl:value-of select="concat('http:',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
                              </xsl:when>
                              <xsl:otherwise>
-                               <xsl:value-of select="concat('http://',mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'?format=html')"/>
+                               <xsl:value-of select="concat('http://',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
                              </xsl:otherwise>
                            </xsl:choose>
                          </xsl:when>
