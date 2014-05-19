@@ -363,12 +363,12 @@
                                         <a class="lead" href="<%= request.getContextPath() %>/handle/<%=items[i].getHandle() %>"> 
                                             <%= StringUtils.abbreviate(displayTitle, 70) %> 
                                         </a>
-                                    <% if (!authorDate.equals("")){%>
+                                    <% if ((authorDate!=null) && !authorDate.equals("")){%>
                                         <p>
                                             <%= authorDate%>
                                         </p>
                                     <%}%>
-                                    <% if (!displayDesc.equals("")){%>
+                                    <% if ((displayDesc!=null) && !displayDesc.equals("")){%>
                                         <p>
                                             <%= StringUtils.abbreviate(displayDesc,300)%>
                                         </p>
