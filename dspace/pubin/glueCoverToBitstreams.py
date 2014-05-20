@@ -6,7 +6,7 @@ from optparse import OptionParser
 DSPACE_METADATA_ELEM = "pu.pdf.coverpage"; 
 DSPACE_HOME = os.environ.get('DSPACE_HOME') or  "/dspace";
 DSPACE_CMD =  "/bin/dspace"
-DSPACE_OPTS = " --include object,ITEM.handle,internalId,BUNDLE.name,BUNDLE.id,mimeType,checksum,checksumAlgo," + \
+DSPACE_OPTS = " --include object,ITEM.handle,ITEM.id,internalId,BUNDLE.name,BUNDLE.id,mimeType,checksum,checksumAlgo," + \
               "ITEM." + DSPACE_METADATA_ELEM +  ",name " + \
                "--format TXT "
 DSPACE_LIST =      " bulk-list --root ROOT --type BITSTREAM " +  DSPACE_OPTS; 
@@ -27,7 +27,9 @@ def doit():
         doLog("", options.log_file); 
 
         # iter over relevant bitstreams 
-        cmd =  options.dspace_cmd +  DSPACE_LIST.replace("ROOT", options.root);
+        cmd =  options.dspace_cmd +  DSPACE_LIST.replace("ROOT", options.root); 
+        if (options.workFlowItemsOnly): 
+            cmd = cmd + " -W"; 
         output = execCommand(cmd, options.verbose); 
         for line in output.split("\n"): 
             if (line[0] == '#'):
@@ -46,11 +48,15 @@ def doit():
             try: 
                stages = [];
                result = "NOTHING-TO-DO";
+               dspaceItemObj =  bitstream['ITEM.handle']; 
+               if (not dspaceItemObj): 
+                     dspaceItemObj = "ITEM." + bitstream['ITEM.id'];
+              
                bitstream['fileName'] = getDSpaceFileName(options.assetstore, bitstream['internalId']); 
                bitstream['pdfFileName'] = options.bitstream_covered_dir + "/" + \
                                           "BUNDLE."  + bitstream['BUNDLE.id'] +":" + bitstream['name']
                bitstream['md5FileName'] = os.path.splitext(bitstream['pdfFileName'])[0] + ".md5"; 
-               doLog(bitstream['md5FileName'] + " checkMetaData " + bitstream['ITEM.handle'], options.log_file) 
+               doLog(bitstream['md5FileName'] + " checkMetaData " + dspaceItemObj, options.log_file) 
                stages.append("checkMetaData");
                hasMetaData = (bitstream['ITEM.' + DSPACE_METADATA_ELEM ] != '')
                
@@ -106,7 +112,7 @@ def doit():
                ## set metadata value 
                doLog(bitstream['md5FileName'] + " setMetaData " + DSPACE_METADATA_ELEM + "=" + options.metavalue, options.log_file); 
                stages.append("setMetaData"); 
-               cmd = options.dspace_cmd + " " + DSPACE_METADATA.replace("ITEM", bitstream['ITEM.handle']); 
+               cmd = options.dspace_cmd + " " + DSPACE_METADATA.replace("ITEM", dspaceItemObj); 
                cmd = cmd.replace("METADATA", options.metavalue); 
                cmd = cmd.replace("EPERSON", options.eperson);
                if (options.dryrun):
@@ -213,6 +219,9 @@ def parseargs():
                   help="Required: DSpace community, collection, or item"); 
     parser.add_option("-s", "--store", dest="storedir",
                   help="directory containing trace files and generated bitstreams, default: " + STORE_DIR  + "/<ROOT_PARAM>" )
+    parser.add_option( "-W", "--doWorkFlowItems", 
+                  action="store_true", dest="workFlowItemsOnly", default=False,
+                  help="Restrict to working on items in workflow "); 
     parser.add_option("-y", "--dryrun", 
                   action="store_true", dest="dryrun", default=False,
                   help="Dryrun only "); 
@@ -273,6 +282,7 @@ def parseargs():
 def prtOptions(dest, options): 
             print >> dest, "# Root:\t" + str(options.root); 
             print >> dest, "# Cover:\t" + str(options.cover); 
+            print >> dest, "# DoWorkFlowItems:\t" + str(options.workFlowItemsOnly); 
             print >> dest, "# CoverMetaDataValue:\t" + str(options.metavalue); 
             print >> dest, "# Dryrun:\t\t" + str(options.dryrun); 
             print >> dest, "# DSPACE:\t" + str(options.dhome); 

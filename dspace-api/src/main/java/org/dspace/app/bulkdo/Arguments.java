@@ -57,7 +57,7 @@ class Arguments {
     public static String VERBOSE_LONG = "verbose";
 
     static String WORKFLOW_ITEM = "W";
-    static String WORKFLOW_ITEM_LONG = "doWorkSpaceItems";
+    static String WORKFLOW_ITEM_LONG = "doWorkFlowItems";
 
     public static String WHO = "w";
     public static String WHO_LONG = "who";
@@ -125,9 +125,9 @@ class Arguments {
     }
 
     private String getActionString(char action) {
-        for (int i = 0; i < actionText.length; i++) {
-            if (actionText[i].charAt(0) == action) {
-                return actionText[i];
+        for (String anActionText : actionText) {
+            if (anActionText.charAt(0) == action) {
+                return anActionText;
             }
         }
         return null;
