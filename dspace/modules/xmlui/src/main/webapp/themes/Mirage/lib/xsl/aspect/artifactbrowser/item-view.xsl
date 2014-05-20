@@ -54,8 +54,8 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
-                  <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
-                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-external-head</i18n:text></h2>
+                  <xsl:when test="./mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
                   </xsl:when>
                   <xsl:otherwise>
                     <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
@@ -355,8 +355,8 @@
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
         <xsl:choose>
-          <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
-            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-external-head</i18n:text></h2>
+          <xsl:when test="mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
           </xsl:when>
           <xsl:otherwise>
             <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
