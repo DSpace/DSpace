@@ -485,4 +485,19 @@ public class XmlWorkflowItem implements InProgressSubmission {
         // FIXME - auth?
         DatabaseManager.delete(ourContext, wfRow);
     }
+
+    @Override
+    public void addMapCollection(Collection collection) throws SQLException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Collection[] getMapCollections() throws SQLException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
