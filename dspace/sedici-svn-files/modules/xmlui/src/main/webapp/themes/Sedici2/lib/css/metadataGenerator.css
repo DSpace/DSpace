@@ -1,0 +1,54 @@
+
+.metadataGenerator {
+    display: inline-table;
+    margin-top: 10px;
+    overflow: auto;
+    position: relative;
+}
+.metadataGenerator .generator_list {
+    float: right;
+    width: 385px;
+}
+.metadataGenerator .selection {
+    width: 250px;
+    border-right: solid 1px #C0C0C0;
+    float: left;
+    margin-right: 15px;
+}
+.metadataGenerator .selection * {
+    display: block;
+}
+
+.metadataGenerator .generator_list .label {
+    font-weight: bold;
+}
+.metadataGenerator .generator_list .label:hover {
+    background-color: #D4EEFA;
+}
+.metadataGenerator .generator_list .value {
+    padding: 1px 2px;
+    cursor: pointer;
+}
+.metadataGenerator .generator_list .value:hover {
+    background-color: #AAAAAA;
+}
+
+.metadataGenerator .selection select {
+    width: 230px;
+}
+.metadataGenerator .selection textarea {
+    width: 230px;
+    height: 200px;
+}
+.metadataGenerator .generator_list > div {
+    background-color: #FFFFFF;
+    border: 1px solid #C0C0C0;
+    cursor: pointer;
+    margin: 5px;
+    padding: 2px 3px;
+}
+
+.metadataGenerator .placeholder {
+    height: 20px;
+    background-color: #D4EEFA !important;
+}

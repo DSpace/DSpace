@@ -1,0 +1,27 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+	version="1.1">
+
+	<meta>
+		<pageMeta>
+			<metadata element="title">SEDICI - ¿Qué es SEDICI?</metadata>
+		</pageMeta>
+	</meta>
+
+	<body>
+		<div>
+
+			<head>¿Qué es SEDICI?</head>
+
+			<div id="pagina_estatica" class="pagina_queEsSedici">
+
+				<p>SEDICI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la <a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata </a> y como tal su misión es albergar, preservar, difundir y dar visibilidad a nivel mundial a toda la producción científica e intelectual de las distintas unidades académicas que la componen. </p>
+				<p> SEDICI se <a href="pages/resolucionSedici" title="Resolucion">creó</a> en el año 2003 con este propósito y desde entonces su acervo ha crecido exponencialmente, alojando en estos momentos más de 1000 tesis de grado, más de 2900 tesis de posgrado y aproximadamente 10000 artículos, buena parte de ellos a texto completo. SEDICI aloja también revistas producidas por los distintos laboratorios, institutos y centros de investigación con que cuenta la universidad, así como otras publicaciones vinculadas de un modo u otro a esta casa de altos estudios.</p>
+				<p>El repositorio se apoya y se rige por los lineamientos de la Open Archives Iniciative (OAI), en pos de la libre circulación y socialización 	del conocimiento.</p>
+				<p>Para más información sobre las políticas del repositorio consultar <a href="pages/politicas" title="Politicas" >aquí</a></p>
+				
+			</div>
+
+		</div>
+	</body>
+
+</document>

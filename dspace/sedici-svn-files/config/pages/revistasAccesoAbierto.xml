@@ -1,0 +1,219 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+	version="1.1">
+
+	<meta>
+		<pageMeta>
+			<metadata element="title">SEDICI - Revistas de Acceso Abierto</metadata>
+		</pageMeta>
+	</meta>
+
+	<body>
+		<div>
+			<head>Revistas de Acceso Abierto</head>
+
+			<div id='pagina_estatica' class="pagina_links">
+
+
+				<ul>
+					<li>
+						<h1>Directory of Open Access Journals (DOAJ)</h1>
+
+						<p>
+							Invitamos a todos nuestros usuarios a visitar el
+							<a href="http://www.doaj.org" target="_blank">Directorio de Revistas de
+								Acceso Abierto (Directory of Open Access Journals)</a>
+							, una loable iniciativa en la que se reúnen, en una misma página,
+							gran cantidad de revistas académicas de diversas áreas del
+							conocimiento, cuyo contenido es de acceso abierto.
+							Las mismas
+							pueden buscarse por título, pero a su vez se encuentran
+							agrupadas
+							por materia (entre otras, Artes y Arquitectura,
+							Negocios y
+							Economía, Química, Ciencias de la Salud, Lengua y
+							Literatura,
+							Derecho y Ciencias Políticas, Matemática y
+							Estadística, Filosofía
+							y Religión,
+							Tecnología e Ingeniería). Una vez que se pincha en la
+							materia deseada, se
+							despliegan todas las revistas allí agrupadas,
+							y se destacan,
+							mediante la leyenda "DOAJ content", aquellas que
+							son de acceso
+							abierto.
+							En el directorio hay actualmente 4250
+							revistas, de las cuales 1575
+							permiten búsquedas por artículo.
+							Por
+							otra parte, 290518 artículos están ya incluidos en el
+							repositorio, provenientes de revistas de prestigiosas
+							universidades de todo el mundo. Creemos que es de importancia
+							vital para nuestro propio proyecto apoyar y difundir iniciativas
+							semejantes, y esperamos que todos nuestros usuarios puedan hacer
+							uso de este imponente repositorio.
+						</p>
+					</li>
+
+
+					<li>
+
+
+						<h1>e-revistas (Plataforma Open Access de Revistas Científicas
+							Electrónicas Españolas y Latinoamericanas)</h1>
+						<p>
+							También animamos a nuestros usuarios a visitar la interesante
+							plataforma
+							<a href="http://www.erevistas.csic.es" target="_blank">e-revistas</a>
+							, dedicada, en este caso, a revistas de acceso abierto del ámbito
+							iberoamericano. Con el mismo espíritu imperante en DOAJ, se
+							listan y agrupan aquí revistas de diferentes universidades
+							escritas en castellano. El sitio se propone, entre otros
+							objetivos, recolectar y mostrar aquellas revistas que alcancen
+							rigurosos requisitos de calidad en el ámbito científico
+							hispanoparlante; además de ser un repositorio de recursos "open
+							access", brinda a sus usuarios una experiencia de navegación
+							personalizada. En estos momentos, hay disponibles 341 revistas y
+							81581 artículos. También ofrecen alojamiento para nuevas revistas
+							en el marco de una estrategia de optimización de la difusión de
+							la cultura científica. Esperamos, asimismo, que estos nuevos
+							contenidos sean de gran utilidad para nuestra comunidad
+							científico-académica así como para nuestros usuarios en general.
+						</p>
+
+
+
+
+						<h1> REDALYC (Red de Revistas Científicas de America Latina y el
+							Caribe, España y Portugal) </h1>
+						<p>
+							Invitamos a todos nuestros usuarios a usar y disfrutar de los
+							servicios ofrecidos por
+							<a href="http://www.redalyc.org" target="_blank">REDALYC</a>
+							, un portal que reúne 550 revistas científicas de acceso abierto
+							y más de 120000 artículos a texto completo. El diseño de la
+							página, sobrio y minimal,
+							facilita enormemente tanto la búsqueda
+							como la lectura on line de los
+							artículos allí reunidos. Las
+							búsquedas pueden realizarse tanto
+							por área temática de la revista
+							(como ciencias sociales y
+							humanidades o ciencias naturales y
+							exactas) como por país.
+							REDALYC se destaca también por ser un
+							ejemplo a seguir en lo que
+							a catalogación de los materiales se
+							refiere: además de ofrecer
+							los artículos tanto en formato PDF como
+							HTML incluye también el
+							modo de citarlos correctamente según
+							diferentes normas (ISO, APA,
+							MLA, entre otras). Por si todo esto
+							fuera poco, el sitio cuenta
+							también con un detalladísimo sistema
+							de estadísticas que permite
+							obtener un seguimiento minucioso tanto
+							del sitio como de cada
+							revista incluida.
+						</p>
+
+					</li>
+
+
+					<li>
+						<h1>DIRECTORIO DE REVISTAS OPEN ACCESS RECONOCIDAS POR EL ISI WEB
+							OF SCIENCE</h1>
+						<p>
+							La Pontificia Universidad Católica de Valparaíso (Chile) ofrece en su página
+							<a href="http://ejbiotechnology.ucv.cl/proyecto/buscar.php" target="_blank">web</a>
+							un completo directorio de revistas científicas open access a
+							nivel mundial. Las búsquedas pueden realizarse por área temática
+							y por categoría temática según el ISI. La novedad que presenta
+							este directorio es que lista las revistas no sólo por su área
+							temática sino también por su factor de impacto, un aspecto muy
+							importante cuando de revistas científicas se trata, ya que
+							resulta de la ecuación entre el número de artículos publicados en
+							un período determinado y la cantidad de citas en otras revistas
+							en ese mismo período.
+						</p>
+					</li>
+
+
+					<li>
+
+						<h1>REVISTAS OPEN ACCESS DEL CSIC</h1>
+						<p>
+							El Consejo Superior de Investigaciones Científicas del gobierno
+							de España exhibe en su
+							<a href="http://revistas.csic.es/"
+								title="Consejo Superior de Investigaciones Científicas de España"
+								target="_blank">portal</a>
+							, de manera por demás atractiva, gran cantidad de revistas de
+							acceso abierto, distribuidas en tres categorías temáticas:
+							Ciencias, Ciencias Sociales y Artes y Humanidades. También es
+							posible acceder al catálogo de todas las revistas así como a
+							otros recursos on line. Ofrece, además, la posibilidad de
+							registrarse en el sitio como lector y obtener así información y
+							novedades de las revistas de interés.
+						</p>
+
+					</li>
+
+
+					<li>
+						<h1>REVICIEN: PUBLICACIONES CIENTÍFICAS ESPAÑOLAS</h1>
+						<p>
+							Otro interesante portal español es
+							<a href="http://www.revicien.net/" title="ReviCien" target="_blank">ReviCien
+							</a>
+							, donde se alojan gran cantidad de publicaciones científicas
+							publicadas en el ámbito peninsular. Las revistas se encuentran
+							divididas por áreas temáticas, entre las que se incluyen Ciencias
+							Agrarias, Ciencias de la Vida, Física y Astronomía, Ingeniería y
+							Tecnología, Medicina, Medio Ambiente y Química, entre otras.
+						</p>
+
+					</li>
+
+
+					<li>
+						<h1>DIRECTORIO DE REVISTAS DE LA UNIVERSIDAD DE MURCIA</h1>
+						<p>
+							La Universidad de Murcia (España) presenta en este
+							<a href="http://revistas.um.es/" title="Universidad de Murcia"
+								target="_blank">portal </a>
+							todas las revistas producidas dentro de la universidad. Con el
+							soporte de OJS (Open Journals System), las revistas se presentan
+							listadas en orden alfábetico y versan sobre diferentes temas.
+							Entre otras, se destacan: Anales de Documentación, Anales de
+							Filología Hispánica, Cartaphilus, Cuadernos de Filología Inglesa,
+							Daimon, Glosas Didácticas, Miscelánea Medieval Murciana y Revista
+							de Investigación Lingüística.
+						</p>
+
+					</li>
+
+
+					<li>
+						<h1>MILES DE REVISTAS OPEN ACCESS EN OPEN-J GATE</h1>
+						<p>
+							<a href="http://www.openj-gate.org" title="Open-J Gate" target="_blank">
+								Open-J Gate </a>
+							es un portal que reúne más de 6400 revistas open access de las
+							más diversas materias, de las cuales 3700 tienen arbitraje
+							realizado por pares. Las búsquedas de los artículos pueden
+							realizarse por editor, por título y por materia. En este último
+							caso, las grandes áreas temáticas, como Artes y Humanidades,
+							Ciencias Biomédicas o Ingeniería y Tecnología, se subdividen a su
+							vez en áreas y disciplinas más específicas, lo que reduce
+							considerablemente el número de resultados no pertinentes en la
+							búsqueda.
+						</p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+
+</document>

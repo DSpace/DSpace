@@ -1,0 +1,224 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+	version="1.1">
+
+	<meta>
+		<pageMeta>
+			<metadata element="title">SEDICI - Políticas del repositorio</metadata>
+		</pageMeta>
+	</meta>
+
+	<body>
+		<div>
+
+			<head>Políticas del repositorio</head>
+
+			<div id="pagina_estatica" class="pagina_politicas">
+				<p>
+					SEDICI es el Repositorio Institucional de la Universidad Nacional de La Plata 
+					creado en el año 2003 para constituirse como portal de acceso central que reúna 
+					toda la producción digital generada en el ámbito de la Universidad y para dar a 
+					sus creaciones una mayor visibilidad, aumentar su uso e impacto y asegurar su acceso 
+					y preservación a largo plazo. 
+					El repositorio SEDICI adhiere a la Iniciativa de Acceso Abierto que sustenta el principio 
+					de la libre disposición de la información. A continuación se exponen las políticas del 
+					repositorio, las cuales son sometidas regularmente a revisión.
+				</p>
+
+				<ul>
+					<li><a href="pages/politicas#contenidos">Política de contenidos</a></li>
+					<li><a href="pages/politicas#acceso">Política de acceso a datos</a></li>
+					<li><a href="pages/politicas#deposito">Política de depósito</a></li>
+					<li><a href="pages/politicas#preservacion">Política de preservación</a></li>
+					<li><a href="pages/politicas#metadatos">Política de Metadatos</a></li>
+					<li><a href="pages/politicas#servicios">Política de Servicios</a></li>
+				</ul>
+
+
+				<h1 id="contenidos">Política de contenidos</h1>
+					<p>SEDICI recibe la producción de toda la UNLP en sus actividades de enseñanza, investigación y extensión. 
+						Los materiales a incorporar en el repositorio deben cumplir con al menos uno de los siguientes requisitos:
+					</p>	  
+					<ul>
+						<li>haber pasado un proceso de revisión,</li>
+						<li>ser editados y publicados en el ámbito de la Universidad,</li>
+						<li>ser generados por docentes y/o investigadores de la Universidad o centros asociados,</li>
+						<li>provenir de otras dependencias de la Universidad, o</li>
+						<li>presentar un valor histórico-cultural que amerite su preservación</li>
+					</ul>
+					<br/>
+					<p> 
+						Excepcionalmente podrá también albergar materiales que, aunque no estén producidos
+						en la institución, tengan carácter o importancia singular para la misma.
+					</p>
+					<p>
+					    De acuerdo a lo precedente algunas de las tipologías aceptadas son: 
+					    tesis de grado y posgrado, artículos científicos en cualquiera de sus <a href="pages/politicas#fnVersiones">versiones *</a>, 
+					    artículos de divulgación, libros y capítulos de libro, presentaciones en congresos, 
+					    producciones artísticas, imágenes, grabaciones audiovisuales, publicaciones periódicas, 
+					    mapas, patentes y reseñas (que hayan pasado por un proceso de evaluación). 
+					    También se incorporarán al repositorio, otros tipos de documentos como informes 
+					    técnicos, proyectos de investigación, ordenanzas y reglamentaciones.
+					</p>
+					<p>
+						Las obras depositadas pueden estar en cualquier idioma, siendo español, portugués e inglés los más relevantes. 
+					</p>
+					<p>
+						El repositorio acepta los formatos de archivo más comúnmente utilizados como PDF, Word y Powerpoint, 
+						aunque por razones de accesibilidad y preservación digital es recomendable el uso de formatos abiertos como RTF, 
+						TIFF y JPG frente a formatos propietarios (Word, GIF, etc).
+					</p>
+
+
+					<h1 id="acceso">Política de acceso a los datos</h1>
+						<p>Las obras alojadas en el repositorio pueden ser visualizadas y descargadas de forma libre y 
+							gratuita, sin necesidad de registro o autorización previa, siempre respetando las condiciones 
+							expuestas en las licencias de uso adosadas a las mismas. 
+							Los autores o titulares de la propiedad intelectual de cada obra aceptan en el momento de depósito 
+							una <a href="http://sedici.unlp.edu.ar/static/resources/licencia_de_deposito.pdf">licencia de distribución NO EXCLUSIVA </a>,
+							que habilita al repositorio a cumplir con su tarea de preservación y dispone una licencia de uso sobre cada 
+							obra que  explicita al público los usos permitidos, por ejemplo: </p>
+							<ul>
+								<li>si se permite uso comercial o no,</li> 
+								<li>si se permiten obras derivadas y si dichas obras derivadas deben mantener la misma licencia que
+								 el documento original o si no se permiten derivaciones en absoluto.</li>
+							</ul>
+							<p>Las licencias de uso soportadas desde el repositorio pertenecen a la familia <a href="http://www.creativecommons.org.ar/" target="_blanck"> Creative Commons 
+								</a> que habilitan la descarga, 
+								el uso y compartición de los contenidos siempre que se mencionen la obra y al autor original. 
+								La base de datos SHERPA/ROMEO recoge las políticas de permisos de más de 700 editores en el mundo; 
+								es una herramienta útil para comprobar si es posible o no depositar en <b>SEDICI</b> un artículo 
+								publicado en una revista científica, y si es así, qué versión del trabajo es susceptible de ser archivada.
+							</p>
+				
+				<h1 id="deposito">Política de depósito</h1>
+				
+				<p>
+					<b>El repositorio</b> se sustenta en un modelo distribuido de trabajo mediante el cual pueden existir diferentes vías de depósito:
+				</p>
+				<p>
+					<ul>
+						<li>Autoarchivo: un autor registrado en el repositorio carga su obra a partir de una serie de pasos que 
+							   incluyen la descripción (tipología, título, etc), adjunta los archivos, selecciona la Licencia de uso 
+							   Creative Commons y confirma los datos. 
+						</li>
+						<li>Depósito delegado: el autor presenta personalmente su obra en nuestras oficinas (o la envía por correo) 
+							   junto con la Licencia de depósito firmada.
+													
+						</li>
+						<li>En algunos casos el repositorio puede asignar un permiso especial a un representante de un Centro, Instituto, 
+							   etc. que asume el compromiso de carga de los materiales de ese centro.
+						</li>
+					</ul>
+					
+				</p>
+				<p>
+					En todos los casos corresponden al repositorio las tareas de revisión, descripción normalizada  y publicación 
+					o veto de la obra. Solamente se vetarán los trabajos que no cumplan con las condiciones mínimas establecidas en 
+					las políticas de contenidos arriba mencionadas.
+				</p>
+				<p>
+					Los trabajos pueden ser depositados en cualquier momento y hacerse públicos de manera inmediata o diferida 
+					luego de la finalización de un período elegido por el autor denominado período de embargo. El embargo es un 
+					bloqueo temporal durante el cual el contenido de una obra se mantiene oculto e inaccesible.
+				</p>
+				<p>
+					Los autores afirman ser los titulares de los derechos patrimoniales de las obras depositadas  y 
+					por tanto asumen toda responsabilidad ante infracciones de la ley de propiedad intelectual. 
+					El repositorio se compromete a quitar una obra de circulación ante una demanda de violación de 
+					derechos de propiedad intelectual. De ser necesario el autor puede subir una versión actualizada de 
+					una obra propia para usar como reemplazo o complemento de la previamente depositada. 
+									
+				</p>
+					
+				
+				
+				<h1 id="preservacion">Política de preservación digital</h1>
+				<p>
+					El propósito fundamental del repositorio SEDICI es asegurar la accesibilidad, legibilidad y preservación 
+					digital a tiempo indefinido de todas las obras que alberga. Para poder cumplir con esta misión el autor le concede 
+					al repositorio en la licencia de depósito permiso expreso para transformar la obra. 
+				</p>
+				<p>Dentro de las tareas regulares que se cumplen en el repositorio se pueden mencionar:</p>
+				<ul>
+					<li>Backups periódicos en servidores externos</li>
+					<li>Vigilancia y conversión de formatos de archivo </li>
+					<li>Actualización del software que sustenta al repositorio.</li>
+					<li>Comprobaciones periódicas de la integridad de los archivos para asegurar que la obra no ha sufrido alteraciones.</li>
+					<li>Comprobaciones periódicas de la accesibilidad de la obra (verificación de privacidad de obras embargadas).</li>
+					<li>Inclusión de una URL persistente Handle.net para la identificación y localización inequívoca de la obra.</li>
+				</ul>
+
+				<p>Las obras pueden ser removidas a solicitud del autor o titular de los derechos patrimoniales si se esgrimen 
+				algunos argumentos como los siguientes:</p>
+				<ul>
+					<li>Reglas de los editores.</li>
+					<li>Violación comprobada del derecho patrimonial..</li>
+					<li>Requerimientos legales y violaciones probadas.</li>
+					<li>Seguridad nacional</li>
+					<li>Investigación falsificada.</li>
+				</ul>
+				<p>
+					Los ítems retirados no son removidos del repositorio, pero sí de la vista pública.
+				</p>
+		
+
+				<h1 id="metadatos">Política de metadatos</h1>
+				<p>
+				   Los metadatos son la información descriptiva que se aplica sobre un recurso para facilitar su organización,
+				   recuperación, preservación e interoperabilidad. Para catalogar una obra, rel repositorio utiliza un perfil 
+				   de aplicación dependiente de la tipología documental. Dicho perfil se compone a partir de otros formatos 
+				   como: DC extendido, ETD, MODS, entre otros. 
+				</p>
+				<p>
+				   Todos los registros de metadatos de las obras depositadas en el repositorio son diseminadas a partir de 
+				   protocolos de interoperabilidad bajo formato Dublin Core y similares. 
+				   El acceso a estos metadatos es libre y gratuito, y se fomenta su reuso en cualquier medio sin permisos previos, 
+				   bajo la condición de mantener el identificador/enlace persistente (Handle) al registro original de metadatos 
+				   disponible en el portal http://sedici.unlp.edu.ar. 
+				</p>
+ 
+				<h1 id="servicios">Política de servicios</h1>
+				<p><b>Servicios para usuarios:</b></p>
+				<ul>
+					<li>Acceso público a contenidos desde el portal a partir de búsqueda y navegación, documentos destacados y 
+					listado de últimos recursos agregados. 
+					</li>
+					<li>Suscripción a contenidos de colecciones por email y canales de noticias RSS.</li>
+					<li>Difusión de novedades: redes sociales: Facebook, Twitter, blog.</li>
+					<li>Exposición de procedimientos internos a partir de recursos disponibles en el repositorio y de 
+						páginas complementarias: instructivos, manuales, preguntas frecuentes, ayuda, entre otros.
+					</li>
+					<li>Soporte a usuarios: a partir de vías tradicionales, email y foros.</li>
+				</ul> 
+				<br/>
+				<p><b>Servicios para autores:</b></p>
+				<ul>
+					<li>Asesoría en cuestiones de políticas de autoarchivo de las editoriales.</li>
+					<li>Links a sitios especiales: DOAJ, Sherpa-Romeo</li>
+					<li>Participación en talleres sobre acceso abierto.</li>
+				</ul>
+				<br/> 
+				<p><b>Servicios para repositorios:</b></p>
+				<p>
+				<ul>
+					<li>Curso sobre repositorios.</li>
+					<li>Manuales internos y artículos propios en congresos del área.</li>
+				</ul>
+				</p>
+				
+				<h1>Aclaraciones: </h1>
+				<p style="font-size:11px;">
+					 <b id="fnVersiones">Artículos preprints y postprints</b>. Los preprints son las versiones enviadas por los autores para
+					 ser evaluadas por un comité de pares de una revista científica. Los postprints pueden ser de  autor o
+					 de editor y hacen referencia a los artículos que han pasado la evaluación de los pares. Los postprints 
+					 de autor son las versiones aceptadas de los artículos en que el autor ha incorporado las sugerencias del
+					 comité de pares para mejorar el texto mientras que los postprints de editor son las versiones finales
+					 publicadas que suelen incluir el logo del editor, cambios de formato y de maquetación. Mas información en 
+					 http://sherpa.ac.uk/romeo/definitions.php#prepostprints 
+				</p>
+			</div>
+		</div>
+	</body>
+
+
+</document>

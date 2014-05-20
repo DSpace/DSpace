@@ -1,0 +1,1308 @@
+<?xml version="1.0"?>
+<!DOCTYPE input-forms SYSTEM "input-forms.dtd">
+
+
+<input-forms>
+
+	<!-- The form-map maps collection handles to forms. DSpace does not -->
+	<!-- require that a collection's name be unique, even within a community 
+		. -->
+	<!-- DSpace does however insure that each collection's handle is unique. -->
+	<!-- Form-map provides the means to associate a unique collection name -->
+	<!-- with a form. The form-map also provides the special handle "default" -->
+	<!-- (which is never a collection), here mapped to "traditional". Any -->
+	<!-- collection which does not appear in this map will be associated with -->
+	<!-- the mapping for handle "default". -->
+
+	<form-map>
+		<name-map collection-handle="default" form-name="traditional" />
+	</form-map>
+
+
+	<!-- The form-definitions map lays out the detailed definition of all the -->
+	<!-- submission forms.Each separate form set has a unique name as an -->
+	<!-- attribute. This name matches one of the names in the form-map. One -->
+	<!-- named form set has the name "traditional"; as this name suggests, -->
+	<!-- it is the old style and is also the default, which gets used when -->
+	<!-- the specified collection has no correspondingly named form set. -->
+	<!-- -->
+	<!-- Each form set contains an ordered set of pages; each page defines -->
+	<!-- one submission metadata entry screen. Each page has an ordered list -->
+	<!-- of field definitions, Each field definition corresponds to one -->
+	<!-- metatdata entry (a so-called row), which has a DC element name, a -->
+	<!-- displayed label, a text string prompt which is called a hint , and -->
+	<!-- an input-type. Each field also may hold optional elements: DC -->
+	<!-- qualifier name, a repeatable flag, and a text string whose presence -->
+	<!-- serves as a 'this field is required' flag. -->
+
+	<form-definitions>
+
+		<form name="traditional">
+
+			<page number="1">
+
+				<!-- /////////////////// SELECCION DE TIPO Y SUBTIPO /////////////////// -->
+				
+				<!-- Tipo de documento: determina la carga de otros metadatos -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>type</dc-element>
+					<label>Tipo de documento (*)</label>
+					<input-type value-pairs-name="common_types">dropdown</input-type>
+					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
+					<required>Debe seleccionar un tipo de documento, ya que el proceso de carga dependerá de su elección</required>
+				</field>
+
+				<!-- 
+				Sub-tipo de documento: clasificación específica hecha por administradores.
+				Dado que no hay manera de hacer dos combos dependientes, se genera una combo para cada 
+				posible tipo de documento seleccionado en el campo anterior (dc.type).
+				Esto, además de ser una solución muy mala, tiene el problema de que las opciones que 
+				se ofrecen en el workflow son solo aquellas que corresponden al tipo principal seleccionado
+				en el proceso de submit. Si se desea cambiar el tipo principal del documento, primero debe
+				pasarse a la pagina siguiente (para que se actualice el valor del metadato dc.type) y luego
+				volver a esta pagina.
+				La ventaja de esta solución "mala" es que es muy rápida. :)
+				-->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Artículo (*)</label>
+					<input-type value-pairs-name="common_subtypes_articulo">dropdown</input-type>
+					<hint>Seleccione el tipo de artículo que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Articulo</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Tesis (*)</label>
+					<input-type value-pairs-name="common_subtypes_tesis">dropdown</input-type>
+					<hint>Seleccione el tipo de tesis que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Tesis</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Libro (*)</label>
+					<input-type value-pairs-name="common_subtypes_libro">dropdown</input-type>
+					<hint>Seleccione el tipo de libro que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Libro</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Objeto Físico (*)</label>
+					<input-type value-pairs-name="common_subtypes_objeto_fisico">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto físico que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de objeto físico</required>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto Fisico</type-bind>
+				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Objeto de Aprendizaje (*)</label>
+					<input-type value-pairs-name="common_subtypes_objeto_de_aprendizaje">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto de aprendizaje que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de objeto de aprendizaje</required>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto de aprendizaje</type-bind>
+				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Objeto de Conferencia (*)</label>
+					<input-type value-pairs-name="common_subtypes_objeto_conferencia">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto de conferencia</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Documento Institucional (*)</label>
+					<input-type value-pairs-name="common_subtypes_documento_institucional">dropdown</input-type>
+					<hint>Seleccione el tipo de documento institucional que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Documento institucional</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Imagen Fija (*)</label>
+					<input-type value-pairs-name="common_subtypes_imagen_fija">dropdown</input-type>
+					<hint>Seleccione el tipo de imagen fija que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Imagen fija</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Imagen en Movimiento (*)</label>
+					<input-type value-pairs-name="common_subtypes_imagen_movimiento">dropdown</input-type>
+					<hint>Seleccione el tipo de imagen en movimiento que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Imagen en movimiento</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Audio (*)</label>
+					<input-type value-pairs-name="common_subtypes_audio">dropdown</input-type>
+					<hint>Seleccione el tipo de audio que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>Audio</type-bind>
+				</field>
+
+				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
+
+
+                <!-- Interprete en los Audios -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>interprete</dc-qualifier>
+					<repeatable>true</repeatable>
+					<input-type>onebox</input-type>
+					<label>Interprete</label>
+					<hint>Seleccione el interprete del audio</hint>
+					<type-bind>Audio</type-bind>
+				</field>
+
+				<!-- Autor (persona) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>person</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Autor (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Autores de la obra</hint>
+					<required>Debe indicar al menos un autor</required>
+					<required-on-group>!SeDiCIAdmin</required-on-group>
+				</field>
+
+				<!-- Autor Institucional (institucion) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>corporate</dc-qualifier>
+					<label>Autor Institucional</label>
+					<input-type>onebox</input-type>
+					<hint>Cuando la autoría de la obra no se puede asignar a una persona en particular, el autor es la institución en donde la obra se genera</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Título (principal) -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<label>Título (*)</label>
+					<input-type>textarea</input-type>
+					<hint>El título principal de la obra </hint>
+					<required>El ingreso de un título es obligatorio</required>
+					<i18n>true</i18n>
+				</field>
+
+				<!-- Subtítulo (principal) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>title</dc-element>
+					<dc-qualifier>subtitle</dc-qualifier>
+					<label>Subtítulo</label>
+					<input-type>textarea</input-type>
+					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
+					<i18n>true</i18n>
+				</field>
+
+				<!-- Título alternativo -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>title</dc-element>
+					<dc-qualifier>alternative</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Título alternativo</label>
+					<input-type>onebox</input-type>
+					<hint>Otros títulos con los que se conoce la obra, traducciones del título, etc. Si el título alternativo incluye un subtítulo, éste debe indicarse usando "::" (ej: titulo alternativo :: subtitulo)</hint>
+					<visibility>workflow</visibility>
+					<i18n>true</i18n>
+				</field>
+
+				<!-- Título del libro (solo para capitulos de libro) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>bookTitle</dc-qualifier>
+					<label>Título del libro</label>
+					<input-type>onebox</input-type>
+					<hint>En el caso de capítulos, indicar aquí el título del libro al que pertenence</hint>
+					<type-bind>Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Idioma del recurso -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>language</dc-element>
+					<label>Idioma (*)</label>
+					<input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+					<hint>Idioma principal de la obra</hint>
+					<required>Debe indicar el idioma principal de la obra</required>
+					<type-bind>Articulo,Tesis,Libro,Objeto de conferencia,Documento institucional,Imagen fija,Imagen en movimiento,Audio</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Fecha de publicación (solo en el submit, para todos los tipos de documento excepto Tesis y Objetos de conferencia) -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<label>Fecha de Publicación</label>
+					<input-type>date</input-type>
+					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
+					<visibility>submit</visibility>
+					<type-bind>Articulo,Libro,Documento institucional,Imagen fija,Imagen en movimiento,Audio</type-bind>
+				</field>
+
+				<!-- Fecha de publicación (solo en el workflow, para todos los tipos de documento) -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>issued</dc-qualifier>
+					<label>Fecha de Publicación</label>
+					<input-type>date</input-type>
+					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Fecha de creación de un objeto -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>created</dc-qualifier>
+					<label>Fecha de Creación</label>
+					<hint>Fecha de creación o manufacturación del objeto.</hint>
+					<input-type>date</input-type>
+					<type-bind>Objeto Fisico</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Localización fisica -->
+				<field>
+					<dc-schema>mods</dc-schema>
+					<dc-element>location</dc-element>
+					<repeatable>true</repeatable>
+					<label>Localización Física</label>
+					<input-type>onebox</input-type>
+					<hint>URL de acceso al catalogo de la biblioteca o información de acceso al recurso fisico (ej.: Bibhuma). Es obligatorio cuando el recurso no es FULLTEXT</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Alcance Geográfico -->
+				<!-- TODO Hay que hacerlo controlado -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>spatial</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Alcance Geográfico</label>
+					<input-type>onebox</input-type>
+					<hint>Zona geográfica a la que se hace referencia en la obra</hint>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
+				</field>
+
+				<!-- Alcance Temporal -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>temporal</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Alcance Temporal</label>
+					<input-type>onebox</input-type>
+					<hint>Período temporal al que se hace referencia en el texto</hint>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
+				</field>
+
+				<!-- Descripción Física / Extension -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<dc-qualifier>extent</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Extensión</label>
+					<input-type>onebox</input-type>
+					<hint>Cantidad de páginas, duración, tamaño, etc</hint>
+					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
+				</field>
+				
+				<!-- Medio Fisico / Materiales-->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>format</dc-element>
+					<dc-qualifier>medium</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Materiales</label>
+					<input-type>onebox</input-type>
+					<hint>Materiales que conforman el objeto.</hint>
+					<visibility>workflow</visibility>
+					<type-bind>Objeto Fisico</type-bind>
+				</field>
+
+				<!-- Fulltext -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>fulltext</dc-qualifier>
+					<label>Texto completo (*)</label>
+					<input-type value-pairs-name="boolean_values">dropdown</input-type>
+					<hint>Indica si se cuenta con el texto completo de la obra</hint>
+					<required>Debe indicar si se cuenta con el documento completo</required>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Entidad de origen -->
+				<field>
+					<dc-schema>mods</dc-schema>
+					<dc-element>originInfo</dc-element>
+					<dc-qualifier>place</dc-qualifier>
+					<label>Entidad de origen (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Institución donde el documento fue creado</hint>
+					<required>Debe seleccionar la institución de origen del documento</required>
+				</field>
+			<!-- Abstract -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>abstract</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Resumen</label>
+					<input-type>textarea</input-type>
+					<hint>Resumen de la obra</hint>
+					<i18n>true</i18n>
+				</field>
+
+				<!-- Keywords -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>keyword</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Palabras clave</label>
+					<input-type>onebox</input-type>
+					<hint>Palabras o terminos extraídos del documento</hint>
+					<i18n>true</i18n>
+				</field>
+				<!-- Período de embargo -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>embargo</dc-element>
+					<dc-qualifier>period</dc-qualifier>
+					<label>Período de Embargo</label>
+					<input-type value-pairs-name="embargo_periods">dropdown</input-type>
+					<hint>Seleccione el período de embargo que se aplicará sobre la obra</hint>
+				    <visibility>workflow</visibility>
+				</field>
+
+				<!-- Localización electrónica -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>uri</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Localización electrónica</label>
+					<input-type>onebox</input-type>
+					<hint>URL de acceso al recurso</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+			</page>
+
+			<page number="2">
+
+				
+
+				<!-- Materia (categoria 5 del Tesauro) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>materias</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Materia SeDiCI (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Area temática del recurso extraída del tesauro de materias de SeDiCI</hint>
+					<required>Debe ingresar al menos una materia para el documento</required>
+					<vocabulary>srsc</vocabulary>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Materia (de la lista de encabezamiento de LoC) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>lcsh</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Materia LCSH</label>
+					<input-type>onebox</input-type>
+					<hint>Area temática del recurso extraida del tesauro de la Library of Congress</hint>
+					<vocabulary>srsc</vocabulary>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores DECS -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>decs</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores DECS</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del tesauro DECS</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores Eurovoc -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>eurovoc</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores Eurovoc</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del tesauro Eurovoc</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores acmcss98 -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>acmcss98</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores ACM</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del Sist de clasificacion ACM98</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores libres -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>other</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Otros descriptores</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso. Texto libre</hint>
+					<visibility>workflow</visibility>
+					<i18n>true</i18n>
+				</field>
+
+				<!-- Descriptores SeDiCI y Unesco (solo edicion) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>descriptores</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores SeDiCI (sólo para edición)</label>
+					<input-type>onebox</input-type>
+					<hint>Términos de los tesauros SeDiCI y Unesco que ya no se usan. Este campo existe solo a los efectos de editar los valores cargados en el pasado</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- ISSN -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>issn</dc-qualifier>
+					<label>ISSN</label>
+					<input-type>onebox</input-type>
+					<hint>ISSN de la revista en la que el artículo fué publicado</hint>
+					<type-bind>Libro, Articulo,Objeto de conferencia</type-bind>
+				</field>
+
+				<!-- ISBN - TESIS (opcional) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>isbn</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>ISBN</label>
+					<input-type>onebox</input-type>
+					<hint>Introduzca aquí el número de ISBN de su obra sólo si ésta ya lo tiene</hint>
+					<type-bind>Tesis,Objeto de conferencia</type-bind>
+				</field>
+
+				<!-- Nro de Acta - TESIS (opcional) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>acta</dc-element>
+					<label>Nro de acta</label>
+					<input-type>onebox</input-type>
+					<hint>Número de acta de aprobación de la tesis</hint>
+					<type-bind>Tesis</type-bind>
+				</field>
+				
+				<!-- ISBN - LIBROS (obligatorio) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>isbn</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>ISBN</label>
+					<input-type>onebox</input-type>
+					<hint>El código ISBN correspondiente al libro</hint>
+					<required>Debe ingresar el ISBN del libro</required>
+					<type-bind>Libro</type-bind>
+				</field>
+
+				<!-- Otros identificadores -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<repeatable>true</repeatable>
+					<label>Otros identificadores</label>
+					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+					<hint>Otros códigos de identificación de la obra</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Nombre del Ciclo para los audios -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>ciclo</dc-qualifier>
+					<input-type>onebox</input-type>
+					<label>Programa</label>
+					<hint>Ingrese el ciclo del audio</hint>
+					<type-bind>Audio</type-bind>
+				</field>
+
+				<!-- Titulo de la revista -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>journalTitle</dc-qualifier>
+					<label>Título de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Título de la serie en la que el documento fué publicado</hint>
+					<type-bind>Articulo</type-bind>
+				</field>
+				
+				<!-- Volumen y numero de la revista -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>journalVolumeAndIssue</dc-qualifier>
+					<label>Volúmen y número de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Volúmen y número de la serie en la que el documento fué publicado</hint>
+					<type-bind>Articulo</type-bind>
+				</field>
+
+				<!-- Serie de Libro -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isPartOfSeries</dc-qualifier>
+					<label>Titulo y número de la serie</label>
+					<input-type>onebox</input-type>
+					<hint>Titulo y número de la serie en la que el libro fué publicado</hint>
+					<type-bind>Libro</type-bind>
+				</field>
+
+
+				<!-- Dossier -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>dossier</dc-qualifier>
+					<label>Nombre del Dossier</label>
+					<input-type>textarea</input-type>
+					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
+					<type-bind>Articulo</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Evaluación -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>peerReview</dc-qualifier>
+					<label>Evaluación</label>
+					<input-type value-pairs-name="common_evaluations">dropdown</input-type>
+					<hint>Tipo de evaluación a la que el recurso fue sometido</hint>
+					<type-bind>Articulo,Objeto de conferencia</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Fecha de exposición de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>exposure</dc-qualifier>
+					<label>Fecha de presentación</label>
+					<input-type>date</input-type>
+					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
+					<type-bind>Tesis,Objeto de conferencia, Audio</type-bind>
+				</field>
+
+
+				<!-- Nombre del evento (Obligatorio para Objetos de Conferencia) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>event</dc-qualifier>
+					<label>Nombre del evento</label>
+					<input-type>textarea</input-type>
+					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
+					<type-bind>Objeto de conferencia</type-bind>
+					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
+				</field>
+				
+
+				<!-- Nombre del evento (Opcional para articulos) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>event</dc-qualifier>
+					<label>Nombre del evento</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre del congreso o conferencia en el que este documento fue presentado</hint>
+					<type-bind>Articulo</type-bind>
+				</field>
+
+				<!-- Director de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>director</dc-qualifier>
+					<label>Director de la Tesis</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre del director de la Tesis</hint>
+					<type-bind>Tesis</type-bind>
+				</field>
+
+				<!-- CoDirecotor de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>codirector</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Co-Director de la Tesis</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre de los co-directores de la Tesis</hint>
+					<type-bind>Tesis</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Jurado de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>juror</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Miembros del Jurado</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre de los miembros del jurado que evaluaron el trabajo</hint>
+					<type-bind>Tesis</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Lugar de desarrollo de la tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>institucionDesarrollo</dc-element>
+					<repeatable>true</repeatable>
+					<label>Lugar de desarrollo</label>
+					<input-type>onebox</input-type>
+					<hint>Institución en donde se desarrollo el trabajo de tesis</hint>
+					<type-bind>Tesis</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Grado alcanzado -->
+				<field>
+					<dc-schema>thesis</dc-schema>
+					<dc-element>degree</dc-element>
+					<dc-qualifier>name</dc-qualifier>
+					<label>Grado alcanzado (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Grado al que el tesista accede</hint>
+					<required>Debe seleccionar el Grado Alcanzado</required>
+					<type-bind>Tesis</type-bind>
+				</field>
+
+				<!-- Institución garante -->
+				<field>
+					<dc-schema>thesis</dc-schema>
+					<dc-element>degree</dc-element>
+					<dc-qualifier>grantor</dc-qualifier>
+					<label>Institución garante (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Institución que otorga el título</hint>
+					<required>Debe seleccionar la Institución Garante</required>
+					<type-bind>Tesis</type-bind>
+				</field>
+
+				<!-- Compilador de libro -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>compiler</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Compilador</label>
+					<input-type>onebox</input-type>
+					<hint>Persona que realizó el trabajo de compilación (sólo si aplica)</hint>
+					<type-bind>Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Otros colaboradores (general) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>colaborator</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Colaboradores</label>
+					<input-type>onebox</input-type>
+					<hint>Otros colaboradores de la obra</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Otros colaboradores de un libro -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<repeatable>true</repeatable>
+					<label>Otros colaboradores del Libro</label>
+					<input-type value-pairs-name="common_libro_contributors">qualdrop_value</input-type>
+					<hint>Otros colaboradores del libro</hint>
+					<type-bind>Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Firmante de un documento institucional -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>inscriber</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Firmantes</label>
+					<input-type>onebox</input-type>
+					<hint>Personas que firman la Resolución/Ordenanza</hint>
+					<type-bind>Documento institucional</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Numero de expediente del documento institucional -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>identifier</dc-element>
+					<dc-qualifier>expediente</dc-qualifier>
+					<label>Nº de expediente</label>
+					<input-type>onebox</input-type>
+					<hint>Número de expediente asociado a este documento</hint>
+					<type-bind>Documento institucional</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Editorial -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<label>Editorial</label>
+					<input-type>onebox</input-type>
+					<hint>Editorial encargada de la publicación de la obra</hint>
+					<type-bind>Tesis,Libro</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Produccion -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>publisher</dc-element>
+					<label>Produccion</label>
+					<input-type>onebox</input-type>
+					<hint>Productora encargada de la publicación de la obra</hint>
+					<type-bind>Audio</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Entidad fuente -->
+				<field>
+					<dc-schema>mods</dc-schema>
+					<dc-element>recordInfo</dc-element>
+					<dc-qualifier>recordContentSource</dc-qualifier>
+					<label>Fuente</label>
+					<input-type value-pairs-name="record_content_sources">dropdown</input-type>
+					<hint>Nombre de la entidad y/o sitio web desde donde se obtuvo la información del registro</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+		<!-- Es revisión de -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isReviewOf</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Es revisión de</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) del cual este documento es una revisión</hint>
+					<type-bind>Articulo</type-bind>
+					<visibility>workflow</visibility>
+				</field>
+				
+				<!-- Tiene una revisión -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isReviewedBy</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Es revisado por</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) que es una revisión del recurso en proceso de carga</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Se relaciona con -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>isRelatedWith</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Se relaciona con</label>
+					<input-type>onebox</input-type>
+					<hint>Link a un documento (puede ser externo a SeDiCI) con el cual este documento está relacionado</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+
+				<!-- Notas -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>note</dc-qualifier>
+					<label>Notas</label>
+					<input-type>textarea</input-type>
+					<hint>
+					   Agregue aquí cualquier otra información que considere pertinente para una mejor catalogación de este item
+				    </hint>
+				</field>
+
+			</page>
+
+		</form>
+
+	</form-definitions>
+
+
+	<!-- form-value-pairs populate dropdown and qualdrop-value lists. -->
+	<!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+	<!-- A 'value-pairs' element has a value-pairs-name and a dc-term -->
+	<!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+	<!-- Term this set of value-pairs applies. -->
+	<!-- Current dc-terms are: identifier-pairs, type-pairs, and -->
+	<!-- language_iso-pairs. The name attribute matches a name -->
+	<!-- in the form-map, above. -->
+	<!-- A value-pair contains one 'pair' for each value displayed in the list -->
+	<!-- Each pair contains a 'displayed-value' element and a 'stored-value' -->
+	<!-- element. A UI list displays the displayed-values, but the program -->
+	<!-- stores the associated stored-values in the database. -->
+
+	<form-value-pairs>
+		<value-pairs value-pairs-name="boolean_values">
+			<pair>
+				<displayed-value>SI</displayed-value>
+				<stored-value>true</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>NO</displayed-value>
+				<stored-value>false</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+			<pair>
+				<displayed-value>Otro</displayed-value>
+				<stored-value>other</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>DOI</displayed-value>
+				<stored-value>doi</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Handle</displayed-value>
+				<stored-value>handle</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_libro_contributors" dc-term="identifier">
+			<pair>
+				<displayed-value>Editor</displayed-value>
+				<stored-value>editor</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Traductor</displayed-value>
+				<stored-value>translator</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_types" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Tipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Articulo</displayed-value>
+				<stored-value>Articulo</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Tesis</displayed-value>
+				<stored-value>Tesis</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Libro</displayed-value>
+				<stored-value>Libro</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Objeto Fisico</displayed-value>
+				<stored-value>Objeto Fisico</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Objeto de aprendizaje</displayed-value>
+				<stored-value>Objeto de aprendizaje</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Objeto de conferencia</displayed-value>
+				<stored-value>Objeto de conferencia</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Documento institucional</displayed-value>
+				<stored-value>Documento institucional</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Imagen fija</displayed-value>
+				<stored-value>Imagen fija</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Imagen en movimiento</displayed-value>
+				<stored-value>Imagen en movimiento</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Audio</displayed-value>
+				<stored-value>Audio</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_articulo" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Preprint</displayed-value>
+				<stored-value>Preprint</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Documento de trabajo</displayed-value>
+				<stored-value>Documento de trabajo</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Comunicación</displayed-value>
+				<stored-value>Comunicacion</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Revisión</displayed-value>
+				<stored-value>Revision</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Contribución a revista</displayed-value>
+				<stored-value>Contribucion a revista</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Informe técnico</displayed-value>
+				<stored-value>Informe tecnico</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Artículo</displayed-value>
+				<stored-value>Articulo</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Tesis de doctorado</displayed-value>
+				<stored-value>Tesis de doctorado</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Tesis de maestría</displayed-value>
+				<stored-value>Tesis de maestria</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Tesis de grado</displayed-value>
+				<stored-value>Tesis de grado</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Trabajo de especialización</displayed-value>
+				<stored-value>Trabajo de especializacion</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_libro" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Libro</displayed-value>
+				<stored-value>Libro</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Capítulo de libro</displayed-value>
+				<stored-value>Capitulo de libro</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_objeto_fisico" dc-term="type">
+			<pair>
+				<displayed-value>- Seleccione un subtipo -</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Instrumento musical</displayed-value>
+				<stored-value>Instrumento musical</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_objeto_de_aprendizaje" dc-term="type">
+			<pair>
+				<displayed-value>- Seleccione un subtipo -</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Clase</displayed-value>
+				<stored-value>Clase</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Trabajo práctico</displayed-value>
+				<stored-value>Trabajo practico</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Material complementario</displayed-value>
+				<stored-value>Material complementario</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Programa</displayed-value>
+				<stored-value>Programa</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_objeto_conferencia" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Objeto de conferencia</displayed-value>
+				<stored-value>Objeto de conferencia</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_documento_institucional" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Resolución</displayed-value>
+				<stored-value>Resolucion</stored-value>
+			</pair>
+            <pair>
+				<displayed-value>Ordenanza</displayed-value>
+				<stored-value>Ordenanza</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Documento institucional</displayed-value>
+				<stored-value>Documento institucional</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Imagen fija</displayed-value>
+				<stored-value>Imagen fija</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_imagen_movimiento" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Imagen en movimiento</displayed-value>
+				<stored-value>Imagen en movimiento</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_audio" dc-term="type">
+            <pair>
+                <displayed-value>- Seleccione un Subtipo -</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+				<displayed-value>Audio</displayed-value>
+				<stored-value>Audio</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Entrevista</displayed-value>
+				<stored-value>Entrevista</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Musica</displayed-value>
+				<stored-value>Musica</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Discurso</displayed-value>
+				<stored-value>Discurso</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Testimonio</displayed-value>
+				<stored-value>Testimonio</stored-value>
+			</pair>
+		</value-pairs>
+
+
+		<!-- default language order: (from dspace 1.2.1) "en_US", "en", "es", "de", 
+			"fr", "it", "ja", "zh", "other", "" -->
+		<value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+			<pair>
+				<displayed-value>Español</displayed-value>
+				<stored-value>es</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Inglés</displayed-value>
+				<stored-value>en</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Portugués</displayed-value>
+				<stored-value>pt</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Francés</displayed-value>
+				<stored-value>fr</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Italiano</displayed-value>
+				<stored-value>it</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Alemán</displayed-value>
+				<stored-value>de</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Otro</displayed-value>
+				<stored-value>other</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_evaluations">
+			<pair>
+				<displayed-value>No aplica</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Con revisión por pares</displayed-value>
+				<stored-value>peer-review</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Sin revisión por pares</displayed-value>
+				<stored-value>non-peer-review</stored-value>
+			</pair>
+		</value-pairs>
+
+		<!-- Los valores se guardan en Dias -->
+		<value-pairs value-pairs-name="embargo_periods">
+			<pair>
+				<displayed-value>No aplicar embargo (recomendado)</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>1 Mes</displayed-value>
+				<stored-value>30</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>3 Meses</displayed-value>
+				<stored-value>90</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>6 Meses</displayed-value>
+				<stored-value>180</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>12 meses</displayed-value>
+				<stored-value>365</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>18 Meses</displayed-value>
+				<stored-value>545</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>24 meses</displayed-value>
+				<stored-value>730</stored-value>
+			</pair>
+		</value-pairs>
+
+		<!-- Alternativas de fuentes -->
+		<value-pairs value-pairs-name="record_content_sources">
+			<pair>
+				<displayed-value>No aplica</displayed-value>
+				<stored-value></stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Memoria académica</displayed-value>
+				<stored-value>&lt;a href="http://www.memoria.fahce.unlp.edu.ar" target="_blank"&gt;Memoria académica&lt;/a&gt;</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Naturalis</displayed-value>
+				<stored-value>&lt;a href="http://naturalis.fcnym.unlp.edu.ar" target="_blank"&gt;Naturalis&lt;/a&gt;</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Revistas de la FAHCE</displayed-value>
+				<stored-value>&lt;a href="http://revistas.fahce.unlp.edu.ar" target="_blank"&gt;Revistas de la FAHCE&lt;/a&gt;</stored-value>
+			</pair>
+		</value-pairs>
+
+	</form-value-pairs>
+
+</input-forms>

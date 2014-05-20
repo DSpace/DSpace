@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+	Developed by DSpace @ Lyncode <dspace@lyncode.com>
+ -->
+<Configuration xmlns="http://www.lyncode.com/XOAIConfiguration"
+	identation="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
+	maxListSetsSize="100" stylesheet="static/style.xsl">
+
+	<Contexts>
+		<Context baseurl="request">
+			<Format refid="oaidc" />
+<!-- 			<Format refid="mets" /> -->
+<!-- 			<Format refid="xoai" /> -->
+<!-- 			<Format refid="didl" /> -->
+		</Context>
+		
+		<!--
+			Driver Guidelines:
+		 
+			- http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
+			
+			Page 57 - 58
+		 -->
+		<Context baseurl="driver">
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="driverTransformer"/>
+			<!-- Title : Mandatory -->
+			<Filter refid="titleexistsFilter" />
+			<!-- Creator : Mandatory -->
+			<Filter refid="authorexistsFilter"/>
+			<!-- Possible Document Type : Mandatory -->
+			<Filter refid="driverDocumentSubtypeFilter"/>
+			<!-- Hay bitstreams asociados al item? -->
+			<!-- Localización electrónica (en caso de ser material externo)? -->
+			<Filter refid="driverBundleOriginalOLocalizacionElectronica"/>
+			<!-- Identifier : Mandatory / Sólo alcanza-basta con el dc.identifier.uri - En el repositorio, todos lo tienen por definición-->
+			<!-- Open Access (Downloadable) -->
+		<!-- Éste filtro es quitado debido a que el mismo muestra o no un item según el permiso de LECTURA que tengan todos sus bundles. Si al menos uno de los bundles no tiene permiso de LECTURA, el recurso se considera 'NO accesible'. Como estos permisos puede ser modificados desde la administración, y dicha acción puede ser propenso a desencadenar errores, entonces este filtro no es aplicado en este contexto.-->
+<!-- 			<Filter refid="bitstreamaccessFilter"/> -->
+			<!-- Date : Mandatory  -->
+			<Filter refid="driverDateExistsFilter" />
+			<!-- Language : -->
+			<!-- No filtro por language, porque: o bien todo registro tiene language o está por defecto en español -->
+			<!-- Éste filtro no aplica, ya que verifica que los tipos de documentos coincidan con los definidos en info-eu-repo. Como los tipos que se almacenan en el repositorio son de criterio propio y no respetan completamente los tipos definidos en el estandar, entonces éste filtro es quitado. -->
+<!-- 			<Filter refid="driverdocumenttypeFilter"/>  -->
+			<!-- dc.rights must contain openAccess token -->
+			<!-- RIGHTS : Mandatory -->
+			<!-- Debe existir al menos un dc:rights con algún tipo de AccessRight definido por la info-eu-repo. Mediante la utilización del transformer driver.xsl, se garantizá que siempre exista.-->
+<!-- 			<Filter refid="driveraccessFilter"/>  -->
+			
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="driverSet" />
+			<!-- Metadata Formats -->
+			<Format refid="oaidc"/>
+			<Format refid="mets" />
+			<Format refid="didl" />
+		</Context>
+		
+		<!-- 
+			OpenAIRE Guidelines 1.1:
+			
+			- http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en
+			
+			There is a limitation over the embargoedEndDate parameter:
+			
+			- Predefined DSpace fields don't allow to set this up with a default.
+		 -->
+		<Context baseurl="openaire">
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="openaireTransformer" />
+			<!-- TITLE : Mandatory -->
+			<Filter refid="titleexistsFilter" />
+			<!-- CREATOR : Mandatory -->
+			<Filter refid="authorexistsFilter"/>
+			<!-- Possible DOCUMENT TYPE (same as Driver)-->
+			<Filter refid="driverDocumentSubtypeFilter"/>
+<!-- 			<Filter refid="driverdocumenttypeFilter"/> -->
+			<!-- Hay bitstreams asociados al item? -->
+			<!-- Localización electrónica (en caso de ser material externo)? -->
+			<Filter refid="driverBundleOriginalOLocalizacionElectronica"/>
+			<!-- DATE : Mandatory  -->
+			<Filter refid="driverDateExistsFilter" />
+			<!-- IDENTIFIER : Mandatory - Siempre existe en nuestro repositorio para cada item. -->
+			
+			<!-- RIGHTS : Mandatory -->
+			<!-- Debe existir al menos un dc:rights con algún tipo de AccessRight definido por la info-eu-repo. Mediante la utilización del transformer driver.xsl, se garantizá que siempre exista.-->
+			
+			<!-- dc.relation must has the specified prefix -->
+			<!-- Este filtro no es usado. Se basa en la utilización del concepto Project Identifier, el cual no es utilizado en nuestro repositorio. -->
+<!-- 			<Filter refid="openairerelationFilter" /> -->
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="openaireSet" />
+			<!-- Metadata Formats -->
+			<Format refid="oaidc" />
+<!-- 			<Format refid="mets" /> -->
+		</Context>
+		
+		<Context baseurl="snrd">
+		
+			<!-- Date format, field prefixes, etc are ensured by the transformer -->
+			<Transformer refid="snrdTransformer" />
+
+			<!-- Regla 3 -->
+			<Filter refid="fulltextOnlyFilter"/>
+			
+			<!-- Regla 4 -->
+			<Filter refid="titleexistsFilter" />
+			
+			<!-- Regla 5 -->
+			<Filter refid="authorexistsFilter"/> <!-- OK -->
+			
+<!-- 			<Filter refid="formatExistsFilter"/> -->
+			
+			<Filter refid="existsBundleOriginalFilter"/>
+			
+			<Filter refid="snrddocumentsubtypeFilter"/>
+			
+			<!-- Regla 7 -->
+<!-- 	TBD		<Filter refid="directorExisteParaTesisFilter"/> -->
+			
+			<!-- Regla 8
+			al dope 
+			<Filter refid="dateExistsFilter"/>
+			-->
+			
+			<!-- Regla 9 
+			Deberia ser postfilter 
+			<Filter refid="driverdocumenttypeFilter"/>
+			-->
+			
+			<!-- Regla 10
+			Deberia ser postfilter  
+			<Filter refid="snrddocumenttypeFilter"/>
+			-->
+			<!-- Regla 11
+			no se puede aplicar aqui porque el mime es del bitstream!
+			<Filter refid="formatExistsFilter"/>
+			 -->
+			
+			<!-- Regla 13 
+			al dope
+			<Filter refid="identifierExistsFilter"/>
+			-->
+			
+			<!-- Just an alias, if fact it returns all items within the driver context -->
+			<Set refid="snrdSet" />
+			
+			<!-- Metadata Formats -->
+			<Format refid="oaidc" />
+		</Context>
+	</Contexts>
+	
+	
+	<Formats>
+		<Format id="oaidc">
+			<Prefix>oai_dc</Prefix>
+			<XSLT>metadataFormats/oai_dc.xsl</XSLT>
+			<Namespace>http://www.openarchives.org/OAI/2.0/oai_dc/</Namespace>
+			<SchemaLocation>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</SchemaLocation>
+		</Format>
+		<Format id="mets">
+			<Prefix>mets</Prefix>
+			<XSLT>metadataFormats/mets.xsl</XSLT>
+			<Namespace>http://www.loc.gov/METS/</Namespace>
+			<SchemaLocation>http://www.loc.gov/standards/mets/mets.xsd</SchemaLocation>
+		</Format>
+		<!-- Shows the XOAI internal generated XML -->
+		<Format id="xoai">
+			<Prefix>xoai</Prefix>
+			<XSLT>metadataFormats/xoai.xsl</XSLT>
+			<Namespace>http://www.lyncode.com/xoai</Namespace>
+			<SchemaLocation>http://www.lyncode.com/schemas/xoai.xsd</SchemaLocation>
+		</Format>
+		<Format id="didl">
+			<Prefix>didl</Prefix>
+			<XSLT>metadataFormats/didl.xsl</XSLT>
+			<Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
+			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
+		</Format>
+	</Formats>
+	
+	<Transformers>
+		<Transformer id="driverTransformer">
+			<XSLT>transformers/driver.xsl</XSLT>
+		</Transformer>
+		<Transformer id="openaireTransformer">
+			<XSLT>transformers/openaire.xsl</XSLT>
+		</Transformer>
+		<Transformer id="snrdTransformer">
+			<XSLT>transformers/snrd.xsl</XSLT>
+		</Transformer>
+	</Transformers>
+	
+
+	<Filters>
+		
+		<Filter id="authorexistsFilter">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DSpaceAnyMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>sedici.creator.person</Value>
+				<Value>sedici.creator.corporate</Value>
+				<Value>sedici.creator.interprete</Value>
+				<Value>sedici.contributor.compiler</Value>
+				<Value>sedici.contributor.coordinator</Value>
+				<Value>sedici.contributor.editor</Value>
+				<Value>sedici.contributor.translator</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="titleexistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.title</Value>
+			</Parameter>
+		</Filter>
+		
+<!-- 		<Filter id="authorexistsFilter"> -->
+<!-- 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class> -->
+<!-- 			<Parameter key="field"> -->
+<!-- 				<Value>dc.contributor.author</Value> -->
+<!-- 			</Parameter> -->
+<!-- 		</Filter> -->
+		
+		<Filter id="dateExistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.date</Value>
+			</Parameter>
+		</Filter>
+		
+		<!-- ¿Exists bitstreams associated to the item? -->
+		<!-- No usar este filtro. Utilizar el DspaceExistsBundleOriginalFilter en su lugar. -->
+<!-- 		<Filter id="formatExistsFilter"> -->
+<!-- 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class> -->
+<!-- 			<Parameter key="field"> -->
+<!-- 				<Value>dc.format.mimetype</Value> -->
+<!-- 			</Parameter> -->
+<!-- 		</Filter> -->
+		
+		<Filter id="existsBundleOriginalFilter">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DspaceExistsBundleOriginalFilter</Class>
+		</Filter>
+		
+		<Filter id="identifierExistsFilter">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.format</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="driverdocumenttypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>info:eu-repo/semantics/article</Value>
+				<Value>info:eu-repo/semantics/bachelorThesis</Value>
+				<Value>info:eu-repo/semantics/masterThesis</Value>
+				<Value>info:eu-repo/semantics/doctoralThesis</Value>
+				<Value>info:eu-repo/semantics/book</Value>
+				<Value>info:eu-repo/semantics/bookPart</Value>
+				<Value>info:eu-repo/semantics/review</Value>
+				<Value>info:eu-repo/semantics/conferenceObject</Value>
+				<Value>info:eu-repo/semantics/lecture</Value>
+				<Value>info:eu-repo/semantics/workingPaper</Value>
+				<Value>info:eu-repo/semantics/preprint</Value>
+				<Value>info:eu-repo/semantics/report</Value>
+				<Value>info:eu-repo/semantics/annotation</Value>
+				<Value>info:eu-repo/semantics/contributionToPeriodical</Value>
+				<Value>info:eu-repo/semantics/patent</Value>
+				<Value>info:eu-repo/semantics/other</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="driverBundleOriginalOLocalizacionElectronica">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DspaceExistsBundleOriginalOrElectronicLocationFilter</Class>
+		</Filter>
+		
+		<!-- Sólo se considera fecha de publicación o de exposición (en el caso de las tesis) -->
+		<Filter id="driverDateExistsFilter">
+			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DSpaceAnyMetadataExistsFilter</Class>
+			<Parameter key="fields">
+				<Value>sedici.date.exposure</Value>
+				<Value>dc.date.issued</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="driveraccessFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.rights</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>contains</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>open access</Value>
+				<Value>openAccess</Value>
+			</Parameter>
+		</Filter>
+		
+		<!-- Dejamos tanto objetos textuales como no textuales. Instrumento musical no se exporta -->
+		<Filter id="driverDocumentSubtypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.subtype</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Documento de trabajo</Value>
+				<Value>Preprint</Value>
+				<Value>Articulo</Value>
+				<Value>Comunicacion</Value>
+				<Value>Revision</Value>
+				<Value>Contribuciones a revistas</Value>
+				<Value>Informe tecnico</Value>
+				<Value>Patente</Value>
+				<Value>Tesis de doctorado</Value>
+				<Value>Tesis de maestria</Value>
+				<Value>Tesis de grado</Value>
+				<Value>Libro</Value>
+				<Value>Capitulo de libro</Value>
+				<Value>Objeto de conferencia</Value>
+				<Value>Documento institucional</Value>
+				<Value>Resolucion</Value>
+				<Value>Imagen fija</Value>
+				<Value>Imagen en movimiento</Value>
+				<Value>Audio</Value>
+				<Value>Entrevista</Value>
+				<Value>Musica</Value>
+				<Value>Discurso</Value>
+				<Value>Testimonio</Value>
+				<Value>Clase</Value>
+				<Value>Trabajo practico</Value>
+				<Value>Material complementario</Value>
+				<Value>Programa</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="bitstreamaccessFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAuthorizationFilter</Class>
+		</Filter>
+		<Filter id="openairerelationFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.relation</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>starts_with</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>info:eurepo/grantAgreement/EC/FP</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="snrddocumentsubtypeFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.subtype</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Articulo</Value>
+				<Value>Documento de trabajo</Value>
+				<Value>Revision</Value>
+				<Value>Informe tecnico</Value>
+				<Value>Patente</Value>
+				<Value>Tesis de doctorado</Value>
+				<Value>Tesis de maestria</Value>
+				<Value>Trabajo de especializacion</Value>
+				<Value>Trabajo final de grado</Value>
+				<Value>Tesis de grado</Value>
+				<Value>Libro</Value>
+				<Value>Capitulo de libro</Value>
+				<Value>Objeto de conferencia</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="fulltextOnlyFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.description.fulltext</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>equal</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>true</Value>
+				<Value>si</Value>
+			</Parameter>
+		</Filter>
+		
+	</Filters>
+	
+	<Sets>
+		<Set id="driverSet">
+			<Pattern>driver</Pattern>
+			<Name>Open Access DRIVERset</Name>
+			<!-- Just an alias -->
+		</Set>
+		<Set id="openaireSet">
+			<Pattern>ec_fundedresources</Pattern>
+			<Name>EC_fundedresources set</Name>
+			<!-- Just an alias -->
+		</Set>
+		<Set id="snrdSet">
+			<Pattern>snrd</Pattern>
+			<Name>Conjunto de recursos para Sistema Nacional de Repositorios Digitales, Argentina SNRD</Name>
+			<!-- Just an alias -->
+		</Set>
+	
+	</Sets>
+</Configuration>

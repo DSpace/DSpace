@@ -1,0 +1,25 @@
+# Rejection email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  Name of the rejector
+# {3}  Reason for the rejection
+#
+Subject: Repositorio SeDiCI, UNLP - Su envío no fue aceptado 
+
+Estimado usuario, 
+
+Se ha rechazado la incorporacion su envío "{0}" a la colección "{1}" con la siguiente explicación:
+
+{3}
+
+Tenga en cuenta que su envío no ha sido borrado, puede acceder a él a través de la página de "Carga de documentos": http://sedici.unlp.edu.ar/submissions 
+
+Muchas gracias. 
+Cordialmente, 
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

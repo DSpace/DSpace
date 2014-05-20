@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+<body>
+<div id="file.news.div.news" n="news" rend="primary">
+<head>DSpace/Manakin Repository</head>
+<p>El <strong>Servicio de Difusión de la Creación Intelectual</strong> es el 
+Repositorio Institucional de la Universidad Nacional de La Plata, un servicio libre y gratuito 
+creado para albergar, preservar y dar visibilidad a las producciones de las Unidades Académicas 
+de la Universidad.</p>
+</div>
+</body>
+<options/>
+<meta>
+<userMeta/>
+<pageMeta/>
+<repositoryMeta/>
+</meta>
+</document>

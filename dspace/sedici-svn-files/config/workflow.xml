@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wf-config>
+
+    <workflow-map>
+        <name-map collection="default" workflow="default"/>
+        <name-map collection="10915/50" workflow="autoarchive"/>
+    </workflow-map>
+
+    <!--Workflow modificado para SeDiCI-->
+    <!-- 
+    	Roles:
+    	- CollectionAdmin: revisores a nivel de coleccion (ej.: bibliotecarios) a quienes se delega
+    					una primera revisión y corrección de los documentos enviados.
+    	- SeDiCIAdmin: revisores para todas las colecciones. Se corresponde con un Group en la aplicación,
+    					 cuyos miembros son responsables de la revisión y aceptación final de cada 
+    					 documento (haya pasado o no por la revisión del CollectionAdmin)
+    					 
+    	Pasos de revisión:
+    	- (Paso 1) CollectionLevelReview: ejecutable por el rol CollectionAdmin. Su ejecución se
+    					   determina a nivel de Collection, creando el grupo COLLECTION_X_WORKFLOW_ROLE_CollectionAdmin 
+    					   (desde la administración de la colección X) y asignando usuarios al mismo. Si este grupo 
+    					   no existe o no posee usuarios, este paso del workflow se omite y el recurso pasa 
+    					   directamente al siguiente paso.
+    	- (Paso 2) SeDiCILevelReview: ejecutable por el rol SeDiCIAdmin. La intención es que siempre se ejecute este paso,
+    					   obligando así a revisar todos los recursos enviados.
+    					   
+    	Si bien los pasos son ejecutados por roles distintos, la acción de cada uno es la misma: Editar/Aceptar/Rechazar.
+    	Esto es para que tanto a nivel local (colección) como a nivel global (administradores de SeDiCI) exista la posibilidad de 
+    	editar los metadatos de un envío, rechazarlo o bien aceptarlo (para pasar al paso 2 o archivarlo en DSpace según corresponda).
+    	
+    	
+    	Coleccion de Autoarchivo:
+    	
+    	Para la coleccion de autoarchivo se utiliza un workflow especial que incluye una Action adicional para la seleccion de la
+    	colección en la que se instalará el ítem.
+     -->
+     
+    <!-- Workflow general -->
+    <workflow start="CollectionLevelReview" id="default">
+
+        <roles>
+            <role id="CollectionAdmin" name="CollectionAdmin" scope="collection" description="Este paso le permite a un revisor de la Colección, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
+            <outcomes>
+                <step status="0">SeDiCILevelReview</step>
+            </outcomes>
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+    </workflow>
+
+	<!-- Workflow para la coleccion de autoarchivo -->
+    <workflow start="CollectionLevelReview" id="autoarchive">
+
+        <roles>
+            <role id="CollectionAdmin" name="CollectionAdmin" scope="collection" description="Este paso le permite a un revisor de la Colección, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
+            <outcomes>
+                <step status="0">SeDiCILevelReview</step>
+            </outcomes>
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+                <action id="selectcollectionaction"/>
+            </actions>
+        </step>
+        
+    </workflow>
+
+
+</wf-config>

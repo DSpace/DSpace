@@ -1,0 +1,31 @@
+# E-mail sent with the information filled out in a suggest form.
+#
+# Parameters: {0} recipient name
+#             {1} sender name
+#             {2} repository name
+#             {3} item title
+#             {4} item handle URI
+#             {5} item local URL - may be used in lieu of {4} if not using handle server
+#             {6} collection name
+#             {7} sender message 
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Items de interés en SeDiCI
+
+Hola {0}:
+
+{1} solicité que le enviáramos este e-mail sobre un item disponible en {2}.
+
+Título: {3}
+Ubicación: {5}
+En la colección: {6}
+Mensaje personal: {7}
+
+El SeDiCI es el repositorio institucional de la UNLP. Se encarga de capturar, almacenar, catalogar, preservar y distribuir la producciń intelectual de la UNLP en formato  digital.
+Para más información, visite sedici.unlp.edu.ar
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

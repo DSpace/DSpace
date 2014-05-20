@@ -1,0 +1,30 @@
+# E-mail sent to designated address when an internal server error occurs
+#
+# Parameters: {0} DSpace server URL
+#             {1} Date & time
+#             {2} Session ID
+#             {3} URL + HTTP parameters, if any
+#             {4} Exception stack trace
+#             {5} User details
+#             {6} IP address
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - Error interno del servidor
+Un error interno del servidor ha ocurrido en {0}:
+
+Fecha:       {1}
+Sesión de ID: {2}
+Usuario:       {5}
+Dirección de IP: {6}
+
+{3}
+
+Excepción:
+{4}
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

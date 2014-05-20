@@ -1,0 +1,40 @@
+RewriteEngine on
+
+#External redirect para accessos a la colección de la radiouniversidad. No quitar
+RewriteRule ^radio(.*)$ /handle/10915/25224$1 [R=permanent,L]
+
+#External redirect para accessos phpoai de sedici2003
+RewriteRule ^phpoai/oai2.php(.*)$ /oai/request$1 [R=permanent,L]
+
+#Internal rewrite
+#De: /ARG-UNLP-EBook-0000000001/1789.pdf
+#A: /search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
+RewriteRule ^([^/]+)/([0-9]+)\.[a-z]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [L,NC]
+
+#Internal rewrite
+#De: /?id=ARG-UNLP-EBook-0000000001
+#De: /index.php?id=ARG-UNLP-ART-0000008109
+#A: /search/request.php?id_document=ARG-UNLP-EBook-0000000001
+RewriteCond %{QUERY_STRING} id=([^&]*)
+RewriteRule ^([^/]*)$ search/request.php?id_document=%1 [L,NC]
+
+#Internal rewrite
+#De: /static/redirector.php?adress=oai/oai
+#A: /static/oai/oai.php
+RewriteCond %{QUERY_STRING} ^.*adress=([^&]*).*$
+RewriteRule ^static/redirector.php(.*)$ static/%1.php [L]
+
+#Internal rewrite al aspecto de redirección de DSpace
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !redirect.php$
+RewriteCond %{REQUEST_URI} \.php$ [OR]
+RewriteCond %{REQUEST_URI} ^/autoarchivo/.*
+RewriteRule ^(.*)$ /redirect.php?old_url=\/$1\&%{QUERY_STRING}  [L]
+
+###################################################
+###################################################
+
+#Canalizo todo hacia dspace por mod_proxy (el proxy se configura desde el virtual host)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ ajp://localhost:8009/$1 [P]
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2011 SeDiCI <info@sedici.unlp.edu.ar>
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!--
+
+The BrowseArtifacts Aspect is responsible for browsing communities /
+collections / items / and bitstreams.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+
+        <map:transformers>
+            <map:transformer name="ShowNews" src="ar.edu.unlp.sedici.aspect.news.ShowNews"/>
+        </map:transformers>
+
+        <map:matchers default="wildcard">
+                <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+                <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+        </map:matchers>
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+
+            <!--
+                    Navigation links to browse the repository.
+                    - This includes links that are relative to the currently
+            -->
+
+            <map:match pattern="">
+                <map:transform type="ShowNews">
+                     <map:parameter name="id" value="feed"/>            
+                </map:transform>
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>
