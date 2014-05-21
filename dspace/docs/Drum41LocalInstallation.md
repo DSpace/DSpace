@@ -378,6 +378,17 @@ dspace.baseUrl = http://localhost:8080
 
 solr.server = http://localhost:8983/solr
 
+
+# Stackable Authentication Methods
+security.plugins.stack = \
+        org.dspace.authenticate.IPAuthentication, \
+        org.dspace.authenticate.CASAuthentication, \
+        org.dspace.authenticate.PasswordAuthentication
+
+# IP Authentication 
+authentication.ip = 
+
+
 # CAS LDAP CONFIGURATION 
 ldap.bind.auth = <ENTER-UMD-LDAP-AUTH-INFO-HERE>
 ldap.bind.password = <ENTER-UMD-LDAP-PASSWORD-HERE>

@@ -44,6 +44,18 @@ assetstore.dir.1 =
 assetstore.dir.2 = 
 assetstore.dir.3 =
 
+#### Stackable Authentication Methods #####
+security.plugins.stack = \
+        org.dspace.authenticate.IPAuthentication, \
+        org.dspace.authenticate.CASAuthentication, \
+        org.dspace.authenticate.PasswordAuthentication
+############################################
+
+#### IP Authentication #####################
+authentication.ip = 
+############################################
+
+
 ##########################
 # CAS LDAP CONFIGURATION #
 ##########################
