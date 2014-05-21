@@ -1,4 +1,4 @@
-# Email sent to DSpace users when they successfully batch import items via BTE.
+# Email sent to DRUM users when they successfully batch import items via BTE.
 #
 # Parameters: {0} the filepath to the mapfile created by the batch import
 #          
@@ -11,5 +11,5 @@ The batch item import you initiated from the DSpace UI has completed successfull
 You may find the mapfile for the import in the following path: {0}
 
 
-The DSpace Team
+The DRUM Team
 

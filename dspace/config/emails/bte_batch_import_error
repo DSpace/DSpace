@@ -1,4 +1,4 @@
-# Email sent to DSpace users when they BTE batch import fails.
+# Email sent to DRUM users when they BTE batch import fails.
 #
 # Parameters: {0} the export error
 #             {1} the URL to the feedback page
@@ -15,5 +15,4 @@ For more information you may contact your system administrator:
 
 
 
-The DSpace Team
-
+The DRUM Team

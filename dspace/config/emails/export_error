@@ -1,4 +1,4 @@
-# Email sent to DSpace users when they successfully export an item or collection.
+# Email sent to DRUM users when they successfully export an item or collection.
 #
 # Parameters: {0} the export error
 #             {1} the URL to the feedback page
@@ -15,5 +15,5 @@ For more information you may contact your system administrator:
 
 
 
-The DSpace Team
+The DRUM Team
 

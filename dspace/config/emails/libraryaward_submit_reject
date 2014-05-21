@@ -1,4 +1,4 @@
-# Rejection email message
+Rejection email message
 #
 # {0}  Title of submission
 # {1}  Name of collection
@@ -12,7 +12,7 @@ You submitted: {0}
 
 To collection: {1}
 
-Your submission has been rejected by {2}
+Your submission has been rejected by the Review Committee (drum-help@umd.edu)
 with the following explanation:
 
 {3}
@@ -20,4 +20,4 @@ with the following explanation:
 Your submission has not been deleted.  You can access it from your
 "My DRUM" page: {4}
 
-DRUM
+Review Committee for the Library Award for Undergraduate Research
