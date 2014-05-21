@@ -218,7 +218,7 @@ def parseargs():
     parser.add_option("-r", "--root", dest="root",
                   help="Required: DSpace community, collection, or item"); 
     parser.add_option("-s", "--store", dest="storedir",
-                  help="directory containing trace files and generated bitstreams, default: " + STORE_DIR  + "/<ROOT_PARAM>" )
+                  help="directory containing trace files and generated bitstreams, default: " + STORE_DIR )
     parser.add_option( "-W", "--doWorkFlowItems", 
                   action="store_true", dest="workFlowItemsOnly", default=False,
                   help="Restrict to working on items in workflow "); 
