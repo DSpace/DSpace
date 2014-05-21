@@ -490,13 +490,14 @@ $ cd /apps/servers/drum/tomcat411
 $ ./control start
 ```
 
-* Refresh Browse and Search Indexes
+* Refresh Browse and Search  and OAI Indexes
  
 Run command from the Drum 4.1 installation directory (Tomcat & Solr should be up and running)
 
 ```
 $ cd /apps/drum 
 $ bin/dspace index-discovery -f
+$ bin/dspace oai import
 ```
 
 * Create administrator account (optional, unlless you have UMD CAS account in the current  DSpace with Administrator permissions). Please, note the user account is identified by email id.
