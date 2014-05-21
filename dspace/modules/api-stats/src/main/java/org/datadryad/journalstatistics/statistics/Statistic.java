@@ -31,8 +31,8 @@ public class Statistic<T> {
         return name;
     }
 
-    public void foo() {
-        this.value = extractor.extract("foo");
+    public void extractAndStore(String journalName) {
+        this.value = extractor.extract(journalName);
     }
 
 }
