@@ -55,6 +55,9 @@ security.plugins.stack = \
 authentication.ip = 
 ############################################
 
+#### LDAP Authentication Configuration Settings ####
+enable.ldap = 
+############################################
 
 ##########################
 # CAS LDAP CONFIGURATION #

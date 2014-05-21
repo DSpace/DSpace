@@ -388,6 +388,9 @@ security.plugins.stack = \
 # IP Authentication 
 authentication.ip = 
 
+# LDAP Authentication Configuration Settings
+enable.ldap = 
+
 
 # CAS LDAP CONFIGURATION 
 ldap.bind.auth = <ENTER-UMD-LDAP-AUTH-INFO-HERE>
