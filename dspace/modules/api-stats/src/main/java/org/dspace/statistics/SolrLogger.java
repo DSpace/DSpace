@@ -462,8 +462,10 @@ public class SolrLogger
 
     public static void markRobotsByIP()
     {
+        int ipIndex = 0;
         for(String ip : SpiderDetector.getSpiderIpAddresses()){
-
+            ipIndex++;
+            log.debug("Marking robot " + ip + " (" + ipIndex + " of " + SpiderDetector.getSpiderIpAddresses().size() + ")");
             try {
 
                 /* Result Process to alter record to be identified as a bot */
