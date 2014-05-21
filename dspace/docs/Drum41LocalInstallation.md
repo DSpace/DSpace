@@ -373,6 +373,7 @@ $ vi local.properties
 dspace.install.dir=/apps/drum
 dspace.hostname = localhost
 dspace.baseUrl = http://localhost:8080
+my.dspace.url = ${dspace.baseUrl}/jspui
 
 # Solr Server location
 

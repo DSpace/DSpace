@@ -30,6 +30,9 @@ dspace.hostname =
 # DSpace base host URL.  Include port number etc.
 dspace.baseUrl = 
 
+# My DSpace url
+my.dspace.url = ${dspace.baseUrl}/jspui
+
 # Name of the site
 dspace.name = DRUM 4.1
 
