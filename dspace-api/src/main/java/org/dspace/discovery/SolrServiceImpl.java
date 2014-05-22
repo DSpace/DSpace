@@ -40,6 +40,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -1300,7 +1301,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         log.debug("  Added Grouping");
 
 
-        Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
 
         try {
             // now get full text of any bitstreams in the TEXT bundle
@@ -1318,17 +1318,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     for (Bitstream myBitstream : myBitstreams)
                     {
                         try {
-                            InputStreamReader is = new InputStreamReader(
-                                    myBitstream.retrieve()); // get input
-                            readers.add(is);
 
-                            // Add each InputStream to the Indexed Document
-                            String value = IOUtils.toString(is);
-                            doc.addField("fulltext", value);
+                            doc.addField("fulltext", new AutoCloseInputStream(myBitstream.retrieve()));
 
                             if(hitHighlightingFields.contains("*") || hitHighlightingFields.contains("fulltext"))
                             {
-                                doc.addField("fulltext_hl", value);
+                                doc.addField("fulltext_hl", new AutoCloseInputStream(myBitstream.retrieve()));
                             }
 
                             log.debug("  Added BitStream: "
@@ -1349,16 +1344,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             log.error(e.getMessage(), e);
         }
-        finally {
-            Iterator<InputStreamReader> itr = readers.iterator();
-            while (itr.hasNext()) {
-                InputStreamReader reader = itr.next();
-                if (reader != null) {
-                    reader.close();
-                }
-            }
-            log.debug("closed " + readers.size() + " readers");
-        }
 
         //Do any additional indexing, depends on the plugins
         List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
@@ -1376,6 +1361,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             log.error("Error while writing item to discovery index: " + handle + " message:"+ e.getMessage(), e);
         }
     }
+
+
 
     /**
      * Create Lucene document with all the shared fields initialized.
