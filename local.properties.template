@@ -62,6 +62,10 @@ authentication.ip =
 enable.ldap = 
 ############################################
 
+##### LDAP AutoRegister Settings ##########
+ldap.autoregister = 
+############################################
+
 ##########################
 # CAS LDAP CONFIGURATION #
 ##########################
