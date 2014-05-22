@@ -108,14 +108,7 @@
         </script>
     <%
     }
-    if (extraHeadDataLast != null)
-    { %>
-		<%= extraHeadDataLast %>
-		<%
-		    }
     %>
-
-        
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
