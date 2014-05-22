@@ -190,27 +190,27 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	arreglo.put("by", 6);
 		    	switch (arreglo.get(cc_license)) {
 				case 1:
-					licenseDescription="Creative Commons Atribución-NoComercial-SinDerivadas";
+					licenseDescription="Creative Commons Attribution-NonCommercial-NoDerivs";
 					postfixLicenseDescription="(CC BY-NC-ND 2.5)";
 					break;
 				case 2:
-					licenseDescription="Creative Commons Atribución-NoComercial-CompartirIgual";
+					licenseDescription="Creative Commons Attribution-NonCommercial-ShareAlike";
 					postfixLicenseDescription="(CC BY-NC-SA 2.5)";
 					break;
 				case 3:
-					licenseDescription="Creative Commons Atribución-NoComercial";
+					licenseDescription="Creative Commons Attribution-NonCommercial";
 					postfixLicenseDescription="(CC BY-NC 2.5)";
 					break;
 				case 4:
-					licenseDescription="Creative Commons Atribución-SinDerivadas";
+					licenseDescription="Creative Commons Attribution-NoDerivs";
 					postfixLicenseDescription="(CC BY-ND 2.5)";
 					break;
 				case 5:
-					licenseDescription="Creative Commons Atribución-CompartirIgual";
+					licenseDescription="Creative Commons Attribution-ShareAlike";
 					postfixLicenseDescription="(CC BY-SA 2.5)";
 					break;
 				default:
-					licenseDescription="Creative Commons Atribución";
+					licenseDescription="Creative Commons Attribution";
 					postfixLicenseDescription="(CC BY 2.5)";
 					break;
 				}
@@ -246,20 +246,20 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	
 		    	//cargo los nuevos valores para el metadata 
 		    	licenseUri="http://creativecommons.org/licenses/by";
-		    	licenseDescription="Creative Commons Atribución";
+		    	licenseDescription="Creative Commons Attribution";
 		    	
 		    	if (!commercial.equals("y")){
 		    		licenseUri=licenseUri+"-"+commercial;
 		    		postfixLicenseDescription+="-"+commercial;
-		    		licenseDescription=licenseDescription+"-NoComercial";
+		    		licenseDescription=licenseDescription+"-NonCommercial";
 		    	}
 		    	if (!derivatives.equals("y")){
 		    		licenseUri=licenseUri + "-" + derivatives;
 		    		postfixLicenseDescription+="-"+derivatives;
 		    		if (derivatives=="nd"){
-		    			licenseDescription=licenseDescription+"-SinDerivadas";
+		    			licenseDescription=licenseDescription+"-NoDerivs";
 		    		} else {
-		    			licenseDescription=licenseDescription+"-CompartirIgual";
+		    			licenseDescription=licenseDescription+"-ShareAlike";
 		    		}
 		    	};
 		    	licenseUri=licenseUri+"/"+ ccVersion +"/";
