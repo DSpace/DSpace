@@ -200,3 +200,16 @@ loglevel.other = INFO
 loglevel.dspace = INFO
 # loglevel.dspace: Log level for all DSpace-specific code (org.dspace.*)
 # Possible values (from most to least info): DEBUG, INFO, WARN, ERROR, FATAL
+
+############################
+# ADDITIONAL CONFIGURATION #
+############################
+
+# Used by daily subscription mailer
+eperson.subscription.limiteperson =
+
+# Used by daily groovy/update_stats_nightly (stats from apache logs) cron job
+update.stats.apachelog.dir =
+
+# Used by etd loader cron job
+etdloader.transfermarc =

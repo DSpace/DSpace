@@ -425,6 +425,16 @@ mail.etd.recipient =
 # HANDLE CONFIGURATION 
 handle.prefix = 123456789
 
+### ADDITIONAL CONFIGURATION 
+
+#### Used by daily subscription mailer
+eperson.subscription.limiteperson =
+
+#### Used by daily groovy/update_stats_nightly (stats from apache logs) cron job
+update.stats.apachelog.dir =
+
+#### Used by etd loader cron job
+etdloader.transfermarc =
 
 
 ```
