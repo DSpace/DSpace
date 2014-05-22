@@ -504,7 +504,11 @@ public class BrowseListTag extends TagSupport
                     Any other metadata fields present in webui.itemlist.colums
                     will be include in a single column.
                 */
-                out.print("<div class=\"col-md-10 col-sm-10 col-xs-10\">");
+                String colSize = "col-md-10 col-sm-10 col-xs-10";
+                if(linkToEdit){
+                    colSize = "col-md-8 col-sm-8 col-xs-10";
+                }
+                out.print("<div class=\""+colSize+"\">");
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
                 {
                     String field = fieldArr[colIdx];
@@ -707,18 +711,23 @@ public class BrowseListTag extends TagSupport
                 /*  damanzano:
                     We don´t need this in our browse results layout
                 */
-//                // Add column for 'edit item' links
-//                if (linkToEdit)
-//                {
-//                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
-//
+                // Add column for 'edit item' links
+                if (linkToEdit)
+                {
+                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
+
 //                    out.print("<td headers=\"" + id + "\" class=\""
 //                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
 //                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
 //                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
 //                        + "<input type=\"submit\" value=\"Edit Item\" /></form>"
 //                        + "</td>");
-//                }
+                    out.print("<div headers=\"" + id + "\" class=\"col-md-2 col-sm-2 col-xs-12\" >"
+                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+                        + "<input class=\"btn btn-primary pull-right\" type=\"submit\" value=\"Edit Item\" /></form>"
+                        + "</div>");
+                }
 
                 //out.println("</tr>");
                 out.println("</div>");
