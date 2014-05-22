@@ -419,7 +419,6 @@ mail.registration.notify = <ENTER-AN-EMAIL-ADDRESS-HERE>
 
 ## ETD Loader Email settings (optional)
 
-heckman.recipient =
 mail.etdmarc.recipient =
 mail.etd.recipient =
 
