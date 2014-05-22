@@ -25,7 +25,7 @@ GetCmdLine();
 # Get directories
 chomp($bindir = `dirname $0`);
 
-$ENV{JAVA_OPTS}  = " -Dlog4j.configuration=log4j-etdloader.properties";
+$ENV{JAVA_OPTS} .= " -Dlog4j.configuration=log4j-etdloader.properties";
 $ENV{JAVA_OPTS} .= " -Ddspace.log.init.disable=true";
 $ENV{JAVA_OPTS} .= " -Detdloader.zipfile=$zipfile";
 $ENV{JAVA_OPTS} .= " -Detdloader.marcfile=$marcfile" if (defined $marcfile);
