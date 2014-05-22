@@ -147,6 +147,10 @@ mail.alert.recipient =
 #mail.registration.notify = email-address-here
 mail.registration.notify = 
 
+# ETD Loader Email settings
+heckman.recipient = 
+mail.etdmarc.recipient = 
+mail.etd.recipient = 
 
 ########################
 # HANDLE CONFIGURATION #

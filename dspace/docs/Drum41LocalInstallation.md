@@ -417,6 +417,11 @@ mail.admin = <ENTER-AN-EMAIL-ADDRESS-HERE>
 mail.alert.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
 mail.registration.notify = <ENTER-AN-EMAIL-ADDRESS-HERE>
 
+## ETD Loader Email settings (optional)
+
+heckman.recipient =
+mail.etdmarc.recipient =
+mail.etd.recipient =
 
 # HANDLE CONFIGURATION 
 handle.prefix = 123456789
