@@ -175,4 +175,9 @@ class MetaDataArguments extends  Arguments {
                 schema + "." + element + "." + String.valueOf(qualifier) + ") " +
                 "=" + metaData_value);
    }
+
+    @Override
+    public void shortDescription() {
+        System.out.println("ADD metaData value to or DELete value from all dspaceObjects of given type contained in root");
+    }
 }

@@ -199,6 +199,9 @@ class Arguments {
         myhelp.printHelp(mainClass + "\n", options);
         System.out.println("");
 
+        shortDescription();
+        System.out.println("");
+
         System.out.println("OPTION " + KEYS_LONG + ": ");
         System.out.println("\tDefault Print Keys: " + deepToString(defaultKeys));
         optionExplainKeys();
@@ -208,16 +211,22 @@ class Arguments {
         description();
     }
 
+    public void shortDescription() {
+        System.out.println("TODO - add short description");
+    }
+
     public void description() {
-        System.out.println("TODO - add description");
+        // TODO - add more detail
+        // for now see README file
     }
 
     protected void optionExplainKeys() {
         System.out.println("\tAvailable Keys depend on the type of object being printed");
         System.out.println("\t\t" + Constants.typeText[Constants.COLLECTION] + ":" + deepToString(ActionTarget.availableKeys(Constants.COLLECTION)));
-        System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)));
+        System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)) + "any metadafield, POLICY.dspace_action");
         System.out.println("\t\t" + Constants.typeText[Constants.BUNDLE] + ":" + deepToString(ActionTarget.availableKeys(Constants.BUNDLE)));
         System.out.println("\t\t" + Constants.typeText[Constants.BITSTREAM] + ":" + deepToString(ActionTarget.availableKeys(Constants.BITSTREAM)));
+        System.out.println("\t\t" + "where dspace_action may be one of:  " + deepToString(Constants.actionText));
     }
 
     public Boolean parseArgs(String[] argv) throws ParseException {

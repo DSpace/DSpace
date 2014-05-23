@@ -151,7 +151,7 @@ public class Lister {
         ca.setLayout(new PatternLayout("# %c: %m%n"));
         log.addAppender(ca);
 
-        Arguments args = new Arguments(Lister.class.getCanonicalName());
+        Arguments args = new ListArguments();
         try {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
@@ -170,6 +170,18 @@ public class Lister {
             args.usage();
             System.exit(1);
         }
+    }
+
+}
+
+class ListArguments extends  Arguments {
+    public ListArguments() {
+        super(Lister.class.getCanonicalName());
+    }
+
+    @Override
+    public void shortDescription() {
+        System.out.println("List dspaceObjects of given type contained in root, printing properties designated by include keys");
     }
 
 }

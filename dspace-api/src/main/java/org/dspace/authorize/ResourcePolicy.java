@@ -7,10 +7,7 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-import java.util.Date;
 import org.apache.log4j.Logger;
-
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -18,6 +15,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+
+import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Class representing a ResourcePolicy
@@ -464,6 +464,6 @@ public class ResourcePolicy
         } catch (SQLException e) {
             who = e.getMessage();
         }
-        return "POLICY." + getID() + "(" +  who + ")";
+        return "POLICY" + "(" +  who + ")";
     }
 }

@@ -182,4 +182,9 @@ class BitstreamsArguments extends Arguments {
         super.printArgs(out, prefix);
         out.println(prefix + " " + Arguments.BITSTREAM_FILE_LONG + "=" + filename);
     }
+
+    @Override
+    public void shortDescription() {
+        System.out.println("Replace bitstream file in BITSTREAM object defined by root");
+    }
 }

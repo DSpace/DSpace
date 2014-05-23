@@ -218,4 +218,10 @@ class PolicyArguments extends Arguments {
         out.println(prefix + " " + WHO_LONG + "=" + whoObj);
         out.println(prefix + " ");
     }
+
+    @Override
+    public void shortDescription() {
+        System.out.println("ADD policy to or DELete policy from all dspaceObjects of given type contained in root");
+    }
+
 }
