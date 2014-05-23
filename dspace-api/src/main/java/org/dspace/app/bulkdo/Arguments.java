@@ -73,6 +73,7 @@ class Arguments {
 
     protected Options options = null;
     protected CommandLine line;
+    protected String mainClass;
 
     private Context c = null;
     private DSpaceObject dobj = null;
@@ -88,11 +89,12 @@ class Arguments {
     private char doAction;
     private char[] availableActions;
 
-    Arguments() {
-        this(null);
+    Arguments(String mainClass) {
+        this(mainClass, null);
     }
 
-    Arguments(char[] myAvailableActions) {
+    Arguments(String mainCmd, char[] myAvailableActions) {
+        mainClass = mainCmd;
         options = new Options();
         availableActions = myAvailableActions;
         doAction = '?';
@@ -194,7 +196,7 @@ class Arguments {
 
     public void usage() {
         HelpFormatter myhelp = new HelpFormatter();
-        myhelp.printHelp("Bulk Apply ActionTarget\n", options);
+        myhelp.printHelp(mainClass + "\n", options);
         System.out.println("");
 
         System.out.println("OPTION " + KEYS_LONG + ": ");
@@ -202,7 +204,12 @@ class Arguments {
         optionExplainKeys();
         System.out.println("");
 
-        System.out.println("TODO: ADD EXPLANATIONS");
+        System.out.println("DESCRIPTION");
+        description();
+    }
+
+    public void description() {
+        System.out.println("TODO - add description");
     }
 
     protected void optionExplainKeys() {

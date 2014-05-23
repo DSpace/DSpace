@@ -122,7 +122,7 @@ class MetaDataArguments extends  Arguments {
     String schema, qualifier, element;
 
     MetaDataArguments() {
-        super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
+        super(MetaData.class.getCanonicalName(), new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
         options.addOption(Arguments.METADATA, Arguments.METADATA_LONG, true, "metadata setting of the form 'schema.ualifier.name=value'");
     }
 

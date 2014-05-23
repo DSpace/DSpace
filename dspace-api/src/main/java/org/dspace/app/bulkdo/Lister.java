@@ -151,7 +151,7 @@ public class Lister {
         ca.setLayout(new PatternLayout("# %c: %m%n"));
         log.addAppender(ca);
 
-        Arguments args = new Arguments();
+        Arguments args = new Arguments(Lister.class.getCanonicalName());
         try {
             if (args.parseArgs(argv)) {
                 Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());

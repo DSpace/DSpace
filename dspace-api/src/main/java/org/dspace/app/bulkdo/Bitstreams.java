@@ -125,7 +125,7 @@ class BitstreamsArguments extends Arguments {
     Boolean gogo;
 
     BitstreamsArguments() {
-        super(new char[]{Arguments.DO_REPLACE});
+        super(Bitstreams.class.getCanonicalName(),  new char[]{Arguments.DO_REPLACE});
         options.addOption(Arguments.BITSTREAM_FILE, Arguments.BITSTREAM_FILE_LONG, true, "file to replace given bitstream");
         options.addOption(Arguments.GOGO, Arguments.GOGO_LONG, false, "ignore file format incompatibilities");
     }

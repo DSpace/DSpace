@@ -168,7 +168,7 @@ class PolicyArguments extends Arguments {
     int dspaceActionid;
 
     PolicyArguments() {
-        super(new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
+        super(Policies.class.getCanonicalName(), new char[]{Arguments.DO_ADD, Arguments.DO_DEL});
         options.addOption(DSPACE_ACTION, DSPACE_ACTION_LONG, true, "one of " + deepToString(Constants.actionText) + " default is " + Constants.actionText[Constants.READ]);
         options.addOption(WHO, WHO_LONG, true, "group/eperson used in policies, give as GROUP.<name>, EPERSON.<netid>, or EPERSON.<email>");
     }
