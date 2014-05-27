@@ -1,4 +1,4 @@
-# Bulk-* Command examples
+# org.dspace.app.bulkdo package
 
 The org.dspace.app.bulkdo package contains four dspace main commands:
 * bulk-list: list dspace objects contained in a the 'tree' rooted at a community, collection, item, bundle, or bitstream
