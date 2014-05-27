@@ -789,11 +789,11 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<div class=\"panel panel-info\">");
-        out.println("<div class=\"panel-heading\">"
+        out.print("<table align=\"center\" class=\"miscTable\"><tr>");
+        out.println("<td class=\"evenRowEvenCol\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
-                + "</div>");
+                + "</strong></p>");
 
         try
         {
@@ -822,10 +822,10 @@ public class ItemTag extends TagSupport
             // if user already has uploaded at least one file
         	if (!filesExist)
         	{
-        		out.println("<div class=\"panel-body\">"
+        		out.println("<p>"
         				+ LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.files.no")
-                            + "</div>");
+                            + "</p>");
         	}
         	else
         	{
@@ -898,7 +898,10 @@ public class ItemTag extends TagSupport
                     + "</th><th id=\"t4\" class=\"standard\">"
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.fileformat")
-                    + "</th><th>&nbsp;</th></tr>");
+                    + "</th><th id=\"t4\" class=\"standard\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.views")
+                    + "</th></tr>");
 
             	// if primary bitstream is html, display a link for only that one to
             	// HTMLServlet
@@ -1021,6 +1024,9 @@ public class ItemTag extends TagSupport
             					out
                                     .print("</td><td class=\"standard\" align=\"center\">");
 
+                                                out.print(bitstreams[k].getIntMetadata("views"));
+                                                out.print("</td><td class=\"standard\" align=\"center\">");
+
             					// is there a thumbnail bundle?
             					if ((thumbs.length > 0) && showThumbs)
             					{
@@ -1089,7 +1095,7 @@ public class ItemTag extends TagSupport
         	throw new IOException(sqle.getMessage(), sqle);
         }
 
-        out.println("</div>");
+        out.println("</td></tr></table>");
     }
 
     private void getThumbSettings()
