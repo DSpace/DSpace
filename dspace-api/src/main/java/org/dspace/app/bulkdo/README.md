@@ -1,8 +1,6 @@
 # Bulk-* Command examples
 
-Here I give a few example on how to use the bulk-* commands from the PR: .....
-
-There are four commands:
+The org.dspace.app.bulkdo package contains four dspace main commands:
 * bulk-list: list dspace objects contained in a the 'tree' rooted at a community, collection, item, bundle, or bitstream
 * bulk-pol: add a policy described by a dspace action and an Eperson or Group to all dspace objects contained in a
  'tree' at given by dspace object; likewise delete a given policy
