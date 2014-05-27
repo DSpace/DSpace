@@ -93,7 +93,7 @@
             <td class="searchBoxLabelSmall" valign="middle" nowrap="nowrap">
               <%-- <input type="text" name="query" id="tequery" size="10"/><input type=image border="0" src="<%= request.getContextPath() %>/image/search-go.gif" name="submit" alt="Go" value="Go"/> --%>
               <input type="text" name="query" id="tequery" size="10"/><input type="image" border="0" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" src="<%= request.getContextPath() %>/image/search-go.gif"/>
-              <br/><a href="<%= request.getContextPath() %>/advanced-search"><fmt:message key="jsp.layout.navbar-default.advanced"/></a>
+              
 <%
 			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
 			{
