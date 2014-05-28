@@ -193,7 +193,7 @@ Common usage:
     <!-- in the target directory, the new file is suffixed wth *.new   -->
     <!-- and should be hand updated afterward                .          -->
     <!-- ============================================================= -->
-    <target name="update_configs" depends="overwrite_configs,overwrite_solr_configs" description="Updates the Configuration Directory">
+    <target name="update_configs" depends="overwrite_configs_custom,overwrite_solr_configs" description="Updates the Configuration Directory">
     	<antcall target="init_geolite" />
     </target>
 
@@ -268,6 +268,83 @@ Common usage:
         </echo>
 
     </target>
+	
+	<!-- Overwrite all config except news-side.html, news-top.html, and default.license files -->
+	<target name="overwrite_configs_custom" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
+
+	        <!--
+	        Copy files that are absent in target
+	        -->
+	        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+	            <fileset dir="config-temp" includes="**/*">
+	                <present present="srconly" targetdir="${dspace.dir}/config" />
+	            </fileset>
+	        </copy>
+
+	        <!--
+	        Copy files that are different in target to *.old suffix
+	        -->
+	        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+	                <fileset dir="${dspace.dir}/config">
+	                   <and>
+	                    <different targetdir="config-temp" ignoreFileTimes="true" />
+	                    <present present="both" targetdir="config-temp" />
+	                   </and>
+	                    <type type="file" />
+	                	<exclude name="news-*.html" />
+	                	<exclude name="default.license" />
+	                </fileset>
+	            <globmapper from="*" to="*-${build.date}.old" />
+	        </copy>
+
+	        <!--
+	        Force overwrite of whats left
+	        -->
+	        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+	            <fileset dir="config-temp">
+	                <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
+	                <type type="file" />
+	            	<exclude name="news-*.html" />
+	            	<exclude name="default.license" />
+	            </fileset>
+	        </copy>
+
+	        <!--
+	        Remove the work directory
+	        -->
+	        <delete dir="config-temp" />
+
+	        <echo>
+	====================================================================
+	 The DSpace configuration has been updated.
+
+	 During the upgrade process the build has attempted to overwrite the
+	 previous configuration while preserving your previous changes in files
+	 suffixed "*.old"
+
+	 To complete installation, you should do the following:
+
+	 * Check that you've properly merged any differences in the following files:
+
+	        </echo>
+
+	        <fileset dir="${dspace.dir}/config" id="config.files">
+	              <include name="**/*.old"/>
+	        </fileset>
+
+	        <pathconvert pathsep="${line.separator}" property="configfiles" refid="config.files"/>
+
+	        <echo>${configfiles}</echo>
+
+	        <echo>
+
+	  * To properly merge your previous configuration files, it's
+	    best to try to take the newer version and copy your
+	    previous changes into it.
+	====================================================================
+	        </echo>
+
+	    </target>
 
     <target name="copy_configs_keep" unless="${overwrite}" depends="prepare_configs">
 
