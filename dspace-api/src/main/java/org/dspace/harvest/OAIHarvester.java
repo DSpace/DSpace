@@ -557,13 +557,25 @@ public class OAIHarvester {
     	// Now create the special ORE bundle and drop the ORE document in it
 		if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3)
 		{
-			Bundle OREBundle = item.createBundle("ORE");
+			Bundle OREBundle = null;
+            Bundle[] OREBundles = item.getBundles("ORE");
+			Bitstream OREBitstream = null;
+
+            if ( OREBundles.length > 0 )
+                OREBundle = OREBundles[0];
+            else
+                OREBundle = item.createBundle("ORE");
 
 			XMLOutputter outputter = new XMLOutputter();
 			String OREString = outputter.outputString(oreREM);
 			ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
 
-			Bitstream OREBitstream = OREBundle.createBitstream(OREStream);
+            OREBitstream = OREBundle.getBitstreamByName("ORE.xml");
+
+            if ( OREBitstream != null )
+                OREBundle.removeBitstream(OREBitstream);
+
+            OREBitstream = OREBundle.createBitstream(OREStream);
 			OREBitstream.setName("ORE.xml");
 
 			BitstreamFormat bf = FormatIdentifier.guessFormat(ourContext, OREBitstream);
