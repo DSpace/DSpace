@@ -733,3 +733,59 @@ input.ds-authority-lock.is-locked
   { background-image: url(./image/lock24.png); }
 input.ds-authority-lock.is-unlocked
   { background-image: url(./image/unlock24.png); }
+
+  
+  
+/* Bootstrap Overrides */
+.alert-info, .panel-info>.panel-heading, .panel-success>.panel-heading {
+	background-image: -webkit-gradient(linear,left 0,left 100%,from(#fff0c1),to(#ffe9c2));
+	background-image: -webkit-linear-gradient(top,#fff0c1,0%,#ffe9c2,100%);
+	background-image: -moz-linear-gradient(top,#fff0c1 0,#ffe9c2 100%);
+	background-image: linear-gradient(to bottom,#fff0c1 0,#ffe9c2 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffff0c1',endColorstr='#ffffe9c2',GradientType=0);
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.alert-info, .panel-info>.panel-heading, .panel-success>.panel-heading {
+	color: #a68011;
+	background-color: #fff0c1;
+	border-color: #a68011;
+}
+
+.alert-info, .panel-success, .panel-info {
+	border-color: #a68011;
+}
+
+.panel-default>.panel-heading {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
+	background-color: #ffcc33;
+	border-color: #a68011;
+}
+
+.btn-primary {
+	background-image: -webkit-gradient(linear,left 0,left 100%,from(#ffcc33),to(#fdb73f));
+	background-image: -webkit-linear-gradient(top,#ffcc33,0%,#fdb73f,100%);
+	background-image: -moz-linear-gradient(top,#ffcc33 0,#fdb73f 100%);
+	background-image: linear-gradient(to bottom,#ffcc33 0,#fdb73f 100%);
+	background-repeat: repeat-x;
+	border-color: #a68011;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffcc33',endColorstr='#fffdb73f',GradientType=0);
+}
+
+h1, h2, h3, h4, h5 {
+	font-weight: bold;
+}
+
+label {
+	font-weight: 500;
+}
+
+/* End Bootstrap Overrides */
+
+
