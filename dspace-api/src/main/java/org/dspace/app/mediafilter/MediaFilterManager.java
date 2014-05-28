@@ -25,6 +25,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -40,6 +41,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
@@ -54,6 +56,8 @@ import org.dspace.search.DSIndexer;
  */
 public class MediaFilterManager
 {
+    private static Logger log = Logger.getLogger(MediaFilterManager.class);
+
 	//key (in dspace.cfg) which lists all enabled filters by name
     public static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
 	
@@ -84,10 +88,23 @@ public class MediaFilterManager
     private static Map<String, List<String>> filterFormats = new HashMap<String, List<String>>();
     
     private static List<String> skipList = null; //list of identifiers to skip during processing
+
+    private static List<String> publicFiltersClasses = null;
     
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static final String FILTER_PLUGIN_SEPARATOR = "\034";
+
+    static {
+        String publicPermissionFilters = ConfigurationManager.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
+        if(publicPermissionFilters != null) {
+            String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
+            publicFiltersClasses = new ArrayList<String>();
+            for(String filter : publicPermisionFiltersArray) {
+                publicFiltersClasses.add(filter.trim());
+            }
+        }
+    }
     
     public static void main(String[] argv) throws Exception
     {
@@ -771,10 +788,19 @@ public class MediaFilterManager
         b.setFormat(bf);
         b.update();
         
-        //Inherit policies from the source bitstream
-        //(first remove any existing policies)
+        //Set permissions on the derivative bitstream
+        //- First remove any existing policies
         AuthorizeManager.removeAllPolicies(c, b);
-        AuthorizeManager.inheritPolicies(c, source, b);
+
+        //- Determine if this is a public-derivative format
+        if(publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
+            //- Set derivative bitstream to be publicly accessible
+            Group anonymous = Group.find(c, 0);
+            AuthorizeManager.addPolicy(c, b, Constants.READ, anonymous);
+        } else {
+            //- Inherit policies from the source bitstream
+            AuthorizeManager.inheritPolicies(c, source, b);
+        }
 
         // fixme - set date?
         // we are overwriting, so remove old bitstream
