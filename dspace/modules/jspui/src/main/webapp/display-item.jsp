@@ -121,6 +121,19 @@
             }
         }
     }
+    
+    /** damanzano:
+     *  The dc.identifier.citation is needed to show full citation instead of handle.
+     */
+    String citation = "";
+    if (handle != null) {
+        DCValue[] citationValue = item.getDC("identifier", "citation", Item.ANY);
+        if (citationValue.length != 0) {
+            citation = citationValue[0].value;
+        } else {
+            citation = "";
+        }
+    }
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -155,8 +168,9 @@
 
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
-                <div class="well"><fmt:message key="jsp.display-item.identifier"/>
-                    <code><%= HandleManager.getCanonicalForm(handle) %></code>
+                <div class="well">
+                    <fmt:message key="jsp.display-item.identifier"/>
+                    <p><%= citation %></p>
                     <button class="visible-xs pull-right btn btn-primary" type="button" data-toggle="offcanvas" data-target=".sidebar-section">
                     <fmt:message key="jsp.display-item.collection-actions"/> <span class="glyphicon glyphicon-arrow-right"></span>
                     </button>
