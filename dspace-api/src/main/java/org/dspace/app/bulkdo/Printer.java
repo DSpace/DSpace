@@ -70,7 +70,7 @@ public class Printer extends PrintStream {
         if (obj.getClass().isArray()) {
             return deepToString((Object[]) obj);
         }
-        return obj.toString().replaceAll("\n", " ");
+        return obj.toString().replaceAll("\n", " ").replaceAll("[^A-Za-z0-9!@#$%^&*()_+-={}|:;<>?,./~`' ]", "?");
     }
 
 }
