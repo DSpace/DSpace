@@ -74,6 +74,8 @@ class ActionTarget {
                 default:
                     throw new RuntimeException("should never try to create ActionTarget from " + obj.toString());
             }
+            if (up == null)
+                return null;
             return create(context, null, up);
         } catch (SQLException e) {
             throw new RuntimeException("should never happen???:  " + e.getMessage());
