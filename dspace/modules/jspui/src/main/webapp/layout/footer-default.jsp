@@ -82,6 +82,11 @@
         <script type="text/javascript">
           addthis.layers({
             'theme' : 'transparent',
+            'domain': 'bibliotecadigital.icesi.edu.co',
+            'linkFilter' : function(link, layer) {
+                console.log(link.title + ' - ' + link.url + " - " + layer);
+                return link;
+            },
             'share' : {
               'position' : 'left',
               'numPreferredServices' : 4,
