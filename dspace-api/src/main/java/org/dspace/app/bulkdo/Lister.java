@@ -7,6 +7,7 @@ import org.apache.log4j.PatternLayout;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
 
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
@@ -89,7 +90,8 @@ public class Lister {
             ArrayList<ActionTarget> cols = actionTargets[Constants.COLLECTION];
             if (workflowItem) {
                 for (int i = 0; i < cols.size(); i++) {
-                    WorkspaceItem[] wis = WorkspaceItem.findByCollection(context, (Collection) cols.get(i).getObject());
+                    log.debug("List WorkSpaceItems for " + cols.get(i).getObject());
+                    WorkflowItem[] wis = WorkflowItem.findByCollection(context, (Collection) cols.get(i).getObject());
                     for (int j = 0; j < wis.length; j++) {
                         targets.add(ActionTarget.create(context, cols.get(i), wis[j].getItem()));
                     }
@@ -97,6 +99,7 @@ public class Lister {
             } else {
                 for (int i = 0; i < cols.size(); i++) {
                     // items from collections and subcollections ???
+                    log.debug("List Items for " + cols.get(i).getObject());
                     ItemIterator iter = ((Collection) cols.get(i).getObject()).getAllItems();
                     while (iter.hasNext()) {
                         targets.add(ActionTarget.create(context, cols.get(i), iter.next()));
