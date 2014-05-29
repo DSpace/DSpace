@@ -7,6 +7,8 @@
 ====
 User-agent: *
 
+Sitemap: http://drum.lib.umd.edu/sitemap
+
 # Uncomment the following line ONLY if sitemaps.org or HTML sitemaps are used
 # and you have verified that your site is being indexed correctly.
 # Disallow: /browse
