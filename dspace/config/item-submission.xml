@@ -18,6 +18,7 @@
  <!-- for handle "default".                                                -->
  <submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
+   <name-map collection-handle="1903/11324" submission-name="LibraryAward" />
  </submission-map>
 
 
@@ -185,18 +186,20 @@
 	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
 	 	  required in input-forms and items are assumed to have always multiple-files attached.
 	      If re-enable the initial questions step you should comment out this step-->
-	 <step>
+	 
+     <step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	 </step>
           
-     <!--Disabled by default Since DSpace 4.0: Step 1 will be to gather initial information
+     <!--Drum uses initial questions step, but DSpace 4.1 does not 
 	  <step>
 	    <heading>submit.progressbar.initial-questions</heading>
 		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
 		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
-	  </step> -->
+	  </step>
+	  -->
       
       <!--Step 2 will be to Describe the item.-->
       <step>
@@ -272,6 +275,61 @@
      
    </submission-process>
 
+     <submission-process name="LibraryAward">
+         
+         <!--If you disable the initial questions step you should insert the -->
+         <!--SkipInitialQuestionsStep below, to enable proper processing of  -->
+         <!--input-forms configuration                                       -->
+         <step>
+             <processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+         </step>
+         
+         <!--Step 2 will be to Describe the item.-->
+         <step>
+             <heading>submit.progressbar.describe</heading>
+             <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+             <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+             <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
+             <workflow-editable>true</workflow-editable>
+         </step>
+         
+         <!--Step 3 will be to Upload the item-->
+         <step>
+             <heading>submit.progressbar.upload</heading>
+             <processing-class>edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep</processing-class>
+             <jspui-binding>edu.umd.lib.dspace.app.webui.submit.step.JSPLibraryAwardUploadStep</jspui-binding>
+             <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+             <workflow-editable>true</workflow-editable>
+         </step>
+         
+         <!--Step 4 will be to Verify/Review everything -->
+         <step>
+             <heading>submit.progressbar.verify</heading>
+             <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+             <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+             <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+             <workflow-editable>true</workflow-editable>
+         </step>
+         
+         <!--Step 5 will be to Sign off on the License-->
+         <step>
+             <heading>submit.progressbar.license</heading>
+             <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+             <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+             <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+             <workflow-editable>false</workflow-editable>
+         </step>
+         
+         <!-- Hidden processing step -->
+         <step>
+             <heading>submit.progressbar.complete</heading>
+             <processing-class>edu.umd.lib.dspace.submit.step.LibraryAwardCompleteStep</processing-class>
+             <jspui-binding>org.dspace.app.webui.submit.step.JSPCompleteStep</jspui-binding>
+             <workflow-editable>false</workflow-editable>
+         </step>
+         
+     </submission-process>
+     
  </submission-definitions>
 
 </item-submission>
