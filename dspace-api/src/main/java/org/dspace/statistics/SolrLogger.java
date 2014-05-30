@@ -1528,6 +1528,10 @@ public class SolrLogger
                 for(SolrDocument doc : docs) {
                     String uid = doc.get("uid").toString();
                     String ip = doc.get("ip").toString();
+                    if(ip.equals("::1")) {
+                        ip = "127.0.0.1";
+                    }
+
                     String id = doc.get("id").toString();
                     String type = doc.get("type").toString();
                     String time = doc.get("time").toString();
