@@ -113,6 +113,33 @@
   
   <tr class="navigationBarItem">
     <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/curate") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/curate"><fmt:message key="jsp.layout.navbar-admin.curate"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/privateitems") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/privateitems"><fmt:message key="jsp.layout.navbar-admin.privateitems"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/batchmetadataimport") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/batchmetadataimport"><fmt:message key="jsp.layout.navbar-admin.batchmetadataimport"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/news-edit") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
@@ -224,6 +251,33 @@
      </td>
      <td nowrap="nowrap" class="navigationBarItem">
          <a href="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-admin.logout"/></a>
+     </td>
+ </tr>
+
+ <tr class="navigationBarItem">
+     <td>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
+     </td>
+     <td nowrap="nowrap" class="navigationBarItem">
+         <a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a>
+     </td>
+ </tr>
+
+ <tr class="navigationBarItem">
+     <td>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
+     </td>
+     <td nowrap="nowrap" class="navigationBarItem">
+        <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a>
+     </td>
+ </tr>
+
+ <tr class="navigationBarItem">
+     <td>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
+     </td>
+     <td nowrap="nowrap" class="navigationBarItem">
+         <a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a>
      </td>
  </tr>
 </table>
