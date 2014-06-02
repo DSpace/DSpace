@@ -17,6 +17,7 @@ import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipFile;
@@ -35,6 +36,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemexport.ItemExportException;
@@ -1676,23 +1678,21 @@ public class ItemImport
      * 
      * Process the Options to apply to the Item. The options are tab delimited
      * 
-     * Options:
-     *      48217870-MIT.pdf        permissions: -r 'MIT Users'     description: Full printable version (MIT only)
-     *      permissions:[r|w]-['group name']
-     *      description: 'the description of the file'
-     *      
-     *      where:
-     *          [r|w] (meaning: read|write)
-     *          ['MIT Users'] (the group name)
-     *          
+     * Options: 48217870-MIT.pdf permissions: -r 'MIT Users' description: Full
+     * printable version (MIT only) permissions:[r|w]-['group name']
+     * description: 'the description of the file'
+     * 
+     * where: [r|w] (meaning: read|write) ['MIT Users'] (the group name)
+     * 
      * @param c
      * @param myItem
      * @param options
      * @throws SQLException
      * @throws AuthorizeException
+     * @throws ParseException
      */
     private void processOptions(Context c, Item myItem, List<String> options)
-            throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException, ParseException
     {
         for (String line : options)
         {
@@ -1799,10 +1799,10 @@ public class ItemImport
                         .trim();
             }
 
-            String thisEmbargo = "";
+            String thisEmbargoDate = "";
             if (embargoExists)
             {
-                thisEmbargo = line.substring(
+                thisEmbargoDate = line.substring(
                         eMarkerIndex + embargoMarker.length(), eEndIndex)
                         .trim();
             }
@@ -1862,9 +1862,8 @@ public class ItemImport
                 if (embargoExists)
                 {
                     System.out.println("\tSetting embargo for " + bitstreamName
-                            + " until "
-                            + thisEmbargo);
-                    // Call setEmbargo
+                            + " until " + thisEmbargoDate);
+                    setEmbargo(c, thisEmbargoDate, null, bs);
                 }
             }
         }
@@ -1909,6 +1908,69 @@ public class ItemImport
             }
         }
 
+    }
+
+    /**
+     * Sets the embargo date on a bitstream
+     * 
+     * @param c
+     * @param embargoDate
+     * @param grpName
+     *            group name specified if embargo applies to a specific group
+     * @param bs
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws ParseException
+     */
+    private void setEmbargo(Context c, String date, String groupName,
+            DSpaceObject dspaceobj) throws SQLException, AuthorizeException,
+            ParseException
+
+    {
+        Date embargoDate = DateUtils.parseDate(date, new String[] {
+                "yyyy-MM-dd", "yyyy-MM", "yyyy" });
+        if (embargoDate != null)
+        {
+            if (!isTest)
+            {
+                AuthorizeManager.authorizeAction(c, dspaceobj, Constants.READ);
+
+                Group policyGroup;
+                if (groupName != null)
+                {
+                    policyGroup = Group.findByName(c, groupName);
+                    if (policyGroup == null)
+                    {
+                        throw new Error("Group name " + groupName
+                                + " does not exist");
+                    }
+                }
+                else
+                {
+                    policyGroup = Group.find(c, 0);
+                }
+
+                String reason = "";
+                if (dspaceobj instanceof Item)
+                {
+                    reason += "Item";
+                }
+                else if (dspaceobj instanceof Bundle)
+                {
+                    reason += "Bundle";
+                }
+                else if (dspaceobj instanceof Bitstream)
+                {
+                    reason += "Bitstream";
+                }
+                reason += " is embargoed until " + embargoDate.toString();
+
+                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null,
+                        c, "Embargo Policy", policyGroup.getID(), null,
+                        embargoDate, Constants.READ, reason, dspaceobj);
+                rp.update();
+            }
+        }
     }
 
     // XML utility methods
