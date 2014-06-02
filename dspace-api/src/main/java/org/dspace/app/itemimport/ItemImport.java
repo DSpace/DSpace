@@ -1970,6 +1970,25 @@ public class ItemImport
                         embargoDate, Constants.READ, reason, dspaceobj);
                 rp.update();
             }
+            else
+            {
+                String reason = "";
+                if (dspaceobj instanceof Item)
+                {
+                    reason += "Item";
+                }
+                else if (dspaceobj instanceof Bundle)
+                {
+                    reason += "Bundle";
+                }
+                else if (dspaceobj instanceof Bitstream)
+                {
+                    reason += "Bitstream";
+                }
+                reason += " would be embargoed until " + embargoDate.toString();
+
+                System.out.println(reason);
+            }
         }
     }
 
