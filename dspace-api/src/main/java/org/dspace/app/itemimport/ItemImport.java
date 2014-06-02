@@ -1385,6 +1385,7 @@ public class ItemImport
                         boolean bundleExists = false;
                         boolean permissionsExist = false;
                         boolean descriptionExists = false;
+                        boolean embargoExists = false;
 
                         // look for a bundle name
                         String bundleMarker = "\tbundle:";
@@ -1428,6 +1429,20 @@ public class ItemImport
                             descriptionExists = true;
                         }
 
+                        // look for embargo
+                        String embargoMarker = "\tembargo:";
+                        int eMarkerIndex = line.indexOf(embargoMarker);
+                        int eEndIndex = 0;
+                        if (eMarkerIndex > 0)
+                        {
+                            eEndIndex = line.indexOf("\t", eMarkerIndex + 1);
+                            if (eEndIndex == -1)
+                            {
+                                eEndIndex = line.length();
+                            }
+                            embargoExists = true;
+                        }
+
                         // is this the primary bitstream?
                         String primaryBitstreamMarker = "\tprimary:true";
                         boolean primary = false;
@@ -1454,7 +1469,8 @@ public class ItemImport
                             System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                         }
 
-                        if (permissionsExist || descriptionExists)
+                        if (permissionsExist || descriptionExists
+                                || embargoExists)
                         {
                             String extraInfo = bitstreamName;
 
@@ -1468,6 +1484,13 @@ public class ItemImport
                             {
                                 extraInfo = extraInfo
                                         + line.substring(dMarkerIndex, dEndIndex);
+                            }
+
+                            if (embargoExists)
+                            {
+                                extraInfo = extraInfo
+                                        + line.substring(eMarkerIndex,
+                                                eEndIndex);
                             }
 
                             options.add(extraInfo);
@@ -1677,6 +1700,7 @@ public class ItemImport
 
             boolean permissionsExist = false;
             boolean descriptionExists = false;
+            boolean embargoExists = false;
 
             String permissionsMarker = "\tpermissions:";
             int pMarkerIndex = line.indexOf(permissionsMarker);
@@ -1702,6 +1726,19 @@ public class ItemImport
                     dEndIndex = line.length();
                 }
                 descriptionExists = true;
+            }
+
+            String embargoMarker = "\tembargo:";
+            int eMarkerIndex = line.indexOf(embargoMarker);
+            int eEndIndex = 0;
+            if (eMarkerIndex > 0)
+            {
+                eEndIndex = line.indexOf("\t", eMarkerIndex + 1);
+                if (eEndIndex == -1)
+                {
+                    eEndIndex = line.length();
+                }
+                embargoExists = true;
             }
 
             int bsEndIndex = line.indexOf("\t");
@@ -1762,6 +1799,14 @@ public class ItemImport
                         .trim();
             }
 
+            String thisEmbargo = "";
+            if (embargoExists)
+            {
+                thisEmbargo = line.substring(
+                        eMarkerIndex + embargoMarker.length(), eEndIndex)
+                        .trim();
+            }
+
             Bitstream bs = null;
             boolean notfound = true;
             if (!isTest)
@@ -1812,6 +1857,14 @@ public class ItemImport
                             + bitstreamName);
                     bs.setDescription(thisDescription);
                     bs.update();
+                }
+
+                if (embargoExists)
+                {
+                    System.out.println("\tSetting embargo for " + bitstreamName
+                            + " until "
+                            + thisEmbargo);
+                    // Call setEmbargo
                 }
             }
         }
