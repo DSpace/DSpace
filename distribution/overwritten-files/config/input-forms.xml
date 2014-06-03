@@ -200,6 +200,7 @@
 					<hint>Autores de la obra</hint>
 					<required>Debe indicar al menos un autor</required>
 					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 				<field> <!-- Ok -->	<!-- Duplicado para Red de Museos -->
 					<dc-schema>sedici</dc-schema>
