@@ -18,12 +18,6 @@
     </command>
 
     <command>
-        <name>classpath</name>
-        <description>Calculate and display the DSpace classpath</description>
-        <step></step>
-    </command>
-
-    <command>
         <name>cleanup</name>
         <description>Remove deleted bitstreams from the assetstore</description>
         <step>
