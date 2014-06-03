@@ -76,6 +76,9 @@ public class DCInput
 
     /** allowed document types */
     private List<String> typeBind = null;
+    
+    /** indicates the opposite of types */
+	private boolean negateTypeBind = false;
 
     /** if the field is internationalizable */
     private boolean i18nable = false;
@@ -93,6 +96,7 @@ public class DCInput
      * Map's keys are group names and map's values determine whether there is a NOT modifier for that group 
      */
     private Map<String, Boolean> visibilityOnGroup = null;
+
     
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -152,6 +156,13 @@ public class DCInput
         typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if(typeBindDef != null && typeBindDef.trim().length() > 0) {
+        	
+        	if(typeBindDef.startsWith("!")){
+        		//Se esta negando todo el type-bind
+        		negateTypeBind = true;
+        		typeBindDef = typeBindDef.substring(1);
+        	}
+        	
         	String[] types = typeBindDef.split(",");
         	for(String type : types) {
         		typeBind.add( type.trim() );
@@ -450,19 +461,18 @@ public class DCInput
 	}
 
 	/**
-	 * Decides if this field is valid for the document type. It verifies if an typeName is prohibited (!) or not.
+	 * Decides if this field is valid for the document type. It verifies if this field is used for one or more types.
 	 * @param typeName Document type name
 	 * @return true when there is no type restriction or typeName is allowed
 	 */
 	public boolean isAllowedFor(String typeName) {
 		if(typeBind.isEmpty()) 
             return true;
-		else if (typeBind.contains("!"+typeName))
-			return false;
-		else 
+		else if (negateTypeBind)
+			return !typeBind.contains(typeName);
+		else
 			return typeBind.contains(typeName);
 	}
-	
 	
 	
 	/**
