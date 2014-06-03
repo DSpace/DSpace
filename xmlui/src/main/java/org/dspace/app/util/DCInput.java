@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
@@ -447,16 +450,20 @@ public class DCInput
 	}
 
 	/**
-	 * Decides if this field is valid for the document type
+	 * Decides if this field is valid for the document type. It verifies if an typeName is prohibited (!) or not.
 	 * @param typeName Document type name
 	 * @return true when there is no type restriction or typeName is allowed
 	 */
 	public boolean isAllowedFor(String typeName) {
-		if(typeBind.size() == 0)
-			return true;
-		
-		return typeBind.contains(typeName);
+		if(typeBind.isEmpty()) 
+            return true;
+		else if (typeBind.contains("!"+typeName))
+			return false;
+		else 
+			return typeBind.contains(typeName);
 	}
+	
+	
 	
 	/**
 	 * Returns true if this field has a group-based mandatory restriction
