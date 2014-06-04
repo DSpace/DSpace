@@ -332,7 +332,7 @@ public class Group extends DSpaceObject
     public boolean isMember(EPerson e)
     {
         // special, group 0 is anonymous
-        if (getID() == 0)
+        if (getID() == Group.ANONYMOUS_ID)
         {
             return true;
         }
@@ -1421,4 +1421,9 @@ public class Group extends DSpaceObject
     {
 
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }
