@@ -258,7 +258,7 @@ class ItemActionTarget extends ActionTarget {
 class BundleActionTarget extends ActionTarget {
     Bundle bdl;
 
-    static String[] theAvailableKeys = {"isEmbargoed", "name"};
+    static String[] theAvailableKeys = {"name"};
 
     BundleActionTarget(Context context, ActionTarget up, DSpaceObject o) {
         super(context, up, o);
@@ -268,11 +268,6 @@ class BundleActionTarget extends ActionTarget {
     protected boolean toHashMap() {
         boolean create = super.toHashMap();
         if (create) {
-            try {
-                put("isEmbargoed", bdl.isEmbargoed());
-            } catch (SQLException e) {
-                put("isEmbargoed", e.getMessage());
-            }
             put("name", bdl.getName());
         }
         return create;
