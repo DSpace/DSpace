@@ -241,44 +241,71 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return price;
     }
 
-    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
-        Item item =Item.find(context, shoppingcart.getItem());
-        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, item);
-        Long allowedSizeT=PaymentSystemConfigurationManager.getMaxFileSize();
-        long allowedSize = allowedSizeT;
-        String currency = shoppingcart.getCurrency();
-        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
+    /**
+     * Calculate the surcharge for a data package, based on its size in bytes
+     * @param allowedSize the maximum size allowed before large file surcharge
+     * @param totalDataFileSize the total size of data files in bytes
+     * @param fileSizeFeeAfter the fee per unit to assess after exceeding allowedSize
+     * @param initialSurcharge Initial surcharge, e.g. 15 for the first 1GB exceeding 10GB.
+     * @param surchargeUnitSize amount of data to assess a fileSizeFeeAfter on, e.g. 1GB = 1*1024*1024
+     * @return The total surcharge to assess.
+     */
+    public static double calculateFileSizeSurcharge(
+            long allowedSize,
+            long totalDataFileSize,
+            double fileSizeFeeAfter,
+            double initialSurcharge,
+            long surchargeUnitSize) {
+        double totalSurcharge = initialSurcharge;
+        if(totalDataFileSize > allowedSize){
+            int unit =0;
+            //eg. $10 after every 1 gb
+            if(surchargeUnitSize > 0) {
+                Long overSize = (totalDataFileSize - allowedSize) / surchargeUnitSize;
+                unit = overSize.intValue();
+            }
+            totalSurcharge = totalSurcharge+fileSizeFeeAfter*unit;
+        }
+        return totalSurcharge;
+    }
 
-        double totalSurcharge=0;
-        long totalSizeDataFile=0;
+    /**
+     * Get the total size in bytes of all bitstreams within a data package.
+     * Assumes item is a data package and DryadWorkFlowUtils.getDataFiles returns
+     * data file items with bundles, bitstreams.
+     * @param context
+     * @param dataPackage
+     * @return
+     * @throws SQLException
+     */
+    public long getTotalDataFileSize(Context context, Item dataPackage) throws SQLException {
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage);
+        long size = 0;
         for(Item dataFile : dataFiles){
-
             Bundle bundles[] = dataFile.getBundles();
             for(Bundle bundle:bundles)
             {
                 Bitstream bitstreams[]=bundle.getBitstreams();
                 for(Bitstream bitstream:bitstreams)
                 {
-                    totalSizeDataFile=totalSizeDataFile+bitstream.getSize();
+                    size += bitstream.getSize();
                 }
             }
-
         }
+        return size;
+    }
 
-        if(totalSizeDataFile > allowedSize){
-            totalSurcharge+=shoppingcart.getSurcharge();
-            int unit =0;
-            Long UNITSIZE=PaymentSystemConfigurationManager.getUnitSize();  //1 GB
-            //eg. $10 after every 1 gb
-            if(UNITSIZE!=null&&UNITSIZE>0) {
-                Long overSize = (totalSizeDataFile-allowedSize)/UNITSIZE;
-                unit = overSize.intValue();
-            }
-            totalSurcharge = totalSurcharge+fileSizeFeeAfter*unit;
+    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
+        // Extract values from database objects and configuration to pass to calculator
+        String currency = shoppingcart.getCurrency();
 
-        }
+        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize().longValue();
+        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
+        Long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
 
-
+        Item item = Item.find(context, shoppingcart.getItem());
+        long totalSizeDataFile = getTotalDataFileSize(context, item);
+        double totalSurcharge = calculateFileSizeSurcharge(allowedSize, totalSizeDataFile, fileSizeFeeAfter, shoppingcart.getSurcharge(), unitSize);
         return totalSurcharge;
     }
 
