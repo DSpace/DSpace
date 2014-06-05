@@ -38,7 +38,7 @@ Created by Tim Donohue
           <head><xsl:value-of select="$pageTitle"/></head>
           <p></p>
           <p>
-            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
+            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
           </p>
           <p>
             <!-- TODO: This should be moved to an I18N message key -->
