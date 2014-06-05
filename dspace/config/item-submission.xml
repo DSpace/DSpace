@@ -186,20 +186,20 @@
 	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
 	 	  required in input-forms and items are assumed to have always multiple-files attached.
 	      If re-enable the initial questions step you should comment out this step-->
-	 
+	 <!--
      <step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	 </step>
-          
-     <!--Drum uses initial questions step, but DSpace 4.1 does not 
-	  <step>
+     -->
+       
+      <step>
 	    <heading>submit.progressbar.initial-questions</heading>
 		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
 		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
 	  </step>
-	  -->
+	 
       
       <!--Step 2 will be to Describe the item.-->
       <step>

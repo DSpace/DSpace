@@ -404,8 +404,24 @@
          {
              sb.append("\" disabled=\"disabled");
          }
+         
+         int month = -1;
+         int day = -1;
+         int year = -1;
+         
+         try {
+         if (!dateIssued.equals("")){
+             month = dateIssued.getMonth();
+             day = dateIssued.getDay();
+             year = dateIssued.getYear();
+         }
+         }
+         catch (Exception e){
+             System.out.println("Error parsing date issued");
+         }
+                  
          sb.append("\"><option value=\"-1\"")
-            .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
+            .append((month == -1 ? " selected=\"selected\"" : ""))
 //          .append(">(No month)</option>");
             .append(">")
             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
@@ -415,7 +431,7 @@
          {
             sb.append("<option value=\"")
               .append(j)
-              .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
+              .append((month == j ? "\" selected=\"selected\"" : "\"" ))
               .append(">")
               .append(org.dspace.content.DCDate.getMonthName(j,I18nUtil.getSupportedLocale(request.getLocale())))
               .append("</option>");
@@ -434,7 +450,7 @@
              sb.append("\" disabled=\"disabled");
          }
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
-            .append((dateIssued.getDay() > 0 ?
+            .append((day > 0 ?
                      String.valueOf(dateIssued.getDay()) : "" ))
 //          .append("\"/>Year:<input type=text name=\"")
                 .append("\"/>")
@@ -449,7 +465,7 @@
              sb.append("\" disabled=\"disabled");
          }
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
-            .append((dateIssued.getYear() > 0 ?
+            .append((year > 0 ?
                  String.valueOf(dateIssued.getYear()) : "" ))
             .append("\"/></td>\n");
     
