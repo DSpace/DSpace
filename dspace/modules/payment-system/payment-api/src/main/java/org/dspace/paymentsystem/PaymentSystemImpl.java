@@ -256,9 +256,10 @@ public class PaymentSystemImpl implements PaymentSystemService {
             double fileSizeFeeAfter,
             double initialSurcharge,
             long surchargeUnitSize) {
-        double totalSurcharge = initialSurcharge;
+        double totalSurcharge = 0.0;
         if(totalDataFileSize > allowedSize){
-            int unit =0;
+            totalSurcharge = initialSurcharge;
+            int unit = 0;
             //eg. $10 after every 1 gb
             if(surchargeUnitSize > 0) {
                 Long overSize = (totalDataFileSize - allowedSize) / surchargeUnitSize;
