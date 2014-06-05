@@ -220,24 +220,36 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
+    /**
+     * Calculate the shopping cart total
+     * @param discount if true, basicFee and nonIntegratedFee are ignored
+     * @param fileSizeSurcharge surcharge to add for large files
+     * @param basicFee basic submission fee
+     * @param nonIntegratedFee additional fee for non integrated jounrals
+     * @return the shopping cart total, based on the input parameters
+     */
+    static double calculateTotal(boolean discount,
+            double fileSizeSurcharge,
+            double basicFee,
+            double nonIntegratedFee) {
+        double price;
+        if(discount) {
+            price = fileSizeSurcharge;
+        } else {
+            // no journal, voucher, or country discount
+            price = basicFee + fileSizeSurcharge + nonIntegratedFee;
+        }
+        return price;
+    }
+
     public Double calculateShoppingCartTotal(Context context,ShoppingCart shoppingcart,String journal) throws SQLException{
         log.debug("recalculating shopping cart total");
-
-        Double price = new Double(0);
-
-        if(hasDiscount(context,shoppingcart,journal))
-        {
-            //has discount , only caculate the file surcharge fee
-            price =getSurchargeLargeFileFee(context, shoppingcart);
-        }
-        else
-        {
-            //no journal,voucher,country discount
-            Double basicFee = shoppingcart.getBasicFee();
-            double fileSizeFee=getSurchargeLargeFileFee(context, shoppingcart);
-            price = basicFee+fileSizeFee;
-            price = price+getNoIntegrateFee(context,shoppingcart,journal);
-        }
+        boolean discount = hasDiscount(context,shoppingcart,journal);
+        double fileSizeSurcharge = getSurchargeLargeFileFee(context, shoppingcart);
+        double basicFee = shoppingcart.getBasicFee();
+        double fileSizeFee = getSurchargeLargeFileFee(context, shoppingcart);
+        double nonIntegratedFee = getNoIntegrateFee(context, shoppingcart, journal);
+        double price = calculateTotal(discount, fileSizeSurcharge, basicFee, fileSizeFee);
         return price;
     }
 
