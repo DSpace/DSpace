@@ -250,7 +250,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
      * @param surchargeUnitSize amount of data to assess a fileSizeFeeAfter on, e.g. 1GB = 1*1024*1024
      * @return The total surcharge to assess.
      */
-    public static double calculateFileSizeSurcharge(
+    static double calculateFileSizeSurcharge(
             long allowedSize,
             long totalDataFileSize,
             double fileSizeFeeAfter,
