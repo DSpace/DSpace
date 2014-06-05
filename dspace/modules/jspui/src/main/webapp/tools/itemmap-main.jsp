@@ -64,7 +64,7 @@
 	 
     <%-- <p>There are <%=count_native%> items owned by this collection, and
     <%=count_import%> items mapped in from other collections.</p> --%>
-	<p><fmt:message key="jsp.tools.itemmap-main.info1">
+	<p class="alert alert-info"><fmt:message key="jsp.tools.itemmap-main.info1">
         <fmt:param><%=count_native%></fmt:param>
         <fmt:param><%=count_import%></fmt:param>
     </fmt:message></p>
@@ -168,7 +168,7 @@
     {
 %>
     <%-- <p>This collection has no items mapped into it.</p> --%>
-	<p><fmt:message key="jsp.tools.itemmap-main.info8"/></p>
+	<p class="alert alert-warning"><fmt:message key="jsp.tools.itemmap-main.info8"/></p>
 <%
     }
 
@@ -183,6 +183,6 @@
 
         String myLink = request.getContextPath()+"/tools/itemmap?action=browse";
 %>
-    <p align="center"><a href="<%=myLink%>&amp;cid=<%=cid%>&amp;t=<%=myID%>"><%=myTitle%> (<%=myCount%>)</a></p>
+    <p><a href="<%=myLink%>&amp;cid=<%=cid%>&amp;t=<%=myID%>"><%=myTitle%> (<%=myCount%>)</a></p>
 <%  } %>            
 </dspace:layout>
