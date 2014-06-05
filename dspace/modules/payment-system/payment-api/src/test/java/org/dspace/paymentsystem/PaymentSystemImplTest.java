@@ -59,4 +59,28 @@ public class PaymentSystemImplTest {
         double result = PaymentSystemImpl.calculateFileSizeSurcharge(allowedSize, totalDataFileSize, fileSizeFeeAfter, initialSurcharge, surchargeUnitSize);
         assertEquals("Calculated does not match", expResult, result, 0.0);
     }
+
+    @Test
+    public void testCalculateTotalDiscounted() {
+        System.out.println("Testing shopping cart total with discount");
+        boolean discount = true;
+        double fileSizeSurcharge = 15.0;
+        double basicFee = 80.0;
+        double nonIntegratedFee = 10.0;
+        double expResult = 15.0;
+        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
+        assertEquals("Calculated does not match", expResult, result, 0.0);
+    }
+
+    @Test
+    public void testCalculateTotalNotDiscounted() {
+        System.out.println("Testing shopping cart total without discount");
+        boolean discount = false;
+        double fileSizeSurcharge = 0.0;
+        double basicFee = 80.0;
+        double nonIntegratedFee = 10.0;
+        double expResult = 90.0;
+        double result = PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
+        assertEquals("Calculated does not match", expResult, result, 0.0);
+    }
 }
