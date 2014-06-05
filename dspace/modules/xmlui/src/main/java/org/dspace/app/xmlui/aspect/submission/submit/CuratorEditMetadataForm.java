@@ -131,7 +131,6 @@ public class CuratorEditMetadataForm extends AbstractDSpaceTransformer {
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
         header.addCell().addContent(T_column3);
-        header.addCell().addContent(T_column4);
 
         ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
         for (DCValue value : values) {
