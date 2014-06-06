@@ -384,7 +384,7 @@
 
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
-        .append("</label><div class=\"col-md-10\">");
+        .append("</label><div class=\"row col-md-10\">");
       
       for (int i = 0; i < fieldCount; i++)
       {
@@ -393,10 +393,10 @@
          else
             dateIssued = new org.dspace.content.DCDate("");
     
-         sb.append("<div class=\"row col-md-12\"><div class=\"input-group col-md-10\"><div class=\"row\">")
-			.append("<span class=\"input-group col-md-6\"><span class=\"input-group-addon\">")
+         sb.append("<div class=\"input-group col-md-10\">")
+			.append("<div class=\"col-md-5\"><div class=\"col-md-3\"><label>")
          	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
-            .append("</span><select class=\"form-control\" name=\"")
+            .append("</label></div><div class=\"row col-md-8\"><select class=\"form-control\" name=\"")
             .append(fieldName)
             .append("_month");
          if (repeatable && i>0)
@@ -424,10 +424,10 @@
               .append("</option>");
          }
     
-         sb.append("</select></span>")
-	            .append("<span class=\"input-group col-md-2\"><span class=\"input-group-addon\">")
+         sb.append("</select></div></div>")
+	            .append("<div class=\"col-md-3\"><div class=\"col-md-4\"><label>")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
-                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
+                .append("</label></div><div class=\"row col-md-8\"><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_day");
          if (repeatable && i>0)
@@ -439,9 +439,9 @@
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
             .append((dateIssued.getDay() > 0 ?
                      String.valueOf(dateIssued.getDay()) : "" ))
-                .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
+                .append("\"/></div></div><div class=\"col-md-4\"><div class=\"col-md-3\"><label>")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
-                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
+                .append("</label></div><div class=\"row col-md-8\"><input class=\"form-control\" type=\"text\" name=\"")
             .append(fieldName)
             .append("_year");
          if (repeatable && i>0)
@@ -453,7 +453,7 @@
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ?
                  String.valueOf(dateIssued.getYear()) : "" ))
-            .append("\"/></span></div></div>\n");
+            .append("\"/></div></div>\n");
     
          if (repeatable && !readonly && i < defaults.length)
          {
@@ -927,7 +927,7 @@
          }
 
          // do the dropdown box
-         sb.append("<div class=\"row col-md-12\"><span class=\"input-group col-md-10\"><span class=\"input-group-addon\"><select name=\"")
+         sb.append("<div class=\"row col-md-12\"><div class=\"col-md-10\"><div class=\"row col-md-2\"><select class=\"form-control\" name=\"")
            .append(fieldName)
            .append("_qualifier");
          if (repeatable && j!= fieldCount-1)
@@ -951,7 +951,7 @@
          }
       
          // do the input box
-         sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
+         sb.append("</select></div><div class=\"row col-md-10\"><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
            .append("_value");
          if (repeatable && j!= fieldCount-1)
@@ -962,7 +962,7 @@
          }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
-           .append("\"/></span>\n");
+           .append("\"/></div></div>\n");
 
          if (repeatable && !readonly && j < defaults.length)
          {

@@ -382,13 +382,15 @@
 			--%>
      
                 <div class="input-group">	
-                <label class="input-group-addon" for="source_normal"><fmt:message key="jsp.tools.edit-collection.form.label16"/></label>
-                <div class="form-control">
-                	<input class="col-md-1" type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source" />
-                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label17"/></span>
-               		<input class="col-md-1" type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source" />
-                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label18"/></span>
-                </div>
+                	<label><fmt:message key="jsp.tools.edit-collection.form.label16"/></label>
+                	<div class="radio">
+	                	<input type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source" />
+                		<label><fmt:message key="jsp.tools.edit-collection.form.label17"/></label>
+                	</div>
+                	<div class="radio">
+	               		<input type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source" />
+                		<label><fmt:message key="jsp.tools.edit-collection.form.label18"/></label>
+                	</div>
                 </div><br/>
                 <div class="row">
                 	<label class="col-md-3" for="oai_provider"><fmt:message key="jsp.tools.edit-collection.form.label19"/></label>
@@ -434,15 +436,19 @@
 					</span>
 				</div><br/>
 				<div class="input-group">	
-                <label class="input-group-addon" for="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label22"/></label>
-                <div class="form-control">
-                	<input class="col-md-1" type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level" />
-                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label23"/></span><br/>
-                	<input class="col-md-1" type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level" />
-                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label24"/></span><br/>
-                	<input class="col-md-1" type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level" />
-                	<span class="col-md-11"><fmt:message key="jsp.tools.edit-collection.form.label25"/></span><br/>
-                </div>
+                	<label><fmt:message key="jsp.tools.edit-collection.form.label22"/></label>
+                	<div class="radio">
+	                	<input type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level" />
+    	            	<label><fmt:message key="jsp.tools.edit-collection.form.label23"/></label>
+    	            </div>
+    	            <div class="radio">
+                		<input type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level" />
+                		<label><fmt:message key="jsp.tools.edit-collection.form.label24"/></label>
+                	</div>
+    	            <div class="radio">
+                		<input type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level" />
+                		<label><fmt:message key="jsp.tools.edit-collection.form.label25"/></label>
+                	</div>
                 </div><br/>	
                 <div class="row">
                 <label class="col-md-6"><fmt:message key="jsp.tools.edit-collection.form.label26"/></label>
