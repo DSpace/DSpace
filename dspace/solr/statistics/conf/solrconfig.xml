@@ -812,6 +812,11 @@
        <int name="rows">10</int>
        <str name="df">id</str>
      </lst>
+     
+     <shardHandlerFactory class="HttpShardHandlerFactory">
+       <str name="urlScheme">https://</str>
+     </shardHandlerFactory>
+     
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
          multi-val params from the query (or the existing "defaults").
