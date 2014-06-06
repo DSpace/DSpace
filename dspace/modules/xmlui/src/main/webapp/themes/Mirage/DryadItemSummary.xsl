@@ -285,10 +285,9 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </div>
-                    <!-- only show citation/share if viewing from public (not admin) page -->
+                    <!-- only show citation/share if viewing from page with real handle (not in process) -->
                     <xsl:if
-                            test="not($meta[@element='request'][@qualifier='URI'][.='admin/item/view_item'])
-					and not($meta[@element='request'][@qualifier='URI'][contains(., 'workflow')])">
+                            test="$meta[@element='request'][@qualifier='URI'][contains(.,'handle') or contains(.,'resource')]">
                         <xsl:variable name="pkgDOI"
                                       select="$meta[@element='identifier'][@qualifier='package']"/>
                         <!-- Here we give links to expost the citation and share options available
@@ -694,9 +693,9 @@
                             </xsl:choose>
                         </div>
                     </xsl:if>
-                    <!-- only show citation/share if viewing from public (not admin) page -->
+                    <!-- only show citation/share if viewing from page with real handle (not in process) -->
                     <xsl:if
-                            test="not($meta[@element='request'][@qualifier='URI'][.='admin/item/view_item'])">
+                            test="$meta[@element='request'][@qualifier='URI'][contains(.,'handle') or contains(.,'resource')]">
                         <div align="right" style="padding-right: 20px; padding-bottom: 5px;">
                             <a href="/cite" id="cite" title="Click to open and close">
                                 <i18n:text>xmlui.DryadItemSummary.cite</i18n:text>
