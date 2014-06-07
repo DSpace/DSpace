@@ -407,6 +407,12 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
+            <exclusions>
+            	<exclusion>
+                	<groupId>net.sf.ehcache</groupId>
+            		<artifactId>ehcache-core</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -446,12 +452,10 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.version}</version>
+            <artifactId>solr-solrj</artifactId>            
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

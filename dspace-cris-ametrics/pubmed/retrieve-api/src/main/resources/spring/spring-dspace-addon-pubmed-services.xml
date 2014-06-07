@@ -81,7 +81,7 @@
 	</bean>
 	
 	<bean id="transactionManagerPMC"
-		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactoryPMC" />
 	</bean>
 	
@@ -102,7 +102,7 @@
 	</bean>
 
 	<bean id="sessionFactoryPMC"
-		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSourcePMC" />
 		<property name="configLocation" value="classpath:hibernate/hibernate-pmc.cfg.xml" />
 		<property name="hibernateProperties" ref="hibernateProperties" />	
