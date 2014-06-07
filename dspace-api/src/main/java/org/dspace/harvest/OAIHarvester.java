@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import ORG.oclc.oai.harvester2.verb.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -63,12 +64,6 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-
-import ORG.oclc.oai.harvester2.verb.GetRecord;
-import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
-import ORG.oclc.oai.harvester2.verb.ListRecords;
-import ORG.oclc.oai.harvester2.verb.ListSets;
 
 
 /**
@@ -139,13 +134,9 @@ public class OAIHarvester {
         // Set the ORE options
 		Namespace ORESerializationNamespace = OAIHarvester.getORENamespace();
 
-        if (ORESerializationNamespace == null) {
-        	log.error("No ORE serialization namespace declared; see dspace.cfg option \"harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}\"");
-        	throw new HarvestingException("No ORE serialization namespace specified");
-        } else {
-        	ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
-        	ORESerialKey = ORESerializationNamespace.getPrefix();
-        }
+        //No need to worry about ORESerializationNamespace, this can never be null
+        ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
+        ORESerialKey = ORESerializationNamespace.getPrefix();
 
         // Set the metadata options
         metadataKey = harvestRow.getHarvestMetadataConfig();
@@ -373,7 +364,13 @@ public class OAIHarvester {
 				else {
 					listRecords = new ListRecords(oaiSource, resumptionToken);
 				}
-				targetCollection.update();
+                ourContext.turnOffAuthorisationSystem();
+                try {
+                    targetCollection.update();
+                } finally {
+                    //In case of an exception, make sure to restore our authentication state to the previous state
+                    ourContext.restoreAuthSystemState();
+                }
 				ourContext.commit();
 			}
 		}
@@ -398,6 +395,7 @@ public class OAIHarvester {
 		}
 		finally {
 			harvestRow.update();
+            ourContext.turnOffAuthorisationSystem();
 			targetCollection.update();
 			ourContext.commit();
 			ourContext.restoreAuthSystemState();
@@ -932,7 +930,7 @@ public class OAIHarvester {
         String DMDOAIPrefix = null;
 
         try {
-            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
+            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, getORENamespace().getURI());
             DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
     	}
     	catch (Exception ex) {
@@ -958,29 +956,21 @@ public class OAIHarvester {
     	try {
             //If we do not want to harvest from one set, then skip this.
     		if(!"all".equals(oaiSetId)){
-                ListSets ls = new ListSets(oaiSource);
+                ListIdentifiers ls = new ListIdentifiers(oaiSource, null, null, oaiSetId, DMDOAIPrefix);
 
                 // The only error we can really get here is "noSetHierarchy"
                 if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
                     for (int i=0; i<ls.getErrors().getLength(); i++) {
                         String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
-                        errorSet.add(errorCode);
+                        errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec (" + errorCode + ")");
                     }
                 }
                 else {
                     // Drilling down to /OAI-PMH/ListSets/set
                     Document reply = db.build(ls.getDocument());
                     Element root = reply.getRootElement();
-                    List<Element> sets= root.getChild("ListSets",OAI_NS).getChildren("set",OAI_NS);
-
-                    for (Element set : sets)
-                    {
-                        String setSpec = set.getChildText("setSpec", OAI_NS);
-                        if (setSpec.equals(oaiSetId)) {
-                            foundSet = true;
-                            break;
-                        }
-                    }
+                    //Check if we can find items, if so this indicates that we have children and our sets exist
+                    foundSet = 0 < root.getChild("ListIdentifiers",OAI_NS).getChildren().size();
 
                     if (!foundSet) {
                         errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");

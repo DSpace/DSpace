@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>CRIS-4.0.0-SNAPSHOT</version>
+   <version>CRIS-4.1.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>https://github.com/Cineca/DSpace</url>
    <description>
@@ -123,19 +123,20 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
+         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
          <plugin>
            <artifactId>maven-antrun-plugin</artifactId>
            <version>1.7</version>
-           <configuration>
-             <target>
-	       <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
-               <native2ascii encoding="UTF8" src="${basedir}" dest="${basedir}/target" includes="*.properties" />
-             </target>
-           </configuration>
            <executions>
              <execution>
                <id>native2ascii-utf8</id>
                <phase>generate-resources</phase>
+               <configuration>
+                 <target name="Encode any UTF-8 chars in properties">
+                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
+                 </target>
+               </configuration>
                <goals>
                  <goal>run</goal>
                </goals>
@@ -587,125 +588,125 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
-            <type>jar</type>
+			<version>${project.version}</version>
+			<type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-cris-jspui-webapp</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-cris-webservices-webapp</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-lookup</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>pubmed-lookup-web</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>         
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>CRIS-4.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -1126,32 +1127,32 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-api</artifactId>
-			<version>CRIS-4.0.0-SNAPSHOT</version>			
+			<version>CRIS-4.1.0-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-api</artifactId>
-			<version>CRIS-4.0.0-SNAPSHOT</version>			
+			<version>CRIS-4.1.0-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-jspui-webapp</artifactId>
-			<version>CRIS-4.0.0-SNAPSHOT</version>			
+			<version>CRIS-4.1.0-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-api</artifactId>
-			<version>CRIS-4.0.0-SNAPSHOT</version>			
+			<version>CRIS-4.1.0-SNAPSHOT</version>			
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-cris-webservices-webapp</artifactId>
-			<version>CRIS-4.0.0-SNAPSHOT</version>			
+			<version>CRIS-4.1.0-SNAPSHOT</version>			
 		</dependency>
 		 <dependency>
              <groupId>org.dspace</groupId>
 			 <artifactId>pubmed-retrieve</artifactId>
-			 <version>CRIS-4.0.0-SNAPSHOT</version>
+			 <version>CRIS-4.1.0-SNAPSHOT</version>
          </dependency>
 		<dependency>
 			<groupId>net.sf.flexjson</groupId>

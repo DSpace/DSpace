@@ -65,12 +65,16 @@ public class DailyReportEmailer
     public void sendReport(File attachment, int numberOfBitstreams) 
             throws IOException, javax.mail.MessagingException 
     { 
-        Email email = new Email(); 
-        email.setSubject("Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues"); 
-        email.setContent("report is attached ..."); 
-        email.addAttachment(attachment, "checksum_checker_report.txt"); 
-        email.addRecipient(ConfigurationManager.getProperty("mail.admin")); 
-        email.send(); 
+        if(numberOfBitstreams > 0)
+        {
+            String hostname = ConfigurationManager.getProperty("dspace.hostname");
+            Email email = new Email();
+            email.setSubject("Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues on " + hostname);
+            email.setContent("report is attached ...");
+            email.addAttachment(attachment, "checksum_checker_report.txt");
+            email.addRecipient(ConfigurationManager.getProperty("mail.admin"));
+            email.send();
+        }
     } 
 
     /**

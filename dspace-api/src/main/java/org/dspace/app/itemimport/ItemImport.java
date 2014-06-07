@@ -715,6 +715,7 @@ public class ItemImport
         	} catch (Exception e) {
         		System.err.println("Exception");
         		e.printStackTrace();
+        		throw e;
         	}
 
         	ItemImport myloader = new ItemImport();
@@ -761,8 +762,7 @@ public class ItemImport
 
         if (d == null || !d.isDirectory())
         {
-            System.out.println("Error, cannot open source directory " + sourceDir);
-            System.exit(1);
+            throw new Exception("Error, cannot open source directory " + sourceDir);
         }
 
         String[] dircontents = d.list(directoryFilter);
@@ -792,9 +792,8 @@ public class ItemImport
 
         if (d == null || !d.isDirectory())
         {
-            System.out.println("Error, cannot open source directory "
+            throw new Exception("Error, cannot open source directory "
                     + sourceDir);
-            System.exit(1);
         }
 
         // read in HashMap first, to get list of handles & source dirs

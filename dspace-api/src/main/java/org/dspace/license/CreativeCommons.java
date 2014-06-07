@@ -20,6 +20,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -61,7 +62,7 @@ public class CreativeCommons
         String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
         String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
 
-        if ((proxyHost != null) && (proxyPort != null))
+        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
         {
             System.setProperty("http.proxyHost", proxyHost);
             System.setProperty("http.proxyPort", proxyPort);
