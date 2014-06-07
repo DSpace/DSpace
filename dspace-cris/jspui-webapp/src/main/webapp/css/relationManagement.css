@@ -1,0 +1,42 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+div#relation_management_ria {display: table-row; width: 100%;}
+div#relation_management_ria div#relation_management_searchDiv {display: table-cell; width: 660px;}
+div#relation_management_ria div#relation_management_selectedDiv {display: table-cell;width: 320px;}
+div#relation_management_ria h3 {margin-bottom: 1em;}
+div#relation_management_ria div {padding-right: 5px;}
+div#relation_management_changesLog{clear: both; margin-top: 1em;background-color: white;padding-top:1em;padding-bottom:1em;}
+input#save, input#exit {margin-left:3em;}
+a span.relationmanagement.status {text-decoration: underline;}
+span.relationmanagement.status {font-weight: bold; color: black;}
+span.relationmanagement.status.hided {color: grey;}
+span.relationmanagement.status.selected {color: #F6AD35;}
+span.relationmanagement.status.unlinked {color: red;}
+div.relation_management_selected { color: #F6AD35; display: table-row; background-color: grey; border: 1px solid white; margin:0px;}
+div.changelog {display: table-row;}
+div.change-status, div.change-description {display: table-cell; padding-right:5px;}
+div.change-status {font-weight: bold;}
+div.change-status.hide {color: grey;}
+div.change-status.select {color: #F6AD35;}
+div.change-status.unlink {color: red;}
+div.relation_management_selected_count {display: table-cell; font-size: 120%; font-weight: bold; padding: 3px; border-top: 1px solid white;border-bottom: 1px solid white;border-left: 1px solid white;}
+div.relation_management_selected_desc {display: table-cell; border-rigth: 1px solid white; border-top: 1px solid white; border-bottom: 1px solid white; width: 100%; padding: 3px;}
+.showDragHandle {
+    background-image: url("../images/updown.gif");
+    background-position: center center;
+    background-repeat: no-repeat;    
+}
+.sortableCursor {cursor: move;}
+.intro {
+    height: 240px;
+    margin-left: 15px;
+    width: 800px;
+}
+div.intro ul li {
+    list-style: decimal outside none;
+}

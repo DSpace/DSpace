@@ -1,0 +1,283 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+html, body {
+    margin:0;
+    padding:0;
+    font-family: "Lucida Grande", Verdana;
+    font-size: 0.9em;
+    /* text-align: center; */    
+    background-color:#F2F2F2;
+}
+
+html body.ui-layout-container div.ui-layout-north div#banner.thumbnail {
+	text-align: center;	
+}
+
+/* table {
+    margin-top:-10px;
+    margin-left:7px;
+}
+ */
+h4 {
+    font-size:1.1em;
+    text-decoration:none;
+    font-weight:normal;
+    color:#23A4FF;
+}
+
+/*a {
+    color:#23A4FF;
+}*/
+
+#container {
+    width: 1000px;
+    height: 600px;
+    margin:0 auto;
+    position:relative;
+}
+
+#left-container, 
+#right-container, 
+#center-container {
+    height:600px;
+    position:absolute;
+    top:0;
+}
+
+#left-container, #right-container {
+    width:200px;
+    color:#686c70;
+    text-align: left;
+    overflow: auto;
+    background-color:#fff;
+    background-repeat:no-repeat;
+    border-bottom:1px solid #ddd;
+}
+
+#left-container {
+    left:0;
+    background-image:url('col2.png');
+    background-position:center right;
+    border-left:1px solid #ddd;
+    
+}
+
+#right-container {
+    right:0;
+    background-image:url('col1.png');
+    background-position:center left;
+    border-right:1px solid #ddd;
+}
+
+#right-container h4{
+    text-indent:8px;
+}
+
+#center-container {
+    width:600px;
+    left:200px;
+    background-color:#1a1a1a;
+    color:#ccc;
+}
+
+.text {
+    margin: 7px;
+}
+
+#inner-details {
+    font-size:0.8em;
+    list-style:none;
+    margin:7px;
+}
+
+
+#log {
+	height: auto !important;
+	min-height: none !important;		
+}
+
+#infovis {
+    position:relative;
+    width:auto;
+    height:auto;
+    margin:auto;
+/*    overflow:hidden;*/
+}
+
+/*TOOLTIPS*/
+.tip {
+    color: #111;
+    width: 139px;
+    background-color: white;
+    border:1px solid #ccc;
+    -moz-box-shadow:#555 2px 2px 8px;
+    -webkit-box-shadow:#555 2px 2px 8px;
+    -o-box-shadow:#555 2px 2px 8px;
+    box-shadow:#555 2px 2px 8px;
+    opacity:0.9;
+    filter:alpha(opacity=90);
+    font-size:10px;
+    font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+    padding:7px;
+    width: auto;
+}
+
+#tip-edge {
+    color: #111;
+    width: 139px;
+    background-color: grey;
+    border:1px solid #ccc;
+    -moz-box-shadow:#555 2px 2px 8px;
+    -webkit-box-shadow:#555 2px 2px 8px;
+    -o-box-shadow:#555 2px 2px 8px;
+    box-shadow:#555 2px 2px 8px;
+    opacity:0.9;
+    filter:alpha(opacity=90);
+    font-size:10px;
+    font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+    padding:7px;
+}
+
+.node {	
+	font-size: 0.8em;	
+}
+
+.network-degree sup {
+    font-weight: normal !important;
+    vertical-align: bottom !important;
+}
+
+.network-degree {
+    color: #3399CC;
+    font-size: 11px !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    line-height: 12px !important;
+    text-align: center !important;
+}
+
+
+html body.ui-layout-container div.ui-layout-east div#accordion.ui-accordion h3.ui-accordion-header {
+	text-align: left;
+	font-size: 0.9em;	
+}
+
+#profileminimized {
+	display: none;	
+}
+
+#profiletargetminimized {
+	display: none;	
+}
+
+.imagemin {
+	width: 80px;
+}
+#picturemin {
+ 	width: 80px;
+ 	float: left;
+}
+
+span.header4#headermin {
+	font-size: small !important;	
+}
+
+#ulmin {
+	font-size: smaller;
+	text-align: left;	
+}
+
+#profiletarget {
+/*	padding-top: 1em;	*/
+}
+
+#profiletargettwice {
+	padding-top: 2em;	
+}
+
+#logcontent {
+	padding-top: 0.5em;	
+}
+
+.otherminimized {
+	padding-left: 70px;	
+}
+
+#footer-south {
+	text-align: center;
+}
+
+#loader {
+	width: 100%;	
+}
+
+.profile {
+	border: 1px dotted;	
+}
+
+#profileTitle {
+	color: #3399CC;
+    font-size: 11px !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    line-height: 12px !important;
+    text-align: center !important;	
+}
+
+.footerdiv {
+	margin:5px;
+	min-width: 900px;
+}
+
+.smallfont {
+	font-size: xx-small;	
+}
+
+
+span.icon-network{
+	background-image: url("../image/network/network_icon.jpg") !important;
+}
+
+.icon-activate{
+	background-image: url("../image/network/businessman_add.png") !important;
+}
+
+.icon-deactivate{
+	background-image: url("../image/network/businessman_delete.png") !important;
+}
+
+.icon-graphlayoutcustom {
+	background-image: url("../image/network/custom_rgraph.png") !important;
+}
+
+.icon-graphlayoutdefault {
+	background-image: url("../image/network/default_rgraph.png") !important;
+}
+span.icon-network, .icon-activate, .icon-deactivate, .icon-graphlayoutcustom, .icon-graphlayoutdefault {
+	background-repeat: no-repeat;
+	background-position: center;
+}
+.titleradio {
+	font-size: 	small;	
+}
+
+#edgetableinformation {
+/*	width: 100%;
+	overflow: auto;*/
+	font-size: .8em;
+}
+
+#edgetableinformation td {
+	vertical-align: top;
+}
+
+a {
+    color: #4EAC2E;
+    text-decoration: none;
+    cursor: pointer;
+}

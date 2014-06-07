@@ -1,0 +1,1651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:webflow="http://www.springframework.org/schema/webflow-config"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	
+	<bean id="txProxyTemplate" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="proxyTargetClass" value="true" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>								
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="baseService" class="it.cilea.osd.common.service.PersistenceService"
+		abstract="true">		
+		<property name="modelDaos">
+			<map>			
+				<entry key="org.dspace.app.cris.model.RelationPreference">
+					<ref bean="relationPreferenceDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.model.ANestedObject">
+					<ref bean="nestedObjectDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.web.Tab">
+					<ref bean="tabDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.ResearcherPage">
+					<ref bean="researcherPageDao" />
+				</entry>				
+				<entry key="org.dspace.app.cris.model.Project">
+					<ref bean="researcherGrantDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.OrganizationUnit">
+					<ref bean="organizationUnitDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage">
+					<ref bean="rpAdditionalDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage">
+					<ref bean="projectAdditionalDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.OUAdditionalFieldStorage">
+					<ref bean="ouAdditionalDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.RPPropertiesDefinition">
+					<ref bean="rpPropertiesDefinitionDao" />
+				</entry>
+				<entry				         
+					key="org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition">
+					<ref bean="rpNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition">
+					<ref bean="grantPropertiesDefinitionDao" />
+				</entry>
+				<entry				         
+					key="org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition">
+					<ref bean="projectNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.OUPropertiesDefinition">
+					<ref bean="ouPropertiesDefinitionDao" />
+				</entry>
+				<entry				         
+					key="org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition">
+					<ref bean="ouNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition">
+					<ref bean="rpDecoratorPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition">
+					<ref bean="grantDecoratorPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition">
+					<ref bean="ouDecoratorPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition">
+					<ref bean="rpDecoratorNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry				                  
+					key="org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition">
+					<ref bean="projectDecoratorNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry				                  
+					key="org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition">
+					<ref bean="ouDecoratorNestedPropertiesDefinitionDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.RPTypeNestedObject">
+					<ref bean="rpTypeDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject">
+					<ref bean="projectTypeDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.OUTypeNestedObject">
+					<ref bean="ouTypeDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested">
+					<ref bean="rpDecoratorTypeNestedDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested">
+					<ref bean="projectDecoratorTypeNestedDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested">
+					<ref bean="ouDecoratorTypeNestedDao" />
+				</entry>
+				<entry
+					key="it.cilea.osd.jdyna.model.Containable">
+					<ref bean="containableDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.model.Property">
+					<ref bean="propertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.RPProperty">
+					<ref bean="rpPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.ProjectProperty">
+					<ref bean="grantPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.OUProperty">
+					<ref bean="ouPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.RPNestedProperty">
+					<ref bean="rpNestedPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.ProjectNestedProperty">
+					<ref bean="projectNestedPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.OUNestedProperty">
+					<ref bean="ouNestedPropertyDao" />
+				</entry>												
+				<entry key="org.dspace.app.cris.model.jdyna.RPNestedObject">
+					<ref bean="rpNestedObjectDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.ProjectNestedObject">
+					<ref bean="projectNestedObjectDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.OUNestedObject">
+					<ref bean="ouNestedObjectDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.model.PropertiesDefinition">
+					<ref bean="propertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.TabResearcherPage">
+					<ref bean="rpTabDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.TabProject">
+					<ref bean="grantTabDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.TabOrganizationUnit">
+					<ref bean="ouTabDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.BoxResearcherPage">
+					<ref bean="rpBoxDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.BoxProject">
+					<ref bean="grantBoxDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.BoxOrganizationUnit">
+					<ref bean="ouBoxDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.EditTabResearcherPage">
+					<ref bean="rpEditTabDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.EditTabProject">
+					<ref bean="grantEditTabDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit">
+					<ref bean="ouEditTabDao" />
+				</entry>						
+				<entry key="it.cilea.osd.jdyna.widget.WidgetTesto">
+					<ref bean="widgetTextDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.widget.WidgetEmail">
+					<ref bean="widgetEmailDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.widget.WidgetDate">
+					<ref bean="widgetDateDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.widget.WidgetLink">
+					<ref bean="widgetLinkDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.widget.WidgetFile">
+					<ref bean="widgetFileDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.model.AWidget">
+					<ref bean="widgetDao" />
+				</entry>				
+				<entry key="org.dspace.app.cris.model.StatSubscription">
+					<ref bean="statSubscriptionDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.CrisSubscription">
+					<ref bean="crisSubscriptionDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.ws.User">
+					<ref bean="userWSDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition">
+					<ref bean="dynamicDecoratorPropertiesDefinitionDao" />
+				</entry>
+				<entry				                  
+					key="org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition">
+					<ref bean="dynamicDecoratorNestedPropertiesDefinitionDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested">
+					<ref bean="dynamicDecoratorTypeNestedDao" />
+				</entry>					
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject">
+					<ref bean="dynamicNestedTypeDefinitionDao" />
+				</entry>								
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition">
+					<ref bean="dynamicPropertiesDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.ResearchObject">
+					<ref bean="dynamicDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DynamicObjectType">
+					<ref bean="dynamicTypeDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.TabDynamicObject">
+					<ref bean="dynamicTabDao" />
+				</entry>
+				<entry
+					key="org.dspace.app.cris.model.jdyna.BoxDynamicObject">
+					<ref bean="dynamicBoxDao" />
+				</entry>				
+				<entry
+					key="org.dspace.app.cris.model.jdyna.EditTabDynamicObject">
+					<ref bean="dynamicEditTabDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.DynamicProperty">
+					<ref bean="dynamicPropertyDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.jdyna.DynamicNestedProperty">
+					<ref bean="dynamicNestedPropertyDao" />
+				</entry>
+				<entry				         
+					key="org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition">
+					<ref bean="dynamicNestedPropertiesDefinitionDao" />
+				</entry>			
+				<entry key="org.dspace.app.cris.model.jdyna.DynamicNestedObject">
+					<ref bean="dynamicNestedObjectDao" />
+				</entry>
+			</map>
+		</property>		
+	</bean>
+
+	<bean id="applicationService" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="org.dspace.app.cris.service.ApplicationService"
+				init-method="init" destroy-method="destroy" parent="baseService">
+				<property name="applicationDao" ref="applicationDao" />
+				<property name="listenerOnPostUpdate">
+					<list>
+						<ref local="crisIndexerListener" />
+						<ref local="nestedIndexerListener" />		
+					</list>
+				</property>
+				<property name="listenerOnPostDelete">
+					<list>
+						<ref local="crisIndexerListener" />
+						<ref local="nestedIndexerListener" />		
+					</list>
+				</property>
+				<property name="listenerOnPreInsert">
+					<list>
+						<ref local="nestedPositionListener" />		
+					</list>
+				</property>				
+			</bean>
+		</property>
+	</bean>
+		
+	<bean id="researcherPageUtils" class="org.dspace.app.cris.util.ResearcherPageUtils">
+		<constructor-arg ref="applicationService" />
+	</bean>	
+	
+	<bean class="it.cilea.osd.jdyna.util.AnagraficaUtils">
+		<constructor-arg ref="applicationService" />
+	</bean>	
+	
+	<bean id="statSubscribeService" class="org.dspace.app.cris.statistics.service.StatSubscribeService">			
+		<constructor-arg ref="applicationService" />
+		<property name="statsLogger" ref="org.dspace.statistics.SolrLogger"/>
+	</bean>	
+
+	<bean id="CrisSubscribeService" class="org.dspace.app.cris.service.CrisSubscribeService">			
+		<constructor-arg ref="applicationService" />		
+	</bean>	
+		
+	<!--  DAO  -->
+	
+	<bean id="applicationDao" class="org.dspace.app.cris.dao.ApplicationDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="namedQueryIntroductionAdvisor"
+		class="it.cilea.osd.common.dao.impl.NamedQueryIntroductionAdvisor" />
+
+	<bean id="abstractDaoTarget" class="it.cilea.osd.common.dao.impl.GenericDaoHibernateImpl"
+		abstract="true">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="abstractDao" class="org.springframework.aop.framework.ProxyFactoryBean"
+		abstract="true">
+		<property name="interceptorNames">
+			<list>
+				<value>namedQueryIntroductionAdvisor</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="researcherPageDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ResearcherPageDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.ResearcherPage</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="researcherGrantDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ProjectDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.Project</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+		
+		
+	<bean id="organizationUnitDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.OrganizationUnitDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.OrganizationUnit</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+		
+	<bean id="rpAdditionalDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.RPAdditionalFieldStorageDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+
+	<bean id="projectAdditionalDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ProjectAdditionalFieldStorageDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ouAdditionalDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.OUAdditionalFieldStorageDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.jdyna.OUAdditionalFieldStorage</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="dynamicDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.DynamicObjectDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.ResearchObject</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+			
+	<bean id="dynamicAdditionalDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.DynamicAdditionalFieldStorageDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.jdyna.DynamicAdditionalFieldStorage</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+			
+	<bean id="widgetDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.model.AWidget
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="widgetTextDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetTestoDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetTesto
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="widgetLinkDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetLinkDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetLink
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="widgetFileDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetFileDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetFile
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="widgetEmailDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetEmailDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetEmail
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="widgetDateDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetDateDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetDate
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="propertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.model.Property
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPPropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="grantPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectPropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ouPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUPropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpNestedPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPNestedProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="projectNestedPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectNestedProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<bean id="ouNestedPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUNestedProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="relationPreferenceDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RelationPreferenceDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.RelationPreference
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="nestedObjectDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.NestedObjectDAO
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.model.ANestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="rpNestedObjectDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.NestedObjectDAO
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="projectNestedObjectDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.NestedObjectDAO
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ouNestedObjectDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.NestedObjectDAO
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="projectNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+
+	<bean id="grantPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="ouNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+
+	<bean id="ouPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="dynamicPropertiesDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="propertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.model.PropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+
+
+	<bean id="tabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>it.cilea.osd.jdyna.dao.TabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.web.Tab
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.RPTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.TabResearcherPage
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="grantTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ProjectTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.TabProject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="ouTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.OUTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.TabOrganizationUnit
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="rpBoxDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.RPBoxDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.BoxResearcherPage
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="grantBoxDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ProjectBoxDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.BoxProject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="ouBoxDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.OUBoxDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="rpEditTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.RPEditTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.EditTabResearcherPage
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="grantEditTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.ProjectEditTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.EditTabProject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="ouEditTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.OUEditTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>		
+	<bean id="rpDecoratorPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPDecoratorPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="rpDecoratorNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPDecoratorNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="grantDecoratorPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectDecoratorPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="projectDecoratorNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectDecoratorNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="ouDecoratorPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUDecoratorPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="ouDecoratorNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUDecoratorNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicDecoratorPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicDecoratorPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicDecoratorNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicDecoratorNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="containableDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.ContainableDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.model.Containable
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="crisSubscriptionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.CrisSubscriptionDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.CrisSubscription</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="statSubscriptionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.StatSubscriptionDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.StatSubscription</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicNestedTypeDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicTypeNestedObjectDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpTypeDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPTypeNestedObjectDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.RPTypeNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="projectTypeDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectTypeNestedObjectDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="ouTypeDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUTypeNestedObjectDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.OUTypeNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="rpDecoratorTypeNestedDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.RPDecoratorTypeNestedDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="projectDecoratorTypeNestedDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.ProjectDecoratorTypeNestedDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="ouDecoratorTypeNestedDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OUDecoratorTypeNestedDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+				
+	<bean id="dynamicDecoratorTypeNestedDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicDecoratorTypeNestedDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="userWSDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.UserWSDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.ws.User</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>		
+	
+	
+	<bean id="dynamicTypeDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>org.dspace.app.cris.dao.DynamicObjectTypeDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+		
+	<bean id="dynamicBoxDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>it.cilea.osd.jdyna.dao.TypedBoxDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.BoxDynamicObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>it.cilea.osd.jdyna.dao.TypedTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.TabDynamicObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicEditTabDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>it.cilea.osd.jdyna.dao.EditTypedTabDao</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.EditTabDynamicObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicPropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="dynamicNestedPropertyDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.PropertyDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicNestedProperty
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicNestedPropertiesDefinitionDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.DynamicNestedPropertiesDefinitionDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dynamicNestedObjectDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.NestedObjectDAO
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.jdyna.DynamicNestedObject
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	
+	<!--  resources  -->
+	<bean id="dspaceDatasource" class="org.dspace.app.cris.util.DSpaceDataSource">
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+	</bean>
+	
+	<bean id="dspaceDBDriver" factory-bean="dspaceDatasource" factory-method="getDriver" />
+	<bean id="dspaceDBUsername" factory-bean="dspaceDatasource" factory-method="getUsername" />
+	<bean id="dspaceDBPassword" factory-bean="dspaceDatasource" factory-method="getPassword" />
+	<bean id="dspaceDBUrl" factory-bean="dspaceDatasource" factory-method="getUrl" />
+	<bean id="hibernateProperties" factory-bean="dspaceDatasource" factory-method="getHibernateProperties" />
+
+	<bean id="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" ref="dspaceDBDriver" />
+		<property name="jdbcUrl" ref="dspaceDBUrl" />
+		<property name="user" ref="dspaceDBUsername" />
+		<property name="password" ref="dspaceDBPassword" />
+		
+		<!-- these are C3P0 properties -->
+        <property name="acquireIncrement" value="5" />
+        <property name="minPoolSize" value="20" />
+        <property name="maxPoolSize" value="100" />
+        <property name="maxIdleTime" value="100" />
+		<property name="maxStatements" value="50" />
+  		<property name="idleConnectionTestPeriod" value="3000" />
+  		<property name="loginTimeout" value="300" />
+  
+	</bean>
+	
+	<!--
+			event listenter for indexing with Hibernate Seach and naming RP change
+		-->
+	<bean id="eventIntegrator" class="org.dspace.app.cris.util.HibernateEventRegistry" init-method="init">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="eventListeners">
+			<map>
+				<entry key="save-update">					
+					<ref local="UUIDListener" />											
+				</entry>
+				<entry key="pre-insert">		
+					<list>		
+						<ref local="RPListener" />	
+						<ref local="CRISIDListener" />
+					</list>
+				</entry>				
+				<entry key="pre-update">					
+					<ref local="RPListener" />											
+				</entry>				
+				<entry key="post-load">
+					<list>
+					<ref local="RPListener" />
+						<ref local="rpResourcePolicyListener" />																	
+					</list>
+				</entry>
+				<entry key="post-insert">
+					<list>
+						<ref local="rpResourcePolicyListener" />											
+					</list>
+				</entry>
+				<entry key="post-update">	
+					<list>
+						<ref local="rpResourcePolicyListener" />						
+					</list>				
+				</entry>				
+				<entry key="post-delete">
+					<list>
+						<ref local="rpResourcePolicyListener" />						
+					</list>
+				</entry>				
+			</map>
+		</property>
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:hibernate/hibernate-cris.cfg.xml" />
+		<property name="hibernateProperties" ref="hibernateProperties" />
+		
+	</bean>
+
+	<bean id="crisIndexerListener" class="org.dspace.app.cris.discovery.NativeCrisListenerSolrIndexer">
+		<property name="crisSearchService" ref="org.dspace.discovery.IndexingService" />
+	</bean>
+	
+	<bean id="nestedIndexerListener" class="org.dspace.app.cris.discovery.NativeNestedListenerSolrIndexer">
+		<property name="crisSearchService" ref="org.dspace.discovery.IndexingService" />
+	</bean>
+	
+	<bean id="rpResourcePolicyListener" class="org.dspace.app.cris.model.listener.RPResourcePolicyListener"/>
+	
+	<bean id="RPListener" class="org.dspace.app.cris.model.listener.RPListener"/>
+
+	<bean id="UUIDListener" class="org.dspace.app.cris.model.listener.UUIDListener"/>
+	
+	<bean id="CRISIDListener" class="org.dspace.app.cris.model.listener.CrisIDListener"/>
+	
+	<bean id="nestedPositionListener" class="org.dspace.app.cris.model.listener.NestedPositionListener"/>
+
+	<bean id="visualNetworkSolrService" class="org.dspace.app.cris.network.VisualizationGraphSolrService">
+		<property name="searcher" ref="org.dspace.discovery.SearchService" />
+	</bean>
+	
+	<bean id="visualNetworkIndexer" class="org.dspace.app.cris.network.VisualizationGraphIndexer">
+		<property name="indexer" ref="org.dspace.discovery.IndexingService" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<bean id="crisConstants" class="org.dspace.app.cris.model.CrisConstants">
+		<property name="applicationService" ref="applicationService" />
+	</bean>
+	
+	<bean id="org.dspace.app.cris.service.RelationPreferenceService"
+		class="org.dspace.app.cris.service.RelationPreferenceService">
+		<property name="applicationService" ref="applicationService" />
+		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
+	</bean>
+	
+	
+	<bean id="sectionStatsExtraIndexer" 
+    	class="org.dspace.app.cris.statistics.SectionStatsIndexPlugin">
+    </bean>     
+
+	
+	 <bean id="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData" 
+    	class="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData">
+    </bean>
+    
+    <bean id="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData" 
+    	class="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData">
+    </bean>              
+       
+</beans>

@@ -1,0 +1,1173 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+/* 
+  The contents of this file are subject to the license and copyright
+   detailed in the LICENSE and NOTICE files at the root of the source
+   tree and available online at
+   
+   https://github.com/CILEA/dspace-cris/wiki/License
+
+ */
+/* Researcher field */
+span.fieldError, .errorMessage {
+    color: red;
+    font-size: .95em;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+}
+
+div.box div.collapsable table {
+	color: #332621;
+	font-size: 10pt;
+	font-family: sans-serif;
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: none;
+	/*display: inline;*/
+	//padding: 1pt;
+	background-color: #ffffff;	
+}
+
+div.expanded-content
+{
+	padding: 0px;
+	background-color: #ffffff;
+}
+
+div.box div.collapsable  table a {
+	text-decoration: none;
+}
+
+/*div.box div.collapsable  table a:visited {
+	color: #000;
+}*/
+
+div.box div.collapsable  table a:hover {
+	color: #6F0A0A;
+	text-decoration: underline;
+}
+
+div.box div.collapsable  table tr th {
+	font-family: sans-serif;
+	text-align: left;
+	padding-top: 1pt;
+	padding-right: 10pt;
+	padding-bottom: 1pt;
+	padding-left: 10pt;
+}
+
+div.box div.collapsable  table tr td {
+	font-family: sans-serif;
+}
+
+div.box div.collapsable  table tr td.tableHead {
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	font-size: 10pt;
+	color: #9D030A;
+}
+
+div.box div.collapsable  table tr td.columnHead {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 5pt;
+	font-size: 10pt;
+}
+
+div.box div.collapsable  table tr td.columnBody {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 3pt;
+	font-size: 10pt;
+}
+
+div.box div.collapsable  table tr td.columnBody a {
+	color: blue;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 3pt;
+	font-size: 10pt;
+}
+
+div.box div.collapsable  table tr td.ncHead {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-top: 1pt;
+	padding-right: 0pt;
+	padding-bottom: 1pt;
+	padding-left: 5pt;
+	font-size: 9pt;
+}
+
+div.box div.collapsable  table tr td.ncBody {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 0pt;
+	padding-bottom: 1pt;
+	padding-left: 3pt;
+	font-size: 9pt;
+}
+
+div.box div.collapsable  table tr td.ncBody a {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	padding-top: 1pt;
+	padding-right: 0pt;
+	padding-bottom: 1pt;
+	padding-left: 3pt;
+	font-size: 9pt;
+}
+
+div.box div.collapsable  table tr td.oddRowOddCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: bold;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #ffffff;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+div.box div.collapsable  table tr td.evenRowOddCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: bold;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #eeeeee;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+div.box div.collapsable  table tr td.oddRowEvenCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #ffffff;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+div.box div.collapsable  table tr td.evenRowEvenCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #eeeeee;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+div.box div.collapsable  table tr td a.oddRowOddCol:hover,
+div.box div.collapsable  table tr td a.evenRowOddCol:hover,
+div.box div.collapsable  table tr td a.oddRowEvenCol:hover,
+div.box div.collapsable  table tr td a.evenRowEvenCol:hover
+	{
+	color: #332621;
+	TEXT-DECORATION: underline;
+}
+
+div.box div.collapsable  table tr td.highlightRowOddCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #ffffff;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+div.box div.collapsable  table tr td.highlightRowEvenCol {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #cccccc;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 1px
+}
+
+.sep_bar {
+	color: #9D030A;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: small;
+	font-weight: bolder;
+}
+
+.header4 {
+	color: #C00000;
+	font-size: large !important;
+	font-size: 13.5pt;
+	font-weight: bold;
+}
+
+.header5 {
+	color: #000000;
+	font-size: medium;
+	font-weight: bold;
+}
+
+.header6 {
+	color:#000000;	
+	font-size:12px;
+	font-weight:normal;
+}
+
+/* /Researcher field */
+#researcher .box_info_and_picture {
+  border-bottom: #cccccc 3px solid; 
+  text-align: left; 
+  border-left: #cccccc 3px solid; 
+  background-color: #ffffff; 
+  width: auto !important;
+  min-width: 170px;
+  width: 170px; 
+  border-top: #cccccc 3px solid; 
+  border-right: #cccccc 3px solid;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#researcher .image {
+	width: 120px;
+	/* height: 132px; */
+	overflow: hidden
+}
+
+#researcher .box_info_and_picture table tr .image_td {
+	vertical-align: middle;
+	padding: 20px;	
+}
+
+
+/* Display tag */
+.displaytaglikemisctable {
+	padding: 0;
+	margin: 1px;
+	border: 1px solid #ccc;
+	width: 99%;	
+}
+
+.displaytaglikemisctable th {
+	background: #ffffff;
+	font: bold 0.7em Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	text-align: left;
+	padding: 3px;
+	border-bottom: 2px solid #ccc;	
+}
+
+.displaytaglikemisctable td {
+	font: normal 0.7em Verdana, Arial, Helvetica, sans-serif;
+	color: #000;
+	padding: 2px 3px 2px 3px;
+	margin: 1px;
+}
+
+.displaytaglikemisctable td img {
+	border: 0;
+}
+
+.displaytaglikemisctable td.rightalign {
+	text-align: right;
+}
+
+.displaytaglikemisctable td.centeralign {
+	text-align: center;
+}
+
+.displaytaglikemisctable tr.odd td {
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #ffffff;
+}
+
+.displaytaglikemisctable tr.even td {
+	font-size: 10pt;
+	font-style: normal;
+	font-weight: normal;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	background: #cccccc;
+}
+
+.displaytaglikemisctable th.sorted {
+	background-color: #f9e375;
+}
+
+.displaytaglikemisctable th.sorted a,.displaytaglikemisctable th.sortable a
+	{
+	display: block;
+	background: url(../image/cris/arrow_off.png) no-repeat right;
+	color: #000;
+	text-decoration: none;
+}
+
+.displaytaglikemisctable th.sorted a:hover,.displaytaglikemisctable th.sortable a:hover
+	{
+	color: #f00;
+}
+
+.displaytaglikemisctable th.order1 a {
+	background-image: url(../image/cris/arrow_down.png);
+}
+
+.displaytaglikemisctable th.order2 a {
+	background-image: url(../image/cris/arrow_up.png);
+}
+
+.displaytaglikemisctable tr td input.name {
+	width: 99%;
+}
+
+.displaytaglikemisctable tr td input.dept {
+	width: 99%;
+}
+
+.displaytaglikemisctable th.staff {
+	width: 100px;
+}
+
+p.pagebanner {	
+	font-family:sans-serif;
+	font-size: 10pt;
+	color: #000;
+	padding-bottom: 0px;
+}
+
+span.pagebanner {
+	font-size: 10pt;
+}
+
+span.pagelinks {
+	font-size: 10pt;
+	color: #000000;
+	background-color: #EEEEEE;	
+	font-family: sans-serif;
+	text-decoration: none;
+	text-align: center;
+	padding: 5pt;
+	width: 99%;
+	display: block;
+}
+
+span.pagelinks a {
+	color: #000;
+	text-decoration: underline;
+}
+
+span.pagelinks:link {
+	color: #903; 
+	text-decoration: underline;
+}
+span.pagelinks:visited {
+	color: #903; 
+	text-decoration: underline;
+}
+span.pagelinks a:hover {
+	color: #903; 
+	text-decoration: underline;
+}
+
+/* End Display tag */
+.fakebutton {
+	border: 2px outset #cccccc;
+	background-color: #cccccc;
+	text-decoration: none;
+	padding: 2px;
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: bold;
+	color: green;
+}
+
+.fakebutton:active {
+	border: 2px inset #cccccc;
+}
+
+#export div.rightpad {
+	padding: 5px 5px 5px 5px;
+}
+
+
+#export div.rightpad input {
+	width: 250px;	
+}
+
+#export .rangeinput .rightpad input {
+	width: 140px;
+}
+
+#export .rangeinput  .rightpad #fromto {	
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#export div#radiofieldexport {
+	padding: 5px;
+	display: inline;	
+}
+
+#export div.rightpadboolean {
+	width: 100%;
+	text-align: right;
+    padding: 5px 5px 5px 5px;
+}
+
+#export div.rightpadboolean .exportbooleanoption {
+    padding-right: 10px;
+}
+
+.pending {
+	color: green;
+}
+
+.scopus {
+	float: left; width: 48%;	
+}
+.isi {
+	float: left; width: 48%;
+}
+
+.scopus span#title,
+.isi span#title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 5pt;
+	font-size: 10pt;
+	height: 2em;
+	color: #9D030A;
+}
+
+.field {
+	padding-top:2pt;
+}
+
+.field_value {	
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 55%;
+	font-size: 10pt;
+	
+}
+
+.field_value a {
+	color: blue;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.field_label {
+	float: left;
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-left: 1em;
+	font-size: 10pt;
+	width: 12em;
+}
+
+.bibliometricsright div.dynaField,
+.bibliometricsleft div.dynaField
+ {
+	padding-top:2pt;
+	float: none;
+	clear: none;
+	display: block;	
+}
+
+.bibliometricsright div.dynaField span.dynaLabel,
+.bibliometricsleft div.dynaField span.dynaLabel
+{
+	float: left;
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-left: 1em;
+	font-size: 10pt;
+	/*width: 40%;*/	
+	clear: none;
+	display: block;
+	padding-bottom: 0;
+	padding-right: 0;
+	padding-top: 0;
+	min-height: none;
+}
+
+
+.bibliometricsright div.dynaField div.dynaFieldValue,
+.bibliometricsleft div.dynaField div.dynaFieldValue
+{
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 55%;
+	font-size: 10pt;
+	float: none;
+}
+
+.bibliometricsright div.dynaField div.dynaFieldValue a,
+.bibliometricsleft div.dynaField div.dynaFieldValue a
+{
+	color: blue;
+	font-family: Arial, Helvetica, sans-serif;
+}
+td.body {
+	font-size: 10pt;
+}
+
+#searchmiddle fieldset {	
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+p.submitFormWarn {
+	margin-top: 10px;
+	background-color: #FFFFCC;
+	border: 1px solid red;
+	padding: 10px;
+}
+
+#researcher table tr td.tb-head0 {
+	background-color: #FFFFFF;
+	border-color: #DDDDDD #DDDDDD #000000;	
+	border-style: none none solid;
+	border-width: medium medium 1pt;
+	padding: 2pt 5pt;
+}
+
+#researcher table tr td.tb-head1 {
+	background-color:#F0F0F0;
+	border-color:#000000 #000000;
+	border-style:solid solid none;
+	border-width:1pt 1pt medium;
+	font-size:10pt;
+	font-weight:bold;
+	padding:2pt 5pt;	
+}
+
+#researcher table tr td.tb-head2 {
+	background-color: #FFFFFF;
+	border: 1pt solid;
+	border-color: #DDDDDD #DDDDDD #000000;
+	font-size: 10pt;
+	padding: 2pt 5pt;
+}
+
+#researcher table tr td.tb-head2 a {
+	color: #000000;
+}
+
+#researcher table tr td.tb-body {
+	background-color: #F9F9F9;
+	border-color: #000000 #000000;	
+	border-style: none solid solid;
+	border-width: medium 1pt 1pt;
+	padding: 2pt 1pt;
+}
+
+div.showMoreLessBox-dark {
+	border: 1pt solid #465661;
+}
+div.showMoreLessBox {
+	border: 1pt solid #D0D4D7;
+}
+div.box div.collapsable  {
+	font-size: 10pt;
+	text-decoration: none;
+	padding: 0pt;	
+	border: 1px solid #C7CCCF;
+}
+
+div.box div.collapsable  legend {
+	color: #000000;
+	font-weight: bold;
+	padding: 0 5pt 5pt;
+	text-decoration: none;
+}
+
+div.box div.collapsable  legend right-side {
+	text-align: right;
+}
+
+div.box div.collapsable  label {
+	color: #000000;
+	display: block;
+	padding: 5pt 0 2pt;
+	text-decoration: none;
+}
+
+div.box div.collapsable  label a:link {
+	color: #0000FF;
+	text-decoration: none;
+}
+
+div.box div.collapsable  label a:visited {
+	color: #903;
+	text-decoration: underline;
+}
+
+div.box div.collapsable  label a:hover {
+	color: #903;
+	text-decoration: underline;
+}
+
+#researcher #hidden_appearalsocitedas fieldset {
+	font-size: 10pt;	
+	border: #C00000;
+	text-decoration: none;
+}
+
+#researcher #hidden_firstalsocitedas fieldset {
+	font-size: 10pt;	
+	border: #C00000;
+	text-decoration: none;
+	background-color: transparent;
+}
+
+div.box div.collapsable  table tr td.ncBody a.cv {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-size: 9pt;
+	padding: 0pt;
+}
+
+div.box div.collapsable  table tr td ul.ncBody1 {
+margin:0 0 0 20px;
+padding:0;
+}
+
+div.box div.collapsable  table tr td ul li.ncBody1 {
+color:#000000;
+font-family:Arial,Helvetica,sans-serif;
+font-size:9pt;
+list-style-type:disc;
+}
+div.box div.collapsable  table tr td ul li a.ncBody1:hover {
+color:#990033;
+text-decoration:underline;
+}
+
+div.box div.collapsable  table tr td.black_line {
+background-color:#000000;
+font-size:8px;
+margin:0;
+padding:0;
+}
+
+.bibliometricsleft {
+	float: left; width: 48%;
+	border-right: groove;
+	border-bottom: groove;
+	height: 11em !important;
+	height: 13em;
+	padding-top: 8px;
+	padding-bottom: 8px;	
+}
+.bibliometricsright {
+	float: left; width: 48%;
+	border-bottom: groove;
+	height: 11em !important;
+	height: 13em;
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.bibliometricsright span#title,
+.bibliometricsleft span#title
+ {
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 5pt;
+	font-size: 10pt;
+	height: 2em;
+	color: #9D030A;
+}
+
+#mathematics {	
+	border-bottom: groove;
+	border-left: none;
+	border-right: none;
+	width: 96%;
+	height: auto !important;	
+	padding-top: 8px;
+	padding-bottom: 8px;	
+}
+
+#scholaruniverse {	
+	border-bottom: groove;
+	border-left: none;
+	border-right: none;
+	width: 96%;
+	height: 5em;	
+	height: 5em !important;
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+#pubmed {	
+	border-bottom: groove;
+	border-left: none;
+	border-right: none;
+	width: 96%;
+	height: auto;
+	padding-top: 8px;
+	padding-bottom: 8px;	
+}
+
+
+div.box div.collapsable  .green {
+color:green;
+font-weight:bold;
+}
+
+#researcher fieldset .green {
+color:green;
+font-weight:bold;
+}
+
+#researcher fieldset .green a {
+color:blue;
+font-weight:bold;
+font-size:inherit;
+}
+
+div#projectsDiv div.dynaFieldComboValueFirst, div#coprojectsDiv div.dynaFieldComboValueFirst,
+div#coprojectsDiv div.dynaFieldComboValue, div#projectsDiv div.dynaFieldComboValue {
+	border: none;
+}
+
+div#projectsDiv div.dynaFieldComboValueFirst, div#coprojectsDiv div.dynaFieldComboValueFirst,
+div#projectsDiv div.dynaFieldComboValue, div#coprojectsDiv div.dynaFieldComboValue
+{
+	background: transparent url(../image/authority/separator-grants.gif) no-repeat;
+	background-position: bottom;
+	padding-bottom: 20px;
+	width: 99%;
+}
+div#coprojectsDiv a, div#projectsDiv a, div#awardsDiv a
+{
+	background: transparent url(../image/authority/authority.gif) no-repeat;
+	background-position: right;
+	padding-right: 20px;
+	display: inline-block;
+	white-space: nowrap;	
+}
+
+div#mathscinetcoauthorslabel a {
+	color: blue;	
+}
+
+div.bibliometricspiece {
+	
+}
+
+table#mathematicsstudents {
+	width: 100%;
+}
+
+table.statanchors {border : 0; width: 100%;}
+table.statanchors tr th {color: #660000; text-align: left;}
+table.statanchors tr td {padding-left: 20px;}
+
+table#tablemediacomment {
+	width: 100%;	
+}
+
+center#bannercenter {
+	background-color: #9a3334;
+	background-image: url(../image/cris/background_banner_7.jpg)	
+}
+
+
+
+.miscTable th.sorted_desc a {
+	background-image: url(../image/cris/arrow_down.png);
+	background-position: right;
+	background-repeat: no-repeat;
+	display: inline-block;
+	padding-right: 20px; 
+}
+
+.miscTable th.sorted_asc a {
+	background-image: url(../image/cris/arrow_up.png);
+	background-position: right;
+	background-repeat: no-repeat;
+	display: inline-block;
+	padding-right: 20px;
+}
+
+.miscTable th.sortable a
+	{
+	display: inline-block;
+	background: url(../image/cris/arrow_off.png) no-repeat right;
+	color: #000;
+	text-decoration: none;
+	padding-right: 20px;
+}
+
+.miscTable th.sortable a:hover
+	{
+	color: #f00;
+}
+
+#hidden_firstvariants fieldset,#hidden_appearvariants fieldset, #hidden_firsttitles fieldset, #hidden_appeartitles fieldset, #hidden_firstinterests fieldset, #hidden_appearinterests fieldset, #hidden_firsturls fieldset, #hidden_appearurls fieldset, #hidden_firstcv fieldset, #hidden_appearcv fieldset, #hidden_firstpicture fieldset, #hidden_appearpicture fieldset {
+	border-color: #00FF00;
+}
+
+h2 span.titlestats {
+	text-decoration: underline; 
+}
+
+table.statanchors tr th span.titlestats {text-decoration: underline;}
+
+table.hkudatadetail tr td {
+    font-family: sans-serif;
+    padding: 1pt 10pt;
+}
+
+div.box div.collapsable table tr td.columnBody {
+	padding-left: 6pt;
+}
+
+.variantsLessControlElement {
+	font-size: 9pt;	
+}
+
+div.variants div.collapsable{
+	padding: 0;
+	border: none;	
+}
+
+div.box div.collapsable table tr td ul.ncBody {
+	margin-left: 15pt;
+	padding: 0;
+}
+
+/*	rpnew.css	*/
+
+
+/* Sub Local nav */
+#nav-sublocal {
+	width: 200px;
+	padding: 0px;
+	margin: 0px;
+}
+#nav-sublocal ul {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+	display: inline;
+}
+
+#nav-sublocal ul li span.nolink {
+	color: #332621; 
+	font-size: 10pt; 
+	font-family: sans-serif; 
+	text-decoration: none;
+	display: inline;
+	padding: 1px 1px 1px 15px; 
+	background: #fff url(red_arrow.jpg) 5px 4px no-repeat;
+}
+
+#nav-sublocal ul li {
+	padding: 0px;
+	display: inline;
+}
+#nav-sublocal ul li a {
+	display: block;
+	font-size: 8pt;
+	color: #333;
+	background: #f1f1f1 url(red_arrow.jpg) no-repeat 10px 8px;
+	padding-top: 4px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	padding-left: 20px;
+	border-bottom: 1px solid #fff;
+}
+#nav-sublocal ul li a:hover {
+	background-color: #e6e6e6;
+	border-bottom: 1px solid #ccc;
+}
+
+#nav-sublocal ul li.node {
+	padding: 0px;
+	display: inline;
+}
+#nav-sublocal ul li.node a {
+	display: block;
+	font-size: 8pt;
+	color: #333;
+	background: #e6e6e6 url(35.png) no-repeat 7px 5px;
+	padding-top: 4px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	padding-left: 20px;
+	border-bottom: 1px solid #fff;
+}
+#nav-sublocal ul li.node a:hover {
+	background-color: #e6e6e6;
+	border-bottom: 1px solid #ccc;
+}
+/* /Sub Local nav */
+
+
+/* Expand-collapse containers */
+
+.showMoreLessBox1-dark, .showMoreLessBox1
+{
+	padding: 0;
+	background: #fff;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0px;
+	margin-left: 0;
+}
+
+.showMoreLessBox1-dark h3 { margin: 0; padding: 3px 6px 4px 6px; font-size: 14px; font-weight: bold;  }
+.showMoreLessBox1 h3 { margin: 0; padding: 3px 6px 4px 6px; font-size: 12px; font-weight: bold;  }
+
+.showMoreLessBox1-dark h3 { color: #fff; background: #465661 }
+.showMoreLessBox1-dark h3:hover { background: #586770 url('../image/cris/bg_showmorelessbox.png') 0px -100px repeat-x; }
+.showMoreLessBox1-dark h3:active { background: #96a0a5 url('../image/cris/bg_showmorelessbox.png') 0px -200px repeat-x; }
+
+
+.showMoreLessBox1 h3 { color: #455560; background: #d0d4d7 }
+.showMoreLessBox1 h3:hover { background: #d9dddf url('../image/cris/bg_showmorelessbox.png') 0px -400px repeat-x; }
+.showMoreLessBox1 h3:active { background: #f9f9fa url('../image/cris/bg_showmorelessbox.png') 0px -500px repeat-x; }
+
+
+h3 img.hide {display: none;}
+
+.info_message {
+	padding: 50px;		
+}
+
+form.citationExportBottom table tr td.columnBody {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	padding-top: 1pt;
+	padding-right: 3pt;
+	padding-bottom: 1pt;
+	padding-left: 3pt;
+	font-size: 10pt;
+}
+
+
+/* Expand-collapse containers */
+
+.showMoreLessControlElement { cursor: hand; cursor: pointer; outline: 0; }
+.showMoreLessControlElement img { margin-right: 3px }
+
+.expanded-content{padding: 10px 3px 3px 3px} 
+.expanded-content-nopad { padding: 0 0 0 0 }
+
+.showMoreLessBox-dark, .showMoreLessBox
+{ border: 1px solid #c7cccf; padding: 0; margin: 0 0 10px 0; background: #fff }
+
+//h2.control:before{content: url(../image/cris/btn_lite_expand.gif);}
+//h2.control.expanded:before {content: url(../image/cris/btn_lite_collapse.gif);}
+.showMoreLessBox-dark h2, .showMoreLessBox h2 { margin: 0; padding: 3px 6px 4px 6px; font-size: 16px; font-weight: bold;  }
+
+/*.showMoreLessBox-dark h2 { color: #fff; background: #465661 url('../image/cris/bg_showmorelessbox.png') 0px 0px repeat-x; } */
+.showMoreLessBox-dark h2 { color: #fff; background: #465661 }
+.showMoreLessBox-dark h2:hover { background: #586770 url('../image/cris/bg_showmorelessbox.png') 0px -100px repeat-x; }
+.showMoreLessBox-dark h2:active { background: #96a0a5 url('../image/cris/bg_showmorelessbox.png') 0px -200px repeat-x; }
+
+
+/* .showMoreLessBox h2 { color: #455560; background: #d0d4d7 url('../image/cris/bg_showmorelessbox.png') 0px -300px repeat-x; }*/
+.showMoreLessBox h2 { color: #455560; background: #d0d4d7 }
+.showMoreLessBox h2:hover { background: #d9dddf url('../image/cris/bg_showmorelessbox.png') 0px -400px repeat-x; }
+.showMoreLessBox h2:active { background: #f9f9fa url('../image/cris/bg_showmorelessbox.png') 0px -500px repeat-x; }
+
+.showMoreLessBlock span { font-size: 11px; color: #455560 }
+
+.showMoreLessInline span { font-size: 11px; text-decoration: underline; color: #034ea2; white-space: nowrap; padding-left: 0.3m; cursor: pointer }
+.showMoreLessInline span:hover { color: #ff7600 }
+.showMoreLessInline p { margin: 0 0 1em 0; padding: 0 }
+
+.showMoreLocalAvail .link {  }
+.showMoreLocalAvail .link span { font-weight: bold; color: #034ea2; text-decoration: underline; cursor: pointer }
+.showMoreLocalAvail .link span:hover { color: #ff7600 }
+.showMoreLocalAvail .display { display: none }
+
+h2 img.hide {display: none;}
+h4 img.hide {display: none;}
+
+.log {
+    height: auto !important;
+    text-align: center;
+}
+
+.logcontent {
+    padding-top: 0.5em;
+}
+.dynaField, .dynaFieldComboValue, .dynaFieldComboValueFirst, .dynaFieldComboValueLast, .dynaFieldComboValueFirstLast, .dynaClear {margin: 0;}
+.ui-tabs .ui-tabs-nav li.ui-state-active {top: 4px !important;padding-bottom:2px;}
+.ui-tabs .ui-tabs-nav li {top: 3px !important;}
+#cris-tabs-navigation {
+	position: fixed;
+	top: 20px;
+	right: 50px;
+	width: 250px;
+	font-size: 0.8em;
+	z-index: 10000 !important;
+	margin: 0px !important;
+	padding: 5px !important;
+	/* Fallback for web browsers that doesn't support RGBa */
+	background: rgb(255, 255, 255);
+	/* RGBa with 0.6 opacity */
+	background: rgba(255, 255, 255, 0.8);
+	/* For IE 5.5 - 7*/
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000, endColorstr=#00000000);
+	/* For IE 8*/
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00000000, endColorstr=#00000000)";
+}
+#cris-tabs-navigation h2 {font-size: 1.2em;}
+#cris-tabs-navigation div.internalmenu {
+	padding: 5px;
+	margin: 0px !important;
+}
+#cris-tabs-navigation div div ul {overflow:hidden;}
+#cris-tabs-navigation div div ul li {
+	border-left: none !important;
+	border-right: none !important;
+	padding: 3px 10px 3px 10px;	
+}
+#cris-tabs-navigation div div ul li:hover {
+	border: 1px solid #E17009;
+}
+#cris-tabs-navigation div div ul li:hover a {
+	color: #E17009;
+}
+.ui-widget-content div {margin: 0px !important;}
+div.cris-record-info span {display: block; font-size: 8pt;margin-top:10px;}
+a.cris-edit-anchor:hover {
+	border-color: #E17009;
+	color: #E17009;
+}
+
+a.cris-edit-anchor {
+	*top: 16em !important;	
+}
+
+a.cris-edit-anchor {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    -webkit-transform: rotate(90deg);
+    -webkit-transform-origin: top left;    
+    -ms-transform-origin-x: left;
+    -ms-transform-origin-y: top;
+    -ms-transform: rotate(90deg);
+    background: none repeat scroll 0 0 #013466;
+    border-color: -moz-use-text-color white white;
+    border-image: none;
+    border-radius: 0 0 5px 5px;
+    border-right: 2px solid white;
+    border-style: none solid solid;
+    border-width: medium 2px 2px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    display: block;
+    font-family: arial,FreeSans,Helvetica,sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px;
+    position: fixed;
+    text-decoration: none;
+    white-space: nowrap;
+    left: 10px;
+    top: 40px;    
+    width: 12em;
+    transform: rotate(90deg);
+    transform-origin: left top;
+    position: relative;
+    z-index: 1000;
+}
+a#cris-rp-changestatus {text-decoration: none;}
+span#cris-rp-status-value {text-decoration: underline;}
+.cris-edit-eperson, .cris-edit-status {display: inline-block; padding: 10px;float: left;}
+.cris-edit-record-info {display: inline-block; padding: 10px;}
+.cris-edit-record-info span {padding: 0.3em;}
+.cris-edit-record-info span {display:block;}
+
+div.subscription-current {
+	background: url('../images/double_arrow.png') 0% 30% no-repeat;
+	font-weight: bold;
+	padding-left: 15px;
+	/*	margin-left: -25px;
+	padding-left: 25px;
+	line-height: 250%;
+	background-color: #ebebeb;*/
+}
+
+#picture {
+	width: 120px; 
+}

@@ -1,0 +1,53 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+.ui-accordion .ui-accordion-header .ui-icon {
+	left: 0.5em;
+	margin-top: -8px;
+	position: absolute;
+	top: 50%;
+}
+
+.ui-accordion-icons .ui-accordion-header a {
+	padding-left: 2.2em;
+}
+
+.ui-tabs .ui-tabs-hide {
+	display: none !important;
+}
+
+html body div#wrapper h1 {
+	margin: 0 auto 40px;	
+}
+
+.cris-edit-extra {
+	margin: 0 auto 40px;
+	width: 970px;
+	border: double;
+}
+
+.ui-tabs-nav {
+	display: block;
+}
+
+.ui-autocomplete-loading {
+	background: white url('../../../image/jdyna/indicator.gif') right center
+		no-repeat;
+}
+
+.ui-autocomplete {
+	max-height: 100px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+}
+/* IE 6 doesn't support max-height
+     * we use height instead, but this forces the menu to always be this tall
+     */
+* html .ui-autocomplete {
+	height: 100px;
+}

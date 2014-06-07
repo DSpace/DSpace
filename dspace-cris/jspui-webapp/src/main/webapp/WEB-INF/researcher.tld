@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+		 http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+		version="2.0">
+
+	<tlib-version>1.0</tlib-version>
+
+<short-name>researcher</short-name>
+<uri>researchertags</uri>
+
+
+
+
+<function>
+	<description>Get nested objects by shortname</description>
+	<name>getResearcherNestedObjectByShortname</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>List getResearcherNestedObjectByShortname(java.lang.Integer,java.lang.String)</function-signature>
+</function>
+
+ <function>
+	<description>Get nested objects by shortname and type</description>
+	<name>getCrisNestedObjectByShortname</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>List getCrisNestedObjectByShortname(java.lang.Integer,java.lang.String,java.lang.Class)</function-signature>
+</function>
+
+<function>
+	<description>Get nested objects</description>
+	<name>getResearcherNestedObject</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>List getResearcherNestedObject(java.lang.Integer,java.lang.Integer)</function-signature>
+</function>
+
+<function>
+	<description>Get nested objects paginate</description>
+	<name>getPaginateResearcherNestedObject</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>List getPaginateResearcherNestedObject(java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.Integer)</function-signature>
+</function>
+
+<function>
+	<description>Check if logical groups are not public (only dynamic metadata)</description>
+	<name>isGroupFieldsHidden</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>boolean isGroupFieldsHidden(org.dspace.app.cris.model.ResearcherPage,java.lang.String)</function-signature>
+</function>
+
+
+<function>
+	<description>Check if logical groups are not public (isGroupFieldsHidden internally called)</description>
+	<name>isGroupFieldsHiddenWithStructural</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>boolean isGroupFieldsHiddenWithStructural(org.dspace.app.cris.model.ResearcherPage,java.lang.String)</function-signature>
+</function>
+
+
+<function>
+	<description>Check if box are not public</description>
+	<name>isBoxHidden</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>boolean isBoxHidden(java.lang.Object,java.lang.String)</function-signature>
+</function>
+
+<function>
+	<description>Check if there is a metadata editable at least</description>
+	<name>isThereMetadataNoEditable</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>boolean isThereMetadataNoEditable(java.lang.String, java.lang.Class)</function-signature>
+</function>
+
+<function>
+	<description>Get all months stats</description>
+	<name>getAllMonthsStats</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>List getAllMonthsStats(java.lang.Object)</function-signature>
+</function>
+
+<function>
+	<description>Get the rp key from the db primary key</description>
+	<name>rpkey</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>String rpkey(java.lang.Integer)</function-signature>
+</function>
+
+
+<function>
+	<description>Get the cris key from the db primary key</description>
+	<name>criskey</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>String criskey(java.lang.Integer,java.lang.Class)</function-signature>
+</function>
+<function>
+	<description>Count public metadata on box</description>
+	<name>countBoxPublicMetadata</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>int countBoxPublicMetadata(org.dspace.app.cris.model.ResearcherPage,java.lang.String, java.lang.Boolean)</function-signature>
+</function>
+
+<function>
+	<description>Sort Box by custom comparator</description>
+	<name>sortBoxByComparator</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>Box sortBoxByComparator(java.util.List,java.lang.String)</function-signature>
+</function>
+
+<function>
+	<description>Sort Containable by custom comparator</description>
+	<name>sortContainableByComparator</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>Containable sortContainableByComparator(java.util.List,java.lang.String)</function-signature>
+</function>
+
+<function>
+	<description>Url encoder</description>
+	<name>encode</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>String encode(java.lang.String,java.lang.String)</function-signature>
+</function>
+
+
+</taglib>
