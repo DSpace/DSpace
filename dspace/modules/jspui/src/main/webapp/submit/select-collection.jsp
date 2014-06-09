@@ -124,7 +124,7 @@
 	<p class="submitFormWarn"><fmt:message key="jsp.submit.select-collection.none-authorized"/></p>
 <%  } %>	
 	   <p><fmt:message key="jsp.general.goto"/><br />
-	   <a href="<%= request.getContextPath() %>"><fmt:message key="jsp.general.home"/></a><br />
+	   <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.general.home"/></a><br />
 	   <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.general.mydspace" /></a>
 	   </p>	
 </dspace:layout>
