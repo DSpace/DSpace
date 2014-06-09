@@ -43,34 +43,6 @@ public class CommunitiesResource {
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
 	}
-    
-    /*
-    The "GET" annotation indicates this method will respond to HTTP Get requests.
-    The "Produces" annotation indicates the MIME response the method will return.
-     */
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String list() {
-        StringBuilder everything = new StringBuilder();
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
-            org.dspace.content.Community[] communities = org.dspace.content.Community.findAllTop(context);
-            for(org.dspace.content.Community community : communities) {
-                everything.append(community.getName() + "<br/>\n");
-            }
-            return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
-
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    //TODO Respond to html for communities/:id
 
     @GET
     @Path("/")
