@@ -64,25 +64,24 @@
 	
 	<meta name="robots" content="index follow"/>
 	
-	<title>Network of collaboration - ${researcher.preferredName.value}</title>	
+	<title>Network of collaboration - ${researcher.fullName}</title>	
 
-	<link href="<%=request.getContextPath()%>/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />	
+	<link href="<%=request.getContextPath()%>/favicon.ico" type="image/x-icon" rel="shortcut icon" />	
 	<link href="<%=request.getContextPath()%>/css/researcher.css" type="text/css"  rel="stylesheet" />	
 	<link href="<%=request.getContextPath()%>/css/jdyna.css" type="text/css"  rel="stylesheet" />
 	
-	<%--link href="<%=request.getContextPath()%>/css/smoothness/jquery-ui-1.8.18.custom.css" type="text/css" rel="stylesheet" /--%>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.0/themes/smoothness/jquery-ui.css" />
+	<link href="<%=request.getContextPath()%>/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="<%=request.getContextPath()%>/css/collaborationNetwork.css" rel="stylesheet" type="text/css" />
-    <%--link href="<%=request.getContextPath()%>/css/layout-default-latest.css" rel="stylesheet" type="text/css" /--%>
-	<link rel="stylesheet" href="http://layout.jquery-dev.net/lib/css/layout-default-latest.css" />
-        
-    <%--script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-1.4.4.min.js"></script--%>
-    <%--script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script--%>
-    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.min.js"></script>
+	<link type="text/css" href="<%=request.getContextPath()%>/css/jquery/ui/all/jquery-ui-latest.custom.css" rel="stylesheet" media="all"/>
+
+	<script type="text/javascript" src="<%= request.getContextPath() %>/javascripts/tmpl.min.js"> </script>
+	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/jit.js"></script>
     <%--script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.layout-1.3rc.js"></script--%>
-    <script src="http://layout.jquery-dev.net/lib/js/jquery.layout-latest.min.js"></script>
+    <script src="<%=request.getContextPath()%>/js/jquery.layout-latest.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/collaborationNetwork.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.dataTables.js"></script>
         
@@ -153,10 +152,10 @@
 #main-rp, #target-rp, #target-common { border: 3px solid #eee; border-bottom: 3px solid #888; border-right: 1px solid #777; padding-bottom: 5px; background-color: #fff; border-top-width: 0; }
 .rp-label { background: #465661; color: #fff; font-weight: bold; padding: 1px; }
 .rp-header { overflow: hidden; }
-.rp-image { float: left; display: inline; }
+.rp-image { display: block; margin-left: auto; margin-right: auto; text-align: center; }
 .rp-image img { width: 40px; }
-.rp-content { float: right; width: 75%; font-size: .8em; }
-.rp-name { color: #cf3118; font-weight: bold; }
+.rp-content { font-size: .8em; }
+.rp-name { text-align: center; color: #cf3118; font-weight: bold; }
 .rp-title { } 
 .rp-dept { overflow: hidden; }
 .rp-dept > span { float: left; font-style: italic; font-weight: bold; }
@@ -169,9 +168,12 @@
 #target-rp { border-left-width: 0px; }
 .target-separator { color: #cf3118; text-align: center; padding: 10px; font-weight: bold; }
 
+#inner-center { background-color: white; }
+
 @media print {
 	#toolbar_print { display: none; }
 	.ui-layout-south { display: none; }
+	.slider-zoom { display: none; }	
 }
 </style>
 
@@ -180,7 +182,7 @@
 
 
 
-	var j = jQuery.noConflict();
+	var j = jQuery;
 
 
 	var eventTypeDepth = new Array();
@@ -207,7 +209,7 @@
 
 </head>
 <body>
-	
+
 	<div id="main-pain" class="ui-layout-center">
 	
 	
@@ -218,27 +220,24 @@
 				<div id="sliderleveldistance"></div>
 				<div id="slider-zoom-out">-</div>
 			</div>			
-            <div id="toolbar_print" class="transparent">
+            <div id="toolbar_print" class="btn-toolbar btn-group" role="toolbar">
 				<%--a style='display:none; position: relative;' href='javascript:screenPage()' id='screen'>
 					<img id='imgscreen' alt='Return to visualization' title='Return to visualization'  src='../image/window_size.png'/>
 				</a--%>
-				<a style="position: relative;"
+				<button type="button" class="btn btn-default"
                                         href="javascript:void(0)" id="printWithoutWest"><img
                                         alt="Print without name card" title="Print without name card"
                                         src="<%= request.getContextPath() %>/image/network/layout-content-icon_print.png" />
-                                </a>
-                                <a style="position: relative;"
+                                </button>
+                                <button type="button" class="btn btn-default"
                                         href="javascript:void(0)" id="printWithWest"><img
                                         alt="Print with name card" title="Print with name card"
                                         src="<%= request.getContextPath() %>/image/network/layout-sidebar-icon_print.png" />
-                                </a>
-		<div id="note">
-<ul style="padding-left: 15px;">
-<li>Best printed with IE/FireFox</li>
-<li>Because of space limitations, approximately 20 names only appear in the first circle for any given facet.</li>
-<li>External name variants have not been merged.</li>
-</ul>
-		</div>
+                                </button>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#networkInformation">
+    								<span class="fa fa-cog" style="height: 18px;"></span>
+  								</button>
+
 			</div>
 					<div id="infovis"></div>			
 	
@@ -251,17 +250,7 @@
 			</div>		
 		</div>
 
-		<div id="relationfragment" class="dialogfragment">
-				<div id="relationfragmentcontent">
-				
-				</div>
-		</div>
-
-		<div id="relationfragmenttwice" class="dialogfragment">
-				<div id="relationfragmenttwicecontent">
-			
-				</div>
-		</div>		
+		
 	</div>
 
 	<div id="network-pane" class="ui-layout-west">
@@ -275,27 +264,12 @@
 								key="jsp.network.label.title.focusprofile" /></div>
 					<div class="rp-header">
 						<div class="rp-image">
-						<c:choose>
-							<c:when
-								test="${!empty researcher.pict && !empty researcher.pict.value}">
-										<c:set value="${dyna:getFileName(researcher.pict.value)}" var="pictname"></c:set>
+
 										<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authority}">
-											<img title="A preview ${pictname} picture"
-												src="<%=request.getContextPath()%>/cris/rp/fileservice/${dyna:getFileFolder(researcher.pict.value)}?filename=${pictname}"
-												alt="${pictname} picture" name="picture" id="picture" /> </a>
-															
-							</c:when>
-							<c:otherwise>
-
-								<tr>
-
-									<td class="image_td" colspan="2" align="center">
-
-										<div class="image"></div></td>
-
-								</tr>
-							</c:otherwise>
-						</c:choose>
+											<img title="A preview ${authority} picture"
+												src="researcherimage/${authority}"
+												alt="${authority} picture" name="picture" id="picture" /> </a>
+														
 
 					</div>
 					<div class="rp-content">
@@ -706,8 +680,8 @@
 	});	
 
 	j("select[name='radiographlayout']").change(function(){
-		if (j("#radiographlayout1").attr("selected") && !customRGraph) { customRGraph = true; rgraph.refresh(); }
-		if (j("#radiographlayout2").attr("selected") && customRGraph) { customRGraph = false; rgraph.refresh(); }
+		if (j("#radiographlayout1").is(":selected") && !customRGraph) { customRGraph = true; rgraph.refresh(); }
+		if (j("#radiographlayout2").is(":selected") && customRGraph) { customRGraph = false; rgraph.refresh(); }
 	});
 	
 	
@@ -864,10 +838,6 @@
 		                )
 
 	});
-
-	j("#relationfragment").dialog({closeOnEscape: true, modal: true, autoOpen: false, resizable: false, width: '50%'});
-	j("#relationfragmenttwice").dialog({closeOnEscape: true, modal: true, autoOpen: false, width: 'auto'});
-		
 	
 	function screenPage() {		
 		
@@ -961,5 +931,62 @@
 
 	-->    
 	</script>
+	<script type="text/x-tmpl" id="tmpl-networkimage">
+		<div class='tip-title'><img style='width: 40px' id='picture' name='picture' src='researcherimage/{%= o.id %}'/><span>{%= o.name %}</span></div>
+	</script>
+
+
+<div class="modal fade" id="networkInformation">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"><fmt:message key="jsp.network.label.title.info"/></h4>
+      </div>
+      <div class="modal-body">
+        <p>
+        <ul style="padding-left: 15px;">
+			<li>Best printed with IE/FireFox</li>
+			<li>Because of space limitations, approximately 20 names only appear in the first circle for any given facet.</li>
+			<li>External name variants have not been merged.</li>
+		</ul>        
+        </p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+	
+<div class="modal fade dialogfragment" id="relationfragment">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="relationfragmentcontenttitle"><fmt:message key="jsp.network.label.title.info"/></h4>
+      </div>
+      <div class="modal-body">
+        <div id="relationfragmentcontent">
+				
+		</div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade dialogfragment" id="relationfragmenttwice">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="relationfragmenttwicecontenttitle"><fmt:message key="jsp.network.label.title.info"/></h4>
+      </div>
+      <div class="modal-body">
+        <div id="relationfragmenttwicecontent">
+				
+		</div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 </html>

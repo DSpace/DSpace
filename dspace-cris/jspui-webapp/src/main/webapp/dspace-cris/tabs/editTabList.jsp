@@ -16,25 +16,19 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" navbar="admin"
+<dspace:layout locbar="link" style="submission" navbar="admin"
 	titlekey="jsp.dspace-admin.hku.jdyna-configuration.listedittabs">
 
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.listedittabs" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
+	<h1><fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.listedittabs" />
+		<a target="_blank" class="pull-right"
 				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
                                 "help.site-admin.rp")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
+				key="jsp.help" /></a></h1>
 	
 	<c:if test="${not empty messages}">
 		<div class="message" id="successMessages"><c:forEach var="msg"
 			items="${messages}">
-			<div id="authority-message">${msg}</div>
+			<div id="authority-message" class="alert alert-success">${msg}</div>
 		</c:forEach></div>
 		<c:remove var="messages" scope="session" />
 	</c:if>
@@ -43,7 +37,7 @@
 	<ul>
 		<c:forEach items="${listTab}" var="tab">
 			<li>
-			<div style="padding: 0; margin: 0 10px;">${tab.title} <c:if
+			${tab.title} <c:if
 				test="${tab.mandatory eq 'false'}">
 				<a class="jdynaremovebutton"
 					title="<fmt:message
@@ -68,17 +62,13 @@
 					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 				title="<fmt:message
 					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-				name="edit" id="edit_${tab.id}" /> </a></div>
-
+				name="edit" id="edit_${tab.id}" /> </a>
 			</li>
-			<div>&nbsp;</div>
-
 		</c:forEach>
 	</ul>
 	</fieldset>
 
-	<div style="padding: 0; margin: 0 10px;"><a
-		href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createEditTabs.htm">
-	<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newtab" />
-	</a></div>
+<a href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createEditTabs.htm">
+<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.newtab" />
+</a>
 </dspace:layout>

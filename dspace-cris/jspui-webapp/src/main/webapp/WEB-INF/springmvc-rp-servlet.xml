@@ -314,6 +314,14 @@
 		</property>
 	</bean>
 	
+	<!-- Controller to redirect researcher into own profile after click on IRIS menu -->
+	<bean id="myRPProfileController" class="org.dspace.app.webui.cris.controller.MyRPProfileController">
+		<property name="applicationService" ref="applicationService" />
+		<property name="viewName">
+			<value>researcherDetailsPage</value>
+		</property>
+	</bean>
+	
 	<!-- Controller to expose (via JSON) informations about the rp of the current 
 		user -->
 	<bean id="jsonMyRPController"
@@ -402,7 +410,7 @@
 			<value>redirect:/cris/tools/rp/editDynamicData.htm?id=</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.ResearcherPageDTO</value>
+			<value>org.dspace.app.cris.model.dto.ResearcherPageDTO</value>
 		</property>
 		<property name="commandName">
 			<value>dto</value>
@@ -1072,7 +1080,7 @@
 			<value>/jdyna/rpDataEditForm</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.RPAnagraficaObjectDTO</value>
+			<value>org.dspace.app.cris.model.dto.RPAnagraficaObjectDTO</value>
 		</property>		
 		<property name="commandName">
 			<value>anagraficadto</value>
@@ -1598,7 +1606,7 @@
 			<value>redirect:/cris/tools/project/editDynamicData.htm?id=</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.ProjectDTO</value>
+			<value>org.dspace.app.cris.model.dto.ProjectDTO</value>
 		</property>
 		<property name="commandName">
 			<value>dto</value>
@@ -2210,7 +2218,7 @@
 			<value>/jdyna/projectDataEditForm</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.ProjectAnagraficaObjectDTO
+			<value>org.dspace.app.cris.model.dto.ProjectAnagraficaObjectDTO
 			</value>
 		</property>		
 		<property name="commandName">
@@ -2826,7 +2834,7 @@
 			<value>redirect:/cris/tools/ou/editDynamicData.htm?id=</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.OrganizationUnitDTO</value>
+			<value>org.dspace.app.cris.model.dto.OrganizationUnitDTO</value>
 		</property>
 		<property name="commandName">
 			<value>dto</value>
@@ -3439,7 +3447,7 @@
 			<value>/jdyna/ouDataEditForm</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.OUAnagraficaObjectDTO</value>
+			<value>org.dspace.app.cris.model.dto.OUAnagraficaObjectDTO</value>
 		</property>		
 		<property name="commandName">
 			<value>anagraficadto</value>
@@ -5406,7 +5414,7 @@
 			<value>/jdyna/doDataEditForm</value>
 		</property>
 		<property name="commandClass">
-			<value>org.dspace.app.webui.cris.dto.DynamicAnagraficaObjectDTO</value>
+			<value>org.dspace.app.cris.model.dto.DynamicAnagraficaObjectDTO</value>
 		</property>		
 		<property name="commandName">
 			<value>anagraficadto</value>
@@ -5531,6 +5539,8 @@
 				<prop key="/login">myRPController</prop>
 				<prop key="/tools/subscription/*">crisSubscriptionController</prop>
 				<prop key="/rp/myRp.json">jsonMyRPController</prop>
+				<prop key="/myProfile">myRPProfileController</prop>
+				<prop key="/myStatistics">rpStatisticsController</prop>
 				
 				<!-- Image and file Loader -->
 				<prop key="/researchertabimage/*">loadTabIcon</prop>
@@ -5831,8 +5841,7 @@
 				
 				<!-- Other research entities details URL -->												
 				<prop key="/**/*">detailsDOController</prop>	        		
-		        <prop key="/*/details.htm">redirectDetailsDOController</prop>		
-				
+		        <prop key="/*/details.htm">redirectDetailsDOController</prop>	
 				
 			</props>
 		</property>
@@ -6224,7 +6233,7 @@
 
 	<!-- statistics -->
 	<bean id="rpStatisticsController"
-		class="org.dspace.app.webui.cris.controller.statistics.CrisStatisticsController">
+		class="org.dspace.app.webui.cris.controller.statistics.RPStatisticsController">
 		<property name="solrConfig">
 			<ref bean="solrConfig" />
 		</property>

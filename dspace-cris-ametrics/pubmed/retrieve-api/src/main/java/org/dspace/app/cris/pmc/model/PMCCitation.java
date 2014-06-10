@@ -14,13 +14,14 @@ import it.cilea.osd.common.model.Identifiable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -45,10 +46,13 @@ public class PMCCitation implements Identifiable, HasTimeStampInfo
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
+	@CollectionTable(name = "cris_pmc_citation_itemids", joinColumns = @JoinColumn(name = "cris_pmc_citation_pubmedid"))
+	@Column(name = "element")
     private List<Integer> itemIDs;
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinTable(name="cris_pmc_citation2record")
+    @CollectionTable(name = "cris_pmc_citation2record", joinColumns = @JoinColumn(name = "cris_pmc_citation_pubmedid"))
+    @Column(name = "pmcrecords_pmcid")
     private List<PMCRecord> pmcRecords;
 
     /** timestamp info for creation and last modify */

@@ -5,7 +5,7 @@
  *
  * https://github.com/CILEA/dspace-cris/wiki/License
  */
-package org.dspace.app.cris.discovery;
+package org.dspace.app.cris.integration;
 
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
@@ -150,9 +151,10 @@ public class CrisItemEnhancerUtility
             {
                 try
                 {
+                    ACrisObject newInstance = enh.getClazz().newInstance();
                     if (dc.authority != null
-                            && dc.authority.startsWith(
-                                    enh.getClazz().newInstance().getAuthorityPrefix()))
+                            && ((newInstance instanceof ResearchObject)?dc.authority.startsWith(enh.getType()):dc.authority.startsWith(
+                                    newInstance.getAuthorityPrefix())))
                     {
                         if (mam.getMinConfidence(dc.schema, dc.element,
                                 dc.qualifier) <= dc.confidence)

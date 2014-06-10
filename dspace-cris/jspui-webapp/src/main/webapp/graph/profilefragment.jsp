@@ -57,29 +57,12 @@
 								key="jsp.network.label.title.targetprofile" /></div>
 					<div class="rp-header">
 						<div class="rp-image">
-						<c:choose>
-							<c:when
-								test="${!empty researchertarget.pict && !empty researchertarget.pict.value && researchertarget.pict.visibility==1}">
-										
-										<c:set value="${dyna:getFileName(researchertarget.pict.value)}" var="pictname"></c:set>
+						
 										<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authoritytarget}">
-											<img title="A preview ${pictname} picture"
-												src="<%=request.getContextPath()%>/cris/rp/fileservice/${dyna:getFileFolder(researchertarget.pict.value)}?filename=${pictname}"
-												alt="${pictname} picture" name="picture" id="picture" /> </a>
-															
-							</c:when>
-							<c:otherwise>
-
-								<tr>
-
-									<td class="image_td" colspan="2" align="center">
-
-										<div class="image"></div></td>
-
-								</tr>
-							</c:otherwise>
-						</c:choose>
-
+											<img title="A preview ${authoritytarget} picture"
+												src="researcherimage/${authoritytarget}"
+												alt="${authoritytarget} picture" name="picture" id="picture" /> </a>
+						
 					</div>
 					<div class="rp-content">
 							<div class="rp-name"><a target="_blank" href="<%= request.getContextPath() %>/cris/rp/${authoritytarget}">
@@ -194,15 +177,13 @@
 								"with" : "${authoritytarget}"
 							},
 							success : function(data) {								
-								j('#relationfragment').dialog('open');
-								j(".ui-dialog-titlebar").html("${fullname} / ${researchertarget.fullName} &nbsp; <a class='ui-dialog-titlebar-close ui-corner-all' href='#' role='button'><span class='ui-icon ui-icon-closethick'>close</span></a>");j(".ui-dialog-titlebar").show();
+								j('#relationfragment').modal("show");
+								j("#relationfragmentcontenttitle").html("${fullname} / ${researchertarget.fullName}");
 								j('#relationfragmentcontent').html(data);
-								j('#relationfragment').dialog('option', 'position', 'center');
-								j('#relationfragment').css("max-height", (jQuery(window).height() - 100) + 'px');
 								j("#log").dialog("close");
 							},
 							error : function(data) {
-								j('#relationfragment').dialog("close");
+								j('#relationfragment').modal("hide");
 								j("#log").dialog("open");
 								Log.write(data.statusText);
 								j("#log").dialog("close");
@@ -210,5 +191,4 @@
 						});
 
 					});
-	j(".ui-dialog-titlebar").click(function() {	j('#relationfragment').dialog("close");});
 </script>

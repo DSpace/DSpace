@@ -25,23 +25,15 @@
 <%@page import="org.dspace.app.cris.model.CrisConstants"%>
 <%@ taglib uri="jdynatags" prefix="dyna" %>
 
-<dspace:layout locbar="link" navbar="admin"
+<dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.researchers-list">
 
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message
-				key="jsp.dspace-admin.edit-propertiesdefinition" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.rp")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
-
-
+<h1><fmt:message
+	key="jsp.dspace-admin.edit-propertiesdefinition" />
+<a target="_blank"
+	href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
+                             "help.site-admin.rp")%>'><fmt:message
+	key="jsp.help" /></a></h1>
 
 	<form:form commandName="propertiesdefinition" method="post">
 		<c:set value="${message}" var="message" scope="request" />
@@ -328,7 +320,7 @@
 
 		<input type="hidden" id="tabId" name="tabId" value="${tabId}" />
 		<input type="hidden" id="boxId" name="boxId" value="${boxId}" />
-		<input type="submit" name="save"
+		<input type="submit" name="save" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 
 	</form:form>

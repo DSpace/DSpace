@@ -19,21 +19,14 @@
 <%@page import="org.dspace.app.cris.model.CrisConstants"%>
 
 <c:set var="CRIS_DYNAMIC_TYPE_ID_START"><%=CrisConstants.CRIS_DYNAMIC_TYPE_ID_START%></c:set>
-<dspace:layout locbar="link" navbar="admin"	titlekey="jsp.dspace-admin.do">
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.do" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
+<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.do">
+			<h1><fmt:message key="jsp.dspace-admin.do" />
+			<a class="pull-right" target="_blank" href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
                                 "help.site-admin.do")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
+				key="jsp.help" /></a></h1>
 
 	<c:if test="${not empty messages}">
-		<div class="message" id="successMessages"><c:forEach var="msg"
+		<div class="alert alert-success" id="successMessages"><c:forEach var="msg"
 			items="${messages}">
 			<div id="authority-message">${msg}</div>
 		</c:forEach></div>
@@ -42,37 +35,29 @@
 
 
 	<c:if test="${!empty error}">
-		<span id="errorMessage"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
+		<span id="errorMessage" class="alert alert-danger"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
 	</c:if>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
 
 	<ul>
-
 		<li>
-		<div style="padding: 0; margin: 0 10px;"><a id="addentity"
-			href="<%=request.getContextPath()%>/cris/administrator/do/add.htm"><fmt:message
-			key="jsp.dspace-admin.hku.add-typodynamicobject" /></a></div>	
-		
-		<div>&nbsp;</div>
+			<a id="addentity" href="<%=request.getContextPath()%>/cris/administrator/do/add.htm"><fmt:message
+			key="jsp.dspace-admin.hku.add-typodynamicobject" /></a>	
 		</li>
-	
 	</ul>
-	
 	
 	<fieldset><legend><fmt:message key="jsp.dspace-admin.hku.list-typodynamicobject" /></legend>
 	<div style="padding: 0; margin: 0 10px;">			
 			<display:table name="${researchobjects}" cellspacing="0" cellpadding="0" 
-			requestURI="" id="objectList" htmlId="objectList"  class="displaytaglikemisctable" export="false">
-				<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id"> 
+			requestURI="" id="objectList" htmlId="objectList"  class="table" export="false">
+				<display:column titleKey="jsp.layout.table.cris.admin-list.id"> 
 					<a href="<%=request.getContextPath()%>/cris/administrator/${objectList.shortName}/index.htm?id=${objectList.id}">${objectList.id}</a>
 				</display:column>									
-				<display:column headerClass="shortname" titleKey="jsp.layout.table.cris.admin-list.shortname" property="shortName" sortable="true" />										
-				<display:column headerClass="label" class="label" titleKey="jsp.layout.table.cris.admin-list.label" property="label" sortable="true"/>
-				<display:column headerClass="typodef" titleKey="jsp.layout.table.cris.admin-list.typodef" sortable="true">
+				<display:column titleKey="jsp.layout.table.cris.admin-list.shortname" property="shortName" sortable="true" />										
+				<display:column titleKey="jsp.layout.table.cris.admin-list.label" property="label" sortable="true"/>
+				<display:column titleKey="jsp.layout.table.cris.admin-list.typodef" sortable="true">
 					${objectList.id + CRIS_DYNAMIC_TYPE_ID_START}
 				</display:column>
-				<display:column>
+				<display:column titleKey="jsp.layout.table.cris.admin-list.actions">
 					<a href="<%=request.getContextPath()%>/cris/administrator/do/edit.htm?id=${objectList.id}">Edit</a>
 					<a href="<%=request.getContextPath()%>/cris/administrator/do/delete.htm?id=${objectList.id}">Delete</a>					
 				</display:column>	

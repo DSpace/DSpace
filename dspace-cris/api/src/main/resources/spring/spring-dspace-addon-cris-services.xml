@@ -1638,11 +1638,6 @@
 	<bean id="sectionStatsExtraIndexer" 
     	class="org.dspace.app.cris.statistics.SectionStatsIndexPlugin">
     </bean>     
-
-	
-	 <bean id="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData" 
-    	class="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData">
-    </bean>
     
     <bean id="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData" 
     	class="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData">

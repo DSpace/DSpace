@@ -42,52 +42,56 @@
 							<%
 								if (fileURL == null) {
 							%>
-							<div id="${holder.shortName}" class="box ${holder.collapsed?"":"expanded"}">
-								  <h3><a href="#">${holder.title}</a></h3>
-								  <div>
-								  <p>
-			
-
-									<c:set var="hideLabel">${fn:length(propertiesDefinitionsInHolder[holder.shortName]) le 1}</c:set>
-									<c:forEach
-										items="${propertiesDefinitionsInHolder[holder.shortName]}"
-										var="tipologiaDaVisualizzare" varStatus="status">
-
-			
-										<c:if
-											test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorTypeDefinition')}">
-											
-											
-												<c:set var="totalHit" value="0"/>
-												<c:set var="limit" value="5"/>
-												<c:set var="offset" value="0"/>											
-												<c:set var="pageCurrent" value="0"/>	
-												<c:set var="editmode" value="false"/>
-												
-												<div
-													id="viewnested_${tipologiaDaVisualizzare.real.id}" class="viewnested">
-														<img src="<%=request.getContextPath()%>/image/cris/bar-loader.gif" class="loader" />
-															<fmt:message key="jsp.jdyna.nestedloading" />
-												<span class="spandatabind nestedinfo">${tipologiaDaVisualizzare.real.id}</span>
-												<span id="nested_${tipologiaDaVisualizzare.real.id}_totalHit" class="spandatabind">0</span>
-												<span id="nested_${tipologiaDaVisualizzare.real.id}_limit" class="spandatabind">5</span>
-												<span id="nested_${tipologiaDaVisualizzare.real.id}_pageCurrent" class="spandatabind">0</span>
-												<span id="nested_${tipologiaDaVisualizzare.real.id}_editmode" class="spandatabind">false</span>
-												<span id="nested_${tipologiaDaVisualizzare.real.id}_externalJSP" class="spandatabind">${tipologiaDaVisualizzare.externalJSP}</span>
-												</div>
-										</c:if>
-										<c:if
-											test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition')}">
-											<dyna:display tipologia="${tipologiaDaVisualizzare.real}"
-												hideLabel="${hideLabel}"
-												values="${anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}" />
-
-										</c:if>
-									</c:forEach>
-									
-										</p>
-									</div>	
-								</div>
+							<div class="panel-group" id="${holder.shortName}">
+  									<div class="panel panel-default">
+    										<div class="panel-heading">
+      												<h4 class="panel-title">
+        												<a data-toggle="collapse" data-parent="#${holder.shortName}" href="#collapseOne${holder.shortName}">
+          													${holder.title}
+        												</a>
+      												</h4>
+    										</div>
+										    <div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
+												<div class="panel-body">
+											      <c:set var="hideLabel">${fn:length(propertiesDefinitionsInHolder[holder.shortName]) le 1}</c:set>
+													<c:forEach
+														items="${propertiesDefinitionsInHolder[holder.shortName]}"
+														var="tipologiaDaVisualizzare" varStatus="status">
+							
+														<c:if
+															test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorTypeDefinition')}">
+															
+																<c:set var="totalHit" value="0"/>
+																<c:set var="limit" value="5"/>
+																<c:set var="offset" value="0"/>											
+																<c:set var="pageCurrent" value="0"/>	
+																<c:set var="editmode" value="false"/>
+																
+																<div
+																	id="viewnested_${tipologiaDaVisualizzare.real.id}" class="viewnested">
+																		<img src="<%=request.getContextPath()%>/image/cris/bar-loader.gif" class="loader" />
+																			<fmt:message key="jsp.jdyna.nestedloading" />
+																<span class="spandatabind nestedinfo">${tipologiaDaVisualizzare.real.id}</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_totalHit" class="spandatabind">0</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_limit" class="spandatabind">5</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_pageCurrent" class="spandatabind">0</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_editmode" class="spandatabind">false</span>
+																<span id="nested_${tipologiaDaVisualizzare.real.id}_externalJSP" class="spandatabind">${tipologiaDaVisualizzare.externalJSP}</span>
+																</div>
+														</c:if>
+														<c:if
+															test="${dyna:instanceOf(tipologiaDaVisualizzare,'it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition')}">
+															<dyna:display tipologia="${tipologiaDaVisualizzare.real}"
+																hideLabel="${hideLabel}"
+																values="${anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}" />
+														</c:if>
+													</c:forEach>		
+										        </div>
+										  </div>
+								   </div>
+							</div>
+							
+							
 							<%
 								} else {
 							%>
@@ -99,6 +103,5 @@
 							%>
 
 						</c:if>
-					<div class="dynaClear">&nbsp;</div>			
 					</c:forEach>
 	</div>

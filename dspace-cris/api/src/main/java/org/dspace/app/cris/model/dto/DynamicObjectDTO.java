@@ -5,10 +5,9 @@
  *
  * https://github.com/CILEA/dspace-cris/wiki/License
  */
-package org.dspace.app.webui.cris.dto;
+package org.dspace.app.cris.model.dto;
 
-import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.cris.model.ResearchObject;
 
 
 /**
@@ -19,15 +18,15 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
  * @author pascarelli
  * 
  */
-public class OrganizationUnitDTO {
+public class DynamicObjectDTO {
 	
 	private Integer id;
 	private String sourceID;
 	private String uuid;
 	private Boolean status;
-	private String name;
+	private String name;	
 		
-	private OrganizationUnit organizationUnit;
+	private ResearchObject dynamicObject;
 	
 	public Integer getId() {
 		return id;
@@ -55,14 +54,8 @@ public class OrganizationUnitDTO {
 	public void setName(String title) {
 		this.name = title;
 	}	
-    public void setOrganizationUnit(OrganizationUnit organizationUnit)
-    {
-        this.organizationUnit = organizationUnit;
-    }
-    public OrganizationUnit getOrganizationUnit()
-    {
-        return organizationUnit;
-    }
+    
+	
     public void setUuid(String uuid)
     {
         this.uuid = uuid;
@@ -70,6 +63,14 @@ public class OrganizationUnitDTO {
     public String getUuid()
     {
         return uuid;
+    }
+    public ResearchObject getDynamicObject()
+    {
+        return dynamicObject;
+    }
+    public void setDynamicObject(ResearchObject dynamicObject)
+    {
+        this.dynamicObject = dynamicObject;
     }
 
 }

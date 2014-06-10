@@ -66,14 +66,30 @@ public class ResearcherPictureServlet extends HttpServlet
         InputStream is = null;
         try
         {
-            is = new FileInputStream(file);
+            if (file.exists() && !file.isDirectory())
+            {
+                is = new FileInputStream(file);
 
+            }
+            else
+            {
+                String imgRedirected = "";
+                Object defaultPlatformUserImg = req.getAttribute("anonymousUserImg");
+                if(defaultPlatformUserImg==null) {
+                    imgRedirected = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "researcherpage.image-default.path");
+                }
+                else {
+                    imgRedirected = String.valueOf(defaultPlatformUserImg);
+                }
+                response.sendRedirect(imgRedirected);
+                return;
+            }
             response.setContentType(req.getSession().getServletContext()
                     .getMimeType(file.getName()));
             Long len = file.length();
             response.setContentLength(len.intValue());
-            response.setHeader("Content-Disposition", "attachment; filename="
-                    + file.getName());
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=" + file.getName());
             FileCopyUtils.copy(is, response.getOutputStream());
             response.getOutputStream().flush();
         }

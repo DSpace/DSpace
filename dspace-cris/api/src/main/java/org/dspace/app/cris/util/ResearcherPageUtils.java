@@ -8,22 +8,36 @@
 package org.dspace.app.cris.util;
 
 import it.cilea.osd.jdyna.model.ANestedObject;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ANestedProperty;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.dspace.app.cris.integration.NameResearcherPage;
+import org.dspace.app.cris.integration.RPAuthority;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
-import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.content.DCPersonName;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.Choices;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * This class provides some static utility methods to extract information from
@@ -156,10 +170,13 @@ public class ResearcherPageUtils
     {
         if (alternativeName.equals(rp.getFullName()))
         {
+            RestrictedField translatedName = rp.getTranslatedName();
             return rp.getFullName()
-                    + (rp.getTranslatedName() != null
-                            && rp.getTranslatedName().getVisibility() == VisibilityConstants.PUBLIC ? " "
-                            + rp.getTranslatedName().getValue()
+                    + (translatedName != null
+                            && translatedName.getValue() != null
+                            && !translatedName.getValue().isEmpty()
+                            && translatedName.getVisibility() == VisibilityConstants.PUBLIC ? " "
+                            + translatedName.getValue()
                             : "");
         }
         else
@@ -341,5 +358,199 @@ public class ResearcherPageUtils
             Integer id, Class<T> clazz)
     {
         return applicationService.get(clazz, id);
+    }
+
+    public static Choices doGetMatches(String field, String query) throws SearchServiceException
+	{
+    	DSpace dspace = new DSpace();
+    	SearchService searchService = dspace.getServiceManager().getServiceByName(
+                "org.dspace.discovery.SearchService", SearchService.class);
+
+    	ConfigurationService configurationService = dspace.getServiceManager().getServiceByName(
+                "org.dspace.services.ConfigurationService",
+                ConfigurationService.class);
+    	
+    	return doGetMatches(field, query, configurationService, searchService);
+	}
+    
+	public static Choices doGetMatches(String field, String query, ConfigurationService _configurationService,
+			SearchService _searchService) throws SearchServiceException
+	{
+		Choices choicesResult;
+		if (query != null && query.length() > 2)
+		{
+		    DCPersonName tmpPersonName = new DCPersonName(
+		            query.toLowerCase());
+	
+		    String luceneQuery = "";
+		    if (StringUtils.isNotBlank(tmpPersonName.getLastName()))
+		    {
+		        luceneQuery += ClientUtils.escapeQueryChars(tmpPersonName
+		                .getLastName().trim())
+		                + (StringUtils.isNotBlank(tmpPersonName
+		                        .getFirstNames()) ? "" : "*");
+		    }
+	
+		    if (StringUtils.isNotBlank(tmpPersonName.getFirstNames()))
+		    {
+		        luceneQuery += (luceneQuery.length() > 0 ? " " : "")
+		                + ClientUtils.escapeQueryChars(tmpPersonName
+		                        .getFirstNames().trim()) + "*";
+		    }
+		    luceneQuery = luceneQuery.replaceAll("\\\\ ", " ");
+		    DiscoverQuery discoverQuery = new DiscoverQuery();
+		    discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
+		    String filter = _configurationService.getProperty("cris."
+		            + RPAuthority.RP_AUTHORITY_NAME
+		            + ((field != null && !field.isEmpty()) ? "." + field
+		                    : "") + ".filter");
+		    if (filter != null)
+		    {
+		        discoverQuery.addFilterQueries(filter);
+		    }
+	
+		    discoverQuery
+		            .setQuery("{!lucene q.op=AND df=crisauthoritylookup}("
+		                    + luceneQuery
+		                    + ") OR (\""
+		                    + luceneQuery.substring(0,
+		                            luceneQuery.length() - 1) + "\")");
+		    discoverQuery.setMaxResults(50);
+		    DiscoverResult result = _searchService.search(null,
+		            discoverQuery, true);
+	
+			List<Choice> choiceList = new ArrayList<Choice>();
+	
+			for (DSpaceObject dso : result.getDspaceObjects()) {
+				ResearcherPage rp = (ResearcherPage) dso;
+				choiceList.add(new Choice(getPersistentIdentifier(rp), rp.getFullName(),
+						getLabel(rp.getFullName(), rp)
+						));
+	
+				if (rp.getTranslatedName() != null
+						&& rp.getTranslatedName().getVisibility() == VisibilityConstants.PUBLIC
+						&& rp.getTranslatedName().getValue() != null) {
+					choiceList.add(new Choice(getPersistentIdentifier(rp), rp
+							.getTranslatedName().getValue(),
+							getLabel(rp.getTranslatedName()
+									.getValue(), rp)));
+				}
+	
+				for (RestrictedField variant : rp.getVariants()) {
+					if (variant.getValue() != null
+							&& variant.getVisibility() == VisibilityConstants.PUBLIC) {
+						choiceList.add(new Choice(getPersistentIdentifier(rp), variant
+								.getValue(), getLabel(
+								variant.getValue(), rp)));
+					}
+				}
+		    }
+	
+		    Choice[] results = new Choice[choiceList.size()];
+		    results = choiceList.toArray(results);
+		    choicesResult = new Choices(results, 0, results.length,
+		            Choices.CF_AMBIGUOUS, false, 0);
+		} else {
+			choicesResult = new Choices(false);
+		}
+		return choicesResult;
+	}
+	
+	public static List<String> getAllNamesForm(String crisID) {
+
+        ResearcherPage rp = applicationService.getEntityByCrisId(crisID,
+                ResearcherPage.class);
+
+        if (rp == null) {
+            log.error("researcher=" + crisID + " not found");
+            return null;
+        }
+
+        return getAbbreviations(getAllVariantsName(null, rp));
+	}
+	
+	
+    public static List<NameResearcherPage> getAllVariantsName(
+            Set<Integer> invalidIds, ResearcherPage researcher)
+    {
+        String authority = researcher.getCrisID();
+        Integer id = researcher.getId();
+        List<NameResearcherPage> names = new LinkedList<NameResearcherPage>();
+        NameResearcherPage name = new NameResearcherPage(
+                researcher.getFullName(), authority, id, invalidIds);
+        names.add(name);
+        RestrictedField field = researcher.getPreferredName();
+        if (field != null && field.getValue() != null
+                && !field.getValue().isEmpty())
+        {
+            NameResearcherPage name_1 = new NameResearcherPage(
+                    field.getValue(), authority, id, invalidIds);
+            names.add(name_1);
+        }
+        field = researcher.getTranslatedName();
+        if (field != null && field.getValue() != null
+                && !field.getValue().isEmpty())
+        {
+            NameResearcherPage name_2 = new NameResearcherPage(
+                    field.getValue(), authority, id, invalidIds);
+            names.add(name_2);
+        }
+        for (RestrictedField r : researcher.getVariants())
+        {
+            if (r != null && r.getValue() != null && !r.getValue().isEmpty())
+            {
+                NameResearcherPage name_3 = new NameResearcherPage(
+                        r.getValue(), authority, id, invalidIds);
+                names.add(name_3);
+            }
+        }
+
+        return names;
+    }
+	   
+    private static List<String> getAbbreviations(List<NameResearcherPage> names)
+    {
+        List<String> result = new ArrayList<String>();
+        for (NameResearcherPage rpn : names)
+        {
+
+            String rawValue = rpn.getName();
+            
+            // oggetto dcpersona composto solo da cognome e nome
+            DCPersonName dcpersona = new DCPersonName(rawValue);
+            String firstname = "";
+            //firstNames contiene una lista di iniziali del nome delle persone
+            List<String> firstNames = new ArrayList<String>();
+            String[] tmpStr;
+            int tmp = dcpersona.getFirstNames().indexOf(" ");
+            
+            if(tmp > -1){
+                tmpStr = dcpersona.getFirstNames().split(" ");
+                for(int h = 0; h < tmpStr.length; h++){
+                    if(!StringUtils.trim(tmpStr[h]).equals("")) {
+                        firstname += tmpStr[h].substring(0, 1);
+                        firstNames.add(firstname);
+                    }
+                }
+                for (int h = 0; h < tmpStr.length; h++) {
+                    if(!StringUtils.trim(tmpStr[h]).equals("")) {
+                        firstNames.add(tmpStr[h].substring(0, 1));
+                    }
+                }
+            }else{
+                firstname = dcpersona.getFirstNames().substring(0, 1);
+                firstNames.add(firstname);
+            }
+            
+            String lastname = dcpersona.getLastName();
+            result.add(dcpersona.getFirstNames() +" " + lastname);
+            result.add(lastname +" " + dcpersona.getFirstNames());
+            for(String first : firstNames) {
+                result.add(first + " "+ lastname);
+                result.add(lastname + " " + first);                
+            }
+            
+        }
+        return result;
     }
 }

@@ -11,7 +11,6 @@
 <%@page import="java.util.List"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.net.URLEncoder"            %>
-<%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Set" %>
@@ -110,7 +109,7 @@ if (info.getPagetotal() > 1)
 <dspace:browselist items="<%= (BrowseItem[])info.getItems() %>" config="crisrp" sortBy="<%= new Integer(info.getSo().getNumber()).toString() %>" order="<%= info.getOrder() %>"/>
 
 <script type="text/javascript"><!--
-    var j = jQuery.noConflict();
+	var j = jQuery;
     function sortBy(sort_by, order) {
         j('#sort_by<%= info.getType() %>').val(sort_by);
         j('#order<%= info.getType() %>').val(order);

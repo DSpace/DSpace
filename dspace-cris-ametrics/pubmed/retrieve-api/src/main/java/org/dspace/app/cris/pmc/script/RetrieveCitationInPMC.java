@@ -10,7 +10,6 @@ package org.dspace.app.cris.pmc.script;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,10 +21,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.pmc.model.PMCCitation;
 import org.dspace.app.cris.pmc.model.PMCRecord;
 import org.dspace.app.cris.pmc.services.PMCEntrezException;
@@ -62,6 +57,8 @@ public class RetrieveCitationInPMC
     private static long timeElapsed = 3600000 * 24 * 7; // 1 week
 
     private static long maxItemToWork = 100;
+    
+    private static String queryDefault = "+dc.identifier.pmid:[* TO *]";
 
     public static void main(String[] args) throws SearchServiceException,
             SQLException, AuthorizeException, ParseException
@@ -83,6 +80,12 @@ public class RetrieveCitationInPMC
                 true,
                 "Process a max of <x> items. Only worked items matter, item not worked because up-to-date (see t option) are not counted. Use 0 to set no limits");
 
+        options.addOption(
+                "q",
+                "query",
+                true,
+                "Override the default query to retrieve puntual publication (used for test scope, the default query will be deleted");
+        
         CommandLine line = parser.parse(options, args);
 
         if (line.hasOption('h'))
@@ -110,6 +113,11 @@ public class RetrieveCitationInPMC
         {
             maxItemToWork = Long.valueOf(line.getOptionValue('x').trim());
         }
+        
+        if (line.hasOption('q'))
+        {
+            queryDefault = line.getOptionValue('q').trim(); 
+        }
         ServiceManager serviceManager = dspace.getServiceManager();
         // System.out.println(serviceManager.getServicesNames());
         searcher = serviceManager.getServiceByName(
@@ -125,7 +133,7 @@ public class RetrieveCitationInPMC
             context = new Context();
 
             DiscoverQuery query = new DiscoverQuery();
-            query.setQuery("+dc.identifier.pmid:[* TO *]");
+            query.setQuery(queryDefault);
             query.setMaxResults(Integer.MAX_VALUE);
             query.setDSpaceObjectFilter(Constants.ITEM);            
             query.addSearchField("dc.identifier.pmid");           

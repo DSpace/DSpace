@@ -39,8 +39,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -159,7 +159,12 @@
 		</developer>
 		<developer>
 			<name>Luigi Andrea Pascarelli</name>
-			<email>luigiandrea.pascarelli@cineca.it</email>
+			<email>l.pascarelli@cineca.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+		<developer>
+			<name>Riccardo Fazio</name>
+			<email>r.fazio@cineca.it</email>
 			<timezone>GMT +1</timezone>
 		</developer>
 	</developers>

@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
+import org.dspace.app.cris.model.dto.DynamicObjectDTO;
 import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.webui.cris.dto.DynamicObjectDTO;
 import org.dspace.app.webui.cris.util.DODisplayTagData;
 import org.dspace.app.webui.cris.util.OUDisplayTagData;
 import org.dspace.core.ConfigurationManager;

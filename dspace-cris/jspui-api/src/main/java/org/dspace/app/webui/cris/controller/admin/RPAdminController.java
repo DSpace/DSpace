@@ -14,7 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.webui.cris.dto.ResearcherPageDTO;
+import org.dspace.app.cris.model.dto.ResearcherPageDTO;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 

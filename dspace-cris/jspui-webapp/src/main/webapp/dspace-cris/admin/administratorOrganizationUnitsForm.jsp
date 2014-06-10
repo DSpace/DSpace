@@ -18,30 +18,22 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" navbar="admin" titlekey="jsp.dspace-admin.cris.ous-list">
-
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.cris.ous-list" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.cris.ou-list")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
-	
+<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.cris.ous-list">
+<h1><fmt:message key="jsp.dspace-admin.cris.ous-list" />
+<a target="_blank"
+	href='<%=LocaleSupport.getLocalizedMessage(pageContext,
+                             "help.site-admin.cris.ou-list")%>'><fmt:message
+	key="jsp.help" /></a></h1>
 	
 	<form:form commandName="dto" method="post">
 	<c:set value="${message}" var="message" scope="request"/>	
 	<c:if test="${!empty message}">		
-    <div id="authority-message"><fmt:message key="${message}"/></div>    
+    <div class="alert alert-default"><fmt:message key="${message}"/></div>    
 	</c:if>
 	<c:if test="${not empty messages}">
 	<div class="message" id="successMessages"><c:forEach var="msg"
 		items="${messages}">
-		<div id="authority-message">${msg}</div>
+		<div class="alert alert-success">${msg}</div>
 	</c:forEach></div>
 	<c:remove var="messages" scope="session" />
 	</c:if>
@@ -54,8 +46,7 @@
 		</spring:bind>
 										
 		<display:table name="${dto}" cellspacing="0" cellpadding="0" 
-			requestURI="" id="objectList" htmlId="objectList"  class="displaytaglikemisctable" export="false">
-			
+			requestURI="" id="objectList" htmlId="objectList"  class="table" export="false">
 			<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id" property="id" url="/cris/ou/details.htm" paramId="id" paramProperty="id" sortable="true" />							
 			<display:column headerClass="uuid" titleKey="jsp.layout.table.cris.admin-list.uuid" property="uuid" url="/cris/ou/details.htm" paramId="id" paramProperty="id" sortable="true" />										
 			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" property="sourceID" url="/cris/ou/details.htm" paramId="code" paramProperty="sourceID" sortable="true"/>									
@@ -66,7 +57,8 @@
 
 		</display:table>
 		
-		<input type="submit" value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
+		<input type="submit" class="btn btn-primary" 
+		value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 		
 	</form:form>				 
 </dspace:layout>

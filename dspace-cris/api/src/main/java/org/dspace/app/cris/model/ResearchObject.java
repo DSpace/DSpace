@@ -48,11 +48,12 @@ import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
         @NamedQuery(name = "ResearchObject.paginate.sourceID.desc", query = "from ResearchObject order by sourceReference.sourceID desc"),
         @NamedQuery(name = "ResearchObject.paginate.uuid.asc", query = "from ResearchObject order by uuid asc"),
         @NamedQuery(name = "ResearchObject.paginate.uuid.desc", query = "from ResearchObject order by uuid desc"),
-        @NamedQuery(name = "ResearchObject.uniqueBySourceID", query = "from ResearchObject where sourceReference.sourceID = ?"),
+        @NamedQuery(name = "ResearchObject.uniqueBySourceID", query = "from ResearchObject where sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
         @NamedQuery(name = "ResearchObject.uniqueUUID", query = "from ResearchObject where uuid = ?"),
         @NamedQuery(name = "ResearchObject.uniqueByCrisID", query = "from ResearchObject where crisID = ?"),
         @NamedQuery(name = "ResearchObject.paginateByType.id.asc", query = "from ResearchObject where (typo = :par0) order by id asc"),
-        @NamedQuery(name = "ResearchObject.paginateByType.id.desc", query = "from ResearchObject where (typo = :par0) order by id desc")
+        @NamedQuery(name = "ResearchObject.paginateByType.id.desc", query = "from ResearchObject where (typo = :par0) order by id desc"),
+        @NamedQuery(name = "ResearchObject.uniqueByUUID", query = "from ResearchObject where uuid = ?")
   })
 public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, DynamicPropertiesDefinition, DynamicNestedProperty, DynamicNestedPropertiesDefinition, DynamicNestedObject, DynamicTypeNestedObject>
 {
@@ -79,6 +80,7 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
     public ResearchObject()
     {
         this.dynamicField = new DynamicAdditionalFieldStorage();
+        dynamicField.setDynamicObject(this);
     }
     
     public void setDynamicField(DynamicAdditionalFieldStorage dynamicField)

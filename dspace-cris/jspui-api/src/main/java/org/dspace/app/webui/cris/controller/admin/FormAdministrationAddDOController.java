@@ -35,35 +35,13 @@ public class FormAdministrationAddDOController extends BaseFormController
             throws Exception
     {
         ResearchObject object = (ResearchObject) command;
-        String sourceId = object.getSourceID();
-
         String path = Utils.getAdminSpecificPath(request, null);
-
-        if (sourceId != null && !sourceId.isEmpty())
-        {
-            object = applicationService.getEntityBySourceId(sourceId,
-                    ResearchObject.class);
-
-            if (object != null)
-            {
-
-                return new ModelAndView("redirect:/cris/" + path
-                        + "/administrator/index.htm?error=true");
-            }
-
-        }
-
-        else
-        {
-            object = new ResearchObject();
-            object.setSourceID(sourceId);
-            object.setStatus(false);
-            object.getDynamicField().setDynamicObject(object);
-            object.setTypo(applicationService.findTypoByShortName(
-                    DynamicObjectType.class, path));
-            applicationService.saveOrUpdate(ResearchObject.class, object);
-
-        }
+        object = new ResearchObject();
+        object.setStatus(false);
+        object.getDynamicField().setDynamicObject(object);
+        object.setTypo(applicationService.findTypoByShortName(
+                DynamicObjectType.class, path));
+        applicationService.saveOrUpdate(ResearchObject.class, object);
         return new ModelAndView(getSuccessView() + object.getId() + "&path="
                 + path);
 

@@ -21,7 +21,7 @@
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.app.cris.model.jdyna.VisibilityTabConstant"%>
 
-<dspace:layout locbar="link" navbar="admin"
+<dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.edit-tab">
 
 	<table width="95%">

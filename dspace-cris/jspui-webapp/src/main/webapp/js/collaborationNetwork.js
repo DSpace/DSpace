@@ -314,7 +314,7 @@ function init(graph, rp, network, typo) {
 						foundParent(node, rgraph);
 						var name = node.id;
 						if(name.match("^rp[0-9]*")) {
-							var html = "<div class=\"tip-title\"><img style='width: 40px' id='picture' name='picture' src='researcherimage/"+node.id+"'/><span>" + node.name	+ "</span></div>";
+							var html = tmpl("tmpl-networkimage", {id: node.id, name: node.name});
 							tip.innerHTML = html;
 						}
 						else {

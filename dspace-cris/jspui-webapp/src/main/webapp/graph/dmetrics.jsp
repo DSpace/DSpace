@@ -84,7 +84,7 @@
 
 	
 	<script><!--
-	var j = jQuery.noConflict();
+	var j = jQuery;
 
 	var myExportOption = [
 				 			{

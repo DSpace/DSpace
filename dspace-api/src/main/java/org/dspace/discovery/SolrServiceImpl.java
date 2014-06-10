@@ -512,16 +512,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     SolrDocument doc = (SolrDocument) iter.next();
 
+                    String handle = (String) doc.getFieldValue("handle");
+                    
                     DSpaceObject o = findDSpaceObject(context, doc);
 
                     if (o == null)
                     {
-                        log.info("Deleting: " + o.getHandle());
+                        log.info("Deleting: " + handle);
                         /*
                          * Use IndexWriter to delete, its easier to manage
                          * write.lock
                          */
-                        unIndexContent(context, o);
+                        unIndexContent(context, handle);
                     }
                     else
                     {
@@ -1702,6 +1704,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.add(property, values.toArray(new String[values.size()]));
         }
 
+        List<String> facetQueries = discoveryQuery.getFacetQueries();
+        for (String facetQuery : facetQueries)
+        {
+            solrQuery.addFacetQuery(facetQuery);
+        }
+        
         List<DiscoverFacetField> facetFields = discoveryQuery.getFacetFields();
         if(0 < facetFields.size())
         {
@@ -1731,12 +1739,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     solrQuery.setFacetPrefix(field, facetFieldConfig.getPrefix());
                 }
-            }
-
-            List<String> facetQueries = discoveryQuery.getFacetQueries();
-            for (String facetQuery : facetQueries)
-            {
-                solrQuery.addFacetQuery(facetQuery);
             }
 
             if(discoveryQuery.getFacetMinCount() != -1)
@@ -1909,11 +1911,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     //TODO: do not assume this, people may want to use it for other ends, use a regex to make sure
                     //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
                     //Prepare the string from {facet.field.name}:[startyear TO endyear] to startyear - endyear
-                    String facetField = facetQuery.substring(0, facetQuery.indexOf(":"));
-                    String name = facetQuery.substring(facetQuery.indexOf('[') + 1);
-                    name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
-                    String filter = facetQuery.substring(facetQuery.indexOf('['));
-                    filter = filter.substring(0, filter.lastIndexOf(']') + 1);
+					String facetField = query.getNamedFacetQuery(facetQuery);
+					String filter = facetQuery;
+					String name = facetQuery;
+					if (facetField == null) {
+						facetField = facetQuery.substring(0,
+								facetQuery.indexOf(":"));
+						name = facetQuery
+								.substring(facetQuery.indexOf('[') + 1);
+						name = name.substring(0, name.lastIndexOf(']'))
+								.replaceAll("TO", "-");
+						filter = facetQuery.substring(facetQuery.indexOf('['));
+						filter = filter.substring(0,
+								filter.lastIndexOf(']') + 1);
+					}
 
                     Integer count = sortedFacetQueries.get(facetQuery);
 
@@ -2365,4 +2376,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 			throw new SearchServiceException(e.getMessage(), e);
 		}
 	}
+
+	@Override
+    public QueryResponse search(SolrQuery query) throws SearchServiceException
+    {
+        try
+        {
+            return getSolr().query(query);
+        }
+        catch (Exception e)
+        {
+            throw new org.dspace.discovery.SearchServiceException(
+                    e.getMessage(), e);
+        }
+    }
 }

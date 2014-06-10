@@ -10,7 +10,6 @@ package org.dspace.app.webui.cris.controller.statistics;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -19,18 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.app.cris.integration.statistics.IStatsComponent;
 import org.dspace.app.cris.integration.statistics.StatComponentsService;
-import org.dspace.app.cris.model.StatSubscription;
 import org.dspace.app.cris.statistics.bean.ResultBean;
 import org.dspace.app.cris.statistics.bean.TreeKeyMap;
 import org.dspace.app.cris.statistics.bean.TwoKeyMap;
-import org.dspace.app.webui.cris.components.statistics.StatsComponent;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -53,7 +47,6 @@ public class StatisticsController extends AStatisticsController
             Map<String, Object> data = new HashMap<String, Object>();
             data.put(_ID_LABEL, id);
             data.put(_JSP_KEY, jspKey);
-            HttpSolrServer solrServer = new HttpSolrServer(getSolrConfig().getStatisticsCore());
 
             Map<String, IStatsComponent> components = statsComponentsService.getComponents();
             TwoKeyMap label = new TwoKeyMap();

@@ -12,7 +12,7 @@
 <%@include file="../modules/graph/monthsGraph.jsp"%>
 
 
-<table class="statsTable">
+<table class="table table-bordered">
 	<tr>
 		<th><!-- spacer cell --></th>		
 		<th><fmt:message key="view.data.total" /></th>
@@ -41,7 +41,7 @@
 	</c:if>
 	</c:forEach>
 	<tr>
-		<th scope="row" colspan="13" align="right"><fmt:message key="view.${data.jspKey}.data.${statType}.${objectName}.total.total" /></th>						
+		<th scope="row" colspan="13" class="text-right"><fmt:message key="view.${data.jspKey}.data.${statType}.${objectName}.total.total" /></th>						
 		<td>
 			${data.resultBean.dataBeans[statType][objectName]['total'].dataTable[0][0]}
 		</td>

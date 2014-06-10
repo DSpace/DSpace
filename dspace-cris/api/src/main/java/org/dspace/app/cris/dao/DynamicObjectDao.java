@@ -21,7 +21,7 @@ import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 public interface DynamicObjectDao extends CrisObjectDao<ResearchObject>        
 {
     
-    public ResearchObject uniqueBySourceID(String staffNo);
+    public ResearchObject uniqueBySourceID(String sourceRef, String sourceId);
 
     public long countByType(DynamicObjectType typo);
 

@@ -20,7 +20,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.configuration.RelationPreferenceConfiguration;
-import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
@@ -28,12 +27,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
-import org.dspace.browse.BrowserScope;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -45,7 +39,6 @@ import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -62,14 +55,6 @@ public class BindItemToRP
 {
     /** the logger */
     private static Logger log = Logger.getLogger(BindItemToRP.class);
-
-    /**
-     * the name of the browse index where lookup for potential matches.
-     * Configured in the dspace.cfg with the property
-     * <code>researcherpage.browseindex</code>
-     */
-    private static final String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
-            .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
 
     private RelationPreferenceService relationPreferenceService;
 
@@ -93,11 +78,13 @@ public class BindItemToRP
         for (RelationPreferenceConfiguration configuration : relationPreferenceService
                 .getConfigurationService().getList())
         {
-            if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class))
+            if (configuration.getRelationConfiguration().getRelationClass()
+                    .equals(Item.class))
             {
                 rejected = applicationService
-                        .findRelationsPreferencesByUUIDByRelTypeAndStatus(
-                                rp.getUuid(), configuration.getRelationConfiguration().getRelationName(),
+                        .findRelationsPreferencesByUUIDByRelTypeAndStatus(rp
+                                .getUuid(), configuration
+                                .getRelationConfiguration().getRelationName(),
                                 RelationPreference.UNLINKED);
             }
         }
@@ -199,11 +186,14 @@ public class BindItemToRP
         for (RelationPreferenceConfiguration configuration : relationPreferenceService
                 .getConfigurationService().getList())
         {
-            if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class))
+            if (configuration.getRelationConfiguration().getRelationClass()
+                    .equals(Item.class))
             {
                 rejected = applicationService
                         .findRelationsPreferencesByUUIDByRelTypeAndStatus(
-                                researcher.getUuid(), configuration.getRelationConfiguration().getRelationName(),
+                                researcher.getUuid(), configuration
+                                        .getRelationConfiguration()
+                                        .getRelationName(),
                                 RelationPreference.UNLINKED);
             }
         }
@@ -212,86 +202,11 @@ public class BindItemToRP
         {
             invalidIds.add(relationPreference.getItemID());
         }
-        List<NameResearcherPage> names = new LinkedList<NameResearcherPage>();
 
-        String authority = researcher.getCrisID();
-        int id = researcher.getId();
-        NameResearcherPage name = new NameResearcherPage(
-                researcher.getFullName(), authority, id, invalidIds);
-        names.add(name);
-        RestrictedField field = researcher.getPreferredName();
-        if (field != null && field.getValue() != null
-                && !field.getValue().isEmpty())
-        {
-            NameResearcherPage name_1 = new NameResearcherPage(
-                    field.getValue(), authority, id, invalidIds);
-            names.add(name_1);
-        }
-        field = researcher.getTranslatedName();
-        if (field != null && field.getValue() != null
-                && !field.getValue().isEmpty())
-        {
-            NameResearcherPage name_2 = new NameResearcherPage(
-                    field.getValue(), authority, id, invalidIds);
-            names.add(name_2);
-        }
-        for (RestrictedField r : researcher.getVariants())
-        {
-            if (r != null && r.getValue() != null && !r.getValue().isEmpty())
-            {
-                NameResearcherPage name_3 = new NameResearcherPage(
-                        r.getValue(), authority, id, invalidIds);
-                names.add(name_3);
-            }
-        }
+        IRetrievePotentialMatchPlugin plugin = dspace
+                .getSingletonService(IRetrievePotentialMatchPlugin.class);
+        Set<Integer> result = plugin.retrieve(context, invalidIds, researcher);
 
-        Set<Integer> result = new HashSet<Integer>();
-        try
-        {
-            BrowseIndex bi = BrowseIndex
-                    .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
-            // now start up a browse engine and get it to do the work for us
-            BrowseEngine be = new BrowseEngine(context);
-            int count = 1;
-
-            for (NameResearcherPage tempName : names)
-            {
-                log.debug("work on " + tempName.getName() + " with identifier "
-                        + tempName.getPersistentIdentifier() + " (" + count
-                        + " of " + names.size() + ")");
-                // set up a BrowseScope and start loading the values into it
-                BrowserScope scope = new BrowserScope(context);
-                scope.setBrowseIndex(bi);
-                // scope.setOrder(order);
-                scope.setFilterValue(tempName.getName());
-                // scope.setFilterValueLang(valueLang);
-                // scope.setJumpToItem(focus);
-                // scope.setJumpToValue(valueFocus);
-                // scope.setJumpToValueLang(valueFocusLang);
-                // scope.setStartsWith(startsWith);
-                // scope.setOffset(offset);
-                scope.setResultsPerPage(Integer.MAX_VALUE);
-                // scope.setSortBy(sortBy);
-                scope.setBrowseLevel(1);
-                // scope.setEtAl(etAl);
-
-                BrowseInfo binfo = be.browse(scope);
-                log.debug("Find " + binfo.getResultCount()
-                        + "item(s) in browsing...");
-                for (BrowseItem bitem : binfo.getBrowseItemResults())
-                {
-                    if (!invalidIds.contains(bitem.getID()))
-                    {
-                        result.add(bitem.getID());
-                    }
-                }
-            }
-        }
-        catch (BrowseException be)
-        {
-            log.error(LogManager.getHeader(context, "getPotentialMatch",
-                    "researcher=" + researcher.getCrisID()), be);
-        }
         return result;
     }
 
@@ -337,9 +252,9 @@ public class BindItemToRP
      * Search potential matches for all the ResearcherPage supplied. The
      * algorithm search for any researcher page and any researcher's name
      * (regardless the visibility attribute) all the items published in DSpace
-     * using the Browse System (@link
-     * using the Browse System (@link #researcherPotentialMatchLookupBrowserIndex}, if a match is found
-     * and there is not an existent authority key for the metadata then the rp
+     * using the Browse System (@link using the Browse System (@link
+     * #researcherPotentialMatchLookupBrowserIndex}, if a match is found and
+     * there is not an existent authority key for the metadata then the rp
      * identifier of the matching researcher page is used as authority key and a
      * confidence value is attributed as follow:
      * <ul>
@@ -363,61 +278,36 @@ public class BindItemToRP
             RelationPreferenceService relationPreferenceService)
     {
         log.debug("Working...building names list");
-        List<NameResearcherPage> names = new LinkedList<NameResearcherPage>();
+
+        List<NameResearcherPage> names = new ArrayList<NameResearcherPage>();
+
+        Map<String, Set<Integer>> mapInvalids = new HashMap<String, Set<Integer>>();
         for (ResearcherPage researcher : rps)
         {
             Set<Integer> invalidIds = new HashSet<Integer>();
-           
+
             List<RelationPreference> rejected = new ArrayList<RelationPreference>();
             for (RelationPreferenceConfiguration configuration : relationPreferenceService
                     .getConfigurationService().getList())
             {
-                if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class))
+                if (configuration.getRelationConfiguration().getRelationClass()
+                        .equals(Item.class))
                 {
                     rejected = relationPreferenceService
                             .findRelationsPreferencesByUUIDByRelTypeAndStatus(
-                                    researcher.getUuid(), configuration.getRelationConfiguration().getRelationName(),
+                                    researcher.getUuid(), configuration
+                                            .getRelationConfiguration()
+                                            .getRelationName(),
                                     RelationPreference.UNLINKED);
                 }
             }
-            
+
             for (RelationPreference relationPreference : rejected)
             {
                 invalidIds.add(relationPreference.getItemID());
             }
-            String authority = researcher.getCrisID();
-            int id = researcher.getId();
-
-            NameResearcherPage name = new NameResearcherPage(
-                    researcher.getFullName(), authority, id, invalidIds);
-            names.add(name);
-            RestrictedField field = researcher.getPreferredName();
-            if (field != null && field.getValue() != null
-                    && !field.getValue().isEmpty())
-            {
-                NameResearcherPage name_1 = new NameResearcherPage(
-                        field.getValue(), authority, id, invalidIds);
-                names.add(name_1);
-            }
-            field = researcher.getTranslatedName();
-            if (field != null && field.getValue() != null
-                    && !field.getValue().isEmpty())
-            {
-                NameResearcherPage name_2 = new NameResearcherPage(
-                        field.getValue(), authority, id, invalidIds);
-                names.add(name_2);
-            }
-            for (RestrictedField r : researcher.getVariants())
-            {
-                if (r != null && r.getValue() != null
-                        && !r.getValue().isEmpty())
-                {
-                    NameResearcherPage name_3 = new NameResearcherPage(
-                            r.getValue(), authority, id, invalidIds);
-                    names.add(name_3);
-                }
-            }
-
+            
+            mapInvalids.put(researcher.getCrisID(), invalidIds);
         }
         log.debug("...DONE building names list size " + names.size());
         log.debug("Create DSpace context and use browse indexing");
@@ -426,42 +316,20 @@ public class BindItemToRP
         {
             context = new Context();
             context.setIgnoreAuthorization(true);
-            
-            List<MetadataField> fieldsWithAuthoritySupport = metadataFieldWithAuthorityRP(context);
-            
-            BrowseIndex bi = BrowseIndex
-                    .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
-            // now start up a browse engine and get it to do the work for us
-            BrowseEngine be = new BrowseEngine(context);
-            int count = 1;
-            for (NameResearcherPage tempName : names)
-            {
-                log.info("work on " + tempName.getName() + " with identifier "
-                        + tempName.getPersistentIdentifier() + " (" + count
-                        + " of " + names.size() + ")");
-                // set up a BrowseScope and start loading the values into it
-                BrowserScope scope = new BrowserScope(context);
-                scope.setBrowseIndex(bi);
-                // scope.setOrder(order);
-                scope.setFilterValue(tempName.getName());
-                // scope.setFilterValueLang(valueLang);
-                // scope.setJumpToItem(focus);
-                // scope.setJumpToValue(valueFocus);
-                // scope.setJumpToValueLang(valueFocusLang);
-                // scope.setStartsWith(startsWith);
-                // scope.setOffset(offset);
-                scope.setResultsPerPage(Integer.MAX_VALUE);
-                // scope.setSortBy(sortBy);
-                scope.setBrowseLevel(1);
-                // scope.setEtAl(etAl);
 
-                BrowseInfo binfo = be.browse(scope);
-                log.info("Find " + binfo.getResultCount()
-                        + "item(s) in browsing...");
-                bindItemsToRP(relationPreferenceService, context,
-                        fieldsWithAuthoritySupport, tempName,
-                        binfo.getItemResults(context));
-                count++;
+            List<MetadataField> fieldsWithAuthoritySupport = metadataFieldWithAuthorityRP(context);
+            IRetrievePotentialMatchPlugin plugin = new DSpace()
+                    .getSingletonService(IRetrievePotentialMatchPlugin.class);
+
+            Map<NameResearcherPage, Item[]> result = plugin
+                    .retrieveGroupByName(context, mapInvalids, rps);
+            for (NameResearcherPage tempName : result.keySet())
+            {
+                if(result.get(tempName).length>0) {
+                    bindItemsToRP(relationPreferenceService, context,
+                            fieldsWithAuthoritySupport, tempName,
+                            result.get(tempName));
+                }
             }
 
         }
@@ -480,7 +348,8 @@ public class BindItemToRP
 
     }
 
-    public static void bindItemsToRP(RelationPreferenceService relationPreferenceService,
+    public static void bindItemsToRP(
+            RelationPreferenceService relationPreferenceService,
             Context context, ResearcherPage researcher, Item[] items)
             throws SQLException, BrowseException, AuthorizeException
     {
@@ -488,20 +357,23 @@ public class BindItemToRP
         int id = researcher.getId();
         List<NameResearcherPage> names = new LinkedList<NameResearcherPage>();
         Set<Integer> invalidIds = new HashSet<Integer>();
-      
+
         List<RelationPreference> rejected = new ArrayList<RelationPreference>();
         for (RelationPreferenceConfiguration configuration : relationPreferenceService
                 .getConfigurationService().getList())
         {
-            if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class))
+            if (configuration.getRelationConfiguration().getRelationClass()
+                    .equals(Item.class))
             {
                 rejected = relationPreferenceService
                         .findRelationsPreferencesByUUIDByRelTypeAndStatus(
-                                researcher.getUuid(), configuration.getRelationConfiguration().getRelationName(),
+                                researcher.getUuid(), configuration
+                                        .getRelationConfiguration()
+                                        .getRelationName(),
                                 RelationPreference.UNLINKED);
             }
         }
-        
+
         for (RelationPreference relationPreference : rejected)
         {
             invalidIds.add(relationPreference.getItemID());
@@ -543,7 +415,8 @@ public class BindItemToRP
         }
     }
 
-    private static void bindItemsToRP(RelationPreferenceService relationPreferenceService,
+    private static void bindItemsToRP(
+            RelationPreferenceService relationPreferenceService,
             Context context, List<MetadataField> fieldsWithAuthoritySupport,
             NameResearcherPage tempName, Item[] items) throws BrowseException,
             SQLException, AuthorizeException
@@ -551,37 +424,36 @@ public class BindItemToRP
         context.turnOffAuthorisationSystem();
         Map<String, Integer> cacheCount = new HashMap<String, Integer>();
         for (Item item : items)
-                {
-                    if (tempName.getRejectItems() != null
-                            && tempName.getRejectItems().contains(item.getID()))
-                    {
+        {
+            if (tempName.getRejectItems() != null
+                    && tempName.getRejectItems().contains(item.getID()))
+            {
                 log.warn("Item has been reject for this authority - itemID "
-                                        + item.getID());
-                    }
-                    else
-                    {
-                        boolean modified = false;
-                        
+                        + item.getID());
+            }
+            else
+            {
+                boolean modified = false;
 
-                        DCValue[] values = null;
-                        for (MetadataField md : fieldsWithAuthoritySupport)
-                        {
+                DCValue[] values = null;
+                for (MetadataField md : fieldsWithAuthoritySupport)
+                {
                     String schema = (MetadataSchema.find(context,
                             md.getSchemaID())).getName();
 
-                            values = item.getMetadata(schema, md.getElement(),
-                                    md.getQualifier(), Item.ANY);
+                    values = item.getMetadata(schema, md.getElement(),
+                            md.getQualifier(), Item.ANY);
                     item.clearMetadata(schema, md.getElement(),
                             md.getQualifier(), Item.ANY);
-                            for (DCValue value : values)
-                            {
+                    for (DCValue value : values)
+                    {
 
                         int matches = 0;
 
-                                if (value.authority == null
+                        if (value.authority == null
                                 && (value.value.equals(tempName.getName()) || value.value
                                         .startsWith(tempName.getName() + ";")))
-                                {
+                        {
                             matches = countNamesMatching(cacheCount,
                                     tempName.getName());
                             item.addMetadata(
@@ -589,32 +461,32 @@ public class BindItemToRP
                                     value.element,
                                     value.qualifier,
                                     value.language,
-                                                    tempName.getName(),
-                                            tempName.getPersistentIdentifier(),
+                                    tempName.getName(),
+                                    tempName.getPersistentIdentifier(),
                                     matches >= 1 ? Choices.CF_AMBIGUOUS
                                             : matches == 1 ? Choices.CF_UNCERTAIN
                                                     : Choices.CF_NOTFOUND);
-                                    modified = true;
-                                }
-                                else
-                                {
+                            modified = true;
+                        }
+                        else
+                        {
                             item.addMetadata(value.schema, value.element,
                                     value.qualifier, value.language,
                                     value.value, value.authority,
                                     value.confidence);
-                                }
-                            }
-                            values = null;
                         }
-                        if (modified)
-                        {
-                    log.debug("Update item with id " + item.getID());
-                            item.update();
-                        }
-                        context.commit();
-                        context.clearCache();
                     }
+                    values = null;
                 }
+                if (modified)
+                {
+                    log.debug("Update item with id " + item.getID());
+                    item.update();
+                }
+                context.commit();
+                context.clearCache();
+            }
+        }
         context.restoreAuthSystemState();
     }
 
@@ -637,9 +509,11 @@ public class BindItemToRP
             IOException
     {
         Set<Integer> ids = getPotentialMatch(context, researcher);
-        DatabaseManager.updateQuery(context,
-                "delete from potentialmatches where rp like ?",
-                researcher.getCrisID());
+        DatabaseManager
+                .updateQuery(
+                        context,
+                        "DELETE FROM potentialmatches WHERE rp like ? AND pending IS NULL",
+                        researcher.getCrisID());
         for (Integer id : ids)
         {
             TableRow pmTableRow = DatabaseManager.create(context,
@@ -660,7 +534,7 @@ public class BindItemToRP
         if (researcher == null)
         {
             return;
-            }
+        }
 
         generatePotentialMatches(context, researcher);
     }
@@ -682,78 +556,7 @@ public class BindItemToRP
         {
             if (context != null && context.isValid())
                 context.abort();
-            }
+        }
 
     }
-}
-
-/**
- * Support class to build the full list of names to process in the BindItemToRP
- * work method
- * 
- * @author cilea
- * 
- */
-class NameResearcherPage
-{
-    /** the name form to lookup for */
-    private String name;
-
-    /** the rp identifier */
-    private String persistentIdentifier;
-
-    private int id;
-
-    /** the ids of previous rejected matches */
-    private Set<Integer> rejectItems;
-
-    public NameResearcherPage(String name, String authority, int id,
-            Set<Integer> rejectItems)
-    {
-        this.name = name;
-        this.persistentIdentifier = authority;
-        this.id = id;
-        this.rejectItems = rejectItems;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getPersistentIdentifier()
-    {
-        return persistentIdentifier;
-    }
-
-    public void setPersistentIdentifier(String persistentIdentifier)
-    {
-        this.persistentIdentifier = persistentIdentifier;
-    }
-
-    public int getId()
-    {
-        return id;
-    }
-
-    public void setId(int id)
-    {
-        this.id = id;
-    }
-
-    public Set<Integer> getRejectItems()
-    {
-        return rejectItems;
-    }
-
-    public void setRejectItems(Set<Integer> rejectItems)
-    {
-        this.rejectItems = rejectItems;
-    }
-
 }

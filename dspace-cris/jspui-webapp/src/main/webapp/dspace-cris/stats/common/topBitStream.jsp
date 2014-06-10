@@ -52,7 +52,7 @@
 </div>
 <script type="text/javascript">
 <!--
-var j = jQuery.noConflict();
+var j = jQuery;
 j(document).ready(function() {
 
 	
@@ -61,7 +61,21 @@ j(document).ready(function() {
 		d.trigger('redraw');			
 	});
 	
-	j("#statstabs").tabs();
+	j("#statstabs").tabs({
+		"activate": function( event, ui ) {
+			j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+		},
+		"beforeActivate": function( event, ui ) {
+			 j("li.active").toggleClass("active");
+		},
+   		"create": function( event, ui ) {
+               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
+               j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
+               j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
+               j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
+               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
+        }
+	});
 });
 -->
 </script>

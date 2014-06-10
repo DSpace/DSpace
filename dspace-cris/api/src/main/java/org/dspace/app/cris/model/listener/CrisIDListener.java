@@ -40,7 +40,11 @@ public class CrisIDListener implements PreInsertEventListener
             }
             if (found)
             {
-                event.getState()[idx] = ResearcherPageUtils.getPersistentIdentifier((ACrisObject)object);
+				String crisID = ResearcherPageUtils
+						.getPersistentIdentifier((ACrisObject) object);
+				event.getState()[idx] = crisID;
+				ACrisObject crisObj = (ACrisObject) object;
+				crisObj.setCrisID(crisID);
             }
         }
         return false;

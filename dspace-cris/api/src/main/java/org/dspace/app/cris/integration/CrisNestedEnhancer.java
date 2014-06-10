@@ -5,7 +5,7 @@
  *
  * https://github.com/CILEA/dspace-cris/wiki/License
  */
-package org.dspace.app.cris.discovery;
+package org.dspace.app.cris.integration;
 
 import it.cilea.osd.jdyna.model.ANestedObject;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;

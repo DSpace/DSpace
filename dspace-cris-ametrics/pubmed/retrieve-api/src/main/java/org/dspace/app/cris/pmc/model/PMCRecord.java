@@ -11,11 +11,13 @@ import it.cilea.osd.common.model.Identifiable;
 
 import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -57,19 +59,26 @@ public class PMCRecord implements Identifiable
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
+    @CollectionTable(name = "cris_pmc_record_pubmedids", joinColumns = @JoinColumn(name = "cris_pmc_record_pmcid"))
+    @Column(name = "element")
     private List<Integer> pubmedIDs;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SELECT)
+    @CollectionTable(name = "cris_pmc_record_handles", joinColumns = @JoinColumn(name = "cris_pmc_record_pmcid"))
+    @Column(name = "element")
     private List<String> handles;
 
-    @Type(type = "text")
+    @Type(type="org.hibernate.type.StringClobType")
+    @Column(name = "title")
     private String title;
 
-    @Type(type = "text")
+    @Type(type="org.hibernate.type.StringClobType")
+    @Column(name = "authors")
     private String authors;
 
-    @Type(type = "text")
+    @Type(type="org.hibernate.type.StringClobType")
+    @Column(name = "publicationnote")
     private String publicationNote;
 
     public Integer getId()

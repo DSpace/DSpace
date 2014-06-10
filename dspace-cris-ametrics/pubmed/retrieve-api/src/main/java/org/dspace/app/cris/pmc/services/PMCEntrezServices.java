@@ -7,13 +7,10 @@
  */
 package org.dspace.app.cris.pmc.services;
 
-import it.cilea.osd.common.utils.ClasspathEntityResolver;
 import it.cilea.osd.common.utils.XMLUtils;
+import it.cineca.surplus.ir.util.CustomClasspathEntityResolver;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -298,9 +295,9 @@ public class PMCEntrezServices
             factory.setIgnoringElementContentWhitespace(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
-            db.setEntityResolver(new ClasspathEntityResolver());
+            db.setEntityResolver(new CustomClasspathEntityResolver());
             Document inDoc = db.parse(xmlResponse,
-                    "classpath://it/cilea/pmc/services/");
+                    "classpath://org/dspace/app/cris/pmc/services/");
 
             Element dataRoot = inDoc.getDocumentElement();
 
@@ -376,9 +373,9 @@ public class PMCEntrezServices
             factory.setIgnoringElementContentWhitespace(true);
 
             DocumentBuilder dbuilder = factory.newDocumentBuilder();
-            dbuilder.setEntityResolver(new ClasspathEntityResolver());
+            dbuilder.setEntityResolver(new CustomClasspathEntityResolver());
             Document inDoc = dbuilder.parse(xmlResponse,
-                    "classpath://it/cilea/pmc/services/");
+                    "classpath://org/dspace/app/cris/pmc/services/");
 
             Element dataRoot = inDoc.getDocumentElement();
             Element idList = XMLUtils.getSingleElement(dataRoot, "IdList");

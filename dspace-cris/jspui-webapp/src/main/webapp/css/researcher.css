@@ -880,12 +880,6 @@ center#bannercenter {
 	border-color: #00FF00;
 }
 
-h2 span.titlestats {
-	text-decoration: underline; 
-}
-
-table.statanchors tr th span.titlestats {text-decoration: underline;}
-
 table.hkudatadetail tr td {
     font-family: sans-serif;
     padding: 1pt 10pt;

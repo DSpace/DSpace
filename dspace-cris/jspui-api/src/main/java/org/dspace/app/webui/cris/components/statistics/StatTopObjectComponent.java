@@ -23,7 +23,7 @@ import org.dspace.app.cris.statistics.bean.TreeKeyMap;
 import org.dspace.app.cris.statistics.bean.TwoKeyMap;
 import org.dspace.app.webui.cris.components.BeanFacetComponent;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLogger;
@@ -32,7 +32,7 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
         StatsComponent<T>
 {
 
-    private static final String QUERY_COMMON = "'''{'''!join from={0} to=search.uniqueid fromIndex=search'''}'''{1} AND -withdrawn:true";
+	private static final String QUERY_COMMON = "'''{'''!join from={0} to=search.uniqueid fromIndex={2}'''}'''{1} AND -withdrawn:true";
 
     private String fromField;
 
@@ -63,7 +63,7 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
             for(String filter : getBean().getFilters()) {
                 solrQuery.addFilterQuery(filter);
             }            
-            String query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery());
+            String query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery(), getSearchCore());
             String sID = getObjectId(id);
             query = MessageFormat.format(query, sID);
             solrQuery.setQuery(query);
@@ -158,7 +158,7 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
     public Map<String, ObjectCount[]> queryFacetDate(SolrLogger statsLogger, DSpaceObject object,
             String dateType, String dateStart, String dateEnd, int gap) throws SolrServerException
     {
-        String query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery());
+        String query = MessageFormat.format(QUERY_COMMON, getFromField(), getBean().getQuery(), getSearchCore());
         String sID = getObjectId(""+object.getID());
         query = MessageFormat.format(query, sID);
         Map<String, ObjectCount[]> map = new HashMap<String, ObjectCount[]>();
@@ -170,7 +170,12 @@ public class StatTopObjectComponent<T extends DSpaceObject> extends
 
     }
     
-    @Override
+    private String getSearchCore() {
+		return ConfigurationManager.getProperty("solr-statistics",
+				"solr.join.core");
+	}
+
+	@Override
     public String getMode()
     {      
         return VIEW;

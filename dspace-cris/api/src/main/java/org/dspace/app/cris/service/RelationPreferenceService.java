@@ -230,15 +230,12 @@ public class RelationPreferenceService
             relPref.setStatus(action);
             relPref.setPriority(priority);
         }
-        if (action != null)
-        {
-            applicationService.saveOrUpdate(RelationPreference.class, relPref);
-        }
-        else
-        {
-            applicationService
-                    .delete(RelationPreference.class, relPref.getId());
-        }
+		if (action != null) {
+			applicationService.saveOrUpdate(RelationPreference.class, relPref);
+		} else if (relPref.getId() != null) {
+			applicationService
+					.delete(RelationPreference.class, relPref.getId());
+		}
         if (!conf.executeExtraAction(context, cris, dso.getID(), previousState,
                 previousPriority, action, priority))
         {

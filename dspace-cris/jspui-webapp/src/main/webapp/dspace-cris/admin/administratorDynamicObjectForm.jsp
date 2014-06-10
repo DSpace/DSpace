@@ -55,7 +55,7 @@
 		</spring:bind>
 										
 		<display:table name="${dto}" cellspacing="0" cellpadding="0" 
-			requestURI="" id="objectList" htmlId="objectList"  class="displaytaglikemisctable" export="false">
+			requestURI="" id="objectList" htmlId="objectList" export="false">
 			<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id" property="id" url="/cris/${objectList.dynamicObject.typo.shortName}/details.htm" paramId="id" paramProperty="id" sortable="true" />							
 			<display:column headerClass="uuid" titleKey="jsp.layout.table.cris.admin-list.uuid" property="uuid" url="/cris/${objectList.dynamicObject.typo.shortName}/details.htm" paramId="id" paramProperty="id" sortable="true" />										
 			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" property="sourceID" url="/cris/${objectList.dynamicObject.typo.shortName}/details.htm" paramId="code" paramProperty="sourceID" sortable="true"/>		

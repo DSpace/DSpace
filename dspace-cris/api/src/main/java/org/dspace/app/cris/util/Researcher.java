@@ -15,15 +15,17 @@ import org.dspace.app.cris.integration.CrisComponentsService;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.CrisStatComponentsService;
 import org.dspace.app.cris.integration.statistics.StatComponentsService;
+import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.statistics.service.StatSubscribeService;
+import org.dspace.content.EPersonCRISIntegration;
 import org.dspace.utils.DSpace;
 import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
-public class Researcher
+public class Researcher implements EPersonCRISIntegration
 {
     DSpace dspace = new DSpace();
 
@@ -163,5 +165,15 @@ public class Researcher
     public List<CrisComponentsService> getAllCrisComponents()
     {
         return dspace.getServiceManager().getServicesByType(CrisComponentsService.class);   
+    }
+
+    @Override
+    public String getResearcher(Integer epersonID)
+    {
+        ResearcherPage result = getApplicationService().getResearcherPageByEPersonId(epersonID);
+        if(result==null) {
+            return null;
+        }
+        return ResearcherPageUtils.getPersistentIdentifier(result);
     }
 }

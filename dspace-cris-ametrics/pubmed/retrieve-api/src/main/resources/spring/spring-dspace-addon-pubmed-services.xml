@@ -82,30 +82,7 @@
 	
 	<bean id="transactionManagerPMC"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactoryPMC" />
-	</bean>
-	
-
-	<!--  resources  -->		
-	<bean id="dataSourcePMC"
-		class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-		<property name="driverClass" ref="dspaceDBDriver" />
-		<property name="jdbcUrl" ref="dspaceDBUrl" />
-		<property name="user" ref="dspaceDBUsername" />
-		<property name="password" ref="dspaceDBPassword" />
-		
-		<!-- these are C3P0 properties -->
-        <property name="acquireIncrement" value="5" />
-        <property name="minPoolSize" value="20" />
-        <property name="maxPoolSize" value="100" />
-        <property name="maxIdleTime" value="100" />		
-	</bean>
-
-	<bean id="sessionFactoryPMC"
-		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSourcePMC" />
-		<property name="configLocation" value="classpath:hibernate/hibernate-pmc.cfg.xml" />
-		<property name="hibernateProperties" ref="hibernateProperties" />	
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
 	<bean id="namedQueryIntroductionAdvisorPMC"
@@ -113,7 +90,7 @@
 
 	<bean id="abstractDaoTargetPMC" class="it.cilea.osd.common.dao.impl.GenericDaoHibernateImpl"
 		abstract="true">
-		<property name="sessionFactory" ref="sessionFactoryPMC" />
+		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
 	<bean id="abstractDaoPMC" class="org.springframework.aop.framework.ProxyFactoryBean"

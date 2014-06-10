@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.dto.ResearcherPageDTO;
 import org.dspace.app.webui.cris.controller.BaseFormController;
-import org.dspace.app.webui.cris.dto.ResearcherPageDTO;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,31 +35,11 @@ public class FormAdministrationAddResearcherController extends
             throws Exception
     {
         ResearcherPageDTO researcherDTO = (ResearcherPageDTO) command;
-        String staffNo = researcherDTO.getSourceID();
         ResearcherPage researcher = null;
-        if (staffNo != null && !staffNo.isEmpty())
-        {
-            researcher = applicationService
-                    .getResearcherPageByStaffNo(researcherDTO.getSourceID());
-
-            if (researcher != null)
-            {
-
-                return new ModelAndView("redirect:/cris/rp/"
-                        + "administrator/index.htm?error=true");
-            }
-
-        }
-
-        else
-        {
-            researcher = new ResearcherPage();
-            researcher.setSourceID(staffNo);
-            researcher.setStatus(false);
-            researcher.getDynamicField().setResearcherPage(researcher);           
-            applicationService.saveOrUpdate(ResearcherPage.class, researcher);
-
-        }
+        researcher = new ResearcherPage();
+        researcher.setStatus(false);
+        researcher.getDynamicField().setResearcherPage(researcher);           
+        applicationService.saveOrUpdate(ResearcherPage.class, researcher);
         return new ModelAndView(getSuccessView() + researcher.getId());
 
     }

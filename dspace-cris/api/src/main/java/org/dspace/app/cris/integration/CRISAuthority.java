@@ -8,17 +8,22 @@
 package org.dspace.app.cris.integration;
 
 
+import it.cilea.osd.jdyna.util.AnagraficaUtils;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.dto.CrisAnagraficaObjectDTO;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.ChoiceAuthorityDetails;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
@@ -33,7 +38,7 @@ import org.dspace.utils.DSpace;
  * 
  * @author cilea
  */
-public abstract class CRISAuthority implements ChoiceAuthority
+public abstract class CRISAuthority implements ChoiceAuthority, ChoiceAuthorityDetails
 {
     /** The logger */
     private static Logger log = Logger.getLogger(CRISAuthority.class);
@@ -114,7 +119,17 @@ public abstract class CRISAuthority implements ChoiceAuthority
                 {
                     discoverQuery.addFilterQueries(filter);
                 }
-
+                else {
+                    if(field.contains("_authority_") && getPluginName().equals(DOAuthority.class.getSimpleName())) {
+                        filter = configurationService.getProperty("cris."
+                                + getPluginName()
+                                + ".dc_authority_default.filter");
+                        if(filter==null) {
+                            throw new RuntimeException("You have to define a default dc_authority_default filter");
+                        }
+                        discoverQuery.addFilterQueries(MessageFormat.format(filter,  field.substring(field.lastIndexOf("_") + 1)));
+                    }
+                }
                 discoverQuery
                         .setQuery("{!lucene q.op=AND df=crisauthoritylookup}("
                                 + luceneQuery
@@ -202,4 +217,19 @@ public abstract class CRISAuthority implements ChoiceAuthority
     }
 
     protected abstract Class<? extends ACrisObject> getCRISTargetClass();
+    
+    @Override
+    public Object getDetailsInfo(String field, String key, String locale) {
+    	init();
+    	ACrisObject cris = applicationService.getEntityByCrisId(key, getCRISTargetClass());
+    	if (cris != null)
+    	{
+	    	CrisAnagraficaObjectDTO dto = new CrisAnagraficaObjectDTO(cris);
+			AnagraficaUtils
+					.fillDTO(dto, cris, applicationService.getList(cris
+							.getClassPropertiesDefinition()));
+			return dto;
+    	}
+    	return null;
+    }
 }

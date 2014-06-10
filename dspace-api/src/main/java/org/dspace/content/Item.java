@@ -2849,4 +2849,11 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
     public String getTypeText() {
         return Constants.typeText[Constants.ITEM];
     }
+
+	public Item getWrapper() {
+        DSpace dspace = new DSpace();
+		ItemWrapperIntegration wrapperService = (ItemWrapperIntegration) dspace
+				.getSingletonService(ItemWrapperIntegration.class);
+        return wrapperService.getWrapper(this);    
+    }
 }

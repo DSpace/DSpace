@@ -18,6 +18,6 @@ import org.dspace.app.cris.model.OrganizationUnit;
 public interface OrganizationUnitDao extends CrisObjectDao<OrganizationUnit>
 {
  
-    public OrganizationUnit uniqueBySourceID(String staffNo);
+    public OrganizationUnit uniqueBySourceID(String sourceRef, String sourceId);
 
 }

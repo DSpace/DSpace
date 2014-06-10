@@ -18,20 +18,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" navbar="admin" titlekey="jsp.dspace-admin.do-list">
+<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.do-list">
 
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.do-list" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.do-list")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
-
+	<h1><fmt:message key="jsp.dspace-admin.do-list" />
+	<a target="_blank" class="pull-right" href='<%=LocaleSupport.getLocalizedMessage(pageContext,
+                              "help.site-admin.do-list")%>'><fmt:message
+		key="jsp.help" /></a></h1>
 
 	<form:form commandName="dto" method="post">
 	<spring:bind path="dto.*">
@@ -39,12 +31,12 @@
 			<div id="errorMessages">
 		</c:if>
 		<c:forEach items="${status.errorMessages}" var="error">
-			<span class="errorMessage"><fmt:message
+			<span class="alert alert-danger"><fmt:message
 				key="jsp.layout.hku.prefix-error-code" /> ${error}</span>
 			<br />
 		</c:forEach>
 		<c:if test="${!empty status.errorMessages}">
-			<div id="errorMessages">
+			</div>
 		</c:if>
 	</spring:bind>
 			

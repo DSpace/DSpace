@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.dto.RPAnagraficaObjectDTO;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
 import org.dspace.app.cris.model.jdyna.EditTabResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
@@ -34,7 +35,6 @@ import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.app.webui.cris.dto.RPAnagraficaObjectDTO;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;

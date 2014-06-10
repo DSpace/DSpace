@@ -10,6 +10,7 @@ package org.dspace.app.webui.cris.util;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -210,18 +211,18 @@ public class RelationPreferenceUtil
         List<Object[]> dsoList = new ArrayList<Object[]>();
         for (SolrDocument doc : qRes.getResults())
         {
-            List<String> unlinked = (List<String>) doc
-                    .getFieldValue(RelationPreference.PREFIX_RELATIONPREFERENCES
+            Collection<Object> unlinked = doc
+                    .getFieldValues(RelationPreference.PREFIX_RELATIONPREFERENCES
                             + configurationName
                             + "."
                             + RelationPreference.UNLINKED);
-            List<String> hided = (List<String>) doc
-                    .getFieldValue(RelationPreference.PREFIX_RELATIONPREFERENCES
+            Collection<Object> hided = doc
+                    .getFieldValues(RelationPreference.PREFIX_RELATIONPREFERENCES
                             + configurationName
                             + "."
                             + RelationPreference.HIDED);
-            List<String> selected = (List<String>) doc
-                    .getFieldValue(RelationPreference.PREFIX_RELATIONPREFERENCES
+            Collection<Object> selected = doc
+                    .getFieldValues(RelationPreference.PREFIX_RELATIONPREFERENCES
                             + configurationName
                             + "."
                             + RelationPreference.SELECTED);
