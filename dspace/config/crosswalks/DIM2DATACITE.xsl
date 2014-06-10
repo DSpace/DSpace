@@ -11,7 +11,7 @@
     <xsl:output method="xml" version="1.0"
                 encoding="utf-8" indent="yes"/>
 
-    <xsl:template match="/dim:dim">
+    <xsl:template match="dim:dim">
       <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
       <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
