@@ -2,20 +2,22 @@
  */
 package org.datadryad.journalstatistics.extractor;
 
+import java.sql.SQLException;
+import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.dspace.AbstractUnitTest;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DataPackageCountTest extends AbstractUnitTest {
+public class DataPackageCountTest {
 
+    private Context context;
     public DataPackageCountTest() {
     }
 
@@ -29,6 +31,11 @@ public class DataPackageCountTest extends AbstractUnitTest {
 
     @Before
     public void setUp() {
+        try {
+            this.context = new Context();
+        } catch (SQLException ex) {
+            fail("Unable to instantiate Context " + ex);
+        }
     }
 
     @After
@@ -37,16 +44,17 @@ public class DataPackageCountTest extends AbstractUnitTest {
 
     /**
      * Test of extract method, of class DataPackageCount.
+     * Data packages are items in collection identified by 'stats.datapkgs.coll'
+     * having prism.publicationName as provided
      */
     @Test
     public void testExtract() {
+        // There should be one package in the database with journal name "Test Journal"
         System.out.println("extract");
-        String journalName = "";
-        DataPackageCount instance = new DataPackageCount(null);
-        Integer expResult = null;
+        String journalName = "Test Journal";
+        DataPackageCount instance = new DataPackageCount(this.context);
+        Integer expResult = 1;
         Integer result = instance.extract(journalName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 }
