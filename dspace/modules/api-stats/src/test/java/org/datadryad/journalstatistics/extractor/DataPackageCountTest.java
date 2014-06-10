@@ -3,6 +3,9 @@
 package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
+import org.datadryad.api.DryadDataPackage;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -48,10 +51,14 @@ public class DataPackageCountTest {
      * having prism.publicationName as provided
      */
     @Test
-    public void testExtract() {
+    public void testExtract() throws SQLException {
         // There should be one package in the database with journal name "Test Journal"
-        System.out.println("extract");
+        // Create a data package
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        // set its journal
         String journalName = "Test Journal";
+        dataPackage.setPublicationName(journalName);
+
         DataPackageCount instance = new DataPackageCount(this.context);
         Integer expResult = 1;
         Integer result = instance.extract(journalName);
