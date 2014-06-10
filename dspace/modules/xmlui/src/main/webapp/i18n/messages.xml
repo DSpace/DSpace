@@ -2324,12 +2324,12 @@
 
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Choose a license:</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Without license</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Attribution</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc"> Attribution-NonCommercial </message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Attribution-NonCommercial-NoDerivs </message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Attribution-NonCommercial-ShareAlike </message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd"> Attribution-NoDerivs </message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa"> Attribution-ShareAlike </message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 2.5 Argentina (CC BY 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 2.5 Argentina (CC BY-NC 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Argentina (CC BY-NC-ND 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Argentina (CC BY-NC-SA 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivs 2.5 Argentina (CC BY-ND 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 2.5 Argentina (CC BY-SA 2.5)</message>
 <!-- Otras traducciones -->
 
 <message key="sedici.aspect.collectionViewer.addItem">Add document</message>
