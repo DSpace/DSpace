@@ -239,7 +239,7 @@
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	      <descriptions>
 	        <description descriptionType="Other">
-              <xsl:value-of select="dspace:field[@element='description' and @qualifier='']"/>
+              <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
 	      </descriptions>
       </xsl:if>
