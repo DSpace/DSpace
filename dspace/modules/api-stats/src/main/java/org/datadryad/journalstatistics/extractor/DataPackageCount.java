@@ -5,6 +5,7 @@ package org.datadryad.journalstatistics.extractor;
 import java.io.IOException;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -44,7 +45,7 @@ public class DataPackageCount extends DatabaseExtractor<Integer> {
                     JOURNAL_QUALIFIER,
                     journalName);
 
-            dataPackages = getDataPackagesCollection();
+            dataPackages = DryadDataPackage.getCollection(context);
 
             while(itemsByJournal.hasNext()) {
                 Item item = itemsByJournal.next();
