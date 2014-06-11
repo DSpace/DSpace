@@ -53,7 +53,14 @@
                 <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
             </xsl:when>
             <xsl:otherwise>
-                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+                <xsl:choose>
+                  <xsl:when test="./mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+                  </xsl:otherwise>
+                </xsl:choose>
                 <table class="ds-table file-list">
                     <tr class="ds-table-header-row">
                         <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
@@ -347,8 +354,14 @@
         <xsl:template match="mets:fileGrp[@USE='CONTENT']">
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
-
-        <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+        <xsl:choose>
+          <xsl:when test="mets:file/mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.files-external-head</i18n:text></h2>
+          </xsl:when>
+          <xsl:otherwise>
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+          </xsl:otherwise>
+      </xsl:choose>
         <div class="file-list">
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
@@ -394,6 +407,28 @@
                 </a>
             </div>
             <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">
+              <xsl:choose>
+                <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                 <div>
+                    <span class="bold">
+                        <i18n:text>xmlui.submit.dataset.form.dataset.repo-name.help</i18n:text>
+                        <xsl:text>:</xsl:text>
+                    </span>
+                    <span>
+                      <xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='TXT']/@xlink:text,':')"/>
+                    </span>
+                </div>
+                <div>
+                    <span class="bold">
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text>
+                        <xsl:text>:</xsl:text>
+                    </span>
+                    <span>
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='TXT']/@xlink:title"/>
+                    </span>
+                </div>
+              </xsl:when>
+              <xsl:otherwise>
                 <div>
                     <span class="bold">
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-name</i18n:text>
@@ -475,7 +510,9 @@
                     <span>
                         <xsl:value-of select="@CHECKSUM"/>
                     </span>
-                </div>
+               </div>
+              </xsl:otherwise>
+            </xsl:choose>
             </div>
             <div class="file-link" style="height: {$thumbnail.maxheight}px;">
                 <a>
