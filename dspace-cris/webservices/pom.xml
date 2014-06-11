@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace-cris-webservices</artifactId>	
+	<name>DSpace CRIS :: API</name>
+    <parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris</artifactId>
+		<version>CRIS-4.1.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+   </parent>
+
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/..</root.basedir>
+   </properties>
+	
+  <modules>
+    <module>dspace-cris-webservices-webapp</module>
+    <module>dspace-cris-webservices-api</module>
+  </modules>
+</project>

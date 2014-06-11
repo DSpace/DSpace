@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">	
+	<!-- Acquires the DSpace Utility Class with initialized Service Manager -->
+    <bean id="researcher" class="org.dspace.app.cris.util.Researcher"/>
+            
+    <!-- Acquires reference to RP applicationService --> 
+    <bean id="applicationService" factory-bean="researcher" factory-method="getApplicationService" />
+    
+    <!-- Acquires reference to Cris SearchService --> 
+    <bean id="crisSearchService" factory-bean="researcher" factory-method="getCrisSearchService" />
+    
+    <!-- Acquires reference to RelationPreferenceService relationPreferenceService --> 
+    <bean id="relationPreferenceService" factory-bean="researcher" factory-method="getRelationPreferenceService" />
+    
+    <bean id="rpComponents" factory-bean="researcher" factory-method="getRPComponents" />
+    <bean id="pjComponents" factory-bean="researcher" factory-method="getProjectComponents" />
+    <bean id="ouComponents" factory-bean="researcher" factory-method="getOUComponents" />
+    <bean id="doComponents" factory-bean="researcher" factory-method="getDOComponents" />
+	
+	<bean id="sessionFactory" factory-bean="researcher" factory-method="getSessionFactory"/>
+	
+	<bean id="researcherTagLibraryService" class="org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions">
+		<property name="applicationService" ref="applicationService"/>
+	</bean>
+
+	<bean id="researcherPageUtils" class="org.dspace.app.cris.util.ResearcherPageUtils">
+		<constructor-arg ref="applicationService" />
+	</bean>
+
+	<bean id="validatorService" class="org.dspace.app.webui.cris.validator.ExtendedValidatorService">
+		<constructor-arg ref="applicationService" />
+	</bean>
+
+	
+	<bean id="CrisSubscribeService" factory-bean="researcher" factory-method="getCrisSubscribeService" />
+    <bean id="statSubscribeService" factory-bean="researcher" factory-method="getStatSubscribeService" />
+    
+    <bean id="doStatisticRequestsManager" factory-bean="researcher" factory-method="getDOStatsComponents" />
+    <bean id="ouStatisticRequestsManager" factory-bean="researcher" factory-method="getOUStatsComponents" />
+    <bean id="pjStatisticRequestsManager" factory-bean="researcher" factory-method="getPJStatsComponents" />
+    <bean id="rpStatisticRequestsManager" factory-bean="researcher" factory-method="getRPStatsComponents" />
+    <bean id="collectionRequestsManager" factory-bean="researcher" factory-method="getCollectionStatsComponents" />
+    <bean id="itemRequestsManager" factory-bean="researcher" factory-method="getItemStatsComponents" />
+    <bean id="communityRequestsManager" factory-bean="researcher" factory-method="getCommunityStatsComponents" />
+    
+</beans>

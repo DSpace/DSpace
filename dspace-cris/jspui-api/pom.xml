@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace-cris-jspui-api</artifactId>
+	<name>DSpace CRIS :: JSPUI API</name>
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-cris</artifactId>
+		<version>CRIS-4.1.0-SNAPSHOT</version>
+	</parent>
+
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/..</root.basedir>
+   </properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-cris-api</artifactId>
+		</dependency>
+
+		<!-- we have customization and patched jspui classes so we directly depend 
+			on dspace-api -->
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-jspui</artifactId>
+			<type>jar</type>
+			<classifier>classes</classifier>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<!-- JAX-RS: Java API for RESTful Web Services -->
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.1</version>
+		</dependency>
+
+		<!-- obtained from JEE5 Reference SDK -->
+
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<version>1.2_12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.faces</groupId>
+			<artifactId>jsf-impl</artifactId>
+			<version>1.2_12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.dev.rome</groupId>
+			<artifactId>rome</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>pubmed-lookup</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>pubmed-lookup-web</artifactId>
+			<type>war</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-web-api</artifactId>
+
+		</dependency>
+
+		<dependency>
+			<groupId>it.cilea</groupId>
+			<artifactId>commons-cilea-webapi</artifactId>
+			<version>${it.cilea.ccommons.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-webmvc-api</artifactId>
+
+		</dependency>
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-webmvc-webapp</artifactId>
+			<version>${org.jdyna.version}</version>
+			<type>war</type>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.sf.flexjson</groupId>
+			<artifactId>flexjson</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

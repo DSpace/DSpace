@@ -7,6 +7,7 @@
  */
 package org.dspace.app.statistics;
 
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -153,10 +154,10 @@ public class LogAnalyser
    private static Pattern logRegex = null;
    
    /** pattern to match commented out lines from the config file */
-   private static Pattern comment = Pattern.compile("^#");
+   private static final Pattern comment = Pattern.compile("^#");
         
    /** pattern to match genuine lines from the config file */
-   private static Pattern real = Pattern.compile("^(.+)=(.+)");
+   private static final Pattern real = Pattern.compile("^(.+)=(.+)");
    
    /** pattern to match all search types */
    private static Pattern typeRX = null;
@@ -1165,8 +1166,12 @@ public class LogAnalyser
                         "AND metadata_field_id = (" +
                         " SELECT metadata_field_id " +
                         " FROM metadatafieldregistry " +
-                        " WHERE element = 'type' " +
-                        " AND qualifier IS NULL) ";
+                        " WHERE metadata_schema_id = (" +
+                        "  SELECT metadata_schema_id" +
+                        "   FROM MetadataSchemaRegistry" +
+                        "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
+                        "  AND element = 'type' " +
+                        "  AND qualifier IS NULL) ";
         }
         
         // start the date constraint query buffer
@@ -1184,8 +1189,12 @@ public class LogAnalyser
                           "WHERE metadata_field_id = (" +
                           " SELECT metadata_field_id " +
                           " FROM metadatafieldregistry " +
-                          " WHERE element = 'date' " +
-                          " AND qualifier = 'accessioned') ");
+                          " WHERE metadata_schema_id = (" +
+                          "  SELECT metadata_schema_id" +
+                          "   FROM MetadataSchemaRegistry" +
+                          "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
+                          "  AND element = 'date' " +
+                          "  AND qualifier = 'accessioned') ");
 
         // Verifies that the metadata contains a valid date, otherwise the
         // postgres queries blow up when doing the ::timestamp cast.

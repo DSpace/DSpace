@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<!-- The contents of this file are subject to the license and copyright detailed 
+	in the LICENSE and NOTICE files at the root of the source tree and available 
+	online at https://github.com/CILEA/dspace-cris/wiki/License -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- SEE HERE -> connection parameters in dspace.cfg Dialect in hibernate.properties 
+			NOTE -> to use with Hibernate Tool need to set up the right dialect here -->
+		<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+		<!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
+
+		<property name="hibernate.default_batch_fetch_size">10240</property>
+
+		<property name="hibernate.cache.use_second_level_cache">true</property>
+		<property name="hibernate.cache.use_query_cache">true</property>
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+
+		<property name="hibernate.bytecode.use_reflection_optimizer">true</property>
+		<property name="hibernate.show_sql">false</property>
+		<property name="hibernate.generate_statistics">false</property>
+
+
+		<!-- alternative to C3P0 -->
+		<property name="hibernate.connection.pool_size">30</property>
+		<property name="hibernate.search.autoregister_listeners">false</property>
+
+		<mapping class="it.cilea.osd.common.core.TimeStampInfo" />
+		<mapping class="it.cilea.osd.common.core.SingleTimeStampInfo" />
+
+		<mapping class="org.dspace.app.cris.model.ResearcherPage" />
+		<mapping class="org.dspace.app.cris.model.Project" />
+		<mapping class="org.dspace.app.cris.model.OrganizationUnit" />
+		<mapping class="org.dspace.app.cris.model.RestrictedField" />
+		<mapping class="org.dspace.app.cris.model.RestrictedFieldFile" />
+		<mapping class="org.dspace.app.cris.model.RestrictedFieldLocalOrRemoteFile" />
+		<mapping class="org.dspace.app.cris.model.CrisSubscription" />
+		<mapping class="org.dspace.app.cris.model.RelationPreference" />
+		<mapping class="org.dspace.app.cris.model.SourceReference" />
+
+		<!-- Dynamic field -->
+
+		<mapping class="org.dspace.app.cris.model.jdyna.RPProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.ProjectProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.OUProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.RPNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.RPTypeNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.RPNestedProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.ProjectNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.ProjectNestedProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.OUNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.OUTypeNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.OUNestedProperty" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.RPPropertiesDefinition" />
+		<mapping class="org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition" />
+		<mapping class="org.dspace.app.cris.model.jdyna.OUPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.TabResearcherPage" />
+		<mapping class="org.dspace.app.cris.model.jdyna.EditTabResearcherPage" />
+		<mapping class="org.dspace.app.cris.model.jdyna.BoxResearcherPage" />
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.TabProject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.EditTabProject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.BoxProject" />
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.TabOrganizationUnit" />
+		<mapping class="org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit" />
+		<mapping class="org.dspace.app.cris.model.jdyna.BoxOrganizationUnit" />
+		
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.TabDynamicObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.EditTabDynamicObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.BoxDynamicObject" />
+
+		<mapping class="org.dspace.app.cris.model.ResearchObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicProperty" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicObjectType" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DynamicNestedProperty" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition" />
+		<mapping class="org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition" />
+		<mapping
+			class="org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition" />
+		<!-- JDynA mapping -->
+		<mapping class="it.cilea.osd.jdyna.model.ANestedObject" />
+
+		<mapping class="it.cilea.osd.jdyna.model.Property" />
+		<mapping class="it.cilea.osd.jdyna.model.PropertiesDefinition" />
+
+		<mapping class="it.cilea.osd.jdyna.model.AValue" />
+		<mapping class="it.cilea.osd.jdyna.value.DateValue" />
+		<mapping class="it.cilea.osd.jdyna.value.TextValue" />
+		<mapping class="it.cilea.osd.jdyna.value.LinkValue" />
+		<mapping class="it.cilea.osd.jdyna.value.FileValue" />
+		<mapping class="it.cilea.osd.jdyna.value.NumberValue" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.value.RPPointer" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.value.ProjectPointer" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.value.OUPointer" />
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.value.DOPointer" />
+
+
+		<mapping class="it.cilea.osd.jdyna.model.AWidget" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetTesto" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetLink" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetDate" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetFile" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetPointer" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetNumero" />
+
+		<mapping class="it.cilea.osd.jdyna.widget.Size" />
+		<mapping class="it.cilea.osd.jdyna.web.Box" />
+		<mapping class="it.cilea.osd.jdyna.web.BoxMessage" />
+		<mapping class="it.cilea.osd.jdyna.web.Tab" />
+		<mapping class="it.cilea.osd.jdyna.model.Containable" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetFileRP" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetFileProject" />
+
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetFileOU" />
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetFileDO" />
+		
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerOU" />
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerPJ" />
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerRP" />
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetPointerDO" />
+
+
+		<mapping class="org.dspace.app.cris.model.StatSubscription" />
+		<mapping class="org.dspace.app.cris.model.ws.User" />
+		<mapping class="org.dspace.app.cris.model.ws.Criteria" />
+
+		<mapping class="it.cilea.osd.jdyna.model.ScopeDefinition" />
+
+	</session-factory>
+
+</hibernate-configuration>
+

@@ -7,13 +7,14 @@
  */
 package org.dspace.xoai.util;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.util.TimeZone;
 
 /**
  * 
@@ -33,8 +34,8 @@ public class DateUtils
         // 2008-01-01T00:00:00Z
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'000Z'");
     	if (!init) sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String ret = sdf.format(date);
-        System.out.println(ret);
         return ret;
     }
 

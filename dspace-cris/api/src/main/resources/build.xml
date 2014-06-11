@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<project name="researcherpage" basedir="${basedir}">
+        <property name="hibernate_configuration" value="${basedir}/src/main/resources/hibernate/hibernate-cris.cfg.xml" />
+		<property name="hibernate_properties" value="${tool.dir}/hibernate-rp.properties" />
+        <property name="log4j_properties" value="${dspace.dir}/config/log4j.properties" />
+        <property file="${hibernate_properties}" />
+        <property file="${log4j_properties}" />
+
+        <dirname file="${log4j.appender.A1.File}" property="loggingDir" />
+
+        <!-- Generate the schema for all mapping files in our class tree -->
+        <target name="generate-ddl" description="Generate DDL from the O/R mapping files">                
+                <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" />
+                <hibernatetool destdir="${tool.dir}">
+                        <classpath refid="maven.compile.classpath" />
+                        <annotationconfiguration propertyfile="${hibernate_properties}" configurationfile="${hibernate_configuration}" />
+                        <hbm2ddl export="false" console="true" drop="false" create="true" outputfilename="schema.ddl" delimiter=";"/>
+                </hibernatetool>
+        </target>
+
+        <!-- Generate the schema for UPDATE all mapping files in our class tree -->
+        <target name="generate-update-ddl" description="Generate UPDATE DDL from the O/R mapping files">        	
+                <taskdef name="hibernatetool" classname="org.dspace.app.cris.util.UpdateSchemaTool" classpath="${maven_compile_classpath}"/>
+                <hibernatetool properties="${hibernate_properties}"  config="${hibernate_configuration}" outputFile="${tool.dir}/schema-update.ddl" delimiter=";">                    
+                </hibernatetool>
+        </target>
+	
+
+        <target name="generate-drop-ddl" description="Generate DDL from the O/R mapping files">
+                <taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" />
+                <hibernatetool destdir="${tool.dir}">
+                        <classpath refid="maven.compile.classpath" />
+                        <annotationconfiguration propertyfile="${hibernate_properties}" configurationfile="${hibernate_configuration}" />
+                        <hbm2ddl export="false" console="true" drop="true" create="false" outputfilename="schema-drop.ddl" delimiter=";" />                                             
+                </hibernatetool>        
+        </target>
+
+        <target name="create-tables-and-GEN-DDL" depends="generate-ddl, generate-drop-ddl" description="Generate tables from the DDL file">
+                <sql driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" userid="${hibernate.connection.username}" password="${hibernate.connection.password}" onerror="continue" src="schema.ddl">
+                        <classpath refid="maven.compile.classpath" />
+                </sql>
+        </target>
+
+        <target name="create-tables-NO-GEN-DDL" description="Generate tables from the DDL file (NO REGEN)">
+                <sql driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" userid="${hibernate.connection.username}" password="${hibernate.connection.password}" onerror="continue" src="schema.ddl">
+                        <classpath refid="maven.compile.classpath" />
+                </sql>
+        </target>
+
+        <target name="refresh-database" depends="drop-table, create-tables-and-GEN-DDL" description="Ricrea il Database da zero" />
+
+        <target name="drop-table" description="DROP table">
+                <sql driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" userid="${hibernate.connection.username}" password="${hibernate.connection.password}" onerror="continue" src="schema-drop.ddl">
+                        <classpath refid="maven.compile.classpath" />
+                </sql>
+        </target>
+
+        <target name="populate-tables" description="Populate tables">
+                <sql driver="${hibernate.connection.driver_class}" url="${hibernate.connection.url}" userid="${hibernate.connection.username}" password="${hibernate.connection.password}" onerror="continue" src="config_anagrafica.sql">
+                        <classpath refid="maven.compile.classpath" />
+                </sql>
+        </target>
+</project>

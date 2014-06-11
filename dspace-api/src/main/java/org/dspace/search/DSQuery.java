@@ -475,6 +475,9 @@ public class DSQuery
             lastModified = reader.getVersion();         
             searcher = new IndexSearcher(reader);
             
+        } else {
+            reader.close();
+            searchDir.close();
         }
 
         return searcher;

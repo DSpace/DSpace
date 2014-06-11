@@ -2,4 +2,4 @@ language: java
 jdk:
  - oraclejdk7
  - openjdk7
-script: "mvn clean package license:check -Dmaven.test.skip=false"
+script: "mvn clean package -Dmaven.test.skip=true"

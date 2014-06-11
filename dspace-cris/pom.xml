@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace-cris</artifactId>
+	<name>DSpace CRIS</name>
+
+	<scm>
+		<connection>scm:git:https://github.com/Cineca/dspace-cris.git</connection>
+		<developerConnection>scm:git:https://github.com/Cineca/dspace-cris.git</developerConnection>
+		<url>https://github.com/Cineca/dspace-cris.git</url>
+		<tag>HEAD</tag>
+	</scm>
+   
+	<parent>
+		<artifactId>dspace-parent</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>CRIS-4.1.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<modules>
+		<module>api</module>
+		<module>jspui-api</module>
+		<module>jspui-webapp</module>
+		<module>webservices</module>
+	</modules>
+
+	<!--Force UTF-8 encoding during build on all platforms -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>		
+        <root.basedir>${basedir}</root.basedir>
+	</properties>
+    
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+    	<repository>
+        	<id>repo</id>
+        	<name>Cineca Maven Repository</name>
+        	<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+    	</repository>
+    	<snapshotRepository>
+        	<id>snapshot-repo</id>
+        	<name>Cineca Maven Repository</name>
+        	<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+    	</snapshotRepository>
+    	<site>
+            <id>website</id>
+            <url>http://cineca.github.io/dspace-cris/index.html</url>
+        </site>        
+	</distributionManagement>
+	
+	<repositories>		
+		<repository>
+			<id>cineca-repo</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/releases</url>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</snapshots>
+		</repository>
+		
+		<repository>
+			<id>cineca-repo-snapshot</id>
+			<name>Cineca Maven Repository</name>
+			<url>https://github.com/Cineca/mvn-repo/raw/master/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>never</checksumPolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<dependencyManagement>
+		<dependencies>
+		
+		
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-entitymanager</artifactId>
+				<version>${org.hibernate.entitymanager.version}</version>
+			</dependency>
+						        
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-ehcache</artifactId>
+				<version>${org.hibernate.ehcache.version}</version>
+			</dependency>
+						     
+			<dependency>
+				<groupId>c3p0</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>0.9.1.2</version>
+				<type>jar</type>
+				<scope>compile</scope>
+			</dependency>    
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-core</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-date</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-pointer</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-web-api</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>      
+		
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-webmvc-api</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+		
+		</dependencies>
+	</dependencyManagement>
+
+	
+	<developers>
+		<developer>
+			<name>Andrea Bollini</name>
+			<email>a.bollini@cineca.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+		<developer>
+			<name>Luigi Andrea Pascarelli</name>
+			<email>luigiandrea.pascarelli@cineca.it</email>
+			<timezone>GMT +1</timezone>
+		</developer>
+	</developers>
+	
+</project>

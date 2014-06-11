@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>  
+   <artifactId>dspace-cris-jspui-webapp</artifactId>
+   <name>DSpace CRIS :: Web Application Resources</name>
+   <packaging>war</packaging>
+   <description>DSpace CRIS JSP Based Webapplication Resources</description>
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
+   -->
+   <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-cris</artifactId>
+        <version>CRIS-4.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+   </parent>
+
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <root.basedir>${basedir}/..</root.basedir>
+   </properties>
+   
+	<build>
+	  <finalName>dspace-cris-jspui-webapp</finalName>	
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+               <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
+               <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+               <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+   
+</project>

@@ -1,0 +1,353 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
+a.pagination {
+	text-decoration: underline;
+}
+.menuBar {
+	font-size: 10pt;
+	color: #000000;
+	background-color: #EEEEEE;
+	font-family: sans-serif;
+	text-decoration: none;
+	padding: 5px;
+}
+a.menuBar:link {
+	color: #903; 
+	text-decoration: underline;
+}
+a.menuBar:visited {
+	color: #903; 
+	text-decoration: underline;
+}
+a.menuBar:hover {
+	color: #903; 
+	text-decoration: underline;
+}
+
+/*	table	*/
+.miscTable {
+	font-size: 10pt;
+	vertical-align: middle;
+	color: #000000;
+	font-family: sans-serif;
+	background-color: #fffffc;
+}
+
+.miscTable a {
+	color: #000;
+}
+
+.miscTable p {
+	font-size: 10pt;
+}
+
+.miscTable p a {
+	font-size: 10pt;
+	text-decoration: underline;
+	color: blue;
+}
+
+#rightTable  a {
+	font-size: 10pt;
+	color: #606060;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+#rightTable td {
+	font-size: 10pt;
+	font-family: sans-serif;
+	padding-bottom:5px;
+}
+
+.oddRow {
+	color: #332621;
+	font-size: 10pt;
+	background-color: #ffffff;
+	vertical-align: top;
+	font-family: sans-serif;
+}
+a.oddRow:visited {
+	color: #639;
+}
+a.oddRow:hover {
+	color: #6F0A0A;
+	text-decoration: underline;
+}
+
+.evenRow {
+	color: #332621; 
+	font-size: 10pt;
+	background-color: #cccccc; 
+	vertical-align: top;
+	font-family: sans-serif; 
+}
+a.evenRow:visited {
+	color: #639;
+}
+a.evenRow:hover {
+	color: #6F0A0A;
+	text-decoration: underline;
+}
+
+table tr td.oddRowOddCol {
+	background: #fff;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	font-weight: bold;
+	padding-top: 1px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+table tr td.oddRowEvenCol {
+	background: #fff;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	padding-top: 1px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+table tr td.evenRowOddCol {
+	background: #eee;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	font-weight: bold;
+	padding-top: 1px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+table tr td.evenRowEvenCol {
+	background: #eee;
+	color: #332621;
+	vertical-align: top;
+	text-decoration: none;
+	padding-top: 1px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+table th.sortable {
+	display: inline-block;
+	background: url('../images/arrow_off.png') right no-repeat;
+	color: #000;
+	padding-right: 20px;
+	cursor: pointer;
+}
+
+table th.sorted_desc {
+	display: inline-block;
+	background: url('../images/arrow_down.png') right no-repeat;
+	color: #000;
+	padding-right: 20px;
+}
+
+table th.sorted_asc {
+	display: inline-block;
+	background: url('../images/arrow_up.png') right no-repeat;
+	color: #000;
+	padding-right: 20px;
+}
+
+
+#pagination {
+	font-size: 12pt;
+	font-weight: bold;
+	color: blue;
+	font-family: Tohoma, "Lucida Grande", Arial, sans-serif;
+	text-decoration: none;
+	text-align: center;
+}
+
+#pagination a {
+	font-size: 10pt;
+	font-weight: normal;
+	text-decoration: underline;
+}
+
+#misc {
+	font-size: 11pt;
+}
+
+
+#misc table tr td {
+	font-size: 11pt;
+
+}
+
+#misc a {
+	font-size: 11pt;
+	text-decoration: underline;
+	color: blue;
+}
+
+#misc a:visited {
+	color: blue;
+}
+
+#misc .touchTop {
+	padding-top: 0;
+	margin-top: 0;
+}
+
+#misc p {
+
+}
+
+/* Display tag */
+.displaytaglikemisctable {
+        padding: 0;
+        margin: 1px;
+        border: 1px solid #ccc;
+        width: 99%;     
+}
+
+.displaytaglikemisctable th {
+        background: #ffffff;
+        font: bold 0.9em Verdana, Arial, Helvetica, sans-serif;
+        color: #000;
+        text-align: left;
+        padding: 3px;
+        border-bottom: 2px solid #ccc;  
+}
+
+.displaytaglikemisctable td {
+        font: normal 0.7em Verdana, Arial, Helvetica, sans-serif;
+        color: #000;
+        padding: 2px 3px 2px 3px;
+        margin: 1px;
+}
+
+.displaytaglikemisctable td img {
+        border: 0;
+}
+
+.displaytaglikemisctable td.rightalign {
+        text-align: right;
+}
+
+.displaytaglikemisctable td.centeralign {
+        text-align: center;
+}
+
+.displaytaglikemisctable tr.odd td {
+        font-size: 10pt;
+        font-style: normal;
+        font-weight: normal;
+        color: #332621;
+        vertical-align: top;
+        text-decoration: none;
+        background: #ffffff;
+}
+
+.displaytaglikemisctable tr.even td {
+        font-size: 10pt;
+        font-style: normal;
+        font-weight: normal;
+        color: #332621;
+        vertical-align: top;
+        text-decoration: none;
+        background: #cccccc;
+}
+
+.displaytaglikemisctable th.sorted {
+        background-color: #f9e375;
+}
+
+.displaytaglikemisctable th.sorted a,.displaytaglikemisctable th.sortable a
+        {
+        display: block;
+        background: url(../images/arrow_off.png) no-repeat right;
+        color: #000;
+        text-decoration: none;
+}
+
+.displaytaglikemisctable th.sorted a:hover,.displaytaglikemisctable th.sortable a:hover
+        {
+        color: #f00;
+}
+
+.displaytaglikemisctable th.order1 a {
+        background-image: url(../images/arrow_down.png);
+}
+
+.displaytaglikemisctable th.order2 a {
+        background-image: url(../images/arrow_up.png);
+}
+
+.displaytaglikemisctable tr td input.active {
+        float: right;
+}
+
+.displaytaglikemisctable tr td input.name {
+        width: 99%;
+}
+
+.displaytaglikemisctable tr td input.dept {
+        width: 99%;
+}
+
+.displaytaglikemisctable th.active {
+        width: 75px;
+}
+.displaytaglikemisctable th.staff {
+        width: 100px;
+}
+
+.displaytaglikemisctable th.chinese {
+        width: 120px;
+}
+
+p.pagebanner {  
+        font-family:sans-serif;
+        font-size: 10pt;
+        color: #000;
+        padding-bottom: 0px;
+}
+
+span.pagebanner {
+        font-size: 10pt;
+}
+
+span.pagelinks {
+        font-size: 10pt;
+        color: #000000;
+        background-color: #EEEEEE;      
+        font-family: sans-serif;
+        text-decoration: none;
+        text-align: center;
+        padding: 1px;
+        width: 99%;
+        display: block;
+}
+
+span.pagelinks a {
+        color: #000;
+        text-decoration: underline;
+}
+
+span.pagelinks:link {
+        color: #903; 
+        text-decoration: underline;
+}
+span.pagelinks:visited {
+        color: #903; 
+        text-decoration: underline;
+}
+span.pagelinks a:hover {
+        color: #903; 
+        text-decoration: underline;
+}
+
+/* End Display tag */

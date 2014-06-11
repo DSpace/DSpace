@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    https://github.com/CILEA/dspace-cris/wiki/License
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	<bean id="WSConfiguration" class="org.dspace.app.cris.ws.WSConfigurationService">
+		<property name="configurationService" ref="dspace.configurationService" />
+	</bean>
+
+	<bean id="WSConfiguration.mainSchema" factory-bean="WSConfiguration" factory-method="getMainSchema" />
+	<bean id="WSConfiguration.locationUri" factory-bean="WSConfiguration" factory-method="getLocationUri" />
+	<bean id="WSConfiguration.fileMainSchema" factory-bean="WSConfiguration" factory-method="getFileMainSchema" />
+	
+	<bean id="authenticationWS" class="org.dspace.app.cris.ws.AuthenticationWS">		
+		<property name="applicationService" ref="applicationService" />				
+	</bean>
+	
+	<bean abstract="true" id="abstractEndpoint" class="org.dspace.app.cris.ws.AWSAuthService">
+		<property name="searchService" ref="crisSearchService" />
+		<property name="authenticationWS" ref="authenticationWS" />
+		<property name="types2ws">
+			<map>
+				<entry key="publications" value-ref="wsServicesPublications" />
+				<entry key="researcherPages" value-ref="wsServicesRP" />
+				<entry key="grants" value-ref="wsServicesProjects" />
+				<entry key="orgunits" value-ref="wsServicesOrgUnits" />
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="abstractEndpoint" id="rpNormalEndpoint" class="org.dspace.app.cris.ws.WSNormalAuthService">
+	</bean>
+
+	<bean parent="abstractEndpoint" id="rpTokenEndpoint" class="org.dspace.app.cris.ws.WSTokenAuthService">
+	</bean>
+
+	<bean
+		class="org.springframework.ws.server.endpoint.mapping.PayloadRootQNameEndpointMapping">
+		<property name="mappings">
+			<props>
+				<prop
+					key="{http://www.cilea.it/cris/schemas}NormalAuthQueryRequest">rpNormalEndpoint</prop>
+				<prop
+					key="{http://www.cilea.it/cris/schemas}TokenAuthQueryRequest">rpTokenEndpoint</prop>
+			</props>
+		</property>
+		<property name="interceptors">
+			<list>
+				<ref bean="wsRequestValidatingInterceptor" />
+				<!-- <ref bean="wsResponseValidatingInterceptor" /> -->						
+			</list>
+		</property>
+	</bean>
+
+	<bean id="wsRequestValidatingInterceptor"
+		class="org.dspace.app.cris.ws.interceptor.CustomRequestPayloadValidatingInterceptor">
+		<property name="applicationService" ref="applicationService" />
+		<property name="schema" ref="WSConfiguration.mainSchema" />
+		<property name="validateRequest" value="true" />
+		<property name="validateResponse" value="false" />
+	</bean>
+
+<!-- 	<bean id="wsResponseValidatingInterceptor"
+		class="it.cilea.hku.authority.ws.interceptor.CustomResponsePayloadValidatingInterceptor">
+		<property name="applicationService" ref="applicationService" />
+		<property name="schema" value="/WEB-INF/classes/crisresponse.xsd" />
+		<property name="validateRequest" value="false" />
+		<property name="validateResponse" value="true" />
+	</bean> -->
+
+	<bean id="wsdlforwsservices"
+		class="org.springframework.ws.wsdl.wsdl11.DynamicWsdl11Definition">
+		<property name="builder">
+			<bean
+				class="org.springframework.ws.wsdl.wsdl11.builder.XsdBasedSoap11Wsdl4jDefinitionBuilder">				
+				<property name="schema" ref="WSConfiguration.fileMainSchema" />
+				<property name="portTypeName" value="cris" />
+				<property name="locationUri" ref="WSConfiguration.locationUri" />
+				<property name="targetNamespace">
+					<util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_TARGET"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="wsServicesPublications" class="org.dspace.app.cris.ws.WSServicesPublications">
+		<property name="marshaller" ref="publicationMarshaller" />		
+        <property name="searchServices" ref="crisSearchService" />
+    </bean>
+    
+	<bean id="wsServicesRP" class="org.dspace.app.cris.ws.WSServicesCRIS">		
+		<property name="marshaller" ref="dynamicMarshallerRP" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.RP_TYPE_ID"/></property>
+    </bean>
+        
+	<bean id="wsServicesProjects" class="org.dspace.app.cris.ws.WSServicesCRIS">		
+		<property name="marshaller" ref="dynamicMarshallerPJ" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.PROJECT_TYPE_ID"/></property>
+    </bean>
+    
+    <bean id="wsServicesOrgUnits" class="org.dspace.app.cris.ws.WSServicesCRIS">		
+		<property name="marshaller" ref="dynamicMarshallerOU" />
+        <property name="searchServices" ref="crisSearchService" />
+        <property name="supportedType"><util:constant static-field="org.dspace.app.cris.model.CrisConstants.OU_TYPE_ID"/></property>
+    </bean>
+    
+    <!-- beans to move in a XML mapping module -->
+    <bean id="dynamicMarshallerRP" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_RP"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_RP"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.RPPropertiesDefinition"/>
+     </bean>
+
+    <bean id="dynamicMarshallerPJ" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PJ"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_PJ"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition"/>
+     </bean>
+     
+     <bean id="dynamicMarshallerOU" class="org.dspace.app.cris.ws.marshaller.MarshallerDynamicObject">
+     	<property name="applicationService" ref="applicationService" />
+     	<property name="namespace"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_OU"/></property>
+     	<property name="namespacePrefix"><util:constant static-field="org.dspace.app.cris.ws.WSConstants.NAMESPACE_PREFIX_OU"/></property>
+     	<property name="tpClazz" value="org.dspace.app.cris.model.jdyna.OUPropertiesDefinition"/>
+     </bean>
+          
+     <bean id="publicationMarshaller" class="org.dspace.app.cris.ws.marshaller.MarshallerPublications">
+     </bean>
+	
+</beans>
