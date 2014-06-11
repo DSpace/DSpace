@@ -9,6 +9,9 @@ import org.dspace.core.Context;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class DatabaseExtractor<T> implements ExtractorInterface<T> {
+    static final String JOURNAL_ELEMENT = "publicationName";
+    static final String JOURNAL_QUALIFIER = null;
+    static final String JOURNAL_SCHEMA = "prism";
     
     private Context context;
     public DatabaseExtractor(Context context) {
@@ -18,7 +21,7 @@ public abstract class DatabaseExtractor<T> implements ExtractorInterface<T> {
     protected DatabaseExtractor() {
     }
 
-    protected final Context getContext() {
+    final Context getContext() {
         return context;
     }
 
