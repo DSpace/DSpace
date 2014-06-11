@@ -5,7 +5,7 @@
  *
  * https://github.com/CILEA/dspace-cris/wiki/License
  */
-package org.dspace.app.webui.cris.dto;
+package org.dspace.app.cris.model.dto;
 
 import org.dspace.app.cris.model.ACrisObject;
 

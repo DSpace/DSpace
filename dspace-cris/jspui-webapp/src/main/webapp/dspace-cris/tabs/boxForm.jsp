@@ -21,19 +21,13 @@
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.app.cris.model.jdyna.VisibilityTabConstant"%>
 
-<dspace:layout locbar="link" navbar="admin"
+<dspace:layout locbar="link" style="submission" navbar="admin"
 	titlekey="jsp.dspace-admin.researchers-list">
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.edit-box" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.rp")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
+<h1><fmt:message key="jsp.dspace-admin.edit-box" />
+<a target="_blank"
+	href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
+                             "help.site-admin.rp")%>'><fmt:message
+	key="jsp.help" /></a></h1>
 
 		
 							<c:set var="hasCustomEditJSP" value="false" scope="request" />
@@ -77,13 +71,13 @@
 	<form:form commandName="box" method="post">
 		<c:set value="${message}" var="message" scope="request" />
 		<c:if test="${!empty message}">
-			<div id="authority-message"><fmt:message key="${message}" /></div>
+			<div class="alert alert-default"><fmt:message key="${message}" /></div>
 		</c:if>
 
 		<c:if test="${not empty messages}">
 			<div class="message" id="successMessages"><c:forEach var="msg"
 				items="${messages}">
-				<div id="authority-message">${msg}</div>
+				<div class="alert alert-success">${msg}</div>
 			</c:forEach></div>
 			<c:remove var="messages" scope="session" />
 		</c:if>
@@ -91,7 +85,7 @@
 		<%--  first bind on the object itself to display global errors - if available  --%>
 		<spring:bind path="box">
 			<c:forEach items="${status.errorMessages}" var="error">
-				<span id="errorMessage"><fmt:message
+				<span id="errorMessage" class="alert alert-danger"><fmt:message
 					key="jsp.layout.hku.prefix-error-code" /> ${error}</span>
 				<br>
 			</c:forEach>
@@ -100,7 +94,7 @@
 				
 		<spring:bind path="box.*">
 		<c:if test="${not empty status.errorMessages}">
-			<div class="error"><c:forEach var="error"
+			<div class="alert alert-danger"><c:forEach var="error"
 				items="${status.errorMessages}">
 	               ${error}<br />
 			</c:forEach></div>
@@ -108,7 +102,7 @@
 		</spring:bind>
 
 		<c:if test="${not empty status.errorMessages}">
-		<div class="error"><c:forEach var="error"
+		<div class="alert alert-danger"><c:forEach var="error"
 			items="${status.errorMessages}">
                  ${error}<br />
 		</c:forEach></div>
@@ -317,7 +311,7 @@
 		</c:forEach>
 		
 		<c:if test="${fn:length(containablesList) > count}"> 
-		<a class="show" id="show" href="#" title="Show other"><img alt="Show/Hide other fields" src="<%= request.getContextPath() %>/images/cris/showotherfields.png"></a>
+		<a class="show" id="show" href="#" title="Show other"><fmt:message key="jsp.dspace-admin.edit-box.showotherpdef" /><i class="fa fa-toggle-down"></i></a>
 		
 		<div id="othermetadata" style="display: none">
 		<c:forEach
@@ -458,62 +452,62 @@
 		</fieldset>
 
 		<input type="hidden" id="tabId" name="tabId" value="${tabId}" />
-		<input type="submit"
+		<input type="submit" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
-
+		<div class="clearfix"> </div>
 		<c:if test="${!empty box.id}">
-			<div style="padding: 0; margin: 0 10px;"><a
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createDateDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newdatedynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createTextDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newtextdynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createNestedDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newnesteddynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createLinkDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newlinkdynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createFileDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newfiledynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createRPPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newrppointerdynamicfield" />
-			</a></div>
-						<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createProjectPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newprojectpointerdynamicfield" />
-			</a></div>
-						<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createOUPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newoupointerdynamicfield" />
-			</a></div>
-			<div style="padding: 0; margin: 0 10px;"><a
+			</a>
+			<a class="btn btn-default"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createDOPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newdopointerdynamicfield" />
-			</a></div>
+			</a>
 		</c:if>
 
 	</form:form>
 	
 	<script type="text/javascript">
 	<!--
-	var j = jQuery.noConflict();
+	var j = jQuery;
     j(document).ready(function() {	
 		j( "#show" ).click(function() {
 			j( "#othermetadata" ).toggle();

@@ -36,6 +36,10 @@ public class ComponentInfoDTO<T extends DSpaceObject>
 
     private int start;
 
+	private int searchTime;
+
+	private String relationName;
+
     private String buildCommonURL()
     {
 
@@ -202,4 +206,20 @@ public class ComponentInfoDTO<T extends DSpaceObject>
     {
         this.pagetotal = pagetotal;
     }
+
+	public void setSearchTime(int searchTime) {
+		this.searchTime = searchTime;
+	}
+
+	public int getSearchTime() {
+		return searchTime;
+	}
+
+	public void setRelationName(String relationName) {
+		this.relationName = relationName;
+	}
+
+	public String getRelationName() {
+		return relationName;
+	}
 }

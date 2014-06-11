@@ -27,7 +27,7 @@
 
 <%@ taglib uri="jdynatags" prefix="dyna" %>
 <c:set var="STANDARD_ACCESS" value="<%=  AccessLevelConstants.STANDARD_ACCESS %>"></c:set>
-<dspace:layout locbar="link" navbar="admin"
+<dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.researchers-list">
 
 	<table width="95%">

@@ -8,11 +8,6 @@
 package org.dspace.app.cris.service;
 
 import it.cilea.osd.common.model.Identifiable;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ANestedProperty;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.model.Property;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +19,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.cris.dao.ApplicationDao;
 import org.dspace.app.cris.dao.CrisObjectDao;
 import org.dspace.app.cris.dao.CrisSubscriptionDao;
 import org.dspace.app.cris.dao.DynamicObjectDao;
@@ -42,7 +36,6 @@ import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.StatSubscription;
-import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.ws.User;
@@ -135,6 +128,10 @@ public class ApplicationService extends ExtendedTabService
         applicationDao.evict(identifiable);
     }
 
+    public ResearchObject getBySourceID(String sourceRef, String sourceId)
+    {
+    	return researchDao.uniqueBySourceID(sourceRef, sourceId);
+    }
     public long countSubscriptionsByUUID(String uuid)
     {
         return crisSubscriptionDao.countByUUID(uuid);
@@ -501,22 +498,25 @@ public class ApplicationService extends ExtendedTabService
         return researcherPageDao.uniqueByEPersonId(id);
     }
 
+    @Deprecated
     public ResearcherPage getResearcherPageByStaffNo(String code)
     {
         //return (ResearcherPage) getEntityBySourceID(code);
-        return researcherPageDao.uniqueBySourceID(code);
+        return researcherPageDao.uniqueBySourceID(null, code);
     }
 
+    @Deprecated
     public Project getResearcherGrantByCode(String code)
     {
         //return (Project) getEntityBySourceID(code);
-        return projectDao.uniqueBySourceID(code);
+        return projectDao.uniqueBySourceID(null, code);
     }
 
+    @Deprecated
     public OrganizationUnit getOrganizationUnitByCode(String code)
     {
         //return (OrganizationUnit) getEntityBySourceID(code);
-        return organizationUnitDao.uniqueBySourceID(code);
+        return organizationUnitDao.uniqueBySourceID(null, code);
     }
 
     public <T extends ACrisObject> T getEntityByCrisId(String crisID,
@@ -526,16 +526,31 @@ public class ApplicationService extends ExtendedTabService
         return dao.uniqueByCrisID(crisID);
     }
   
-    public <T extends ACrisObject> T getEntityBySourceId(String sourceID,
+    public <T extends ACrisObject> T getEntityBySourceId(String sourceRef, String sourceID,
             Class<T> className)
     {
         CrisObjectDao<T> dao = (CrisObjectDao<T>) getDaoByModel(className);
-        return dao.uniqueBySourceID(sourceID);
+        return dao.uniqueBySourceID(sourceRef, sourceID);
     }
 
     public ACrisObject getEntityByUUID(String uuid)
     {
-        return ((ApplicationDao) getApplicationDao()).uniqueByUUID(uuid);
+        // return ((ApplicationDao) getApplicationDao()).uniqueByUUID(uuid);
+        // HIBERNATE 4 seems not support polymorphic query on mappedsuperclass
+        ACrisObject obj = researcherPageDao.uniqueByUUID(uuid);
+        if (obj == null)
+        {
+            obj = organizationUnitDao.uniqueByUUID(uuid);
+            if (obj == null)
+            {
+                obj = projectDao.uniqueByUUID(uuid);
+                if (obj == null)
+                {
+                    obj = researchDao.uniqueByUUID(uuid);
+                }
+            }
+        }
+        return obj;
     }
 
     public User getUserWSByUsernameAndPassword(String username,
@@ -552,6 +567,11 @@ public class ApplicationService extends ExtendedTabService
     public Date uniqueLastModifiedTimeStamp(int id)
     {
         return researcherPageDao.uniqueLastModifiedTimeStamp(id);
+    }
+    
+    public ResearcherPage uniqueByCrisID(String crisID)
+    {
+        return researcherPageDao.uniqueByCrisID(crisID);
     }
 
     public List<RPProperty> findAnagraficaByRPID(int id)
@@ -697,6 +717,4 @@ public class ApplicationService extends ExtendedTabService
         return researchDao.paginateByType(typo, sort, inverse, (page - 1)
                 * maxResults, maxResults);
     }
-   
-   
 }

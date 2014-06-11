@@ -11,9 +11,16 @@
 <c:set var="pieType" >location</c:set>
 <c:set var="targetDiv" scope="page" >div_${data.jspKey}_${statType}_${objectName}_${pieType}</c:set>
 
-<div id="${targetDiv}" style="width: 100%; height: 300px;"></div>
-
 <c:set var="jsDataObjectName" scope="page"> data_${statType}_${objectName}_${pieType}_${pieType}</c:set>
+<c:if test="${fn:length(data.resultBean.dataBeans[statType][objectName][pieType].dataTable) gt 0}">
+<div class="panel panel-default">
+  <div class="panel-heading">
+   <h6 class="panel-title"><i class="fa fa-map-marker"></i> <fmt:message key="view.stats.map.title" /></h6>
+  </div>
+  <div class="panel-body">
+	<div id="${targetDiv}" style="width: 100%; height: 300px;"></div>
+  </div>
+</div>
 
 <script type="text/javascript">
 <!--
@@ -46,3 +53,4 @@ if (${jsDataObjectName}.length==0) return;
 initialize_${jsDataObjectName}();
 -->
 </script>
+</c:if>

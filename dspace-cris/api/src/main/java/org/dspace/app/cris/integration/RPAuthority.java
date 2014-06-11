@@ -21,7 +21,6 @@ import org.dspace.app.cris.model.VisibilityConstants;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.authority.AuthorityVariantsSupport;
 import org.dspace.content.authority.Choice;
@@ -34,6 +33,8 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 
 /**
@@ -47,7 +48,9 @@ import org.dspace.utils.DSpace;
 public class RPAuthority extends CRISAuthority implements
         AuthorityVariantsSupport, NotificableAuthority
 {
-    /** The logger */
+    public static final String PUBLICATIONS_RELATION_NAME = "publications";
+
+	/** The logger */
     private static Logger log = Logger.getLogger(RPAuthority.class);
 
     /** The name as this ChoiceAuthority MUST be configurated */
@@ -63,6 +66,7 @@ public class RPAuthority extends CRISAuthority implements
 
     private RelationPreferenceService relationPreferenceService;
 
+    private List<String> metadataAuth;
     /**
      * Make sure that the class is fully initialized before use it
      */
@@ -126,89 +130,11 @@ public class RPAuthority extends CRISAuthority implements
         try
         {
             init();
-            if (query != null && query.length() > 2)
-            {
-                DCPersonName tmpPersonName = new DCPersonName(
-                        query.toLowerCase());
-
-                String luceneQuery = "";
-                if (StringUtils.isNotBlank(tmpPersonName.getLastName()))
-                {
-                    luceneQuery += ClientUtils.escapeQueryChars(tmpPersonName
-                            .getLastName().trim())
-                            + (StringUtils.isNotBlank(tmpPersonName
-                                    .getFirstNames()) ? "" : "*");
-                }
-
-                if (StringUtils.isNotBlank(tmpPersonName.getFirstNames()))
-                {
-                    luceneQuery += (luceneQuery.length() > 0 ? " " : "")
-                            + ClientUtils.escapeQueryChars(tmpPersonName
-                                    .getFirstNames().trim()) + "*";
-                }
-                luceneQuery = luceneQuery.replaceAll("\\\\ ", " ");
-                DiscoverQuery discoverQuery = new DiscoverQuery();
-                discoverQuery.setDSpaceObjectFilter(CrisConstants.RP_TYPE_ID);
-                String filter = configurationService.getProperty("cris."
-                        + RP_AUTHORITY_NAME
-                        + ((field != null && !field.isEmpty()) ? "." + field
-                                : "") + ".filter");
-                if (filter != null)
-                {
-                    discoverQuery.addFilterQueries(filter);
-                }
-
-                discoverQuery
-                        .setQuery("{!lucene q.op=AND df=crisauthoritylookup}("
-                                + luceneQuery
-                                + ") OR (\""
-                                + luceneQuery.substring(0,
-                                        luceneQuery.length() - 1) + "\")");
-                discoverQuery.setMaxResults(50);
-                DiscoverResult result = searchService.search(null,
-                        discoverQuery, true);
-
-                List<Choice> choiceList = new ArrayList<Choice>();
-
-                for (DSpaceObject dso : result.getDspaceObjects())
-                {
-                    ResearcherPage rp = (ResearcherPage) dso;
-                    choiceList
-                            .add(new Choice(ResearcherPageUtils
-                                    .getPersistentIdentifier(rp), rp
-                                    .getFullName(), ResearcherPageUtils
-                                    .getLabel(rp.getFullName(), rp)));
-
-                    if (rp.getTranslatedName() != null
-                            && rp.getTranslatedName().getVisibility() == VisibilityConstants.PUBLIC
-                            && rp.getTranslatedName().getValue() != null)
-                    {
-                        choiceList.add(new Choice(ResearcherPageUtils
-                                .getPersistentIdentifier(rp), rp
-                                .getTranslatedName().getValue(),
-                                ResearcherPageUtils.getLabel(rp
-                                        .getTranslatedName().getValue(), rp)));
-                    }
-
-                    for (RestrictedField variant : rp.getVariants())
-                    {
-                        if (variant.getValue() != null
-                                && variant.getVisibility() == VisibilityConstants.PUBLIC)
-                        {
-                            choiceList.add(new Choice(ResearcherPageUtils
-                                    .getPersistentIdentifier(rp), variant
-                                    .getValue(), ResearcherPageUtils.getLabel(
-                                    variant.getValue(), rp)));
-                        }
-                    }
-                }
-
-                Choice[] results = new Choice[choiceList.size()];
-                results = choiceList.toArray(results);
-                return new Choices(results, 0, results.length,
-                        Choices.CF_AMBIGUOUS, false, 0);
-            }
-            return new Choices(false);
+            ConfigurationService _configurationService = this.configurationService;
+            SearchService _searchService = this.searchService;
+            Choices choicesResult = ResearcherPageUtils.doGetMatches(field, query, _configurationService, _searchService);
+            
+            return choicesResult;
         }
         catch (Exception e)
         {
@@ -216,6 +142,10 @@ public class RPAuthority extends CRISAuthority implements
             return new Choices(true);
         }
     }
+
+	protected String generateDisplayValue(String value, ResearcherPage rp) {
+		return ResearcherPageUtils.getLabel(value, rp);
+	}
 
     /**
      * Return a list of choices performing an exact query on the RP names (full,
@@ -274,9 +204,8 @@ public class RPAuthority extends CRISAuthority implements
                 {
                     ResearcherPage rp = (ResearcherPage) dso;
                     choiceList
-                            .add(new Choice(rp.getCrisID(), text,
-                                    ResearcherPageUtils.getLabel(
-                                            rp.getFullName(), rp)));
+                            .add(new Choice(rp.getCrisID(), rp.getFullName(),
+                                    generateDisplayValue(rp.getFullName(), rp)));
                 }
             }
 
@@ -382,32 +311,8 @@ public class RPAuthority extends CRISAuthority implements
      */
     public void reject(int itemID, String authorityKey)
     {
-        init();
-        ResearcherPage cris = applicationService
-                .getResearcherByAuthorityKey(authorityKey);
-        Context context = null;
-
-        try
-        {
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-            List<String> list = new ArrayList<String>();
-            list.add(String.valueOf(itemID));
-            relationPreferenceService.unlink(context, cris, "publications",
-                    list);
-            context.restoreAuthSystemState();
-        }
-        catch (SQLException e)
-        {
-            log.error(e.getMessage(), e);
-        }
-        finally
-        {
-            if(context!=null && context.isValid()) {
-                context.abort();
-            }
-        }
-
+        int[] itemIDs = {itemID};
+        reject(itemIDs, authorityKey);
     }
 
     /**
@@ -434,8 +339,14 @@ public class RPAuthority extends CRISAuthority implements
                 list.add(String.valueOf(itemID));    
             }
             
-            relationPreferenceService.unlink(context, cris, "publications",
+			// FIXME this should be performed by the AuthorityManagementServlet
+			// and not here!
+			// when done in the proper way, the relationpreference should invoke
+			// the notify to provide hack
+			// for external authority services
+            relationPreferenceService.unlink(context, cris, PUBLICATIONS_RELATION_NAME,
                     list);
+            context.commit();
             context.restoreAuthSystemState();
         }
         catch (SQLException e)
@@ -451,6 +362,7 @@ public class RPAuthority extends CRISAuthority implements
         
     }
 
+    
     @Override
     protected int getCRISTargetTypeID()
         {
@@ -461,5 +373,38 @@ public class RPAuthority extends CRISAuthority implements
     protected Class<ResearcherPage> getCRISTargetClass()
     {
         return ResearcherPage.class;
+    }
+
+    @Override
+	public void accept(int itemID, String authorityKey, int confidence)
+    {
+		init();
+        Context context = null;
+        try
+        {
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+
+			// FIXME this should be performed by the AuthorityManagementServlet
+			// and not here!
+			// when done in the proper way, the relationpreference should invoke
+			// the notify to provide hack
+			// for external authority services
+			ResearcherPage rp = applicationService
+					.getResearcherByAuthorityKey(authorityKey);
+			List<String> list = new ArrayList<String>();
+			list.add(String.valueOf(itemID));
+			relationPreferenceService.active(context, rp,
+					PUBLICATIONS_RELATION_NAME,
+                    list);
+			context.restoreAuthSystemState();
+		} catch (SQLException e) {
+			log.error(e.getMessage(), e);
+		} finally {
+            if(context!=null && context.isValid()) {
+                context.abort();
+            }
+        }
+        
     }
 }

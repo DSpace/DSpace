@@ -9,7 +9,6 @@ package org.dspace.app.cris.model;
 
 import it.cilea.osd.common.core.TimeStampInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +43,10 @@ import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
         @NamedQuery(name = "Project.paginate.sourceID.desc", query = "from Project order by sourceReference.sourceID desc"),
         @NamedQuery(name = "Project.paginate.uuid.asc", query = "from Project order by uuid asc"),
         @NamedQuery(name = "Project.paginate.uuid.desc", query = "from Project order by uuid desc"),
-        @NamedQuery(name = "Project.uniqueBySourceID", query = "from Project where sourceReference.sourceID = ?"),
+        @NamedQuery(name = "Project.uniqueBySourceID", query = "from Project where sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
         @NamedQuery(name = "Project.uniqueUUID", query = "from Project where uuid = ?"),
-        @NamedQuery(name = "Project.uniqueByCrisID", query = "from Project where crisID = ?")        
+        @NamedQuery(name = "Project.uniqueByCrisID", query = "from Project where crisID = ?"),
+        @NamedQuery(name = "Project.uniqueByUUID", query = "from Project where uuid = ?")
   })
 public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefinition, ProjectNestedProperty, ProjectNestedPropertiesDefinition, ProjectNestedObject, ProjectTypeNestedObject>
         implements                

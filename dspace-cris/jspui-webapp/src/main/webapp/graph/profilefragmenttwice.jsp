@@ -63,31 +63,14 @@
 		
 			<div id="profiletargettwiceminimized" class="profile">		
 				
-						<c:choose>
-				<c:when
-								test="${!empty researchertarget.pict && !empty researchertarget.pict.value && researchertarget.pict.visibility==1}">
 						<div class="imagemin">
-																
-								<c:set value="${dyna:getFileName(researchertarget.pict.value)}" var="pictname"></c:set>
-										<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authoritytarget}">
-											<img title="A preview ${pictname} picture"
-												src="<%=request.getContextPath()%>/cris/rp/fileservice/${dyna:getFileFolder(researchertarget.pict.value)}?filename=${pictname}"
-												alt="${pictname} picture" name="picture" id="picture" /> </a>
-							
+
+									<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authoritytarget}">
+											<img title="A preview ${authoritytarget} picture"
+												src="researcherimage/${authoritytarget}"
+												alt="${authoritytarget} picture" name="picture" id="picture" /> </a>
+																			
 						</div>
-					</c:when>
-				<c:otherwise>
-							
-
-
-						<div class="imagemin">
-							
-								
-							
-						</div>
-
-					</c:otherwise>
-					</c:choose>
 					<div class="otherminimized">
 					<span class="header4" id="headermin">
 					<c:if test="${fn:length(researchertarget.anagrafica4view['honorific'])>0 && researchertarget.anagrafica4view['honorific'][0].visibility==1}">
@@ -214,14 +197,13 @@ j(".deptvisualizationprofiletwice").click(function(){
 								"with" : "${authoritytarget}"
 							},
 							success : function(data) {								
-								j('#relationfragmenttwice').dialog("open");	
-								j(".ui-dialog-titlebar").html("${fullname} / ${researchertarget.fullName} &nbsp; <a class='ui-dialog-titlebar-close ui-corner-all' href='#' role='button'><span class='ui-icon ui-icon-closethick'>close</span></a>");j(".ui-dialog-titlebar").show();
+								j('#relationfragmenttwice').modal("show");	
+								j("#relationfragmenttwicecontenttitle").html("${fullname} / ${researchertarget.fullName}");
 								j('#relationfragmenttwicecontent').html(data);
-								j('#relationfragmenttwice').dialog('option', 'position', 'center');
 								j("#log").dialog("close");
 							},
 							error : function(data) {
-								j('#relationfragmenttwice').dialog("close");
+								j('#relationfragmenttwice').modal("hide");
 								j("#log").dialog("open");
 								Log.write(data.statusText);
 								j("#log").dialog("close");
@@ -230,5 +212,4 @@ j(".deptvisualizationprofiletwice").click(function(){
 
 					});
 	
-	j(".ui-dialog-titlebar").click(function() {	j('#relationfragmenttwice').dialog("close");});
 </script>

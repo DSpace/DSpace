@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -121,4 +123,6 @@ public interface SearchService {
      * @return the indexed field
      */
     String toSortFieldIndex(String metadataField, String type);
+
+    QueryResponse search(SolrQuery solrQuery) throws SearchServiceException;
 }

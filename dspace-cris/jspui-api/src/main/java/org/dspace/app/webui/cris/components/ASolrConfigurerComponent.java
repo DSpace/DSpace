@@ -202,7 +202,8 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
 
         ComponentInfoDTO<T> componentInfo = buildComponentInfo(docs, context,
                 type, start, order, rpp, etAl, docsNumFound, pageTotal,
-                pageCurrent, pageLast, pageFirst, sortOption);
+				pageCurrent, pageLast, pageFirst, sortOption,
+				docs.getSearchTime());
 
         componentInfoMap.put(getShortName(), componentInfo);
         request.setAttribute("componentinfomap", componentInfoMap);
@@ -220,7 +221,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
     private ComponentInfoDTO<T> buildComponentInfo(DiscoverResult docs,
             Context context, String type, int start, String order, int rpp,
             int etAl, long docsNumFound, int pageTotal, int pageCurrent,
-            int pageLast, int pageFirst, SortOption sortOption)
+			int pageLast, int pageFirst, SortOption sortOption, int searchTime)
             throws Exception
     {
         ComponentInfoDTO<T> componentInfo = new ComponentInfoDTO<T>();
@@ -233,7 +234,8 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         componentInfo.setPagecurrent(pageCurrent);
         componentInfo.setPagelast(pageLast);
         componentInfo.setPagefirst(pageFirst);
-
+		componentInfo.setRelationName(getRelationConfiguration()
+				.getRelationName());
         componentInfo.setOrder(order);
         componentInfo.setSo(sortOption);
         componentInfo.setStart(start);
@@ -241,6 +243,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         componentInfo.setEtAl(etAl);
         componentInfo.setTotal(docsNumFound);
         componentInfo.setType(type);
+		componentInfo.setSearchTime(searchTime);
         return componentInfo;
     }
 

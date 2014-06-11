@@ -7,11 +7,11 @@
  */
 package org.dspace.app.cris.pmc.dao;
 
-import org.dspace.app.cris.pmc.model.PMCCitation;
-
 import it.cilea.osd.common.dao.GenericDao;
 
-public interface PMCRecordDao extends GenericDao<PMCCitation, Integer>
+import org.dspace.app.cris.pmc.model.PMCRecord;
+
+public interface PMCRecordDao extends GenericDao<PMCRecord, Integer>
 {
 
 }

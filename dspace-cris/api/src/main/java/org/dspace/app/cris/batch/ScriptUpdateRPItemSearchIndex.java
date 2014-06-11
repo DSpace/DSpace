@@ -36,8 +36,9 @@ import org.dspace.browse.BrowserScope;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.search.DSIndexer;
+import org.dspace.event.Event;
 import org.dspace.utils.DSpace;
 
 public class ScriptUpdateRPItemSearchIndex
@@ -226,16 +227,11 @@ public class ScriptUpdateRPItemSearchIndex
                 Item[] items = binfo.getItemResults(context);
                 for (Item item : items)
                 {
-                    DSIndexer.indexContent(context, item, true);
-                    ib.indexItem(item);
+                    context.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, item.getID(), null));
                 }
             }
             context.commit();
             context.clearCache();
-        }
-        catch (DCInputsReaderException e)
-        {
-            log.error(e.getMessage());
         }
         finally
         {

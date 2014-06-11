@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.displaytag.pagination.PaginatedList;
 import org.displaytag.properties.SortOrderEnum;
-import org.dspace.app.webui.cris.dto.DynamicObjectDTO;
+import org.dspace.app.cris.model.dto.DynamicObjectDTO;
 
 public class DODisplayTagData implements PaginatedList, Serializable {
 

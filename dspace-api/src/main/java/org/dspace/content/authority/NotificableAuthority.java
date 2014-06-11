@@ -37,4 +37,6 @@ public interface NotificableAuthority
      *            the authority key
      */
     public void reject(int[] itemIDs, String authorityKey);
+    
+	public void accept(int itemID, String authorityKey, int confidence);
 }

@@ -21,7 +21,7 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
  */
 public interface ResearcherPageDao extends CrisObjectDao<ResearcherPage>        
 {
-    public ResearcherPage uniqueBySourceID(String staffNo);
+    public ResearcherPage uniqueBySourceID(String sourceRef, String sourceId);
 
     public List<ResearcherPage> findAllResearcherPageByStatus(Boolean status);
 

@@ -18,6 +18,6 @@ import org.dspace.app.cris.model.Project;
 public interface ProjectDao extends CrisObjectDao<Project>
 {
 
-    public Project uniqueBySourceID(String staffNo);
+    public Project uniqueBySourceID(String sourceRef, String sourceId);
     
 }

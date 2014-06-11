@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.dto.ProjectDTO;
 import org.dspace.app.webui.cris.controller.BaseFormController;
-import org.dspace.app.webui.cris.dto.ProjectDTO;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,29 +32,11 @@ public class FormAdministrationAddProjectController extends BaseFormController
             throws Exception
     {
         ProjectDTO grantDTO = (ProjectDTO) command;
-        String code = grantDTO.getSourceID();
         Project grant = null;
-        if (code != null && !code.isEmpty())
-        {
-            grant = applicationService.getResearcherGrantByCode(code);
-            if (grant != null)
-            {
-
-                return new ModelAndView("redirect:/cris/ou/"
-                        + "administrator/index.htm?error=true");
-            }
-        }
-        else
-        {
-
-            grant = new Project();
-            grant.setSourceID(code);
-            grant.setStatus(false);
-            grant.getDynamicField().setProject(grant);
-            applicationService.saveOrUpdate(Project.class, grant);
-
-        }
+        grant = new Project();
+        grant.setStatus(false);
+        grant.getDynamicField().setProject(grant);
+        applicationService.saveOrUpdate(Project.class, grant);
         return new ModelAndView(getSuccessView() + grant.getId());
-
     }
 }

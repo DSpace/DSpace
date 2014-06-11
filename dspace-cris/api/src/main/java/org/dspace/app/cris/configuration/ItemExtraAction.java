@@ -92,7 +92,7 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
                         + previousAction);
     }
 
-    private void unlink(Context context, ACrisObject cris, int itemID)
+	protected void unlink(Context context, ACrisObject cris, int itemID)
     {
         try
         {
@@ -117,10 +117,13 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
                     {
                         md.authority = null;
                         md.confidence = Choices.CF_UNSET;
-                        // commented the next java line as it is not
-                        // anymore necessary. It is already done as part of
-                        // "standard" relationpreference management
-                        //
+						// commented the next java line as it produces a cycle
+						// the RPAuthority invoke the relationPreference as the
+						// default
+						// authorityManagementServlet of DSpace is not yet aware
+						// of the
+						// relationPreferenceService... when fixed we should
+						// emit a signal to the cam
                         // cam.notifyReject(item.getID(), schema, element,
                         // qualifier, rpKey);
                     }
@@ -138,7 +141,7 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
         }
     }
 
-    private void link(Context context, ACrisObject cris, int itemID)
+	protected void link(Context context, ACrisObject cris, int itemID)
     {
         try
         {
@@ -192,6 +195,15 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
                 }
                 item.update();
             }
+
+			// commented the next java line as it produces a cycle
+			// the RPAuthority invoke the relationPreference as the default
+			// authorityManagementServlet of DSpace is not yet aware of the
+			// relationPreferenceService... when fixed we should emit a signal
+			// to the cam
+			// cam.notifyAccept(item.getID(), schema, element,
+			// qualifier, rpKey);
+
             context.commit();
         }
         catch (Exception e)

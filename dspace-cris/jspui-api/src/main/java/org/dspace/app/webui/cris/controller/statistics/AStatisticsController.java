@@ -13,10 +13,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.app.cris.integration.statistics.IStatComponentService;
-import org.dspace.app.cris.integration.statistics.IStatsComponent;
 import org.dspace.app.cris.integration.statistics.IStatsGenericComponent;
-import org.dspace.app.cris.integration.statistics.StatComponentsService;
 import org.dspace.app.cris.model.StatSubscription;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
@@ -30,7 +29,8 @@ import org.springframework.web.servlet.mvc.Controller;
 
 public abstract class AStatisticsController<T extends IStatsGenericComponent> implements Controller
 {
-    
+	protected HttpSolrServer solrServer;
+
     /** log4j logger */
     private static Logger log = Logger
             .getLogger(AStatisticsController.class);
@@ -135,6 +135,8 @@ public abstract class AStatisticsController<T extends IStatsGenericComponent> im
     public void setSolrConfig(StatsConfig solrConfig)
     {
         this.solrConfig = solrConfig;
+		this.solrServer = new HttpSolrServer(getSolrConfig()
+				.getStatisticsCore());
     }
 
 

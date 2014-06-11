@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.dto.ResearcherPageDTO;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.webui.cris.dto.ResearcherPageDTO;
 import org.dspace.app.webui.cris.util.RPDisplayTagData;
 import org.dspace.core.ConfigurationManager;
 import org.springframework.validation.BindException;

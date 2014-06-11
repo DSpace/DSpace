@@ -18,6 +18,7 @@
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
 <c:set var="dspace.layout.head" scope="request">
+	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js"></script>
 		<script type="text/javascript">
 	var j = jQuery.noConflict();
 	j(document).ready(function() {
@@ -27,31 +28,23 @@
 	});
     </script>
 </c:set>
-<dspace:layout locbar="link" navbar="admin"	titlekey="jsp.dspace-admin.rp">
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.userws" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.userws")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
+<dspace:layout locbar="link" style="submission"	titlekey="jsp.dspace-admin.rp">
+<h1><fmt:message key="jsp.dspace-admin.userws" />
+<a target="_blank"
+	href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
+                             "help.site-admin.userws")%>'><fmt:message
+	key="jsp.help" /></a></h1>
 
 	<c:if test="${not empty messages}">
 		<div class="message" id="successMessages"><c:forEach var="msg"
 			items="${messages}">
-			<div id="authority-message">${msg}</div>
+			<div id="authority-message" class="alert alert-success">${msg}</div>
 		</c:forEach></div>
 		<c:remove var="messages" scope="session" />
 	</c:if>
 	<c:if test="${!empty error}">
-		<span id="errorMessage"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
+		<span id="errorMessage" class="alert alert-danger"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
 	</c:if>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
 
 	<display:table name="${listUsers}" cellspacing="0" cellpadding="0" 
 			requestURI="" id="objectList" htmlId="objectList"  class="displaytaglikemisctable" export="false">
@@ -61,7 +54,6 @@
 			
 			<c:choose>
 			<c:when test="${!empty objectList.username}">
-				
 				<display:column titleKey="jsp.layout.table.hku.ws.info" url="/cris/administrator/webservices/edit.htm" paramId="id" paramProperty="id" sortable="true">
 					${objectList.username}				
 				</display:column>
@@ -80,11 +72,8 @@
 			</display:column>
 			
 	</display:table>
-	
 	<br/>
-	<br/>
-	<input type="button" id="create" value="<fmt:message key="jsp.layout.hku.ws.create.new"/>"/>
-	
+	<input class="btn btn-primary" type="button" id="create" value="<fmt:message key="jsp.layout.hku.ws.create.new"/>"/>
 	
 	
 </dspace:layout>

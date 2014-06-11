@@ -18,8 +18,8 @@ public interface CrisObjectDao<T extends ACrisObject> extends PaginableObjectDao
 
     T uniqueByID(Integer rp);
 
-    T uniqueBySourceID(String sourceID);
+    T uniqueBySourceID(String sourceRef, String sourceID);
 
-    
+    T uniqueByUUID(String uuid);
     
 }

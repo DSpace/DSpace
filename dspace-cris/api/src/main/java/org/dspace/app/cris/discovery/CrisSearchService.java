@@ -21,7 +21,6 @@ import it.cilea.osd.jdyna.value.PointerValue;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,15 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.cris.integration.CrisEnhancer;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ICrisObject;
@@ -73,7 +69,6 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.RPTypeNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -89,76 +84,9 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.utils.DSpace;
-import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
 public class CrisSearchService extends SolrServiceImpl
 {
-
-    private final class CrisItemWrapper implements MethodInterceptor
-    {
-        @Override
-        public Object invoke(MethodInvocation invocation) throws Throwable
-        {
-
-            if (invocation.getMethod().getName().equals("getMetadata"))
-            {
-                if (invocation.getArguments().length == 4)
-                {
-                    DCValue[] basic = (DCValue[]) invocation.proceed();
-                    String schema = (String) invocation.getArguments()[0];
-                    String element = (String) invocation.getArguments()[1];
-                    String qualifier = (String) invocation.getArguments()[2];
-                    String lang = (String) invocation.getArguments()[3];
-                    if (schema == Item.ANY || "crisitem".equals(schema))
-                    {
-                        DCValue[] dcvalues = addCrisEnhancedMetadata(
-                                (Item) invocation.getThis(), basic, schema,
-                                element, qualifier, lang);
-                        return dcvalues;
-                    }
-                }
-            }
-            return invocation.proceed();
-        }
-
-        private DCValue[] addCrisEnhancedMetadata(Item item, DCValue[] basic,
-                String schema, String element, String qualifier, String lang)
-        {
-            List<DCValue> extraMetadata = new ArrayList<DCValue>();
-            if (schema == Item.ANY)
-            {
-                List<String> crisMetadata = CrisItemEnhancerUtility
-                        .getAllCrisMetadata();
-                if (crisMetadata != null)
-                {
-                    for (String cM : crisMetadata)
-                    {
-                        extraMetadata = CrisItemEnhancerUtility
-                                .getCrisMetadata(item, cM);
-                    }
-                }
-            }
-            else if ("crisitem".equals(schema))
-            {
-                extraMetadata = CrisItemEnhancerUtility.getCrisMetadata(item,
-                        schema + "." + element + "." + qualifier);
-            }
-            if (extraMetadata.size() == 0)
-            {
-                return basic;
-            }
-            else
-            {
-                DCValue[] result = new DCValue[basic.length
-                        + extraMetadata.size()];
-                List<DCValue> resultList = new ArrayList<DCValue>();
-                resultList.addAll(Arrays.asList(basic));
-                resultList.addAll(extraMetadata);
-                result = resultList.toArray(result);
-                return result;
-            }
-        }
-    }
 
     private static final Logger log = Logger.getLogger(CrisSearchService.class);
 
@@ -272,11 +200,7 @@ public class CrisSearchService extends SolrServiceImpl
     protected void buildDocument(Context context, Item item)
             throws SQLException, IOException
     {
-        AspectJProxyFactory pf = new AspectJProxyFactory(item);
-        pf.setProxyTargetClass(true);
-        pf.addAdvice(new CrisItemWrapper());
-        // ProxyFactory pf = new ProxyFactory(item);
-        super.buildDocument(context, (Item) pf.getProxy());
+        super.buildDocument(context, item.getWrapper());
     }
 
     public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> boolean indexCrisObject(
@@ -616,18 +540,6 @@ public class CrisSearchService extends SolrServiceImpl
         }
     }
 
-    public QueryResponse search(SolrQuery query) throws SearchServiceException
-    {
-        try
-        {
-            return getSolr().query(query);
-        }
-        catch (Exception e)
-        {
-            throw new org.dspace.discovery.SearchServiceException(
-                    e.getMessage(), e);
-        }
-    }
 
     @Override
     public void updateIndex(Context context, boolean force, int type)
@@ -661,28 +573,34 @@ public class CrisSearchService extends SolrServiceImpl
     private <T extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void createCrisIndex(
             Context context, Class<T> classCrisObject)
     {
-        List<T> rpObjects = getApplicationService().getList(classCrisObject);
-
-        if (rpObjects != null)
+    	long tot = getApplicationService().count(classCrisObject);
+    	final int MAX_RESULT = 10;
+    	long numpages = (tot / MAX_RESULT) + 1;
+        for (int page = 0; page < numpages; page++)
         {
-            for (T cris : rpObjects)
-            {
-                indexCrisObject(cris, true);
-                // indexing nested
-                for (ATNO anestedtype : getApplicationService().getList(
-                        cris.getClassTypeNested()))
-                {
-                    List<ACNO> anesteds = getApplicationService()
-                            .getNestedObjectsByParentIDAndTypoID(cris.getId(),
-                                    anestedtype.getId(), cris.getClassNested());
-                    for (ACNO anested : anesteds)
-                    {
-                        indexNestedObject(anested, true);
-                    }
-                }
-            }
+			List<T> rpObjects = getApplicationService().getPaginateList(
+					classCrisObject, "id", false, page, MAX_RESULT);
+	
+	        if (rpObjects != null)
+	        {
+	            for (T cris : rpObjects)
+	            {
+	                indexCrisObject(cris, true);
+	                // indexing nested
+	                for (ATNO anestedtype : getApplicationService().getList(
+	                        cris.getClassTypeNested()))
+	                {
+	                    List<ACNO> anesteds = getApplicationService()
+	                            .getNestedObjectsByParentIDAndTypoID(cris.getId(),
+	                                    anestedtype.getId(), cris.getClassNested());
+	                    for (ACNO anested : anesteds)
+	                    {
+	                        indexNestedObject(anested, true);
+	                    }
+	                }
+	            }
+	        }
         }
-
     }
 
     public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> boolean indexNestedObject(
@@ -760,20 +678,19 @@ public class CrisSearchService extends SolrServiceImpl
     private <P, TP, PP, PTP> void commonIndexerHeader(Boolean status,
             String uuid, SolrInputDocument doc)
     {
+               
+        boolean disabled = false;
         if (status == null || !status)
-        {
+        {            
             // only admin can searh/browse disabled researcher page
-            doc.addField("withdrawn", true);
-            doc.addField("disabled", true);
+            disabled = true;
         }
-        else
-        {
-            doc.addField("withdrawn", false);
-            doc.addField("disabled", false);
-        }
-
-        doc.addField("read", "g0");
-        doc.addField("discoverable", true);// item.isDiscoverable());
+        
+        doc.addField("withdrawn", disabled);
+        doc.addField("disabled", disabled);
+        doc.addField("discoverable", !disabled);// item.isDiscoverable());
+        
+        doc.addField("read", "g0");        
         doc.addField("cris-uuid", uuid);
     }
 

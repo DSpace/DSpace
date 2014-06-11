@@ -74,7 +74,7 @@ import org.dspace.eperson.EPerson;
         @NamedQuery(name = "ResearcherPage.countAllResearcherByName", query = "select count(*) from ResearcherPage rp join rp.dynamicField.anagrafica vv where ((vv.typo.shortName = 'variants' or vv.typo.shortName = 'preferredName' or vv.typo.shortName = 'fullName' or vv.typo.shortName = 'translatedName') and vv.value = :par0)"),
         @NamedQuery(name = "ResearcherPage.countAllResearcherByNameExceptResearcher", query = "select count(*) from ResearcherPage rp join rp.dynamicField.anagrafica vv where ((vv.typo.shortName = 'variants' or vv.typo.shortName = 'preferredName' or vv.typo.shortName = 'fullName' or vv.typo.shortName = 'translatedName') and vv.value = :par0) and rp.id != :par1 "),
         @NamedQuery(name = "ResearcherPage.findAllResearcherByNamesTimestampLastModified", query = "from ResearcherPage where namesModifiedTimeStamp.timestamp >= ?"),
-        @NamedQuery(name = "ResearcherPage.uniqueBySourceID", query = "from ResearcherPage rp where rp.sourceReference.sourceID = ?"),
+        @NamedQuery(name = "ResearcherPage.uniqueBySourceID", query = "from ResearcherPage rp where rp.sourceReference.sourceRef = ? and rp.sourceReference.sourceID = ?"),
         @NamedQuery(name = "ResearcherPage.findAllResearcherInDateRange", query = "from ResearcherPage rp where rp.timeStampInfo.timestampCreated.timestamp between :par0 and :par1"),
         @NamedQuery(name = "ResearcherPage.findAllResearcherByCreationDateBefore", query = "from ResearcherPage rp where rp.timeStampInfo.timestampCreated.timestamp <= ?"),
         @NamedQuery(name = "ResearcherPage.findAllResearcherByCreationDateAfter", query = "from ResearcherPage rp where rp.timeStampInfo.timestampCreated.timestamp >= ?"),
@@ -90,7 +90,8 @@ import org.dspace.eperson.EPerson;
         @NamedQuery(name = "ResearcherPage.uniqueUUID", query = "from ResearcherPage where uuid = ?"),
         @NamedQuery(name = "ResearcherPage.uniqueByCrisID", query = "from ResearcherPage where crisID = ?"),
         @NamedQuery(name = "ResearcherPage.idFindMax", query = "select max(id) from ResearcherPage"),
-        @NamedQuery(name = "ResearcherPage.uniqueByEPersonId", query = "from ResearcherPage where epersonID = ?") })
+        @NamedQuery(name = "ResearcherPage.uniqueByEPersonId", query = "from ResearcherPage where epersonID = ?"),
+        @NamedQuery(name = "ResearcherPage.uniqueByUUID", query = "from ResearcherPage where uuid = ?") })
 public class ResearcherPage extends
         ACrisObject<RPProperty, RPPropertiesDefinition, RPNestedProperty, RPNestedPropertiesDefinition, RPNestedObject, RPTypeNestedObject> implements Cloneable
 {

@@ -28,12 +28,11 @@
     </script>
     	
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-	<link href="${contextPath}/css/stats.css" type="text/css" rel="stylesheet" />
 	<style type="text/css">
 	  #map_canvas { height: 100% }
 	</style>
 	<script type="text/javascript"
-	    src="http://maps.google.com/maps/api/js?sensor=true">
+	    src="//maps.google.com/maps/api/js?sensor=true&v=3">
 	</script>	
 	
 	<script type="text/javascript">
@@ -46,23 +45,26 @@
 	</script>
 </c:set>
 
-<c:set var="type"><%=request.getParameter("type") %></c:set>
-<c:set var="dspace.cris.navbar" scope="request">
-	<%@ include file="/dspace-cris/stats/item/_itemReport-right.jsp" %>
-</c:set>
-
-
-
 <dspace:layout titlekey="jsp.statistics.item-title">
 
 <div id="content">
-<div class="title detail"><h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.title}</fmt:param></fmt:message></h1></div>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="form-inline">
+	         <div class="form-group">
+			 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><a href="${contextPath}/handle/${data.object.handle}">${data.title}</a></fmt:param></fmt:message></h1>
+			 </div>
+			 <c:set var="type"><%=request.getParameter("type") %></c:set>
+			<%@ include file="/dspace-cris/stats/item/_itemReport-right.jsp" %>
+		</div>
+	</div>
+</div>
+
+
 
 <div class="richeditor">
 <div class="top"></div>
-<div class="container">
 	<%@ include file="/dspace-cris/stats/item/_itemReport.jsp" %>
-</div>
 <div class="bottom"></div>
 </div>
 <div class="clear"></div>

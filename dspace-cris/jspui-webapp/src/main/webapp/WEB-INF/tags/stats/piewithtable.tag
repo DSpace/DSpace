@@ -14,17 +14,13 @@
 <c:choose>
         <c:when test="${fn:length(data.resultBean.dataBeans[statType][objectName][pieType].limitedDataTable)>0}">
 
-    	
-	
-		<div class="target_stats_button">
-				<a id="iestatspng_${targetDiv}" style="display: none">Save as PNG Image</a>
-				<a id="statspng_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.png">Save as PNG Image</a>
-				|
-				<a id="statsjpg_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.jpg">Save as JPEG Image</a>
-				<a id="iestatsjpg_${targetDiv}" style="display: none">Save as JPEG Image</a>
+		<div class="target_stats_button pull-right">
+				<a id="iestatspng_${targetDiv}" style="display: none"><fmt:message key="jsp.statistics.save-as-png" /></a>
+				<a class="btn btn-default" id="statspng_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.png"><fmt:message key="jsp.statistics.save-as-png" /></a>
+				<a class="btn btn-default" id="statsjpg_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.jpg"><fmt:message key="jsp.statistics.save-as-jpeg" /></a>
+				<a id="iestatsjpg_${targetDiv}" style="display: none"><fmt:message key="jsp.statistics.save-as-jpeg" /></a>
 		</div>
-			
-			
+			<div class="clearfix"> </div>
 			<div class="target_stats" id="${targetDiv}"></div>
 
 
@@ -32,7 +28,7 @@
 
 <c:set var="jsDataObjectName" scope="page"> data_${statType}_${objectName}_${pieType}_${pieType}</c:set>
 <script type="text/javascript"><!--
-		var j = jQuery.noConflict();
+		var j = jQuery;
        
 
         var ${jsDataObjectName} = new google.visualization.DataTable();
@@ -51,13 +47,13 @@
                     'height': 400,                    
                     'backgroundColor': 'none',
                     'pieSliceText': 'label',
-                    'legend': {textStyle: {color: 'white'}}
+                    'legend': {textStyle: {color: 'black'}}
     	        };
       
                var chart = new google.visualization.PieChart(document.getElementById('${targetDiv}'));               
                
                // set up event handler
-               l = google.visualization.events.addListener(chart, 'ready', function() {              
+               var l = google.visualization.events.addListener(chart, 'ready', function() {              
                    
             	   if(navigator.userAgent.indexOf("Trident/5")>-1) {
                    	   j('#statspng_${targetDiv}').hide();
@@ -89,8 +85,8 @@
         
         j(document).ready(function() {        	
             j('div#statstab-content-${pieType}').bind('redraw', function() {            	
-            	 
-            	setInterval(function(){drawChart_${statType}_${objectName}_${pieType}_${pieType}()},500);
+            	setTimeout(function(){drawChart_${statType}_${objectName}_${pieType}_${pieType}()},500);
+            	//drawChart_${statType}_${objectName}_${pieType}_${pieType}();
         	});
             google.setOnLoadCallback(drawChart_${statType}_${objectName}_${pieType}_${pieType});            
         });

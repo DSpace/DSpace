@@ -68,8 +68,7 @@
     <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/jit.js"></script>
-    <%--script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.layout-1.3rc.js"></script--%>
-    <script src="http://layout.jquery-dev.net/lib/js/jquery.layout-latest.min.js"></script>
+    <script src="<%=request.getContextPath()%>/js/jquery.layout-latest.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/collaborationNetwork.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.dataTables.js"></script>
         
@@ -153,7 +152,7 @@
 
 
 
-	var j = jQuery.noConflict();
+	var j = jQuery;
 
 
 	var eventTypeDepth = new Array();

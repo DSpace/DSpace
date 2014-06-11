@@ -13,7 +13,6 @@
 
 <script type="text/javascript"><!--
 
-var j = jQuery.noConflict();
 j(document).ready(function() {
     	j('div#statstab-content-time').bind('redraw', function() {            	
     		drawVisualization_${statType}_${objectName}_${pieType}();
@@ -60,8 +59,10 @@ j(document).ready(function() {
               'options': {
                 // Use the same chart area width as the control for axis alignment.
                 'chartArea': {'height': '80%', 'width': '90%'},
-                'hAxis': {'slantedText': false, 'format':'MMM, y', 'textStyle': {'color': '#999999', 'fontSize': '11', 'fontName': '"Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif'}},
-                'vAxis': {'textStyle': {'color': '#999999', 'fontSize': '11', 'fontName': '"Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif'}},
+                'hAxis': {'slantedText': false, 'format':'MMM, y'//, 
+                	//'textStyle': {'color': '#999999', 'fontSize': '11', 'fontName': '"Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif'}
+                },
+                //'vAxis': {'textStyle': {'color': '#999999', 'fontSize': '11', 'fontName': '"Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif'}},
                 'legend': {'position': 'none'},
                 'pointSize': 5,
                 'height': 400,
@@ -80,7 +81,8 @@ j(document).ready(function() {
                 },
                 'title': '<fmt:message key="view.${data.jspKey}.data.${statType}.${objectName}.${pieType}.title" />',
                 'titlePosition': 'out',
-                'titleTextStyle':  {'color': '#FFFFFF', 'fontSize': '16'}
+                'titleTextStyle':  {//'color': '#FFFFFF', 
+                	'fontSize': '16'}
                 
                 
               }
@@ -120,7 +122,7 @@ j(document).ready(function() {
          	   		j('#iestatsjpg_${targetDiv}').show();
          	   		
     				j('#iestatspng_${targetDiv}').click(function() {
-    					convertToImg(document.getElementById('chart_${targetDiv}'),0);			
+    					convertToImg(document.getElementById('chart_${targetDiv}'),0);
     				});
     				j('#iestatsjpg_${targetDiv}').click(function() {
     					convertToImg(document.getElementById('chart_${targetDiv}'),1);			
@@ -138,13 +140,14 @@ j(document).ready(function() {
     </script>
         	 
         
- 		<div class="target_stats_button">
-				<a id="iestatspng_${targetDiv}" style="display: none">Save as PNG Image</a>
-				<a id="statspng_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.png">Save as PNG Image</a>
-				|
-				<a id="statsjpg_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.jpg">Save as JPEG Image</a>
-				<a id="iestatsjpg_${targetDiv}" style="display: none">Save as JPEG Image</a>
+ 		<div class="pull-right target_stats_button">
+				<a id="iestatspng_${targetDiv}" style="display: none"><fmt:message key="jsp.statistics.save-as-png" /></a>
+				<a class="btn btn-default" id="statspng_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.png"><fmt:message key="jsp.statistics.save-as-png" /></a>
+				
+				<a class="btn btn-default" id="statsjpg_${targetDiv}" href="#" download="stats_${statType}_${objectName}_${pieType}.jpg"><fmt:message key="jsp.statistics.save-as-jpeg" /></a>
+				<a id="iestatsjpg_${targetDiv}" style="display: none"><fmt:message key="jsp.statistics.save-as-jpeg" /></a>
 		</div>
+		<div class="clearfix"> </div>
       	 <div id="dashboard_${targetDiv}" class="dashboard_stats">      	 	
 	        <div class="target_stats" id="chart_${targetDiv}" style="height: 400px;"></div>
         	<div class="control_stats" id="control_${targetDiv}" style="height: 50px;"></div>

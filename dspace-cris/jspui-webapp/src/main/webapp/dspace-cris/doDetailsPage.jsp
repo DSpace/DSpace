@@ -52,49 +52,12 @@
 <c:set var="admin" scope="request"><%= isAdmin %></c:set>
 
 <c:set var="dspace.layout.head.last" scope="request">
-	<!--[if lte IE 8]>
-			
-    <script type="text/javascript">
-    	
-   	jQuery(document).ready(function()
-		{
-		
-			jQuery( ".cris-edit-anchor" ).position({
-    			my: "left top",
-    			at: "left top",
-    			of: "#tabs",
-    			offset: "-30 0"    			
-			});
-			
-			if(jQuery.support.leadingWhitespace) {
-			
-			}
-			else {
-				jQuery( ".cris-edit-anchor" ).css("filter","progid:DXImageTransform.Microsoft.BasicImage(rotation=1)");
-			}		
-    	}
-    );
-    </script>        
-	<![endif]-->
+	
     <script type="text/javascript"><!--
 
-		var j = jQuery.noConflict();    	
-    	var ajaxurlnavigation = "<%=request.getContextPath()%>/cris/${specificPartPath}/navigation.json";
+    	var j = jQuery;	
     	
- 
     	var activeTab = function(){
-    		j(".box:not(.expanded)").accordion({
-    			autoHeight: false,
-    			navigation: true,
-    			collapsible: true,
-    			active: false
-    		});
-    		j(".box.expanded").accordion({
-    			autoHeight: false,
-    			navigation: true,
-    			collapsible: true,
-    			active: 0
-    		});
     		
     		var ajaxurlrelations = "<%=request.getContextPath()%>/cris/${specificPartPath}/viewNested.htm";
 			j('.nestedinfo').each(function(){
@@ -157,63 +120,27 @@
 			});
     	};
     	
-		j(document).ready(function()
-				{
-		j("#log3").dialog({closeOnEscape: true, modal: true, autoOpen: false, resizable: false, open: function(event, ui) { j(".ui-dialog-titlebar").hide();}});
+		j(document).ready(function(){
 			
 			j("#tabs").tabs({
 				cache: true,
 				selected: ${currTabIdx-1},
 				load: function(event, ui){
 					activeTab();
-					}							
-			});
-			
-			j('.navigation-tabs:not(.expanded)').accordion({
-				collapsible: true,
-				active: false,
-				event: "click mouseover"
-			});
-			j('.navigation-tabs.expanded').accordion({
-				collapsible: true,
-				active: 0,
-				event: "click mouseover"
-			});
-			j.ajax( {
-				url : ajaxurlnavigation,
-				data : {																			
-					"objectId": ${entity.id}
 				},
-				success : function(data) {
-					for (var i = 0; i < data.navigation.length; i++)
-					{
-						if (data.navigation[i].boxes == null || data.navigation[i].boxes.length == 0)
-						{
-							j('#bar-tab-'+data.navigation[i].id).remove();
-							j('#cris-tabs-navigation-'+data.navigation[i].id).remove();
-						}
-						else
-						{
-							j('#bar-tab-'+data.navigation[i].id+' a img').attr('src','<%=request.getContextPath()%>/cris/researchertabimage/'+data.navigation[i].id);
-							var img = j('#bar-tab-'+data.navigation[i].id+' a img');
-							j('#bar-tab-'+data.navigation[i].id+' a').html(data.navigation[i].title);
-							j('#bar-tab-'+data.navigation[i].id+' a').prepend(img);
-							img.after('&nbsp;');
-							j('#cris-tabs-navigation-'+data.navigation[i].id+' h3 a img').attr('src','<%=request.getContextPath()%>/cris/researchertabimage/'+data.navigation[i].id);
-							j('#cris-tabs-navigation-'+data.navigation[i].id+'-ul').html('');
-							for (var k = 0; k < data.navigation[i].boxes.length; k++)
-							{	
-								j('#cris-tabs-navigation-'+data.navigation[i].id+"-ul")
-									.append('<li class="ui-accordion ui-widget-content ui-state-default"><a href="${root}/cris/${specificPartPath}/${authority}/'
-											+data.navigation[i].shortName+'.html?open='+data.navigation[i].boxes[k].shortName+'">'+data.navigation[i].boxes[k].title+'</a></li>');
-							}
-							j('.navigation-tabs').accordion("resize");							
-						}
-					}
+				"activate": function( event, ui ) {
+					j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
 				},
-				error : function(data) {
-					//nothing				
-				}
+				"beforeActivate": function( event, ui ) {
+	   			 j("li.active").toggleClass("active");
+				},
+		   		"create": function( event, ui ) {
+		               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
+		               j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
+		               j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
+		               j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
+		               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
+		        }
 			});
 			
 			activeTab();
@@ -226,62 +153,57 @@
 <dspace:layout title="${entity.typo.label}">
 
 <div id="content">
-	<div id="cris-tabs-navigation">
-	<div class="internalmenu ui-helper-reset ui-widget ui-corner-all ui-widget-content">
-	<h2><fmt:message key="jsp.cris.detail.navigation-menu-heading" /></h2>
-		<c:forEach items="${tabList}" var="tabfornavigation" varStatus="rowCounter">
-			<div id="cris-tabs-navigation-${tabfornavigation.id}" class="navigation-tabs <c:if test="${tabfornavigation.id == tabId}">expanded</c:if>">
-			<h3><a href="${tablink}"><img style="width: 16px;vertical-align: middle;" border="0"
-					src="<%=request.getContextPath()%>/image/jdyna/indicator.gif"
-  						alt="icon" />${tabfornavigation.title}</a></h3>
-			<ul id="cris-tabs-navigation-${tabfornavigation.id}-ul">
-					<li><img
-							src="<%=request.getContextPath()%>/image/jdyna/indicator.gif"
-		    				class="loader" />Loading</li>
-			</ul>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="form-inline">
+	         <div class="form-group">
+				 <h1><fmt:message key="jsp.layout.ou.detail.name" /> ${entity.name}</h1>
+			      <%
+			      if (isAdmin) {
+				  %>		
+				  <fmt:message key="jsp.cris.detail.info.sourceid.none" var="i18nnone" />
+				  <div class="cris-record-info">
+					<span class="cris-record-info-sourceid"><b><fmt:message key="jsp.cris.detail.info.sourceid" /></b> ${!empty entity.sourceID?entity.sourceID:i18nnone}</span>
+					<span class="cris-record-info-sourceref"><b><fmt:message key="jsp.cris.detail.info.sourceref" /></b> ${!empty entity.sourceRef?entity.sourceRef:i18nnone}</span>
+					<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${entity.timeStampInfo.timestampCreated.timestamp}</span>
+					<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> ${entity.timeStampInfo.timestampLastModified.timestamp}</span>
+				  </div>	
+				  <%
+    			  }
+				  %>	
 			</div>
-		</c:forEach>
-		
-				<%
-    if (isAdmin) {
-%><hr/>
-	<fmt:message key="jsp.cris.detail.info.sourceid.none" var="i18nnone" />
-	<div class="cris-record-info">
-		<span class="cris-record-info-sourceid"><b><fmt:message key="jsp.cris.detail.info.sourceid" /></b> ${!empty entity.sourceID?entity.sourceID:i18nnone}</span>
-		<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${entity.timeStampInfo.timestampCreated.timestamp}</span>
-		<span class="cris-record-info-updated"><b><fmt:message key="jsp.cris.detail.info.updated" /></b> ${entity.timeStampInfo.timestampLastModified.timestamp}</span>
-	</div>
-<%
-    }
-%>	
-		<span>
-			<img src="${root}/image/stats/chart_curve.png">
-			<a href="<%= request.getContextPath() %>/cris/stats/do.html?id=${entity.uuid}">View Statistics</a>
-		</span>
-
-
-
-<span>
-<c:choose>
-        <c:when test="${!subscribed}">
-                <img src="<%= request.getContextPath() %>/image/stats/start-bell.png">
-                <a href="<%= request.getContextPath() %>/cris/tools/subscription/subscribe?uuid=${entity.uuid}">Email Alert</a>
-        </c:when>
-        <c:otherwise>
-                <img src="<%= request.getContextPath() %>/image/stats/stop-bell.png">
-                <a href="<%= request.getContextPath() %>/cris/tools/subscription/unsubscribe?uuid=${entity.uuid}">Remove Email Alert</a>
-        </c:otherwise>        
-</c:choose>
-</span>
-<span>
-        <img src="${root}/image/stats/feed.png">
-        <a href="<%= request.getContextPath() %>/open-search?query=dc.relation.ispartof_authority:${authority}&amp;format=rss">RSS Feed</a>
-</span>
-		
-		</div>
-	 </div>
-<h1><fmt:message key="jsp.layout.do.detail.title-first" /> ${entity.name}</h1>
-<div>&nbsp;</div>
+		 	<div class="form-group pull-right" style="margin-top:1.5em;">
+				<div class="btn-group">
+					<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/stats/ou.html?id=${entity.uuid}"><i class="fa fa-bar-chart-o"></i> <fmt:message key="jsp.cris.detail.link.statistics" /></a>
+					<c:choose>
+	       					<c:when test="${!subscribed}">
+	               				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/subscription/subscribe?uuid=${entity.uuid}"><i class="fa fa-bell"></i> <fmt:message key="jsp.cris.detail.link.email.alert" /></a>
+	       					</c:when>
+	       					<c:otherwise>
+	               				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/subscription/unsubscribe?uuid=${entity.uuid}"><i class="fa fa-bell-o"></i> <fmt:message key="jsp.cris.detail.link.email.alert.remove" /></a>
+	       					</c:otherwise>      
+					</c:choose>			
+					<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=dc.relation.ispartof_authority:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
+				</div>
+				<c:if test="${do_page_menu && !empty entity}"> 		
+					<c:if test="${!empty addModeType && addModeType=='display'}">
+<%--					<div class="btn-group">
+	      				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/${specificPartPath}/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-pencil-square-o"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.do"><fmt:param>${entity.typo.label}</fmt:param></fmt:message></a>
+		  				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			    			<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
+			  			</button>
+			  			<ul class="dropdown-menu" role="menu">
+						    <li>
+									<a href="<%= request.getContextPath() %>/cris/tools/${specificPartPath}/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-pencil-square-o"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.do"><fmt:param>${entity.typo.label}</fmt:param></fmt:message></a>
+							</li>
+						</ul>
+		  			</div>  --%>
+			  		</c:if>
+ 				</c:if> 			
+			</div>
+	   </div>
+    </div>
+</div>
 	<c:if test="${!entity.status}">
 		<div class="warning">
 			<fmt:message key="jsp.layout.hku.detail.do-disabled" />
@@ -300,18 +222,6 @@
 	<c:remove var="messages" scope="session" />
 	</c:if>					
 		<div id="researcher">
-			
-			<c:if test="${do_page_menu && !empty entity}"> 		
-				<c:if test="${!empty addModeType && addModeType=='display'}">
-      			<!--[if lte IE 8]>
-      			<div id="cris-edit-anchor-div">
-      			<![endif]-->
-      				<a class="cris-edit-anchor" href="<%= request.getContextPath() %>/cris/tools/${specificPartPath}/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.do"><fmt:param>${entity.typo.label}</fmt:param></fmt:message></a>
-      			<!--[if lte IE 8]>
-      			</div>
-      			<![endif]-->
-  				</c:if>
- 			</c:if> 			
 			<jsp:include page="commonDetailsPage.jsp"></jsp:include>
 		</div>
 

@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
+import org.dspace.content.EPersonCRISIntegration;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Dispatcher;
@@ -60,6 +61,9 @@ public class Context
 
     /** Current user - null means anonymous access */
     private EPerson currentUser;
+
+	/** Current user crisID if any **/
+	private String crisID;
 
     /** Current Locale */
     private Locale currentLocale;
@@ -135,14 +139,18 @@ public class Context
         connection = DatabaseManager.getConnection();
         connection.setAutoCommit(false);
 
-//	This is one heck of a bottleneck, most visitors were just outsider/robots, they should be
-//	querying our database most of the time, so just let them do the reading and guard only those
-//	updating our database instead, don't lock up the connection just for the sake of those people.
-//	Free up those "Idle in Transaction" connections.
+		// This is one heck of a bottleneck, most visitors were just
+		// outsider/robots, they should be
+		// querying our database most of the time, so just let them do the
+		// reading and guard only those
+		// updating our database instead, don't lock up the connection just for
+		// the sake of those people.
+		// Free up those "Idle in Transaction" connections.
         connection.setAutoCommit(true);
-	isAutoCommit = true;
+		isAutoCommit = true;
 
         currentUser = null;
+		crisID = null;
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
@@ -181,6 +189,16 @@ public class Context
     public void setCurrentUser(EPerson user)
     {
         currentUser = user;
+
+		EPersonCRISIntegration plugin = (EPersonCRISIntegration) PluginManager
+				.getSinglePlugin(org.dspace.content.EPersonCRISIntegration.class);
+		if (plugin != null) {
+			if (user != null) {
+				crisID = plugin.getResearcher(user.getID());
+			} else {
+				crisID = null;
+			}
+		}
     }
 
     /**
@@ -193,6 +211,10 @@ public class Context
     {
         return currentUser;
     }
+
+	public String getCrisID() {
+		return crisID;
+	}
 
     /**
      * Gets the current Locale

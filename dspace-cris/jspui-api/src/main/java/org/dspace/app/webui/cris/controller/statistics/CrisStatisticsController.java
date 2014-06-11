@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.AStatComponentService;
 import org.dspace.app.cris.integration.statistics.IStatsComponent;
@@ -46,7 +45,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>>
         extends AStatisticsController<IStatsDualComponent>
 {
-
     /** log4j logger */
     private static Logger log = Logger
             .getLogger(CrisStatisticsController.class);
@@ -74,8 +72,7 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
             Map<String, Object> data = new HashMap<String, Object>();
             data.put(_ID_LABEL, id);
             data.put(_JSP_KEY, jspKey);
-            HttpSolrServer solrServer = new HttpSolrServer(getSolrConfig()
-                    .getStatisticsCore());
+
 
             Map<String, IStatsDualComponent> components = statsComponentsService
                     .getComponents();

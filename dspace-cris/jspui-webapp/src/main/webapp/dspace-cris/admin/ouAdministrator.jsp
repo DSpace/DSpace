@@ -17,9 +17,11 @@
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
 <c:set var="dspace.layout.head.last" scope="request">
+    <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.8.24.custom.min.js'></script>
     <script type="text/javascript"><!--
 
-		var j = jQuery.noConflict();
+    var j = jQuery;
     j(document).ready(function()
 			{
     		j('#addentity').click(function() {
@@ -31,57 +33,34 @@
 	</script>
     
 </c:set>
-<dspace:layout locbar="link" navbar="admin"	titlekey="jsp.dspace-admin.project">
-	<table width="95%">
-		<tr>
-			<td align="left">
-			<h1><fmt:message key="jsp.dspace-admin.ou" /></h1>
-			</td>
-			<td align="right" class="standard"><a target="_blank"
-				href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.ou")%>'><fmt:message
-				key="jsp.help" /></a></td>
-		</tr>
-	</table>
-
+<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.project">
+<h1><fmt:message key="jsp.dspace-admin.ou" />
+<a target="_blank"
+	href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
+                             "help.site-admin.ou")%>'><fmt:message
+	key="jsp.help" /></a></h1>
 
 	<c:if test="${!empty error}">
-		<span id="errorMessage"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
+		<span id="errorMessage" class="alert alert-danger"><fmt:message key="jsp.layout.hku.prefix-error-code"/> <fmt:message key="${error}"/></span>
 	</c:if>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
 
 	<ul>
-
 		<li>
-
-		<div style="padding: 0; margin: 0 10px;"><a
-			href="<%=request.getContextPath()%>/cris/administrator/ou/listTabs.htm"><fmt:message
-			key="jsp.dspace-admin.hku.jdyna-configuration.listtabs" /></a></div>		
-		<div>&nbsp;</div>
+			<a href="<%=request.getContextPath()%>/cris/administrator/ou/listTabs.htm"><fmt:message
+			key="jsp.dspace-admin.hku.jdyna-configuration.listtabs" /></a>		
 		</li>
 		<li>
-
-		<div style="padding: 0; margin: 0 10px;"><a
-			href="<%=request.getContextPath()%>/cris/administrator/ou/listEditTabs.htm"><fmt:message
-			key="jsp.dspace-admin.hku.jdyna-configuration.listedittabs" /></a></div>	
-		
-		<div>&nbsp;</div>
+			<a href="<%=request.getContextPath()%>/cris/administrator/ou/listEditTabs.htm"><fmt:message
+			key="jsp.dspace-admin.hku.jdyna-configuration.listedittabs" /></a>	
 		</li>
 		<li>
-
-		<div style="padding: 0; margin: 0 10px;"><a
-			href="<%=request.getContextPath()%>/cris/administrator/ou/listBoxs.htm"><fmt:message
-			key="jsp.dspace-admin.hku.jdyna-configuration.listboxs" /></a></div>	
-		
-		<div>&nbsp;</div>
+			<a href="<%=request.getContextPath()%>/cris/administrator/ou/listBoxs.htm"><fmt:message
+			key="jsp.dspace-admin.hku.jdyna-configuration.listboxs" /></a>	
 		</li>
-	
 		<li>
-		<div style="padding: 0; margin: 0 10px;"><a id="addentity"
+		<a id="addentity"
 			href="#"><fmt:message
-			key="jsp.dspace-admin.hku.add-organizationunit" /></a></div>	
-		
+			key="jsp.dspace-admin.hku.add-organizationunit" /></a>	
 		
 		<div style="display: none; float: right;"><c:set
 			var="contextPath"><%=request.getContextPath()%></c:set> <form:form 
@@ -90,17 +69,11 @@
 
 		</form:form>
 		</div>
-		
-
-		<div>&nbsp;</div>
 		</li>
 
 		<li>
-		<div style="padding: 0; margin: 0 10px;"><a
-			href="<%=request.getContextPath()%>/cris/administrator/ou/list.htm"><fmt:message
-			key="jsp.dspace-admin.hku.see-ou" /></a></div>
-		<div>&nbsp;</div>
+			<a href="<%=request.getContextPath()%>/cris/administrator/ou/list.htm"><fmt:message
+			key="jsp.dspace-admin.hku.see-ou" /></a>
 		</li>
-	
 	</ul>
 </dspace:layout>

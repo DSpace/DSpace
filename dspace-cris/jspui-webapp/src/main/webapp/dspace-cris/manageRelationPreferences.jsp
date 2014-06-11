@@ -47,12 +47,11 @@
             });
     	}
     	
-	    var j = jQuery.noConflict();
+    	var j = jQuery;
 	    j(document).ready(function() {
 	            
 	            	//,${ishideEnabled},${isUnlinkEnabled});
-	            j('#submit_save').button({disabled:true});
-	            j('#submit_exit').button();
+	    		j('#submit_save').attr('disabled', 'disabled');
 	            j('#savemessage').hide();
 	            searchDataTable = j('#relation_management_searchTable').dataTable( {
 	                "bProcessing": true,
@@ -270,7 +269,7 @@
 			            	change.append(j('<input id="'+inputId+'" name="'+inputId+'" type="hidden">').val(uuid));	
 			            }
 		            	j('#relation_management_changesLog_queue').append(change);
-		            	j('#submit_save').button({disabled:false});
+		            	j('#submit_save').removeAttr('disabled');
 		            	j('#savemessage').show();
 		            	j('#disabledsavemessage').hide();
 		            }
@@ -278,7 +277,7 @@
 	            	{
 		            	if (j('div.changelog').length == 0)
 		            	{
-			            	j('#submit_save').button({disabled:true});
+		            		j('#submit_save').attr('disabled', 'disabled');
 				            j('#savemessage').hide();
 				            j('#disabledsavemessage').show();
 		            	}
@@ -297,7 +296,7 @@
 		            		changeD.append(j('<span>').html('Selected list re-ordered'));
 				            change.append(changeS).append(changeD);
 				            j('#relation_management_changesLog_queue').append(change);
-				            j('#submit_save').button({disabled:true});
+				            j('#submit_save').attr('disabled', 'disabled');
 				            j('#savemessage').hide();
 				            j('#disabledsavemessage').show();
 	            		}
@@ -316,7 +315,7 @@
     </script>
 </c:set>
 
-<dspace:layout titlekey="jsp.layout.cris.relationmanagement.title.${confName}">
+<dspace:layout style="submission" titlekey="jsp.layout.cris.relationmanagement.title.${confName}">
 
 <div id="content">
 	<h1><fmt:message key="jsp.layout.cris.relationmanagement.title.${confName}"/></h1>
@@ -385,11 +384,12 @@
 	<div id="relation_management_changesLog">
 		<h3 id="relation_management_changesLog_title"><fmt:message key="jsp.layout.cris.relationmanagement.changelog" /></h3>
 		<div id="relation_management_changesLog_queue">&nbsp;</div>
+		<br/>
 		<div id="buttons">
-			<span id="savemessage"><fmt:message key="jsp.layout.cris.relationmanagement.save.msg" /></span>
-			<span id="disabledsavemessage"><fmt:message key="jsp.layout.cris.relationmanagement.save.disabled" /></span>
-			<input type="submit" name="submit_save" id="submit_save" value="<fmt:message key="jsp.layout.cris.relationmanagement.save" />" />
-			<input type="submit" name="submit_exit" id="submit_exit" value="<fmt:message key="jsp.layout.cris.relationmanagement.exit" />" />
+			<span id="savemessage" class="alert alert-danger"><fmt:message key="jsp.layout.cris.relationmanagement.save.msg" /></span>
+			<span id="disabledsavemessage" class="alert alert-info"><fmt:message key="jsp.layout.cris.relationmanagement.save.disabled" /></span>
+			<input type="submit" class="btn btn-primary" name="submit_save" id="submit_save" value="<fmt:message key="jsp.layout.cris.relationmanagement.save" />" />
+			<input type="submit" class="btn btn-default" name="submit_exit" id="submit_exit" value="<fmt:message key="jsp.layout.cris.relationmanagement.exit" />" />
 		</div>
 	</div>
 	</form>
