@@ -65,4 +65,19 @@ public abstract class DryadObject {
         }
     }
 
+    protected final void addToCollectionAndArchive(Collection collection) throws SQLException {
+        getItem().setOwningCollection(collection);
+        try {
+            collection.addItem(getItem());
+            getItem().setArchived(true);
+            getItem().update();
+            collection.update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception adding to collection", ex);
+        } catch (IOException ex) {
+            log.error("IO exception adding to collection", ex);
+        }
+    }
+
+
 }

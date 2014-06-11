@@ -44,7 +44,9 @@ public class DryadDataPackage extends DryadObject {
         if(wsi == null) {
             return null;
         } else {
-            return new DryadDataPackage(wsi);
+            DryadDataPackage dataPackage = new DryadDataPackage(wsi);
+            dataPackage.addToCollectionAndArchive(collection);
+            return dataPackage;
         }
 
     }

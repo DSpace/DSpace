@@ -42,7 +42,9 @@ public class DryadDataFile extends DryadObject {
         if(wsi == null) {
             return null;
         } else {
-            return new DryadDataFile(wsi);
+            DryadDataFile dataFile = new DryadDataFile(wsi);
+            dataFile.addToCollectionAndArchive(collection);
+            return dataFile;
         }
     }
 
