@@ -36,6 +36,7 @@ public class DataPackageCountTest {
     public void setUp() {
         try {
             this.context = new Context();
+            context.turnOffAuthorisationSystem();
         } catch (SQLException ex) {
             fail("Unable to instantiate Context " + ex);
         }
