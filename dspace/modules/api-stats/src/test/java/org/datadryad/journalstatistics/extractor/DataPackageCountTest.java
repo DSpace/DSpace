@@ -59,6 +59,7 @@ public class DataPackageCountTest {
         // set its journal
         String journalName = "Test Journal";
         dataPackage.setPublicationName(journalName);
+        context.commit();
 
         DataPackageCount instance = new DataPackageCount(this.context);
         Integer expResult = 1;
