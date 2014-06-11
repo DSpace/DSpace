@@ -14,7 +14,7 @@
 
 	<!-- CRIS Item enhanced metadata, used to add dynamically to the item information from linked
      CRIS entities as it was metadata of the item -->
-	<bean class="org.dspace.app.cris.discovery.CrisItemEnhancer">
+	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
 		<property name="alias" value="author" />
 		<property name="metadata">
 			<list>
@@ -35,7 +35,7 @@
 	
 	<!-- CRIS enhanced metadata, used to add dynamically to the CRIS entity information from linked
          CRIS entities as it was metadata of the current CRIS entity from clazz -->
-	<bean class="org.dspace.app.cris.discovery.CrisEnhancer">
+	<bean class="org.dspace.app.cris.integration.CrisEnhancer">
 		<property name="clazz">
 			<value>org.dspace.app.cris.model.Project</value>
 		</property>
@@ -49,7 +49,7 @@
 		</property>
 	</bean>
 	
-	<bean class="org.dspace.app.cris.discovery.CrisEnhancer">
+	<bean class="org.dspace.app.cris.integration.CrisEnhancer">
 		<property name="clazz">
 			<value>org.dspace.app.cris.model.Project</value>
 		</property>
@@ -65,7 +65,7 @@
 	
 	<!-- CRIS nested enhanced metadata, used to add dynamically to the CRIS entity information from the nested
      CRIS entities as it was metadata of the current CRIS entity from clazz -->
-	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+	<bean class="org.dspace.app.cris.integration.CrisNestedEnhancer"
 		scope="prototype">
 		<property name="applicationService" ref="applicationService" />
 		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject" />
@@ -85,7 +85,7 @@
 		</property>
 	</bean>
 
-	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+	<bean class="org.dspace.app.cris.integration.CrisNestedEnhancer"
 		scope="prototype">
 		<property name="applicationService" ref="applicationService" />
 		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject" />
@@ -106,7 +106,7 @@
 	</bean>
 
 
-	<bean class="org.dspace.app.cris.discovery.CrisNestedEnhancer"
+	<bean class="org.dspace.app.cris.integration.CrisNestedEnhancer"
 		scope="prototype">
 		<property name="applicationService" ref="applicationService" />
 		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.ProjectNestedObject" />

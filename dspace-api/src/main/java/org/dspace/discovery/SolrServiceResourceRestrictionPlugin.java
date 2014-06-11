@@ -60,7 +60,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
     	try {
-            if(!AuthorizeManager.isAdmin(context)){
+    	    if(context != null && !AuthorizeManager.isAdmin(context)){
             	StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query
                 resourceQuery.append("read:(g0");

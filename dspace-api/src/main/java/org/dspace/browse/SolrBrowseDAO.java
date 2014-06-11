@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
@@ -304,17 +303,23 @@ public class SolrBrowseDAO implements BrowseDAO
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             BrowseItem bitem = null;
-            if (solrDoc instanceof Item)
+            if (solrDoc instanceof BrowsableDSpaceObject)
             {
-                Item item = (Item) solrDoc;
-                bitem = new BrowseItem(context, item.getID(),
-                    item.isArchived(), item.isWithdrawn(), item.isDiscoverable());
+                if (solrDoc instanceof Item)
+                {
+                    Item item = (Item) solrDoc;
+                    bitem = new BrowseItem(context, item.getID(),
+                            item.isArchived(), item.isWithdrawn(),
+                            item.isDiscoverable());
+                }
+                else
+                {
+                    bitem = new BrowseDSpaceObject(context,
+                            (BrowsableDSpaceObject) solrDoc);             
+                }
+                bitems.add(bitem);
             }
-            else
-            {
-                bitem = new BrowseDSpaceObject(context, (BrowsableDSpaceObject) solrDoc);
-            }
-            bitems.add(bitem);
+            
         }
         return bitems;
     }
@@ -697,6 +702,7 @@ public class SolrBrowseDAO implements BrowseDAO
         {
             itemsDiscoverable = false;
         }
+        this.table = table;
         facetField = table;
     }
 
