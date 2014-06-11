@@ -13,7 +13,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
 /**
- *
+ * Counts Dryad Data Packages in the archive associated with a specified Journal
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataPackageCount extends DatabaseExtractor<Integer> {
@@ -37,6 +37,8 @@ public class DataPackageCount extends DatabaseExtractor<Integer> {
              * Initial implementation is to fetch items by metadata field ID
              * then filter on collection. This may be too slow since it will
              * result in a lot of queries and could be done with a single join
+             *
+             * Note: findByMetadataField only returns items in archive
              */
             ItemIterator itemsByJournal = Item.findByMetadataField(
                     this.getContext(),
