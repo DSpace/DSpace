@@ -52,17 +52,15 @@ public class DataPackageCountTest {
      * having prism.publicationName as provided
      */
     @Test
-    public void testExtract() throws SQLException {
-        // There should be one package in the database with journal name "Test Journal"
-        // Create a data package
-        DryadDataPackage dataPackage = DryadDataPackage.create(context);
-        // set its journal
+    public void testCountDataPackages() throws SQLException {
+        // Count the initial number of data packages
         String journalName = "Test Journal";
-        dataPackage.setPublicationName(journalName);
-        context.commit();
-
         DataPackageCount instance = new DataPackageCount(this.context);
-        Integer expResult = 1;
+        Integer initialCount = instance.extract(journalName);
+        // Create a new data package, and assert the count goes up by one
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(journalName);
+        Integer expResult = initialCount + 1;
         Integer result = instance.extract(journalName);
         assertEquals(expResult, result);
     }
