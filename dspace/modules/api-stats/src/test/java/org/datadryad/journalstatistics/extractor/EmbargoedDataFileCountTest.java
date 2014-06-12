@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.api.DryadDataFile;
+import org.datadryad.test.ContextUnitTest;
 import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,24 +19,18 @@ import static org.junit.Assert.*;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class EmbargoedDataFileCountTest {
+public class EmbargoedDataFileCountTest extends ContextUnitTest {
 
-    private Context context;
     private Date futureDate;
 
     @Before
     public void setUp() {
-        try {
-            this.context = new Context();
-            context.turnOffAuthorisationSystem();
-            Calendar calendar = new GregorianCalendar();
-            calendar.set(Calendar.YEAR, 9999);
-            calendar.set(Calendar.MONTH, 1);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            futureDate = calendar.getTime();
-        } catch (SQLException ex) {
-            fail("Unable to instantiate Context " + ex);
-        }
+        super.setUp();
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.YEAR, 9999);
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        futureDate = calendar.getTime();
     }
 
     /**

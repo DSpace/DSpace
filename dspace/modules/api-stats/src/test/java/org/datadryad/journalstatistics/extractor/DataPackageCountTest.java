@@ -4,6 +4,7 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
 import org.datadryad.api.DryadDataPackage;
+import org.datadryad.test.ContextUnitTest;
 import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,20 +14,7 @@ import static org.junit.Assert.*;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DataPackageCountTest {
-
-    private Context context;
-
-    @Before
-    public void setUp() {
-        try {
-            this.context = new Context();
-            context.turnOffAuthorisationSystem();
-        } catch (SQLException ex) {
-            fail("Unable to instantiate Context " + ex);
-        }
-    }
-
+public class DataPackageCountTest extends ContextUnitTest{
     /**
      * Test of extract method, of class DataPackageCount.
      * Data packages are items in collection identified by 'stats.datapkgs.coll'
