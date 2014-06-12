@@ -183,6 +183,10 @@
 		<mapping class="org.dspace.app.cris.model.ws.Criteria" />
 
 		<mapping class="it.cilea.osd.jdyna.model.ScopeDefinition" />
+		
+		<!-- PMC -->
+		<mapping class="org.dspace.app.cris.pmc.model.PMCRecord" />
+		<mapping class="org.dspace.app.cris.pmc.model.PMCCitation" />
 
 	</session-factory>
 

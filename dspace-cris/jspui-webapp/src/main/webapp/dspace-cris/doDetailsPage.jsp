@@ -187,7 +187,7 @@
 				</div>
 				<c:if test="${do_page_menu && !empty entity}"> 		
 					<c:if test="${!empty addModeType && addModeType=='display'}">
-<%--					<div class="btn-group">
+					<div class="btn-group">
 	      				<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/${specificPartPath}/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-pencil-square-o"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.do"><fmt:param>${entity.typo.label}</fmt:param></fmt:message></a>
 		  				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 			    			<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
@@ -197,7 +197,7 @@
 									<a href="<%= request.getContextPath() %>/cris/tools/${specificPartPath}/editDynamicData.htm?id=${entity.id}&anagraficaId=${entity.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-pencil-square-o"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.do"><fmt:param>${entity.typo.label}</fmt:param></fmt:message></a>
 							</li>
 						</ul>
-		  			</div>  --%>
+		  			</div>
 			  		</c:if>
  				</c:if> 			
 			</div>

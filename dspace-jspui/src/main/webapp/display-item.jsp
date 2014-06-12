@@ -294,11 +294,11 @@ j(document).ready(function() {
 %>
 
 <% if(pmcEnabled) { %>
-
+<div>&nbsp;</div>
 <div class="panel panel-info">
 <div class="panel-heading">Citations:</div>
 <ul class="panel-body">
-       <li id="pmcCitedCount" style="display: none;">PubMed Central: <div id="pmcCitedResult" class="citedByDiv"></div></li>
+       <li id="pmcCitedCount" style="display: none;"><div id="pmcCitedResult" class="citedByDiv"></div></li>
 </ul>
 </div>
 

@@ -11,6 +11,8 @@
 	default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
 	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+	
+	<bean class="org.dspace.app.cris.integration.CrisItemWrapper" id="org.dspace.content.ItemWrapperIntegration"/>
 
 	<!-- CRIS Item enhanced metadata, used to add dynamically to the item information from linked
      CRIS entities as it was metadata of the item -->

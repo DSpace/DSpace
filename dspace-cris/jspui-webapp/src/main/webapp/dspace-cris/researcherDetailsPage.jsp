@@ -217,7 +217,7 @@
 	  				<a class="btn btn-default" href="<%= request.getContextPath() %>/open-search?query=author_authority:${authority}&amp;format=rss"><i class="fa fa-rss"></i> <fmt:message key="jsp.cris.detail.link.rssfeed" /></a>
 				</div>
 				<c:if test="${researcher_page_menu && !empty researcher}">
-					<%-- <div class="btn-group">
+				<div class="btn-group">
 						<c:if test="${!empty addModeType && addModeType=='display'}">
 							<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/tools/rp/editDynamicData.htm?id=${researcher.id}&anagraficaId=${researcher.dynamicField.id}<c:if test='${!empty tabIdForRedirect}'>&tabId=${tabIdForRedirect}</c:if>"><i class="fa fa-edit"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.edit.primary-data"/></a>
 						 </c:if>
@@ -239,11 +239,11 @@
 								</li>
 							</c:if>
 						</ul>
-					</div> --%>
+					</div> 
 					
-					<div class="btn-group">
+<%-- 					<div class="btn-group">
 						<a class="btn btn-default" href="${root}/cris/uuid/${researcher.uuid}/relMgmt/publications"><i class="fa fa-book"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.manage-publication"/></a>
-					</div>
+					</div> --%>
 				</c:if>
 			 </div>
 		</div>

@@ -290,7 +290,20 @@
 			select: function(event, ui){
 				j('#newTabId').val(j(ui.tab).attr('href').substr(5));
 				j('#submit_save').click();
-			}
+			},
+			"activate": function( event, ui ) {
+				j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+			},
+			"beforeActivate": function( event, ui ) {
+   			 j("li.active").toggleClass("active");
+			},
+	   		"create": function( event, ui ) {
+	               j("div.ui-tabs").toggleClass("ui-tabs ui-widget ui-widget-content ui-corner-all tabbable");
+	               j("ul.ui-tabs-nav").toggleClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all nav nav-tabs");
+	               j("li.ui-tabs-active").toggleClass("ui-state-default ui-corner-top ui-tabs-active ui-state-active active");
+	               j("li.ui-state-default").toggleClass("ui-state-default ui-corner-top");
+	               j("div.ui-tabs-panel").toggleClass("ui-tabs-panel ui-widget-content ui-corner-bottom tab-content with-padding");
+	        }
 		});
 		
 		j('.navigation-tabs:not(.expanded)').accordion({
@@ -406,7 +419,7 @@
 <c:if test="${not empty messages}">
 	<div class="message" id="successMessages"><c:forEach var="msg"
 		items="${messages}">
-		<div id="authority-message">${msg}</div>
+		<div id="authority-message" class="alert alert-success">${msg}</div>
 	</c:forEach></div>
 	<c:remove var="messages" scope="session" />
 </c:if>
@@ -422,7 +435,7 @@
 			<div id="errorMessages">
 		</c:if>
 		<c:forEach items="${status.errorMessages}" var="error">
-			<span class="errorMessage"><fmt:message
+			<span class="errorMessage alert alert-danger"><fmt:message
 				key="jsp.layout.hku.prefix-error-code" /> ${error}</span>
 			<br />
 		</c:forEach>
@@ -431,7 +444,7 @@
 		</c:if>
 	</spring:bind>
 
-<div class="extra">
+<div class="panel panel-default">
 	
 		<div class="cris-edit-status">
 		<spring:bind path="status">
@@ -471,9 +484,12 @@
 		<c:when test="${admin}">
 			<dyna:text labelKey="jsp.cris.detail.info.sourceid" propertyPath="anagraficadto.sourceID" visibility="false"/>
 			<div class="dynaClear">&nbsp;</div>			
+			<dyna:text labelKey="jsp.cris.detail.info.sourceref" propertyPath="anagraficadto.sourceRef" visibility="false"/>
+			<div class="dynaClear">&nbsp;</div>
 		</c:when>
 		<c:otherwise>
 			<span class="cris-record-info-sourceid"><b><fmt:message key="jsp.cris.detail.info.sourceid" /></b> ${!empty anagraficadto.sourceID?anagraficadto.sourceID:i18nnone}</span>
+			<span class="cris-record-info-sourceref"><b><fmt:message key="jsp.cris.detail.info.sourceref" /></b> ${!empty anagraficadto.sourceRef?anagraficadto.sourceRef:i18nnone}</span>
 		</c:otherwise>
 		</c:choose>
 			<span class="cris-record-info-created"><b><fmt:message key="jsp.cris.detail.info.created" /></b> ${anagraficadto.timeStampCreated}</span>

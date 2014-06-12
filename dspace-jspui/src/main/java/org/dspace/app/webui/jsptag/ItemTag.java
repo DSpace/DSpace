@@ -534,12 +534,8 @@ public class ItemTag extends TagSupport
         // Get all the metadata
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-        out.println("<div class=\"panel panel-info\"><div class=\"panel-heading\">"
-                + LocaleSupport.getLocalizedMessage(pageContext,
-                        "org.dspace.app.webui.jsptag.ItemTag.full") + "</div>");
-
         // Three column table - DC field, value, language
-        out.println("<table class=\"panel-body table itemDisplayTable\">");
+		out.println("<table class=\"table itemDisplayTable\">");
         out.println("<tr><th id=\"s1\" class=\"standard\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.dcfield")
@@ -583,14 +579,13 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table></div><br/>");
+		out.println("</table>");
 
         listBitstreams();
 
         if (ConfigurationManager
                 .getBooleanProperty("webui.licence_bundle.show"))
         {
-            out.println("<br/><br/>");
             showLicence();
         }
     }
@@ -645,11 +640,11 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<div class=\"panel panel-info\">");
-        out.println("<div class=\"panel-heading\">"
+		out.print("<div class=\"panel panel-default\">");
+		out.println("<div class=\"panel-heading\"><h6 class=\"panel-title\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
-                + "</div>");
+				+ "</h6></div>");
 
         try
         {
@@ -966,7 +961,7 @@ public class ItemTag extends TagSupport
 
             for (int k = 0; k < bitstreams.length; k++)
             {
-                out.print("<div align=\"center\" class=\"standard\">");
+				out.print("<div class=\"text-center\">");
                 out.print("<strong><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
                 out.print(request.getContextPath());
                 out.print("/retrieve/");

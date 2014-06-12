@@ -384,25 +384,29 @@ public class ItemListTag extends TagSupport {
 
 				// String css = "oddRow" + cOddOrEven[colIdx] + "Col";
 				String css = "oddRow";
-
+				String csssort = ""; 
                 String message = "itemlist." + field;
 				String thJs = null;
 
 				for (SortOption tmpSo : SortOption.getSortOptions()) {
 					if (field.equalsIgnoreCase(tmpSo.getMetadata())) {
+					    css += " sortable sort_" + tmpSo.getNumber();
 						thJs = " onclick=\"sortBy(" + tmpSo.getNumber() + ",";
 						if (sortOption != null
 								&& sortOption.getNumber() == tmpSo.getNumber()) {
 							if (isDesc) {
 								thJs += " 'ASC'";
 								css += " sorted_desc";
+								csssort += "fa fa-sort-asc pull-right";
 							} else {
 								thJs += " 'DESC'";
-								css += " sorted_asc";
+								css += " sorted_asc";								
+								csssort += "fa fa-sort-desc pull-right";
 							}
 						} else {
 							thJs += " 'ASC'";
 							css += " sortable";
+							csssort += "fa fa-sort pull-right";
 						}
 						thJs += ")\"";
 						break;
@@ -418,7 +422,7 @@ public class ItemListTag extends TagSupport {
                         + (emph[colIdx] ? "<strong>" : "")
 						+ (thJs != null ? "<a " + thJs + " href=\"#\">" : "")
 						+ LocaleSupport.getLocalizedMessage(pageContext,
-								message) + (thJs != null ? "</a>" : "")
+								message) + (thJs != null ? "<i class=\""+ csssort +"\"></i></a>" : "")
                         + (emph[colIdx] ? "</strong>" : "") + "</th>");
             }
 
