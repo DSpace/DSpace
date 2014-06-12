@@ -60,14 +60,6 @@ public class DryadDataFileTest extends ContextUnitTest {
     }
 
     /**
-     * Test of getDataPackage method, of class DryadDataFile.
-     */
-    @Test
-    public void testGetDataPackage() {
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of parseDate method, of class DryadDataFile.
      */
     @Test
