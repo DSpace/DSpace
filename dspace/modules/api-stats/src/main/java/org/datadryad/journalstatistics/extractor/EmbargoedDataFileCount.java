@@ -4,6 +4,8 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataFile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -15,6 +17,7 @@ import org.dspace.core.Context;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class EmbargoedDataFileCount extends DataFileCount {
+    private static Logger log = Logger.getLogger(DataItemCount.class);
     public EmbargoedDataFileCount(Context context) {
         super(context);
     }
@@ -39,8 +42,8 @@ public class EmbargoedDataFileCount extends DataFileCount {
             ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
             collection = getCollection();
             while (itemsByJournal.hasNext()) {
-                Item item = itemsByJournal.next();
-                if (item.isOwningCollection(collection)) {
+                DryadDataFile dataFile = new DryadDataFile(itemsByJournal.next());
+                if(dataFile.isEmbargoed()) {
                     count++;
                 }
             }
@@ -52,5 +55,5 @@ public class EmbargoedDataFileCount extends DataFileCount {
             log.error("SQLException getting item count per journal", ex);
         }
         return count;
-
+    }
 }
