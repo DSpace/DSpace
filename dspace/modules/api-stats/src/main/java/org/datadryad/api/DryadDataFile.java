@@ -34,7 +34,7 @@ public class DryadDataFile extends DryadObject {
     private static final String EMBARGO_DATE_ELEMENT = "date";
     private static final String EMBARGO_DATE_QUALIFIER = "embargoedUntil";
 
-    private static final DateFormat EMBARGO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-DD");
+    private static final DateFormat EMBARGO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private DryadDataPackage dataPackage;
     private static Logger log = Logger.getLogger(DryadDataFile.class);
