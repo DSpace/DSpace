@@ -54,7 +54,7 @@
 
 
 
-<dspace:layout titlekey="jsp.statistics.item-title">
+<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.item-title">
 
 <div id="content">
 <div class="title detail"><h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.title}</fmt:param></fmt:message></h1></div>

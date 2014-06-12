@@ -70,10 +70,10 @@
 	<link href="<%=request.getContextPath()%>/css/researcher.css" type="text/css"  rel="stylesheet" />	
 	<link href="<%=request.getContextPath()%>/css/jdyna.css" type="text/css"  rel="stylesheet" />
 	
-	<link href="<%=request.getContextPath()%>/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-	<link href="<%=request.getContextPath()%>/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/static/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+	<link href="<%=request.getContextPath()%>/static/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="<%=request.getContextPath()%>/css/collaborationNetwork.css" rel="stylesheet" type="text/css" />
-	<link type="text/css" href="<%=request.getContextPath()%>/css/jquery/ui/all/jquery-ui-latest.custom.css" rel="stylesheet" media="all"/>
+	<link type="text/css" href="<%=request.getContextPath()%>/static/css/jquery/ui/all/jquery-ui-latest.custom.css" rel="stylesheet" media="all"/>
 
 	<script type="text/javascript" src="<%= request.getContextPath() %>/javascripts/tmpl.min.js"> </script>
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>

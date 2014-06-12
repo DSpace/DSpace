@@ -47,10 +47,6 @@
     List<ACrisObject> rpSubscriptions = (List<ACrisObject>) request
    	 	.getAttribute("crisobject_subscriptions");
 %>
-<c:set var="dspace.cris.navbar" scope="request">
-       <c:set var="classcurrent" scope="page">0</c:set>
-       <%@ include file="/dspace-cris/_subscription-right.jsp" %>
-</c:set>
 
 <dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
@@ -65,39 +61,52 @@
     if (updated)
     {
 %>
-	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
-	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
+	<div class="alert alert-success"><fmt:message key="jsp.mydspace.subscriptions.info1"/></div>
 <%
     }
 %>
+
+    			
+    			<div class="btn-group pull-right">
+			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+    				<fmt:message key="jsp.mydspace.subscriptions.button.seealso"/> <span class="fa fa-caret-down"></span>	
+  				</button>
+				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+					<li><a href="<%= request.getContextPath() %>/cris/tools/stats/subscription/list.htm"><fmt:message key="jsp.layout.navbar-hku.stat-subscription"/></a></li>
+				</ul>
+				</div>
+
+<!-- 
         <form class="form-group" action="<%= request.getContextPath() %>/subscribe" method="post">
         	<div class="col-md-6">
             <select id="available-subscriptions" class="form-control" name="collection">
                 <option value="-1"><fmt:message key="jsp.mydspace.subscriptions.select_collection" /></option>
 <%
-    for (int i = 0; i < availableSubscriptions.length; i++)
-    {
+    if (availableSubscriptions!=null)
+		for (int i = 0; i < availableSubscriptions.length; i++)
+	    {
 %>
                 <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
 <%
-    }
+   		}
 %>
             </select>
             </div>
             <input class="btn btn-success" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
  			<input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
 	</form>
-
+-->
 <h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.community-head"/></h3>
 <p><fmt:message key="jsp.mydspace.subscriptions.info2-community"/></p>
 <%
-if (commSubscriptions.length > 0)
-{
+if (commSubscriptions!=null)
+	if (commSubscriptions.length > 0)
+	{
 %>
 <p><fmt:message key="jsp.mydspace.subscriptions.info3-community"/></p>
 
 <center>
-    <table class="mydspace-subscriptions" summary="Table displaying your subscriptions">
+    <table class="table" summary="Table displaying your subscriptions">
 	<tr>
 		<th>Community</th>
 		<th>Identifier</th>
@@ -121,7 +130,7 @@ String row = "odd";
              <td class="<%=row%>RowOddCol">
                 <form method="post" action=""> 
                     <input type="hidden" name="community" value="<%=commSubscriptions[i].getID()%>" />
-		<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+		<input type="submit" class="btn btn-warning" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
                 </form>
              </td>
         </tr>
@@ -131,7 +140,7 @@ row = (row.equals("even") ? "odd" : "even");
 %>
    <tr>
 	<td /><td />
-	<td><form method="post" action=""><input type="submit" name="submit_clear_comm" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" /></form></td>
+	<td><form method="post" action=""><input type="submit" class="btn btn-danger" name="submit_clear_comm" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" /></form></td>
    </tr>
     </table>
 </center>
@@ -150,6 +159,7 @@ else
 <br/>
 
 <h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.collection-head"/></h3>        
+<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     if (subscriptions.length > 0)
     {
@@ -206,7 +216,7 @@ if (rpSubscriptions.size() > 0)
 <p><fmt:message key="jsp.mydspace.subscriptions.info3-rp"/></p>
 
 <center>
-    <table class="mydspace-subscriptions" summary="Table displaying your subscriptions">
+    <table class="table" summary="Table displaying your subscriptions">
 	<tr>
 		<th>Type</th>
 		<th>Name</th>
@@ -230,7 +240,7 @@ String row = "odd";
 				<td class="<%=row%>RowEvenCol"><a href="<%=request.getContextPath()%>/cris/<%= rp.getPublicPath() %>/<%= ResearcherPageUtils.getPersistentIdentifier(rp) %>"><%= rp.getCrisID() %></a></td>
 				<td class="<%=row%>RowOddCol"><form method="post" action="">
                     <input type="hidden" name="crisobject" value="<%=rp.getUuid()%>" />
-                    <input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+                    <input type="submit" class="btn btn-warning" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
      			</td>
      	</tr>
 </form>
@@ -243,7 +253,7 @@ row = (row.equals("even") ? "odd" : "even");
 	<td />
 	<td />
 	<td />	
-	<td><form method="post" action=""><input type="submit" name="submit_clear_rp" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" /></td>
+	<td><form method="post" action=""><input type="submit" class="btn btn-danger" name="submit_clear_rp" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" /></td>
     </form>
    </tr>
     </table>
@@ -260,7 +270,5 @@ else
 <%
 }
 %>
-
-<p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.goto-mydspace"/> </a></p>
 
 </dspace:layout>

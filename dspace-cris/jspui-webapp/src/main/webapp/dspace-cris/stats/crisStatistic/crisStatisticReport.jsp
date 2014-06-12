@@ -49,7 +49,7 @@
 <c:set var="type"><%=request.getParameter("type") %></c:set>
 <c:set var="mode"><%=request.getParameter("mode") %></c:set>
 
-<dspace:layout titlekey="jsp.statistics.${data.jspKey}.${mode}title">
+<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.${data.jspKey}.${mode}title">
 
 
 <div id="content">

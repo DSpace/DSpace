@@ -45,7 +45,7 @@
 	</script>
 </c:set>
 
-<dspace:layout titlekey="jsp.statistics.item-title">
+<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.item-title">
 
 <div id="content">
 <div class="row">

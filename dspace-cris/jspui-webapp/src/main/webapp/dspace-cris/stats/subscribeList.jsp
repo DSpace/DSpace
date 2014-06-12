@@ -19,11 +19,17 @@
 <c:set var="dspace.layout.head" scope="request">
 	<link href="<%=request.getContextPath() %>/css/misctable.css" type="text/css" rel="stylesheet" />
 </c:set>
-<c:set var="dspace.cris.navbar" scope="request">
-	<c:set var="classcurrent" scope="page">1</c:set>
-	<%@ include file="/dspace-cris/_subscription-right.jsp" %>
-</c:set>
-<dspace:layout titlekey="jsp.statistics.title-subscription-list">
+<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.title-subscription-list">
+
+    			<div class="btn-group pull-right">
+			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+    				<fmt:message key="jsp.mydspace.subscriptions.button.seealso"/> <span class="fa fa-caret-down"></span>	
+  				</button>
+				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+					<li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-hku.item-subscription"/></a></li>
+				</ul>
+				</div>
+
 
 <div id="content">
 <div class="title"><h1><fmt:message key="jsp.statistics.title-subscription-list" /></h1></div>
