@@ -3,14 +3,11 @@
 package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.test.ContextUnitTest;
-import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

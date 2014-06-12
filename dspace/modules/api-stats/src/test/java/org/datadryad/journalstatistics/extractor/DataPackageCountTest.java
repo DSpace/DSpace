@@ -5,8 +5,6 @@ package org.datadryad.journalstatistics.extractor;
 import java.sql.SQLException;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
-import org.dspace.core.Context;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

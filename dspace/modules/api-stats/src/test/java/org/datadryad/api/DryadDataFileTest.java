@@ -8,12 +8,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
