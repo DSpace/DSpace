@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -35,7 +34,7 @@ public class DryadDataFile extends DryadObject {
     private static final String EMBARGO_DATE_ELEMENT = "date";
     private static final String EMBARGO_DATE_QUALIFIER = "embargoedUntil";
 
-    private static final DateFormat EMBARGO_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-DD");
+    private static final DateFormat EMBARGO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-DD");
 
     private DryadDataPackage dataPackage;
     private static Logger log = Logger.getLogger(DryadDataFile.class);
