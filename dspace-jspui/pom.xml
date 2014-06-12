@@ -65,6 +65,9 @@
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
                         <exclude>**/bootstrap/**</exclude>
+                        <exclude>**/jstree/**</exclude>
+                        <exclude>**/font-awesome/**</exclude>
+                        <exclude>**/fonts/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
