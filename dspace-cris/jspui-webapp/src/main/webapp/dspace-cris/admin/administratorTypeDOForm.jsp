@@ -18,7 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.do-list">
+<dspace:layout locbar="link" style="submission" navbar="admin" titlekey="jsp.dspace-admin.do-list">
 
 	<h1><fmt:message key="jsp.dspace-admin.do-list" />
 	<a target="_blank" class="pull-right" href='<%=LocaleSupport.getLocalizedMessage(pageContext,

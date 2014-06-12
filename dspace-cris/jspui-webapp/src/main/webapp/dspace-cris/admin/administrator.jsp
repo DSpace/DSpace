@@ -16,7 +16,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.cris">
+<dspace:layout locbar="link" style="submission" navbar="admin"  titlekey="jsp.dspace-admin.cris">
 			<h1><fmt:message key="jsp.dspace-admin.cris" />
 				<a class="pull-right" href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
                                 "help.site-admin.cris")%>'><fmt:message

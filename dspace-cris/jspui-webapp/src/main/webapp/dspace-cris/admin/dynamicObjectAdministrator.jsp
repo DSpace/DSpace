@@ -33,7 +33,7 @@
 	</script>
     
 </c:set>
-<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.crisconfiguration">
+<dspace:layout locbar="link" style="submission" navbar="admin" titlekey="jsp.dspace-admin.crisconfiguration">
 	<h1><fmt:message key="jsp.dspace-admin.crisconfiguration"><fmt:param>${fn:toUpperCase(path)}</fmt:param></fmt:message>
 		<a target="_blank" class="pull-right" href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
                               "help.site-admin.do")%>'><fmt:message

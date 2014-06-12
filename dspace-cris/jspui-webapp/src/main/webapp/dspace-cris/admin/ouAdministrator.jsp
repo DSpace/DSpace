@@ -33,7 +33,7 @@
 	</script>
     
 </c:set>
-<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.project">
+<dspace:layout locbar="link" style="submission" navbar="admin" titlekey="jsp.dspace-admin.project">
 <h1><fmt:message key="jsp.dspace-admin.ou" />
 <a target="_blank"
 	href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,

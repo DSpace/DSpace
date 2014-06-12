@@ -19,7 +19,7 @@
 <%@page import="org.dspace.app.cris.model.CrisConstants"%>
 
 <c:set var="CRIS_DYNAMIC_TYPE_ID_START"><%=CrisConstants.CRIS_DYNAMIC_TYPE_ID_START%></c:set>
-<dspace:layout locbar="link" style="submission" titlekey="jsp.dspace-admin.do">
+<dspace:layout locbar="link" style="submission" navbar="admin" titlekey="jsp.dspace-admin.do">
 			<h1><fmt:message key="jsp.dspace-admin.do" />
 			<a class="pull-right" target="_blank" href='<%=request.getContextPath()%><%=LocaleSupport.getLocalizedMessage(pageContext,
                                 "help.site-admin.do")%>'><fmt:message

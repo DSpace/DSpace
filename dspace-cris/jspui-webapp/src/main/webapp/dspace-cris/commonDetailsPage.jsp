@@ -33,7 +33,7 @@
 							</c:when>
 							<c:otherwise>
 									<a href="${tablink}"><img style="width: 16px;vertical-align: middle;" border="0"
-										src="<%=request.getContextPath()%>/image/jdyna/indicator.gif"
+										src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}"
 			    						alt="icon" />${area.title}</a>
 							</c:otherwise>
 						</c:choose></li>

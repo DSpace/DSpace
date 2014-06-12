@@ -18,7 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<dspace:layout locbar="link" navbar="admin" titlekey="jsp.dspace-admin.do-list">
+<dspace:layout locbar="link" style="submission" navbar="admin" titlekey="jsp.dspace-admin.do-list">
 
 	<table width="95%">
 		<tr>
