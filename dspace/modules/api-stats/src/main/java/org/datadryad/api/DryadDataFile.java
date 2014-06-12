@@ -65,7 +65,7 @@ public class DryadDataFile extends DryadObject {
         return dataFile;
     }
 
-    public DryadDataPackage getDataPackage(Context context) {
+    public DryadDataPackage getDataPackage() {
         if(dataPackage == null) {
             // Find the data package for this file
             throw new RuntimeException("Not yet implemented");
