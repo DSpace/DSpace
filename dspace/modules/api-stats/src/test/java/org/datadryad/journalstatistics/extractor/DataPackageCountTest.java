@@ -4,13 +4,8 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
 import org.datadryad.api.DryadDataPackage;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
