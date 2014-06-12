@@ -68,6 +68,7 @@
                         <exclude>**/jstree/**</exclude>
                         <exclude>**/font-awesome/**</exclude>
                         <exclude>**/fonts/**</exclude>
+                        <exclude>**/javascripts/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
