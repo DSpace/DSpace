@@ -27,19 +27,10 @@ public class DryadDataFileTest extends ContextUnitTest {
     private Date pastDate;
     private Date nowDate;
     private Date futureDate;
-    public DryadDataFileTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
 
     @Before
     public void setUp() {
+        super.setUp();
         calendar = new GregorianCalendar();
         nowDate = calendar.getTime();
         int currentYear = calendar.get(Calendar.YEAR);
@@ -47,10 +38,6 @@ public class DryadDataFileTest extends ContextUnitTest {
         pastDate = calendar.getTime();
         calendar.set(Calendar.YEAR, currentYear + 1);
         futureDate = calendar.getTime();
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**
