@@ -428,8 +428,7 @@
 
 
         <!--
-           Builds SOLR WAR for DSpace
-        -->
+          SKIP Building SOLR WAR for DSpace
         <profile>
             <id>dspace-solr</id>
             <activation>
@@ -441,6 +440,7 @@
                 <module>dspace-solr</module>
             </modules>
         </profile>
+        -->
 
         <!--
            Builds SWORDv2 WAR for DSpace

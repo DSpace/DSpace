@@ -93,7 +93,7 @@
         <profile>
             <id>dspace-solr</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>solr</module>
