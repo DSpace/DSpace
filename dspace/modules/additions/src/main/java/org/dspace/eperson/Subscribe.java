@@ -390,7 +390,7 @@ public class Subscribe
         // Check for restricted eperson list
         String epersonLimit = ConfigurationManager
                 .getProperty("eperson.subscription.limiteperson");
-        if (epersonLimit != null)
+        if (!(epersonLimit == null || epersonLimit.equals("")))
         {
             List l = Arrays.asList(epersonLimit.split(" *, *"));
             if (!l.contains(eperson.getEmail()))
