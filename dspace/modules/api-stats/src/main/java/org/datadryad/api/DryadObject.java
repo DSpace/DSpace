@@ -16,7 +16,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 
 /**
- *
+ * Wraps a DSpace Item and provides Dryad-specific behaviors
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class DryadObject {
@@ -25,9 +25,12 @@ public abstract class DryadObject {
     private static final String PUBLICATION_NAME_QUALIFIER = null;
     private static Logger log = Logger.getLogger(DryadObject.class);
 
-    protected WorkspaceItem workspaceItem;
-    protected DryadObject(WorkspaceItem workspaceItem) {
-        this.workspaceItem = workspaceItem;
+    protected Item item;
+    protected DryadObject(Item item) {
+        if(item == null) {
+            throw new RuntimeException("Cannot instantiate a DryadObject with null item");
+        }
+        this.item = item;
     }
     protected static Collection collectionFromHandle(Context context, String handle) throws SQLException {
         DSpaceObject object = HandleManager.resolveToObject(context, handle);
@@ -38,15 +41,8 @@ public abstract class DryadObject {
         }
     }
 
-    public WorkspaceItem getWorkspaceItem() {
-        return workspaceItem;
-    }
-
     public Item getItem() {
-        if(workspaceItem != null) {
-            return workspaceItem.getItem();
-        }
-        return null;
+        return item;
     }
 
     public String getIdentifier() {
@@ -57,11 +53,9 @@ public abstract class DryadObject {
         getItem().clearMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null);
         getItem().addMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null, publicationName);
         try {
-            getWorkspaceItem().update();
+            getItem().update();
         } catch (AuthorizeException ex) {
             log.error("Authorize exception setting publication name", ex);
-        } catch (IOException ex) {
-            log.error("IO exception setting publication name", ex);
         }
     }
 
@@ -78,6 +72,4 @@ public abstract class DryadObject {
             log.error("IO exception adding to collection", ex);
         }
     }
-
-
 }

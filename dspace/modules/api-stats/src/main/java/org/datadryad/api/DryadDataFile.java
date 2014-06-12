@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -20,8 +21,8 @@ public class DryadDataFile extends DryadObject {
     private DryadDataPackage dataPackage;
     private static Logger log = Logger.getLogger(DryadDataFile.class);
 
-    public DryadDataFile(WorkspaceItem workspaceItem) {
-        super(workspaceItem);
+    public DryadDataFile(Item item) {
+        super(item);
     }
 
     public static Collection getCollection(Context context) throws SQLException {
@@ -31,21 +32,19 @@ public class DryadDataFile extends DryadObject {
 
     public static DryadDataFile create(Context context) throws SQLException {
         Collection collection = DryadDataFile.getCollection(context);
-        WorkspaceItem wsi = null;
+        DryadDataFile dataFile = null;
         try {
-            wsi = WorkspaceItem.create(context, collection, true);
+            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            Item item = wsi.getItem();
+            dataFile = new DryadDataFile(item);
+            dataFile.addToCollectionAndArchive(collection);
+            wsi.deleteWrapper();
         } catch (AuthorizeException ex) {
             log.error("Authorize exception creating a Data File", ex);
         } catch (IOException ex) {
             log.error("IO exception creating a Data File", ex);
         }
-        if(wsi == null) {
-            return null;
-        } else {
-            DryadDataFile dataFile = new DryadDataFile(wsi);
-            dataFile.addToCollectionAndArchive(collection);
-            return dataFile;
-        }
+        return dataFile;
     }
 
     public DryadDataPackage getDataPackage(Context context) {
@@ -54,6 +53,11 @@ public class DryadDataFile extends DryadObject {
             throw new RuntimeException("Not yet implemented");
         }
         return dataPackage;
+    }
+
+    public boolean isEmbargoed() {
+        //TODO: Read metadata and determine if embargoed
+        return false;
     }
 
 }

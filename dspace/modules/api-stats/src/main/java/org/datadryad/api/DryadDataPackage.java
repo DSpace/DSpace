@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -22,8 +23,8 @@ public class DryadDataPackage extends DryadObject {
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
-    public DryadDataPackage(WorkspaceItem workspaceItem) {
-        super(workspaceItem);
+    public DryadDataPackage(Item item) {
+        super(item);
     }
 
     public static Collection getCollection(Context context) throws SQLException {
@@ -33,21 +34,20 @@ public class DryadDataPackage extends DryadObject {
 
     public static DryadDataPackage create(Context context) throws SQLException {
         Collection collection = DryadDataPackage.getCollection(context);
-        WorkspaceItem wsi = null;
+        DryadDataPackage dataPackage = null;
         try {
-            wsi = WorkspaceItem.create(context, collection, true);
+            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            Item item = wsi.getItem();
+            dataPackage = new DryadDataPackage(item);
+            dataPackage.addToCollectionAndArchive(collection);
+            wsi.deleteWrapper();
+            return dataPackage;
         } catch (AuthorizeException ex) {
             log.error("Authorize exception creating a Data Package", ex);
         } catch (IOException ex) {
             log.error("IO exception creating a Data Package", ex);
         }
-        if(wsi == null) {
-            return null;
-        } else {
-            DryadDataPackage dataPackage = new DryadDataPackage(wsi);
-            dataPackage.addToCollectionAndArchive(collection);
-            return dataPackage;
-        }
+        return dataPackage;
 
     }
 
