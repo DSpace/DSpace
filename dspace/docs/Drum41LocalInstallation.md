@@ -378,6 +378,8 @@ my.dspace.url = ${dspace.baseUrl}/jspui
 # Solr Server location
 
 solr.server = http://localhost:8983/solr
+OR
+solr.server = https://localhost:8443/solr
 
 
 # Stackable Authentication Methods
