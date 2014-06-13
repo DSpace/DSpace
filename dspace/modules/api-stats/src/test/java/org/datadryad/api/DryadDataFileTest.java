@@ -5,22 +5,16 @@ package org.datadryad.api;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
 import org.dspace.core.Context;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
 
 /**
  *
