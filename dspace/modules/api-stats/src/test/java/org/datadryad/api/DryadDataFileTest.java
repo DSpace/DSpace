@@ -2,16 +2,25 @@
  */
 package org.datadryad.api;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
 import org.dspace.core.Context;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 
 /**
  *
@@ -135,5 +144,36 @@ public class DryadDataFileTest extends ContextUnitTest {
         DryadDataFile instance = DryadDataFile.create(context);
         instance.setEmbargo("untilArticleAppears", futureDate);
         assertTrue(instance.isEmbargoed());
+    }
+    /**
+     * Test of addBitstream method, of class DryadDataFile.
+     */
+    @Test
+    public void testAddBitstream() throws Exception {
+        System.out.println("addBitstream");
+        InputStream stream = DryadDataFileTest.class.getClassLoader().getResourceAsStream("Logo-one-tone-dark.jpg");
+        DryadDataFile instance = DryadDataFile.create(context);
+        instance.addBitstream(stream);
+    }
+
+    /**
+     * Test of getTotalStorageSize method, of class DryadDataFile.
+     */
+    @Test
+    public void testGetTotalStorageSize() throws Exception {
+        System.out.println("getTotalStorageSize");
+
+        File file1 = new File(DryadDataFileTest.class.getClassLoader().getResource("Logo-one-tone-dark.jpg").toURI());
+        File file2 = new File(DryadDataFileTest.class.getClassLoader().getResource("world.js").toURI());
+
+        Long expResult = file1.length() + file2.length();
+        assertTrue(expResult > 0);
+
+        DryadDataFile instance = DryadDataFile.create(context);
+        instance.addBitstream(new FileInputStream(file1));
+        instance.addBitstream(new FileInputStream(file2));
+
+        Long result = instance.getTotalStorageSize();
+        assertEquals(expResult, result);
     }
 }

@@ -3,6 +3,7 @@
 package org.datadryad.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.Date;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -152,5 +155,25 @@ public class DryadDataFile extends DryadObject {
                 log.error("Authorize exception setting embargo", ex);
             }
         }
+    }
+
+    public void addBitstream(InputStream stream) throws SQLException, IOException {
+        try {
+            getItem().createSingleBitstream(stream);
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception adding bitstream", ex);
+        }
+    }
+
+    public Long getTotalStorageSize() throws SQLException {
+        // bundles and bitstreams
+        Long size = 0L;
+        for(Bundle bundle : getItem().getBundles()) {
+            for(Bitstream bitstream : bundle.getBitstreams()) {
+                // exclude READMEs?
+                size += bitstream.getSize();
+            }
+        }
+        return size;
     }
 }
