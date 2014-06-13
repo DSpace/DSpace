@@ -1,11 +1,12 @@
--- Database data for Dryad metadata schemas as of 2014-06-11
+-- Database data for Dryad metadata and bitstream registries as of 2014-06-13
 -- Captured statically for use in a test database, should not be used in production deployments
--- instead, load metadata schemas using MetadataImporter
+-- instead, load metadata schemas using MetadataImporter and install bitstream registries
+-- using ant fresh_install
 --
 -- This file was created from
 -- pg_dump -t metadataschemaregistry --column-inserts --data-only
 -- pg_dump -t metadatafieldregistry --column-inserts --data-only
--- 
+-- pg_dump -t bitstreamformatregistry --column-inserts --data-only
 
 --
 -- Data for Name: metadataschemaregistry
@@ -128,3 +129,68 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (95, 5, 'workflow', 'selectjournal', NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (96, 5, 'submit', 'showEmbargo', NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (97, 6, 'publicationName', NULL, 'Title of the magazine, or other publication, in which a resource was/will be published.');
+
+--
+-- Data for Name: bitstreamformatregistry
+--
+
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (1, 'application/octet-stream', 'Unknown', 'Unknown data format', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (2, 'text/plain', 'License', 'Item-specific license agreed upon to submission', 1, true);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (5, 'text/plain', 'Text', 'Plain Text', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (57, 'application/gnutar', 'TGZ', 'UNIX Tar File Gzipped (TGZ)', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (21, 'application/vnd.visio', 'Microsoft Visio', 'Microsoft Visio', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (22, 'application/x-filemaker', 'FMP3', 'Filemaker Pro', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (23, 'image/x-ms-bmp', 'BMP', 'Microsoft Windows bitmap', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (24, 'application/x-photoshop', 'Photoshop', 'Photoshop', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (27, 'audio/x-mpeg', 'MPEG Audio', 'MPEG Audio', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (28, 'application/vnd.ms-project', 'Microsoft Project', 'Microsoft Project', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (31, 'application/x-tex', 'TeX', 'Tex/LateX document', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (32, 'application/x-dvi', 'TeX dvi', 'TeX dvi format', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (34, 'application/wordperfect5.1', 'WordPerfect', 'WordPerfect 5.1 document', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (35, 'audio/x-pn-realaudio', 'RealAudio', 'RealAudio file', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (36, 'image/x-photo-cd', 'Photo CD', 'Kodak Photo CD image', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (29, 'application/mathematica', 'Mathematica', 'Mathematica Notebook', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (38, 'text/plain', 'Nexus', 'Nexus', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (12, 'image/jpeg', 'JPEG', 'JPEG Image', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (42, 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Microsoft PowerPoint OpenXML', 'Microsoft PowerPoint OpenXML', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (41, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'Microsoft Word OpenXML', 'Microsoft Word OpenXML', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (40, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Microsoft Excel OpenXML', 'Microsoft Excel OpenXML', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (18, 'audio/x-wav', 'WAV', 'Wave Audio Format', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (46, 'application/vnd.google-earth.kml+xml', 'KML', 'Keyhole Markup Language (KML)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (3, 'application/pdf', 'Adobe PDF', 'Adobe Portable Document Format (PDF)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (4, 'text/xml', 'XML', 'Extensible Markup Language (XML)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (50, 'text/plain', 'Newick', 'Newick tree file', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (7, 'text/css', 'CSS', 'Cascading Style Sheets (CSS)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (51, 'application/x-python', 'Python', 'Python program', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (6, 'text/html', 'HTML', 'Hypertext Markup Language (HTML)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (8, 'application/msword', 'Microsoft Word', 'Microsoft Word 97-2007', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (9, 'application/vnd.ms-powerpoint', 'Microsoft Powerpoint', 'Microsoft Powerpoint 97-2007', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (54, 'text/plain', 'Perl', 'Perl program', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (10, 'application/vnd.ms-excel', 'Microsoft Excel', 'Microsoft Excel 97-2007', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (11, 'application/marc', 'MARC', 'Machine-Readable Cataloging records (MARC)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (56, 'text/plain', 'FASTA QUAL File', 'FASTA QUAL File', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (13, 'image/gif', 'GIF', 'Graphics Interchange Format (GIF)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (33, 'application/sgml', 'SGML', 'Standard Generalized Markup Language (SGML)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (14, 'image/png', 'PNG', 'Portable Network Graphics (PNG)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (15, 'image/tiff', 'TIFF', 'Tag Image File Format (TIFF)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (16, 'audio/x-aiff', 'AIFF', 'Audio Interchange File Format (AIFF)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (17, 'audio/basic', 'Basic Audio', 'Basic Audio (AU)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (19, 'video/mpeg', 'MPEG', 'Moving Picture Experts Group (MPEG)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (20, 'application/rtf', 'RTF', 'Rich Text Format (RTF)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (25, 'application/postscript', 'Postscript', 'Postscript', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (26, 'video/quicktime', 'Quicktime', 'Quicktime Video', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (30, 'application/x-latex', 'LaTeX', 'LaTeX document', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (39, 'text/csv', 'Comma-separated values', 'Comma-separated values (CSV)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (43, 'application/zip', 'Zip', 'Zip archive', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (45, 'application/rdf+xml', 'OWL', 'Web Ontology Language (OWL)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (47, 'audio/mpeg3', 'MP3', 'MP3 audio', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (48, 'application/x-gzip', 'GNU ZIP', 'GZip archive', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (49, 'text/plain', 'R script', 'R script', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (52, 'video/avi', 'AVI video', 'Audio Video Interleave (AVI)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (53, 'video/mp4', 'MPEG-4', 'MPEG-4 video', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (55, 'application/tar', 'TAR archive', 'Tape Archive File (TAR)', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (58, 'text/plain', 'Phylip', 'Phylogeny Inference Package (Phylip)', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (59, 'application/x-rar-compressed', 'RAR', 'Roshal ARchive (RAR)', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (60, 'application/vnd.ms-excel.sheet.binary.macroEnabled.12', 'Microsoft Excel Binary XML', 'Microsoft Excel Binary XML', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (61, 'application/bzip2', 'Bzip2', 'Bzip2 archive', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (44, 'application/x-fasta', 'FASTA', 'FASTA sequence file', 1, false);
