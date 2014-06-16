@@ -4,7 +4,9 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadObject;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -24,6 +26,7 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
     }
 
     protected abstract Collection getCollection() throws SQLException;
+    protected abstract DryadObject makeDryadObject(Item item);
 
     @Override
     public Integer extract(final String journalName) {
@@ -43,7 +46,20 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
             while (itemsByJournal.hasNext()) {
                 Item item = itemsByJournal.next();
                 if (item.isOwningCollection(collection)) {
-                    count++;
+                    /*
+                     * Since comparing dates requires reading metadata from DB,
+                     * only check if filterOnDates is true
+                     */
+                    if(this.filterOnDates) {
+                        // get the date, compare to ranges
+                        DryadObject dryadObject = makeDryadObject(item);
+                        Date dateAccessioned = dryadObject.getDateAccessioned();
+                        if(isDateWithinRange(dateAccessioned)) {
+                            count++;
+                        }
+                    } else {
+                        count++;
+                    }
                 }
             }
         } catch (AuthorizeException ex) {
