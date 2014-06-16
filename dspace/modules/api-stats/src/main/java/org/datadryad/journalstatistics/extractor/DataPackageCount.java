@@ -4,7 +4,9 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
 import org.datadryad.api.DryadDataPackage;
+import org.datadryad.api.DryadObject;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
@@ -20,6 +22,11 @@ public class DataPackageCount extends DataItemCount  {
     @Override
     protected Collection getCollection() throws SQLException {
         return DryadDataPackage.getCollection(getContext());
+    }
+
+    @Override
+    protected DryadObject makeDryadObject(Item item) {
+        return new DryadDataPackage(item);
     }
 
 }
