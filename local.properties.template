@@ -154,6 +154,7 @@ mail.registration.notify =
 # ETD Loader Email settings
 mail.etdmarc.recipient = 
 mail.etd.recipient = 
+mail.duplicate_title = 
 
 ########################
 # HANDLE CONFIGURATION #
