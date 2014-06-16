@@ -5,9 +5,7 @@ package org.datadryad.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import org.apache.log4j.Logger;
@@ -36,8 +34,6 @@ public class DryadDataFile extends DryadObject {
     private static final String EMBARGO_DATE_SCHEMA = "dc";
     private static final String EMBARGO_DATE_ELEMENT = "date";
     private static final String EMBARGO_DATE_QUALIFIER = "embargoedUntil";
-
-    private static final DateFormat EMBARGO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private DryadDataPackage dataPackage;
     private static Logger log = Logger.getLogger(DryadDataFile.class);
@@ -77,11 +73,11 @@ public class DryadDataFile extends DryadObject {
     }
 
     static Date parseDate(String dateString) throws ParseException {
-        return EMBARGO_DATE_FORMAT.parse(dateString);
+        return DATE_FORMAT.parse(dateString);
     }
 
     static String formatDate(Date date) {
-        return EMBARGO_DATE_FORMAT.format(date);
+        return DATE_FORMAT.format(date);
     }
     
     static Date[] extractDatesFromMetadata(DCValue[] values) {

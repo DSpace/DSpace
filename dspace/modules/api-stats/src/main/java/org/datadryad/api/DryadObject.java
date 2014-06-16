@@ -4,6 +4,8 @@ package org.datadryad.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -24,6 +26,7 @@ public abstract class DryadObject {
     private static final String PUBLICATION_NAME_ELEMENT = "publicationName";
     private static final String PUBLICATION_NAME_QUALIFIER = null;
     private static Logger log = Logger.getLogger(DryadObject.class);
+    protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     protected Item item;
     protected DryadObject(Item item) {
