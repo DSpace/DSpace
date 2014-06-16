@@ -5,10 +5,13 @@ package org.datadryad.api;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -25,6 +28,11 @@ public abstract class DryadObject {
     private static final String PUBLICATION_NAME_SCHEMA = "prism";
     private static final String PUBLICATION_NAME_ELEMENT = "publicationName";
     private static final String PUBLICATION_NAME_QUALIFIER = null;
+
+    private static final String DATE_ACCESSIONED_SCHEMA = "dc";
+    private static final String DATE_ACCESSIONED_ELEMENT = "date";
+    private static final String DATE_ACCESSIONED_QUALIFIER = "accessioned";
+
     private static Logger log = Logger.getLogger(DryadObject.class);
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -74,5 +82,19 @@ public abstract class DryadObject {
         } catch (IOException ex) {
             log.error("IO exception adding to collection", ex);
         }
+    }
+
+    public Date getDateAccessioned() {
+        Date dateAccessioned = null;
+        DCValue[] metadata = item.getMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, Item.ANY);
+        if(metadata.length > 0) {
+            DCValue firstDate = metadata[0];
+            try {
+                dateAccessioned = DATE_FORMAT.parse(firstDate.value);
+            } catch (ParseException ex) {
+                log.error("Error parsing " + firstDate.value, ex);
+            }
+        }
+        return dateAccessioned;
     }
 }
