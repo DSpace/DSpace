@@ -18,15 +18,22 @@ public abstract class DatabaseExtractor<T> implements ExtractorInterface<T> {
     
     Date beginDate = DISTANT_PAST;
     Date endDate = DISTANT_FUTURE;
+    Boolean filterOnDates = Boolean.FALSE;
     
     private Context context;
     public DatabaseExtractor(Context context) {
         this.context = context;
     }
 
-    public void setBeginDate(Date beginDate) { this.beginDate = beginDate; }
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+        this.filterOnDates = Boolean.TRUE;
+    }
     public Date getBeginDate() { return beginDate; }
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+        this.filterOnDates = Boolean.TRUE;
+    }
     public Date getEndDate() { return endDate; }
 
     protected DatabaseExtractor() {
@@ -34,6 +41,17 @@ public abstract class DatabaseExtractor<T> implements ExtractorInterface<T> {
 
     final Context getContext() {
         return context;
+    }
+
+    final Boolean isDateWithinRange(final Date date) {
+        if (
+                (date != null) &&
+                (date.compareTo(this.beginDate) >= 0) &&
+                (date.compareTo(this.endDate) <= 0)) {
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
     }
 
     /**
