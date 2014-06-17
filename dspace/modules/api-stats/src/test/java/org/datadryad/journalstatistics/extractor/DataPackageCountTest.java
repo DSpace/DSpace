@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DataPackageCountTest extends ContextUnitTest{
+public class DataPackageCountTest extends ContextUnitTest {
     /**
      * Test of extract method, of class DataPackageCount.
      * Data packages are items in collection identified by 'stats.datapkgs.coll'
