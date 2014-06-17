@@ -504,13 +504,15 @@ public class EtdLoader
 
             String searchTitle = "";
 
+            int index = title.indexOf(" ", 1);
+
             if (searchTerm.length() > 0)
             {
                 searchTitle = searchTerm.toString().trim();
             }
             else
             {
-                searchTitle = title.substring(0, MAX_TITLE_LENGTH);
+                searchTitle = title.substring(0, index);
             }
 
             log.debug("Search Term: " + searchTerm.toString().trim()
