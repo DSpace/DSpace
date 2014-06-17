@@ -103,7 +103,7 @@
     int rpp          = qArgs.getMaxResults();
     int etAl         = ((Integer) request.getAttribute("etal")).intValue();
 
-    String[] options = new String[]{"equals","contains","authority","notequals","notcontains","notauthority"};
+    String[] options = new String[]{"contains","equals","authority","notequals","notcontains","notauthority"};
     
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
