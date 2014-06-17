@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -14,7 +15,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -34,6 +34,11 @@ public abstract class DryadObject {
     private static final String DATE_ACCESSIONED_QUALIFIER = "accessioned";
 
     private static Logger log = Logger.getLogger(DryadObject.class);
+
+    /* Considered using DCDate instead of a distinct SimpleDateFormat,
+     * but there is no option to choose a granularity or formatter when
+     * getting strings from dates. So we'd need our own formatter anyways
+     */
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     protected Item item;
@@ -50,6 +55,39 @@ public abstract class DryadObject {
         } else {
             return null;
         }
+    }
+    static Date[] extractDatesFromMetadata(DCValue[] values) {
+        Date[] dates = new Date[values.length];
+        for (int i = 0; i < values.length; i++) {
+            try {
+                dates[i] = parseDate(values[i].value);
+            } catch (ParseException ex) {
+                log.error("Exception parsing date from '" + values[i].value + "'", ex);
+            }
+        }
+        return dates;
+    }
+
+    static String formatDate(Date date) {
+        return DATE_FORMAT.format(date);
+    }
+
+    static Date getEarliestDate(DCValue[] values) {
+        Date[] embargoDates = extractDatesFromMetadata(values);
+        return getEarliestDate(embargoDates);
+    }
+
+    static Date getEarliestDate(Date[] dates) {
+        if (dates.length > 0) {
+            Arrays.sort(dates);
+            return dates[0];
+        } else {
+            return null;
+        }
+    }
+
+    static Date parseDate(String dateString) throws ParseException {
+        return DATE_FORMAT.parse(dateString);
     }
 
     public Item getItem() {
@@ -90,7 +128,7 @@ public abstract class DryadObject {
         if(metadata.length > 0) {
             DCValue firstDate = metadata[0];
             try {
-                dateAccessioned = DATE_FORMAT.parse(firstDate.value);
+                dateAccessioned = parseDate(firstDate.value);
             } catch (ParseException ex) {
                 log.error("Error parsing " + firstDate.value, ex);
             }

@@ -5,8 +5,6 @@ package org.datadryad.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -70,40 +68,6 @@ public class DryadDataFile extends DryadObject {
             throw new RuntimeException("Not yet implemented");
         }
         return dataPackage;
-    }
-
-    static Date parseDate(String dateString) throws ParseException {
-        return DATE_FORMAT.parse(dateString);
-    }
-
-    static String formatDate(Date date) {
-        return DATE_FORMAT.format(date);
-    }
-    
-    static Date[] extractDatesFromMetadata(DCValue[] values) {
-        Date dates[] = new Date[values.length];
-        for(int i=0;i<values.length;i++) {
-            try {
-                dates[i] = parseDate(values[i].value);
-            } catch (ParseException ex) {
-                log.error("Exception parsing date from '" + values[i].value + "'", ex);
-            }
-        }
-        return dates;
-    }
-
-    static Date getEarliestDate(Date[] dates) {
-        if(dates.length > 0) {
-            Arrays.sort(dates);
-            return dates[0];
-        } else {
-            return null;
-        }
-    }
-
-    static Date getEarliestDate(DCValue values[]) {
-        Date[] embargoDates = extractDatesFromMetadata(values);
-        return getEarliestDate(embargoDates);
     }
 
     public boolean isEmbargoed() {
