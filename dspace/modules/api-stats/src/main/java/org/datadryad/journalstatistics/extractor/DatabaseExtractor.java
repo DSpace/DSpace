@@ -44,13 +44,23 @@ public abstract class DatabaseExtractor<T> implements ExtractorInterface<T> {
     }
 
     final Boolean isDateWithinRange(final Date date) {
+        checkDateOrder();
         if (
                 (date != null) &&
-                (date.compareTo(this.beginDate) >= 0) &&
-                (date.compareTo(this.endDate) <= 0)) {
+                (date.after(this.beginDate) || date.equals(this.beginDate)) &&
+                (date.before(this.endDate) || date.equals(this.endDate))
+                ) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
+        }
+    }
+
+    final void checkDateOrder() {
+        if(filterOnDates) {
+            if(beginDate.after(endDate)) {
+                throw new IllegalStateException("beginDate must not be after endDate");
+            }
         }
     }
 
