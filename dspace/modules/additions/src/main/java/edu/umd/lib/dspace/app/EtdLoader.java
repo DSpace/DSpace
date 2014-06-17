@@ -118,8 +118,6 @@ public class EtdLoader
 
     final static int MAX_WORD_COUNT = 4;
 
-    final static int MAX_TITLE_LENGTH = 70;
-
     static long lRead = 0;
 
     static long lWritten = 0;
@@ -498,8 +496,7 @@ public class EtdLoader
 
             StringBuilder searchTerm = new StringBuilder();
 
-            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT)
-                    || (searchTerm.length() < MAX_TITLE_LENGTH); wordCount++)
+            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT); wordCount++)
             {
                 searchTerm = searchTerm.append(words[wordCount]);
                 searchTerm = searchTerm.append(" ");
