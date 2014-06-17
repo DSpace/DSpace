@@ -113,6 +113,7 @@ public abstract class DryadObject {
         try {
             collection.addItem(getItem());
             getItem().setArchived(true);
+            setDateAccessioned(new Date());
             getItem().update();
             collection.update();
         } catch (AuthorizeException ex) {
@@ -134,5 +135,16 @@ public abstract class DryadObject {
             }
         }
         return dateAccessioned;
+    }
+
+    public void setDateAccessioned(Date dateAccessioned) throws SQLException {
+        String dateAccessionedString = formatDate(dateAccessioned);
+        getItem().clearMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, null);
+        getItem().addMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, null, dateAccessionedString);
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting date accessioned", ex);
+        }
     }
 }
