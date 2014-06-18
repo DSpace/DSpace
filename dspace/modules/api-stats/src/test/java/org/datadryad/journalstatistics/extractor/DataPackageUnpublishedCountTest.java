@@ -6,11 +6,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
-import org.junit.After;
-import org.junit.AfterClass;
+import org.dspace.content.DCDate;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -61,8 +60,16 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
     public void testCountUnpublishedDataPackages() throws Exception {
         System.out.println("countUnpublishedDataPackages");
         // Make sure there is exactly one unpublished data package for JUN 2014
-        DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
+        DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
+        DCDate submittedDate = new DCDate(date_2014_06_07);
+        String submitterName = "Cornelius Tester";
+        String submitterEmail = "test@example.com";
+        String provenanceStartId = "TEST START ID";
+        String bitstreamProvenanceMessage = "Number of Bitstreams: 0";
         String journalName = "Test Journal";
+        dataPackage.setPublicationName(journalName);
+        dataPackage.addSubmittedProvenance(submittedDate, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
+        DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
         Map<String, Integer> results = instance.extract(journalName);
         assertNotNull(results);
         assertTrue(results.containsKey(STRING_2014_06));
