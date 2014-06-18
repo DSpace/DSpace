@@ -56,4 +56,18 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         String result = DataPackageUnpublishedCount.extractDateStringFromProvenance(provenance);
         assertEquals(expResult, result);
     }
+
+    @Test
+    public void testCountUnpublishedDataPackages() throws Exception {
+        System.out.println("countUnpublishedDataPackages");
+        // Make sure there is exactly one unpublished data package for JUN 2014
+        DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
+        String journalName = "Test Journal";
+        Map<String, Integer> results = instance.extract(journalName);
+        assertNotNull(results);
+        assertTrue(results.containsKey(STRING_2014_06));
+        Integer expectedCount = 1;
+        Integer resultCount = results.get(STRING_2014_06);
+        assertEquals(expectedCount, resultCount);
+    }
 }
