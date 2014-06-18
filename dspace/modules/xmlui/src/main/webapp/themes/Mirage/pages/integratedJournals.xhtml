@@ -20,12 +20,18 @@
         }
 
         #journal-policies {
+            table-layout: fixed;
             width: 100%;
         }
 
-        #journal-policies th,
+        table.dataTable thead th, 
+        table.dataTable thead td,
+        #journal-policies thead th,
         #journal-policies td {
+            table-layout: fixed;
             text-align: center;
+            padding: 5px;
+            vertical-align: middle;
         }
         #journal-policies th:first-child,
         #journal-policies td:first-child {
@@ -94,23 +100,31 @@
         * Add a row for each journal entry in database (first row is alwys default-policies)
         * Each data row should have class 'odd', 'even', 'odd', ...
     -->
-    <table id="journal-policies">
+    <table id="journal-policies" class="display" cellspacing="0" width="100%">
+        <colgroup>
+            <col span="1" style="width: 175px"></col>
+            <col span="1" style="width: 90px"></col>
+            <col span="1" style="width: *"></col>
+            <col span="1" style="width: 80px"></col>
+            <col span="1" style="width: 100px"></col>
+            <col span="1" style="width: 110px"></col>
+        </colgroup>
         <thead>
             <tr class="table-shims">
-                <td width="200">&#160;</td>
-                <td width="90">&#160;</td>
-                <td width="*">&#160;</td>
-                <td width="80">&#160;</td>
-                <td width="100">&#160;</td>
-                <td width="110">&#160;</td>
+                <td>&#160;</td>
+                <td>&#160;</td>
+                <td>&#160;</td>
+                <td>&#160;</td>
+                <td>&#160;</td>
+                <td>&#160;</td>
             </tr>
             <tr>
-                <th class="right-border background-on">Journal</th>
+                <th class="right-border background-on" colspan="1">Journal</th>
                 <th class="right-border background-on" colspan="4">Submission</th>
-                <th class="background-on">Payment</th>
+                <th class="background-on" colspan="1">Payment</th>
             </tr>
             <tr>
-                <th class="right-border" style="font-weight: normal;">&#160;</th>
+                <th class="right-border" style="font-weight: normal;" colspan="1">&#160;</th>
                 <th style="font-weight: normal;">Integrated</th>
                 <th style="font-weight: normal;">Submit:<br/>R: Prior to Review<br/>A: On Acceptance</th>
                 <th style="font-weight: normal;">Data embargo allowed</th>
