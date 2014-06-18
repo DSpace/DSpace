@@ -11,15 +11,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Gets the data packages by journal that are unpublished (Still in workflow), returns
