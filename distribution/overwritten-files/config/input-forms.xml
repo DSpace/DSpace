@@ -209,7 +209,7 @@
 					<repeatable>true</repeatable>
 					<label>Autor</label>
 					<input-type>onebox</input-type>
-					<hint>Autores de la obra</hint>
+					<hint>Etnia o persona considerado como creador del objeto</hint>
 					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
@@ -220,7 +220,7 @@
 					<dc-qualifier>corporate</dc-qualifier>
 					<label>Autor Institucional</label>
 					<input-type>onebox</input-type>
-					<hint>Cuando la autoría de la obra no se puede asignar a una persona en particular, el autor es la institución en donde la obra se genera</hint>
+					<hint>Institución,empresa u organización creadora del recurso</hint>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -293,7 +293,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
 					<visibility>submit</visibility>
-					<type-bind>Articulo,Libro,Documento institucional,Imagen fija,Imagen en movimiento,Audio</type-bind>
+					<type-bind>!Objeto Fisico,Objeto de conferencia,Objeto de aprendizaje</type-bind>
 				</field>
 
 				<!-- Fecha de publicación (solo en el workflow, para todos los tipos de documento) -->
@@ -314,7 +314,7 @@
 					<dc-element>date</dc-element>
 					<dc-qualifier>created</dc-qualifier>
 					<label>Fecha de Creación</label>
-					<hint>Fecha de creación o manufacturación del objeto.</hint>
+					<hint>Se puede indicar el año, año y mes, o año,mes y día. En caso de incertidumbre, indicar el año más próximo considerado y aclarar luego en las notas acerca de esta situación con c (circa), década o siglo. Ejemplo: c. 1910, Siglo XX</hint>
 					<input-type>date</input-type>
 					<type-bind>Objeto Fisico</type-bind>
 					<visibility>workflow</visibility>
@@ -364,9 +364,9 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>format</dc-element>
 					<repeatable>true</repeatable>
-					<label>Inscipciones y enumeración de partes</label>
-					<input-type>onebox</input-type>
-					<hint>Enumeración de inscripciones sobre el objeto, así como la enumeración de las partes que lo constituyen.</hint>
+					<label>Descripción física</label>
+					<input-type>textarea</input-type>
+					<hint>Inscripciones existentes en el objeto, observaciones  sobre las piezas, etc.</hint>
 					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
@@ -378,7 +378,7 @@
 					<repeatable>true</repeatable>
 					<label>Extensión</label>
 					<input-type>onebox</input-type>
-					<hint>Cantidad de páginas, duración, tamaño, etc</hint>
+					<hint>Cantidad de páginas, duración, tamaño, peso, etc. Utilizar sistema métrico decimal cuando sea posible. Ej: 123pp. Las medidas deben ir en el siguiente orden: Alto, Ancho, Largo, Diámetro. </hint>
 					<visibility>workflow</visibility>
 <!-- 					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group> -->
 				</field>
@@ -391,7 +391,7 @@
 					<repeatable>true</repeatable>
 					<label>Materiales</label>
 					<input-type>onebox</input-type>
-					<hint>Materiales que conforman el objeto.</hint>
+					<hint>Material en que está hecho el objeto, técnica usada para fabricarlo. Ejemplo: madera, bronce, plástico</hint>
 					<visibility>workflow</visibility>
 					<type-bind>Objeto Fisico</type-bind>
 				</field>
@@ -428,6 +428,20 @@
 					<input-type>textarea</input-type>
 					<hint>Resumen de la obra</hint>
 					<i18n>true</i18n>
+					<type-bind>!Tesis</type-bind>
+				</field>
+				<!-- Abstract / Obligatorio sólo para Tesistas -->
+				<field> <!-- Ok -->
+					<dc-schema>dc</dc-schema>
+					<dc-element>description</dc-element>
+					<dc-qualifier>abstract</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Resumen (*)</label>
+					<input-type>textarea</input-type>
+					<hint>Resumen de la obra</hint>
+					<i18n>true</i18n>
+					<required>Debe especificarse el resúmen de la obra.</required>
+					<type-bind>Tesis</type-bind>
 				</field>
 
 				<!-- Keywords -->
@@ -510,7 +524,6 @@
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso a partir del tesauro DECS</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Descriptores Eurovoc -->
@@ -631,7 +644,7 @@
 					<repeatable>true</repeatable>
 					<label>Otros identificadores</label>
 					<input-type>onebox</input-type>
-					<hint>Otros códigos de identificación de la obra</hint>
+					<hint>Identificadores del objeto, como ser museo y número u otros identificadores internos. Indicar código con letras, números, dos puntos y guiones sin espacios. Ejemplos: MF:1234, F:14, MK:123</hint>
 					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
@@ -836,6 +849,7 @@
 					<input-type>onebox</input-type>
 					<hint>Otros colaboradores de la obra</hint>
 					<visibility>workflow</visibility>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Otros colaboradores de un libro -->
@@ -945,7 +959,6 @@
 					<input-type>onebox</input-type>
 					<hint>Link a un documento (puede ser externo a SeDiCI) con el cual este documento está relacionado</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 
@@ -968,9 +981,10 @@
 					<dc-element>description</dc-element>
 					<dc-qualifier>note</dc-qualifier>
 					<label>Otras notas</label>
+					<repeatable>true</repeatable>
 					<input-type>textarea</input-type>
 					<hint>
-					   Agregue aquí cualquier otra información que considere pertinente para una mejor catalogación de este item. Entre ellos: notas acerca de la precedencia del objeto(origen, forma de ingreso, fuente de ingreso, fecha de ingreso del objeto, entre otros); notas acerca del estado del objeto(estado de conservación, restauraciones, observaciones del objeto, según corresponda); notas acerca del uso o funcionamiento del objeto; notas acerca de la historia del objeto; y cualquier otra nota importante.
+					   Indicar en campos de NOTA individuales: 1) Nota de procedencia (fecha y forma de incorporación, donante, etc), 2) Nota de estado de conservación, 3) Nota de uso (forma de funcionamiento, si funciona o no) y 4) Nota de historia (menciones en bibliografía, personajes que lo usaron). También puede agregar otras notas libres acerca del objeto. 
 				    </hint>
 				    <type-bind>Objeto Fisico</type-bind>
 				</field>
@@ -1161,6 +1175,14 @@
 			<pair>
 				<displayed-value>Instrumento musical</displayed-value>
 				<stored-value>Instrumento musical</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Instrumento científico</displayed-value>
+				<stored-value>Instrumento cientifico</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Instrumento</displayed-value>
+				<stored-value>Instrumento</stored-value>
 			</pair>
 		</value-pairs>
 		
