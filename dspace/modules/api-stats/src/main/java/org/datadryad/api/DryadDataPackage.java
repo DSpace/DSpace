@@ -16,6 +16,10 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
 
 /**
  *
@@ -27,6 +31,10 @@ public class DryadDataPackage extends DryadObject {
     private static final String PROVENANCE_ELEMENT = "description";
     private static final String PROVENANCE_QUALIFIER = "provenance";
     private static final String PROVENANCE_LANGUAGE = "en";
+    private static final String WORKFLOWITEM_TABLE = "workflowitem";
+    private static final String WORKFLOWITEM_COLUMN_ITEMID = "item_id";
+    private static final String WORKFLOWITEM_COLUMN_COLLECTIONID = "collection_id";
+
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -55,7 +63,43 @@ public class DryadDataPackage extends DryadObject {
             log.error("IO exception creating a Data Package", ex);
         }
         return dataPackage;
+    }
 
+    public static DryadDataPackage createInWorkflow(Context context) throws SQLException {
+        /*
+         * WorkflowItems are normally created by WorkflowManager.start(),
+         * but this method has a lot of side effects (activating steps, sending
+         * emails) and generally heavyweight.
+         * Instead we'll just create rows in the workflowitem table for now.
+         */
+        Collection collection = DryadDataPackage.getCollection(context);
+        DryadDataPackage dataPackage = null;
+        try {
+            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            Item item = wsi.getItem();
+            TableRow row = DatabaseManager.create(context, WORKFLOWITEM_TABLE);
+            row.setColumn(WORKFLOWITEM_COLUMN_ITEMID, item.getID());
+            row.setColumn(WORKFLOWITEM_COLUMN_COLLECTIONID, collection.getID());
+            DatabaseManager.update(context, row);
+            dataPackage = new DryadDataPackage(item);
+            wsi.deleteWrapper();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception creating a Data Package", ex);
+        } catch (IOException ex) {
+            log.error("IO exception creating a Data Package", ex);
+        }
+        return dataPackage;
+    }
+
+    public WorkflowItem getWorkflowItem(Context context) throws SQLException {
+        try {
+            return WorkflowItem.findByItemId(context, getItem().getID());
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting workflow item for data package", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting workflow item for data package", ex);
+        }
+        return null;
     }
 
     static Set<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) {

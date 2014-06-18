@@ -35,6 +35,18 @@ public class DryadDataPackageTest extends ContextUnitTest {
         System.out.println("create");
         DryadDataPackage result = DryadDataPackage.create(context);
         assertNotNull(result);
+        assertNull(result.getWorkflowItem(context));
+    }
+
+    /**
+     * Test of createInWorkflow method, of class DryadDataPackage
+     */
+    @Test
+    public void testCreateInWorkflow() throws Exception {
+        System.out.println("createInWorkflow");
+        DryadDataPackage result = DryadDataPackage.createInWorkflow(context);
+        assertNotNull(result);
+        assertNotNull(result.getWorkflowItem(context));
     }
 
     /**
