@@ -28,6 +28,8 @@ import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
+import org.dspace.app.util.CollectionDropDown;
+
 /**
  * Allow the user to select a collection they wish to submit an item to, 
  * this step is sort-of but not officialy part of the item submission 
@@ -70,23 +72,23 @@ public class SelectCollectionStep extends AbstractSubmissionStep
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {     
-		Collection[] collections; // List of possible collections.
-		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
-		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-
-		if (dso instanceof Community)
-		{
-			collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
-		} 
-		else
-		{
-			collections = Collection.findAuthorized(context, null, Constants.ADD);
-		}
+        Collection[] collections; // List of possible collections.
+        String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
+        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
         
-		// Basic form with a drop down list of all the collections
-		// you can submit too.
+        if (dso instanceof Community)
+        {
+            collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
+        } 
+        else
+        {
+            collections = Collection.findAuthorized(context, null, Constants.ADD);
+        }
+        
+        // Basic form with a drop down list of all the collections
+        // you can submit too.
         Division div = body.addInteractiveDivision("select-collection",actionURL,Division.METHOD_POST,"primary submission");
-		div.setHead(T_submission_head);
+        div.setHead(T_submission_head);
         
         List list = div.addList("select-collection", List.TYPE_FORM);
         list.setHead(T_head);       
@@ -98,8 +100,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.addOption("",T_collection_default);
         for (Collection collection : collections) 
         {
-        	String name = collection.getMetadata("name");
-        	select.addOption(collection.getHandle(),name);
+            select.addOption(collection.getHandle(), CollectionDropDown.collectionPath(collection));
         }
         
         Button submit = list.addItem().addButton("submit");

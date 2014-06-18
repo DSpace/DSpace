@@ -34,7 +34,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -199,6 +201,47 @@ public class Subscribe
         Collection[] collArray = new Collection[collections.size()];
 
         return (Collection[]) collections.toArray(collArray);
+    }
+
+    /**
+     * Find out which collections the currently logged in e-person can subscribe to
+     *
+     * @param context
+     *            DSpace context
+     * @param eperson
+     *            EPerson
+     * @return array of collections the currently logged in e-person can subscribe to
+     */
+    public static Collection[] getAvailableSubscriptions(Context context)
+            throws SQLException
+    {
+        return getAvailableSubscriptions(context, null);
+    }
+    
+    /**
+     * Find out which collections an e-person can subscribe to
+     *
+     * @param context
+     *            DSpace context
+     * @param eperson
+     *            EPerson
+     * @return array of collections e-person can subscribe to
+     */
+    public static Collection[] getAvailableSubscriptions(Context context, EPerson eperson)
+            throws SQLException
+    {
+        Collection[] collections;
+        
+        if (eperson != null)
+        {
+            context.setCurrentUser(eperson);
+        }
+        
+        Site site = (Site) Site.find(context, 0);
+        
+        collections = Collection.findAuthorized(context, null, Constants.ADD);
+
+        return collections;
     }
 
     /**

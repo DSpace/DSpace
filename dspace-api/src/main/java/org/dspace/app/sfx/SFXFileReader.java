@@ -54,7 +54,7 @@ public class SFXFileReader {
 
 
     /**
-     * Loads the SFX configuraiton file
+     * Loads the SFX configuration file
      *
      * @param fileName The name of the SFX configuration file
      * @param item The item to process, from which metadata values will be taken
@@ -64,7 +64,7 @@ public class SFXFileReader {
      */
     public static String loadSFXFile(String fileName, Item item) throws IOException
     {
-        // Parse XML file -> XML document will be build
+        // Parse XML file -> XML document will be built
         if (doc == null)
         {
             doc = parseFile(fileName);

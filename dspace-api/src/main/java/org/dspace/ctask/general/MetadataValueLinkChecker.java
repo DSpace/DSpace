@@ -17,7 +17,7 @@ import java.util.List;
  * A link checker that builds upon the BasicLinkChecker to check URLs that
  * appear in all metadata fields where the field starts with http:// or https://
  *
- * Of course thi assumes that there is no extra metadata following the URL.
+ * Of course this assumes that there is no extra metadata following the URL.
  *
  * @author Stuart Lewis
  */

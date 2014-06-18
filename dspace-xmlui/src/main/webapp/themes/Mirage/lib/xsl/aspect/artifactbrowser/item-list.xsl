@@ -84,7 +84,7 @@
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
+                        <xsl:when test="dim:field[@element='title' and descendant::text()]">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
@@ -158,7 +158,7 @@
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
+                        <xsl:when test="dim:field[@element='title' and descendant::text()]">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
@@ -243,7 +243,7 @@
 
     <xsl:template match="mets:fileSec" mode="artifact-preview">
         <xsl:param name="href"/>
-        <div class="thumbnail-wrapper">
+        <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
             <div class="artifact-preview">
                 <a class="image-link" href="{$href}">
                     <xsl:choose>

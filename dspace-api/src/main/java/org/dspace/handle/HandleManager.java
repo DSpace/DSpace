@@ -84,6 +84,48 @@ public class HandleManager
 
         return url;
     }
+    
+    /**
+     * Try to detect a handle in a URL.
+     * @param context DSpace context
+     * @param url The URL
+     * @return The handle or null if the handle couldn't be extracted of a URL
+     * or if the extracted handle couldn't be found.
+     * @throws SQLException  If a database error occurs
+     */
+    public static String resolveUrlToHandle(Context context, String url)
+            throws SQLException
+    {
+        String dspaceUrl = ConfigurationManager.getProperty("dspace.url")
+                + "/handle/";
+        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        
+        String handle = null;
+        
+        if (url.startsWith(dspaceUrl))
+        {
+            handle = url.substring(dspaceUrl.length());
+        }
+        
+        if (url.startsWith(handleResolver))
+        {
+            handle = url.substring(handleResolver.length());
+        }
+        
+        if (null == handle)
+        {
+            return null;
+        }
+        
+        // remove trailing slashes
+        while (handle.startsWith("/"))
+        {
+            handle = handle.substring(1);
+        }
+        TableRow dbhandle = findHandleInternal(context, handle);
+        
+        return (null == dbhandle) ? null : handle;
+    }
 
     /**
      * Transforms handle into the canonical form <em>hdl:handle</em>.
@@ -403,7 +445,7 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static List<String> getHandlesForPrefix(Context context, String prefix)
+    public static List<String> getHandlesForPrefix(Context context, String prefix)
             throws SQLException
     {
         String sql = "SELECT handle FROM handle WHERE handle LIKE ? ";

@@ -23,11 +23,15 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.time.DateFormatUtils" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
+<%@ page import="org.dspace.authorize.AuthorizeManager" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
@@ -48,9 +52,31 @@
     
     request.setAttribute("LanguageSwitch", "hide");
     boolean allowFileEditing = !subInfo.isInWorkflow() || ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
+
+    boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
+
+    List<ResourcePolicy> policies = null;
+    String startDate = "";
+    String globalReason = "";
+    if (withEmbargo)
+    {
+        // Policies List
+        policies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+    
+        startDate = "";
+        globalReason = "";
+        if (policies.size() > 0)
+        {
+            startDate = (policies.get(0).getStartDate() != null ? DateFormatUtils.format(policies.get(0).getStartDate(), "yyyy-MM-dd") : "");
+            globalReason = policies.get(0).getRpDescription();
+        }
+    }
+
+    boolean isAdvancedForm = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 
@@ -62,20 +88,24 @@
     if (justUploaded)
     {
 %>
-		<h1><fmt:message key="jsp.submit.upload-file-list.heading1"/></h1>
+		<h1><fmt:message key="jsp.submit.upload-file-list.heading1"/>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+		</h1>
         <p><fmt:message key="jsp.submit.upload-file-list.info1"/></p>
 <%
     }
     else
     {
 %>
-	    <h1><fmt:message key="jsp.submit.upload-file-list.heading2"/></h1>
+	    <h1><fmt:message key="jsp.submit.upload-file-list.heading2"/>
+	    <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+	    </h1>
 <%
     }
 %>
-        <div><fmt:message key="jsp.submit.upload-file-list.info2"/>&nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+        <div><fmt:message key="jsp.submit.upload-file-list.info2"/></div>
         
-        <table class="miscTable" align="center" summary="Table dispalying your submitted files">
+        <table class="table" align="center" summary="Table dispalying your submitted files">
             <tr>
 				<th id="t1" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading1"/></th>
                 <th id="t2" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading2"/></th>
@@ -83,23 +113,27 @@
                 <th id="t4" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading4"/></th>
                 <th id="t5" class="oddRowEvenCol"><fmt:message key="jsp.submit.upload-file-list.tableheading5"/></th>
 <%
+    String headerClass = "oddRowEvenCol";
+
     if (showChecksums)
     {
+        headerClass = (headerClass == "oddRowEvenCol" ? "oddRowOddCol" : "oddRowEvenCol");
 %>
 
-                <th id="t6" class="oddRowOddCol"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
+                <th id="t6" class="<%= headerClass %>"><fmt:message key="jsp.submit.upload-file-list.tableheading6"/></th>
 <%
     }
-    
-    // Don't display last column ("Remove") in workflow mode
-    if (allowFileEditing)
+
+    if (withEmbargo)
     {
-        // Whether it's an odd or even column depends on whether we're showing checksums
-        String column = (showChecksums ? "Even" : "Odd");
+        // Access Setting
+        headerClass = (headerClass == "oddRowEvenCol" ? "oddRowOddCol" : "oddRowEvenCol");
 %>
-                <th id="t7" class="oddRow<%= column %>Col">&nbsp;</th>
+                <th id="t7" class="<%= headerClass %>"><fmt:message key="jsp.submit.upload-file-list.tableheading7"/></th>
+
 <%
     }
+
 %>
             </tr>
 
@@ -134,24 +168,39 @@
 %>
             <tr>
 		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
-		    <input type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
+		    <input class="form-control" type="radio" name="primary_bitstream_id" value="<%= bitstreams[i].getID() %>"
 			   <% if (bundles[0] != null) {
 				if (bundles[0].getPrimaryBitstreamID() == bitstreams[i].getID()) { %>
 			       	  <%="checked='checked'" %>
 			   <%   }
 			      } %> />
 		</td>
-                <td headers="t2" class="<%= row %>RowOddCol"><a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a></td>
+                <td headers="t2" class="<%= row %>RowOddCol">
+                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[i].getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams[i].getName()) %>" target="_blank"><%= bitstreams[i].getName() %></a>
+            <%      // Don't display "remove" button in workflow mode
+			        if (allowFileEditing)
+			        {
+			%>
+	                    <button class="btn btn-danger pull-right" type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>">
+	                    <span class="glyphicon glyphicon-trash"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button2"/>
+	                    </button>
+			<%
+			        } %>	
+                </td>
                 <td headers="t3" class="<%= row %>RowEvenCol"><%= bitstreams[i].getSize() %> bytes</td>
                 <td headers="t4" class="<%= row %>RowOddCol">
                     <%= (bitstreams[i].getDescription() == null || bitstreams[i].getDescription().equals("")
                         ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.upload-file-list.empty1")
                         : bitstreams[i].getDescription()) %>
-                    <input type="submit" name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>" />
+                    <button type="submit" class="btn btn-default pull-right" name="submit_describe_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
+                    </button>
                 </td>
                 <td headers="t5" class="<%= row %>RowEvenCol">
                     <%= description %> <dspace:popup page="<%= supportLevelLink %>">(<%= supportLevel %>)</dspace:popup>
-                    <input type="submit" name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>" />
+                    <button type="submit" class="btn btn-default pull-right" name="submit_format_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
+                    </button>
                 </td>
 <%
         // Checksum
@@ -164,14 +213,15 @@
 <%
         }
 
-        // Don't display "remove" button in workflow mode
-        if (allowFileEditing)
+        String column = "";
+        if (withEmbargo)
         {
-            // Whether it's an odd or even column depends on whether we're showing checksums
-            String column = (showChecksums ? "Even" : "Odd");
+            column = (showChecksums ? "Even" : "Odd");
 %>
-                <td headers="t7" class="<%= row %>Row<%= column %>Col">
-                    <input type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>" />
+                <td headers="t6" class="<%= row %>Row<%= column %>Col" style="text-align:center"> 
+                    <button class="btn btn-default pull-left" type="submit" name="submit_editPolicy_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
+                    <span class="glyphicon glyphicon-lock"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
+                    </button>
                 </td>
 <%
         }
@@ -183,10 +233,16 @@
 %>
         </table>
 
-<%-- HACK:  Need a space - is there a nicer way to do this than <br> or a --%>
-<%--        blank <p>? --%>
-        <br />
-
+<%
+    // Don't allow files to be added in workflow mode
+    if (allowFileEditing)
+    {
+%>
+            <div class="row"><input class="btn btn-success col-md-2 col-md-offset-5" type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></div>
+<%
+    }
+%>
+<br/>
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
 <%
@@ -208,7 +264,8 @@
         {
 %>
             <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info6"/>
-            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> <input type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.upload-file-list.button3"/>" /></li>
+            <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#checksum\"%>"><fmt:message key="jsp.submit.upload-file-list.help2"/></dspace:popup> 
+            <input class="btn btn-info" type="submit" name="submit_show_checksums" value="<fmt:message key="jsp.submit.upload-file-list.button3"/>" /></li>
 <%
         }
 %>
@@ -221,38 +278,21 @@
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
-<%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
-        <center>
-<%
-    // Don't allow files to be added in workflow mode
-    if (allowFileEditing)
-    {
-%>
-            <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
-<%
-    }
-%>
-            <table border="0" width="80%">
-                <tr>
-                    <td width="100%">&nbsp;</td>
-				<%  //if not first step, show "Previous" button
-					if(!SubmissionController.isFirstStep(request, subInfo))
-					{ %>
-                    <td>
-                        <%-- <input type="submit" name="submit_prev" value="&lt; Previous"> --%>
-						<input type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button5"/>" />
-                    </td>
-				<%  } %>
-                    <td>
-                        <input type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button6"/>" />
-                    </td>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td align="right">
-                        <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.upload-file-list.button7"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+
+        <%  //if not first step, show "Previous" button
+		if(!SubmissionController.isFirstStep(request, subInfo))
+		{ %>
+			<div class="col-md-6 pull-right btn-group">
+				<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.PREVIOUS_BUTTON%>" value="<fmt:message key="jsp.submit.general.previous"/>" />
+				<input class="btn btn-default col-md-4" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+				<input class="btn btn-primary col-md-4" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+				
+		<%  } else { %>
+			<div class="col-md-4 pull-right btn-group">
+				<input class="btn btn-default col-md-6" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
+			    <input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
+		<%  }  %>
+			</div>
 
     </form>
 

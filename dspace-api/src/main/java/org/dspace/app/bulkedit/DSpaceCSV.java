@@ -45,19 +45,19 @@ public class DSpaceCSV implements Serializable
     /** The value separator (defaults to double pipe '||') */
     protected static String valueSeparator;
 
-    /** The value separator in an escaped form for using in regexs */
+    /** The value separator in an escaped form for using in regexes */
     protected static String escapedValueSeparator;
 
     /** The field separator (defaults to comma) */
     protected static String fieldSeparator;
 
-    /** The field separator in an escaped form for using in regexs */
+    /** The field separator in an escaped form for using in regexes */
     protected static String escapedFieldSeparator;
 
-    /** The authority separator (defaults to dobule colon '::') */
+    /** The authority separator (defaults to double colon '::') */
     protected static String authoritySeparator;
 
-    /** The authority separator in an escaped form for using in regexs */
+    /** The authority separator in an escaped form for using in regexes */
     protected static String escapedAuthoritySeparator;
 
 
@@ -385,6 +385,12 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(Item i) throws Exception
     {
+        // If the item does not have an "owningCollection" the the below "getHandle()" call will fail
+        // This should not happen but is here for safety.
+        if (i.getOwningCollection() == null) {
+            return;
+        }
+
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
 
@@ -451,7 +457,7 @@ public class DSpaceCSV implements Serializable
      */
     public final void addItem(String line) throws Exception
     {
-        // Check to see if the last character is a field separator, which hides the last empy column
+        // Check to see if the last character is a field separator, which hides the last empty column
         boolean last = false;
         if (line.endsWith(fieldSeparator))
         {

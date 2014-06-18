@@ -228,7 +228,7 @@ public class LDAPAuthentication
                 context.setCurrentUser(eperson);
 
                 // assign user to groups based on ldap dn
-                assignGroupsBasedOnLdapDn(dn, context);
+                assignGroups(dn, ldap.ldapGroup, context);
                 
                 log.info(LogManager
                     .getHeader(context, "authenticate", "type=ldap"));
@@ -252,13 +252,18 @@ public class LDAPAuthentication
 
                 // If there is no email and the email domain is set, add it to the netid
                 String email = ldap.ldapEmail;
-                if (((email == null) || ("".equals(email))) &&
-                    (!"".equals(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
+
+                if ((StringUtils.isEmpty(email)) &&
+                        (StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
                 {
                     email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
                 }
+                else
+                {
+                    email = netid;
+                }
 
-                if ((email != null) && (!"".equals(email)))
+                if (StringUtils.isNotEmpty(email))
                 {
                     try
                     {
@@ -275,7 +280,7 @@ public class LDAPAuthentication
                             context.setCurrentUser(eperson);
 
                             // assign user to groups based on ldap dn
-                            assignGroupsBasedOnLdapDn(dn, context);
+                            assignGroups(dn, ldap.ldapGroup, context);
 
                             return SUCCESS;
                         }
@@ -288,19 +293,19 @@ public class LDAPAuthentication
                                 {
                                     context.setIgnoreAuthorization(true);
                                     eperson = EPerson.create(context);
-                                    if ((email != null) && (!"".equals(email)))
+                                    if (StringUtils.isNotEmpty(email))
                                     {
                                         eperson.setEmail(email);
                                     }
-                                    if ((ldap.ldapGivenName!=null) && (!ldap.ldapGivenName.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapGivenName))
                                     {
                                         eperson.setFirstName(ldap.ldapGivenName);
                                     }
-                                    if ((ldap.ldapSurname!=null) && (!ldap.ldapSurname.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapSurname))
                                     {
                                         eperson.setLastName(ldap.ldapSurname);
                                     }
-                                    if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+                                    if (StringUtils.isNotEmpty(ldap.ldapPhone))                                    
                                     {
                                         eperson.setMetadata("phone", ldap.ldapPhone);
                                     }
@@ -312,7 +317,7 @@ public class LDAPAuthentication
                                     context.setCurrentUser(eperson);
 
                                     // assign user to groups based on ldap dn
-                                    assignGroupsBasedOnLdapDn(dn, context);
+                                    assignGroups(dn, ldap.ldapGroup, context);
                                 }
                                 catch (AuthorizeException e)
                                 {
@@ -362,6 +367,7 @@ public class LDAPAuthentication
         protected String ldapGivenName = null;
         protected String ldapSurname = null;
         protected String ldapPhone = null;
+        protected String ldapGroup = null;
 
         /** LDAP settings */
         String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
@@ -373,6 +379,7 @@ public class LDAPAuthentication
         String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
         String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
         String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
+        String ldap_group_field = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap.attribute"); 
 
         SpeakerToLDAP(Logger thelog)
         {
@@ -408,7 +415,7 @@ public class LDAPAuthentication
             if ((adminUser != null) && (!adminUser.trim().equals("")) &&
                 (adminPassword != null) && (!adminPassword.trim().equals("")))
             {
-                // Use admin credencials for search// Authenticate
+                // Use admin credentials for search// Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
@@ -448,7 +455,7 @@ public class LDAPAuthentication
                         }
 
                         String attlist[] = {ldap_email_field, ldap_givenname_field,
-                                            ldap_surname_field, ldap_phone_field};
+                                            ldap_surname_field, ldap_phone_field, ldap_group_field};
                         Attributes atts = sr.getAttributes();
                         Attribute att;
 
@@ -481,6 +488,14 @@ public class LDAPAuthentication
                             if (att != null)
                             {
                                 ldapPhone = (String) att.get();
+                            }
+                        }
+                
+                        if (attlist[4] != null) {
+                            att = atts.get(attlist[4]);
+                            if (att != null) 
+                            {
+                                ldapGroup = (String) att.get();
                             }
                         }
 
@@ -614,20 +629,29 @@ public class LDAPAuthentication
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.
      */
-    private void assignGroupsBasedOnLdapDn(String dn, Context context)
+    private void assignGroups(String dn, String group, Context context)
     {
         if (StringUtils.isNotBlank(dn)) 
         {
             System.out.println("dn:" + dn);
             int i = 1;
             String groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + i);
+            
+            boolean cmp;
+            
             while (groupMap != null)
             {
                 String t[] = groupMap.split(":");
                 String ldapSearchString = t[0];
                 String dspaceGroupName = t[1];
+ 
+                if (group == null) {
+                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                } else {
+                    cmp = StringUtils.equalsIgnoreCase(group, ldapSearchString);
+                }
 
-                if (StringUtils.containsIgnoreCase(dn, ldapSearchString)) 
+                if (cmp) 
                 {
                     // assign user to this group   
                     try

@@ -21,7 +21,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * This is a conformation page informing the user that they have 
+ * This is a confirmation page informing the user that they have 
  * completed the submission of the item. It tells them what to 
  * expect next, i.e. the workflow, and gives the option to go home 
  * or start another submission.

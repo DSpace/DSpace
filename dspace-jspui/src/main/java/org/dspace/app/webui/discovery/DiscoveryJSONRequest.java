@@ -24,7 +24,12 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchUtils;
 
-import flexjson.JSONSerializer;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class DiscoveryJSONRequest extends JSONRequest
 {
@@ -69,10 +74,25 @@ public class DiscoveryJSONRequest extends JSONRequest
                 fResults = qResults
                         .getFacetResult(autocompleteField);                
             }
-            JSONSerializer serializer = new JSONSerializer();
-            serializer.rootName("autocomplete");
-            serializer.exclude("class","asFilterQuery");
-            serializer.deepSerialize(fResults, resp.getWriter());
+            Gson gson = new GsonBuilder().addSerializationExclusionStrategy(new ExclusionStrategy() {
+				
+				@Override
+				public boolean shouldSkipField(FieldAttributes f) {
+					
+					if(f.getName().equals("asFilterQuery"))return true;
+					return false;
+				}
+				
+				@Override
+				public boolean shouldSkipClass(Class<?> clazz) {
+					return false;
+				}
+			}).create();
+
+			JsonElement tree = gson.toJsonTree(fResults);
+			JsonObject jo = new JsonObject();
+		    jo.add("autocomplete", tree);
+			resp.getWriter().write(jo.toString());
         }
         catch (Exception e)
         {

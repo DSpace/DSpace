@@ -8,6 +8,7 @@
 
 package org.dspace.solr.filters;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.servlet.ServletContext;
@@ -41,7 +42,7 @@ public class ConfigureLog4jListener
 
         URL configURL;
         try {
-            configURL = new URL(logConfig);
+            configURL = new File(logConfig).toURI().toURL();
         } catch (MalformedURLException e) {
             configURL = Loader.getResource(logConfig);
         }

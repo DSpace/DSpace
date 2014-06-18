@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>4.0-SNAPSHOT</version>
+   <version>5.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -21,13 +21,18 @@
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
-    <!--Force UTF-8 encoding during build on all platforms-->
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene.version>3.5.0</lucene.version>
+        <java.version>1.7</java.version>
+        <lucene.version>4.4.0</lucene.version>
+        <solr.version>4.4.0</solr.version>
         <slf4j.version>1.6.1</slf4j.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -40,12 +45,11 @@
       <pluginManagement>
           <plugins>
               <plugin>
-                  <!-- DSpace requires Java 1.6 or higher -->
                   <artifactId>maven-compiler-plugin</artifactId>
                   <version>2.3.2</version>
                   <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                   </configuration>
               </plugin>
               <plugin>
@@ -92,8 +96,6 @@
                     Enable to debug Maven Surefire tests in remote proces
                     <debugForkedProcess>true</debugForkedProcess>
                     -->
-                    <!-- required when running JMockit under Java 1.5 -->
-                    <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
                 </configuration>
              </plugin>
              <plugin>
@@ -111,6 +113,38 @@
       <!-- These plugin settings only apply to this single POM and are not inherited
            to any submodules. -->
       <plugins>
+         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <version>1.7</version>
+           <executions>
+             <execution>
+               <id>native2ascii-utf8</id>
+               <phase>generate-resources</phase>
+               <configuration>
+                 <target name="Encode any UTF-8 chars in properties">
+                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
+                 </target>
+               </configuration>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+             </execution>
+           </executions>
+           <!-- Required dependencies for native2ascii to function -->
+           <dependencies>
+             <dependency>
+               <groupId>com.sun</groupId>
+               <artifactId>tools</artifactId>
+               <version>${java.version}</version>
+               <scope>system</scope>
+               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
+               <systemPath>${toolsjar}</systemPath>
+             </dependency>
+           </dependencies>
+         </plugin>
+
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.3.2</version>
@@ -192,7 +226,8 @@
            </activation>
            <properties>
                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-               <filters.file>${root.basedir}/build.properties</filters.file>
+               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+               <filters.file>${root.basedir}/target/build.properties</filters.file>
            </properties>
        </profile>
 
@@ -209,7 +244,8 @@
            </activation>
            <properties>
                 <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
-                <filters.file>${root.basedir}/${env}.properties</filters.file>
+                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
            </properties>
        </profile>
 
@@ -250,6 +286,33 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
+        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
+        <profile>
+          <id>default-java-tools</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+            <file>
+                <exists>${java.home}/../lib/tools.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+          </properties>
+        </profile>
+        <profile>
+          <id>mac-java-tools</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+            <file>
+                <exists>${java.home}/../Classes/classes.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+          </properties>
         </profile>
 
 
@@ -334,6 +397,19 @@
                 <module>dspace-jspui</module>
             </modules>
         </profile>
+
+       <!-- REST Jersey -->
+       <profile>
+           <id>dspace-rest</id>
+           <activation>
+               <file>
+                   <exists>dspace-rest/pom.xml</exists>
+               </file>
+           </activation>
+           <modules>
+               <module>dspace-rest</module>
+           </modules>
+       </profile>
 
 
         <!--
@@ -431,6 +507,7 @@
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
+            <module>dspace-rest</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
          </modules>
@@ -451,6 +528,7 @@
             <maven.test.skip>true</maven.test.skip>
         </properties>
       </profile>
+    
    </profiles>
 
    <!--
@@ -466,113 +544,139 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
-
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>5.0-SNAPSHOT</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rest</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>jar</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rest</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-solr</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-solr</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>war</type>
+            <classifier>skinny</classifier>
+         </dependency>
+
          <!-- DSpace Localization Packages -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[3.0.0,4.0.0)</version>
+            <version>[4.0.0,5.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[3.0.0,4.0.0)</version>
+            <version>[4.0.0,5.0.0)</version>
             <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
@@ -643,7 +747,12 @@
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${lucene.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
          </dependency>
          <dependency>
@@ -731,7 +840,7 @@
          <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
          </dependency>
 
          <dependency>
@@ -753,7 +862,7 @@
          <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
+            <version>1.2.17</version>
          </dependency>
          <dependency>
             <groupId>oro</groupId>
@@ -801,9 +910,9 @@
             <version>3.6</version>
          </dependency>
          <dependency>
-            <groupId>net.java.dev.rome</groupId>
+            <groupId>rome</groupId>
             <artifactId>rome</artifactId>
-            <version>1.0.0</version>
+            <version>1.0</version>
          </dependency>
          <dependency>
             <groupId>rome</groupId>
@@ -861,7 +970,7 @@
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.8</version>
+            <version>51.1</version>
          </dependency>
          <dependency>
             <groupId>postgresql</groupId>
@@ -913,16 +1022,16 @@
              <artifactId>slf4j-log4j12</artifactId>
              <version>${slf4j.version}</version>
          </dependency>
+         <dependency> <!-- Keep jmockit before junit -->
+            <groupId>com.googlecode.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+         </dependency>
          <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
-            <scope>test</scope>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace.dependencies.jmockit</groupId>
-            <artifactId>dspace-jmockit</artifactId>
-            <version>0.999.4</version>
             <scope>test</scope>
          </dependency>
          <dependency>
@@ -936,6 +1045,12 @@
             <artifactId>contiperf</artifactId>
             <version>1.06</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
         </dependency>
       </dependencies>
    </dependencyManagement>
@@ -1238,8 +1353,8 @@
         <repository>
             <id>sonatype-releases</id>
             <name>Sonatype Releases Repository</name>
-            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
     </repositories>
-    
+
 </project>

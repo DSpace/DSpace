@@ -39,13 +39,13 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 %>
 
-<dspace:layout titlekey="jsp.register.new-password.title" nocache="true">
+<dspace:layout style="submission" titlekey="jsp.register.new-password.title" nocache="true">
 
     <%-- <h1>Enter a New Password</h1> --%>
 	<h1><fmt:message key="jsp.register.new-password.title"/></h1>
     
     <!-- <p>Hello <%= Utils.addEntities(eperson.getFullName()) %>,</p> -->
-	<p><fmt:message key="jsp.register.new-password.hello">
+	<p class="alert"><fmt:message key="jsp.register.new-password.hello">
         <fmt:param><%= Utils.addEntities(eperson.getFullName()) %></fmt:param>
     </fmt:message></p>
     
@@ -55,7 +55,7 @@
 %>
     <%-- <p><strong>The passwords you enter below must match, and need to be at
     least 6 characters long.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.new-password.info1"/></strong></p>
+	<p class="alert alert-warning"><strong><fmt:message key="jsp.register.new-password.info1"/></strong></p>
 <%
     }
 %>
@@ -64,33 +64,31 @@
     again into the second box.  It should be at least six characters long.</p> --%>
 	<p><fmt:message key="jsp.register.new-password.info2"/></p>
 
-    <form action="<%= request.getContextPath() %>/forgot" method="post">
-        <table class="misc" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                    <table border="0" cellpadding="5">
-                        <tr>
+    <form class="form-horizontal" action="<%= request.getContextPath() %>/forgot" method="post">
+    
+    
+    
+        
+        <div class="form-group">
                             <%-- <td align="right" class="standard"><strong>New Password:</strong></td> --%>
-							<td align="right" class="standard"><label for="tpassword"><strong><fmt:message key="jsp.register.new-password.pswd.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password" id="tpassword" /></td>
-                        </tr>
-                        <tr>
-                            <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
-							<td align="right" class="standard"><label for="tpassword_confirm"><strong><fmt:message key="jsp.register.new-password.confirm.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password_confirm" id="tpassword_confirm" /></td>
-                        </tr>
-                        <tr>
-                            <td align="center" colspan="2">
-                                <%-- <input type="submit" name="submit" value="Set New Password"> --%>
-								<input type="submit" name="submit" value="<fmt:message key="jsp.register.new-password.set.button"/>" />
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-
-        <input type="hidden" name="step" value="<%= RegisterServlet.NEW_PASSWORD_PAGE %>"/>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.new-password.pswd.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password" id="tpassword" />
+                            </div>
+            </div>
+        <div class="form-group">
+	                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.new-password.confirm.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" /></td>
+                            </div>
+		</div>
+	<div class="col-md-offset-5">
+       <%-- <p align="center"><input type="submit" name="submit" value="Update Profile"></p> --%>
+	   <input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.new-password.set.button"/>" />
+	 </div>
+	 
+	    <input type="hidden" name="step" value="<%= RegisterServlet.NEW_PASSWORD_PAGE %>"/>
         <input type="hidden" name="token" value="<%= token %>"/>
     </form>
     

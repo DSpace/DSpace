@@ -34,6 +34,7 @@ import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -391,7 +392,7 @@ public class ItemTag extends TagSupport
             configLine = defaultFields;
         }
 
-        out.println("<center><table class=\"itemDisplayTable\">");
+        out.println("<table class=\"table itemDisplayTable\">");
 
         /*
          * Break down the configuration into fields and display them
@@ -472,7 +473,7 @@ public class ItemTag extends TagSupport
                 try
                 {
                     label = I18nUtil.getMessage("metadata."
-                            + (style != null ? style + "." : "") + field,
+                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
                             context);
                 }
                 catch (MissingResourceException e)
@@ -623,7 +624,7 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table></center><br/>");
+        out.println("</table><br/>");
 
         listBitstreams();
 
@@ -648,12 +649,12 @@ public class ItemTag extends TagSupport
         // Get all the metadata
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-        out.println("<p align=\"center\">"
+        out.println("<div class=\"panel panel-info\"><div class=\"panel-heading\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
-                        "org.dspace.app.webui.jsptag.ItemTag.full") + "</p>");
+                        "org.dspace.app.webui.jsptag.ItemTag.full") + "</div>");
 
         // Three column table - DC field, value, language
-        out.println("<center><table class=\"itemDisplayTable\">");
+        out.println("<table class=\"panel-body table itemDisplayTable\">");
         out.println("<tr><th id=\"s1\" class=\"standard\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.dcfield")
@@ -697,7 +698,7 @@ public class ItemTag extends TagSupport
 
         listCollections();
 
-        out.println("</table></center><br/>");
+        out.println("</table></div><br/>");
 
         listBitstreams();
 
@@ -731,7 +732,9 @@ public class ItemTag extends TagSupport
                 out.print(LocaleSupport.getLocalizedMessage(pageContext,
                           "org.dspace.app.webui.jsptag.ItemTag.appears"));
             }
-            out.print("</td><td class=\"metadataFieldValue\">");
+            out.print("</td><td class=\"metadataFieldValue\""+
+            		(style.equals("full")?"colspan=\"2\"":"")
+            		+">");
 
             for (int i = 0; i < collections.length; i++)
             {
@@ -757,11 +760,11 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest) pageContext
                 .getRequest();
 
-        out.print("<table align=\"center\" class=\"miscTable\"><tr>");
-        out.println("<td class=\"evenRowEvenCol\"><p><strong>"
+        out.print("<div class=\"panel panel-info\">");
+        out.println("<div class=\"panel-heading\">"
                 + LocaleSupport.getLocalizedMessage(pageContext,
                         "org.dspace.app.webui.jsptag.ItemTag.files")
-                + "</strong></p>");
+                + "</div>");
 
         try
         {
@@ -781,10 +784,10 @@ public class ItemTag extends TagSupport
             // if user already has uploaded at least one file
         	if (!filesExist)
         	{
-        		out.println("<p>"
+        		out.println("<div class=\"panel-body\">"
         				+ LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.files.no")
-                            + "</p>");
+                            + "</div>");
         	}
         	else
         	{
@@ -824,7 +827,7 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table cellpadding=\"6\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table class=\"table panel-body\"><tr><th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
@@ -846,7 +849,7 @@ public class ItemTag extends TagSupport
                     + "</th><th id=\"t4\" class=\"standard\">"
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.fileformat")
-                    + "</th></tr>");
+                    + "</th><th>&nbsp;</th></tr>");
 
             	// if primary bitstream is html, display a link for only that one to
             	// HTMLServlet
@@ -886,7 +889,7 @@ public class ItemTag extends TagSupport
                     out.print("</td><td headers=\"t4\" class=\"standard\">");
             		out.print(primaryBitstream.getFormatDescription());
             		out
-                        .print("</td><td class=\"standard\"><a target=\"_blank\" href=\"");
+                        .print("</td><td class=\"standard\"><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
             		out.print(request.getContextPath());
             		out.print("/html/");
             		out.print(handle + "/");
@@ -900,6 +903,15 @@ public class ItemTag extends TagSupport
             	}	
             	else
             	{
+            		Context context = UIUtil
+							.obtainContext(request);
+            		boolean showRequestCopy = false;
+            		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
+            				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
+            						context.getCurrentUser() != null))
+					{
+            			showRequestCopy = true;
+					}
             		for (int i = 0; i < bundles.length; i++)
             		{
             			Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -913,7 +925,7 @@ public class ItemTag extends TagSupport
                                 // Work out what the bitstream link should be
                                 // (persistent
                                 // ID if item has Handle)
-                                String bsLink = "<a target=\"_blank\" href=\""
+                                String bsLink = "target=\"_blank\" href=\""
                                         + request.getContextPath();
 
                                 if ((handle != null)
@@ -936,7 +948,8 @@ public class ItemTag extends TagSupport
 
             					out
                                     .print("<tr><td headers=\"t1\" class=\"standard\">");
-                                out.print(bsLink);
+                                out.print("<a ");
+            					out.print(bsLink);
             					out.print(bitstreams[k].getName());
                                 out.print("</a>");
                                 
@@ -977,6 +990,7 @@ public class ItemTag extends TagSupport
                                             			.getName(),
                                             			Constants.DEFAULT_ENCODING);
 
+            							out.print("<a ");
             							out.print(bsLink);
             							out.print("<img src=\"" + myPath + "\" ");
             							out.print("alt=\"" + tAltText
@@ -984,13 +998,35 @@ public class ItemTag extends TagSupport
             						}
             					}
 
+            					out.print("<a class=\"btn btn-primary\" ");
             					out
                                     .print(bsLink
                                             + LocaleSupport
                                                     .getLocalizedMessage(
                                                             pageContext,
                                                             "org.dspace.app.webui.jsptag.ItemTag.view")
-                                            + "</a></td></tr>");
+                                            + "</a>");
+            					
+								try {
+									if (showRequestCopy && !AuthorizeManager
+											.authorizeActionBoolean(context,
+													bitstreams[k],
+													Constants.READ))
+										out.print("&nbsp;<a class=\"btn btn-success\" href=\""
+												+ request.getContextPath()
+												+ "/request-item?handle="
+												+ handle
+												+ "&bitstream-id="
+												+ bitstreams[k].getID()
+												+ "\">"
+												+ LocaleSupport
+														.getLocalizedMessage(
+																pageContext,
+																"org.dspace.app.webui.jsptag.ItemTag.restrict")
+												+ "</a>");
+								} catch (Exception e) {
+								}
+								out.print("</td></tr>");
             				}
             			}
             		}
@@ -1004,7 +1040,7 @@ public class ItemTag extends TagSupport
         	throw new IOException(sqle.getMessage(), sqle);
         }
 
-        out.println("</td></tr></table>");
+        out.println("</div>");
     }
 
     private void getThumbSettings()
@@ -1032,7 +1068,7 @@ public class ItemTag extends TagSupport
         	throw new IOException(sqle.getMessage(), sqle);
         }
 
-        out.println("<table align=\"center\" class=\"attentionTable\"><tr>");
+        out.println("<table align=\"center\" class=\"table attentionTable\"><tr>");
 
         out.println("<td class=\"attentionCell\"><p><strong>"
                 + LocaleSupport.getLocalizedMessage(pageContext,
@@ -1046,7 +1082,7 @@ public class ItemTag extends TagSupport
             for (int k = 0; k < bitstreams.length; k++)
             {
                 out.print("<div align=\"center\" class=\"standard\">");
-                out.print("<strong><a target=\"_blank\" href=\"");
+                out.print("<strong><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
                 out.print(request.getContextPath());
                 out.print("/retrieve/");
                 out.print(bitstreams[k].getID() + "/");

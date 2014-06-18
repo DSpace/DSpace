@@ -10,19 +10,16 @@ package org.dspace.statistics.util;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.util.Date;
-import java.util.Map;
 import java.text.SimpleDateFormat;
 
 import com.maxmind.geoip.LookupService;
@@ -191,12 +188,10 @@ public class StatisticsDataGenerator {
 		// We got all our parameters now get the rest
 		Context context = new Context();
 		// Find our solr server
-		CommonsHttpSolrServer solr = new CommonsHttpSolrServer(
+		HttpSolrServer solr = new HttpSolrServer(
 				ConfigurationManager.getProperty("solr-statistics", "server"));
 		solr.deleteByQuery("*:*");
 		solr.commit();
-
-		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
 
 		String prevIp = null;
 		String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
@@ -365,24 +360,6 @@ public class StatisticsDataGenerator {
             {
                 doc1.addField("dns", dns.toLowerCase());
             }
-
-			if (dso instanceof Item) {
-				Item item = (Item) dso;
-				// Store the metadata
-                for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
-				{
-					String dcField = entry.getValue();
-
-					DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-							dcField.split("\\.")[1], dcField.split("\\.")[2],
-							Item.ANY);
-					for (DCValue val1 : vals) {
-						String val = val1.value;
-						doc1.addField(entry.getKey(), val);
-						doc1.addField(entry.getKey() + "_search", val.toLowerCase());
-					}
-				}
-			}
 
 			SolrLogger.storeParents(doc1, dso);
 

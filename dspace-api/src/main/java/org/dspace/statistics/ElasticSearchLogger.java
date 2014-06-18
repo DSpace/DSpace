@@ -22,12 +22,14 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
+
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.client.action.index.IndexRequestBuilder;
+
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
@@ -242,7 +244,7 @@ public class ElasticSearchLogger {
             putMappingRequestBuilder.setSource(stringMappingJSON);
             PutMappingResponse response = putMappingRequestBuilder.execute().actionGet();
 
-            if(!response.getAcknowledged()) {
+            if(!response.isAcknowledged()) {
                 log.info("Could not define mapping for type ["+indexName+"]/["+indexType+"]");
             } else {
                 log.info("Successfully put mapping for ["+indexName+"]/["+indexType+"]");
@@ -379,6 +381,124 @@ public class ElasticSearchLogger {
         }
     }
 
+    public void post(DSpaceObject dspaceObject, String ip, String userAgent, String xforwarderfor, EPerson currentUser) {
+        //log.info("DS-ES post for type:"+dspaceObject.getType() + " -- " + dspaceObject.getName());
+
+        client = ElasticSearchLogger.getInstance().getClient();
+
+        boolean isSpiderBot = SpiderDetector.isSpider(ip);
+
+        try {
+            if (isSpiderBot &&
+                    !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true)) {
+                return;
+            }
+
+
+            // Save our basic info that we already have
+
+            if (isUseProxies() && xforwarderfor != null) {
+                /* This header is a comma delimited list */
+                for (String xfip : xforwarderfor.split(",")) {
+                    /* proxy itself will sometime populate this header with the same value in
+                        remote address. ordering in spec is vague, we'll just take the last
+                        not equal to the proxy
+                    */
+                    if (!xforwarderfor.contains(ip)) {
+                        ip = xfip.trim();
+                    }
+                }
+            }
+
+            XContentBuilder docBuilder = null;
+
+
+            docBuilder = XContentFactory.jsonBuilder().startObject();
+
+
+            docBuilder.field("ip", ip);
+
+            docBuilder.field("id", dspaceObject.getID());
+
+            // The numerical constant that represents the DSpaceObject TYPE. i.e. 0=bitstream, 2=item, ...
+            docBuilder.field("typeIndex", dspaceObject.getType());
+
+            // The text that represent the DSpaceObject TYPE. i.e. BITSTREAM, ITEM, COLLECTION, COMMUNITY
+            docBuilder.field("type", Constants.typeText[dspaceObject.getType()]);
+
+            // Save the current time
+            docBuilder.field("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+            if (currentUser != null) {
+                docBuilder.field("epersonid", currentUser.getID());
+            }
+
+            try {
+                String dns = DnsLookup.reverseDns(ip);
+                docBuilder.field("dns", dns.toLowerCase());
+            } catch (Exception e) {
+                log.error("Failed DNS Lookup for IP:" + ip);
+                log.debug(e.getMessage(), e);
+            }
+
+            // Save the location information if valid, save the event without
+            // location information if not valid
+            Location location = locationService.getLocation(ip);
+            if (location != null
+                    && !("--".equals(location.countryCode)
+                    && location.latitude == -180 && location.longitude == -180)) {
+                try {
+                    docBuilder.field("continent", LocationUtils
+                            .getContinentCode(location.countryCode));
+                } catch (Exception e) {
+                    System.out
+                            .println("COUNTRY ERROR: " + location.countryCode);
+                }
+                docBuilder.field("countryCode", location.countryCode);
+                docBuilder.field("city", location.city);
+                docBuilder.field("latitude", location.latitude);
+                docBuilder.field("longitude", location.longitude);
+                docBuilder.field("isBot", isSpiderBot);
+
+                if (userAgent != null) {
+                    docBuilder.field("userAgent", userAgent);
+                }
+            }
+
+            if (dspaceObject instanceof Bitstream) {
+                Bitstream bit = (Bitstream) dspaceObject;
+                Bundle[] bundles = bit.getBundles();
+                docBuilder.field("bundleName").startArray();
+                for (Bundle bundle : bundles) {
+                    docBuilder.value(bundle.getName());
+                }
+                docBuilder.endArray();
+            }
+
+            storeParents(docBuilder, getParents(dspaceObject));
+
+            docBuilder.endObject();
+
+            if (docBuilder != null) {
+                IndexRequestBuilder irb = client.prepareIndex(indexName, indexType)
+                        .setSource(docBuilder);
+                //log.info("Executing document insert into index");
+                if(client == null) {
+                    log.error("Hey, client is null");
+                }
+                irb.execute().actionGet();
+            }
+
+        } catch (RuntimeException re) {
+            log.error("RunTimer in ESL:\n" + ExceptionUtils.getStackTrace(re));
+            throw re;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            client.close();
+        }
+    }
+
+    
     public static String getClusterName() {
         return clusterName;
     }

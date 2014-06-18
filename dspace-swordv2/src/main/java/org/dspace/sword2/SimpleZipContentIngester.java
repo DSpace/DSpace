@@ -20,6 +20,7 @@ import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
+import org.swordapp.server.UriRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,30 +32,11 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 public class SimpleZipContentIngester extends AbstractSwordContentIngester
 {
-    public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription)
-            throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
-    {
-        return this.ingest(context, deposit, dso, verboseDescription, null);
-    }
-
-	public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription, DepositResult result)
-			throws DSpaceSwordException, SwordError, SwordAuthException
-	{
-        if (dso instanceof Collection)
-        {
-            return this.ingestToCollection(context, deposit, (Collection) dso, verboseDescription, result);
-        }
-		else if (dso instanceof Item)
-        {
-            return this.ingestToItem(context, deposit, (Item) dso, verboseDescription, result);
-        }
-		return null;
-	}
-
 	public DepositResult ingestToCollection(Context context, Deposit deposit, Collection collection, VerboseDescription verboseDescription, DepositResult result)
 			throws DSpaceSwordException, SwordError, SwordAuthException
     {
@@ -142,7 +124,7 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester
     }
 
 	private List<Bitstream> unzipToBundle(Context context, File depositFile, Bundle target)
-			throws DSpaceSwordException, SwordAuthException
+			throws DSpaceSwordException, SwordError, SwordAuthException
 	{
 		try
 		{
@@ -164,6 +146,10 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester
 			}
 
 			return derivedResources;
+		}
+		catch (ZipException e)
+		{
+			throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, "unable to unzip provided package", e);
 		}
 		catch (IOException e)
 		{

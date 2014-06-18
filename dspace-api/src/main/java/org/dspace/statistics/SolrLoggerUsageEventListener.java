@@ -31,13 +31,18 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
 		if(event instanceof UsageEvent)
 		{
+			log.debug("Usage event received " + ((UsageEvent)event).getName());
 			try{
 			    UsageEvent ue = (UsageEvent)event;
 			
 			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
                 if(UsageEvent.Action.VIEW == ue.getAction()){
-                    SolrLogger.postView(ue.getObject(), ue.getRequest(), currentUser);
+                	if(ue.getRequest()!=null){
+                		SolrLogger.postView(ue.getObject(), ue.getRequest(), currentUser);
+                	} else {
+                		SolrLogger.postView(ue.getObject(), ue.getIp(), ue.getUserAgent(), ue.getXforwarderfor(), currentUser);
+                	}
                 }else
                 if(UsageEvent.Action.SEARCH == ue.getAction()){
                     UsageSearchEvent usageSearchEvent = (UsageSearchEvent) ue;

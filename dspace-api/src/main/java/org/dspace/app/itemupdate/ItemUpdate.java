@@ -515,7 +515,7 @@ public class ItemUpdate {
 	private File initUndoArchive(File sourceDir)
 	throws FileNotFoundException, IOException
 	{				
-		File parentDir = sourceDir.getAbsoluteFile().getParentFile(); 
+		File parentDir = sourceDir.getCanonicalFile().getParentFile();
 		if (parentDir == null)
 		{
 			throw new FileNotFoundException("Parent directory of archive directory not found; unable to write UndoArchive; no processing performed");    			
@@ -533,8 +533,8 @@ public class ItemUpdate {
 		// create root directory
 		if (!undoDir.mkdir())
 		{
-        	pr("ERROR creating  Undo Archive directory ");
-        	throw new IOException("ERROR creating  Undo Archive directory ");
+			pr("ERROR creating  Undo Archive directory " + undoDir.getCanonicalPath());
+			throw new IOException("ERROR creating  Undo Archive directory " + undoDir.getCanonicalPath());
 		}
 		
         //Undo is suppressed to prevent undo of undo

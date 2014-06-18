@@ -306,7 +306,7 @@ public class AuthenticationUtil
     throws SQLException, AuthorizeException
     {
     	// Only allow loginAs if the administrator has allowed it.
-    	if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+    	if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
         {
             return;
         }
@@ -613,5 +613,14 @@ public class AuthenticationUtil
     	// Otherwise return the real request.
     	return realHttpRequest;
     }
-    
+
+    /**
+     * Has this user authenticated?
+     * @param request
+     * @return true if request is in a session having a user ID.
+     */
+    public static boolean isLoggedIn(HttpServletRequest request)
+    {
+        return (null != request.getSession().getAttribute(EFFECTIVE_USER_ID));
+    }
 }

@@ -50,7 +50,7 @@
     String taskOptions = (String)request.getAttribute("curate_task_options");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.curate.item.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.curate.item.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -62,53 +62,46 @@
           <fmt:param value="<%= title %>"/>
         </fmt:message>
     </h1>
-
-    <table width="60%">
-      <form action="<%=request.getContextPath()%>/dspace-admin/curate" method="post">
+	<div class="row container">
+    <form action="<%=request.getContextPath()%>/dspace-admin/curate" method="post">
 <%
     if (groupOptions != null && !"".equals(groupOptions))
     {
 %>
-      <tr>
-        <td class="curate heading">
-          <fmt:message key="jsp.dspace-admin.curate.select-group.tag"/>:
-        </td>
-        <td class="curate field">
-          <select name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
+    	<div class="input-group">
+          <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.curate.select-group.tag"/>:</label>
+    
+          <select class="form-control" name="select_curate_group" id="select_curate_group" onchange="this.form.submit();">
             <%= groupOptions %>
           </select>
-        </td>
-      </tr>
-    </p>
+    	</div>
+    
 <%
     }
 %>
-      <tr>
-        <td class="curate heading">
-          <fmt:message key="jsp.dspace-admin.curate.select-task.tag"/>:
-        </td>
-        <td class="curate field">
-          <select name="curate_task" id="curate_task">
+    
+        <div class="input-group">
+          <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.curate.select-task.tag"/>:</label>
+    
+          <select class="form-control" name="curate_task" id="curate_task">
             <%= taskOptions %>
           </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="curate button" colspan="2">
-          <input type="hidden" name="item_id" value="<%= itemID %>"/>
-          <input type="submit" name="submit_item_curate" value="<fmt:message key="jsp.dspace-admin.curate.perform.button"/>" />
-          <input type="submit" name="submit_item_queue" value="<fmt:message key="jsp.dspace-admin.curate.queue.button"/>" />
-          </form>
-        </td>
-      </tr>
-      <tr>
-        <td class="curate button" colspan="2">
-          <form method="get" action="<%=request.getContextPath()%>/tools/edit-item">
-            <input type="hidden" name="item_id" value="<%= itemID %>"/>
-            <input type="submit" value="<fmt:message key="jsp.dspace-admin.curate.return.item.button"/>" />
-          </form>
-        </td>
-      </tr>
-    </table>
-
+    	</div>
+    	
+    	<br/>
+          <div class="col-md-4 row pull-right">
+          	<input type="hidden" name="item_id" value="<%= itemID %>"/>
+          	<input class="btn btn-warning col-md-6" type="submit" name="submit_item_queue" value="<fmt:message key="jsp.tools.curate.queue.button"/>" />
+          	<input class="btn btn-primary col-md-6" type="submit" name="submit_item_curate" value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+          </div>
+        
+  	</form>
+      </div>  
+    
+    	<div class="row container">
+         	<form method="get" action="<%=request.getContextPath()%>/tools/edit-item">
+            	<input type="hidden" name="item_id" value="<%= itemID %>"/>
+    			<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.dspace-admin.curate.return.item.button"/>"/>
+	        </form>
+       </div>
 </dspace:layout>

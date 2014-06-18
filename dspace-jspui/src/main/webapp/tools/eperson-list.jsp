@@ -28,6 +28,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
 
@@ -129,7 +130,16 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css"/>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+        <script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
+        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
+							
 <script type="text/javascript">
 <!-- Begin
 
@@ -168,73 +178,65 @@ function clearEPeople()
 	<p class="submitFormHelp"><fmt:message key="jsp.tools.eperson-list.info1"/></p>
 <%  } %>
 <center>
-<form method="get">
-    <input type="hidden" name="first" value="<%= first %>" />
-    <input type="hidden" name="sortby" value="<%= sortBy %>" />
-    <input type="hidden" name="multiple" value="<%= multiple %>" />    
-    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query" /></label><input type="text" name="search" value="<%= search %>"/>
-    <input type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
-<%
-    if (search != null && !search.equals(""))
-    {   %>
-    <br/>
-    <a href="<%= request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first="+first %>"><fmt:message key="jsp.tools.eperson-list.search.return-browse" /></a>	
-<%
-    }    
-%>
-</form>
+	<form method="get">
+	    <input type="hidden" name="first" value="<%= first %>" />
+	    <input type="hidden" name="sortby" value="<%= sortBy %>" />
+	    <input type="hidden" name="multiple" value="<%= multiple %>" />    
+	    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query"/></label>
+	    <input class="form-control" style="width:200px;"type="text" name="search" value="<%= search %>"/>
+	    <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
+	<%
+	    if (search != null && !search.equals("")){   %>
+	    <a class="btn btn-warning" href="<%= request.getContextPath() + "/tools/eperson-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first="+first %>"><fmt:message key="jsp.tools.eperson-list.search.return-browse" /></a>	
+		<%}%>
+		
+	</form>
 </center>
+
 <%-- Controls for jumping around list--%>
-	<table width="99%">
-		<tr>
-		 <%--   <td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0">First</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</a></strong></small></td> --%>
-			
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></strong></small></td>
-		</tr>
-	</table>
+<div class="span12" style="text-align:center">
+	<ul class="pagination">			
+			<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></li>
+	</ul>
+</div
 <br/>
 
 	<form method="get" action=""> <%-- Will never actually be posted, it's just so buttons will appear --%>
 
-    <table class="miscTable" align="center" summary="Epeople list">
+    <table class="table table-striped" align="center" summary="Epeople list">
 <% if (search != null && !search.equals(""))
    {  %>
        <tr>
-            <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
-            <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
-            <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
-            <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
+            <th>&nbsp;</th>
+            <th><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
+            <th><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
+            <th><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
+            <th><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
         </tr>
 <% }
    else 
    {  %>
         <tr>
-            <th id="t1" class="oddRowOddCol">&nbsp;</th>
-            <th id="t2" class="oddRowEvenCol"><%
+            <th id="t1">&nbsp;</th>
+            <th id="t2"><%
                 if (sortBy == EPerson.ID)
                 {
-                    %><strong><fmt:message key="jsp.tools.eperson-list.th.id.sortedby" /></strong><%
+                    %><fmt:message key="jsp.tools.eperson-list.th.id"/><span class="glyphicon glyphicon-arrow-down"><%
                 }
                 else
                 {
                     %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.eperson-list.th.id" /></a><%
                 }
             %></th>
-            <th id="t3" class="oddRowOddCol"><%
+            <th id="t3"><%
                 if (sortBy == EPerson.EMAIL)
                 {
-                    %><strong><fmt:message key="jsp.tools.eperson-list.th.email.sortedby" /></strong><%
+                    %><fmt:message key="jsp.tools.eperson-list.th.email"/><span class="glyphicon glyphicon-arrow-down"><%
                 }
                 else
                 {
@@ -242,10 +244,10 @@ function clearEPeople()
                 }
             %></th>
             <%-- <th class="oddRowEvenCol"><%= sortBy == EPerson.LASTNAME ? "<strong>Last Name &uarr;</strong>" : "<a href=\"" + sortLink + "lastname\">Last Name</a>" %></th> --%>
-            <th id="t4" class="oddRowEvenCol"><%
+            <th id="t4"><%
                 if (sortBy == EPerson.LASTNAME)
                 {
-                    %><fmt:message key="jsp.tools.eperson-list.th.lastname.sortedby" /><%
+                    %><fmt:message key="jsp.tools.eperson-list.th.lastname"/><span class="glyphicon glyphicon-arrow-down"><%
                 }
                 else
                 {
@@ -253,12 +255,12 @@ function clearEPeople()
                 }
             %></th>
 
-            <th id="t5" class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.firstname"/></th>
+            <th id="t5"><fmt:message key="jsp.tools.eperson-list.th.firstname"/></th>
  
-             <th id="t6" class="oddRowEvenCol"><%
+             <th id="t6"><%
                 if (sortBy == EPerson.LANGUAGE)
                 {
-                    %><fmt:message key="jsp.tools.eperson-list.th.language.sortedby" /><%
+                    %><fmt:message key="jsp.tools.eperson-list.th.language"/><span class="glyphicon glyphicon-arrow-down"></span><%
                 }
                 else
                 {
@@ -281,23 +283,24 @@ function clearEPeople()
     {
         EPerson e = epeople[i];
 		// Make sure no quotes in full name will mess up our Javascript
-        String fullname = Utils.addEntities(e.getFullName().replace('\'', ' '));
+        String fullname = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getFullName()));
+        String email = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getEmail()));
 %>
-        <tr>
-			<td headers="t1" class="<%= row %>RowOddCol">
-			    <input type="button" value="<%
-	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail().replaceAll("'", "\\\\'") %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
-			<td headers="t2" class="<%= row %>RowEvenCol"><%= e.getID() %></td>
-			<td headers="t3" class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
-            <td headers="t4" class="<%= row %>RowEvenCol">
+  <tr>
+			<td headers="t1">
+			    <input class="btn btn-success" type="button" value="<%
+			if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
+			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
+			<td headers="t2"><%= e.getID() %></td>
+			<td headers="t3"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
+            <td headers="t4">
                 <%= (e.getLastName() == null ? "" : Utils.addEntities(e.getLastName())) %>
             </td>
-            <td headers="t5" class="<%= row %>RowOddCol">
+            <td headers="t5">
                 <%= (e.getFirstName() == null ? "" : Utils.addEntities(e.getFirstName())) %>
             </td>
-            <td headers="t6" class="<%= row %>RowOddCol">
-                <%= (e.getLanguage() == null ? "" : e.getLanguage()) %>
+            <td headers="t6">
+                <%= (e.getLanguage() == null ? "" : Utils.addEntities(e.getLanguage())) %>
             </td>
         </tr>
 <%
@@ -309,28 +312,21 @@ function clearEPeople()
 <br/>
 
 <%-- Controls for jumping around list--%>
-	<table width="99%">
-		<tr>
-			<%--
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0">First</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</a></strong></small></td> 
-			--%>
-			
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></strong></small></td>
-		</tr>
-	</table>
+<div class="span12" style="text-align:center">
+	<ul class="pagination">
+			<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></li>
+	</ul>
+</div>
 
 	<%-- <p align="center"><input type="button" value="Close" onClick="window.close();"/></p> --%>
-	<p align="center"><input type="button" value="<fmt:message key="jsp.tools.eperson-list.close.button"/>" onclick="window.close();"/></p>
+	<p align="center">
+		<input type="button" class="btn btn-danger" value="<fmt:message key="jsp.tools.eperson-list.close.button"/>" onclick="window.close();"/>
+			</p>
 
 	</form>
 

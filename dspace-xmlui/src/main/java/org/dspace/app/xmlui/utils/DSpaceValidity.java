@@ -108,7 +108,7 @@ public class DSpaceValidity implements SourceValidity
     /**
      * Set the time delay for how long this cache will be assumed 
      * to be valid. When it is assumed valid no other checks will be
-     * made to consider it's validity, and once the time has expired 
+     * made to consider its validity, and once the time has expired 
      * a full validation will occur on the next cache hit. If the 
      * cache proves to be validated on this hit then the assumed 
      * validity timer is reset.
@@ -390,7 +390,7 @@ public class DSpaceValidity implements SourceValidity
     
     
     /**
-     * This method is used during serializion. When tomcat is shutdown cocoon's in-memory 
+     * This method is used during serializion. When Tomcat is shutdown, Cocoon's in-memory 
      * cache is serialized and written to disk to later be read back into memory on start 
      * up. When this class is read back into memory the readObject(stream) method will be 
      * called.
@@ -448,7 +448,7 @@ public class DSpaceValidity implements SourceValidity
         }
         else
         {
-        	// This is an error, state. We are being asked whether we are valid before
+        	// This is an error state. We are being asked whether we are valid before
         	// we have been initialized.
             return SourceValidity.INVALID;
         }

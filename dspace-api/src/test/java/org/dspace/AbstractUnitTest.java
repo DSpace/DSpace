@@ -33,6 +33,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.search.DSIndexer;
 import org.dspace.servicemanager.DSpaceKernelImpl;
@@ -52,11 +54,11 @@ import org.xml.sax.SAXException;
  *
  * @author pvillega
  */
-@UsingMocksAndStubs({MockDatabaseManager.class, MockBrowseCreateDAOOracle.class})
+@UsingMocksAndStubs({MockDatabaseManager.class, MockBrowseCreateDAOOracle.class, MockIndexEventConsumer.class})
 public class AbstractUnitTest
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractUnitTest.class);
+    private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
 
     //Below there are static variables shared by all the instances of the class
     
@@ -118,6 +120,9 @@ public class AbstractUnitTest
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
 
+            // Start the mock database
+            new MockDatabaseManager();
+
             // Load the default registries. This assumes the temporary
             // filesystem is working and the in-memory DB in place.
             Context ctx = new Context();
@@ -147,6 +152,7 @@ public class AbstractUnitTest
                     eperson.setLastName("last");
                     eperson.setEmail("test@email.com");
                     eperson.setCanLogIn(true);
+                    eperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
                 }
 
                 //Create search and browse indexes
@@ -349,6 +355,7 @@ public class AbstractUnitTest
         if(context != null && context.isValid())
         {
             context.abort();
+            context = null;
         }
     }
 

@@ -167,7 +167,7 @@
                 </xsl:if>
               </xsl:attribute>
             </meta>
-            <!-- Add stylsheets -->
+            <!-- Add stylesheets -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
                 <link rel="stylesheet" type="text/css">
                     <xsl:attribute name="media">
@@ -289,7 +289,10 @@
                                 <xsl:text>About This Repository</xsl:text>
                         </xsl:when>
                         <xsl:when test="not($page_title)">
-                                <xsl:text>  </xsl:text>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="$page_title = ''">
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
                                 <xsl:copy-of select="$page_title/node()" />
@@ -324,7 +327,9 @@
                         <xsl:text>/</xsl:text>
                     </xsl:attribute>
                     <span id="ds-header-logo">&#160;</span>
-                    <span id="ds-header-logo-text">mirage</span>
+                    <span id="ds-header-logo-text">
+                       <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
+                    </span>
                 </a>
                 <h1 class="pagetitle visuallyhidden">
                     <xsl:choose>
@@ -339,10 +344,6 @@
                     </xsl:choose>
 
                 </h1>
-                <h2 class="static-pagetitle visuallyhidden">
-                    <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
-                </h2>
-
 
                 <xsl:choose>
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
@@ -385,11 +386,12 @@
                         </div>
                     </xsl:otherwise>
                 </xsl:choose>
-
+                
+                <xsl:call-template name="languageSelection" />
+                
             </div>
         </div>
     </xsl:template>
-
 
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
@@ -483,17 +485,10 @@
                 alt="{$ccLicenseName}"
                 title="{$ccLicenseName}"
                 >
-                <img>
-                     <xsl:attribute name="src">
-                        <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
-                     </xsl:attribute>
-                     <xsl:attribute name="alt">
-                         <xsl:value-of select="$ccLicenseName"/>
-                     </xsl:attribute>
-                     <xsl:attribute name="style">
-                         <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
-                     </xsl:attribute>
-                </img>
+                <xsl:call-template name="cc-logo">
+                    <xsl:with-param name="ccLicenseName" select="$ccLicenseName"/>
+                    <xsl:with-param name="ccLicenseUri" select="$ccLicenseUri"/>
+                </xsl:call-template>
             </a>
             <span>
                 <xsl:attribute name="style">
@@ -504,6 +499,66 @@
             </span>
         </div>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="cc-logo">
+        <xsl:param name="ccLicenseName"/>
+        <xsl:param name="ccLicenseUri"/>
+        <xsl:variable name="ccLogo">
+             <xsl:choose>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by/')">
+                       <xsl:value-of select="'cc-by.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-sa/')">
+                       <xsl:value-of select="'cc-by-sa.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nd/')">
+                       <xsl:value-of select="'cc-by-nd.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc/')">
+                       <xsl:value-of select="'cc-by-nc.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc-sa/')">
+                       <xsl:value-of select="'cc-by-nc-sa.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/licenses/by-nc-nd/')">
+                       <xsl:value-of select="'cc-by-nc-nd.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/publicdomain/zero/')">
+                       <xsl:value-of select="'cc-zero.png'" />
+                  </xsl:when>
+                  <xsl:when test="starts-with($ccLicenseUri,
+                                           'http://creativecommons.org/publicdomain/mark/')">
+                       <xsl:value-of select="'cc-mark.png'" />
+                  </xsl:when>
+                  <xsl:otherwise>
+                       <xsl:value-of select="'cc-generic.png'" />
+                  </xsl:otherwise>
+             </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="ccLogoImgSrc">
+            <xsl:value-of select="$theme-path"/>
+            <xsl:text>/images/creativecommons/</xsl:text>
+            <xsl:value-of select="$ccLogo"/>
+        </xsl:variable>
+        <img>
+             <xsl:attribute name="src">
+                <xsl:value-of select="$ccLogoImgSrc"/>
+             </xsl:attribute>
+             <xsl:attribute name="alt">
+                 <xsl:value-of select="$ccLicenseName"/>
+             </xsl:attribute>
+             <xsl:attribute name="style">
+                 <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
+             </xsl:attribute>
+        </img>
     </xsl:template>
 
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->

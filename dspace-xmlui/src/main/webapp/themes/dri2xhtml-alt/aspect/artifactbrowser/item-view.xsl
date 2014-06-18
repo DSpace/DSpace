@@ -464,6 +464,16 @@
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                         </xsl:otherwise>
                     </xsl:choose>
+                    <xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
+                        <img>
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="$context-path"/>
+                                <xsl:text>/static/icons/lock24.png</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">xmlui.dri2xhtml.METS-1.0.blocked</xsl:attribute>
+                            <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">alt</xsl:attribute>
+                            </img>
+                     </xsl:if>
                 </a>
             </td>
             <!-- File size always comes in bytes and thus needs conversion -->

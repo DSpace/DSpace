@@ -30,7 +30,7 @@
     boolean retry = (request.getAttribute("retry") != null);
 %>
 
-<dspace:layout titlekey="jsp.register.new-user.title">
+<dspace:layout style="submission" titlekey="jsp.register.new-user.title">
     <%-- <h1>User Registration</h1> --%>
 	<h1><fmt:message key="jsp.register.new-user.title"/></h1>
     
@@ -38,40 +38,32 @@
     if (retry)
     { %>
     <%-- <p><strong>The e-mail address you entered was invalid.</strong>  Please try again.</strong></p> --%>
-	<p><fmt:message key="jsp.register.new-user.info1"/></p>
+	<p class="alert alert-warning"><fmt:message key="jsp.register.new-user.info1"/></p>
 <%  } %>
 
     <%-- <p>If you've never logged on to DSpace before, please enter your e-mail
     address in the box below and click "Register".</p> --%>
-	<p><fmt:message key="jsp.register.new-user.info2"/></p>
+	<p class="alert"><fmt:message key="jsp.register.new-user.info2"/></p>
     
-    <form action="<%= request.getContextPath() %>/register" method="post">
+    <form class="form-horizontal" action="<%= request.getContextPath() %>/register" method="post">
 
         <input type="hidden" name="step" value="<%= RegisterServlet.ENTER_EMAIL_PAGE %>"/>
 
-        <table class="miscTable" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                    <table border="0" cellpadding="5">
-                        <tr>
+
                             <%-- <td class="standard"><strong>E-mail Address:</strong></td> --%>
-							<td class="standard"><label for="temail"><strong><fmt:message key="jsp.register.new-user.email.field"/></strong></label></td>
-                            <td class="standard"><input type="text" name="email" id="temail" /></td>
-                        </tr>
-                        <tr>
-                            <td align="center" colspan="2">
+					    <div class="form-group">
+            				<label class="col-md-offset-3 col-md-2 control-label" for="temail"><fmt:message key="jsp.register.new-user.email.field"/></label>
+                            <div class="col-md-3"><input class="form-control" type="text" name="email" id="temail" /></div>
+                        </div>
+                        <div class="row col-md-offset-5">
                                 <%-- <input type="submit" name="submit" value="Register"> --%>
-								<input type="submit" name="submit" value="<fmt:message key="jsp.register.new-user.register.button"/>" />
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+							<input class="btn btn-default col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.new-user.register.button"/>" />
+						</div>
     </form>
     <%-- <p>If you or your department are interested in registering with DSpace, please
     contact the DSpace site administrators.</p> --%>
-	<p><fmt:message key="jsp.register.new-user.info3"/></p>
+    <br/>
+	<div class="alert alert-info"><fmt:message key="jsp.register.new-user.info3"/></div>
 
     <dspace:include page="/components/contact-info.jsp" />
 

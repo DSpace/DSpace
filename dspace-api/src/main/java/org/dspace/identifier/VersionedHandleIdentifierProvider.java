@@ -545,7 +545,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     protected String getCanonical(Item item)
     {
         String canonical = item.getHandle();
-        if( canonical.lastIndexOf(DOT)!=-1)
+        if( canonical.matches(".*/.*\\.\\d+") && canonical.lastIndexOf(DOT)!=-1)
         {
             canonical =  canonical.substring(0, canonical.lastIndexOf(DOT));
         }
@@ -556,7 +556,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     protected String getCanonical(String identifier)
     {
         String canonical = identifier;
-        if( canonical.lastIndexOf(DOT)!=-1)
+        if( canonical.matches(".*/.*\\.\\d+") && canonical.lastIndexOf(DOT)!=-1)
         {
             canonical =  canonical.substring(0, canonical.lastIndexOf(DOT));
         }

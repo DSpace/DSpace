@@ -111,6 +111,16 @@
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                         </xsl:otherwise>
                     </xsl:choose>
+                    <xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
+                        <img>
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="$context-path"/>
+                                <xsl:text>/static/icons/lock24.png</xsl:text>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">xmlui.dri2xhtml.METS-1.0.blocked</xsl:attribute>
+                            <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">alt</xsl:attribute>
+                        </img>
+                     </xsl:if>
                 </a>
             </td>
             <!-- File size always comes in bytes and thus needs conversion --> 
@@ -212,11 +222,15 @@
                 <xsl:if test="position() != last()">, </xsl:if>
             </xsl:for-each>
         </xsl:variable>
+        <xsl:variable name="alt-text"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-access-rights</i18n:text> <xsl:value-of select="$users"/></xsl:variable>
 
         <xsl:choose>
             <xsl:when test="not ($rights_context/@CONTEXTCLASS = 'GENERAL PUBLIC') and ($rights_context/rights:Permissions/@DISPLAY = 'true')">
                 <a href="{mets:FLocat[@LOCTYPE='URL']/@xlink:href}">
-                    <img width="64" height="64" src="{concat($theme-path,'/images/Crystal_Clear_action_lock3_64px.png')}" title="Read access available for {$users}"/>
+                    <img width="64" height="64" src="{concat($theme-path,'/images/Crystal_Clear_action_lock3_64px.png')}">
+                        <xsl:attribute name="title"><xsl:value-of select="$alt-text"/></xsl:attribute>
+                        <xsl:attribute name="alt"><xsl:value-of select="$alt-text"/></xsl:attribute>
+                    </img>
                     <!-- icon source: http://commons.wikimedia.org/wiki/File:Crystal_Clear_action_lock3.png -->
                 </a>
             </xsl:when>

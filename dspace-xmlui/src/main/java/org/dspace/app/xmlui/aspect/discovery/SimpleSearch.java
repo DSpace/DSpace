@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Adán Román Ruiz <aroman@arvo.es> (Bugfix)
  */
 public class SimpleSearch extends AbstractSearch implements CacheableProcessingComponent {
     /**
@@ -77,6 +78,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_notequals = message("xmlui.Discovery.SimpleSearch.filter.notequals");
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
+    private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
 
     private SearchService searchService = null;
 
@@ -145,6 +147,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Text text = searchBoxItem.addText("query");
         text.setValue(queryString);
         searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
+        if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
+        {
+            Item didYouMeanItem = searchList.addItem("did-you-mean", "didYouMean");
+            didYouMeanItem.addContent(T_did_you_mean);
+            didYouMeanItem.addXref(getSuggestUrl(queryResults.getSpellCheckQuery()), queryResults.getSpellCheckQuery(), "didYouMean");
+        }
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
@@ -155,7 +163,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         if(0 < filterFields.size() && filterTypes.size() == 0)
         {
-            //Display the add filters url ONLY if we have no filters selected & fitlers can be added
+            //Display the add filters url ONLY if we have no filters selected & filters can be added
             searchList.addItem().addXref("display-filters", T_filters_show);
         }
         addHiddenFormFields("search", request, fqs, mainSearchDiv);
@@ -185,8 +193,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
                     if(StringUtils.isNotBlank(filterValue))
                     {
-                        Row row = filtersTable.addRow("used-filters-" + i, Row.ROLE_DATA, "search-filter used-filter");
-                        addFilterRow(filterFields, i, row, filterType, filterOperator, filterValue);
+                        Row row = filtersTable.addRow("used-filters-" + i+1, Row.ROLE_DATA, "search-filter used-filter");
+                        addFilterRow(filterFields, i+1, row, filterType, filterOperator, filterValue);
                     }
                 }
                 filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
@@ -295,7 +303,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     protected String generateURL(Map<String, String> parameters)
             throws UIException {
         String query = getQuery();
-        if (!"".equals(query))
+        if (!"".equals(query) && parameters.get("query") == null)
         {
             parameters.put("query", encodeForURL(query));
         }
@@ -381,5 +389,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 division.addHidden("order").setValue(request.getParameter("order"));
             }
         }
+    }
+
+    protected String getSuggestUrl(String newQuery) throws UIException {
+        Map parameters = new HashMap();
+        parameters.put("query", newQuery);
+        return addFilterQueriesToUrl(generateURL(parameters));
     }
 }

@@ -78,7 +78,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 	UIException, SQLException, IOException, AuthorizeException
 	{
 
-        isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
 		// Get our parameters
 		int bitstreamID = parameters.getParameterAsInteger("bitstreamID",-1);

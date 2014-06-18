@@ -59,32 +59,26 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
-        StringBuilder resourceQuery = new StringBuilder();
-        //Always add the anonymous group id to the query
-        resourceQuery.append("read:(g0");
-        EPerson currentUser = context.getCurrentUser();
-        if(currentUser != null){
-            try {
-                resourceQuery.append(" OR e").append(currentUser.getID());
-                //Retrieve all the groups the current user is a member of !
-                Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
-                for (Integer groupId : groupIds) {
-                    resourceQuery.append(" OR g").append(groupId);
+    	try {
+            if(!AuthorizeManager.isAdmin(context)){
+            	StringBuilder resourceQuery = new StringBuilder();
+                //Always add the anonymous group id to the query
+                resourceQuery.append("read:(g0");
+                EPerson currentUser = context.getCurrentUser();
+                if(currentUser != null){
+                    resourceQuery.append(" OR e").append(currentUser.getID());
+                    //Retrieve all the groups the current user is a member of !
+                    Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
+                    for (Integer groupId : groupIds) {
+                        resourceQuery.append(" OR g").append(groupId);
+                    }
                 }
-            } catch (SQLException e) {
-                log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", "") ,e);
-            }
-        }
-        resourceQuery.append(")");
-        try {
-            if(AuthorizeManager.isAdmin(context)){
-                //Admins always have read access even if no policies are present !
-                resourceQuery.append(" OR (!read[* TO *])");
-
+                resourceQuery.append(")");
+                
+                solrQuery.addFilterQuery(resourceQuery.toString());
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while verifying if current user is admin !", ""), e);
+            log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", ""), e);
         }
-        solrQuery.addFilterQuery(resourceQuery.toString());
     }
 }

@@ -75,11 +75,10 @@ public class DatabaseManager
 
     /** DataSource (retrieved from jndi */
     private static DataSource dataSource = null;
-    private static String sqlOnBorrow = null;
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
-    
+
     /** 
      * This regular expression is used to perform sanity checks 
      * on database names (i.e. tables and columns). 
@@ -582,21 +581,6 @@ public class DatabaseManager
 
         if (dataSource != null) {
         	Connection conn = dataSource.getConnection();
-        	if (!StringUtils.isEmpty(sqlOnBorrow))
-        	{
-	        	PreparedStatement pstmt = conn.prepareStatement(sqlOnBorrow);
-	        	try
-	        	{
-	        		pstmt.execute();
-	        	}
-	        	finally
-	        	{
-	        		if (pstmt != null)
-                    {
-                        pstmt.close();
-                    }
-	        	}
-        	}
 
         	return conn;
         }
@@ -1481,24 +1465,11 @@ public class DatabaseManager
 
                 if (dataSource != null)
                 {
-                    if (isOracle)
-                    {
-                        sqlOnBorrow = "ALTER SESSION SET current_schema=" + ConfigurationManager.getProperty("db.username").trim().toUpperCase();
-                    }
-
                     log.debug("Using JNDI dataSource: " + jndiName);
                 }
                 else
                 {
                     log.info("Unable to locate JNDI dataSource: " + jndiName);
-                }
-            }
-
-            if (isOracle)
-            {
-                if (!StringUtils.isEmpty(ConfigurationManager.getProperty("db.postgres.schema")))
-                {
-                    sqlOnBorrow = "SET SEARCH_PATH TO " + ConfigurationManager.getProperty("db.postgres.schema").trim();
                 }
             }
 

@@ -68,23 +68,23 @@ public class EditBitstreamPolicies extends AbstractStep
         AccessStepUtil asu = new AccessStepUtil(context);
 
         // list Policies already added
-        asu.addTablePolicies(div, submissionInfo.getBitstream());
+        asu.addTablePolicies(div, submissionInfo.getBitstream(), collection);
 
         List form = div.addList("submit-edit-policy", List.TYPE_FORM);
         form.setHead(T_head);
-
-        asu.addName(request.getParameter("name"), form, errorFlag);
 
         asu.addListGroups(request.getParameter("group_id"), form, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
         asu.addAccessRadios(request.getParameter("open_access_radios"), request.getParameter("embargo_until_date"), form, errorFlag, submissionInfo.getBitstream());
 
+	    asu.addName(request.getParameter("name"), form, errorFlag);
+
         // Reason
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(isAdvancedFormEnabled){
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);

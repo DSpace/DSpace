@@ -9,13 +9,21 @@ package org.dspace.search;
 
 import java.io.Reader;
 
-import org.apache.lucene.analysis.CharTokenizer;
+import org.apache.lucene.analysis.util.CharTokenizer;
 import org.apache.lucene.util.Version;
 
 /**
  * Customized Lucene Tokenizer, since the standard one rejects numbers from
  * indexing/querying.
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public final class DSTokenizer extends CharTokenizer
 {
     /**

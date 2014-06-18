@@ -13,14 +13,14 @@
     {
         String type   = result.getType();
         boolean isSuccess = result.isSuccess();
-        String resultClass = (isSuccess ? "success" : "failure");
+        String resultClass = (isSuccess ? "success" : "danger");
 %>
-    <div class="notice <%= resultClass %>">
-      <h1 class="task-name">
+    <div class="alert alert-<%= resultClass %>">
+      <b>
         <fmt:message key="jsp.dspace-admin.curate.task.name">
           <fmt:param value="<%= result.getTask() %>"/>
         </fmt:message>
-      </h1>
+      </b>
 <%
         if ("perform".equals(type))
         {

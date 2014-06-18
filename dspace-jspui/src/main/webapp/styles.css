@@ -762,3 +762,86 @@ input.ds-authority-lock.is-unlocked
     text-align: center;
 }
 
+textarea#reason {
+       font-size: 10pt;
+}
+.access-setting {
+    margin-left: 5%;
+}
+th.accessOdd {
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessEven { 
+    width: 20%;
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: right;
+    text-decoration: none;
+    background: #dddddd;
+}
+td.accessOdd{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}
+td.accessEven{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #eeeeee; 
+}
+th.accessHeadOdd {
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #eeeeee;
+}
+th.accessHeadEven { 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    background: #dddddd;
+}
+
+.accessButton{ 
+    font-family: "verdana", "Arial", "Helvetica", sans-serif;
+    font-size: 12pt;
+    font-style: normal;
+    font-weight: normal;
+    color: #000000;
+    vertical-align: middle;
+    text-decoration: none;
+    background: #ffffff; 
+}

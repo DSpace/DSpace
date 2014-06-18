@@ -104,7 +104,7 @@
           <xsl:when test="$clause = 1">
 
               <xsl:choose>
-                  <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                  <xsl:when test="descendant::text() and (count(dim:field[@element='title'][not(@qualifier)]) &gt; 1)">
                       <!-- display first title as h1 -->
                       <h1>
                           <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
@@ -122,7 +122,7 @@
                           </span>
                       </div>
                   </xsl:when>
-                  <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                  <xsl:when test="dim:field[@element='title'][descendant::text()] and count(dim:field[@element='title'][not(@qualifier)]) = 1">
                       <h1>
                           <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
                       </h1>
@@ -140,7 +140,7 @@
           </xsl:when>
 
           <!-- Author(s) row -->
-          <xsl:when test="$clause = 2 and (dim:field[@element='contributor'][@qualifier='author'] or dim:field[@element='creator'] or dim:field[@element='contributor'])">
+          <xsl:when test="$clause = 2 and (dim:field[@element='contributor'][@qualifier='author' and descendant::text()] or dim:field[@element='creator' and descendant::text()] or dim:field[@element='contributor' and descendant::text()])">
                     <div class="simple-item-view-authors">
 	                    <xsl:choose>
 	                        <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
@@ -184,7 +184,7 @@
           </xsl:when>
 
           <!-- identifier.uri row -->
-          <xsl:when test="$clause = 3 and (dim:field[@element='identifier' and @qualifier='uri'])">
+          <xsl:when test="$clause = 3 and (dim:field[@element='identifier' and @qualifier='uri' and descendant::text()])">
                     <div class="simple-item-view-other">
 	                <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span>
 	                <span>
@@ -208,7 +208,7 @@
           </xsl:when>
 
           <!-- date.issued row -->
-          <xsl:when test="$clause = 4 and (dim:field[@element='date' and @qualifier='issued'])">
+          <xsl:when test="$clause = 4 and (dim:field[@element='date' and @qualifier='issued' and descendant::text()])">
                     <div class="simple-item-view-other">
 	                <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>:</span>
 	                <span>
@@ -259,7 +259,7 @@
           </xsl:when>
 
           <!-- Description row -->
-          <xsl:when test="$clause = 6 and (dim:field[@element='description' and not(@qualifier)])">
+          <xsl:when test="$clause = 6 and (dim:field[@element='description' and not(@qualifier) and descendant::text()])">
                 <div class="simple-item-view-description">
 	                <h3 class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</h3>
 	                <div>
@@ -388,7 +388,7 @@
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
         <div class="file-wrapper clearfix">
-            <div class="thumbnail-wrapper">
+            <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
                 <a class="image-link">
                     <xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -407,6 +407,16 @@
                             <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
                         </xsl:otherwise>
                     </xsl:choose>
+                    <xsl:if test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
+                        <img>
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="$context-path"/>
+                                <xsl:text>/static/icons/lock24.png</xsl:text>
+                            </xsl:attribute>
+                           <xsl:attribute name="alt">xmlui.dri2xhtml.METS-1.0.blocked</xsl:attribute>
+                           <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">alt</xsl:attribute>
+                        </img>
+                     </xsl:if>
                 </a>
             </div>
             <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">
@@ -509,24 +519,35 @@
         <xsl:variable name="rights_declaration" select="../../../mets:amdSec/mets:rightsMD[@ID = concat('rightsMD_', $file_id, '_METSRIGHTS')]/mets:mdWrap/mets:xmlData/rights:RightsDeclarationMD"/>
         <xsl:variable name="rights_context" select="$rights_declaration/rights:Context"/>
         <xsl:variable name="users">
-            <xsl:for-each select="$rights_declaration/*">
-                <xsl:value-of select="rights:UserName"/>
-                <xsl:choose>
-                    <xsl:when test="rights:UserName/@USERTYPE = 'GROUP'">
-                       <xsl:text> (group)</xsl:text>
-                    </xsl:when>
-                    <xsl:when test="rights:UserName/@USERTYPE = 'INDIVIDUAL'">
-                       <xsl:text> (individual)</xsl:text>
-                    </xsl:when>
-                </xsl:choose>
-                <xsl:if test="position() != last()">, </xsl:if>
-            </xsl:for-each>
+              <xsl:choose>
+                  <xsl:when test="not ($rights_context)">
+                     <xsl:text>administrators only</xsl:text>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:for-each select="$rights_declaration/*">
+                      <xsl:value-of select="rights:UserName"/>
+                      <xsl:choose>
+                          <xsl:when test="rights:UserName/@USERTYPE = 'GROUP'">
+                             <xsl:text> (group)</xsl:text>
+                          </xsl:when>
+                          <xsl:when test="rights:UserName/@USERTYPE = 'INDIVIDUAL'">
+                             <xsl:text> (individual)</xsl:text>
+                          </xsl:when>
+                      </xsl:choose>
+                      <xsl:if test="position() != last()">, </xsl:if> <!-- TODO fix ending comma -->
+                    </xsl:for-each>
+                  </xsl:otherwise>
+              </xsl:choose>
         </xsl:variable>
+        <xsl:variable name="alt-text"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-access-rights</i18n:text> <xsl:value-of select="$users"/></xsl:variable>
 
         <xsl:choose>
-            <xsl:when test="not ($rights_context/@CONTEXTCLASS = 'GENERAL PUBLIC') and ($rights_context/rights:Permissions/@DISPLAY = 'true')">
+            <xsl:when test="(not ($rights_context/@CONTEXTCLASS = 'GENERAL PUBLIC') and ($rights_context/rights:Permissions/@DISPLAY = 'true')) or not ($rights_context)">
                 <a href="{mets:FLocat[@LOCTYPE='URL']/@xlink:href}">
-                    <img width="64" height="64" src="{concat($theme-path,'/images/Crystal_Clear_action_lock3_64px.png')}" title="Read access available for {$users}"/>
+                    <img width="64" height="64" src="{concat($theme-path,'/images/Crystal_Clear_action_lock3_64px.png')}">
+                        <xsl:attribute name="title"><xsl:value-of select="$alt-text"/></xsl:attribute>
+                        <xsl:attribute name="alt"><xsl:value-of select="$alt-text"/></xsl:attribute>
+                    </img>
                     <!-- icon source: http://commons.wikimedia.org/wiki/File:Crystal_Clear_action_lock3.png -->
                 </a>
             </xsl:when>

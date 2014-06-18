@@ -26,10 +26,12 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.I18nUtil;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Locale;
 import java.sql.SQLException;
 
 /**
@@ -128,18 +130,38 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
         pageMeta.addMetadata("page","feedbackURL").addContent(contextPath + "/feedback");
 
+        // Add the locale metadata including language-dependent labels
+        Locale[] locales = I18nUtil.getSupportedLocales();
+        for (int i=0; i < locales.length; i++)
+        {
+            pageMeta.addMetadata("page", "supportedLocale").addContent(locales[i].toString());
+            // now add the appropriate labels
+            pageMeta.addMetadata("supportedLocale", locales[i].toString()).addContent(locales[i].getDisplayName(locales[i]));
+        }
+         
+        pageMeta.addMetadata("page","currentLocale").addContent(context.getCurrentLocale().toString());
+        
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
         {
             if (dso instanceof Item)
             {
+                pageMeta.addMetadata("focus","containerType").addContent("type:item");
                 pageMeta.addMetadata("focus","object").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
             }
-
-            if (dso instanceof Collection || dso instanceof Community)
+            
+            if (dso instanceof Collection)
             {
+                pageMeta.addMetadata("focus","containerType").addContent("type:collection");
+                pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
+                this.getObjectManager().manageObject(dso);
+            }
+            
+            if (dso instanceof Community)
+            {
+                pageMeta.addMetadata("focus","containerType").addContent("type:community");
                 pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
             }

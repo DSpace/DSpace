@@ -10,10 +10,11 @@ package org.dspace.search;
 import java.io.Reader;
 import java.util.Set;
 
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.PorterStemFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.en.PorterStemFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
@@ -23,7 +24,15 @@ import org.dspace.core.ConfigurationManager;
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
  * stemming and stopword filters.
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class DSAnalyzer extends StopwordAnalyzerBase
 {
     protected final Version matchVersion;
@@ -50,7 +59,7 @@ public class DSAnalyzer extends StopwordAnalyzerBase
     /*
      * Stop table
      */
-    protected final Set stopSet;
+    protected final CharArraySet stopSet;
 
     /**
      * Builds an analyzer
@@ -66,7 +75,7 @@ public class DSAnalyzer extends StopwordAnalyzerBase
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         final Tokenizer source = new DSTokenizer(matchVersion, reader);
         TokenStream result = new StandardFilter(matchVersion, source);
-
+        
         result = new LowerCaseFilter(matchVersion, result);
         result = new StopFilter(matchVersion, result, stopSet);
         result = new PorterStemFilter(result);

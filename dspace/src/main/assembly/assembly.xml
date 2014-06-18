@@ -9,13 +9,13 @@
 -->
 <!--
     DSpace Directory Assembly
-    This assembly creates the 'target/dspace-[version]-build/' which can
+    This assembly creates the 'target/dspace-installer/' which can
     then be installed via Apache Ant.
 -->
-<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
-   <id>build</id>
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+   <id>installer</id>
    <formats>
       <format>dir</format>
    </formats>

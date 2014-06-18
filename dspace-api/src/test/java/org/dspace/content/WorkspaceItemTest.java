@@ -55,22 +55,22 @@ public class WorkspaceItemTest extends AbstractUnitTest
             Collection col = Collection.create(context);
             this.wi = WorkspaceItem.create(context, col, true);
             //we need to commit the changes so we don't block the table for testing
-            context.restoreAuthSystemState();
             context.commit();
+            context.restoreAuthSystemState();
         }
         catch (IOException ex) {
             log.error("IO Error in init", ex);
-            fail("IO Error in init");
+            fail("IO Error in init: " + ex.getMessage());
         }
         catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init");
+            fail("Authorization Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 
@@ -125,6 +125,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         coll = Collection.create(context);
         template = false;
         created = WorkspaceItem.create(context, coll, template);
+        context.commit();
         assertThat("testCreate 0",created,notNullValue());
         assertTrue("testCreate 1",created.getID() >= 0);
         assertThat("testCreate 2",created.getCollection(),equalTo(coll));
@@ -132,6 +133,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         coll = Collection.create(context);
         template = true;
         created = WorkspaceItem.create(context, coll, template);
+        context.commit();
         assertThat("testCreate 3",created,notNullValue());
         assertTrue("testCreate 4",created.getID() >= 0);
         assertThat("testCreate 5",created.getCollection(),equalTo(coll));
@@ -157,6 +159,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
         WorkspaceItem created = null;
 
         coll = Collection.create(context);
+        context.commit();
         template = false;
         created = WorkspaceItem.create(context, coll, template);
         fail("Exception expected");

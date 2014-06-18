@@ -42,17 +42,18 @@
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
 %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
     <head>
         <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="Generator" content="<%= generator %>" />
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/discovery.css" type="text/css" />
-	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.8.22.custom/redmond/jquery-ui-1.8.22.custom.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
+	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -78,13 +79,11 @@
         }
 %>
         
-	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-1.7.2.min.js'></script>
-	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.8.22.custom.min.js'></script>
+	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
+	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/prototype.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
 
     <%--Gooogle Analytics recording.--%>
@@ -111,70 +110,68 @@
 		<%
 		    }
     %>
+    
 
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="<%= request.getContextPath() %>/static/js/html5shiv.js"></script>
+  <script src="<%= request.getContextPath() %>/static/js/respond.min.js"></script>
+<![endif]-->
     </head>
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body>
-
-        <%-- DSpace top-of-page banner --%>
-        <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="pageBanner" width="100%" border="0" cellpadding="0" cellspacing="0">
-
-            <%-- DSpace logo --%>
-            <tr>
-                <td>
-                    <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="198" height="79" border="0"/></a></td>
-                    <td class="tagLine" width="99%"> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <a class="tagLineText" target="_blank" href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
-                </td>
-                <td nowrap="nowrap" valign="middle">
-                </td>
-            </tr>
-            <tr class="stripe"> <%-- Blue stripe --%>
-                <td colspan="3">&nbsp;</td>
-            </tr>
-        </table>
-
-        <%-- Localization --%>
-<%--  <c:if test="${param.locale != null}">--%>
-<%--   <fmt:setLocale value="${param.locale}" scope="session" /> --%>
-<%-- </c:if> --%>
-<%--        <fmt:setBundle basename="Messages" scope="session"/> --%>
-
-        <%-- Page contents --%>
-
-        <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="centralPane" width="99%" border="0" cellpadding="3" cellspacing="1">
-
-            <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
-            <tr valign="top">
-
-            <%-- Navigation bar --%>
-<%
+    <body class="undernavigation">
+<a class="sr-only" href="#content">Skip navigation</a>
+<header class="navbar navbar-inverse navbar-fixed-top">    
+    <%
     if (!navbar.equals("off"))
     {
 %>
-            <td class="navigationBar">
+            <div class="container">
                 <dspace:include page="<%= navbar %>" />
-            </td>
+            </div>
 <%
     }
+    else
+    {
+    	%>
+        <div class="container">
+            <dspace:include page="/layout/navbar-minimal.jsp" />
+        </div>
+<%    	
+    }
 %>
-            <%-- Page Content --%>
+</header>
 
-            <%-- HACK: width specified here for non-CSS compliant Netscape 4.x --%>
-            <%-- HACK: Width shouldn't really be 100%, but omitting this means --%>
-            <%--       navigation bar gets far too wide on certain pages --%>
-            <td class="pageContents" width="100%">
-
+<main id="content" role="main">
+<div class="container banner">
+	<div class="row">
+		<div class="col-md-9 brand">
+		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
+        <fmt:message key="jsp.layout.header-default.brand.description" /> 
+        </div>
+        <div class="col-md-3"><img class="pull-right" src="<%= request.getContextPath() %>/image/logo.gif">
+        </div>
+	</div>
+</div>	
+<br/>
                 <%-- Location bar --%>
 <%
     if (locbar)
     {
 %>
+<div class="container">
                 <dspace:include page="/layout/location-bar.jsp" />
+</div>                
 <%
     }
 %>
+
+
+        <%-- Page contents --%>
+<div class="container">
+<% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
+	<div class="row">
+		<div class="col-md-9">
+<% } %>		
