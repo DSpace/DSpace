@@ -7,24 +7,29 @@
  */
 package org.dspace.search;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.TokenMgrError;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.TokenMgrError;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -40,7 +45,14 @@ import org.dspace.sort.SortOption;
  * DSIndexer contains various static methods for performing queries on indices,
  * for collections and communities.
  *
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class DSQuery
 {
     // Result types
@@ -112,10 +124,13 @@ public class DSQuery
 
         try
         {
+            // calculate execution time 
+            Date startTime = new Date();
+            
             // grab a searcher, and do the search
-            Searcher searcher = getSearcher(c);
+            IndexSearcher searcher = getSearcher(c);
 
-            QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
+            QueryParser qp = new QueryParser(DSIndexer.luceneVersion, "default", DSIndexer.getAnalyzer());
             log.debug("Final query string: " + querystring);
             
             if (operator == null || operator.equals("OR"))
@@ -126,57 +141,34 @@ public class DSQuery
             {
             	qp.setDefaultOperator(QueryParser.AND_OPERATOR);
             }
-            
-            Query myquery = qp.parse(querystring);
-            Hits hits = null;
 
-            try
-            {
-                if (args.getSortOption() == null)
-                {
-                    SortField[] sortFields = new SortField[] {
-                            new SortField("search.resourcetype", true),
-                            new SortField(null, SortField.SCORE, SortOption.ASCENDING.equals(args.getSortOrder()))
-                        };
-                    hits = searcher.search(myquery, new Sort(sortFields));
-                }
-                else
-                {
-                    SortField[] sortFields = new SortField[] {
-                            new SortField("search.resourcetype", true),
-                            new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())),
-                            SortField.FIELD_SCORE
-                        };
-                    hits = searcher.search(myquery, new Sort(sortFields));
-                }
-            }
-            catch (Exception e)
-            {
-                // Lucene can throw an exception if it is unable to determine a sort time from the specified field
-                // Provide a fall back that just works on relevancy.
-                log.error("Unable to use speficied sort option: " + (args.getSortOption() == null ? "type/relevance": args.getSortOption().getName()));
-                hits = searcher.search(myquery, new Sort(SortField.FIELD_SCORE));
-            }
+            Query myquery = qp.parse(querystring);
+            //Retrieve enough docs to get all the results we need !
+            TopDocs  hits = performQuery(args, searcher, myquery, args.getPageSize() * (args.getStart() + 1));
+            
+            Date endTime = new Date();
+            
+            qr.setQueryTime(endTime.getTime() - startTime.getTime());
             
             // set total number of hits
-            qr.setHitCount(hits.length());
+            qr.setHitCount(hits.totalHits);
 
             // We now have a bunch of hits - snip out a 'window'
             // defined in start, count and return the handles
             // from that window
             // first, are there enough hits?
-            if (args.getStart() < hits.length())
+            if (args.getStart() < hits.totalHits)
             {
                 // get as many as we can, up to the window size
                 // how many are available after snipping off at offset 'start'?
-                int hitsRemaining = hits.length() - args.getStart();
+                int hitsRemaining = hits.totalHits - args.getStart();
 
                 int hitsToProcess = (hitsRemaining < args.getPageSize()) ? hitsRemaining
                         : args.getPageSize();
 
                 for (int i = args.getStart(); i < (args.getStart() + hitsToProcess); i++)
                 {
-                    Document d = hits.doc(i);
+                    Document d = searcher.doc(hits.scoreDocs[i].doc);
 
                     String resourceId   = d.get("search.resourceid");
                     String resourceType = d.get("search.resourcetype");
@@ -187,15 +179,15 @@ public class DSQuery
                     switch (Integer.parseInt( resourceType != null ? resourceType : handleType))
                     {
                         case Constants.ITEM:
-                            hitTypes.add(Integer.valueOf(Constants.ITEM));
+                            hitTypes.add(Constants.ITEM);
                             break;
 
                         case Constants.COLLECTION:
-                            hitTypes.add(Integer.valueOf(Constants.COLLECTION));
+                            hitTypes.add(Constants.COLLECTION);
                             break;
 
                         case Constants.COMMUNITY:
-                            hitTypes.add(Integer.valueOf(Constants.COMMUNITY));
+                            hitTypes.add(Constants.COMMUNITY);
                             break;
                     }
 
@@ -228,6 +220,38 @@ public class DSQuery
         }
 
         return qr;
+    }
+
+    private static TopDocs performQuery(QueryArgs args, IndexSearcher searcher, Query myquery, int max) throws IOException {
+        TopDocs hits;
+        try
+        {
+            if (args.getSortOption() == null)
+            {
+                SortField[] sortFields = new SortField[] {
+                        new SortField("search.resourcetype", SortField.Type.INT, true),
+                        new SortField(null, SortField.FIELD_SCORE.getType(), SortOption.ASCENDING.equals(args.getSortOrder()))
+                    };
+                hits = searcher.search(myquery, max, new Sort(sortFields));
+            }
+            else
+            {
+                SortField[] sortFields = new SortField[] {
+                        new SortField("search.resourcetype", SortField.Type.INT, true),
+                        new SortField("sort_" + args.getSortOption().getName(), SortField.Type.STRING, SortOption.DESCENDING.equals(args.getSortOrder())),
+                        SortField.FIELD_SCORE
+                    };
+                hits = searcher.search(myquery, max, new Sort(sortFields));
+            }
+        }
+        catch (Exception e)
+        {
+            // Lucene can throw an exception if it is unable to determine a sort time from the specified field
+            // Provide a fall back that just works on relevancy.
+            log.error("Unable to use speficied sort option: " + (args.getSortOption() == null ? "type/relevance": args.getSortOption().getName()));
+            hits = searcher.search(myquery, max, new Sort(SortField.FIELD_SCORE));
+        }
+        return hits;
     }
 
     static String checkEmptyQuery(String myquery)
@@ -359,7 +383,7 @@ public class DSQuery
             {
                 String thisHandle = (String) i.next();
                 Integer thisType = (Integer) j.next();
-                String type = Constants.typeText[thisType.intValue()];
+                String type = Constants.typeText[thisType];
 
                 // also look up type
                 System.out.println(type + "\t" + thisHandle);
@@ -380,7 +404,7 @@ public class DSQuery
         {
             try
             {
-                searcher.close();
+                searcher.getIndexReader().close();                
                 searcher = null;
             }
             catch (IOException ioe)
@@ -421,12 +445,15 @@ public class DSQuery
        
         // If we have already opened a searcher, check to see if the index has been updated
         // If it has, we need to close the existing searcher - we will open a new one later
-        if (searcher != null && lastModified != IndexReader.getCurrentVersion(indexDir))
+
+        Directory searchDir = FSDirectory.open(new File(indexDir));
+        DirectoryReader reader = DirectoryReader.open(searchDir);
+        if (searcher != null && lastModified != reader.getVersion())
         {
             try
             {
                 // Close the cached IndexSearcher
-                searcher.close();
+                searcher.getIndexReader().close();
             }
             catch (IOException ioe)
             {
@@ -443,29 +470,11 @@ public class DSQuery
         // There is no existing searcher - either this is the first execution,
         // or the index has been updated and we closed the old index.
         if (searcher == null)
-        {
+        {                        
             // So, open a new searcher
-            lastModified = IndexReader.getCurrentVersion(indexDir);
-            String osName = System.getProperty("os.name");
-            if (osName != null && osName.toLowerCase().contains("windows"))
-            {
-                searcher = new IndexSearcher(indexDir){
-                    /*
-                     * TODO: Has Lucene fixed this bug yet?
-                     * Lucene doesn't release read locks in
-                     * windows properly on finalize. Our hack
-                     * extend IndexSearcher to force close().
-                     */
-                    protected void finalize() throws Throwable {
-                        this.close();
-                        super.finalize();
-                    }
-                };
-            }
-            else
-            {
-                searcher = new IndexSearcher(indexDir);
-            }
+            lastModified = reader.getVersion();         
+            searcher = new IndexSearcher(reader);
+            
         }
 
         return searcher;

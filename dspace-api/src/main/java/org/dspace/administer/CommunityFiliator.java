@@ -27,7 +27,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * relationships. Takes community DB Id or handle arguments as inputs.
  * 
  * @author rrodgers
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 
 public class CommunityFiliator

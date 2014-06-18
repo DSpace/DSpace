@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Revision History:
+    
+    2009/01/13: Terry
+	- changed Decision & Information Technologies to Decision, Operations & Information Technologies
+
+    2007/08/23: Terry
+	- changed Biological Resources Engineering to Environmental Science & Technology
+	- changed Natural Resources & Engineering to Plant Science & Landscape Architecture
+
+    2007/08/22: Terry
+	- changed Education Policy & Leadership to Education Policy Studies
+
+    2007/08/17: Terry
+	- changed Languages, Literature & Culture to Languages, Literatures, & Cultures
+
+    2007/08/17: Terry
+	- changed Family Studies Theses and Dissertations to Family Science Theses and Dissertations 
+
+    2007/06/28: Terry
+	- removed stray apostrophe at end of Business and Management: Logistics, Business &amp; Public Policy
+	- deleted 's' from 'sciences' in Nutrition & Food Sciences under Nutrition and Food Science
+	- changed Materials & Science Engineering to Materials Science & Engineering 
+
+    2007/06/01: Courtney
+	- changed bioengineering mapping from bio and cell bio to fischell bioengineering
+
+    2007/05/07: Courtney
+	- remove '&amp;' from 'Biological Resources &amp; Engineering' 
+	- change 'Materials &amp; Science Engineering' to 'Materials Science &amp; Engineering'
+
+    2007/04/02: Courtney
+	- map 'Business and Management: Accounting &amp; Information Assurance' to 
+		'Accounting &amp; Information Assurance Theses and Dissertations'
+	- map 'Business and Management:  Decision &amp; Information Technologies' to 
+		' Decision &amp; Information Technologies Theses and Dissertations'
+	- map 'Business and Management:  Finance' to 
+		' Finance Theses and Dissertations'
+	- map 'Business and Management: Logistics, Business &amp; Public Policy' to 
+		'Logistics, Business &amp; Public Policy Theses and Dissertations'
+	- map 'Business and Management: Management &amp; Organization' to 
+		'Management &amp; Organization Theses and Dissertations'
+	- map 'Business and Management: Marketing' to 
+		' Marketing Theses and Dissertations'
+	- deleted mapping 'Business and Management' to 
+		'Management &amp; Organization Theses and Dissertations'
+	- change 'Public Affairs' to 'Public Policy'
+	- map 'Geography/Library &amp; Information Systems' to
+		'Geography Theses and Dissertations' and 
+		'Information Studies Theses and Dissertations'
+	- map 'Jewish Studies' to 
+		'Jewish Studies Theses and Dissertations'
+	- map 'Urban and Regional Planning and Design' to 
+		'Urban Studies &amp; Planning Theses and Dissertations'
+	- map 'Second Language Acquisition and Application' to 
+		'Languages, Literature &amp; Culture Theses and Dissertations'
+	- map 'Mathematics of Advanced Industrial Technology' to 
+		'Mathematics Theses and Dissertations'
+
+    2007/01/12: Ben
+      - map 'Atmospheric and Oceanic Sciences' to
+        'Atmospheric & Oceanic Science Theses and Dissertations'
+
+    2005/08/26: Ben
+      - fixed typo in Meteorology
+      - fixed typo in Nutrition
+      - map Meteorology to Atmospheric & Oceanic Science
+
+    2005/08/12: Ben
+      - change Research Works to Theses and Dissertations
+-->
+
+<maps>
+  <map>
+    <from>Aerospace Engineering</from>
+    <to>Aerospace Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Agricultural and Resource Economics</from>
+    <to>Agricultural &amp; Resource Economics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>American Studies</from>
+    <to>American Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Animal Sciences</from>
+    <to>Animal &amp; Avian Sciences Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Anthropology</from>
+    <to>Anthropology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Applied Mathematics and Scientific Computation</from>
+    <to>Mathematics Theses and Dissertations</to>
+    <to>Computer Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Architecture</from>
+    <to>Architecture Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Art</from>
+    <to>Art Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Art History and Archaeology</from>
+    <to>Art History &amp; Archaeology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Astronomy</from>
+    <to>Astronomy Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Behavior, Ecology, Evolution and Systematics</from>
+    <to>Biology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Biochemistry</from>
+    <to>Chemistry &amp; Biochemistry Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Bioengineering</from>
+    <to>Fischell Department of Bioengineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Biological Resources Engineering</from>
+    <to>Environmental Science &amp; Technology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Biology</from>
+    <to>Biology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management: Accounting &amp; Information Assurance</from>
+    <to>Accounting &amp; Information Assurance Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management:  Decision &amp; Information Technologies</from>
+    <to>Decision, Operations &amp; Information Technologies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management:  Finance</from>
+    <to>Finance Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management: Logistics, Business &amp; Public Policy</from>
+    <to>Logistics, Business &amp; Public Policy Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management: Management &amp; Organization</from>
+    <to>Management &amp; Organization Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Business and Management: Marketing</from>
+    <to>Marketing Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Cell Biology &amp; Molecular Genetics</from>
+    <to>Cell Biology &amp; Molecular Genetics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Chemical Engineering</from>
+    <to>Chemical and Biomolecular Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Chemical Physics</from>
+    <to>Chemistry &amp; Biochemistry Theses and Dissertations</to>
+    <to>Physics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Chemistry</from>
+    <to>Chemistry &amp; Biochemistry Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Civil Engineering</from>
+    <to>Civil &amp; Environmental Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Classics</from>
+    <to>Classics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Clinical Audiology</from>
+    <to>Hearing &amp; Speech Sciences Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Communication</from>
+    <to>Communication Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Comparative Literature</from>
+    <to>English Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Computer Science</from>
+    <to>Computer Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Counseling and Personnel Services</from>
+    <to>Counseling &amp; Personnel Services Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Creative Writing</from>
+    <to>English Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Criminology and Criminal Justice</from>
+    <to>Criminology &amp; Criminal Justice Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Curriculum and Instruction</from>
+    <to>Curriculum &amp; Instruction Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Dance</from>
+    <to>Dance Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Economics</from>
+    <to>Economics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Education Policy, and Leadership</from>
+    <to>Education Policy Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Electrical Engineering</from>
+    <to>Electrical &amp; Computer Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>English Language and Literature</from>
+    <to>English Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Entomology</from>
+    <to>Entomology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Family Studies</from>
+    <to>Family Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Fire Protection Engineering</from>
+    <to>Fire Protection Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Food Science</from>
+    <to>Nutrition &amp; Food Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>French Language and Literature</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Geography</from>
+    <to>Geography Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Geography/Library &amp; Information Systems</from>
+    <to>Geography Theses and Dissertations</to>
+    <to>Information Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Geology</from>
+    <to>Geology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Germanic Language and Literature</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Gerontology Certificate</from>
+    <to>Family Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Government and Politics</from>
+    <to>Government &amp; Politics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Hearing and Speech Sciences</from>
+    <to>Hearing &amp; Speech Sciences Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Historic Preservation</from>
+    <to>Historic Preservation Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Historic Preservation Certificate</from>
+    <to>Historic Preservation Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>History</from>
+    <to>History Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>History/Library &amp; Information Systems</from>
+    <to>History Theses and Dissertations</to>
+    <to>Information Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Human Development</from>
+    <to>Human Development &amp; Institute for Child Study Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Jewish Studies</from>
+    <to>Jewish Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Journalism</from>
+    <to>Journalism Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Kinesiology</from>
+    <to>Kinesiology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Library &amp; Information Services</from>
+    <to>Information Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Linguistics</from>
+    <to>Linguistics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Marine-Estuarine-Environmental Sciences</from>
+    <to>Biology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Master in Information Management</from>
+    <to>Information Studies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Master of Life Sciences</from>
+    <to>Biology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Material Science and Engineering</from>
+    <to>Materials Science &amp; Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Mathematical Statistics</from>
+    <to>Mathematics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Mathematics</from>
+    <to>Mathematics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Mathematics of Advanced Industrial Technology</from>
+    <to>Mathematics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Measurement, Statistics and Evaluation</from>
+    <to>Measurement, Statistics &amp; Evaluation Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Mechanical Engineering</from>
+    <to>Mechanical Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Atmospheric and Oceanic Sciences</from>
+    <to>Atmospheric &amp; Oceanic Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Modern French Studies</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Molecular and Cell Biology</from>
+    <to>Cell Biology &amp; Molecular Genetics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Music</from>
+    <to>Music Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Natural Resource Sciences</from>
+    <to>Plant Science &amp; Landscape Architecture Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Neuroscience and Cognitive Science</from>
+    <to>Biology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Nuclear Engineering</from>
+    <to>Materials &amp; Science Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Nutrition</from>
+    <to>Nutrition &amp; Food Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Philosophy</from>
+    <to>Philosophy Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Physics</from>
+    <to>Physics Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Professional Master of Engineering</from>
+  </map>
+  <map>
+    <from>Psychology</from>
+    <to>Psychology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Public Policy</from>
+    <to>Public Policy Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Public and Community Health</from>
+    <to>Public &amp; Community Health Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Reliability Engineering</from>
+    <to>Mechanical Engineering Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Russian Language Acquisition and Application</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Second Language Acquisition and Application</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Sociology</from>
+    <to>Sociology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Spanish Language and Literature</from>
+    <to>Languages, Literatures, &amp; Cultures Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Special Education</from>
+    <to>Special Education Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Survey Methodology</from>
+    <to>Joint Program in Survey Methodology Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Sustainable Development and Conservation Biology</from>
+    <to>Environmental Science &amp; Policy Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Systems Engineering</from>
+    <to>Computer Science Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Telecommunications</from>
+    <to>Decision &amp; Information Technologies Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Theatre</from>
+    <to>Theatre Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Urban and Regional Planning and Design</from>
+    <to>Urban Studies &amp; Planning Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Urban Studies and Planning</from>
+    <to>Urban Studies &amp; Planning Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Veterinary Medical Science</from>
+    <to>Department of Veterinary Medicine Theses and Dissertations</to>
+  </map>
+  <map>
+    <from>Women's Studies</from>
+    <to>Women's Studies Theses and Dissertations</to>
+  </map>
+</maps>

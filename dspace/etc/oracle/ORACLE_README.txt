@@ -18,7 +18,7 @@ browse code - LIMIT and OFFSET is used to limit browse results, and an
 Oracle-hack is used to limit the result set to a given size
 
 Oracle has no boolean data type, so a new schema file was created that
-uses INTEGERs and code is inserted everywhere to use 0 for false
+uses NUMBER(1) (AKA 'integers') and code is inserted everywhere to use 0 for false
 and 1 for true if the db.name is Oracle
 
 Oracle doesn't have a TEXT data type either, so TEXT columns are defined
@@ -59,3 +59,8 @@ JDBC driver is reporting INTEGERS as type DECIMAL.
 Oracle doesn't like it when you reference table names in lower case when
 getting JDBC metadata for the tables, so they are converted in TableRow
 to upper case.
+
+==UPDATE 27 November 2012==
+Oracle complains with ORA-01408 if you attempt to create an index on a column which
+has already had the UNIQUE contraint added (such an index is implicit in maintaining the uniqueness
+of the column). See DS-1370 for details.

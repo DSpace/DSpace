@@ -76,7 +76,7 @@ import org.jdom.transform.XSLTransformer;
  * does this automatically.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public abstract class XSLTCrosswalk extends SelfNamedPlugin
 {

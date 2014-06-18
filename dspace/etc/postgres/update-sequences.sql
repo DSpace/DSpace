@@ -1,9 +1,9 @@
 --
 -- update-sequences.sql
 --
--- Version: $Revision: 5691 $
+-- Version: $Revision$
 --
--- Date:    $Date: 2010-10-29 12:50:15 -0400 (Fri, 29 Oct 2010) $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 -- 
@@ -84,6 +84,8 @@ SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
 SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
+SELECT setval('webapp_seq', max(webapp_id)) FROM webapp;
+SELECT setval('requestitem_seq', max(requestitem_id)) FROM requestitem;
 
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'

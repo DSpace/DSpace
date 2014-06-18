@@ -22,7 +22,7 @@ import org.dspace.eperson.EPerson;
  * receives. It also logs when consume() and end() get called. It is intended
  * for testing, exploring, and debugging the event system.
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class TestConsumer implements Consumer
 {

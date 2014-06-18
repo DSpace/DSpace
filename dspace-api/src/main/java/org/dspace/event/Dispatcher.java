@@ -8,7 +8,7 @@
 package org.dspace.event;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dspace.core.Context;
@@ -19,7 +19,7 @@ import org.dspace.core.Context;
  * transform, consolidate, and otherwise optimize the event stream prior to
  * delivering events to its consumers.
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public abstract class Dispatcher
 {
@@ -31,7 +31,7 @@ public abstract class Dispatcher
     /**
      * Map of consumers by their configured name.
      */
-    protected Map<String, ConsumerProfile> consumers = new HashMap<String, ConsumerProfile>();
+    protected Map<String, ConsumerProfile> consumers = new LinkedHashMap<String, ConsumerProfile>();
 
     protected Dispatcher(String name)
     {

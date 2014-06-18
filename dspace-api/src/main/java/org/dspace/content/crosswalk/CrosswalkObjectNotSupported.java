@@ -16,7 +16,7 @@ package org.dspace.content.crosswalk;
  * they ought to be easy to identify and debug.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class CrosswalkObjectNotSupported extends CrosswalkException
 {

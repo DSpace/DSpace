@@ -1,9 +1,9 @@
 --
 -- database_schema_12-13.sql
 --
--- Version: $Revision: 4427 $
+-- Version: $Revision$
 --
--- Date:    $Date: 2009-10-09 18:42:19 -0400 (Fri, 09 Oct 2009) $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 -- 

@@ -1,62 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.7.2.1</version>
+   <version>4.1.0</version>
    <name>DSpace Parent Project</name>
-   <url>http://projects.dspace.org</url>
+   <description>
+   	DSpace open source software is a turnkey institutional repository application.
+   </description>
+   <url>https://github.com/dspace/DSpace</url>
 
    <organization>
       <name>DuraSpace</name>
       <url>http://www.dspace.org</url>
    </organization>
 
-   <parent>
-     <artifactId>dspace-pom</artifactId>
-     <groupId>org.dspace</groupId>
-     <version>10</version>
-   </parent>
+    <!-- brings the sonatype snapshot repository and signing requirement on board -->
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+        <relativePath />
+    </parent>
 
-   <repositories>
-     <repository>
-       <id>um-libraries-repo-legacy</id>
-       <url>https://maven.lib.umd.edu/nexus/content/repositories/legacy/</url>
-     </repository>
-     <!-- org.carrot2:carrot2-mini:3.1.0 has been removed from maven central -->
-     <!-- so get it directly from carrot                                     -->
-     <repository>
-      <id>carrot2</id>
-      <url>http://download.carrot2.org/maven2/</url>
-     </repository>
-   </repositories>
+    <!--Force UTF-8 encoding during build on all platforms-->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.6</java.version> <!-- DSpace requires Java 1.6 or higher -->		
+        <lucene.version>4.4.0</lucene.version>
+        <solr.version>4.4.0</solr.version>
+        <slf4j.version>1.6.1</slf4j.version>
+        <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
+             as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
+        <root.basedir>${basedir}</root.basedir>
+    </properties>
 
-   <build>
-      <plugins>
-         <plugin>
-            <artifactId>maven-release-plugin</artifactId>
-            <version>2.4.1</version>
-            <configuration>
-                <!-- During release:perform, enable the "addons" profile -->
-                <releaseProfiles>addons</releaseProfiles>
-                <goals>deploy</goals>
-                <!-- Auto-Version all modules the same as the parent module -->
-                <autoVersionSubmodules>true</autoVersionSubmodules>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <!-- tests whose name starts by Abstract will be ignored -->
-            <configuration>
-	        <excludes>
-	            <exclude>**/Abstract*</exclude>
-	        </excludes>
-                <!-- required when running JMockit under Java 1.5 -->
-                <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
-            </configuration>
-         </plugin>
-         <plugin>
+    <build>
+      <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
+           (NOTE: individual POMs can override specific settings). -->
+      <pluginManagement>
+          <plugins>
+              <plugin>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <version>2.3.2</version>
+                  <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                  </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+              </plugin>
+              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <!-- We'd rather this be an open-ended range of versions.
@@ -64,115 +70,464 @@
                      http://jira.codehaus.org/browse/MNG-2742
                      Once the bug is fixed, we should put open-ended range in dspace-pom -->
                 <version>2.1.1</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+             </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.6</version>
+                <!-- tests whose name starts by Abstract will be ignored -->
+                <configuration>
+                    <excludes>
+                        <exclude>**/Abstract*</exclude>
+                    </excludes>
+                    <!--
+                    Enable to debug Maven Surefire tests in remote proces
+                    <debugForkedProcess>true</debugForkedProcess>
+                    -->
+                    <!-- required when running JMockit under Java 1.5 -->
+                    <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
+                </configuration>
+             </plugin>
+             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
+             </plugin>
+             <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+             </plugin>
+          </plugins>
+      </pluginManagement>
+
+      <!-- These plugin settings only apply to this single POM and are not inherited
+           to any submodules. -->
+      <plugins>
+         <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
+         <plugin>
+           <artifactId>maven-antrun-plugin</artifactId>
+           <version>1.7</version>
+           <executions>
+             <execution>
+               <id>native2ascii-utf8</id>
+               <phase>generate-resources</phase>
+               <configuration>
+                 <target name="Encode any UTF-8 chars in [src]/*.properties">
+                   <!-- Run 'native2ascii' to encode UTF-8 characters in properties files. Place the resulting file(s) in /target -->
+                   <native2ascii encoding="UTF8" src="${root.basedir}" dest="${root.basedir}/target" includes="*.properties" />
+                 </target>
+               </configuration>
+               <goals>
+                 <goal>run</goal>
+               </goals>
+             </execution>
+           </executions>
+           <!-- Required dependencies for native2ascii to function -->
+           <dependencies>
+             <dependency>
+               <groupId>com.sun</groupId>
+               <artifactId>tools</artifactId>
+               <version>${java.version}</version>
+               <scope>system</scope>
+               <!-- Path to tools.jar (containing native2ascii tool) is determined by a profile (see below) -->
+               <systemPath>${toolsjar}</systemPath>
+             </dependency>
+           </dependencies>
+         </plugin>
+
+         <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+                <!-- During release:perform, enable the "release" profile (see below) -->
+                <releaseProfiles>release</releaseProfiles>
+                <goals>deploy</goals>
+                <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
+                <tagNameFormat>dspace-@{project.version}</tagNameFormat>
+                <!-- Auto-Version all modules the same as the parent module -->
+                <autoVersionSubmodules>true</autoVersionSubmodules>
+            </configuration>
+         </plugin>
+         <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
+                    <header>${root.basedir}/LICENSE_HEADER</header>
+                    <!--Just check headers of everything in the /src directory -->
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <!--Use all default exclusions for IDE files & Maven files, see: 
+                        http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
+                         Individual Maven projects may choose to override these defaults. -->
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <exclude>**/testEnvironment.properties</exclude>
+                        <exclude>**/META-INF/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/LICENSE*</exclude>
+                        <exclude>**/README*</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/.gitignore</exclude>
+                        <exclude>**/build.properties*</exclude>
+                    </excludes>
+                    <mapping> 
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
+                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.LICENSE -->
+                        <xmap>XML_STYLE</xmap>
+                        <xslt>XML_STYLE</xslt>
+                        <wsdd>XML_STYLE</wsdd>
+                        <wsdl>XML_STYLE</wsdl>
+                        <LICENSE>TEXT</LICENSE>
+                    </mapping>  
+                    <encoding>UTF-8</encoding>
+                    <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
+                    <strictCheck>true</strictCheck>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-headers</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
          </plugin>
       </plugins>
    </build>
-
+   
    <profiles>
 
-      <!--
-         =========================================================
-         These are administrative profiles used by release manager
-         to complete release tasks.
-         =========================================================
+       <!-- By default the main dspace.cfg file will be filtered during the build
+            using the "build.properties" file. This profile takes effect, unless
+            "-Denv" is passed in (see 'environment' profile below for more info). -->
+       <profile>
+           <id>default</id>
+           <activation>
+               <property>
+                    <name>!env</name>
+                </property>
+           </activation>
+           <properties>
+               <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+               <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+               <filters.file>${root.basedir}/target/build.properties</filters.file>
+           </properties>
+       </profile>
 
-         Use 'mvn release:prepare -Pall' for tagging the release.
-      -->
-      <profile>
-         <id>all</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
-         <modules>
-            <module>dspace-api</module>
-            <module>dspace-stats</module>
-            <module>dspace-discovery</module>
-            <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
-            <module>dspace-lni</module>
-            <module>dspace-oai</module>
-            <module>dspace-sword</module>
-            <module>dspace</module>
-         </modules>
-      </profile>
+       <!-- Users can pass in an environment flag "-Denv" to tell DSpace to use
+            a different properties file during its build process. 
+            For example: "mvn package -Denv=test" would build DSpace using the
+            settings in "test.properties" instead of those in "build.properties" -->
+       <profile>
+           <id>environment</id>
+           <activation>
+                <property>
+                    <name>env</name>
+                </property>
+           </activation>
+           <properties>
+                <!-- 'root.basedir' is the relative path to the [dspace-src] root folder -->
+                <!-- NOTE that we are using the copy in the target dir, which has any Unicode characters encoded (see native2ascii above) -->
+                <filters.file>${root.basedir}/target/${env}.properties</filters.file>
+           </properties>
+       </profile>
 
 
-      <!--
-         Use 'mvn deploy -Paddons' while doing Continuous Integration
-         and deploying addons to the Maven repository.
-       -->
-      <profile>
-         <id>addons</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <modules>
-            <module>dspace-api</module>
-            <module>dspace-stats</module>
-            <module>dspace-discovery</module>
-            <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
-            <module>dspace-lni</module>
-            <module>dspace-oai</module>
-            <module>dspace-sword</module>
-         </modules>
-      </profile>
-
-      <!--
-         Use 'mvn package -Pdistributions' to create distributions
-         to upload to S.F.
-       -->
-      <profile>
-         <id>distributions</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <inherited>false</inherited>
-                  <executions>
-                     <execution>
+        <!-- This profile ensures that we ONLY generate the Unit Test Environment
+             if the testEnvironment.xml file is found. That way the Test Environment
+             is NOT built when running a 'mvn package' on a "binary" release. -->
+        <profile>
+            <id>generate-test-env</id>
+            <activation>
+                <file>
+                    <exists>src/main/assembly/testEnvironment.xml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- This plugin builds the testEnvironment.zip package
+                         based on the specifications in testEnvironment.xml -->
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
+                                    </descriptors>
+                                    <filters>
+                                        <filter>src/main/filters/testEnvironment.properties</filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
                         <inherited>false</inherited>
-                        <configuration>
-                           <descriptorRefs>
-                              <descriptorRef>release</descriptorRef>
-                              <descriptorRef>src-release</descriptorRef>
-                           </descriptorRefs>
-                           <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${pom.version}</finalName>
-                        </configuration>
-                        <phase>package</phase>
-                        <goals>
-                           <goal>single</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-                  <dependencies>
-                     <dependency>
-                        <groupId>org.dspace.maven.plugins</groupId>
-                        <artifactId>dspace-assembly-plugin</artifactId>
-                        <version>1.1</version>
-                     </dependency>
-                  </dependencies>
-               </plugin>
-            </plugins>
-         </build>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Determine path to Java Tools JAR. This JAR contains the 'native2ascii' tool (required above by maven-antrun-plugin)-->
+        <!-- In most platforms Unix/Windows it's named tools.jar. But, on Mac it's classes.jar (see next profile) -->
+        <profile>
+          <id>default-java-tools</id>
+          <activation>
+            <activeByDefault>true</activeByDefault>
+            <file>
+                <exists>${java.home}/../lib/tools.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+          </properties>
+        </profile>
+        <profile>
+          <id>mac-java-tools</id>
+          <activation>
+            <activeByDefault>false</activeByDefault>
+            <file>
+                <exists>${java.home}/../Classes/classes.jar</exists>
+            </file>
+          </activation>
+          <properties>
+            <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+          </properties>
+        </profile>
+
+
+        <!--
+           These profiles activate the inclusion of various modules into
+           the DSpace Build process. They activate automatically if the
+           source module is in the local file system, correctly located
+           relative to this file.
+        -->
+
+        <!--
+           Builds DSpace "Assembly & Configuration" project
+        -->
+        <profile>
+            <id>dspace</id>
+            <activation>
+                <file>
+                    <exists>dspace/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds central API for DSpace
+        -->
+        <profile>
+            <id>dspace-api</id>
+            <activation>
+                <file>
+                    <exists>dspace-api/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-api</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds Services for DSpace
+        -->
+        <profile>
+            <id>dspace-services</id>
+            <activation>
+                <file>
+                    <exists>dspace-services/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-services</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds XOAI Gateway WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-oai</id>
+            <activation>
+                <file>
+                    <exists>dspace-oai/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-oai</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds JSPUI WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-jspui</id>
+            <activation>
+                <file>
+                    <exists>dspace-jspui/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-jspui</module>
+            </modules>
+        </profile>
+
+       <!-- REST Jersey -->
+       <profile>
+           <id>dspace-rest</id>
+           <activation>
+               <file>
+                   <exists>dspace-rest/pom.xml</exists>
+               </file>
+           </activation>
+           <modules>
+               <module>dspace-rest</module>
+           </modules>
+       </profile>
+
+
+        <!--
+           Builds SWORD WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-sword</id>
+            <activation>
+                <file>
+                    <exists>dspace-sword/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-sword</module>
+            </modules>
+        </profile>
+
+
+        <!--
+          SKIP Building SOLR WAR for DSpace
+        <profile>
+            <id>dspace-solr</id>
+            <activation>
+                <file>
+                    <exists>dspace-solr/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-solr</module>
+            </modules>
+        </profile>
+        -->
+
+        <!--
+           Builds SWORDv2 WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-swordv2</id>
+            <activation>
+                <file>
+                    <exists>dspace-swordv2/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-swordv2</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds XMLUI WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-xmlui</id>
+            <activation>
+                <file>
+                    <exists>dspace-xmlui/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-xmlui</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds LNI WAR & Client for DSpace
+        -->
+        <profile>
+            <id>dspace-lni</id>
+            <activation>
+                <file>
+                    <exists>dspace-lni/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-lni</module>
+                <module>dspace-lni/dspace-lni-client</module>
+            </modules>
+        </profile>
+
+
+      <!--
+         The 'release' profile is used by the 'maven-release-plugin' (see above)
+         to actually perform a DSpace software release to Maven central.
+       -->
+      <profile>
+         <id>release</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <!-- Activate all modules *except* for the 'dspace' module,
+              as it does not include any Java source code to release. -->
+         <modules>
+            <module>dspace-api</module>
+            <module>dspace-jspui</module>
+            <module>dspace-xmlui</module>
+            <module>dspace-lni</module>
+            <module>dspace-oai</module>
+            <module>dspace-rest</module>
+            <module>dspace-sword</module>
+            <module>dspace-swordv2</module>
+         </modules>
       </profile>
 
-      <!-- skip tests by default, but allow override
-      on command line by setting property "-Dmaven.test.skip"-->
-      <!-- Disabled by default, change activeByDefault to true to enable -->
+      <!-- Skip Unit Tests by default, but allow override on command line
+           by setting property "-Dmaven.test.skip=false" -->
       <profile>
         <id>skiptests</id>
         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
+            <!-- This profile should be active at all times, unless the user
+                 specifies a different value for "maven.test.skip" -->
+            <property>
+                <name>!maven.test.skip</name>
+            </property>
+        </activation>
         <properties>
-         <maven.test.skip>true</maven.test.skip>
+            <maven.test.skip>true</maven.test.skip>
         </properties>
       </profile>
+    
    </profiles>
 
    <!--
@@ -180,7 +535,7 @@
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
       a version in your dependencies, look here first to see if
-      its already strongly defined in dspace-pom and dspace-api.
+      its already strongly defined in dspace-parent and dspace-api.
    -->
    <dependencyManagement>
       <dependencies>
@@ -188,111 +543,171 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>1.7.2.1</version>
+            <version>4.1.0</version>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-api</artifactId>
-              <version>1.7.2.1</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-webapp</artifactId>
-              <version>1.7.2.1</version>
-              <type>war</type>
-          </dependency>
+         <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <version>4.1.0</version>
+         </dependency>
+
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-api</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-sword</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-webapp</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-sword</artifactId>
+            <version>4.1.0</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-api</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-swordv2</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-oai-webapp</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-swordv2</artifactId>
+            <version>4.1.0</version>
+            <type>war</type>
+         </dependency>
+
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui</artifactId>
+            <version>4.1.0</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-core</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-oai</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai</artifactId>
+            <version>4.1.0</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-lni</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>1.7.2.1</version>
+            <version>4.1.0</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-webapp</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-lni</artifactId>
+            <version>4.1.0</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-xmlui</artifactId>
+            <version>4.1.0</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-xmlui</artifactId>
+            <version>4.1.0</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>1.7.2.1</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-impl</artifactId>
-            <version>2.0.3</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-api</artifactId>
-            <version>2.0.3</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-services-utils</artifactId>
-            <version>2.0.3</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-stats</artifactId>
-            <version>1.7.2.1</version>
+            <artifactId>dspace-services</artifactId>
+            <version>4.1.0</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[1.7.0.1,1.7.9.9)</version>
+            <version>[4.0.0,5.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[1.7.0.1,1.7.9.9)</version>
+            <version>[4.0.0,5.0.0)</version>
             <type>war</type>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-discovery-provider</artifactId>
-              <version>1.7.2.1</version>
-          </dependency>
          <!-- DSpace third Party Dependencies -->
+
+         <dependency>
+            <groupId>org.swordapp</groupId>
+            <artifactId>sword-common</artifactId>
+            <version>1.1</version>
+         </dependency>
+        <!-- Explicitly Specify Latest Version of Spring -->
+        <dependency>
+            <artifactId>spring-core</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-beans</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-aop</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-context</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-tx</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-jdbc</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+
          <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
@@ -301,13 +716,18 @@
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>2.9.3</version>
+            <version>${lucene.version}</version>
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers</artifactId>
-            <version>2.9.3</version>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${lucene.version}</version>
          </dependency>
+         <dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -324,11 +744,6 @@
             <version>1.5.2</version>
          </dependency>
          <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>oaicat</artifactId>
-            <version>1.5.48</version>
-         </dependency>
-         <dependency>
             <groupId>org.dspace.dependencies</groupId>
             <artifactId>dspace-tm-extractors</artifactId>
             <version>1.0.1</version>
@@ -336,7 +751,7 @@
          <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.0</version>
+            <version>1.2</version>
          </dependency>
          <dependency>
             <groupId>commons-codec</groupId>
@@ -367,29 +782,29 @@
          <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.4</version>
+            <version>2.3</version>
          </dependency>
          <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.2</version>
+            <version>2.6</version>
             <!-- <version>2.1</version> in xmlui - wing -->
          </dependency>
          <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.0.4</version>
+            <version>1.1.1</version>
          </dependency>
          <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.4</version>
          </dependency>
-         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.3.1</version>
-         </dependency>
+          <dependency>
+              <groupId>commons-validator</groupId>
+              <artifactId>commons-validator</artifactId>
+              <version>1.4.0</version>
+          </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -398,7 +813,7 @@
          <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.3</version>
+            <version>2.5</version>
          </dependency>
 
          <dependency>
@@ -420,7 +835,7 @@
          <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
+            <version>1.2.17</version>
          </dependency>
          <dependency>
             <groupId>oro</groupId>
@@ -430,17 +845,17 @@
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>1.2.1</version>
+            <version>1.6.0</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>1.2.1</version>
+            <version>1.6.0</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jempbox</artifactId>
-            <version>1.2.1</version>
+            <version>1.6.0</version>
          </dependency>
          <dependency>
 	        <groupId>org.bouncycastle</groupId>
@@ -528,12 +943,12 @@
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.8</version>
+            <version>51.1</version>
          </dependency>
          <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>8.3-603.jdbc4</version>
+            <version>9.1-901-1.jdbc4</version>
          </dependency>
          <dependency>
             <groupId>com.oracle</groupId>
@@ -541,25 +956,14 @@
             <version>11.2.0.2.0</version>
          </dependency>
          <dependency>
-            <groupId>edu.umd.lib</groupId>
-            <artifactId>lib-util</artifactId>
-            <version>1.0</version>
+            <groupId>com.sun.media</groupId>
+            <artifactId>jai_imageio</artifactId>
+            <version>1.0_01</version>
          </dependency>
          <dependency>
-            <groupId>org.marc4j</groupId>
-            <artifactId>marc4j</artifactId>
-            <version>2.0</version>
-         </dependency>
-         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>catalina</artifactId>
-            <version>6.0.20</version>
-            <scope>provided</scope>
-         </dependency>
-         <dependency>
-            <groupId>cas</groupId>
-            <artifactId>casclient</artifactId>
-            <version>2.1.1</version>
+            <groupId>javax.media</groupId>
+            <artifactId>jai_core</artifactId>
+            <version>1.1.2_01</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -570,6 +974,26 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>jcl-over-slf4j</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-api</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-jdk14</artifactId>
+             <version>${slf4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-log4j12</artifactId>
+             <version>${slf4j.version}</version>
          </dependency>
          <dependency>
             <groupId>junit</groupId>
@@ -595,23 +1019,29 @@
             <version>1.06</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
+        </dependency>
       </dependencies>
    </dependencyManagement>
 
    <licenses>
       <license>
-         <name>DSpace Sourcecode License</name>
-         <url>LICENSE.txt</url>
+         <name>DuraSpace BSD License</name>
+         <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
          <distribution>repo</distribution>
          <comments>
-            A BSD compatable OSS license for the DSpace codebase.
+            A BSD 3-Clause license for the DSpace codebase.
          </comments>
       </license>
-   </licenses>
+    </licenses>
 
    <issueManagement>
       <system>JIRA</system>
-      <url>http://jira.dspace.org/jira/browse/DS</url>
+      <url>https://jira.duraspace.org/browse/DS</url>
    </issueManagement>
 
    <mailingLists>
@@ -858,6 +1288,16 @@
          </roles>
          <timezone>-5</timezone>
       </contributor>
+      <contributor>
+         <name>Steve Swinsburg</name>
+         <email>steve.swinsburg@anu.edu.au</email>
+         <organization>The Australian National University</organization>
+         <organizationUrl>http://www.anu.edu.au</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>+10</timezone>
+      </contributor>
    </contributors>
 
    <!--
@@ -866,112 +1306,28 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
-   </scm>
+      <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
+      <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
+      <url>git@github.com:DSpace/DSpace.git</url>
+     <tag>dspace-4.1</tag>
+  </scm>
 
-   <reporting>
-      <excludeDefaults>true</excludeDefaults>
-      <plugins>
-         <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-               <links>
-                  <link>http://projects.dspace.org/dspace/apidocs</link>
-                  <link>
-                     http://projects.dspace.org/dspace-api/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-jspui/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-oai/apidocs
-                  </link>
-                  <link>http://java.sun.com/j2se/6/docs/api</link>
-                  <link>
-                     http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/dbcp/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/fileupload/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/httpclient/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/logging/api/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/pool/apidocs/
-                  </link>
-                  <link>http://www.junit.org/junit/javadoc/</link>
-                  <link>http://logging.apache.org/log4j/docs/api/</link>
-                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
-                  <link>http://jakarta.apache.org/velocity/api/</link>
-               </links>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-               <aggregate>true</aggregate>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-site-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0-beta-1</version>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-            <version>2.5</version>
-         </plugin>
-         <plugin>
-            <groupId>com.google.testability-explorer</groupId>
-            <artifactId>maven-testability-plugin</artifactId>
-            <version>1.3.3</version>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-                <targetJdk>${dspace.java.target}</targetJdk>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <effort>Max</effort>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>taglist-maven-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-                <aggregate>true</aggregate>
-                <tags>
-                    <tag>TODO</tag>
-                    <tag>FIXME</tag>
-                    <tag>@todo</tag>
-                    <tag>XXX</tag>
-                </tags>
-            </configuration>
-        </plugin>
+    <!--
+        Distribution Management is currently used by the Continuum
+        server to update snapshots it generates. This will also be used
+        on release to deploy release versions to the repository by the
+        release manager.
+    -->
+    <distributionManagement>
+        <!-- further distribution management is found upstream in the sonatype parent -->
+    </distributionManagement>
 
-
-      </plugins>
-   </reporting>
-
+    <repositories>
+        <repository>
+            <id>sonatype-releases</id>
+            <name>Sonatype Releases Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+    
 </project>

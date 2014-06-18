@@ -160,15 +160,15 @@
         Duplicate tokens at the same position (which may result from Stemmed Synonyms or
         WordDelim parts) are removed.
         -->
-    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+   <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <!-- in this example, we will only use synonyms at query time
         <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
         -->
         <!-- Case insensitive stop word removal.
-             enablePositionIncrements=true ensures that a 'gap' is left to
-             allow for accurate phrase queries.
+          add enablePositionIncrements=true in both the index and query
+          analyzers to leave a 'gap' for more accurate phrase queries.
         -->
         <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -177,16 +177,20 @@
                 />
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.EnglishPorterFilterFactory" protected="protwords.txt"/>
+        <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+        <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.EnglishPorterFilterFactory" protected="protwords.txt"/>
+        <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldType>
@@ -201,7 +205,9 @@
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="0" generateNumberParts="0" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.EnglishPorterFilterFactory" protected="protwords.txt"/>
+        <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
+        <!-- this filter can remove any duplicate tokens that appear at the same position - sometimes
+             possible with WordDelimiterFilter in conjuncton with stemming. -->
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldType>
@@ -236,11 +242,11 @@
         <!-- The PatternReplaceFilter gives you the flexibility to use
              Java Regular expression to replace any sequence of characters
              matching a pattern with an arbitrary replacement string, 
-             which may include back refrences to portions of the orriginal
+             which may include back references to portions of the original
              string matched by the pattern.
              
              See the Java Regular Expression documentation for more
-             infomation on pattern and replacement string syntax.
+             information on pattern and replacement string syntax.
              
              http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/package-summary.html
           -->
@@ -255,10 +261,12 @@
      --> 
     <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" /> 
 
+    <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
  </types>
 
 
  <fields>
+ 	<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
    <!-- Valid attributes for fields:
      name: mandatory - the name for the field
      type: mandatory - the name of a previously defined type from the <types> section
@@ -277,8 +285,8 @@
        best performance.
    -->
 
-   <field name="type" type="integer" indexed="true" stored="true" required="true" /> 
-   <field name="id" type="integer" indexed="true" stored="true" required="true" /> 
+   <field name="type" type="integer" indexed="true" stored="true" required="false" />
+   <field name="id" type="integer" indexed="true" stored="true" required="false" />
    <field name="ip" type="string" indexed="true" stored="true" required="false" /> 
    <field name="time" type="date" indexed="true" stored="true" required="true" /> 
    <field name="epersonid" type="integer" indexed="true" stored="true" required="false" />
@@ -286,17 +294,43 @@
    <field name="country" type="string" indexed="true" stored="true" required="false" />
    <field name="countryCode" type="string" indexed="true" stored="true" required="false"/>
    <field name="city" type="string" indexed="true" stored="true" required="false"/> 
-   <field name="longitude" type="float" indexed="true" stored="true" required="false" /> 
-   <field name="latitude" type="float" indexed="true" stored="true" required="false" /> 
+   <field name="longitude" type="float" indexed="true" stored="true" required="false" />
+   <field name="latitude" type="float" indexed="true" stored="true" required="false" />
    <field name="owningComm" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="dns" type="string" indexed="true" stored="true" required="false"/>
    <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
+   <field name="bundleName" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="referrer" type="string" indexed="true" stored="true" required="false"/>
+    <!-- use uuid as uniqueKey update processor chain, see solrconfig.xml-->
+   <field name="uid" type="string" indexed="true" stored="true" required="true" />
+
+   <!--Can either be view/search/search_result/workflow-->
+   <field name="statistics_type" type="string" indexed="true" stored="true" required="true" default="view" />
+
+   <!-- Search specific  -->
+   <field name="query" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="scopeType" type="integer" indexed="true" stored="true" required="false" />
+   <field name="scopeId" type="integer" indexed="true" stored="true" required="false" />
+   <field name="rpp" type="integer" indexed="true" stored="true" required="false" />
+   <field name="sortBy" type="string" indexed="true" stored="true" required="false" />
+   <field name="sortOrder" type="string" indexed="true" stored="true" required="false" />
+   <field name="page" type="integer" indexed="true" stored="true" required="false" />
+
+   <!--Workflow spefic-->
+   <field name="workflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="previousWorkflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="owner" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="submitter" type="integer" indexed="true" stored="true" required="false" />
+   <field name="actor" type="integer" indexed="true" stored="true" required="false" />
+   <field name="workflowItemId" type="integer" indexed="true" stored="true" required="false" />
+
 
  </fields>
 
+ <uniqueKey>uid</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>id</defaultSearchField>

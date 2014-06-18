@@ -15,7 +15,7 @@ import org.dspace.event.Event;
 /**
  * Class for removing Checker data for a Bitstreams based on deletion events.
  *
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class CheckerConsumer implements Consumer
 {

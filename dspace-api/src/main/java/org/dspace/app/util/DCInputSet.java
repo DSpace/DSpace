@@ -15,7 +15,7 @@ import java.util.Map;
  * Class representing all DC inputs required for a submission, organized into pages
  *
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 
 public class DCInputSet
@@ -141,6 +141,10 @@ public class DCInputSet
     {
     	String rowName = dcf.getElement() + "." + dcf.getQualifier();
     	if ( rowName.equals("title.alternative") && ! addTitleAlternative )
+    	{
+    		return false;
+    	}
+    	if (rowName.equals("date.issued") && ! addPublishedBefore )
     	{
     		return false;
     	}

@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robert Tansley
  * @author Larry Stone
- * @version $Revision: 5911 $
+ * @version $Revision$
  */
 public class DCDate
 {

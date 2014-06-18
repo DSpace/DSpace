@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,8 +25,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
-
 import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -34,13 +35,22 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.miscellaneous.LimitTokenCountAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.Version;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -60,27 +70,37 @@ import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.Util;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
- * 
+ *
  * As of 1.4.2 this class has new incremental update of index functionality
  * and better detection of locked state thanks to Lucene 2.1 moving write.lock.
  * It will attempt to attain a lock on the index in the event that an update
  * is requested and will wait a maximum of 30 seconds (a worst case scenario)
- * to attain the lock before giving up and logging the failure to log4j and 
- * to the DSpace administrator email account. 
- * 
+ * to attain the lock before giving up and logging the failure to log4j and
+ * to the DSpace administrator email account.
+ *
  * The Administrator can choose to run DSIndexer in a cron that
  * repeats regularly, a failed attempt to index from the UI will be "caught" up
  * on in that cron.
- * 
+ *
  * @author Mark Diggory
  * @author Graham Triggs
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class DSIndexer
 {
     private static final Logger log = Logger.getLogger(DSIndexer.class);
@@ -95,7 +115,8 @@ public class DSIndexer
 
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
-    
+    static final Version luceneVersion = Version.LUCENE_44;
+
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
     {
@@ -118,11 +139,11 @@ public class DSIndexer
             this.type = type;
         }
     }
-    
+
     private static String indexDirectory = ConfigurationManager.getProperty("search.dir");
-    
+
     private static int maxfieldlength = -1;
-    	
+
     // TODO: Support for analyzers per language, or multiple indices
     /** The analyzer for this DSpace instance */
     private static volatile Analyzer analyzer = null;
@@ -145,13 +166,13 @@ public class DSIndexer
     };
 
     static {
-    	
+
     	// calculate maxfieldlength
     	if (ConfigurationManager.getProperty("search.maxfieldlength") != null)
         {
             maxfieldlength = ConfigurationManager.getIntProperty("search.maxfieldlength");
         }
-    	
+
         // read in indexes from the config
         ArrayList<String> indexConfigList = new ArrayList<String>();
 
@@ -160,24 +181,24 @@ public class DSIndexer
         {
             indexConfigList.add(ConfigurationManager.getProperty("search.index." + i));
         }
-    
+
         if (indexConfigList.size() > 0)
         {
             indexConfigArr = new IndexConfig[indexConfigList.size()];
-            
+
             for (int i = 0; i < indexConfigList.size(); i++)
             {
                 indexConfigArr[i] = new IndexConfig();
                 String index = indexConfigList.get(i);
-    
+
                 String[] configLine = index.split(":");
-                
+
                 indexConfigArr[i].indexName = configLine[0];
-    
+
                 // Get the schema, element and qualifier for the index
                 // TODO: Should check valid schema, element, qualifier?
                 String[] parts = configLine[1].split("\\.");
-    
+
                 switch (parts.length)
                 {
                 case 3:
@@ -199,30 +220,31 @@ public class DSIndexer
                 }
             }
         }
-        
+
         /*
          * Increase the default write lock so that Indexing can be interrupted.
          */
-        IndexWriter.setDefaultWriteLockTimeout(WRITE_LOCK_TIMEOUT);
-    
+        IndexWriterConfig.setDefaultWriteLockTimeout(WRITE_LOCK_TIMEOUT);
+
         /*
          * Create the index directory if it doesn't already exist.
          */
-        if (!IndexReader.indexExists(indexDirectory))
-    	{
-    		try
+        try
+        {
+            if (!DirectoryReader.indexExists(FSDirectory.open(new File(indexDirectory))))
             {
-    			if (!new File(indexDirectory).mkdirs())
+
+                if (!new File(indexDirectory).mkdirs())
                 {
                     log.error("Unable to create index directory: " + indexDirectory);
                 }
-				openIndex(true).close();
-			}
-            catch (IOException e)
-            {
-                throw new IllegalStateException("Could not create search index: " + e.getMessage(),e);
+                openIndex(true).close();
             }
-    	}
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("Could not create search index: " + e.getMessage(),e);
+        }
     }
 
     public static void setBatchProcessingMode(boolean mode)
@@ -236,36 +258,36 @@ public class DSIndexer
 
     /**
      * If the handle for the "dso" already exists in the index, and
-     * the "dso" has a lastModified timestamp that is newer than 
-     * the document in the index then it is updated, otherwise a 
+     * the "dso" has a lastModified timestamp that is newer than
+     * the document in the index then it is updated, otherwise a
      * new document is added.
-     * 
+     *
      * @param context Users Context
      * @param dso DSpace Object (Item, Collection or Community
      * @throws SQLException
      * @throws IOException
      */
-    public static void indexContent(Context context, DSpaceObject dso) throws SQLException
+    public static void indexContent(Context context, DSpaceObject dso) throws SQLException, DCInputsReaderException
     {
     	indexContent(context, dso, false);
     }
     /**
      * If the handle for the "dso" already exists in the index, and
-     * the "dso" has a lastModified timestamp that is newer than 
-     * the document in the index then it is updated, otherwise a 
+     * the "dso" has a lastModified timestamp that is newer than
+     * the document in the index then it is updated, otherwise a
      * new document is added.
-     * 
+     *
      * @param context Users Context
      * @param dso DSpace Object (Item, Collection or Community
      * @param force Force update even if not stale.
      * @throws SQLException
      * @throws IOException
      */
-    public static void indexContent(Context context, DSpaceObject dso, boolean force) throws SQLException
+    public static void indexContent(Context context, DSpaceObject dso, boolean force) throws SQLException, DCInputsReaderException
     {
         try
         {
-            IndexingTask task = prepareIndexingTask(dso, force);
+            IndexingTask task = prepareIndexingTask(context, dso, force);
             if (task != null)
             {
                 processIndexingTask(task);
@@ -280,7 +302,7 @@ public class DSIndexer
     /**
      * unIndex removes an Item, Collection, or Community only works if the
      * DSpaceObject has a handle (uses the handle for its unique ID)
-     * 
+     *
      * @param context DSpace context
      * @param dso DSpace Object, can be Community, Item, or Collection
      * @throws SQLException
@@ -301,9 +323,9 @@ public class DSIndexer
 
     /**
      * Unindex a Document in the Lucene Index.
-     * 
+     *
      * @param context
-     * @param handle 
+     * @param handle
      * @throws SQLException
      * @throws IOException
      */
@@ -326,7 +348,7 @@ public class DSIndexer
             // handle!");
         }
     }
-    
+
     /**
      * reIndexContent removes something from the index, then re-indexes it
      *
@@ -346,10 +368,10 @@ public class DSIndexer
             emailException(exception);
         }
     }
-    
+
     /**
 	 * create full index - wiping old index
-	 * 
+	 *
 	 * @param c context to use
 	 */
     public static void createIndex(Context c) throws SQLException, IOException
@@ -357,15 +379,15 @@ public class DSIndexer
 
     	/* Create a new index, blowing away the old. */
         openIndex(true).close();
-        
+
         /* Reindex all content preemptively. */
         DSIndexer.updateIndex(c, true);
     }
-    
+
     /**
-     * Optimize the existing index. Important to do regularly to reduce 
+     * Optimize the existing index. Important to do regularly to reduce
      * filehandle usage and keep performance fast!
-     * 
+     *
      * @param c Users Context
      * @throws SQLException
      * @throws IOException
@@ -377,7 +399,11 @@ public class DSIndexer
         try
         {
             flushIndexingTaskQueue(writer);
-            writer.optimize();
+            //With lucene 4.0 this method has been deleted , as it is horribly inefficient and very
+            //rarely justified. Lucene's multi-segment search performance has improved
+            //over time, and the default TieredMergePolicy now targets segments with
+            //deletions. For more info see http://blog.trifork.com/2011/11/21/simon-says-optimize-is-bad-for-you/
+            //writer.optimize();
         }
         finally
         {
@@ -386,13 +412,13 @@ public class DSIndexer
     }
 
     /**
-     * When invoked as a command-line tool, creates, updates, removes 
+     * When invoked as a command-line tool, creates, updates, removes
      * content from the whole index
      *
      * @param args
      *            the command-line arguments, none used
-     * @throws IOException 
-     * @throws SQLException 
+     * @throws IOException
+     * @throws SQLException
      */
     public static void main(String[] args) throws SQLException, IOException
     {
@@ -498,25 +524,25 @@ public class DSIndexer
      * Iterates over all Items, Collections and Communities. And updates
      * them in the index. Uses decaching to control memory footprint.
      * Uses indexContent and isStale ot check state of item in index.
-     * 
+     *
      * @param context
      */
     public static void updateIndex(Context context) {
     	updateIndex(context,false);
     }
-    
+
     /**
      * Iterates over all Items, Collections and Communities. And updates
      * them in the index. Uses decaching to control memory footprint.
      * Uses indexContent and isStale to check state of item in index.
-     * 
+     *
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes
      * to step in and attain a lock and write to the index even if other
      * processes/jvms are running a reindex.
-     * 
+     *
      * @param context
-     * @param force 
+     * @param force
      */
     public static void updateIndex(Context context, boolean force) {
     		try
@@ -558,24 +584,30 @@ public class DSIndexer
     			log.error(e.getMessage(), e);
     		}
     }
-    
+
     /**
-     * Iterates over all documents in the Lucene index and verifies they 
+     * Iterates over all documents in the Lucene index and verifies they
      * are in database, if not, they are removed.
-     * 
+     *
      * @param context
-     * @throws IOException 
-     * @throws SQLException 
+     * @throws IOException
+     * @throws SQLException
      */
     public static void cleanIndex(Context context) throws IOException, SQLException {
 
     	IndexReader reader = DSQuery.getIndexReader();
     	
+    	Bits liveDocs = MultiFields.getLiveDocs(reader);
+    	  
     	for(int i = 0 ; i < reader.numDocs(); i++)
     	{
-    		if(!reader.isDeleted(i))
-    		{
-    			Document doc = reader.document(i);
+    	    if (!liveDocs.get(i))
+    		{         
+    	        // document is deleted...
+    	        log.debug("Encountered deleted doc: " + i);
+    		}
+    	    else {
+                Document doc = reader.document(i);
         		String handle = doc.get("handle");
                 if (!StringUtils.isEmpty(handle))
                 {
@@ -593,14 +625,10 @@ public class DSIndexer
                         log.debug("Keeping: " + handle);
                     }
                 }
-    		}
-    		else
-    		{
-    			log.debug("Encountered deleted doc: " + i);
-    		}
+    		}    		
     	}
 	}
-    
+
 	/**
      * Get the Lucene analyzer to use according to current configuration (or
      * default). TODO: Should have multiple analyzers (and maybe indices?) for
@@ -626,7 +654,9 @@ public class DSIndexer
             try
             {
                 Class analyzerClass = Class.forName(analyzerClassName);
-                analyzer = (Analyzer) analyzerClass.newInstance();
+                Constructor constructor = analyzerClass.getDeclaredConstructor(Version.class);
+                constructor.setAccessible(true);
+                analyzer = (Analyzer) constructor.newInstance(luceneVersion);
             }
             catch (Exception e)
             {
@@ -641,9 +671,9 @@ public class DSIndexer
     }
 
 
-    static IndexingTask prepareIndexingTask(DSpaceObject dso, boolean force) throws SQLException, IOException
+    static IndexingTask prepareIndexingTask(Context context, DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
-        String handle = dso.getHandle();
+        String handle = HandleManager.findHandle(context, dso);
         Term term = new Term("handle", handle);
         IndexingTask action = null;
         switch (dso.getType())
@@ -656,7 +686,7 @@ public class DSIndexer
                 if (requiresIndexing(term, ((Item)dso).getLastModified()) || force)
                 {
                     log.info("Writing Item: " + handle + " to Index");
-                    action = new IndexingTask(IndexingTask.Action.UPDATE, term, buildDocumentForItem((Item)dso));
+                    action = new IndexingTask(IndexingTask.Action.UPDATE, term, buildDocumentForItem(context, (Item)dso));
                 }
             }
             else
@@ -831,8 +861,8 @@ public class DSIndexer
 			String recipient = ConfigurationManager
 					.getProperty("alert.recipient");
 
-			if (recipient != null) {
-				Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "internal_error"));
+			if (StringUtils.isNotBlank(recipient)) {
+				Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "internal_error"));
 				email.addRecipient(recipient);
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.url"));
@@ -859,11 +889,11 @@ public class DSIndexer
 		}
 
 	}
-    
+
     /**
 	 * Is stale checks the lastModified time stamp in the database and the index
 	 * to determine if the index is stale.
-	 * 
+	 *
 	 * @param lastModified
 	 * @throws SQLException
 	 * @throws IOException
@@ -871,28 +901,32 @@ public class DSIndexer
     private static boolean requiresIndexing(Term t, Date lastModified)
     throws SQLException, IOException
     {
-		
+
 		boolean reindexItem = false;
 		boolean inIndex = false;
-		
+
 		IndexReader ir = DSQuery.getIndexReader();
-		
-		TermDocs docs = ir.termDocs(t);
-						
-		while(docs.next())
-		{
-			inIndex = true;
-			int id = docs.doc();
-			Document doc = ir.document(id);
+		Bits liveDocs = MultiFields.getLiveDocs(ir);
+		DocsEnum docs = MultiFields.getTermDocsEnum(ir, liveDocs, t.field(), t.bytes());
 
-			Field lastIndexed = doc.getField(LAST_INDEXED_FIELD);
+		int id;
+        if (docs != null)
+        {
+            while ((id = docs.nextDoc()) != DocsEnum.NO_MORE_DOCS)
+            {
+                inIndex = true;
+                Document doc = ir.document(id);
 
-			if (lastIndexed == null || Long.parseLong(lastIndexed.stringValue()) < 
-					lastModified.getTime()) {
-				reindexItem = true;
-			}
-		}
+                IndexableField lastIndexed = doc.getField(LAST_INDEXED_FIELD);
 
+                if (lastIndexed == null
+                        || Long.parseLong(lastIndexed.stringValue()) < lastModified
+                                .getTime())
+                {
+                    reindexItem = true;
+                }
+            }
+        }
 		return reindexItem || !inIndex;
 	}
 
@@ -902,19 +936,29 @@ public class DSIndexer
     private static IndexWriter openIndex(boolean wipeExisting)
             throws IOException
     {
-    	
-    	IndexWriter writer = new IndexWriter(indexDirectory, getAnalyzer(), wipeExisting);
-
+        Directory dir = FSDirectory.open(new File(indexDirectory));
+        
+        LimitTokenCountAnalyzer decoratorAnalyzer = null; 
         /* Set maximum number of terms to index if present in dspace.cfg */
         if (maxfieldlength == -1)
         {
-            writer.setMaxFieldLength(Integer.MAX_VALUE);
+            decoratorAnalyzer = new LimitTokenCountAnalyzer(getAnalyzer(), Integer.MAX_VALUE);
         }
         else
         {
-            writer.setMaxFieldLength(maxfieldlength);
+            decoratorAnalyzer = new LimitTokenCountAnalyzer(getAnalyzer(), maxfieldlength);
         }
+
         
+        IndexWriterConfig iwc = new IndexWriterConfig(luceneVersion, decoratorAnalyzer);
+        if(wipeExisting){
+            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        }else{
+            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        }
+
+        IndexWriter writer = new IndexWriter(dir, iwc);
+
         return writer;
     }
 
@@ -982,8 +1026,8 @@ public class DSIndexer
 
         if (name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
-        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.ANALYZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.ANALYZED));
         }
 
         return doc;
@@ -1008,8 +1052,8 @@ public class DSIndexer
 
         if (name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
-        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.ANALYZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.ANALYZED));
         }
 
         return doc;
@@ -1022,9 +1066,9 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocumentForItem(Item item) throws SQLException, IOException
+    private static Document buildDocumentForItem(Context context, Item item) throws SQLException, IOException, DCInputsReaderException
     {
-    	String handle = item.getHandle();
+    	String handle = HandleManager.findHandle(context, item);
 
     	// get the location string (for searching by collection & community)
         String location = buildItemLocationString(item);
@@ -1050,7 +1094,49 @@ public class DSIndexer
                     mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
                 }
 
-                for (j = 0; j < mydc.length; j++)
+
+                //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
+                if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
+
+                    List<String> newValues = new ArrayList<String>();
+                    Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+
+                    // Get the display value of the respective stored value
+                    for (int k = 0; k < supportedLocales.length; k++)
+                    {
+                        List<String> displayValues = Util
+                                .getControlledVocabulariesDisplayValueLocalized(
+                                        item, mydc, indexConfigArr[i].schema,
+                                        indexConfigArr[i].element,
+                                        indexConfigArr[i].qualifier,
+                                        supportedLocales[k]);
+                        if (displayValues != null && !displayValues.isEmpty())
+                        {
+                            for (int d = 0; d < displayValues.size(); d++)
+                            {
+                                newValues.add(displayValues.get(d));
+                            }
+                        }
+
+                    }
+
+                    if (newValues!=null){
+                        for (int m=0;m<newValues.size();m++){
+                            if (!"".equals(newValues.get(m))){
+
+                                String toAdd=(String) newValues.get(m);
+                                doc.add( new Field(indexConfigArr[i].indexName,
+                                        toAdd,
+                                        Field.Store.NO,
+                                        Field.Index.ANALYZED));
+                            }
+                        }
+                    }
+
+                }
+
+
+             for (j = 0; j < mydc.length; j++)
                 {
                     if (!StringUtils.isEmpty(mydc[j].value))
                     {
@@ -1062,12 +1148,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.SECOND),
                                                    Field.Store.NO,
-                                                   Field.Index.UN_TOKENIZED));
+                                                   Field.Index.NOT_ANALYZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.UN_TOKENIZED));
+                                                    Field.Index.NOT_ANALYZED));
                             }
                         }
                         else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
@@ -1078,12 +1164,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.DAY),
                                                    Field.Store.NO,
-                                                   Field.Index.UN_TOKENIZED));
+                                                   Field.Index.NOT_ANALYZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.UN_TOKENIZED));
+                                                    Field.Index.NOT_ANALYZED));
                             }
                         }
                         else
@@ -1099,7 +1185,7 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName+"_authority",
                                    mydc[j].authority,
                                    Field.Store.NO,
-                                   Field.Index.UN_TOKENIZED));
+                                   Field.Index.NOT_ANALYZED));
 
                                 boolean valueAlreadyIndexed = false;
                                 if (variants != null)
@@ -1110,7 +1196,7 @@ public class DSIndexer
                                         doc.add( new Field(indexConfigArr[i].indexName,
                                                            var,
                                                            Field.Store.NO,
-                                                           Field.Index.TOKENIZED));
+                                                           Field.Index.ANALYZED));
                                         if (var.equals(mydc[j].value))
                                         {
                                             valueAlreadyIndexed = true;
@@ -1121,7 +1207,7 @@ public class DSIndexer
                                              doc.add( new Field("default",
                                                        var,
                                                        Field.Store.NO,
-                                                       Field.Index.TOKENIZED));
+                                                       Field.Index.ANALYZED));
                                         }
                                     }
                                 }
@@ -1132,7 +1218,7 @@ public class DSIndexer
                                     doc.add( new Field(indexConfigArr[i].indexName,
                                                        mydc[j].value,
                                                        Field.Store.NO,
-                                                       Field.Index.TOKENIZED));
+                                                       Field.Index.ANALYZED));
                                 }
                             }
                             else
@@ -1141,11 +1227,11 @@ public class DSIndexer
 	                            doc.add( new Field(indexConfigArr[i].indexName,
 	                                               mydc[j].value,
 	                                               Field.Store.NO,
-	                                               Field.Index.TOKENIZED));
+	                                               Field.Index.ANALYZED));
                         	}
                         }
 
-                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.TOKENIZED));
+                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.ANALYZED));
                     }
                 }
             }
@@ -1164,7 +1250,7 @@ public class DSIndexer
                 if (dcv.length > 0)
                 {
                     String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());
-                    doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.UN_TOKENIZED) );
+                    doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.NOT_ANALYZED) );
                 }
             }
         }
@@ -1230,15 +1316,15 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "archived", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "archived", Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         // KEPT FOR BACKWARDS COMPATIBILITY
         // do location, type, handle first
         doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
 
         // New fields to weaken the dependence on handles, and allow for faster list display
-        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for handle, so use keyword
@@ -1246,20 +1332,20 @@ public class DSIndexer
         if (handle != null)
         {
             // ??? not sure what the "handletext" field is but it was there in writeItemIndex ???
-            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.ANALYZED));
 
             // want to be able to search for handle, so use keyword
             // (not tokenized, but it is indexed)
-            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.NOT_ANALYZED));
 
             // add to full text index
-            doc.add(new Field("default", handle, Field.Store.NO, Field.Index.TOKENIZED));
+            doc.add(new Field("default", handle, Field.Store.NO, Field.Index.ANALYZED));
         }
 
         if(location != null)
         {
-            doc.add(new Field("location", location, Field.Store.NO, Field.Index.TOKENIZED));
-    	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.TOKENIZED));
+            doc.add(new Field("location", location, Field.Store.NO, Field.Index.ANALYZED));
+    	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.ANALYZED));
         }
 
         return doc;
@@ -1271,8 +1357,8 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "deleted", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "deleted", Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
 
@@ -1285,8 +1371,8 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "withdrawn", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "withdrawn", Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
 
@@ -1328,7 +1414,7 @@ public class DSIndexer
 
     /**
      * Helper function to retrieve a date using a best guess of the potential date encodings on a field
-     *  
+     *
      * @param t
      * @return
      */
@@ -1380,7 +1466,7 @@ public class DSIndexer
                 log.error("Unable to parse date format", pe);
             }
         }
-        
+
         return null;
     }
 

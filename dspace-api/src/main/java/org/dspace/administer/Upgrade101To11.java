@@ -18,7 +18,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * new last_modified column in the item table.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Upgrade101To11
 {

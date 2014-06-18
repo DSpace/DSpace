@@ -1,0 +1,7 @@
+Subject: DRUM: incoming etd is missing mapped collection(s)
+Unable to map DISS_inst_contact to additional collection(s).
+
+title:      {0}
+id:         {1}
+handle:     {2}
+collection: {3}

@@ -17,7 +17,7 @@ import java.net.URL;
  * clients of the LNI, along with the generated SOAP code.
  * 
  * @author Larry Stone
- * @version $Revision: 5845 $
+ * @version $Revision$
  */
 public class LNIClientUtils
 {

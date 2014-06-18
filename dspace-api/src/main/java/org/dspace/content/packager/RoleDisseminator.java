@@ -32,6 +32,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.PasswordHash;
 
 import org.jdom.Namespace;
 
@@ -70,6 +71,8 @@ public class RoleDisseminator implements PackageDisseminator
     public static final String LAST_NAME = "LastName";
     public static final String LANGUAGE = "Language";
     public static final String PASSWORD_HASH = "PasswordHash";
+    public static final String PASSWORD_DIGEST = "digest";
+    public static final String PASSWORD_SALT = "salt";
     public static final String CAN_LOGIN = "CanLogin";
     public static final String REQUIRE_CERTIFICATE = "RequireCertificate";
     public static final String SELF_REGISTERED = "SelfRegistered";
@@ -331,7 +334,8 @@ public class RoleDisseminator implements PackageDisseminator
             {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                writer.writeAttribute(NAME, member.getName());
+                if (null != member.getName())
+                    writer.writeAttribute(NAME, member.getName());
             }
             writer.writeEndElement();
         }
@@ -441,9 +445,12 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeStartElement(EPERSON);
         writer.writeAttribute(ID, String.valueOf(eperson.getID()));
 
-        writer.writeStartElement(EMAIL);
-        writer.writeCharacters(eperson.getEmail());
-        writer.writeEndElement();
+        if (eperson.getEmail()!=null)
+        {
+            writer.writeStartElement(EMAIL);
+            writer.writeCharacters(eperson.getEmail());
+            writer.writeEndElement();
+        }
 
         if(eperson.getNetid()!=null)
         {
@@ -475,9 +482,26 @@ public class RoleDisseminator implements PackageDisseminator
         
         if (emitPassword)
         {
-            writer.writeStartElement(PASSWORD_HASH);
-            writer.writeCharacters(eperson.getPasswordHash());
-            writer.writeEndElement();
+            PasswordHash password = eperson.getPasswordHash();
+            if (null != password)
+            {
+                writer.writeStartElement(PASSWORD_HASH);
+
+                String algorithm = password.getAlgorithm();
+                if (null != algorithm)
+                {
+                    writer.writeAttribute(PASSWORD_DIGEST, algorithm);
+                }
+
+                String salt = password.getSaltString();
+                if (null != salt)
+                {
+                    writer.writeAttribute(PASSWORD_SALT, salt);
+                }
+
+                writer.writeCharacters(password.getHashString());
+                writer.writeEndElement();
+            }
         }
 
         if (eperson.canLogIn())

@@ -1,9 +1,9 @@
 --
 -- database_schema.sql
 --
--- Version: $Revision: 5682 $
+-- Version: $Revision$
 --
--- Date:    $Date: 2010-10-28 11:52:41 -0400 (Thu, 28 Oct 2010) $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 --
@@ -93,6 +93,7 @@ CREATE SEQUENCE collection2item_seq;
 CREATE SEQUENCE resourcepolicy_seq;
 CREATE SEQUENCE epersongroup2eperson_seq;
 CREATE SEQUENCE handle_seq;
+CREATE SEQUENCE doi_seq;
 CREATE SEQUENCE workspaceitem_seq;
 CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
@@ -107,6 +108,10 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE versionitem_seq;
+CREATE SEQUENCE versionhistory_seq;
+CREATE SEQUENCE webapp_seq;
+CREATE SEQUENCE requestitem_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -163,7 +168,9 @@ CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
   email               VARCHAR(64) UNIQUE,
-  password            VARCHAR(64),
+  password            VARCHAR(128),
+  salt                VARCHAR(32),
+  digest_algorithm    VARCHAR(16),
   firstname           VARCHAR(64),
   lastname            VARCHAR(64),
   can_log_in          BOOL,
@@ -232,6 +239,7 @@ CREATE TABLE Item
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
   in_archive      BOOL,
   withdrawn       BOOL,
+  discoverable    BOOL,
   last_modified   TIMESTAMP WITH TIME ZONE,
   owning_collection INTEGER
 );
@@ -270,9 +278,10 @@ CREATE INDEX item2bundle_bundle_fk_idx ON Item2Bundle(bundle_id);
 -------------------------------------------------------
 CREATE TABLE Bundle2Bitstream
 (
-  id           INTEGER PRIMARY KEY,
-  bundle_id    INTEGER REFERENCES Bundle(bundle_id),
-  bitstream_id INTEGER REFERENCES Bitstream(bitstream_id)
+  id              INTEGER PRIMARY KEY,
+  bundle_id       INTEGER REFERENCES Bundle(bundle_id),
+  bitstream_id    INTEGER REFERENCES Bitstream(bitstream_id),
+  bitstream_order INTEGER
 );
 
 -- index by bundle_id
@@ -434,7 +443,10 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE
+  end_date             DATE,
+  rpname               VARCHAR(30),
+  rptype               VARCHAR(30),
+  rpdescription        VARCHAR(100)
 );
 
 -- index by resource_type,resource_id - all queries by
@@ -474,6 +486,23 @@ CREATE TABLE Handle
 CREATE INDEX handle_handle_idx ON Handle(handle);
 -- index by resource id and resource type id
 CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+
+-------------------------------------------------------
+-- Doi table
+-------------------------------------------------------
+CREATE TABLE Doi
+(
+  doi_id           INTEGER PRIMARY KEY,
+  doi              VARCHAR(256) UNIQUE,
+  resource_type_id INTEGER,
+  resource_id      INTEGER,
+  status           INTEGER
+);
+
+-- index by handle, commonly looked up
+CREATE INDEX doi_doi_idx ON Doi(doi);
+-- index by resource id and resource type id
+CREATE INDEX doi_resource_id_and_type_idx ON Doi(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -773,7 +802,44 @@ CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
 
 
 
+CREATE TABLE versionhistory
+(
+  versionhistory_id INTEGER NOT NULL PRIMARY KEY
+);
 
+CREATE TABLE versionitem
+(
+  versionitem_id INTEGER NOT NULL PRIMARY KEY,
+  item_id INTEGER REFERENCES Item(item_id),
+  version_number INTEGER,
+  eperson_id INTEGER REFERENCES EPerson(eperson_id),
+  version_date TIMESTAMP,
+  version_summary VARCHAR(255),
+  versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
+);
 
+CREATE TABLE Webapp
+(
+    webapp_id INTEGER NOT NULL PRIMARY KEY,
+    AppName VARCHAR(32),
+    URL VARCHAR,
+    Started TIMESTAMP,
+    isUI INTEGER
+);
 
-
+CREATE TABLE requestitem
+(
+  requestitem_id int4 NOT NULL,
+  token varchar(48),
+  item_id int4,
+  bitstream_id int4,
+  allfiles bool,
+  request_email varchar(64),
+  request_name varchar(64),
+  request_date timestamp,
+  accept_request bool,
+  decision_date timestamp,
+  expires timestamp,
+  CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),
+  CONSTRAINT requestitem_token_key UNIQUE (token)
+);

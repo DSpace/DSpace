@@ -116,7 +116,10 @@ public class BrowseDAOPostgres implements BrowseDAO
     /** flags for what the items represent */
     private boolean itemsInArchive = true;
     private boolean itemsWithdrawn = false;
+    private boolean itemsDiscoverable = true;
 
+    private boolean enableBrowseFrequencies = true;
+    
     /**
      * Required constructor for use by BrowseDAOFactory
      *
@@ -365,7 +368,8 @@ public class BrowseDAOPostgres implements BrowseDAO
                 TableRow row = tri.next();
                 BrowseItem browseItem = new BrowseItem(context, row.getIntColumn("item_id"),
                                                   itemsInArchive,
-                                                  itemsWithdrawn);
+                                                  itemsWithdrawn,
+                                                  itemsDiscoverable);
                 results.add(browseItem);
             }
 
@@ -392,6 +396,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         throws BrowseException
     {
         String query = getQuery();
+        
         Object[] params = getQueryParams();
         log.debug(LogManager.getHeader(context, "executing_value_query", "query=" + query));
 
@@ -409,7 +414,12 @@ public class BrowseDAOPostgres implements BrowseDAO
                 TableRow row = tri.next();
                 String valueResult = row.getStringColumn("value");
                 String authorityResult = row.getStringColumn("authority");
-                results.add(new String[]{valueResult,authorityResult});
+                if (enableBrowseFrequencies){
+                    long frequency = row.getLongColumn("num");
+                    results.add(new String[]{valueResult,authorityResult, String.valueOf(frequency)});
+                }
+                else
+                    results.add(new String[]{valueResult,authorityResult, ""});
             }
 
             return results;
@@ -679,12 +689,21 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             itemsInArchive = false;
             itemsWithdrawn = true;
+            itemsDiscoverable = true;
         }
-        else
+        else if (table.equals(BrowseIndex.getPrivateBrowseIndex().getTableName()))
+        {
+        	itemsInArchive = true;
+            itemsWithdrawn = false;
+        	itemsDiscoverable = false;
+        }
+        else 
         {
             itemsInArchive = true;
             itemsWithdrawn = false;
+            itemsDiscoverable = true;
         }
+
 
         this.rebuildQuery = true;
     }
@@ -773,6 +792,17 @@ public class BrowseDAOPostgres implements BrowseDAO
         // prepare the limit and offset clauses
         buildRowLimitAndOffset(queryBuf, params);
 
+        //If we want frequencies and this is not a count query, enchance the query accordingly
+        if (isEnableBrowseFrequencies() && countValues==null){
+            String before = "SELECT count(*) AS num, dvalues.value, dvalues.authority FROM (";
+            String after = ") dvalues , "+tableMap+" WHERE dvalues.id = "+tableMap+".distinct_id GROUP BY "+tableMap+
+                    ".distinct_id, dvalues.value, dvalues.authority, dvalues.sort_value";
+
+            queryBuf.insert(0, before);
+            queryBuf.append(after);
+            buildOrderBy(queryBuf);
+        }
+        
         return queryBuf.toString();
     }
 
@@ -844,6 +874,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             {
                 queryBuf.append(" DESC ");
             }
+            queryBuf.append(" NULLS LAST ");
         }
     }
 
@@ -1390,5 +1421,13 @@ public class BrowseDAOPostgres implements BrowseDAO
 
     public String getAuthorityValue() {
         return authority;
+    }
+    
+    public boolean isEnableBrowseFrequencies() {
+        return enableBrowseFrequencies;
+    }
+
+    public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
+        this.enableBrowseFrequencies = enableBrowseFrequencies;
     }
 }

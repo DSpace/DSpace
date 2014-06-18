@@ -20,7 +20,7 @@ import java.util.List;
  * Represents the results of a database query
  * 
  * @author Peter Breton
- * @version $Revision: 5915 $
+ * @version $Revision$
  */
 public class TableRowIterator
 {

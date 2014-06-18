@@ -10,27 +10,37 @@ package org.dspace.search;
 import java.io.Reader;
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.apache.lucene.analysis.PorterStemFilter;
-import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.en.PorterStemFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.util.Version;
 import org.dspace.core.ConfigurationManager;
-
-import edu.umd.lib.dspace.search.StripDiacriticSynonymFilter;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
  * stemming and stopword filters.
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
-public class DSAnalyzer extends Analyzer
+@Deprecated
+public class DSAnalyzer extends StopwordAnalyzerBase
 {
+    protected final Version matchVersion;
     /*
      * An array containing some common words that are not usually useful for
      * searching.
      */
-    private static final String[] STOP_WORDS =
+    protected static final String[] STOP_WORDS =
     {
 
     // new stopwords (per MargretB)
@@ -49,24 +59,31 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    private static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
+    protected final CharArraySet stopSet;
 
-    /*
-     * Create a token stream for this analyzer.
+    /**
+     * Builds an analyzer
+     * @param matchVersion Lucene version to match
      */
-    public final TokenStream tokenStream(String fieldName, final Reader reader)
-    {
-        TokenStream result = new DSTokenizer(reader);
-
-        result = new StripDiacriticSynonymFilter(result);
-        result = new StandardFilter(result);
-        result = new LowerCaseFilter(result);
-        result = new StopFilter(result, stopSet);
-        result = new PorterStemFilter(result);
-
-        return result;
+    public DSAnalyzer(Version matchVersion) {
+        super(matchVersion, StopFilter.makeStopSet(matchVersion, STOP_WORDS));
+        this.stopSet = StopFilter.makeStopSet(matchVersion, STOP_WORDS);
+        this.matchVersion = matchVersion;
     }
 
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final Tokenizer source = new DSTokenizer(matchVersion, reader);
+        TokenStream result = new StandardFilter(matchVersion, source);
+        
+        result = new LowerCaseFilter(matchVersion, result);
+        result = new StopFilter(matchVersion, result, stopSet);
+        result = new PorterStemFilter(result);
+
+        return new TokenStreamComponents(source, result);
+    }
+
+    @Override
     public int getPositionIncrementGap(String fieldName)
     {
         // If it is the default field, or bounded fields is turned off in the config, return the default value

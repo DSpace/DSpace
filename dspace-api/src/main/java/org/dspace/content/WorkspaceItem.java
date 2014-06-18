@@ -16,6 +16,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -29,7 +31,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing an item in the process of being submitted by a user
  * 
  * @author Robert Tansley
- * @version $Revision: 6137 $
+ * @version $Revision$
  */
 public class WorkspaceItem implements InProgressSubmission
 {
@@ -152,75 +154,85 @@ public class WorkspaceItem implements InProgressSubmission
         EPerson e = c.getCurrentUser();
 
         // read permission
-        AuthorizeManager.addPolicy(c, i, Constants.READ, e);
+        AuthorizeManager.addPolicy(c, i, Constants.READ, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step1group);
+
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step1group, ResourcePolicy.TYPE_WORKFLOW);
+            }
+
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step2group, ResourcePolicy.TYPE_WORKFLOW);
+            }
+
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step3group, ResourcePolicy.TYPE_WORKFLOW);
+            }
         }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step2group);
-        }
-
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step3group);
-        }
 
         // write permission
-        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e);
+        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+            }
         }
 
         // add permission
-        AuthorizeManager.addPolicy(c, i, Constants.ADD, e);
+        AuthorizeManager.addPolicy(c, i, Constants.ADD, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group, ResourcePolicy.TYPE_WORKFLOW);
+            }
         }
 
         // remove contents permission
-        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e);
+        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group, ResourcePolicy.TYPE_WORKFLOW);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+            }
         }
 
         // Copy template if appropriate
@@ -494,7 +506,7 @@ public class WorkspaceItem implements InProgressSubmission
     /**
      * Update the workspace item, including the unarchived item.
      */
-    public void update() throws SQLException, AuthorizeException, IOException
+    public void update() throws SQLException, AuthorizeException
     {
         // Authorisation is checked by the item.update() method below
 
@@ -574,10 +586,6 @@ public class WorkspaceItem implements InProgressSubmission
         // to workspaceitem ID
         deleteEpersonGroup2WorkspaceItem();
 
-        // delete additional mapped collections
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
-
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
@@ -607,10 +615,6 @@ public class WorkspaceItem implements InProgressSubmission
         //        deleteSubmitPermissions();
         // Remove from cache
         ourContext.removeCached(this, getID());
-
-        // delete additional mapped collections
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -662,53 +666,4 @@ public class WorkspaceItem implements InProgressSubmission
     {
         wiRow.setColumn("published_before", b);
     }
-
-    /**
-     * Get the additional collections to map the item to.
-     * 
-     * @return array of collections
-     * @throws SQLException
-     */
-    public Collection[] getMapCollections() throws SQLException
-    {
-        String myQuery = 
-            "SELECT collection.collection_id FROM collection, collection2workspaceitem WHERE "
-            + "collection.collection_id=collection2workspaceitem.collection_id AND "
-            + "collection2workspaceitem.workspace_item_id=?"
-            ;
-
-        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "collection",
-                                                           myQuery, getID());
-
-        List collectionRows = rows.toList();
-
-        Collection[] collections = new Collection[collectionRows.size()];
-
-        for (int i = 0; i < collectionRows.size(); i++)
-        {
-            TableRow row = (TableRow) collectionRows.get(i);
-
-            collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
-
-        }
-
-        return collections;
-    }
-
-    /**
-     * Add an additional collection to map the item to.
-     * 
-     * @throws SQLException
-     */
-    public void addMapCollection(Collection collection) throws SQLException
-    {
-        // Create mapping
-        TableRow row = DatabaseManager.create(ourContext, "collection2workspaceitem");
-
-        row.setColumn("collection_id", collection.getID());
-        row.setColumn("workspace_item_id", getID());
-
-        DatabaseManager.update(ourContext, row);
-    }
-
 }

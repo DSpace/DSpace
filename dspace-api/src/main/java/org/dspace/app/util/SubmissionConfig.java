@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * @see org.dspace.app.util.SubmissionStepConfig
  * 
  * @author Tim Donohue, based on DCInputSet by Brian S. Hughes
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 
 public class SubmissionConfig implements Serializable

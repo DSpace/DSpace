@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
  * 'invocation mode' - optionally set by the caller on the curation object.
  * Thus, it effectively means that if a task is iterating over a collection,
  * the first error, or failure will halt the process.
- * This insures that the status code and result of the failure are preserved.
+ * This ensures that the status code and result of the failure are preserved.
  * 
  * @author richardrodgers
  */

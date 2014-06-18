@@ -27,7 +27,7 @@ import org.dspace.core.Context;
  * acts as a factory for Dispatchers, which are used by the Context to send
  * events to consumers. It also contains generally useful utility methods.
  * 
- * Version: $Revision: 5844 $
+ * Version: $Revision$
  */
 public class EventManager
 {

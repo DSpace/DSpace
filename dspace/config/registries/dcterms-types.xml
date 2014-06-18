@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+
+<!--
+  - dcterms-types.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - DCTerms registry contributed to eventually replace dublin-core-types.xml
+  - 
+  - <dc-type>
+  -   <schema></schema>
+  -   <element></element>
+  -   
+  -   <scope_note></scope_note>
+  - </dc-type>
+  -->
+
+<!-- start of XML -->
+
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DCTerms Types Registry</title>
+    <contributor.author>Maureen Walsh</contributor.author>
+    <contributor.author>Sarah Potvin</contributor.author>
+    <contributor.author>Bram Luyten</contributor.author>
+    <contributor.editor>$Author$</contributor.editor>
+    <date.created>$Date$</date.created>
+    <description>$Log$</description>
+    <description.version>$Revision$</description.version>
+  </dspace-header>
+
+  <dc-schema>
+          <name>dcterms</name>
+          <namespace>http://purl.org/dc/terms/</namespace>
+  </dc-schema>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>abstract</element>
+    <scope_note>A summary of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>accessRights</element>
+    <scope_note>Information about who can access the resource or an indication of its security status. May include information regarding access or restrictions based on privacy, security, or other policies.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>accrualMethod</element>
+    <scope_note>The method by which items are added to a collection.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>accrualPeriodicity</element>
+    <scope_note>The frequency with which items are added to a collection.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>accrualPolicy</element>
+    <scope_note>The policy governing the addition of items to a collection.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>alternative</element>
+    <scope_note>An alternative name for the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>audience</element>
+    <scope_note>A class of entity for whom the resource is intended or useful.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>available</element>
+    <scope_note>Date (often a range) that the resource became or will become available.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>bibliographicCitation</element>
+    <scope_note>Recommended practice is to include sufficient bibliographic detail to identify the resource as unambiguously as possible.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>comformsTo</element>
+    <scope_note>An established standard to which the described resource conforms.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>contributor</element>
+    <scope_note>An entity responsible for making contributions to the resource. Examples of a Contributor include a person, an organization, or a service.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>coverage</element>
+    <scope_note>The spatial or temporal topic of the resource, the spatial applicability of the resource, or the jurisdiction under which the resource is relevant.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>created</element>
+    <scope_note>Date of creation of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>creator</element>
+    <scope_note>An entity primarily responsible for making the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>date</element>
+    <scope_note>A point or period of time associated with an event in the lifecycle of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>dateAccepted</element>
+    <scope_note>Date of acceptance of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>dateCopyrighted</element>
+    <scope_note>Date of copyright.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>dateSubmitted</element>
+    <scope_note>Date of submission of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>description</element>
+    <scope_note>An account of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>educationLevel</element>
+    <scope_note>A class of entity, defined in terms of progression through an educational or training context, for which the described resource is intended.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>extent</element>
+    <scope_note>The size or duration of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>format</element>
+    <scope_note>The file format, physical medium, or dimensions of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>hasFormat</element>
+    <scope_note>A related resource that is substantially the same as the pre-existing described resource, but in another format.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>hasPart</element>
+    <scope_note>A related resource that is included either physically or logically in the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>hasVersion</element>
+    <scope_note>A related resource that is a version, edition, or adaptation of the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>identifier</element>
+    <scope_note>An unambiguous reference to the resource within a given context.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>instructionalMethod</element>
+    <scope_note>A process, used to engender knowledge, attitudes and skills, that the described resource is designed to support.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isFormatOf</element>
+    <scope_note>A related resource that is substantially the same as the described resource, but in another format.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isPartOf</element>
+    <scope_note>A related resource in which the described resource is physically or logically included.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isReferencedBy</element>
+    <scope_note>A related resource that references, cites, or otherwise points to the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isReplacedBy</element>
+    <scope_note>A related resource that supplants, displaces, or supersedes the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isRequiredBy</element>
+    <scope_note>A related resource that requires the described resource to support its function, delivery, or coherence.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>issued</element>
+    <scope_note>Date of formal issuance (e.g., publication) of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>isVersionOf</element>
+    <scope_note>A related resource of which the described resource is a version, edition, or adaptation.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>language</element>
+    <scope_note>A language of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>license</element>
+    <scope_note>A legal document giving official permission to do something with the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>mediator</element>
+    <scope_note>An entity that mediates access to the resource and for whom the resource is intended or useful.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>medium</element>
+    <scope_note>The material or physical carrier of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>modified</element>
+    <scope_note>Date on which the resource was changed.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>provenance</element>
+    <scope_note>A statement of any changes in ownership and custody of the resource since its creation that are significant for its authenticity, integrity, and interpretation.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>publisher</element>
+    <scope_note>An entity responsible for making the resource available.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dcterms</schema>
+    <element>references</element>
+    <scope_note>A related resource that is referenced, cited, or otherwise pointed to by the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>relation</element>
+    <scope_note>A related resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>replaces</element>
+    <scope_note>A related resource that is supplanted, displaced, or superseded by the described resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>requires</element>
+    <scope_note>A related resource that is required by the described resource to support its function, delivery, or coherence.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>rights</element>
+    <scope_note>Information about rights held in and over the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>rightsHolder</element>
+    <scope_note>A person or organization owning or managing rights over the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>source</element>
+    <scope_note>A related resource from which the described resource is derived.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>spatial</element>
+    <scope_note>Spatial characteristics of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>subject</element>
+    <scope_note>The topic of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>tableOfContents</element>
+    <scope_note>A list of subunits of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>temporal</element>
+    <scope_note>Temporal characteristics of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>title</element>
+    <scope_note>A name given to the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>type</element>
+    <scope_note>The nature or genre of the resource.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dcterms</schema>
+    <element>valid</element>
+    <scope_note>Date (often a range) of validity of a resource.</scope_note>
+  </dc-type>
+</dspace-dc-types>

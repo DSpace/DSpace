@@ -1,0 +1,5 @@
+select name,count(item_id) from collection2item,collection WHERE collection2item.collection_id = collection.collection_id GROUP BY name ORDER BY name;
+
+select email,firstname,lastname,count(item_id) from item,eperson WHERE eperson_id=submitter_id and in_archive GROUP BY email,firstname,lastname ORDER BY lastname;
+
+select count(item.item_id) AS "Items Submitted",substring(text_value from 1 for 4) AS "Year",substring(text_value from 6 for 2) AS "Month" from item,dcvalue where item.item_id = dcvalue.item_id and dc_type_id='11' and (submitter_id != '5' and submitter_id !='6') and in_archive group by substring (text_value from 1 for 4),substring(text_value from 6 for 2) order by substring(text_value from 1 for 4),substring(text_value from 6 for 2);

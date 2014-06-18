@@ -52,7 +52,7 @@ import org.dspace.core.Utils;
  * send that, otherwise it fails. Do not attempt to insert metadata.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see PackageIngester
  * @see PackageDisseminator
  */
@@ -248,11 +248,11 @@ public class PDFPackager
             PackageUtils.createFile(pkgFile);
         }
 
-        //open up output stream to copy bistream to file
+        //open up output stream to copy bitstream to file
         FileOutputStream out = null;
         try
         {
-            //open up output stream to copy bistream to file
+            //open up output stream to copy bitstream to file
             out = new FileOutputStream(pkgFile);
             Utils.copy(pkgBs.retrieve(), out);
         }

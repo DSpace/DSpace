@@ -36,7 +36,7 @@ import org.dspace.core.ConfigurationManager;
  * @see org.dspace.app.util.SubmissionStepConfig
  * 
  * @author Tim Donohue based on DCInputsReader by Brian S. Hughes
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 
 public class SubmissionConfigReader

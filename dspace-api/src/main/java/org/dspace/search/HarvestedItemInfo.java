@@ -17,7 +17,7 @@ import org.dspace.core.Context;
  * Simple container class containing information about a harvested DSpace item.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class HarvestedItemInfo
 {

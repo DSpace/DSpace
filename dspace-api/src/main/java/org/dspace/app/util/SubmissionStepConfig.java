@@ -23,7 +23,7 @@ import java.io.Serializable;
  * @see org.dspace.app.util.SubmissionConfig
  * 
  * @author Tim Donohue
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class SubmissionStepConfig implements Serializable
 {

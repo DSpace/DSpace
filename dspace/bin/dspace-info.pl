@@ -1,46 +1,11 @@
 #!/usr/bin/env perl
-
-###########################################################################
 #
-# dspace-info.pl
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
 #
-# Version: $Revision: 3705 $
+# http://www.dspace.org/license/
 #
-# Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
-#
-# Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
-# Institute of Technology.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
-#
-# - Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
-#
-# - Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
-#
-# - Neither the name of the Hewlett-Packard Company nor the name of the
-# Massachusetts Institute of Technology nor the names of their
-# contributors may be used to endorse or promote products derived from
-# this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-# DAMAGE.
-#
-###########################################################################
 
 # Simple script to check some DSpace site statistics, such
 #  as the size of key directories, counts of significat DSpace
@@ -51,7 +16,8 @@
 
 use strict;
 use File::Find;
-use Cwd;
+use Cwd 'abs_path', 'realpath';
+use File::Basename 'dirname';
 
 
 ##################################################
@@ -59,18 +25,15 @@ use Cwd;
 ##################################################
 
 # where is DSpace installed?
-chomp($binpath = `dirname $0`);
-chdir "$binpath/.." || die "$!\n";
-my $dspace_dir = cwd();
-
-#where is the DATA for the database tables stored?
-my $database_dir = "${dspace_dir}/pgsql";
+my $dspace_dir = realpath(dirname(abs_path($0)).'/..');
 
 # find DSpace directories ###################
 
 my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
 my $search_dir     = GetConfigParameter( "search.dir"     );
 my $logs_dir       = GetConfigParameter( "log.dir"        );
+my $db_name        = GetConfigParameter( "db.url"         );
+$db_name           =~ s/.*\///;
 
 # directories in this array are to be checked for ownership by
 # the dspace user
@@ -81,7 +44,6 @@ my @zerolength_dirs = ( $assetstore_dir );
 
 # error out if cannot locate above directories
 die "Cannot find dspace directory tree $dspace_dir - edit dspace-info.pl 'dspace_dir' variable with correct path"     if( ! -d $dspace_dir   );
-die "Cannot find database data directory $database_dir - edit dspace-info.pl 'database_dir' variable with correct path" if( ! -d $database_dir );
 
 
 #############################################
@@ -108,7 +70,6 @@ my $workspaceitem_count = CountRows( "workspaceitem" );
 my $assetstore_size = DirectorySize( $assetstore_dir );
 my $search_size     = DirectorySize( $search_dir     );
 my $logs_size       = DirectorySize( $logs_dir       );
-my $database_size   = DirectorySize( $database_dir   );
 
 # look for missing logos ####################
 my @communities_without_logos = FindCommunitiesWithoutLogos();
@@ -116,9 +77,6 @@ my @collections_without_logos = FindCollectionsWithoutLogos();
 
 # look for deleted bitstreams
 my @deleted_bitstreams        = FindDeletedBitstreams();
-
-# look for bitstreams without policies
-my @bitstreams_without_policies = FindBitstreamsWithoutPolicies();
 
 # look for empty groups
 my @empty_groups = FindEmptyGroups();
@@ -143,9 +101,7 @@ print "Date: " . localtime() . "\n";
 print "\n"; 
 print "Size of Important Directories:\n";
 SizeReport("Asset store:",      $assetstore_size);
-SizeReport("Database:",         $database_size  );
 SizeReport("Search Directory:", $search_size    );
-SizeReport("History Directory:",$history_size   );
 SizeReport("Logs Directory:",   $logs_size      );
 print "\n";
 print "\n";
@@ -250,20 +206,6 @@ if( $#empty_groups >= 0 )
 }
 
 
-if( $#bitstreams_without_policies >= 0 )
-{
-    my $count = $#bitstreams_without_policies + 1;
-
-    print "Bitstreams without policies:  $count\n";
-    foreach( sort { $a <=> $b } @bitstreams_without_policies )
-    {
-        my ($id) = split /\|/;
-        print "\t$id\n";
-    } 
-    print "\n";
-}
-
-
 # check ownership - check the jsp and asset store directories
 #  for ownership issues - be sure to run this script as the dspace user
 
@@ -329,6 +271,8 @@ sub GetConfigParameter
     }
 
     close CONFIG;
+
+    $return_value =~ s/\$\{dspace.dir\}/$dspace_dir/g;
 
     return $return_value;
 }
@@ -465,7 +409,7 @@ sub ExecuteSQL
     my $arg = shift;
 
     # do the SQL statement
-    open SQLOUT, "psql -d dspace -A -c '$arg' -p 8001 | ";
+    open SQLOUT, "psql -d $db_name -A -c '$arg' | ";
 
     # slurp up the results
     my @results = <SQLOUT>;

@@ -54,7 +54,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  *
  * @author Tim Donohue
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class DescribeStep extends AbstractProcessingStep
 {
@@ -117,6 +117,10 @@ public class DescribeStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        if(!request.getParameterNames().hasMoreElements()){
+            //In case of an empty request do NOT just remove all metadata, just return to the submission page
+            return STATUS_MORE_INPUT_REQUESTED;
+        }
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -139,10 +143,20 @@ public class DescribeStep extends AbstractProcessingStep
             throw new ServletException(e);
         }
 
+        // Fetch the document type (dc.type)
+        String documentType = "";
+        if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+        {
+            documentType = item.getMetadata("dc.type")[0].value;
+        }
+        
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
+
+        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+        	
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
@@ -169,6 +183,12 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
+        	// Omit fields not allowed for this document type
+            if(!inputs[j].isAllowedFor(documentType))
+            {
+            	continue;
+            }
+
             if (!inputs[j]
                         .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                                 : DCInput.SUBMISSION_SCOPE))
@@ -284,10 +304,24 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
-                DCValue[] values = item.getMetadata(inputs[i].getSchema(),
-                        inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
+            	// Do not check the required attribute if it is not visible or not allowed for the document type
+            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+                if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
+                {
+                	continue;
+                }
 
-                if (inputs[i].isRequired() && values.length == 0)
+                String qualifier = inputs[i].getQualifier();
+                if (qualifier == null
+                        && inputs[i].getInputType().equals("qualdrop_value"))
+                {
+                    qualifier = Item.ANY;
+                }
+                DCValue[] values = item.getMetadata(inputs[i].getSchema(),
+                        inputs[i].getElement(), qualifier, Item.ANY);
+
+                if ((inputs[i].isRequired() && values.length == 0) &&
+                     inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
                 {
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));
@@ -965,7 +999,6 @@ public class DescribeStep extends AbstractProcessingStep
      * Return the HTML / DRI field name for the given input.
      *
      * @param input
-     * @return
      */
     public static String getFieldName(DCInput input)
     {

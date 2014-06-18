@@ -20,7 +20,7 @@ import org.dspace.core.ConfigurationManager;
  * includes the name, the class to instantiate and event filters. Note that all
  * characteristics are "global" and the same for all dispatchers.
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class ConsumerProfile
 {

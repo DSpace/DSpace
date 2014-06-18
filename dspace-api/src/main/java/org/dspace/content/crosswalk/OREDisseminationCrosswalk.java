@@ -86,10 +86,10 @@ public class OREDisseminationCrosswalk
     	String oaiUrl = null;
         String dsUrl = ConfigurationManager.getProperty("dspace.url");
         
-        String remSource = ConfigurationManager.getProperty("ore.authoritative.source");
+        String remSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
     	if (remSource == null || remSource.equalsIgnoreCase("oai"))
         {
-            oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+            oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
         }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
         {
@@ -319,7 +319,7 @@ public class OREDisseminationCrosswalk
                 'J' , 'K' , 'L' , 'M' , 'N' , 'O' , 'P' , 'Q' , 'R' ,
                 'S' , 'T' , 'U' , 'V' , 'W' , 'X' , 'Y' , 'Z'};
 		Character digit[] = {'0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '8' , '9'};
-		Character mark[] = {'-' , '_' , '.' , '!' , '~' , '*' , '\'' , '(' , ')'};
+		Character mark[] = {'-' , '_' , '.' , '!' , '~' , '*' , '\'' , '/', '(' , ')'};
 		
 		// reserved
 		//Character reserved[] = {';' , '/' , '?' , ':' , '@' , '&' , '=' , '+' , '$' , ',' ,'%', '#'};

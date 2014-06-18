@@ -1668,11 +1668,15 @@ public class MockDatabaseManager
                 driver.registerPool(poolName, connectionPool);
 
             //preload the contents of the database
-            URL fileSchema = MockDatabaseManager.class.getClassLoader().getResource("database_schema.sql");
             String s = new String();
             StringBuilder sb = new StringBuilder();
 
-            FileReader fr = new FileReader(new File(fileSchema.getPath()));
+            String schemaPath = System.getProperty("db.schema.path");
+            if (null == schemaPath)
+                throw new IllegalArgumentException(
+                        "System property db.schema.path must be defined");
+
+            FileReader fr = new FileReader(new File(schemaPath));
             BufferedReader br = new BufferedReader(fr);
 
             while((s = br.readLine()) != null)
@@ -1691,7 +1695,7 @@ public class MockDatabaseManager
             //exist in the file
             String[] stmts = sb.toString().split(";");
 
-            //stablish the connection using the pool
+            //establish the connection using the pool
             Connection con = DriverManager.getConnection("jdbc:apache:commons:dbcp:" + poolName);
             Statement st = con.createStatement();
 

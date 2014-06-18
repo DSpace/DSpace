@@ -7,6 +7,27 @@
  */
 package org.dspace.content;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
+import org.dspace.core.*;
+import org.dspace.eperson.Group;
+import org.dspace.event.Event;
+import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
@@ -16,29 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
-
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.AuthorizeConfiguration;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
-import org.dspace.browse.ItemCounter;
-import org.dspace.browse.ItemCountException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
-import org.dspace.event.Event;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Class representing a collection.
@@ -50,9 +48,9 @@ import org.dspace.workflow.WorkflowItem;
  * database after calling <code>update</code>. The default group of
  * submitters is slightly different - creating or removing this has instant
  * effect.
- * 
+ *
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Collection extends DSpaceObject
 {
@@ -92,9 +90,16 @@ public class Collection extends DSpaceObject
     /** The default group of administrators */
     private Group admins;
 
+    // Keys for accessing Collection metadata
+    public static final String COPYRIGHT_TEXT = "copyright_text";
+    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String SHORT_DESCRIPTION = "short_description";
+    public static final String SIDEBAR_TEXT = "side_bar_text";
+    public static final String PROVENANCE_TEXT = "provenance_description";
+    
     /**
      * Construct a collection with the given table row
-     * 
+     *
      * @param context
      *            the context this object exists in
      * @param row
@@ -137,7 +142,7 @@ public class Collection extends DSpaceObject
 
         submitters = groupFromColumn("submitter");
         admins = groupFromColumn("admin");
-        
+
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
 
@@ -151,12 +156,12 @@ public class Collection extends DSpaceObject
 
     /**
      * Get a collection from the database. Loads in the metadata
-     * 
+     *
      * @param context
      *            DSpace context object
      * @param id
      *            ID of the collection
-     * 
+     *
      * @return the collection, or null if the ID is invalid.
      * @throws SQLException
      */
@@ -197,10 +202,10 @@ public class Collection extends DSpaceObject
     /**
      * Create a new collection, with a new ID. This method is not public, and
      * does not check authorisation.
-     * 
+     *
      * @param context
      *            DSpace context object
-     * 
+     *
      * @return the newly created collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -286,10 +291,10 @@ public class Collection extends DSpaceObject
     /**
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
-     * 
+     *
      * @param context
      *            DSpace context object
-     * 
+     *
      * @return the collections in the system
      * @throws SQLException
      */
@@ -336,8 +341,58 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get all collections in the system. Adds support for limit and offset.
+     * @param context
+     * @param limit
+     * @param offset
+     * @return
+     * @throws SQLException
+     */
+    public static Collection[] findAll(Context context, Integer limit, Integer offset) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
+                "SELECT * FROM collection ORDER BY name limit ? offset ?", limit, offset);
+
+        List<Collection> collections = new ArrayList<Collection>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Collection fromCache = (Collection) context.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections.add(fromCache);
+                }
+                else
+                {
+                    collections.add(new Collection(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+
+        return collectionArray;
+    }
+
+    /**
      * Get the in_archive items in this collection. The order is indeterminate.
-     * 
+     *
      * @return an iterator over the items in the collection.
      * @throws SQLException
      */
@@ -355,8 +410,29 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get the in_archive items in this collection. The order is indeterminate.
+     * Provides the ability to use limit and offset, for efficient paging.
+     * @param limit Max number of results in set
+     * @param offset Number of results to jump ahead by. 100 = 100th result is first, not 100th page.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException
+     */
+    public ItemIterator getItems(Integer limit, Integer offset) throws SQLException
+    {
+        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
+                + "item.item_id=collection2item.item_id AND "
+                + "collection2item.collection_id= ? "
+                + "AND item.in_archive='1' limit ? offset ?";
+
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
+                myQuery,getID(), limit, offset);
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+    /**
      * Get all the items in this collection. The order is indeterminate.
-     * 
+     *
      * @return an iterator over the items in the collection.
      * @throws SQLException
      */
@@ -374,7 +450,7 @@ public class Collection extends DSpaceObject
 
      /**
      * Get the internal ID of this collection
-     * 
+     *
      * @return the internal identifier
      */
     public int getID()
@@ -400,36 +476,36 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the value of a metadata field
-     * 
+     *
      * @param field
      *            the name of the metadata field to get
-     * 
+     *
      * @return the value of the metadata field
-     * 
+     *
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
     public String getMetadata(String field)
     {
     	String metadata = collectionRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata; 
+    	return (metadata == null) ? "" : metadata;
     }
 
     /**
      * Set a metadata value
-     * 
+     *
      * @param field
      *            the name of the metadata field to get
      * @param value
      *            value to set the field to
-     * 
+     *
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      * @exception MissingResourceException
      */
     public void setMetadata(String field, String value) throws MissingResourceException
     {
-        if ((field.trim()).equals("name") 
+        if ((field.trim()).equals("name")
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -441,9 +517,9 @@ public class Collection extends DSpaceObject
                 value = "Untitled";
             }
         }
-        
-        /* 
-         * Set metadata field to null if null 
+
+        /*
+         * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
@@ -455,7 +531,7 @@ public class Collection extends DSpaceObject
         {
             collectionRow.setColumn(field, value.trim());
         }
-        
+
         modifiedMetadata = true;
         addDetails(field);
     }
@@ -466,9 +542,9 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get the logo for the collection. <code>null</code> is return if the
+     * Get the logo for the collection. <code>null</code> is returned if the
      * collection does not have a logo.
-     * 
+     *
      * @return the logo of the collection, or <code>null</code>
      */
     public Bitstream getLogo()
@@ -480,11 +556,11 @@ public class Collection extends DSpaceObject
      * Give the collection a logo. Passing in <code>null</code> removes any
      * existing logo. You will need to set the format of the new logo bitstream
      * before it will work, for example to "JPEG". Note that
-     * <code>update(/code> will need to be called for the change to take
+     * <code>update</code> will need to be called for the change to take
      * effect.  Setting a logo and not calling <code>update</code> later may
      * result in a previous logo lying around as an "orphaned" bitstream.
      *
-     * @param  is   the stream to use as the new logo
+     * @param  is the stream to use as the new logo
      *
      * @return   the new logo bitstream, or <code>null</code> if there is no
      *           logo (<code>null</code> was passed in)
@@ -544,10 +620,10 @@ public class Collection extends DSpaceObject
      * Note that while the new group is created in the database, the association
      * between the group and the collection is not written until
      * <code>update</code> is called.
-     * 
+     *
      * @param step
      *            the step (1-3) of the workflow to create or get the group for
-     * 
+     *
      * @return the workflow group associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -579,7 +655,7 @@ public class Collection extends DSpaceObject
      * Set the workflow group corresponding to a particular workflow step.
      * <code>null</code> can be passed in if there should be no associated
      * group for that workflow step; any existing group is NOT deleted.
-     * 
+     *
      * @param step
      *            the workflow step (1-3)
      * @param g
@@ -604,10 +680,10 @@ public class Collection extends DSpaceObject
      * Get the the workflow group corresponding to a particular workflow step.
      * This returns <code>null</code> if there is no group associated with
      * this collection for the given step.
-     * 
+     *
      * @param step
      *            the workflow step (1-3)
-     * 
+     *
      * @return the group of reviewers or <code>null</code>
      */
     public Group getWorkflowGroup(int step)
@@ -620,7 +696,7 @@ public class Collection extends DSpaceObject
      * either the newly created group or the previously existing one. Note that
      * other groups may also be allowed to submit to this collection by the
      * authorization system.
-     * 
+     *
      * @return the default group of submitters associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -643,7 +719,7 @@ public class Collection extends DSpaceObject
 
         // register this as the submitter group
         collectionRow.setColumn("submitter", submitters.getID());
-        
+
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
 
         modified = true;
@@ -651,9 +727,9 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Remove the submitters group, if no group has already been created 
-     * then return without error. This will merely dereference the current 
-     * submitters group from the collection so that it may be deleted 
+     * Remove the submitters group, if no group has already been created
+     * then return without error. This will merely dereference the current
+     * submitters group from the collection so that it may be deleted
      * without violating database constraints.
      */
     public void removeSubmitters() throws SQLException, AuthorizeException
@@ -670,11 +746,11 @@ public class Collection extends DSpaceObject
         // Remove the link to the collection table.
         collectionRow.setColumnNull("submitter");
         submitters = null;
-       
+
         modified = true;
     }
 
-    
+
     /**
      * Get the default group of submitters, if there is one. Note that the
      * authorization system may allow others to submit to the collection, so
@@ -682,7 +758,7 @@ public class Collection extends DSpaceObject
      * <P>
      * The default group of submitters for collection 100 is the one called
      * <code>collection_100_submit</code>.
-     * 
+     *
      * @return the default group of submitters, or <code>null</code> if there
      *         is no default group.
      */
@@ -695,7 +771,7 @@ public class Collection extends DSpaceObject
      * Create a default administrators group if one does not already exist.
      * Returns either the newly created group or the previously existing one.
      * Note that other groups may also be administrators.
-     * 
+     *
      * @return the default group of editors associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -711,7 +787,7 @@ public class Collection extends DSpaceObject
             ourContext.turnOffAuthorisationSystem();
             admins = Group.create(ourContext);
             ourContext.restoreAuthSystemState();
-            
+
             admins.setName("COLLECTION_" + getID() + "_ADMIN");
             admins.update();
         }
@@ -721,15 +797,15 @@ public class Collection extends DSpaceObject
 
         // register this as the admin group
         collectionRow.setColumn("admin", admins.getID());
-        
+
         modified = true;
         return admins;
     }
-    
+
     /**
-     * Remove the administrators group, if no group has already been created 
-     * then return without error. This will merely dereference the current 
-     * administrators group from the collection so that it may be deleted 
+     * Remove the administrators group, if no group has already been created
+     * then return without error. This will merely dereference the current
+     * administrators group from the collection so that it may be deleted
      * without violating database constraints.
      */
     public void removeAdministrators() throws SQLException, AuthorizeException
@@ -746,7 +822,7 @@ public class Collection extends DSpaceObject
         // Remove the link to the collection table.
         collectionRow.setColumnNull("admin");
         admins = null;
-       
+
         modified = true;
     }
 
@@ -757,7 +833,7 @@ public class Collection extends DSpaceObject
      * <P>
      * The default group of administrators for collection 100 is the one called
      * <code>collection_100_admin</code>.
-     * 
+     *
      * @return group of administrators, or <code>null</code> if there is no
      *         default group.
      */
@@ -770,7 +846,7 @@ public class Collection extends DSpaceObject
      * Get the license that users must grant before submitting to this
      * collection. If the collection does not have a specific license, the
      * site-wide default is returned.
-     * 
+     *
      * @return the license for this collection
      */
     public String getLicense()
@@ -780,7 +856,7 @@ public class Collection extends DSpaceObject
         if (license == null || license.trim().equals(""))
         {
             // Fallback to site-wide default
-            license = ConfigurationManager.getDefaultSubmissionLicense();
+            license = LicenseManager.getDefaultSubmissionLicense();
         }
 
         return license;
@@ -788,8 +864,8 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the license that users must grant before submitting to this
-     * collection. 
-     * 
+     * collection.
+     *
      * @return the license for this collection
      */
     public String getLicenseCollection()
@@ -799,7 +875,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Find out if the collection has a custom license
-     * 
+     *
      * @return <code>true</code> if the collection has a custom license
      */
     public boolean hasCustomLicense()
@@ -812,7 +888,7 @@ public class Collection extends DSpaceObject
     /**
      * Set the license for this collection. Passing in <code>null</code> means
      * that the site-wide default will be used.
-     * 
+     *
      * @param license
      *            the license, or <code>null</code>
      */
@@ -826,7 +902,7 @@ public class Collection extends DSpaceObject
      * returned if the collection does not have a template. Submission
      * mechanisms may copy this template to provide a convenient starting point
      * for a submission.
-     * 
+     *
      * @return the item template, or <code>null</code>
      */
     public Item getTemplateItem() throws SQLException
@@ -839,7 +915,7 @@ public class Collection extends DSpaceObject
      * no action is taken. Caution: Make sure you call <code>update</code> on
      * the collection after doing this, or the item will have been created but
      * the collection record will not refer to it.
-     * 
+     *
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -863,10 +939,10 @@ public class Collection extends DSpaceObject
     /**
      * Remove the template item for this collection, if there is one. Note that
      * since this has to remove the old template item ID from the collection
-     * record in the database, the colletion record will be changed, including
+     * record in the database, the collection record will be changed, including
      * any other changes made; in other words, this method does an
      * <code>update</code>.
-     * 
+     *
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -879,20 +955,20 @@ public class Collection extends DSpaceObject
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
-        
+
         if (template != null)
         {
             log.info(LogManager.getHeader(ourContext, "remove_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
-            // temporary turn off auth system, we have already checked the permission on the top of the method
+            // temporarily turn off auth system, we have already checked the permission on the top of the method
             // check it again will fail because we have already broken the relation between the collection and the item
             ourContext.turnOffAuthorisationSystem();
             template.delete();
             ourContext.restoreAuthSystemState();
             template = null;
         }
-        
+
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
     }
 
@@ -901,7 +977,7 @@ public class Collection extends DSpaceObject
      * the item and the collection - it does nothing like set an issue date,
      * remove a personal workspace item etc. This has instant effect;
      * <code>update</code> need not be called.
-     * 
+     *
      * @param item
      *            item to add
      * @throws SQLException
@@ -928,7 +1004,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Remove an item. If the item is then orphaned, it is deleted.
-     * 
+     *
      * @param item
      *            item to remove
      * @throws SQLException
@@ -941,7 +1017,7 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the item an orphan?
+        // will the item be an orphan?
         TableRow row = DatabaseManager.querySingle(ourContext,
                 "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
                 item.getID());
@@ -954,25 +1030,25 @@ public class Collection extends DSpaceObject
         }
         log.info(LogManager.getHeader(ourContext, "remove_item",
                 "collection_id=" + getID() + ",item_id=" + item.getID()));
-    
+
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM collection2item WHERE collection_id= ? "+
                 "AND item_id= ? ",
                 getID(), item.getID());
         DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
-        
+
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }
 
     /**
-     * Update the collection metadata (including logo, and workflow groups) to
+     * Update the collection metadata (including logo and workflow groups) to
      * the database. Inserts if this is a new collection.
-     * 
+     *
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit(true);
@@ -994,7 +1070,7 @@ public class Collection extends DSpaceObject
             clearDetails();
         }
     }
-    
+
     public boolean canEditBoolean() throws java.sql.SQLException
     {
         return canEditBoolean(true);
@@ -1018,7 +1094,7 @@ public class Collection extends DSpaceObject
     {
         canEdit(true);
     }
-    
+
     public void canEdit(boolean useInheritance) throws AuthorizeException, SQLException
     {
         Community[] parents = getCommunities();
@@ -1045,7 +1121,7 @@ public class Collection extends DSpaceObject
      * Delete the collection, including the metadata and logo. Items that are
      * then orphans are deleted. Groups associated with this collection
      * (workflow participants and submitters) are NOT deleted.
-     * 
+     *
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -1062,12 +1138,12 @@ public class Collection extends DSpaceObject
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM subscription WHERE collection_id= ? ", 
+                "DELETE FROM subscription WHERE collection_id= ? ",
                 getID());
 
         // Remove Template Item
         removeTemplateItem();
-        
+
         // Remove items
         ItemIterator items = getAllItems();
 
@@ -1077,10 +1153,10 @@ public class Collection extends DSpaceObject
         	{
         		Item item = items.next();
         		IndexBrowse ib = new IndexBrowse(ourContext);
-        		
+
         		if (item.isOwningCollection(this))
         		{
-        			// the collection to be deletd is the owning collection, thus remove
+        			// the collection to be deleted is the owning collection, thus remove
         			// the item from all collections it belongs to
         			Collection[] collections = item.getCollections();
         			for (int i=0; i< collections.length; i++)
@@ -1090,12 +1166,12 @@ public class Collection extends DSpaceObject
         				// Browse.itemRemoved(ourContext, itemId);
         				collections[i].removeItem(item);
         			}
-        			
-        		} 
+
+        		}
         		// the item was only mapped to this collection, so just remove it
         		else
         		{
-        			//notify Browse of removing item mapping. 
+        			//notify Browse of removing item mapping.
         			ib.indexItem(item);
         			// Browse.itemChanged(ourContext, item);
         			removeItem(item);
@@ -1121,25 +1197,38 @@ public class Collection extends DSpaceObject
         // Remove all authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
-        // Remove any WorkflowItems
-        WorkflowItem[] wfarray = WorkflowItem
-                .findByCollection(ourContext, this);
+        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            // Remove any xml_WorkflowItems
+            XmlWorkflowItem[] xmlWfarray = XmlWorkflowItem
+                    .findByCollection(ourContext, this);
 
-        for (int x = 0; x < wfarray.length; x++)
-        {
-            // remove the workflowitem first, then the item
-            Item myItem = wfarray[x].getItem();
-            wfarray[x].deleteWrapper();
-            myItem.delete();
+            for (XmlWorkflowItem aXmlWfarray : xmlWfarray) {
+                // remove the workflowitem first, then the item
+                Item myItem = aXmlWfarray.getItem();
+                aXmlWfarray.deleteWrapper();
+                myItem.delete();
+            }
+        }else{
+            // Remove any WorkflowItems
+            WorkflowItem[] wfarray = WorkflowItem
+                    .findByCollection(ourContext, this);
+
+            for (WorkflowItem aWfarray : wfarray) {
+                // remove the workflowitem first, then the item
+                Item myItem = aWfarray.getItem();
+                aWfarray.deleteWrapper();
+                myItem.delete();
+            }
         }
+
+
 
         // Remove any WorkspaceItems
         WorkspaceItem[] wsarray = WorkspaceItem.findByCollection(ourContext,
                 this);
 
-        for (int x = 0; x < wsarray.length; x++)
-        {
-            wsarray[x].deleteAll();
+        for (WorkspaceItem aWsarray : wsarray) {
+            aWsarray.deleteAll();
         }
 
         //  get rid of the content count cache if it exists
@@ -1157,7 +1246,14 @@ public class Collection extends DSpaceObject
 
         // Remove any Handle
         HandleManager.unbindHandle(ourContext, this);
-        
+
+        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            // delete all CollectionRoles for this Collection
+            for (CollectionRole collectionRole : CollectionRole.findByCollection(ourContext, this.getID())) {
+                collectionRole.delete();
+            }
+        }
+
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
 
@@ -1204,7 +1300,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the communities this collection appears in
-     * 
+     *
      * @return array of <code>Community</code> objects
      * @throws SQLException
      */
@@ -1258,59 +1354,12 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get the communities this collection appears in.  Gets only
-     * the immediate parent communities, not all ancestors, which is
-     * unlike Community.getParents()
-     * 
-     * @return array of <code>Community</code> objects
-     * @throws SQLException
-     */
-    public Community[] getParents() throws SQLException
-    {
-        // Get the bundle table rows
-        TableRowIterator tri = DatabaseManager
-                .queryTable(
-                        ourContext,
-                        "community",
-                        "SELECT community.* FROM community, community2collection WHERE "
-                        + "community.community_id=community2collection.community_id "
-                        + "AND community2collection.collection_id=?",
-                        getID());
-
-        // Build a list of Community objects
-        List communities = new ArrayList();
-
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community owner = (Community) ourContext.fromCache(Community.class,
-                    row.getIntColumn("community_id"));
-
-            if (owner == null)
-            {
-                owner = new Community(ourContext, row);
-            }
-
-            communities.add(owner);
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        Community[] communityArray = new Community[communities.size()];
-        communityArray = (Community[]) communities.toArray(communityArray);
-
-        return communityArray;
-    }
-
-    /**
      * Return <code>true</code> if <code>other</code> is the same Collection
      * as this object, <code>false</code> otherwise
-     * 
+     *
      * @param other
      *            object to compare to
-     * 
+     *
      * @return <code>true</code> if object passed in represents the same
      *         collection as this object
      */
@@ -1346,7 +1395,7 @@ public class Collection extends DSpaceObject
     /**
      * Utility method for reading in a group from a group ID in a column. If the
      * column is null, null is returned.
-     * 
+     *
      * @param col
      *            the column name to read
      * @return the group referred to by that column, or null
@@ -1364,7 +1413,7 @@ public class Collection extends DSpaceObject
 
     /**
      * return type found in Constants
-     * 
+     *
      * @return int Constants.COLLECTION
      */
     public int getType()
@@ -1376,13 +1425,13 @@ public class Collection extends DSpaceObject
      * return an array of collections that user has a given permission on
      * (useful for trimming 'select to collection' list) or figuring out which
      * collections a person is an editor for.
-     * 
+     *
      * @param context
      * @param comm
      *            (optional) restrict search to a community, else null
      * @param actionID
-     *            fo the action
-     * 
+     *            of the action
+     *
      * @return Collection [] of collections with matching permissions
      * @throws SQLException
      */
@@ -1462,7 +1511,7 @@ public class Collection extends DSpaceObject
 
         return itemcount;
      }
-     
+
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
@@ -1498,7 +1547,7 @@ public class Collection extends DSpaceObject
         }
         return adminObject;
     }
-    
+
     @Override
     public DSpaceObject getParentObject() throws SQLException
     {
@@ -1511,5 +1560,12 @@ public class Collection extends DSpaceObject
         {
             return null;
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the collection HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
 }

@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
  * <code>RegistryLoader -dc dc-types.xml</code>
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class RegistryLoader
 {

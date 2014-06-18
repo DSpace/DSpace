@@ -110,7 +110,6 @@ public final class ResultsPruner
      * properties.
      * 
      * @param props
-     * @return
      * @throws FileNotFoundException
      */
     public static ResultsPruner getPruner(Properties props)

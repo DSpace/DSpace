@@ -42,7 +42,7 @@ import org.dspace.core.Context;
  * understand different sets of parameters.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see PackageParameters
  */
 public interface PackageDisseminator

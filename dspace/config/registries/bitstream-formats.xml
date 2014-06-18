@@ -3,9 +3,9 @@
 <!--
   - bitstream-formats.xml
   -
-  - Version:  $Revision: 4640 $
+  - Version:  $Revision$
   -
-  - Date:     $Date: 2009-12-20 03:32:57 -0500 (Sun, 20 Dec 2009) $
+  - Date:     $Date$
   -
   - Initial contents for bitstream format registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the

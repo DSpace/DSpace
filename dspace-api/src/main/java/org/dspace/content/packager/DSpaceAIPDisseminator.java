@@ -9,15 +9,14 @@ package org.dspace.content.packager;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -42,7 +41,6 @@ import edu.harvard.hul.ois.mets.StructMap;
 import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
-import java.net.URLEncoder;
 import java.util.Date;
 import org.dspace.core.Utils;
 
@@ -115,6 +113,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
 
     // dissemination parameters passed to the AIP Disseminator
     private PackageParameters disseminateParams = null;
+    
+    // List of Bundles to filter on, when building AIP
+    private List<String> filterBundles = new ArrayList<String>();
+    // Whether 'filterBundles' specifies an exclusion list (default) or inclusion list.
+    private boolean excludeBundles = true;
 
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -429,81 +432,6 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         return result.toArray(new String[result.size()]);
     }
 
-    /**
-     * Get the URL by which the METS manifest refers to a Bitstream
-     * member within the same package.  In other words, this is generally
-     * a relative path link to where the Bitstream file is within the Zipped
-     * up AIP.
-     * <p>
-     * For a manifest-only AIP, this is a reference to an HTTP URL where
-     * the bitstream should be able to be downloaded from.
-     * An external AIP names a file in the package
-     * with a relative URL, that is, relative pathname.
-     * 
-     * @param bitstream  the Bitstream
-     * @param params Packager Parameters
-     * @return String in URL format naming path to bitstream.
-     */
-    @Override
-    public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
-    {
-        // if bare manifest, use external "persistent" URI for bitstreams
-        if (params != null && (params.getBooleanProperty("manifestOnly", false)))
-        {
-            // Try to build a persistent(-ish) URI for bitstream
-            // Format: {site-base-url}/bitstream/{item-handle}/{sequence-id}/{bitstream-name}
-            try
-            {
-                // get handle of parent Item of this bitstream, if there is one:
-                String handle = null;
-                Bundle[] bn = bitstream.getBundles();
-                if (bn.length > 0)
-                {
-                    Item bi[] = bn[0].getItems();
-                    if (bi.length > 0)
-                    {
-                        handle = bi[0].getHandle();
-                    }
-                }
-                if (handle != null)
-                {
-                    return ConfigurationManager
-                                    .getProperty("dspace.url")
-                            + "/bitstream/"
-                            + handle
-                            + "/"
-                            + String.valueOf(bitstream.getSequenceID())
-                            + "/"
-                            + URLEncoder.encode(bitstream.getName(), "UTF-8");
-                }
-                else
-                {
-                    return ConfigurationManager
-                                    .getProperty("dspace.url")
-                            + "/retrieve/"
-                            + String.valueOf(bitstream.getID());
-                }
-            }
-            catch (SQLException e)
-            {
-                log.error("Database problem", e);
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                log.error("Unknown character set", e);
-            }
-
-            // We should only get here if we failed to build a nice URL above
-            // so, by default, we're just going to return the bitstream name.
-            return bitstream.getName();
-        }
-        else
-        {
-            String base = "bitstream_"+String.valueOf(bitstream.getID());
-            String ext[] = bitstream.getFormat().getExtensions();
-            return (ext.length > 0) ? base+"."+ext[0] : base;
-        }
-    }
 
     /**
      * Adds another structMap element to contain the "parent link" that
@@ -589,8 +517,8 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * By default, include all bundles in AIP as content.
      * <P>
      * However, if the user specified a comma separated list of bundle names
-     * via the "includeBundles" option, then check if this bundle is in that
-     * list.  If it is, return true.  If it is not, return false.
+     * via the "filterBundles" (or "includeBundles")  option, then check if this 
+     * bundle is in that list.  If it is, return true.  If it is not, return false.
      *
      * @param bundle Bundle to check for
      * @return true if bundle should be disseminated when disseminating Item AIPs
@@ -598,27 +526,87 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     @Override
     public boolean includeBundle(Bundle bundle)
     {
-        //Check the 'includeBundles' option to see if a list of bundles was provided (default = "all")
-        String bundleList = this.disseminateParams.getProperty("includeBundles", "all");
+        List<String> bundleList = getBundleList();
 
-        if(bundleList.equalsIgnoreCase("all"))
+        //Check if we are disseminating all bundles
+        if(bundleList.size()==1 && bundleList.get(0).equalsIgnoreCase("all") && !this.excludeBundles)
         {
             return true; //all bundles should be disseminated
         }
         else
         {
-            //Check if this bundle is in our list of bundles to include
-            String[] bundleNames = bundleList.split(",");
-            for(String bundleName : bundleNames)
-            {
-                if(bundle.getName().equals(bundleName))
-                {
-                    return true;
-                }
-            }
-
-            //if not in the 'includeBundles' list, then return false
-            return false;
+            //Check if bundle name is in our list of filtered bundles
+            boolean inList = filterBundles.contains(bundle.getName());
+            //Based on whether this is an inclusion or exclusion filter, 
+            //return whether this bundle should be included.
+            return this.excludeBundles ? !inList : inList;
         }
     }
+    
+    /**
+     * Get our list of bundles to include/exclude in this AIP, 
+     * based on the passed in parameters
+     * @return List of bundles to filter on
+     */
+    protected List<String> getBundleList()
+    {
+        // Check if we already have our list of bundles to filter on, if so, just return it.
+        if(this.filterBundles!=null && !this.filterBundles.isEmpty())
+            return this.filterBundles;
+        
+        // Check for 'filterBundles' option, as this allows for inclusion/exclusion of bundles.
+        String bundleList = this.disseminateParams.getProperty("filterBundles");
+        
+        if(bundleList==null || bundleList.isEmpty())
+        {
+            //For backwards compatibility with DSpace 1.7.x, check the 
+            //'includeBundles' option to see if a list of bundles was provided
+            bundleList = this.disseminateParams.getProperty("includeBundles", "+all");
+            //if we are taking the 'includeBundles' value, prepend "+" to specify that this is an inclusion
+            bundleList = bundleList.startsWith("+") ? bundleList : "+".concat(bundleList);
+        }
+        // At this point, 'bundleList' will be *non-null*. If neither option was passed in,
+        // then 'bundleList' defaults to "+all" (i.e. include all bundles).
+        
+        //If our filter list of bundles begins with a '+', then this list
+        // specifies all the bundles to *include*. Otherwise all 
+        // bundles *except* the listed ones are included
+        if(bundleList.startsWith("+"))
+        {
+            this.excludeBundles = false;
+            //remove the preceding '+' from our bundle list
+            bundleList = bundleList.substring(1);
+        }
+ 
+        //Split our list of bundles to filter on commas
+        this.filterBundles = Arrays.asList(bundleList.split(","));
+        
+ 
+        return this.filterBundles;
+    }
+    
+    
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        String parentHelp = super.getParameterHelp();
+
+        //Return superclass help info, plus the extra parameter/option that this class supports
+        return parentHelp +
+                "\n\n" +
+                "* filterBundles=[bundleList]      " +
+                   "List of bundles specifying which Bundles should be included in an AIP. If this list starts with a '+' symbol," +
+                   " then it represents a list of bundles to *include* in the AIP.  By default, the list represents a list of bundles" +
+                   " to *exclude* from the AIP.";
+    }
+    
 }

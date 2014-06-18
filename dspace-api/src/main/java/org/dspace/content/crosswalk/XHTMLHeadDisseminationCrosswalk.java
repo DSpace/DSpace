@@ -46,7 +46,7 @@ import java.util.*;
  * TODO: This may usefully be extended later to work with communities and
  * collections.
  *
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @author Robert Tansley
  */
 public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements

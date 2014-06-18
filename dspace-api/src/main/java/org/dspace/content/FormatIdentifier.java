@@ -20,7 +20,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * probably isn't a particularly satisfactory long-term solution.
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class FormatIdentifier
 {

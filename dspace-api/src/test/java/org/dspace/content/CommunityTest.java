@@ -63,12 +63,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init");
+            fail("Authorization Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 
@@ -764,6 +764,37 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testGetAllParents 2",son.getAllParents(), notNullValue());
         assertTrue("testGetAllParents 3", son.getAllParents().length == 1);
         assertThat("testGetAllParents 4", son.getAllParents()[0], equalTo(c));
+    }
+
+    /**
+     * Test of getAllCollections method, of class Community.
+     */
+    @Test
+    public void testGetAllCollections() throws Exception
+    {
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeAction((Context) any, (Community) any,
+                        Constants.ADD); result = null;
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = true;
+            }
+        };
+
+        //empty by default
+        assertThat("testGetAllCollections 0",c.getAllCollections(), notNullValue());
+        assertTrue("testGetAllCollections 1", c.getAllCollections().length == 0);
+
+        //community has a collection and a subcommunity, subcommunity has a collection
+        Collection collOfC = c.createCollection();
+        Community sub = Community.create(c, context);
+        Collection collOfSub = sub.createCollection();
+        assertThat("testGetAllCollections 2",c.getAllCollections(), notNullValue());
+        assertTrue("testGetAllCollections 3", c.getAllCollections().length == 2);
+        assertThat("testGetAllCollections 4", c.getAllCollections()[0], equalTo(collOfSub));
+        assertThat("testGetAllCollections 5", c.getAllCollections()[1], equalTo(collOfC));
     }
 
     /**

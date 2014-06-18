@@ -26,7 +26,7 @@ import org.jdom.Namespace;
  * implementations only work on one type of object.
  *
  * @author Larry Stone
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public interface DisseminationCrosswalk
 {

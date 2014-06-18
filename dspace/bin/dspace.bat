@@ -58,6 +58,12 @@ REM Build a CLASSPATH
 set DSPACE_CLASSPATH=%CLASSPATH%;config
 for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
 
+REM If the user only wants the CLASSPATH, just give it now.
+if not "%1"=="classpath" goto javaOpts
+echo %DSPACE_CLASSPATH%
+goto end
+
+:javaOpts
 REM If JAVA_OPTS specified, use those options
 REM Otherwise, default Java to using 256MB of memory
 if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx256m

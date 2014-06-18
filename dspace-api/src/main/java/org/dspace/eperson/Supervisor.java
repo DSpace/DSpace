@@ -25,7 +25,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * orders and so forth.
  *
  * @author  Richard Jones
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class Supervisor {
     /** value to use for no policy set */

@@ -38,7 +38,7 @@ import org.dspace.core.Context;
  *
  * @author Larry Stone
  * @author Tim Donohue
- * @version $Revision: 5844 $
+ * @version $Revision$
  * @see PackageParameters
  * @see AbstractPackageIngester
  */

@@ -88,7 +88,7 @@ import org.jdom.Element;
  * 
  * @author Larry Stone
  * @author Tim Donohue
- * @version $Revision: 6137 $
+ * @version $Revision$
  * @see org.dspace.content.packager.METSManifest
  * @see AbstractPackageIngester
  * @see PackageIngester
@@ -502,6 +502,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // have subclass manage license since it may be extra package file.
             addLicense(context, item, license, collection, params);
 
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
+            
             // Finally, if item is still in the workspace, then we actually need
             // to install it into the archive & assign its handle.
             if(wsi!=null)
@@ -522,10 +527,20 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 //Add template item if one is referenced from manifest (only for Collections)
                 addTemplateItem(context, dso, manifest, pkgFile, params, callback);
             }
+            
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
         }// end if Community/Collection
         else if (type == Constants.SITE)
         {
-            // Do nothing -- Crosswalks will handle anything necessary to ingest at Site-level
+            // Do nothing by default -- Crosswalks will handle anything necessary to ingest at Site-level
+            
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
         }
         else
         {
@@ -536,11 +551,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // -- Step 6 --
         // Finish things up!
-
-        // Subclass hook for final checks and rearrangements
-        // (this allows subclasses to do some final validation / changes as
-        // necessary)
-        finishObject(context, dso, params);
 
         // Update the object to make sure all changes are committed
         PackageUtils.updateDSpaceObject(dso);
@@ -739,6 +749,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // Loop through these files, and add them one by one to Item
         List<Element> manifestContentFiles = manifest
                 .getContentFiles();
+        List<Element> manifestBundleFiles = manifest
+                .getBundleFiles();
 
         boolean setPrimaryBitstream = false;
         BitstreamFormat unknownFormat = BitstreamFormat.findUnknown(context);
@@ -766,7 +778,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // retrieve bundle name from manifest
             String bundleName = METSManifest.getBundleName(mfile);
 
-            // Find or create the bundle where bitstrem should be attached
+            // Find or create the bundle where bitstream should be attached
             Bundle bundle;
             Bundle bns[] = item.getBundles(bundleName);
             if (bns != null && bns.length > 0)
@@ -782,6 +794,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             Bitstream bitstream = bundle.createBitstream(fileStream);
             bitstream.setName(path);
 
+             // Set bitstream sequence id, if known
+            String seqID = mfile.getAttributeValue("SEQ");
+            if(seqID!=null && !seqID.isEmpty())
+                bitstream.setSequenceID(Integer.parseInt(seqID));
+            
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
             manifest.crosswalkBitstream(context, params, bitstream, mfileID,
@@ -820,6 +837,40 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 bitstream.setFormat(bf);
             }
             bitstream.update();
+        }// end for each manifest file
+
+        for (Iterator<Element> mi = manifestBundleFiles.iterator(); mi
+                .hasNext();)
+        {
+            Element mfile = mi.next();
+
+            String bundleName = METSManifest.getBundleName(mfile, false);
+
+            Bundle bundle;
+            Bundle bns[] = item.getBundles(bundleName);
+            if (bns != null && bns.length > 0)
+            {
+                bundle = bns[0];
+            }
+            else
+            {
+                bundle = item.createBundle(bundleName);
+            }
+
+	        String mfileGrp = mfile.getAttributeValue("ADMID");
+	        if (mfileGrp != null)
+	        {
+		        manifest.crosswalkBundle(context, params, bundle, mfileGrp,mdRefCallback);
+	        }
+	        else
+	        {
+		        if (log.isDebugEnabled())
+		        {
+		            log.debug("Ingesting bundle with no ADMID, not crosswalking bundle metadata");
+		        }
+	        }
+
+            bundle.update();
         }// end for each manifest file
 
         // Step 3 -- Sanity checks
@@ -1311,7 +1362,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      *            DSpace Context
      * @param manifest
      *            METS manifest
-     * @returns a DSpace Object which is the parent (or null, if not found)
+     * @return a DSpace Object which is the parent (or null, if not found)
      * @throws PackageValidationException
      *             if parent reference cannot be found in manifest
      * @throws MetadataValidationException
@@ -1358,9 +1409,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * override this method if your METS manifest specifies the handle in
      * another location.
      * 
+     * If no handle was found then null is returned.
+     * 
      * @param manifest
      *            METS manifest
-     * @returns handle as a string (or null, if not found)
+     * @return handle as a string (or null, if not found)
      * @throws PackageValidationException
      *             if handle cannot be found in manifest
      */
@@ -1374,11 +1427,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // decode this URI (by removing the 'hdl:' prefix)
         String handle = decodeHandleURN(handleURI);
 
-        if (handle == null || handle.length() == 0)
-        {
-            throw new PackageValidationException(
-                    "The DSpace Object handle required to ingest this package could not be resolved in manifest. The <mets OBJID='hdl:xxxx'> is missing.");
-        }
 
         return handle;
     }
@@ -1562,7 +1610,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     /**
      * Determines what type of DSpace object is represented in this METS doc.
      * 
-     * @returns one of the object types in Constants.
+     * @return one of the object types in Constants.
      */
     public abstract int getObjectType(METSManifest manifest)
             throws PackageValidationException;

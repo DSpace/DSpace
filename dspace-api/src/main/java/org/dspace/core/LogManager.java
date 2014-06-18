@@ -14,7 +14,7 @@ import org.dspace.eperson.EPerson;
  * 
  * @author David Stuve
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class LogManager
 {

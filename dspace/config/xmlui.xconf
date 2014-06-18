@@ -40,8 +40,8 @@
     - The XMLUI (Manakin Release) configuration file
     -
     - Authors: Scott Phillips
-    - Version: $Revision: 5689 $
-    - Date:    $Date: 2010-10-29 12:16:34 -0400 (Fri, 29 Oct 2010) $
+    - Version: $Revision$
+    - Date:    $Date$
 -->
 
 <xmlui>
@@ -64,23 +64,85 @@
             BrowseArtifacts, SearchArtifacts
             <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
         -->
+
+        <!-- =====================
+             Item Level Versioning
+             ===================== -->
+        <!--
+             To enable Item Level Versioning features, uncomment this aspect.
+             This is currently disabled by default because of two known issues:
+             DS-1382 and DS-1349. Please, review them to see whether they apply
+             to you before enabling versioning.
+        -->
+        <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
+        
+        <!-- =====================
+             Base Features/Aspects
+             ===================== -->
+        <!-- Base DSpace XMLUI Aspects for Display, Browse, Search, Admin, Login and Submission -->
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
-        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
+        <aspect name="Discovery" path="resource://aspects/Discovery/" />
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
-	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
+
+        <!-- ========================
+             Usage Statistics Engines
+             ======================== -->
+        <!-- By default, DSpace uses a Statistics engine based on SOLR -->
+        <aspect name="Statistics" path="resource://aspects/Statistics/" />
+
         <!--
-            To enable Discovery, uncomment this Aspect that will enable it
-            within your existing XMLUI
-            Also make sure to comment the SearchArtifacts aspect
-            as leaving it on together with discovery will cause UI overlap issues
-            <aspect name="Discovery" path="resource://aspects/Discovery/" />
+             If you prefer to use "Elastic Search" Statistics, you can uncomment the below
+             aspect and COMMENT OUT the default "Statistics" aspect above.
+             You must also enable the ElasticSearchLoggerEventListener.
         -->
+        <!-- <aspect name="Statistics - Elastic Search" path="resource://aspects/StatisticsElasticSearch/" /> -->
+
+        <!-- =========================
+             Approval Workflow Systems
+             ========================= -->
+        <!-- By default, DSpace uses a legacy 3-step approval workflow for new submissions -->
+        <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
+
+        <!-- If you prefer, a Configurable XML-based Workflow is available. To enable it, you can
+             uncomment the below aspect and comment out the "Original Workflow" aspect above.
+             PLEASE NOTE: in order to use the configurable workflow you must also run the
+             database migration scripts as detailed in the DSpace Documentation -->
+        <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
+
+        <!-- ==============
+             Search Engines
+             ============== -->
         <!--
-            This aspect tests the various possible DRI features, 
-            it helps a theme developer create themes 
+            To enable the old lucene based search (no facets, filters), uncomment this aspect.
+            Also make sure to comment out the above 'Discovery' aspect
+            (in the "Basic Features/Aspects" group) as leaving it on together
+            with Searching Artifacts aspect will cause UI overlap issues
+            
+			@deprecated Since DSpace 4 the system use an abstraction layer named
+ 			Discovery to provide access to different search provider. The
+ 			legacy system build upon Apache Lucene is likely to be removed in
+ 			a future version. If you are interested in use Lucene as backend
+ 			for the DSpace search system please consider to build a Lucene
+ 			implementation of the Discovery interfaces
+        -->
+        <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />-->
+
+
+        <!-- ==============
+             SWORDv1 Client
+             ============== -->
+        <!-- DSpace also comes with an option SWORD Client aspect, which allows
+             you to submit content FROM your DSpace TO another SWORD-enabled repository.
+             To enable this feature, uncomment the aspect below. -->
+        <!-- <aspect name="SwordClient" path="resource://aspects/SwordClient/" /> -->
+
+        <!--
+            This demo aspect tests the various possible DRI features.
+            It may be useful to developers in developing new aspects or themes.
+            It's accessible for admins in the XMLTest menu or via the /XMLTest/ URL.
         -->
         <!-- <aspect name="XML Tests" path="resource://aspects/XMLTest/"/> -->
     </aspects>
@@ -116,17 +178,21 @@
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
-        <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+        <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
+        <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" />
 
-        <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
-        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
+        <!-- Reference theme, the default Manakin XMLUI layout up to DSpace 1.8 -->
+        <!-- <theme name="Default Reference Theme" regex=".*" path="Reference/" /> -->
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->
 
-        <!-- Table based browse display -->
-        <!-- <theme name="Table Theme" regex=".*" path="TableTheme/" /> -->
+        <!-- The Kubrick theme -->
+        <!-- <theme name="Kubrick" regex=".*" path="Kubrick/" /> -->
 
+        <!--
+             For information on configuring the mobile theme, see:
+             dspace-xmlui/src/main/webapp/themes/mobile/readme.txt
+        -->
     </themes>
 </xmlui>

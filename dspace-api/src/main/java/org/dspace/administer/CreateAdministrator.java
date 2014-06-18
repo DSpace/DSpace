@@ -40,12 +40,12 @@ import org.dspace.eperson.Group;
  * @author Robert Tansley
  * @author Richard Jones
  * 
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public final class CreateAdministrator
 {
 	/** DSpace Context object */
-	private Context context;
+	private final Context context;
 	
     /**
      * For invoking via the command line.  If called with no command line arguments,
@@ -123,9 +123,14 @@ public final class CreateAdministrator
     		System.out.flush();
     		
     		email = input.readLine();
-            if (email != null)
+            if (!StringUtils.isBlank(email))
             {
                 email = email.trim();
+            }
+            else
+            {
+                System.out.println("Please provide an email address.");
+                continue;
             }
     		
     		System.out.print("First name: ");

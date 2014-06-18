@@ -41,7 +41,7 @@ import org.dspace.core.Context;
  * </p>
  * 
  * @author Peter Breton
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class HandlePlugin implements HandleStorage
 {

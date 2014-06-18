@@ -18,7 +18,7 @@ package org.dspace.content;
  * <em>FIXME:  No policy for dealing with "van"/"van der" and "Jr."</em>
  * 
  * @author Robert Tansley
- * @version $Revision: 5844 $
+ * @version $Revision$
  */
 public class DCPersonName
 {

@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
@@ -54,6 +55,9 @@ public class BrowseItem extends DSpaceObject
     /** is the item withdrawn */
     private boolean withdrawn  = false;
 
+    /** is the item discoverable */
+    private boolean discoverable = true;
+    
     /** item handle */
 	private String handle = null;
 
@@ -65,12 +69,13 @@ public class BrowseItem extends DSpaceObject
      * @param in_archive
      * @param withdrawn
      */
-	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn)
+	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn, boolean discoverable)
 	{
 		this.context = context;
 		this.id = id;
         this.in_archive = in_archive;
         this.withdrawn = withdrawn;
+        this.discoverable = discoverable;
     }
 
 	/**
@@ -159,7 +164,6 @@ public class BrowseItem extends DSpaceObject
 	/**
 	 * @deprecated
 	 * @param real
-	 * @return
 	 */
 	public int getType(boolean real)
 	{
@@ -300,7 +304,6 @@ public class BrowseItem extends DSpaceObject
 	 * rendering.  That's your own fault for wanting to put images on your
 	 * browse page!
 	 * 
-	 * @return
 	 * @throws SQLException
 	 */
     public Thumbnail getThumbnail()
@@ -384,6 +387,18 @@ public class BrowseItem extends DSpaceObject
 		}
     }
 
+    @Override
+    public void update() throws SQLException, AuthorizeException
+    {
+
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
+    }
+
     public boolean isArchived()
     {
         return in_archive;
@@ -393,4 +408,8 @@ public class BrowseItem extends DSpaceObject
     {
         return withdrawn;
     }
+    
+    public boolean isDiscoverable() {
+    	return discoverable;
+	}
 }

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkedit;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Set;
  *
  * @author Stuart Lewis
  */
-public class DSpaceCSVLine
+public class DSpaceCSVLine implements Serializable
 {
     /** The item id of the item represented by this line. -1 is for a new item */
     private int id;
@@ -29,7 +30,7 @@ public class DSpaceCSVLine
     /**
      * Create a new CSV line
      *
-     * @param id The item ID of the line
+     * @param itemId The item ID of the line
      */
     public DSpaceCSVLine(int itemId)
     {
@@ -90,6 +91,22 @@ public class DSpaceCSVLine
     {
         // Return any relevant values
         return items.get(key);
+    }
+
+    /**
+     * Get any action associated with this line
+     *
+     * @return The action (may be blank, 'withdraw', 'reinstate' or 'delete')
+     */
+    public String getAction()
+    {
+        if (items.containsKey("action")) {
+            ArrayList actions = items.get("action");
+            if (actions.size() > 0) {
+                return ((String)actions.get(0)).trim();
+            }
+        }
+        return "";
     }
 
     /**
