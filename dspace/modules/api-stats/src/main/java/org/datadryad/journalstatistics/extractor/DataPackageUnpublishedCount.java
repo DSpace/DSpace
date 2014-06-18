@@ -11,8 +11,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -24,13 +27,16 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, Integer>> {
+
+    private static Logger log = Logger.getLogger(DataPackageUnpublishedCount.class);
+
     private static String PROVENANCE_DATE_START_TOKEN = ") on ";
     private static String PROVENANCE_DATE_END_TOKEN = " workflow start";
 
     // Params are collection id and publication name
     private final static String SQL_QUERY =
             "select  " +
-            "  item.item_id, " +
+            "  item.item_id as item_id, " +
             "  mdv_pubname.text_value as publication_name, " +
             "  mdv_provenance.text_value as provenance_submitted " +
             "from  " +
@@ -69,7 +75,21 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
     public Map<String, Integer> extract(String journalName) {
         // Should return a map of Year/month to integers
         Map<String, Integer> results = new HashMap<String, Integer>();
-
+        try {
+            List<DateItem> unpublishedItems = getUnpublishedItems(journalName);
+            for(DateItem dateItem : unpublishedItems) {
+                // TODO: Check date ranges?
+                String bucket = bucketForDate(dateItem.date);
+                if(!results.containsKey(bucket)) {
+                    results.put(bucket, 0);
+                }
+                Integer count = results.get(bucket);
+                count++;
+                results.put(bucket, count);
+            }
+        } catch (SQLException ex) {
+            log.error("SQLException getting unpublished items size per journal", ex);
+        }
         return results;
     }
     
@@ -118,12 +138,31 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
         return dateString;
     }
 
+    /**
+     * Executes the SQL query to get unpublished items for a given journal,
+     * returning the item ids and submission dates
+     * @param journalName
+     * @return a List of {@link DateItem} objects
+     * @throws SQLException
+     */
     private List<DateItem> getUnpublishedItems(String journalName) throws SQLException {
         Collection c = DryadDataPackage.getCollection(this.getContext());
         TableRowIterator tri = DatabaseManager.query(this.getContext(), SQL_QUERY, c.getID(), journalName);
         List<DateItem> dateItems = new ArrayList<DateItem>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
+            int itemId = row.getIntColumn("item_id");
+            String provenance = row.getStringColumn("provenance_submitted");
+            String submittedDateString;
+            try {
+                submittedDateString = extractDateStringFromProvenance(provenance);
+            } catch (ParseException ex) {
+                log.error("Exception extracting date string from provenance, skipping", ex);
+                continue;
+            }
+            DCDate submittedDate = new DCDate(submittedDateString);
+            DateItem dateItem = new DateItem(submittedDate.toDate(), itemId);
+            dateItems.add(dateItem);
         }
         return dateItems;
     }
