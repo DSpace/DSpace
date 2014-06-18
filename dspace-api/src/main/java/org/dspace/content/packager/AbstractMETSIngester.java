@@ -1487,7 +1487,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             ZipEntry manifestEntry = zipPackage.getEntry(path);
 
             // Get inputStream associated with this file
-            return zipPackage.getInputStream(manifestEntry);
+            if (manifestEntry != null)
+                return zipPackage.getInputStream(manifestEntry);
+            else
+            {
+                throw new MetadataValidationException("Manifest file references file '"
+                                        + path + "' not included in the zip.");
+            }
         }
     }
 
