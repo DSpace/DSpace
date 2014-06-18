@@ -65,8 +65,8 @@
         }
         orderElement.val(newOrder);
 
-        var upArrow = row.find('input[name$^="submit_order_"][name$="_up"]');
-        var downArrow = row.find('input[name$^="submit_order_"][name$="_down"]');
+        var upArrow = row.find('input[name^="submit_order_"][name$="_up"]');
+        var downArrow = row.find('input[name^="submit_order_"][name$="_down"]');
 
         //Check if we are the first row, if so hide the up arrow
         if(isBundleRow(row.prev())){
