@@ -93,7 +93,11 @@
      */
     function isBundleRow(row){
         // Checks if the identifier starts with the bundle head identifier
-        return row.attr("id").indexOf("aspect_administrative_item_EditItemBitstreamsForm_row_bundle_head_") == 0;
+
+        //DS-2027, found error condition in which attribute is not set when reordering original bitstreams
+    	var id = row.attr("id");
+    	if (id === undefined) return false;
+        return id.indexOf("aspect_administrative_item_EditItemBitstreamsForm_row_bundle_head_") == 0;
     }
 
 
