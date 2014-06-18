@@ -1496,67 +1496,80 @@ public class SolrLogger
         }
     }
 
+    /**
+     * Export all SOLR usage statistics for viewing/downloading content to a flat text file.
+     * The file goes to a series
+     *
+     * @throws Exception
+     */
     public static void exportHits() throws Exception {
         Context context = new Context();
+
+        File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
+        tempDirectory.mkdirs();
 
         try {
             //First of all retrieve the total number of records to be updated
             SolrQuery query = new SolrQuery();
             query.setQuery("*:*");
-            query.setRows(0);
+
+            ModifiableSolrParams solrParams = new ModifiableSolrParams();
+            solrParams.set(CommonParams.Q, "statistics_type:view OR (*:* AND -statistics_type:*)");
+            solrParams.set(CommonParams.WT, "javabin");
+            solrParams.set(CommonParams.ROWS, String.valueOf(10000));
+
             addAdditionalSolrYearCores(query);
             long totalRecords = solr.query(query).getResults().getNumFound();
-
-            File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
-            tempDirectory.mkdirs();
-
+            System.out.println("There are " + totalRecords + " usage events in SOLR for download/view.");
 
             for(int i = 0; i < totalRecords; i+=10000){
-                ModifiableSolrParams solrParams = new ModifiableSolrParams();
-                solrParams.set(CommonParams.Q, "statistics_type:view");
-                solrParams.set(CommonParams.WT, "javabin");
-                solrParams.set(CommonParams.ROWS, String.valueOf(10000));
                 solrParams.set(CommonParams.START, String.valueOf(i));
-
-                //Have the SOLR data
-                QueryResponse rsp = solr.query(solrParams);
-                SolrDocumentList docs = rsp.getResults();
+                QueryResponse queryResponse = solr.query(solrParams);
+                SolrDocumentList docs = queryResponse.getResults();
 
                 File exportOutput = new File(tempDirectory.getPath() + File.separatorChar + "usagestats_" + i + ".csv");
                 exportOutput.delete();
 
-                for(SolrDocument doc : docs) {
-                    String uid = doc.get("uid").toString();
-                    String ip = doc.get("ip").toString();
-                    if(ip.equals("::1")) {
-                        ip = "127.0.0.1";
-                    }
-
-                    String id = doc.get("id").toString();
-                    String type = doc.get("type").toString();
-                    String time = doc.get("time").toString();
-
-                    //20140527162409835,view_bitstream,1292,2014-05-27T16:24:09,anonymous,127.0.0.1
-                    DSpaceObject dso = DSpaceObject.find(context, Integer.parseInt(type), Integer.parseInt(id));
-
-                    //InputFormat: Mon May 19 07:21:27 EDT 2014
-                    DateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-                    Date solrDate = inputDateFormat.parse(time);
-
-                    //OutputFormat: 2014-05-27T16:24:09
-                    DateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-                    String out = uid + "," + "view_" + dso.getTypeText().toLowerCase() + "," + id + ","  + outputDateFormat.format(solrDate) + ",anonymous," + ip + "\n";
-                    FileUtils.writeStringToFile(exportOutput, out, true);
-
-                }
-                System.out.println("Export hits [" + String.valueOf(i*10000) + " - " + String.valueOf((i+1)*10000) + "] to " + exportOutput.getCanonicalPath());
+                //export docs
+                addDocumentsToFile(context, docs, exportOutput);
+                System.out.println("Export hits [" + i + " - " + String.valueOf(i+9999) + "] to " + exportOutput.getCanonicalPath());
             }
         } catch (Exception e) {
             log.error("Error while exporting SOLR data", e);
             throw e;
         } finally {
             context.abort();
+        }
+    }
+
+    private static void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput) throws SQLException, ParseException, IOException {
+        for(SolrDocument doc : docs) {
+            String ip = doc.get("ip").toString();
+            if(ip.equals("::1")) {
+                ip = "127.0.0.1";
+            }
+
+            String id = doc.get("id").toString();
+            String type = doc.get("type").toString();
+            String time = doc.get("time").toString();
+
+            //20140527162409835,view_bitstream,1292,2014-05-27T16:24:09,anonymous,127.0.0.1
+            DSpaceObject dso = DSpaceObject.find(context, Integer.parseInt(type), Integer.parseInt(id));
+            if(dso == null) {
+                log.debug("Document no longer exists in DB. type:" + type + " id:" + id);
+                continue;
+            }
+
+            //InputFormat: Mon May 19 07:21:27 EDT 2014
+            DateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+            Date solrDate = inputDateFormat.parse(time);
+
+            //OutputFormat: 2014-05-27T16:24:09
+            DateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+            String out = time + "," + "view_" + dso.getTypeText().toLowerCase() + "," + id + ","  + outputDateFormat.format(solrDate) + ",anonymous," + ip + "\n";
+            FileUtils.writeStringToFile(exportOutput, out, true);
+
         }
     }
 
