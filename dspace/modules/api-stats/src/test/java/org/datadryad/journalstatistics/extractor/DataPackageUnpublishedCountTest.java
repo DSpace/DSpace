@@ -59,22 +59,38 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
     @Test
     public void testCountUnpublishedDataPackages() throws Exception {
         System.out.println("countUnpublishedDataPackages");
-        // Make sure there is exactly one unpublished data package for JUN 2014
+        String journalName = "Test Journal";
+        // Get the count prior to adding a data package to the workflow.
+        DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
+        Map<String, Integer> results = instance.extract(journalName);
+        Integer initialCount = 0;
+        if(results != null && results.containsKey(STRING_2014_06)) {
+            initialCount = results.get(STRING_2014_06);
+        }
         DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
         DCDate submittedDate = new DCDate(date_2014_06_07);
         String submitterName = "Cornelius Tester";
         String submitterEmail = "test@example.com";
         String provenanceStartId = "TEST START ID";
         String bitstreamProvenanceMessage = "Number of Bitstreams: 0";
-        String journalName = "Test Journal";
         dataPackage.setPublicationName(journalName);
         dataPackage.addSubmittedProvenance(submittedDate, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
-        DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
-        Map<String, Integer> results = instance.extract(journalName);
-        assertNotNull(results);
-        assertTrue(results.containsKey(STRING_2014_06));
-        Integer expectedCount = 1;
+        results = instance.extract(journalName);
+        assertNotNull("Result map should be non-null", results);
+        assertTrue("Results should contain a count for " + STRING_2014_06, results.containsKey(STRING_2014_06));
+        Integer expectedCount = initialCount + 1;
         Integer resultCount = results.get(STRING_2014_06);
-        assertEquals(expectedCount, resultCount);
+        assertEquals("Count mismatch", expectedCount, resultCount);
+
+        // Add a package to the archive with submission metadata
+        // and make sure it is not counted
+        dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(journalName);
+        dataPackage.addSubmittedProvenance(submittedDate, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
+        results = instance.extract(journalName);
+        assertNotNull("Result map should be non-null", results);
+        assertTrue("Results should contain a count for " + STRING_2014_06, results.containsKey(STRING_2014_06));
+        resultCount = results.get(STRING_2014_06);
+        assertEquals("Count mismatch", expectedCount, resultCount);
     }
 }
