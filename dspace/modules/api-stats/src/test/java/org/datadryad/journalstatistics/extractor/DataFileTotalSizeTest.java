@@ -46,9 +46,9 @@ public class DataFileTotalSizeTest extends ContextUnitTest {
 
         Long expectedSizeIncreaseForJournalName1 = file1.length() + file2.length();
         Long expectedSizeIncreaseForJournalName2 = file3.length();
-        assertTrue(expectedSizeIncreaseForJournalName1 > 0);
-        assertTrue(expectedSizeIncreaseForJournalName2 > 0);
-        assertTrue(expectedSizeIncreaseForJournalName1 != expectedSizeIncreaseForJournalName2);
+        assertTrue("file1 and file2 have no size",expectedSizeIncreaseForJournalName1 > 0);
+        assertTrue("file3 has no size", expectedSizeIncreaseForJournalName2 > 0);
+        assertTrue("file1+file2 size should not equal file3 size", expectedSizeIncreaseForJournalName1 != expectedSizeIncreaseForJournalName2);
 
         // Create a file and associate it with journal 1
 
@@ -65,10 +65,10 @@ public class DataFileTotalSizeTest extends ContextUnitTest {
         
         Long totalSizeForJournalName1 = instance.extract(journalName1);
         Long sizeIncrease1 = totalSizeForJournalName1 - initialSizeForJournalName1;
-        assertEquals(expectedSizeIncreaseForJournalName1, sizeIncrease1);
+        assertEquals("journal name 1 size increase mismatch", expectedSizeIncreaseForJournalName1, sizeIncrease1);
 
         Long totalSizeForJournalName2 = instance.extract(journalName2);
         Long sizeIncrease2 = totalSizeForJournalName2 - initialSizeForJournalName2;
-        assertEquals(expectedSizeIncreaseForJournalName2, sizeIncrease2);
+        assertEquals("journal name 2 size increase mismatch", expectedSizeIncreaseForJournalName2, sizeIncrease2);
     }
 }
