@@ -2467,6 +2467,9 @@
 <message key="xmlui.XMLWorkflow.step.unknown">Unknown state</message>
 <message key="xmlui.XMLWorkflow.Navigation.xmlworkflow_overview">General view for the workflow</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">SEDICI Review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">SEDICI Review</message>
+
 <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.trail">General view for the workflow</message>
 <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.title">General view for the workflow</message>
 <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column1"></message>
