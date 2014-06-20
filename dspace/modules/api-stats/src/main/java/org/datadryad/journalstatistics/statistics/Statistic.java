@@ -1,5 +1,6 @@
 package org.datadryad.journalstatistics.statistics;
 
+import java.util.Date;
 import org.datadryad.journalstatistics.extractor.ExtractorInterface;
 
 /**
@@ -29,6 +30,18 @@ public class Statistic<T> {
 
     public String getName() {
         return name;
+    }
+
+    public void setBeginDate(Date beginDate) {
+        if(beginDate != null) {
+            extractor.setBeginDate(beginDate);
+        }
+    }
+
+    public void setEndDate(Date endDate) {
+        if(endDate != null) {
+            extractor.setEndDate(endDate);
+        }
     }
 
     public void extractAndStore(String journalName) {

@@ -3,6 +3,7 @@
 package org.datadryad.journalstatistics.statistics;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.datadryad.journalstatistics.extractor.DataFileCount;
@@ -18,6 +19,7 @@ import org.dspace.core.Context;
  */
 public class DefaultStatisticsPackage implements StatisticsPackage {
     private List<Statistic> statistics = new ArrayList<Statistic>();
+    private Date beginDate, endDate;
     public DefaultStatisticsPackage(Context context) {
         statistics.add(new Statistic<Integer>("Data packages count", new DataPackageCount(context)));
         statistics.add(new Statistic<Integer>("Data files count", new DataFileCount(context)));
@@ -28,8 +30,20 @@ public class DefaultStatisticsPackage implements StatisticsPackage {
     @Override
     public void run(String journalName) {
         for(Statistic s : statistics) {
+            s.setBeginDate(beginDate);
+            s.setEndDate(endDate);
             s.extractAndStore(journalName);
             System.out.println(s);
         }
+    }
+
+    @Override
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    @Override
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
