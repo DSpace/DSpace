@@ -32,8 +32,11 @@ public class DataFileTotalSize  extends DatabaseExtractor<Long> {
             ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
             collection = DryadDataFile.getCollection(context);
             while (itemsByJournal.hasNext()) {
-                DryadDataFile dataFile = new DryadDataFile(itemsByJournal.next());
-                totalSize += dataFile.getTotalStorageSize();
+                Item item = itemsByJournal.next();
+                if(item.getOwningCollection().equals(collection)) {
+                    DryadDataFile dataFile = new DryadDataFile(item);
+                    totalSize += dataFile.getTotalStorageSize();
+                }
             }
         } catch (AuthorizeException ex) {
             log.error("AuthorizeException getting total size per journal", ex);
