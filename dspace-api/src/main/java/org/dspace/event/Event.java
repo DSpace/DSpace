@@ -576,7 +576,7 @@ public class Event implements Serializable
     }
     
     /**
-     * @return value of detail element of the event.
+     * @return array of identifiers of this event's subject.
      */
     public String[] getIdentifiers()
     {
