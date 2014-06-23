@@ -211,7 +211,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, null, bitstream.lookupIdentifiers(context)));
 
         return bitstream;
     }
@@ -246,7 +247,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, "REGISTER"));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, "REGISTER", bitstream.lookupIdentifiers(context)));
 
         return bitstream;
     }
@@ -506,12 +508,15 @@ public class Bitstream extends DSpaceObject
 
         if (modified)
         {
-            bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+            bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, 
+                    getID(), null, lookupIdentifiers(bContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            bContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, getID(), getDetails()));
+            bContext.addEvent(new Event(Event.MODIFY_METADATA, 
+                    Constants.BITSTREAM, getID(), getDetails(),
+                    lookupIdentifiers(bContext)));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -538,7 +543,8 @@ public class Bitstream extends DSpaceObject
         log.info(LogManager.getHeader(bContext, "delete_bitstream",
                 "bitstream_id=" + getID()));
 
-        bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
+        bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), 
+                String.valueOf(getSequenceID()), lookupIdentifiers(bContext)));
 
         // Remove from cache
         bContext.removeCached(this, getID());
@@ -744,6 +750,7 @@ public class Bitstream extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the bitstream HAS been modified
-        bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+        bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), 
+                null, lookupIdentifiers(bContext)));
     }
 }
