@@ -36,6 +36,12 @@
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
+<%@ page import="java.util.HashMap"%>
+<%@ page import="java.util.Set"%>
+<%@ page import="java.util.Map"%>
+<%@ page import="java.util.List"%>
+<%@ page import="org.dspace.discovery.DiscoverResult.FacetResult"%>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -207,5 +213,31 @@ if (communities != null && communities.length != 0)
     	int discovery_facet_cols = 4;
     %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+</div>
+
+<div>
+	<%
+		Map<String, List<FacetResult>> tcMapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("tagcloud.fresults");
+		List<DiscoverySearchFilterFacet> tcFacetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("tagCloudFacetsConfig");
+		String tcSearchScope = (String) request.getAttribute("tagcloud.searchScope");
+		
+		String index = "subject";
+    	String scope = tcSearchScope;
+    	
+    	Map<String, Integer> data = new HashMap<String, Integer>();
+    	
+    	for (DiscoverySearchFilterFacet facetConf : facetsConf)
+    	{
+    		String f = facetConf.getIndexFieldName();
+    		if (f.equals(index)){
+        		List<FacetResult> facet = mapFacetes.get(f);
+        		for (FacetResult fvalue : facet)
+    		    { 
+        			data.put(fvalue.getDisplayedValue(), (int)fvalue.getCount());
+    		    }
+        	}
+    	}
+	%>
+	<dspace:tagcloud index='<%= index %>' scope='<%= scope %>' data='<%= data %>'/><br/><br/>
 </div>
 </dspace:layout>
