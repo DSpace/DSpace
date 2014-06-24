@@ -140,6 +140,11 @@
             <version>1.2.1</version>
             <type>jar</type>
         </dependency>
+		<dependency>
+    		<groupId>org.mcavallo</groupId>
+    		<artifactId>opencloud</artifactId>
+    		<version>0.3</version>
+		</dependency>
     </dependencies>
 
 </project>
