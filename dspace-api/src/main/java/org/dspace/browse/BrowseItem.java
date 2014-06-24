@@ -38,13 +38,10 @@ import java.util.List;
 public class BrowseItem extends DSpaceObject
 {
 	/** Logger */
-    private static Logger log = Logger.getLogger(BrowseItem.class);
-    
-    /** DSpace context */
-	private Context context;
+    private static final Logger log = Logger.getLogger(BrowseItem.class);
 	
 	/** a List of all the metadata */
-	private List<DCValue> metadata = new ArrayList<DCValue>();
+	private final List<DCValue> metadata = new ArrayList<DCValue>();
 	
 	/** database id of the item */
 	private int id = -1;
@@ -71,7 +68,7 @@ public class BrowseItem extends DSpaceObject
      */
 	public BrowseItem(Context context, int id, boolean in_archive, boolean withdrawn, boolean discoverable)
 	{
-		this.context = context;
+		super(context, null);
 		this.id = id;
         this.in_archive = in_archive;
         this.withdrawn = withdrawn;
@@ -88,12 +85,12 @@ public class BrowseItem extends DSpaceObject
 	 * @return			array of matching values
 	 * @throws SQLException
 	 */
-	public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
+	public DCValue[] getMetadataValues(String schema, String element, String qualifier, String lang)
 		throws SQLException
 	{
         try
         {
-            BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(context);
+            BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(ourContext);
 
             // if the qualifier is a wildcard, we have to get it out of the
             // database
@@ -156,6 +153,7 @@ public class BrowseItem extends DSpaceObject
 	 * 
 	 *@return Constants.ITEM
 	 */
+    @Override
 	public int getType()
 	{
 		return Constants.ITEM;
@@ -182,6 +180,7 @@ public class BrowseItem extends DSpaceObject
 	 * 
 	 *	@return database id of item
 	 */
+    @Override
 	public int getID()
 	{
 		return id;
@@ -279,6 +278,7 @@ public class BrowseItem extends DSpaceObject
 	/* (non-Javadoc)
 	 * @see org.dspace.content.DSpaceObject#getHandle()
 	 */
+    @Override
 	public String getHandle()
 	{
 		// Get our Handle if any
@@ -286,7 +286,7 @@ public class BrowseItem extends DSpaceObject
 		{
 			try
 			{
-				this.handle = HandleManager.findHandle(context, this);
+				this.handle = HandleManager.findHandle(ourContext, this);
 			}
 			catch (SQLException e)
 			{
@@ -310,7 +310,7 @@ public class BrowseItem extends DSpaceObject
     	throws SQLException
     {
     	// instantiate an item for this one.  Not nice.
-        Item item = Item.find(context, id);
+        Item item = Item.find(ourContext, id);
     	
     	if (item == null)
     	{
@@ -353,7 +353,7 @@ public class BrowseItem extends DSpaceObject
         	
         	if ((original[0].getBitstreams().length > 1) && (original[0].getPrimaryBitstreamID() > -1))
         	{
-        		originalBitstream = Bitstream.find(context, original[0].getPrimaryBitstreamID());
+        		originalBitstream = Bitstream.find(ourContext, original[0].getPrimaryBitstreamID());
         		thumbnailBitstream = thumbs[0].getBitstreamByName(originalBitstream.getName() + ".jpg");
         	}
         	else
@@ -363,7 +363,7 @@ public class BrowseItem extends DSpaceObject
         	}
         	
         	if ((thumbnailBitstream != null)
-        			&& (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
+        			&& (AuthorizeManager.authorizeActionBoolean(ourContext, thumbnailBitstream, Constants.READ)))
         	{
                 return new Thumbnail(thumbnailBitstream, originalBitstream);
         	}
@@ -372,12 +372,13 @@ public class BrowseItem extends DSpaceObject
         return null;
     }
 
+    @Override
 	public String getName()
     {
         // FIXME: there is an exception handling problem here
 		try
 		{
-			DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
+			DCValue t[] = getMetadataValues("dc", "title", null, Item.ANY);
 			return (t.length >= 1) ? t[0].value : null;
 		}
 		catch (SQLException sqle)

@@ -140,6 +140,7 @@ public class AbstractUnitTest
 
                 RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
                 MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
+                MetadataImporter.loadRegistry(base + "dspace-types.xml", true);
                 MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
                 ctx.commit();
 

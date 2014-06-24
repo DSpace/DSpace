@@ -63,7 +63,7 @@ public class CreateCollectionForm extends AbstractDSpaceTransformer
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("create-collection",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(parentCommunity.getMetadata("name")));
+	    main.setHead(T_main_head.parameterize(parentCommunity.getName()));
 	        
 	    
 	    // The grand list of metadata options

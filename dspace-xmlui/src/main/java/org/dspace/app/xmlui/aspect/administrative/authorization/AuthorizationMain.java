@@ -146,7 +146,7 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
         {
             parentList.addItem().addHighlight("bold").addXref(baseURL
                     + "&submit_edit&community_id=" + currentCommunity.getID(),
-                    currentCommunity.getMetadata("name"));
+                    currentCommunity.getName());
             List containerSubList = null;
             for (Collection subCols : currentCommunity.getCollections())
             {
@@ -155,7 +155,7 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
                     containerSubList = parentList.addList("subList"
                             + currentCommunity.getID());
                 }
-                String name = subCols.getMetadata("name");
+                String name = subCols.getName();
                 if (name == null || name.length() == 0)
                 {
                     containerSubList.addItemXref(baseURL

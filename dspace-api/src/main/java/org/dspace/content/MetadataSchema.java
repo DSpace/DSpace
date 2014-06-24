@@ -49,6 +49,9 @@ public class MetadataSchema
     /** Short Name of built-in Dublin Core schema. */
     public static final String DC_SCHEMA = "dc";
 
+    /** Short Name of the DSpace-specific schema. */
+    public static final String DSPACE_SCHEMA = "dspace";
+
     /** The row in the table representing this type */
     private TableRow row;
 
@@ -534,7 +537,7 @@ public class MetadataSchema
      *            context, in case we need to read it in from DB
      * @param shortName
      *            the short name for the schema
-     * @return the metadata schema object
+     * @return the metadata schema object, or null if there is none by that name.
      * @throws SQLException
      */
     public static MetadataSchema find(Context context, String shortName)

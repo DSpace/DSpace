@@ -863,7 +863,7 @@ Common usage:
             <arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
         </java>
 
-        <!-- finally import the metadata elements -->
+        <!-- import the Dublin Core metadata elements -->
         <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
@@ -877,6 +877,17 @@ Common usage:
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
             <arg line="-f '${dspace.dir}/config/registries/dcterms-types.xml'" />
+        </java>
+
+        <!-- Import the native DSpace namespace -->
+        <java classname='org.dspace.administer.MetadataImporter'
+              classpathref='class.path'
+              fork='yes'
+              failonerror='yes'>
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-f '${dspace.dir}/config/registries/dspace-types.xml'" />
         </java>
 
         <!-- FIXME: this should be more modular -->

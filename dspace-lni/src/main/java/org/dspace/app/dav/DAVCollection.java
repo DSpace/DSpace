@@ -29,6 +29,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataSchema;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
@@ -49,7 +50,7 @@ import org.jdom.Element;
  */
 class DAVCollection extends DAVDSpaceObject
 {
-    
+
     /** log4j category. */
     private static Logger log = Logger.getLogger(DAVCollection.class);
 
@@ -58,7 +59,7 @@ class DAVCollection extends DAVDSpaceObject
 
     /** The temporary upload directory. */
     private static String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
+                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir");
 
     /** The Constant short_descriptionProperty. */
     private static final Element short_descriptionProperty = new Element(
@@ -104,7 +105,7 @@ class DAVCollection extends DAVDSpaceObject
 
     /**
      * Instantiates a new DAV collection.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
@@ -153,13 +154,13 @@ class DAVCollection extends DAVDSpaceObject
                 ii.close();
             }
         }
-        
+
         return (DAVResource[]) result.toArray(new DAVResource[result.size()]);
     }
 
     /**
      * Gets the collection.
-     * 
+     *
      * @return the DSpace Collection object represented by this resource.
      */
     protected Collection getCollection()
@@ -207,19 +208,19 @@ class DAVCollection extends DAVDSpaceObject
 
         else if (elementsEqualIsh(property, short_descriptionProperty))
         {
-            value = getObjectMetadata("short_description");
+            value = getObjectMetadata(Collection.SHORT_DESCRIPTION);
         }
         else if (elementsEqualIsh(property, introductory_textProperty))
         {
-            value = getObjectMetadata("introductory_text");
+            value = getObjectMetadata(Collection.INTRODUCTORY_TEXT);
         }
         else if (elementsEqualIsh(property, side_bar_textProperty))
         {
-            value = getObjectMetadata("side_bar_text");
+            value = getObjectMetadata(Collection.SIDEBAR_TEXT);
         }
         else if (elementsEqualIsh(property, copyright_textProperty))
         {
-            value = getObjectMetadata("copyright_text");
+            value = getObjectMetadata(Collection.COPYRIGHT_TEXT);
         }
         else if (elementsEqualIsh(property, default_licenseProperty))
         {
@@ -228,7 +229,7 @@ class DAVCollection extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(property, provenance_descriptionProperty))
         {
-            value = getObjectMetadata("provenance_description");
+            value = getObjectMetadata(Collection.PROVENANCE_TEXT);
         }
         else
         {
@@ -249,16 +250,16 @@ class DAVCollection extends DAVDSpaceObject
     // syntactic sugar around getting collection metadata values:
     /**
      * Gets the object metadata.
-     * 
+     *
      * @param mdname the mdname
-     * 
+     *
      * @return the object metadata
      */
     private String getObjectMetadata(String mdname)
     {
         try
         {
-            return this.collection.getMetadata(mdname);
+            return this.collection.getMetadataSingleValue(mdname);
         }
         catch (IllegalArgumentException e)
         {
@@ -284,11 +285,12 @@ class DAVCollection extends DAVDSpaceObject
                 || elementsEqualIsh(prop, copyright_textProperty)
                 || elementsEqualIsh(prop, provenance_descriptionProperty))
         {
-            this.collection.setMetadata(prop.getName(), newValue);
+            this.collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, prop.getName(), DSpaceObject.ANY);
+            this.collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, prop.getName(), null, newValue);
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.collection.setMetadata("name", newValue);
+            this.collection.setName(newValue);
         }
         else if (elementsEqualIsh(prop, default_licenseProperty))
         {
@@ -354,7 +356,7 @@ class DAVCollection extends DAVDSpaceObject
      */
     private static class CountedInputStream extends FilterInputStream
     {
-        
+
         /** The count. */
         private long count = 0;
 
@@ -363,7 +365,7 @@ class DAVCollection extends DAVDSpaceObject
 
         /**
          * Instantiates a new counted input stream.
-         * 
+         *
          * @param is the is
          * @param length the length
          */
@@ -438,7 +440,7 @@ class DAVCollection extends DAVDSpaceObject
      * PUT ingests a package as a new Item. Package type (must match pluggable
      * packager name) is in either (a) "package" query arg in URI (b)
      * content-type request header
-     * 
+     *
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.

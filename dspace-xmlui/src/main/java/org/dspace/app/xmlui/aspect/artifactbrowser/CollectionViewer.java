@@ -139,7 +139,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Set the page title
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
@@ -190,7 +190,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);

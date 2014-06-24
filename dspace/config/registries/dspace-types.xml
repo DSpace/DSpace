@@ -1,0 +1,130 @@
+<?xml version='1.0'?>
+
+<!--
+  - Initial contents for DSpace native type registry.  Once the registry has
+  - been loaded, this file becomes obsolete; the current version of the
+  - registry must be read from the database.
+  - Use org.dspace.content.MetadataSchema, org.dspace.content.MetadataField, org.dspace.content.MetadataValue instead.
+  - Omit <qualifier> tags for unqualified elements
+  -
+  - <dc-type>
+  -   <schema></schema>
+  -   <element></element>
+  -   <qualifier></qualifier>
+  -   <scope_note></scope_note>
+  - </dc-type>
+  -->
+
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace Native Types Registry</title>
+    <contributor.author>Mark Wood</contributor.author>
+    <date.created>17-Feb-2014</date.created>
+    <description>
+        Metadata types specific to DSpace.
+    </description>
+    <description.version>1.0</description.version>
+  </dspace-header>
+
+  <dc-schema>
+      <name>dspace</name>
+      <namespace>http://duraspace.org/namespaces/dspace-types/</namespace>
+  </dc-schema>
+
+  <!-- Community -->
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>name</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>copyright</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>introduction</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>short_description</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>sidebar_text</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>community</element>
+      <qualifier>provenance</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <!-- Collection -->
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>name</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>copyright</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>introduction</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>license</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>short_description</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>sidebar_text</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+      <schema>dspace</schema>
+      <element>collection</element>
+      <qualifier>provenance</qualifier>
+      <scope_note></scope_note>
+  </dc-type>
+
+</dspace-dc-types>

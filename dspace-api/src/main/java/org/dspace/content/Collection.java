@@ -43,25 +43,18 @@ import java.util.MissingResourceException;
  * <P>
  * The collection's metadata (name, introductory text etc), workflow groups, and
  * default group of submitters are loaded into memory. Changes to metadata are
- * not written to the database until <code>update</code> is called. If you
+ * not written to the database until {@link #update} is called. If you
  * create or remove a workflow group, the change is only reflected in the
- * database after calling <code>update</code>. The default group of
+ * database after calling {@link #update}. The default group of
  * submitters is slightly different - creating or removing this has instant
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class Collection extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Collection.class);
-
-    /** Our context */
-    private Context ourContext;
-
-    /** The table row corresponding to this item */
-    private TableRow collectionRow;
+    private static final Logger log = Logger.getLogger(Collection.class);
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -72,17 +65,11 @@ public class Collection extends DSpaceObject
     /** Our Handle */
     private String handle;
 
-    /** Flag set when data is modified, for events */
-    private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
-
     /**
      * Groups corresponding to workflow steps - NOTE these start from one, so
      * workflowGroups[0] corresponds to workflow_step_1.
      */
-    private Group[] workflowGroup;
+    private final Group[] workflowGroup;
 
     /** The default group of submitters */
     private Group submitters;
@@ -91,12 +78,20 @@ public class Collection extends DSpaceObject
     private Group admins;
 
     // Keys for accessing Collection metadata
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
+    public static final String ELEMENT = "collection";
+
+    private static final String NAME_TEXT = "name";
+
+    public static final String COPYRIGHT_TEXT = "copyright";
+    public static final String INTRODUCTORY_TEXT = "introduction";
     public static final String SHORT_DESCRIPTION = "short_description";
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    public static final String PROVENANCE_TEXT = "provenance_description";
-    
+    public static final String SIDEBAR_TEXT = "sidebar_text";
+    public static final String PROVENANCE_TEXT = "provenance";
+    public static final String LICENSE_TEXT = "license";
+
+    static final String LOGO_BITSTREAM_ID = "logo_bitstream_id";
+    static final String TEMPLATE_ITEM_ID = "template_item_id";
+
     /**
      * Construct a collection with the given table row
      *
@@ -108,29 +103,28 @@ public class Collection extends DSpaceObject
      */
     Collection(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
-        collectionRow = row;
+        super(context, row);
 
         // Get the logo bitstream
-        if (collectionRow.isColumnNull("logo_bitstream_id"))
+        if (ourRow.isColumnNull(LOGO_BITSTREAM_ID))
         {
             logo = null;
         }
         else
         {
-            logo = Bitstream.find(ourContext, collectionRow
-                    .getIntColumn("logo_bitstream_id"));
+            logo = Bitstream.find(ourContext, ourRow
+                    .getIntColumn(LOGO_BITSTREAM_ID));
         }
 
         // Get the template item
-        if (collectionRow.isColumnNull("template_item_id"))
+        if (ourRow.isColumnNull(TEMPLATE_ITEM_ID))
         {
             template = null;
         }
         else
         {
-            template = Item.find(ourContext, collectionRow
-                    .getIntColumn("template_item_id"));
+            template = Item.find(ourContext, ourRow
+                    .getIntColumn(TEMPLATE_ITEM_ID));
         }
 
         // Get the relevant groups
@@ -150,7 +144,7 @@ public class Collection extends DSpaceObject
         context.cache(this, row.getIntColumn("collection_id"));
 
         modified = false;
-        modifiedMetadata = false;
+        metadataChanged = false;
         clearDetails();
     }
 
@@ -301,7 +295,7 @@ public class Collection extends DSpaceObject
     public static Collection[] findAll(Context context) throws SQLException
     {
         TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
-                "SELECT * FROM collection ORDER BY name");
+                "SELECT * FROM collection ORDER BY name"); // FIXME no name column; fetch from metadatavalue
 
         List<Collection> collections = new ArrayList<Collection>();
 
@@ -453,14 +447,16 @@ public class Collection extends DSpaceObject
      *
      * @return the internal identifier
      */
+    @Override
     public int getID()
     {
-        return collectionRow.getIntColumn("collection_id");
+        return ourRow.getIntColumn("collection_id");
     }
 
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
      */
+    @Override
     public String getHandle()
     {
         if(handle == null) {
@@ -475,7 +471,7 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get the value of a metadata field
+     * Get the first (or only) value of a metadata field.
      *
      * @param field
      *            the name of the metadata field to get
@@ -485,60 +481,50 @@ public class Collection extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
-    public String getMetadata(String field)
+    public String getMetadataSingleValue(String field)
     {
-    	String metadata = collectionRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+        try {
+            if (null == MetadataField.findByElement(ourContext, getDspaceSchemaID(), ELEMENT, field))
+                throw new IllegalArgumentException("Metadata field '" +field +
+                        "' does not exist in " + MetadataSchema.DSPACE_SCHEMA);
+        } catch (SQLException ex) {
+            throw new IllegalArgumentException("Exception looking up Collection metadata field:  " + field, ex);
+        } catch (AuthorizeException ex) {
+            throw new IllegalArgumentException("Exception looking up Collection metadata field:  " + field, ex);
+        }
+
+        DCValue[] metadata = getMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, field, ANY);
+    	return (metadata.length <= 0) ? "" : metadata[0].value;
+    }
+
+    @Override
+    public String getName()
+    {
+        String name = getMetadataSingleValue(NAME_TEXT);
+    	return (name == null) ? "" : name;
     }
 
     /**
-     * Set a metadata value
+     * Give this Collection a name.
      *
-     * @param field
-     *            the name of the metadata field to get
-     * @param value
-     *            value to set the field to
-     *
-     * @exception IllegalArgumentException
-     *                if the requested metadata field doesn't exist
-     * @exception MissingResourceException
+     * @param name
      */
-    public void setMetadata(String field, String value) throws MissingResourceException
+    public void setName(String name)
     {
-        if ((field.trim()).equals("name")
-                && (value == null || value.trim().equals("")))
+        if ((name == null || name.trim().equals("")))
         {
             try
             {
-                value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                name = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             }
             catch (MissingResourceException e)
             {
-                value = "Untitled";
+                name = "Untitled";
             }
         }
 
-        /*
-         * Set metadata field to null if null
-         * and trim strings to eliminate excess
-         * whitespace.
-         */
-		if(value == null)
-        {
-            collectionRow.setColumnNull(field);
-        }
-        else
-        {
-            collectionRow.setColumn(field, value.trim());
-        }
-
-        modifiedMetadata = true;
-        addDetails(field);
-    }
-
-    public String getName()
-    {
-        return getMetadata("name");
+        clearMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, NAME_TEXT, DSpaceObject.ANY);
+        addMetadata(MetadataSchema.DSPACE_SCHEMA, ELEMENT, NAME_TEXT, null, name);
     }
 
     /**
@@ -581,14 +567,14 @@ public class Collection extends DSpaceObject
         }
 
         // First, delete any existing logo
-        if (!collectionRow.isColumnNull("logo_bitstream_id"))
+        if (!ourRow.isColumnNull(LOGO_BITSTREAM_ID))
         {
             logo.delete();
         }
 
         if (is == null)
         {
-            collectionRow.setColumnNull("logo_bitstream_id");
+            ourRow.setColumnNull(LOGO_BITSTREAM_ID);
             logo = null;
 
             log.info(LogManager.getHeader(ourContext, "remove_logo",
@@ -597,7 +583,7 @@ public class Collection extends DSpaceObject
         else
         {
             Bitstream newLogo = Bitstream.create(ourContext, is);
-            collectionRow.setColumn("logo_bitstream_id", newLogo.getID());
+            ourRow.setColumn(LOGO_BITSTREAM_ID, newLogo.getID());
             logo = newLogo;
 
             // now create policy for logo bitstream
@@ -667,11 +653,11 @@ public class Collection extends DSpaceObject
 
         if (g == null)
         {
-            collectionRow.setColumnNull("workflow_step_" + step);
+            ourRow.setColumnNull("workflow_step_" + step);
         }
         else
         {
-            collectionRow.setColumn("workflow_step_" + step, g.getID());
+            ourRow.setColumn("workflow_step_" + step, g.getID());
         }
         modified = true;
     }
@@ -718,7 +704,7 @@ public class Collection extends DSpaceObject
         }
 
         // register this as the submitter group
-        collectionRow.setColumn("submitter", submitters.getID());
+        ourRow.setColumn("submitter", submitters.getID());
 
         AuthorizeManager.addPolicy(ourContext, this, Constants.ADD, submitters);
 
@@ -744,7 +730,7 @@ public class Collection extends DSpaceObject
         }
 
         // Remove the link to the collection table.
-        collectionRow.setColumnNull("submitter");
+        ourRow.setColumnNull("submitter");
         submitters = null;
 
         modified = true;
@@ -796,7 +782,7 @@ public class Collection extends DSpaceObject
                 Constants.ADMIN, admins);
 
         // register this as the admin group
-        collectionRow.setColumn("admin", admins.getID());
+        ourRow.setColumn("admin", admins.getID());
 
         modified = true;
         return admins;
@@ -820,7 +806,7 @@ public class Collection extends DSpaceObject
         }
 
         // Remove the link to the collection table.
-        collectionRow.setColumnNull("admin");
+        ourRow.setColumnNull("admin");
         admins = null;
 
         modified = true;
@@ -851,7 +837,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicense()
     {
-        String license = getMetadata("license");
+        String license = getMetadataSingleValue(LICENSE_TEXT);
 
         if (license == null || license.trim().equals(""))
         {
@@ -870,7 +856,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicenseCollection()
     {
-        return getMetadata("license");
+        return getMetadataSingleValue(LICENSE_TEXT);
     }
 
     /**
@@ -880,7 +866,7 @@ public class Collection extends DSpaceObject
      */
     public boolean hasCustomLicense()
     {
-        String license = getMetadata("license");
+        String license = getMetadataSingleValue(LICENSE_TEXT);
 
         return !( license == null || license.trim().equals("") );
     }
@@ -894,7 +880,17 @@ public class Collection extends DSpaceObject
      */
     public void setLicense(String license)
     {
-        setMetadata("license",license);
+        if(license == null)
+        {
+            ourRow.setColumnNull(LICENSE_TEXT);
+        }
+        else
+        {
+            ourRow.setColumn(LICENSE_TEXT, license.trim());
+        }
+
+        metadataChanged = true;
+        addDetails(LICENSE_TEXT);
     }
 
     /**
@@ -927,7 +923,7 @@ public class Collection extends DSpaceObject
         if (template == null)
         {
             template = Item.create(ourContext);
-            collectionRow.setColumn("template_item_id", template.getID());
+            ourRow.setColumn(TEMPLATE_ITEM_ID, template.getID());
 
             log.info(LogManager.getHeader(ourContext, "create_template_item",
                     "collection_id=" + getID() + ",template_item_id="
@@ -953,8 +949,8 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
 
-        collectionRow.setColumnNull("template_item_id");
-        DatabaseManager.update(ourContext, collectionRow);
+        ourRow.setColumnNull(TEMPLATE_ITEM_ID);
+        DatabaseManager.update(ourContext, ourRow);
 
         if (template != null)
         {
@@ -1048,6 +1044,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -1056,19 +1053,9 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_collection",
                 "collection_id=" + getID()));
 
-        DatabaseManager.update(ourContext, collectionRow);
+        updateMetadata();
 
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
-            modified = false;
-        }
-        if (modifiedMetadata)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
-            modifiedMetadata = false;
-            clearDetails();
-        }
+        super.update();
     }
 
     public boolean canEditBoolean() throws java.sql.SQLException
@@ -1255,7 +1242,7 @@ public class Collection extends DSpaceObject
         }
 
         // Delete collection row
-        DatabaseManager.delete(ourContext, collectionRow);
+        DatabaseManager.delete(ourContext, ourRow);
 
         // Remove any workflow groups - must happen after deleting collection
         Group g = null;
@@ -1387,7 +1374,7 @@ public class Collection extends DSpaceObject
      public int hashCode()
      {
          int hash = 7;
-         hash = 89 * hash + (this.collectionRow != null ? this.collectionRow.hashCode() : 0);
+         hash = 89 * hash + (this.ourRow != null ? this.ourRow.hashCode() : 0);
          return hash;
      }
 
@@ -1403,12 +1390,12 @@ public class Collection extends DSpaceObject
      */
     private Group groupFromColumn(String col) throws SQLException
     {
-        if (collectionRow.isColumnNull(col))
+        if (ourRow.isColumnNull(col))
         {
             return null;
         }
 
-        return Group.find(ourContext, collectionRow.getIntColumn(col));
+        return Group.find(ourContext, ourRow.getIntColumn(col));
     }
 
     /**
@@ -1416,6 +1403,7 @@ public class Collection extends DSpaceObject
      *
      * @return int Constants.COLLECTION
      */
+    @Override
     public int getType()
     {
         return Constants.COLLECTION;
@@ -1512,6 +1500,7 @@ public class Collection extends DSpaceObject
         return itemcount;
      }
 
+    @Override
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;

@@ -221,19 +221,21 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     public void testGetMetadata()
     {
         //by default all empty values will return ""
-        assertThat("testGetMetadata 0",c.getMetadata("name"), equalTo(""));
-        assertThat("testGetMetadata 1",c.getMetadata("short_description"), equalTo(""));
-        assertThat("testGetMetadata 2",c.getMetadata("introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(""));
-        assertThat("testGetMetadata 4",c.getMetadata("copyright_text"), equalTo(""));
-        assertThat("testGetMetadata 5",c.getMetadata("template_item_id"), equalTo(""));
-        assertThat("testGetMetadata 6",c.getMetadata("provenance_description"), equalTo(""));
-        assertThat("testGetMetadata 7",c.getMetadata("side_bar_text"), equalTo(""));
-        assertThat("testGetMetadata 8",c.getMetadata("license"), equalTo(""));
+        assertThat("testGetMetadata 0",c.getName(), equalTo(""));
+        assertThat("testGetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(""));
+        assertThat("testGetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(""));
+        assertThat("testGetMetadata 3",c.getMetadataSingleValue(Collection.LOGO_BITSTREAM_ID), equalTo(""));
+        assertThat("testGetMetadata 4",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(""));
+        assertThat("testGetMetadata 5",c.getMetadataSingleValue(Collection.TEMPLATE_ITEM_ID), equalTo(""));
+        assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(""));
+        assertThat("testGetMetadata 7",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(""));
+        assertThat("testGetMetadata 8",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(""));
     }
 
     /**
      * Test of setMetadata method, of class Collection.
+     * FIXME need to test template_item_id.
+     * FIXME should test addMetadata, clearMetadata instead.
      */
     @Test
     public void testSetMetadata()
@@ -241,32 +243,33 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         String name = "name";
         String sdesc = "short description";
         String itext = "introductory text";
-        String logo = "1";
         String copy = "copyright declaration";
         String sidebar = "side bar text";
         String tempItem = "3";
         String provDesc = "provenance description";
         String license = "license text";
 
-        c.setMetadata("name", name);
-        c.setMetadata("short_description", sdesc);
-        c.setMetadata("introductory_text", itext);
-        c.setMetadata("logo_bitstream_id", logo);
-        c.setMetadata("copyright_text", copy);
-        c.setMetadata("side_bar_text", sidebar);
-        c.setMetadata("template_item_id", tempItem);
-        c.setMetadata("provenance_description", provDesc);
-        c.setMetadata("license", license);
+        c.setName(name);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, sdesc);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, itext);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, copy);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, sidebar);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, provDesc);
+        c.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, DSpaceObject.ANY);
+        c.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.LICENSE_TEXT, null, license);
 
-        assertThat("testSetMetadata 0",c.getMetadata("name"), equalTo(name));
-        assertThat("testSetMetadata 1",c.getMetadata("short_description"), equalTo(sdesc));
-        assertThat("testSetMetadata 2",c.getMetadata("introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(logo));
-        assertThat("testSetMetadata 4",c.getMetadata("copyright_text"), equalTo(copy));
-        assertThat("testSetMetadata 5",c.getMetadata("side_bar_text"), equalTo(sidebar));
-        assertThat("testGetMetadata 6",c.getMetadata("template_item_id"), equalTo(tempItem));
-        assertThat("testGetMetadata 7",c.getMetadata("provenance_description"), equalTo(provDesc));
-        assertThat("testGetMetadata 8",c.getMetadata("license"), equalTo(license));
+        assertThat("testSetMetadata 0",c.getName(), equalTo(name));
+        assertThat("testSetMetadata 1",c.getMetadataSingleValue(Collection.SHORT_DESCRIPTION), equalTo(sdesc));
+        assertThat("testSetMetadata 2",c.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT), equalTo(itext));
+        assertThat("testSetMetadata 3",c.getMetadataSingleValue(Collection.COPYRIGHT_TEXT), equalTo(copy));
+        assertThat("testSetMetadata 4",c.getMetadataSingleValue(Collection.SIDEBAR_TEXT), equalTo(sidebar));
+        assertThat("testGetMetadata 5",c.getMetadataSingleValue(Collection.PROVENANCE_TEXT), equalTo(provDesc));
+        assertThat("testGetMetadata 6",c.getMetadataSingleValue(Collection.LICENSE_TEXT), equalTo(license));
     }
 
     /**

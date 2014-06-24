@@ -47,7 +47,7 @@ public class DOIIdentifierProviderTest
 
     private static MockDOIConnector connector;
     private DOIIdentifierProvider provider;
-    
+
     /** The most recently created test Item's ID */
     private static int itemID;
 
@@ -96,9 +96,9 @@ public class DOIIdentifierProviderTest
         // with the tests.
         String sql = "DELETE FROM Doi WHERE resource_type_id = ? AND resource_id = ?";
         DatabaseManager.updateQuery(context, sql, item.getType(), item.getID());
-        
+
         DCValue[] metadata = item.getMetadata(
-                DOIIdentifierProvider.MD_SCHEMA, 
+                DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -122,20 +122,20 @@ public class DOIIdentifierProviderTest
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null,
                 remainder.toArray(new String[remainder.size()]));
-        
+
         item.update();
         ctx.commit();
         ctx.restoreAuthSystemState();
 
         return item;
     }
-    
+
     public String createDOI(Item item, Integer status, boolean metadata)
             throws SQLException, IdentifierException, AuthorizeException
     {
         return this.createDOI(item, status, metadata, null);
     }
-    
+
     /**
      * Create a DOI to an item.
      * @param item Item the DOI should be created for.
@@ -143,7 +143,7 @@ public class DOIIdentifierProviderTest
      * @param metadata Whether the DOI should be included in the metadata of the item.
      * @param doi The doi or null if we should generate one.
      * @return the DOI
-     * @throws SQLException 
+     * @throws SQLException
      */
     public String createDOI(Item item, Integer status, boolean metadata, String doi)
             throws SQLException, IdentifierException, AuthorizeException
@@ -152,11 +152,11 @@ public class DOIIdentifierProviderTest
         Random random = new Random();
         if (null == doi)
         {
-            doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
+            doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
                     + Long.toHexString(new Date().getTime()) + "-"
                     + random.nextInt(997);
         }
-        
+
         TableRow doiRow = DatabaseManager.create(context, "Doi");
         doiRow.setColumn("doi", doi.substring(DOI.SCHEME.length()));
         doiRow.setColumn("resource_type_id", item.getType());
@@ -170,7 +170,7 @@ public class DOIIdentifierProviderTest
             doiRow.setColumn("status", status);
         }
         assumeTrue(1 == DatabaseManager.update(context, doiRow));
-        
+
         if (metadata)
         {
             item.addMetadata(DOIIdentifierProvider.MD_SCHEMA,
@@ -180,11 +180,11 @@ public class DOIIdentifierProviderTest
                     DOI.DOIToExternalForm(doi));
             item.update();
         }
-        
+
         context.commit();
         return doi;
     }
-    
+
     @BeforeClass
     public static void setUpClass()
             throws Exception
@@ -197,21 +197,21 @@ public class DOIIdentifierProviderTest
         ctx.setCurrentUser(eperson);
         // Create an environment for our test objects to live in.
         community = Community.create(null, ctx);
-        community.setMetadata("name", "A Test Community");
+        community.setName("A Test Community");
         community.update();
         collection = community.createCollection();
-        collection.setMetadata("name", "A Test Collection");
+        collection.setName("A Test Collection");
         collection.update();
         ctx.complete();
 
         config = kernelImpl.getConfigurationService();
         // Configure the service under test.
         config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
-        config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 
+        config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR,
                 NAMESPACE_SEPARATOR);
         // Don't try to send mail.
         config.setProperty("mail.server.disabled", "true");
-        
+
         connector = new MockDOIConnector();
     }
 
@@ -225,18 +225,18 @@ public class DOIIdentifierProviderTest
         dumpMetadata(Item.find(ctx, itemID));
         */
     }
-    
+
     @Before
     public void setUp()
     {
         context.setCurrentUser(eperson);
         context.turnOffAuthorisationSystem();
-        
+
         provider = new DOIIdentifierProvider();
         provider.setConfigurationService(config);
         provider.setDOIConnector(connector);
     }
-    
+
     @After
     public void tearDown()
     {
@@ -249,11 +249,11 @@ public class DOIIdentifierProviderTest
      */
     @Test
     public void testSupports_Class()
-    {        
+    {
         Class<? extends Identifier> identifier = DOI.class;
         assertTrue("DOI should be supported", provider.supports(identifier));
     }
-    
+
     @Test
     public void testSupports_valid_String()
     {
@@ -265,13 +265,13 @@ public class DOIIdentifierProviderTest
             "http://dx.doi.org/10.5072/123abc-lkj/kljl",
             DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
         };
-        
+
         for (String doi : validDOIs)
         {
             assertTrue("DOI should be supported", provider.supports(doi));
         }
     }
-    
+
     @Test
     public void testDoes_not_support_invalid_String()
     {
@@ -282,24 +282,24 @@ public class DOIIdentifierProviderTest
             "",
             null
         };
-        
+
         for (String notADoi : invalidDOIs)
         {
             assertFalse("Invalid DOIs shouldn't be supported",
                     provider.supports(notADoi));
         }
     }
-    
+
     @Test
     public void testStore_DOI_as_item_metadata()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
         Item item = newItem(context);
-        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
+        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
                 + Long.toHexString(new Date().getTime());
         provider.saveDOIToObject(context, item, doi);
-        
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+
+        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -313,13 +313,13 @@ public class DOIIdentifierProviderTest
         }
         assertTrue("Cannot store DOI as item metadata value.", result);
     }
-    
+
     @Test
     public void testGet_DOI_out_of_item_metadata()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
         Item item = newItem(context);
-        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
+        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
                 + Long.toHexString(new Date().getTime());
 
         item.addMetadata(DOIIdentifierProvider.MD_SCHEMA,
@@ -330,7 +330,7 @@ public class DOIIdentifierProviderTest
         item.update();
         context.commit();
 
-        assertTrue("Failed to recognize DOI in item metadata.", 
+        assertTrue("Failed to recognize DOI in item metadata.",
                 doi.equals(DOIIdentifierProvider.getDOIOutOfObject(item)));
     }
 
@@ -339,7 +339,7 @@ public class DOIIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
         Item item = newItem(context);
-        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR 
+        String doi = DOI.SCHEME + PREFIX + "/" + NAMESPACE_SEPARATOR
                 + Long.toHexString(new Date().getTime());
 
         item.addMetadata(DOIIdentifierProvider.MD_SCHEMA,
@@ -349,10 +349,10 @@ public class DOIIdentifierProviderTest
                 DOI.DOIToExternalForm(doi));
         item.update();
         context.commit();
-        
+
         provider.removeDOIFromObject(context, item, doi);
-        
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+
+        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -366,45 +366,45 @@ public class DOIIdentifierProviderTest
         }
         assertFalse("Cannot remove DOI from item metadata.", foundDOI);
     }
-    
+
     @Test
-    public void testGet_DOI_by_DSpaceObject() 
-            throws SQLException, AuthorizeException, IOException, 
+    public void testGet_DOI_by_DSpaceObject()
+            throws SQLException, AuthorizeException, IOException,
             IllegalArgumentException, IdentifierException
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
-        
+
         String retrievedDOI = DOIIdentifierProvider.getDOIByObject(context, item);
-        
+
         assertNotNull("Failed to load DOI by DSpaceObject.", retrievedDOI);
         assertTrue("Loaded wrong DOI by DSpaceObject.", doi.equals(retrievedDOI));
     }
-    
+
     @Test
-    public void testGet_DOI_lookup() 
-            throws SQLException, AuthorizeException, IOException, 
+    public void testGet_DOI_lookup()
+            throws SQLException, AuthorizeException, IOException,
             IllegalArgumentException, IdentifierException
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
-        
+
         String retrievedDOI = provider.lookup(context, (DSpaceObject) item);
-        
+
         assertNotNull("Failed to loookup doi.", retrievedDOI);
         assertTrue("Loaded wrong DOI on lookup.", doi.equals(retrievedDOI));
     }
-    
+
     @Test
-    public void testGet_DSpaceObject_by_DOI() 
-            throws SQLException, AuthorizeException, IOException, 
+    public void testGet_DSpaceObject_by_DOI()
+            throws SQLException, AuthorizeException, IOException,
             IllegalArgumentException, IdentifierException
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
-        
+
         DSpaceObject dso = DOIIdentifierProvider.getObjectByDOI(context, doi);
-        
+
         assertNotNull("Failed to load DSpaceObject by DOI.", dso);
         if (item.getType() != dso.getType() || item.getID() != dso.getID())
         {
@@ -413,15 +413,15 @@ public class DOIIdentifierProviderTest
     }
 
     @Test
-    public void testResolve_DOI() 
-            throws SQLException, AuthorizeException, IOException, 
+    public void testResolve_DOI()
+            throws SQLException, AuthorizeException, IOException,
             IllegalArgumentException, IdentifierException
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, false);
-        
+
         DSpaceObject dso = provider.resolve(context, doi);
-        
+
         assertNotNull("Failed to resolve DOI.", dso);
         if (item.getType() != dso.getType() || item.getID() != dso.getID())
         {
@@ -441,12 +441,12 @@ public class DOIIdentifierProviderTest
         Item item = newItem(context);
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
-        
+
         // remove one of it
         provider.removeDOIFromObject(context, item, doi1);
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -466,12 +466,12 @@ public class DOIIdentifierProviderTest
         }
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
-        
+
         // remove the otherone as well.
         provider.removeDOIFromObject(context, item, doi2);
-        
+
         // check it
-        metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -492,7 +492,7 @@ public class DOIIdentifierProviderTest
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertFalse("Cannot remove DOI from item metadata.", foundDOI2);
     }
-    
+
     @Test
     public void testMintDOI() throws SQLException, AuthorizeException, IOException
     {
@@ -508,10 +508,10 @@ public class DOIIdentifierProviderTest
             e.printStackTrace();
             fail("Got an IdentifierException: " + e.getMessage());
         }
-        
+
         assertNotNull("Minted DOI is null!", doi);
         assertFalse("Minted DOI is empty!", doi.isEmpty());
-        
+
         try
         {
             DOI.formatIdentifier(doi);
@@ -522,14 +522,14 @@ public class DOIIdentifierProviderTest
             fail("Minted an unrecognizable DOI: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void testMint_returns_existing_DOI()
             throws SQLException, AuthorizeException, IOException, IdentifierException
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, null, true);
-        
+
         String retrievedDOI = provider.mint(context, item);
 
         assertNotNull("Minted DOI is null?!", retrievedDOI);
@@ -543,17 +543,17 @@ public class DOIIdentifierProviderTest
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, null, true);
-        
+
         provider.reserve(context, item, doi);
-        
+
         TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
-        
+
         assertTrue("Reservation of DOI did not set the corret DOI status.",
                 DOIIdentifierProvider.TO_BE_RESERVERED.intValue() == doiRow.getIntColumn("status"));
     }
-    
+
     @Test
     public void testRegister_unreserved_DOI()
             throws SQLException, SQLException, AuthorizeException, IOException,
@@ -561,13 +561,13 @@ public class DOIIdentifierProviderTest
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, null, true);
-        
+
         provider.register(context, item, doi);
-        
+
         TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
-        
+
         assertTrue("Registration of DOI did not set the corret DOI status.",
                 DOIIdentifierProvider.TO_BE_REGISTERED.intValue() == doiRow.getIntColumn("status"));
     }
@@ -579,39 +579,39 @@ public class DOIIdentifierProviderTest
     {
         Item item = newItem(context);
         String doi = this.createDOI(item, DOIIdentifierProvider.IS_RESERVED, true);
-        
+
         provider.register(context, item, doi);
-        
+
         TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
-        
+
         assertTrue("Registration of DOI did not set the corret DOI status.",
                 DOIIdentifierProvider.TO_BE_REGISTERED.intValue() == doiRow.getIntColumn("status"));
     }
-    
+
     @Test
     public void testCreate_and_Register_DOI()
             throws SQLException, SQLException, AuthorizeException, IOException,
             IdentifierException
     {
         Item item = newItem(context);
-        
+
         String doi = provider.register(context, item);
-        
+
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.
         String formated_doi = DOI.formatIdentifier(doi);
         assertTrue("DOI was not in the expected format!", doi.equals(formated_doi));
-        
+
         TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi.substring(DOI.SCHEME.length()));
         assertNotNull("Created DOI was not stored in database.", doiRow);
-        
+
         assertTrue("Registration of DOI did not set the corret DOI status.",
                 DOIIdentifierProvider.TO_BE_REGISTERED.intValue() == doiRow.getIntColumn("status"));
     }
-    
+
     @Test
     public void testDelete_specified_DOI()
             throws SQLException, AuthorizeException, IOException, IdentifierException
@@ -619,12 +619,12 @@ public class DOIIdentifierProviderTest
         Item item = newItem(context);
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
-        
+
         // remove one of it
         provider.delete(context, item, doi1);
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -643,7 +643,7 @@ public class DOIIdentifierProviderTest
         }
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
-        
+
         TableRow doiRow1 = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi1.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow1);
@@ -656,7 +656,7 @@ public class DOIIdentifierProviderTest
         assertTrue("While deleting a DOI the status of another changed.",
                 DOIIdentifierProvider.IS_REGISTERED.intValue() == doiRow2.getIntColumn("status"));
     }
-    
+
     @Test
     public void testDelete_all_DOIs()
             throws SQLException, AuthorizeException, IOException, IdentifierException
@@ -664,12 +664,12 @@ public class DOIIdentifierProviderTest
         Item item = newItem(context);
         String doi1 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
         String doi2 = this.createDOI(item, DOIIdentifierProvider.IS_REGISTERED, true);
-        
+
         // remove one of it
         provider.delete(context, item);
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA,
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
@@ -688,7 +688,7 @@ public class DOIIdentifierProviderTest
         }
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertFalse("Did not removed all DOIs from item metadata.", foundDOI2);
-        
+
         TableRow doiRow1 = DatabaseManager.findByUnique(context, "Doi", "doi",
                 doi1.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow1);
@@ -702,10 +702,10 @@ public class DOIIdentifierProviderTest
                 DOIIdentifierProvider.TO_BE_DELETED.intValue() == doiRow2.getIntColumn("status"));
     }
 
-    
+
     // test the following methods using the MockDOIConnector.
     // updateMetadataOnline
     // registerOnline
     // reserveOnline
-    
+
 }

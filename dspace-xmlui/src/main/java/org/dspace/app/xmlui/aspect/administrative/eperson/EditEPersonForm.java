@@ -183,7 +183,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String emailValue = eperson.getEmail();
 		String firstValue = eperson.getFirstName();
 		String lastValue  = eperson.getLastName();
-		String phoneValue = eperson.getMetadata("phone");
+		String phoneValue = eperson.getMetadataSingleValue("phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
 		java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();

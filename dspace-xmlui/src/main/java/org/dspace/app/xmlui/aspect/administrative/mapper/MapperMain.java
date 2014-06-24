@@ -79,7 +79,7 @@ public class MapperMain extends AbstractDSpaceTransformer {
 		Division div = body.addInteractiveDivision("manage-mapper",contextPath + "/admin/mapper", Division.METHOD_GET,"primary administrative mapper");
 		div.setHead(T_head1);
 		
-		div.addPara(T_para1.parameterize(collection.getMetadata("name")));
+		div.addPara(T_para1.parameterize(collection.getName()));
 		
 		div.addPara(T_para2);
 		

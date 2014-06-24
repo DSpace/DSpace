@@ -81,7 +81,7 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         
         for (Collection collection : collections)
         {
-            String name = collection.getMetadata("name");
+            String name = collection.getName();
             if (name.length() > 50)
             {
                 name = name.substring(0, 47) + "...";

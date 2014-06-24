@@ -28,6 +28,7 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.jdom.Element;
@@ -398,7 +399,7 @@ public class StructBuilder
             }
             
             // default the short description to be an empty string
-            community.setMetadata("short_description", " ");
+            community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, Community.SHORT_DESCRIPTION, null, " ");
             
             // now update the metadata
             Node tn = communities.item(i);
@@ -407,7 +408,7 @@ public class StructBuilder
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    community.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
+                    community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
             
@@ -433,34 +434,34 @@ public class StructBuilder
             element.setAttribute("identifier", community.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(community.getMetadata("name"));
+            nameElement.setText(community.getName());
             element.addContent(nameElement);
             
-            if (community.getMetadata("short_description") != null)
+            if (community.getMetadataSingleValue(Community.SHORT_DESCRIPTION) != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(community.getMetadata("short_description"));
+                descriptionElement.setText(community.getMetadataSingleValue(Community.SHORT_DESCRIPTION));
                 element.addContent(descriptionElement);
             }
             
-            if (community.getMetadata("introductory_text") != null)
+            if (community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT) != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(community.getMetadata("introductory_text"));
+                introElement.setText(community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT));
                 element.addContent(introElement);
             }
             
-            if (community.getMetadata("copyright_text") != null)
+            if (community.getMetadataSingleValue(Community.COPYRIGHT_TEXT) != null)
             {
-                Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(community.getMetadata("copyright_text"));
+                Element copyrightElement = new Element(Community.COPYRIGHT_TEXT);
+                copyrightElement.setText(community.getMetadataSingleValue(Community.COPYRIGHT_TEXT));
                 element.addContent(copyrightElement);
             }
             
-            if (community.getMetadata("side_bar_text") != null)
+            if (community.getMetadataSingleValue(Community.SIDEBAR_TEXT) != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(community.getMetadata("side_bar_text"));
+                sidebarElement.setText(community.getMetadataSingleValue(Community.SIDEBAR_TEXT));
                 element.addContent(sidebarElement);
             }
             
@@ -502,15 +503,16 @@ public class StructBuilder
     	throws TransformerException, SQLException, AuthorizeException, IOException, Exception
     {
         Element[] elements = new Element[collections.getLength()];
-        
+
         for (int i = 0; i < collections.getLength(); i++)
         {
             Element element = new Element("collection");
             Collection collection = parent.createCollection();
-            
+
             // default the short description to the empty string
-            collection.setMetadata("short_description", " ");
-            
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA,
+                    Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, " ");
+
             // import the rest of the metadata
             Node tn = collections.item(i);
             for (Map.Entry<String, String> entry : collectionMap.entrySet())
@@ -518,7 +520,8 @@ public class StructBuilder
                 NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    collection.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
+                    collection.addMetadata(MetadataSchema.DSPACE_SCHEMA,
+                            Collection.ELEMENT, entry.getValue(), null, getStringValue(nl.item(0)));
                 }
             }
             
@@ -527,48 +530,48 @@ public class StructBuilder
             element.setAttribute("identifier", collection.getHandle());
             
             Element nameElement = new Element("name");
-            nameElement.setText(collection.getMetadata("name"));
+            nameElement.setText(collection.getName());
             element.addContent(nameElement);
             
-            if (collection.getMetadata("short_description") != null)
+            if (collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION) != null)
             {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(collection.getMetadata("short_description"));
+                descriptionElement.setText(collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
                 element.addContent(descriptionElement);
             }
             
-            if (collection.getMetadata("introductory_text") != null)
+            if (collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT) != null)
             {
                 Element introElement = new Element("intro");
-                introElement.setText(collection.getMetadata("introductory_text"));
+                introElement.setText(collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
                 element.addContent(introElement);
             }
             
-            if (collection.getMetadata("copyright_text") != null)
+            if (collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT) != null)
             {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(collection.getMetadata("copyright_text"));
+                copyrightElement.setText(collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
                 element.addContent(copyrightElement);
             }
             
-            if (collection.getMetadata("side_bar_text") != null)
+            if (collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT) != null)
             {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(collection.getMetadata("side_bar_text"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadata("license") != null)
+            if (collection.getMetadataSingleValue(Collection.LICENSE_TEXT) != null)
             {
                 Element sidebarElement = new Element("license");
-                sidebarElement.setText(collection.getMetadata("license"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.LICENSE_TEXT));
                 element.addContent(sidebarElement);
             }
             
-            if (collection.getMetadata("provenance_description") != null)
+            if (collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT) != null)
             {
                 Element sidebarElement = new Element("provenance");
-                sidebarElement.setText(collection.getMetadata("provenance_description"));
+                sidebarElement.setText(collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT));
                 element.addContent(sidebarElement);
             }
             

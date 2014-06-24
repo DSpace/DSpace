@@ -56,7 +56,7 @@ public class CommunityListTag extends TagSupport
             for (int i = 0; i < communities.length; i++)
             {
                 // name
-                String name = communities[i].getMetadata("name");
+                String name = communities[i].getName();
 
                 // first and only column is 'name'
                 out.print("<tr><td headers=\"t5\" class=\"" + row + "RowEvenCol\">");

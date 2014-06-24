@@ -122,13 +122,14 @@ public class PasswordAuthentication
      * Add authenticated users to the group defined in authentication-password.cfg by
      * the login.specialgroup key.
      */
+    @Override
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
         // Prevents anonymous users from being added to this group, and the second check
 		// ensures they are password users
 		try
 		{
-			if (!context.getCurrentUser().getMetadata("password").equals(""))
+			if (!context.getCurrentUser().getMetadataSingleValue("password").equals(""))
 			{
 				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))

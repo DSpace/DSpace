@@ -451,15 +451,15 @@ public class BrowseListTag extends TagSupport
                     DCValue[] metadataArray;
                     if (qualifier.equals("*"))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, Item.ANY, Item.ANY);
+                        metadataArray = items[i].getMetadataValues(schema, element, Item.ANY, Item.ANY);
                     }
                     else if (qualifier.equals(""))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, null, Item.ANY);
+                        metadataArray = items[i].getMetadataValues(schema, element, null, Item.ANY);
                     }
                     else
                     {
-                        metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
+                        metadataArray = items[i].getMetadataValues(schema, element, qualifier, Item.ANY);
                     }
 
                     // save on a null check which would make the code untidy

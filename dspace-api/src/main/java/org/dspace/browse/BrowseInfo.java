@@ -888,7 +888,7 @@ public class BrowseInfo
     				sb.append("{{ NULL METADATA }}");
     				break;
     			}
-				DCValue[] values = bi.getMetadata(md[0], md[1], md[2], Item.ANY);
+				DCValue[] values = bi.getMetadataValues(md[0], md[1], md[2], Item.ANY);
 				StringBuffer value = new StringBuffer();
 				if (values != null)
 				{

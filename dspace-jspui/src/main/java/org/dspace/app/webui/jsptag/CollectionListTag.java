@@ -56,7 +56,7 @@ public class CollectionListTag extends TagSupport
             for (int i = 0; i < collections.length; i++)
             {
                 // name
-                String name = collections[i].getMetadata("name");
+                String name = collections[i].getName();
 
                 // first and only column is 'name'
                 out.print("<tr><td headers=\"t4\" class=\"" + row + "RowEvenCol\">");

@@ -197,7 +197,7 @@ public class FlowEPersonUtils {
             if (originalLastName == null || !originalLastName.equals(last)) {
         		personModified.setLastName(last);
         	}
-        	String originalPhone = personModified.getMetadata("phone");
+        	String originalPhone = personModified.getMetadataSingleValue("phone");
             if (originalPhone == null || !originalPhone.equals(phone)) {
         		personModified.setMetadata("phone", phone);
         	}

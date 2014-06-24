@@ -239,11 +239,11 @@ public class DSpaceValidity implements SourceValidity
 
             validityKey.append("Community:");
             validityKey.append(community.getHandle());
-            validityKey.append(community.getMetadata("introductory_text"));
-            validityKey.append(community.getMetadata("short_description"));
-            validityKey.append(community.getMetadata("side_bar_text"));
-            validityKey.append(community.getMetadata("copyright_text"));
-            validityKey.append(community.getMetadata("name"));
+            validityKey.append(community.getMetadataSingleValue(Community.INTRODUCTORY_TEXT));
+            validityKey.append(community.getMetadataSingleValue(Community.SHORT_DESCRIPTION));
+            validityKey.append(community.getMetadataSingleValue(Community.SIDEBAR_TEXT));
+            validityKey.append(community.getMetadataSingleValue(Community.COPYRIGHT_TEXT));
+            validityKey.append(community.getName());
             
             // Add the communities logo
             this.add(community.getLogo());
@@ -255,13 +255,13 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Collection:");
             validityKey.append(collection.getHandle());
-            validityKey.append(collection.getMetadata("introductory_text"));
-            validityKey.append(collection.getMetadata("short_description"));
-            validityKey.append(collection.getMetadata("side_bar_text"));
-            validityKey.append(collection.getMetadata("provenance_description"));
-            validityKey.append(collection.getMetadata("copyright_text"));
-            validityKey.append(collection.getMetadata("license"));
-            validityKey.append(collection.getMetadata("name")); 
+            validityKey.append(collection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
+            validityKey.append(collection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.PROVENANCE_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
+            validityKey.append(collection.getMetadataSingleValue(Collection.LICENSE_TEXT));
+            validityKey.append(collection.getName());
             
             // Add the logo also;
             this.add(collection.getLogo());
@@ -298,7 +298,7 @@ public class DSpaceValidity implements SourceValidity
         	
         	validityKey.append("BrowseItem:");
         	validityKey.append(browseItem.getHandle());
-        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        	DCValue[] dcvs = browseItem.getMetadataValues(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (DCValue dcv : dcvs)
             {
                 validityKey.append(dcv.schema).append(".");

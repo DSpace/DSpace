@@ -22,6 +22,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.jdom.Element;
 
@@ -57,7 +59,7 @@ class DAVCommunity extends DAVDSpaceObject
 
     /** The all props. */
     private static List<Element> allProps = new ArrayList<Element>(commonProps);
-    
+
     static
     {
         allProps.add(logoProperty);
@@ -70,7 +72,7 @@ class DAVCommunity extends DAVDSpaceObject
 
     /**
      * Instantiates a new DAV community.
-     * 
+     *
      * @param context the context
      * @param request the request
      * @param response the response
@@ -157,19 +159,19 @@ class DAVCommunity extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(property, short_descriptionProperty))
         {
-            value = getObjectMetadata("short_description");
+            value = getObjectMetadata(Community.SHORT_DESCRIPTION);
         }
         else if (elementsEqualIsh(property, introductory_textProperty))
         {
-            value = getObjectMetadata("introductory_text");
+            value = getObjectMetadata(Community.INTRODUCTORY_TEXT);
         }
         else if (elementsEqualIsh(property, side_bar_textProperty))
         {
-            value = getObjectMetadata("side_bar_text");
+            value = getObjectMetadata(Community.SIDEBAR_TEXT);
         }
         else if (elementsEqualIsh(property, copyright_textProperty))
         {
-            value = getObjectMetadata("copyright_text");
+            value = getObjectMetadata(Community.COPYRIGHT_TEXT);
         }
         else
         {
@@ -190,16 +192,16 @@ class DAVCommunity extends DAVDSpaceObject
     // syntactic sugar around getting community metadata values:
     /**
      * Gets the object metadata.
-     * 
+     *
      * @param mdname the mdname
-     * 
+     *
      * @return the object metadata
      */
     private String getObjectMetadata(String mdname)
     {
         try
         {
-            return this.community.getMetadata(mdname);
+            return this.community.getMetadataSingleValue(mdname);
         }
         catch (IllegalArgumentException e)
         {
@@ -224,11 +226,12 @@ class DAVCommunity extends DAVDSpaceObject
                 || elementsEqualIsh(prop, side_bar_textProperty)
                 || elementsEqualIsh(prop, copyright_textProperty))
         {
-            this.community.setMetadata(prop.getName(), newValue);
+            this.community.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, prop.getName(), DSpaceObject.ANY);
+            this.community.addMetadata(MetadataSchema.DSPACE_SCHEMA, Community.ELEMENT, prop.getName(), null, newValue);
         }
         else if (elementsEqualIsh(prop, displaynameProperty))
         {
-            this.community.setMetadata("name", newValue);
+            this.community.setName(newValue);
         }
         else if (elementsEqualIsh(prop, logoProperty))
         {
@@ -330,7 +333,7 @@ class DAVCommunity extends DAVDSpaceObject
             SQLException, AuthorizeException, IOException
     {
         Collection newColl = this.community.createCollection();
-        newColl.setMetadata("name", name);
+        newColl.setName(name);
         newColl.update();
         return HttpServletResponse.SC_OK;
     }

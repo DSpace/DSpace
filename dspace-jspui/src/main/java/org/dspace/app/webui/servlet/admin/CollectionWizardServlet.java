@@ -34,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -46,7 +47,7 @@ import org.dspace.eperson.Group;
 
 /**
  * Collection creation wizard UI
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -105,11 +106,11 @@ public class CollectionWizardServlet extends DSpaceServlet
     {
         /*
          * For POST, we expect from the form:
-         * 
+         *
          * community_id DB ID if it was a 'create a new collection' button press
-         * 
+         *
          * OR
-         * 
+         *
          * collection_id DB ID of collection we're dealing with stage Stage
          * we're at (from constants above)
          */
@@ -152,43 +153,43 @@ public class CollectionWizardServlet extends DSpaceServlet
                 // set a variable to show all buttons
                 request.setAttribute("sysadmin_button", Boolean.TRUE);
             }
-            
-            try 
+
+            try
             {
-                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);                
+                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);
                 request.setAttribute("admin_create_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
                 request.setAttribute("admin_create_button", Boolean.FALSE);
             }
-            
-            try 
+
+            try
             {
-                AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);                
+                AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);
                 request.setAttribute("submitters_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
                 request.setAttribute("submitters_button", Boolean.FALSE);
             }
-            
-            try 
+
+            try
             {
-                AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);                
+                AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);
                 request.setAttribute("workflows_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
                 request.setAttribute("workflows_button", Boolean.FALSE);
             }
-            
-            try 
+
+            try
             {
-                AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);                
+                AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);
                 request.setAttribute("template_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
                 request.setAttribute("template_button", Boolean.FALSE);
             }
-            
+
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
             context.complete();
@@ -245,7 +246,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Process input from initial questions page
-     * 
+     *
      * @param context
      *            DSpace context
      * @param request
@@ -303,7 +304,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         }
 
         // Need to set a name so that the indexer won't throw an exception
-        collection.setMetadata("name", "");
+        collection.setName("");
         collection.update();
 
         // Now display "basic info" screen
@@ -314,7 +315,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Process input from one of the permissions pages
-     * 
+     *
      * @param context
      *            DSpace context
      * @param request
@@ -406,7 +407,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         // Add people and groups from the form to the group
         int[] epersonIds = UIUtil.getIntParameters(request, "eperson_id");
         int[] groupIds = UIUtil.getIntParameters(request, "group_ids");
-        
+
         if (epersonIds != null)
         {
             for (int i = 0; i < epersonIds.length; i++)
@@ -419,20 +420,20 @@ public class CollectionWizardServlet extends DSpaceServlet
                 }
             }
         }
-        
+
         if (groupIds != null)
         {
             for (int i = 0; i < groupIds.length; i++)
             {
                 Group group = Group.find(context, groupIds[i]);
-            
+
                 if (group != null)
                 {
                     g.addMember(group);
                 }
             }
         }
-        
+
 
         // Update group
         g.update();
@@ -444,7 +445,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * process input from basic info page
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -471,12 +472,17 @@ public class CollectionWizardServlet extends DSpaceServlet
             }
 
             // Get metadata
-            collection.setMetadata("name", wrapper.getParameter("name"));
-            collection.setMetadata("short_description", wrapper.getParameter("short_description"));
-            collection.setMetadata("introductory_text", wrapper.getParameter("introductory_text"));
-            collection.setMetadata("copyright_text", wrapper.getParameter("copyright_text"));
-            collection.setMetadata("side_bar_text", wrapper.getParameter("side_bar_text"));
-            collection.setMetadata("provenance_description", wrapper.getParameter("provenance_description"));
+            collection.setName(wrapper.getParameter("name"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SHORT_DESCRIPTION, null, wrapper.getParameter("short_description"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.INTRODUCTORY_TEXT, null, wrapper.getParameter("introductory_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.COPYRIGHT_TEXT, null, wrapper.getParameter("copyright_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.SIDEBAR_TEXT, null, wrapper.getParameter("side_bar_text"));
+            collection.clearMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, DSpaceObject.ANY);
+            collection.addMetadata(MetadataSchema.DSPACE_SCHEMA, Collection.ELEMENT, Collection.PROVENANCE_TEXT, null, wrapper.getParameter("provenance_description"));
             // Need to be more careful about license -- make sure it's null if
             // nothing was entered
             String license = wrapper.getParameter("license");
@@ -539,7 +545,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Process input from default item page
-     * 
+     *
      * @param context
      *            DSpace context
      * @param request
@@ -580,7 +586,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
     /**
      * Work out which page to show next, and show it
-     * 
+     *
      * @param context
      * @param request
      * @param response

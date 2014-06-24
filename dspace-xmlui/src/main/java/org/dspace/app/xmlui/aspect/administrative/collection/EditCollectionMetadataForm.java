@@ -90,14 +90,14 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 
             //Check that all HTML input fields contain valid XHTML
-            String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
-	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("introductory_text"));
-	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("copyright_text"));
-	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("side_bar_text"));
+            String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
+	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
+	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
+	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-metadata-edit",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getMetadata("name")));
+	    main.setHead(T_main_head.parameterize(thisCollection.getName()));
    
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
@@ -113,12 +113,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
-	    name.setValue(thisCollection.getMetadata("name"));
+	    name.setValue(thisCollection.getName());
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);
 	    Text short_description = metadataList.addItem().addText("short_description");
-	    short_description.setValue(thisCollection.getMetadata("short_description"));
+	    short_description.setValue(thisCollection.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
 	    short_description.setSize(40);
 	    if (short_description_error != null)
         {
@@ -128,7 +128,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
-	    introductory_text.setValue(thisCollection.getMetadata("introductory_text"));
+	    introductory_text.setValue(thisCollection.getMetadataSingleValue(Collection.INTRODUCTORY_TEXT));
 	    introductory_text.setSize(6, 40);
 	    if (introductory_text_error != null)
         {
@@ -138,7 +138,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
-	    copyright_text.setValue(thisCollection.getMetadata("copyright_text"));
+	    copyright_text.setValue(thisCollection.getMetadataSingleValue(Collection.COPYRIGHT_TEXT));
 	    copyright_text.setSize(6, 40);
 	    if (copyright_text_error != null)
         {
@@ -148,7 +148,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
-	    side_bar_text.setValue(thisCollection.getMetadata("side_bar_text"));
+	    side_bar_text.setValue(thisCollection.getMetadataSingleValue(Collection.SIDEBAR_TEXT));
 	    side_bar_text.setSize(6, 40);
 	    if (side_bar_text_error != null)
         {
@@ -158,13 +158,13 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    // license text
 	    metadataList.addLabel(T_label_license);
 	    TextArea license = metadataList.addItem().addTextArea("license");
-	    license.setValue(thisCollection.getMetadata("license"));
+	    license.setValue(thisCollection.getMetadataSingleValue(Collection.LICENSE_TEXT));
 	    license.setSize(6, 40);
 	    
 	    // provenance description
 	    metadataList.addLabel(T_label_provenance_description);
 	    TextArea provenance_description = metadataList.addItem().addTextArea("provenance_description");
-	    provenance_description.setValue(thisCollection.getMetadata("provenance_description"));
+	    provenance_description.setValue(thisCollection.getMetadataSingleValue(Collection.PROVENANCE_TEXT));
 	    provenance_description.setSize(6, 40);
 	    	    
 	    // the row to upload a new logo 

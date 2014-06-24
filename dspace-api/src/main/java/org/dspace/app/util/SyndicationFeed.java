@@ -176,8 +176,8 @@ public class SyndicationFeed
             if (dso.getType() == Constants.COLLECTION)
             {
                 Collection col = (Collection)dso;
-                defaultTitle = col.getMetadata("name");
-                feed.setDescription(col.getMetadata("short_description"));
+                defaultTitle = col.getName();
+                feed.setDescription(col.getMetadataSingleValue(Collection.SHORT_DESCRIPTION));
                 logo = col.getLogo();
                 String cols = ConfigurationManager.getProperty("webui.feed.podcast.collections");
                 if(cols != null && cols.length() > 1 && cols.contains(col.getHandle()) ) {
@@ -187,8 +187,8 @@ public class SyndicationFeed
             else if (dso.getType() == Constants.COMMUNITY)
             {
                 Community comm = (Community)dso;
-                defaultTitle = comm.getMetadata("name");
-                feed.setDescription(comm.getMetadata("short_description"));
+                defaultTitle = comm.getName();
+                feed.setDescription(comm.getMetadataSingleValue(Community.SHORT_DESCRIPTION));
                 logo = comm.getLogo();
                 String comms = ConfigurationManager.getProperty("webui.feed.podcast.communities");
                 if(comms != null && comms.length() > 1 && comms.contains(comm.getHandle()) ){

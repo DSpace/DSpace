@@ -174,7 +174,7 @@ public class Submissions extends AbstractDSpaceTransformer
                     WorkflowActionConfig action = step.getActionConfig(actionID);
                     String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+stepID+"&actionID="+actionID;
                     DCValue[] titles = item.getItem().getDC("title", null, Item.ANY);
-                    String collectionName = item.getCollection().getMetadata("name");
+                    String collectionName = item.getCollection().getName();
                     EPerson submitter = item.getSubmitter();
                     String submitterName = submitter.getFullName();
                     String submitterEmail = submitter.getEmail();
@@ -267,7 +267,7 @@ public class Submissions extends AbstractDSpaceTransformer
                     Workflow wf = WorkflowFactory.getWorkflow(item.getCollection());
                     String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+stepID+"&actionID="+actionID;
                     DCValue[] titles = item.getItem().getDC("title", null, Item.ANY);
-                    String collectionName = item.getCollection().getMetadata("name");
+                    String collectionName = item.getCollection().getName();
                     EPerson submitter = item.getSubmitter();
                     String submitterName = submitter.getFullName();
                     String submitterEmail = submitter.getEmail();
@@ -370,7 +370,7 @@ public class Submissions extends AbstractDSpaceTransformer
             for (XmlWorkflowItem workflowItem : inprogressItems)
             {
                 DCValue[] titles = workflowItem.getItem().getDC("title", null, Item.ANY);
-                String collectionName = workflowItem.getCollection().getMetadata("name");
+                String collectionName = workflowItem.getCollection().getName();
                 java.util.List<PoolTask> pooltasks = PoolTask.find(context,workflowItem);
                 java.util.List<ClaimedTask> claimedtasks = ClaimedTask.find(context, workflowItem);
 

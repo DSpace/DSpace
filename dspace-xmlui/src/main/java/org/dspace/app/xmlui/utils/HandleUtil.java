@@ -237,7 +237,7 @@ public class HandleUtil
             if (pop instanceof Collection)
             {
             	Collection collection = (Collection) pop;
-            	String name = collection.getMetadata("name");
+            	String name = collection.getName();
             	if (name == null || name.length() == 0)
                 {
                     pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
@@ -250,7 +250,7 @@ public class HandleUtil
             else if (pop instanceof Community)
             {
             	Community community = (Community) pop;
-            	String name = community.getMetadata("name");
+            	String name = community.getName();
             	if (name == null || name.length() == 0)
                 {
                     pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
