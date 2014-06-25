@@ -394,7 +394,7 @@ public class Harvest
 
         for (Group authorizedGroup : authorizedGroups)
         {
-            if (authorizedGroup.getID() == 0)
+            if (authorizedGroup.getID() == Group.ANONYMOUS_ID)
             {
                 return true;
             }
