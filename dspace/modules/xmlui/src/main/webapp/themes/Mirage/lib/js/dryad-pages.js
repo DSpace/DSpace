@@ -1,3 +1,77 @@
+
+jQuery(document).ready(function(){
+    // update the part of the form associated with the input button that was clicked 
+    // name: string, @name attribute value for clicked button input
+    // data: string, HTML reponse from server (entire page)
+    var update_form_part = function(name,data) {
+        // css selector strings
+        var input = 'input[name="' + name + '"]'
+          , form  = '.ds-form-item';
+        jQuery(input).closest(form).replaceWith(
+            jQuery(data).find(input).closest(form)
+        );
+        submit_describe_publication_binders();
+    };
+    // need to save off the name of the submit button that was clicked, since
+    // there is no way to retrieve that information on the form's submit event
+    var clicked;
+    var watch_clicked = function(e) {
+        clicked = jQuery(e.target).attr('name'); 
+    };
+    // function to handle the submit event for the form
+    var submit_describe_publication_onsubmit = function(e) {
+        var input_name = clicked            // localize to this scope for the ajax call
+          , $form = jQuery(e.target)        // the entire describe-publication form
+          , form_data = $form.serialize()   // the form's data
+          , success = false                 // unsuccessful ajax call until we receive a 200
+          , ajax_data;                      // ajax data, for passing to the updater function
+        if (input_name !== undefined) {
+            if (form_data !== '') {
+                try {
+                    jQuery.ajax({
+                          url     : $form.attr('action')
+                        , data    : form_data 
+                        , method  : "POST"
+                        , success : function(data,textStatus,jqXHR) {
+                            if (jqXHR.status === 200) {
+                                success   = true;
+                                ajax_data = data;
+                            } else {
+                                console.log('Error: Form "submit-describe-publication" returned non-success status: ' + jsXHR.status);
+                            }
+                        }
+                        , error : function(jqXHR,textStatus,errorThrown) {
+                            console.log(textStatus);
+                        }
+                        , complete : function(jqXHR,textStatus) {
+                            // update the page using data associated with the input the user selected
+                            if (success === true) {
+                                update_form_part(input_name,ajax_data);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.log('Error: Form "submit-describe-publication" encountered AJAX error: ' + e.toString());
+                }
+            } else {
+                console.log('Error: Form "submit-describe-publication" submitted with empty data.');
+            }
+        } else {
+            console.log('Error: Form "submit-describe-publication" submitted with unhandled input.');
+        }
+        // re-init button-clicked signal and prevent default form-submit action (which triggers page reload)
+        clicked = undefined;
+        e.preventDefault(); 
+        return false;
+    };
+    // these event handlers need to be registered any time the form is submitted, since the DOM is modified 
+    var submit_describe_publication_binders = function() {
+        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication input.ds-button-field').bind('click', watch_clicked);
+        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication').bind('submit', submit_describe_publication_onsubmit);
+    };
+    submit_describe_publication_binders();
+});
+
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
     var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
