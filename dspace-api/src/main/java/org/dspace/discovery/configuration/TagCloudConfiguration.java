@@ -5,13 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.webui.tagcloud;
+package org.dspace.discovery.configuration;
 
 /**
  * @author kstamatis
  *
  */
-public class TagCloudParameters {
+public class TagCloudConfiguration {
 
 	String cloudCase;
 	String width;
@@ -29,7 +29,7 @@ public class TagCloudParameters {
 	String marginRight;
 	
 	String cuttingLevel;
-	String totalTags;
+	int totalTags;
 	boolean randomColors;
 	
 	String ordering;
@@ -42,7 +42,7 @@ public class TagCloudParameters {
 	/**
 	 * 
 	 */
-	public TagCloudParameters() {
+	public TagCloudConfiguration() {
 		//Default values;
 		
 		width = "100%";
@@ -63,7 +63,7 @@ public class TagCloudParameters {
 		marginRight = "5";
 		
 		cuttingLevel = "0";
-		totalTags = "all";
+		totalTags = -1;
 		randomColors = true;
 		
 		ordering = "Tag.GreekNameComparatorAsc";
@@ -245,14 +245,14 @@ public class TagCloudParameters {
 	/**
 	 * @return the totalTags
 	 */
-	public String getTotalTags() {
+	public int getTotalTags() {
 		return totalTags;
 	}
 
 	/**
 	 * @param totalTags the totalTags to set
 	 */
-	public void setTotalTags(String totalTags) {
+	public void setTotalTags(int totalTags) {
 		this.totalTags = totalTags;
 	}
 
