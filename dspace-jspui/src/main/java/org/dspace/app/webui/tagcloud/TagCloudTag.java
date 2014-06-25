@@ -8,12 +8,7 @@
 package org.dspace.app.webui.tagcloud;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.text.Collator;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +18,10 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
+import org.dspace.discovery.configuration.TagCloudConfiguration;
 import org.mcavallo.opencloud.Cloud;
 import org.mcavallo.opencloud.Tag;
 import org.mcavallo.opencloud.Cloud.Case;
-import org.mcavallo.opencloud.formatters.HTMLFormatter;
 
 /**
  * @author kstamatis
@@ -40,7 +31,7 @@ public class TagCloudTag extends SimpleTagSupport{
 
 	private static Logger log = Logger.getLogger(TagCloudTag.class);
 
-	TagCloudParameters parameters;
+	TagCloudConfiguration parameters;
 	Map<String, Integer> data;
 	String index;
 	String scope;
@@ -58,7 +49,7 @@ public class TagCloudTag extends SimpleTagSupport{
 		JspWriter out = pageContext.getOut(); 
 
 		if (parameters == null)
-			parameters = new TagCloudParameters();
+			parameters = new TagCloudConfiguration();
 
 		try {
 			Cloud cloud = new Cloud();  // create cloud 
@@ -72,12 +63,12 @@ public class TagCloudTag extends SimpleTagSupport{
 				cloud.setTagCase(Case.PRESERVE_CASE);
 			else if (parameters.getCloudCase().equals("Case.CASE_SENSITIVE"))
 				cloud.setTagCase(Case.CASE_SENSITIVE);
-			cloud.setMaxWeight(Double.parseDouble(parameters.fontTo));   // max font size
-			cloud.setMinWeight(Double.parseDouble(parameters.fontFrom));
-			if (parameters.getTotalTags().equals("all"))
-				cloud.setMaxTagsToDisplay(10000);
+			cloud.setMaxWeight(Double.parseDouble(parameters.getFontTo()));   // max font size
+			cloud.setMinWeight(Double.parseDouble(parameters.getFontFrom()));
+			if (parameters.getTotalTags()==-1)
+				cloud.setMaxTagsToDisplay(1000000);
 			else
-				cloud.setMaxTagsToDisplay(Integer.parseInt(parameters.getTotalTags()));
+				cloud.setMaxTagsToDisplay(parameters.getTotalTags());
 
 
 			//cloud.setNormThreshold(0.4);
@@ -86,28 +77,28 @@ public class TagCloudTag extends SimpleTagSupport{
 			for (String subject : data.keySet()){
 				if (data.get(subject).intValue() > Integer.parseInt(parameters.getCuttingLevel())){
 					for (int i=0; i<data.get(subject).intValue(); i++){
-						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?"/handle/"+scope+"/":"")+"/simple-search?filterquery="+subject+"&filtername="+index+"&filtertype=equals");   // creates a tag
+						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+"/simple-search?filterquery="+subject+"&filtername="+index+"&filtertype=equals");   // creates a tag
 						//tag2.setScore(subjects.get(subject).doubleValue());
 						cloud.addTag(tag2); 
 					}
 				}
 			}
 
-			out.println("<div class=\"tagcloud\" style=\"width:"+parameters.width+";"+(parameters.shouldCenter?"text-align:center":"")+"\">");
+			out.println("<div class=\"tagcloud\" style=\"width:"+parameters.getWidth()+";"+(parameters.isShouldCenter()?"text-align:center":"")+"\">");
 			int counter = 0;
 
 			List<Tag> tagList = cloud.tags(new Tag.NameComparatorAsc());
-			if (parameters.ordering.equals("Tag.NameComparatorAsc"))
+			if (parameters.getOrdering().equals("Tag.NameComparatorAsc"))
 				tagList = cloud.tags(new Tag.NameComparatorAsc());
-			else if (parameters.ordering.equals("Tag.NameComparatorDesc"))
+			else if (parameters.getOrdering().equals("Tag.NameComparatorDesc"))
 				tagList = cloud.tags(new Tag.NameComparatorDesc());
 			//else if (parameters.ordering.equals("Tag.GreekNameComparatorAsc"))
 			//	tagList = cloud.tags(new GreekComparatorTagAsc());			
 			//else if (parameters.ordering.equals("Tag.GreekNameComparatorDesc"))
 			//	tagList = cloud.tags(new GreekComparatorTagDesc());
-			else if (parameters.ordering.equals("Tag.ScoreComparatorAsc"))
+			else if (parameters.getOrdering().equals("Tag.ScoreComparatorAsc"))
 				tagList = cloud.tags(new Tag.ScoreComparatorAsc());
-			else if (parameters.ordering.equals("Tag.ScoreComparatorDesc"))
+			else if (parameters.getOrdering().equals("Tag.ScoreComparatorDesc"))
 				tagList = cloud.tags(new Tag.ScoreComparatorDesc());
 
 			for (Tag tag : tagList) { 
@@ -152,11 +143,11 @@ public class TagCloudTag extends SimpleTagSupport{
 				}
 
 				String scoreSup = "";
-				if (parameters.displayScore){
+				if (parameters.isDisplayScore()){
 					scoreSup = "<span style=\"font-size:1em\"><sup>("+tag.getScoreInt()+")</sup></span>";
 				}
 				
-				out.println("<a class=\"tagcloud_"+counter+"\" href=\"" + tag.getLink().replace(" & ", " %26 ") +"\" style=\"font-size: "+ tag.getWeight() +"em;"+colorPart+";"+weightPart+"; margin-right:"+parameters.marginRight+"px\" onmouseout=\"this.style.color='#"+theColor+"'\" onmouseover=\"this.style.color='#0581a7'\">"+ tag.getName() + scoreSup +"</a>"); 
+				out.println("<a class=\"tagcloud_"+counter+"\" href=\"" + tag.getLink().replace(" & ", " %26 ") +"\" style=\"font-size: "+ tag.getWeight() +"em;"+colorPart+";"+weightPart+"; margin-right:"+parameters.getMarginRight()+"px\" onmouseout=\"this.style.color='#"+theColor+"'\" onmouseover=\"this.style.color='#0581a7'\">"+ tag.getName() + scoreSup +"</a>"); 
 
 
 				counter ++;
@@ -200,7 +191,7 @@ public class TagCloudTag extends SimpleTagSupport{
 	/**
 	 * @param parameters the parameters to set
 	 */
-	public void setParameters(TagCloudParameters parameters) {
+	public void setParameters(TagCloudConfiguration parameters) {
 		this.parameters = parameters;
 	}
 

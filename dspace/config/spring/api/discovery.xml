@@ -100,6 +100,11 @@
                 <ref bean="searchFilterIssued" />
             </list>
         </property>
+        <property name="tagCloudFacetConfiguration">
+            <list>
+                <ref bean="defaultTagCloudFacetConfiguration" />
+            </list>
+        </property>
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
@@ -203,6 +208,11 @@
                 <ref bean="searchFilterIssued" />
             </list>
         </property>
+        <property name="tagCloudFacetConfiguration">
+            <list>
+                <ref bean="homepageTagCloudFacetConfiguration" />
+            </list>
+        </property>
         <!--The search filters which can be used on the discovery search page (same as defaultConfiguration above)-->
         <property name="searchFilters">
             <list>
@@ -265,6 +275,24 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <!--TagCloud configuration beans-->
+    <bean id="homepageTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
+        <property name="tagCloudConfiguration" ref="tagCloudConfiguration"/>
+        <property name="tagCloudFacets">
+            <list>
+                <ref bean="searchFilterSubject" />
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="tagCloudConfiguration" class="org.dspace.discovery.configuration.TagCloudConfiguration">
+		<property name="displayScore" value="false"/>
+		<property name="shouldCenter" value="true"/>
+		<!--<property name="totalTags" value="-1"/>
+		<property name="colorLevel1" value="242424"/>
+		<property name="weightLevel3" value="bold"/>-->
+    </bean>
+    
     <!--Search filter configuration beans-->
     <bean id="searchFilterTitle" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
         <property name="indexFieldName" value="title"/>
@@ -295,6 +323,7 @@
             </list>
         </property>
         <property name="facetLimit" value="15"/>
+        <property name="tagCloudFacetLimit" value="-1"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
     </bean>

@@ -27,6 +27,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.discovery.configuration.TagCloudConfiguration;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.PluginException;
@@ -85,7 +86,7 @@ public class TagCloudProcessor implements CollectionHomeProcessor,
 	private void process(Context context, HttpServletRequest request,
             HttpServletResponse response, DSpaceObject scope)
     {
-        DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
+        DiscoverQuery queryArgs = DiscoverUtility.getTagCloudDiscoverQuery(context,
                 request, scope, true);
         queryArgs.setMaxResults(0);
         DiscoverResult qResults;
@@ -98,11 +99,15 @@ public class TagCloudProcessor implements CollectionHomeProcessor,
             DiscoveryConfiguration discoveryConfiguration = SearchUtils
                     .getDiscoveryConfiguration(scope);
             List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
-                    .getSidebarFacets();
+                    .getTagCloudFacetConfiguration().getTagCloudFacets();
             
             request.setAttribute("tagCloudFacetsConfig",
                     availableFacet != null ? availableFacet
                             : new ArrayList<DiscoverySearchFilterFacet>());
+            
+            TagCloudConfiguration tagCloudConfiguration = discoveryConfiguration.getTagCloudFacetConfiguration().getTagCloudConfiguration();
+            request.setAttribute("tagCloudConfig",tagCloudConfiguration);
+            		
             if (scope !=null)
             {
                 request.setAttribute("tagcloud.searchScope",
