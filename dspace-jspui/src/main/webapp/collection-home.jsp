@@ -41,13 +41,6 @@
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
-<%@ page import="org.dspace.discovery.configuration.TagCloudConfiguration"%>
-<%@ page import="java.util.HashMap"%>
-<%@ page import="java.util.Set"%>
-<%@ page import="java.util.Map"%>
-<%@ page import="java.util.List"%>
-<%@ page import="org.dspace.discovery.DiscoverResult.FacetResult"%>
 
 <%
     // Retrieve attributes
@@ -210,34 +203,7 @@
         </form>
 
 <div class="row">
-	<%
-		Map<String, List<FacetResult>> tcMapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("tagcloud.fresults");
-		List<DiscoverySearchFilterFacet> tcFacetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("tagCloudFacetsConfig");
-		TagCloudConfiguration tagCloudConfiguration = (TagCloudConfiguration) request.getAttribute("tagCloudConfig");
-		String tcSearchScope = (String) request.getAttribute("tagcloud.searchScope");
-		
-    	String scope = tcSearchScope;
-    	if (tcMapFacetes!=null) {
-    		for (DiscoverySearchFilterFacet facetConf : tcFacetsConf)
-    		{
-    			Map<String, Integer> data = new HashMap<String, Integer>();
-    			String index = facetConf.getIndexFieldName();
-    			
-        		List<FacetResult> facet = tcMapFacetes.get(index);
-        		if (facet!=null){
-        			for (FacetResult fvalue : facet)
-    		   		{ 
-        				data.put(fvalue.getDisplayedValue(), (int)fvalue.getCount());
-    				}
-        		}
-    %>
-    			<div>
-    				<dspace:tagcloud parameters='<%= tagCloudConfiguration %>' index='<%= index %>' scope='<%= scope %>' data='<%= data %>'/><br/><br/>
-    			</div>
-    <%		
-    		}
-    	}
-	%>
+	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
 </div>
 
 <% if (show_items)
