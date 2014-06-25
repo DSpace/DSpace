@@ -36,7 +36,8 @@
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
+<%@ page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
+<%@ page import="org.dspace.discovery.configuration.TagCloudConfiguration"%>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.Set"%>
 <%@ page import="java.util.Map"%>
@@ -215,29 +216,36 @@ if (communities != null && communities.length != 0)
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
 </div>
 
-<div>
+<div class="row">
 	<%
 		Map<String, List<FacetResult>> tcMapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("tagcloud.fresults");
 		List<DiscoverySearchFilterFacet> tcFacetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("tagCloudFacetsConfig");
+		TagCloudConfiguration tagCloudConfiguration = (TagCloudConfiguration) request.getAttribute("tagCloudConfig");
 		String tcSearchScope = (String) request.getAttribute("tagcloud.searchScope");
 		
-		String index = "subject";
     	String scope = tcSearchScope;
-    	
-    	Map<String, Integer> data = new HashMap<String, Integer>();
-    	
-    	for (DiscoverySearchFilterFacet facetConf : facetsConf)
-    	{
-    		String f = facetConf.getIndexFieldName();
-    		if (f.equals(index)){
-        		List<FacetResult> facet = mapFacetes.get(f);
-        		for (FacetResult fvalue : facet)
-    		    { 
-        			data.put(fvalue.getDisplayedValue(), (int)fvalue.getCount());
-    		    }
-        	}
+    	if (tcMapFacetes!=null) {
+    		for (DiscoverySearchFilterFacet facetConf : tcFacetsConf)
+    		{
+    			Map<String, Integer> data = new HashMap<String, Integer>();
+    			String index = facetConf.getIndexFieldName();
+    			
+        		List<FacetResult> facet = tcMapFacetes.get(index);
+        		if (facet!=null){
+        			for (FacetResult fvalue : facet)
+    		   		{ 
+        				data.put(fvalue.getDisplayedValue(), (int)fvalue.getCount());
+    				}
+        		}
+    %>
+    			<div>
+    				<dspace:tagcloud parameters='<%= tagCloudConfiguration %>' index='<%= index %>' scope='<%= scope %>' data='<%= data %>'/><br/><br/>
+    			</div>
+    <%		
+    		}
     	}
 	%>
-	<dspace:tagcloud index='<%= index %>' scope='<%= scope %>' data='<%= data %>'/><br/><br/>
+</div>
+	
 </div>
 </dspace:layout>
