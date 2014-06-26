@@ -1169,11 +1169,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	if (authority != null)
                             	{
                                 	String facetValue = preferedLabel != null?preferedLabel:value;
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:""), facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
+                                	doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+lang:"") + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
                             	}
                             	else
                             	{
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:"") , value.toLowerCase() + separator + value);
+                                	doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+lang:"") + "_filter", value.toLowerCase() + separator + value);
                             	}
                             }else
                                 if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
@@ -1248,7 +1248,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         	lang = meta.language;
                                         }
                                         
-                                        doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:""), indexValue.toLowerCase() + separator + indexValue);
+                                        doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+lang:"") + "_filter", indexValue.toLowerCase() + separator + indexValue);
                                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                                     }
                                 }
@@ -2145,9 +2145,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             if(removePostfix)
             {
-                return field.substring(0, field.lastIndexOf("_filter"));
+                return field.substring(0, field.lastIndexOf("_filter")).replace(facetFieldConfig.getLocale(), "");
             }else{
-                return field + "_filter" + facetFieldConfig.getLocale();
+                return field + facetFieldConfig.getLocale() + "_filter";
             }
         }else if(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
         {
