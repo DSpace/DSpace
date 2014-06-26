@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT;
 
 /**
  * Class contains facet query information
@@ -22,6 +23,7 @@ public class DiscoverFacetField {
     private String prefix;
     private String type;
     private DiscoveryConfigurationParameters.SORT sortOrder;
+    private String locale = "";
 
     public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder) {
         this.field = field;
@@ -54,7 +56,18 @@ public class DiscoverFacetField {
         this.field = field;
         this.offset = offset;
     }
-    public String getField() {
+    
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, int offset, String locale) {
+		super();
+		this.field = field;
+		this.limit = limit;
+		this.offset = offset;
+		this.type = type;
+		this.sortOrder = sortOrder;
+		this.locale = locale;
+	}
+
+	public String getField() {
         return field;
     }
 
@@ -83,4 +96,12 @@ public class DiscoverFacetField {
     {
         this.offset = offset;
     }
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
 }

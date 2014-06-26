@@ -1159,14 +1159,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	//Add a special filter
                            	 	//We use a separator to split up the lowercase and regular case, this is needed to get our filters in regular case
                             	//Solr has issues with facet prefix and cases
+                            	
+                            	String lang = null;
+                            	DiscoverySearchFilterFacet searchFilterFacet = (DiscoverySearchFilterFacet)searchFilter;
+                                if (searchFilterFacet.isLocaleEnabled() && meta.language!=null && !meta.language.trim().equals("")){
+                                	lang = meta.language;
+                                }
+                                
                             	if (authority != null)
                             	{
                                 	String facetValue = preferedLabel != null?preferedLabel:value;
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
+                                	doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:""), facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
                             	}
                             	else
                             	{
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
+                                	doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:"") , value.toLowerCase() + separator + value);
                             	}
                             }else
                                 if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
@@ -1235,7 +1242,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     //We add the field x times that it has occurred
                                     for(int j = i; j < subValues.length; j++)
                                     {
-                                        doc.addField(searchFilter.getIndexFieldName() + "_filter", indexValue.toLowerCase() + separator + indexValue);
+                                    	String lang = null;
+                                    	DiscoverySearchFilterFacet searchFilterFacet = (DiscoverySearchFilterFacet)searchFilter;
+                                        if (searchFilterFacet.isLocaleEnabled() && meta.language!=null && !meta.language.trim().equals("")){
+                                        	lang = meta.language;
+                                        }
+                                        
+                                        doc.addField(searchFilter.getIndexFieldName() + "_filter" + (lang!=null?"_"+lang:""), indexValue.toLowerCase() + separator + indexValue);
                                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                                     }
                                 }
@@ -2134,7 +2147,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 return field.substring(0, field.lastIndexOf("_filter"));
             }else{
-                return field + "_filter";
+                return field + "_filter" + facetFieldConfig.getLocale();
             }
         }else if(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
         {
