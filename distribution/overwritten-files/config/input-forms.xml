@@ -327,7 +327,7 @@
 					<repeatable>true</repeatable>
 					<label>Localización Física</label>
 					<input-type>onebox</input-type>
-					<hint>URL de acceso al catalogo de la biblioteca o información de acceso al recurso fisico (ej.: Bibhuma). Es obligatorio cuando el recurso no es FULLTEXT</hint>
+					<hint>URL de acceso al catalogo de la biblioteca o información suficiente para ubicar físicamente al recurso (ej.: Museo de Fisica, vitrina 12, estante 1). Es obligatorio cuando el recurso no es FULLTEXT</hint>
 					<visibility>workflow</visibility>
 				</field>
 
