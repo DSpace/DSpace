@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             {
                 // values to show in the browse list
                 Set<String> distFValues = new HashSet<String>();
+                Map<String, String> distFValuesWithLanguage = new HashMap<String, String>();
                 // value for lookup without authority
                 Set<String> distFVal = new HashSet<String>();
                 // value for lookup with authority
@@ -296,6 +298,10 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                 .add(nVal
                                                         + SolrServiceImpl.FILTER_SEPARATOR
                                                         + values[x].value);
+                                        distFValuesWithLanguage
+                                        	.put(nVal
+                                                + SolrServiceImpl.FILTER_SEPARATOR
+                                                + values[x].value, values[x].language);
                                         distFVal.add(values[x].value);
                                         distValuesForAC.add(values[x].value);
                                     }
@@ -305,9 +311,9 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     }
                 }
 
-                for (String facet : distFValues)
+                for (String facet : distFValuesWithLanguage.keySet())
                 {
-                    doc.addField(bi.getDistinctTableName() + "_filter", facet);
+                    doc.addField(bi.getDistinctTableName() + (bi.isLocaleEnabled()?"_" + distFValuesWithLanguage.get(facet):"") + "_filter", facet);
                 }
                 for (String facet : distFAuths)
                 {

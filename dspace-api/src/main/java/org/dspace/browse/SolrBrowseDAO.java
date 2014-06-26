@@ -93,6 +93,8 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /** the table that defines the mapping for the relevant container */
     private String containerTable = null;
+    
+    private String locale = "";
 
     /**
      * the name of the field which contains the container id (e.g.
@@ -149,6 +151,7 @@ public class SolrBrowseDAO implements BrowseDAO
                 DiscoverFacetField dff = new DiscoverFacetField(facetField,
                         DiscoveryConfigurationParameters.TYPE_TEXT, -1,
                         DiscoveryConfigurationParameters.SORT.VALUE);
+                dff.setLocale(locale);
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
@@ -746,4 +749,12 @@ public class SolrBrowseDAO implements BrowseDAO
     {
         this.authority = value;
     }
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
 }

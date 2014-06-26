@@ -297,6 +297,9 @@
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
+        <!-- Enable or disable multilanguage support in discovery facets (depending on the session current locale)
+        	 If missing, "false" is meant by default -->
+        <property name="localeEnabled" value="true"/>
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">

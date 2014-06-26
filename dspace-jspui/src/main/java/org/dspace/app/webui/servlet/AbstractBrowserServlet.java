@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -311,6 +312,13 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
             // now start up a browse engine and get it to do the work for us
             BrowseEngine be = new BrowseEngine(context);
+            
+            if (bi.isLocaleEnabled()){
+            	Locale sessionLocale = UIUtil.getSessionLocale(request);
+            	String locale = "_" + sessionLocale.getLanguage(); //underscore '_' is needed!
+            	be.setLocale(locale);
+            }
+        	
             BrowseInfo binfo = be.browse(scope);
             
             request.setAttribute("browse.info", binfo);
