@@ -44,11 +44,11 @@
         		<a data-toggle="collapse" data-parent="#${holder.shortName}" href="#collapseOne${holder.shortName}">
           			${holder.title} <fmt:message
 				key="jsp.layout.dspace.detail.fieldset-legend.component.boxtitle.${info[holder.shortName].type}"/>
-        		</a></h4>
-    			
-    			<div class="btn-group pull-right">
+        		</a>
+        		<% if(subLinks!=null && subLinks.size()>1) {%>
+        		<div class="btn-group">
 			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
-    				Vedi anche <span class="fa fa-caret-down"></span>	
+    				<fmt:message key="jsp.components.button.seealso"/> <span class="fa fa-caret-down"></span>	
   				</button>
 				<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<% for (String[] sub : subLinks ) { %>
@@ -56,6 +56,8 @@
 				<% } %>
 				</ul>
 				</div>
+				<% } %>	
+        	</h4>
     	</div>
 	<div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
 		<div class="panel-body">	
