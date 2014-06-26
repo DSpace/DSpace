@@ -10,6 +10,7 @@ package org.dspace.app.webui.discovery;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -602,6 +603,12 @@ public class DiscoverUtility
                     // at most all the user filters belong to this facet
                     int alreadySelected = userFilters.size();
 
+                    String locale = "";
+                    if (facet.isLocaleEnabled()){
+                    	Locale sessionLocale = UIUtil.getSessionLocale(request);
+                    	locale = "_" + sessionLocale.getLanguage(); //underscore '_' is needed!
+                    }
+                    
                     // Add one to our facet limit to make sure that if
                     // we
                     // have more then the shown facets that we show our
@@ -614,7 +621,7 @@ public class DiscoverUtility
                             .getIndexFieldName(),
                             DiscoveryConfigurationParameters.TYPE_TEXT,
                             facetLimit + 1 + alreadySelected, facet
-                                    .getSortOrder(), facetPage * facetLimit));
+                                    .getSortOrder(), facetPage * facetLimit, locale) );
                 }
             }
         }
