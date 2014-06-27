@@ -67,7 +67,6 @@ public class SolrLogger
     private static int count = 0;
     private static int commit = 10;
 
-
     static
     {
     	log.info("solr.spidersfile:" + ConfigurationManager.getProperty("solr.spidersfile"));
