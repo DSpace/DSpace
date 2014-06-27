@@ -68,6 +68,10 @@
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->
     <!-- Uncomment to enable DOI using EZID
+         Set generateDataciteXML to true to send metadata in DataCite xml schema for EZID DOI mint requests.
+         When generateDataciteXML is enabled, EZIDIdentifierProvider uses 
+         dspace.cfg:crosswalk.dissemination.DataCite.stylesheet configuration for metadata mapping
+
     <bean id="org.dspace.identifier.EZIDIdentifierProvider"
           class="org.dspace.identifier.EZIDIdentifierProvider"
           scope='singleton'>
@@ -97,6 +101,8 @@
                 </entry>
             </map>
         </property>
+        <property name='generateDataciteXML' value='false'/>
+        <property name='disseminationCrosswalkName' value='DataCite'/>
     </bean>
     -->
 

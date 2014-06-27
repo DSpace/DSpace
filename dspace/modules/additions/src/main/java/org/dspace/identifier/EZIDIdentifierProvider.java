@@ -53,16 +53,25 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * <p>Then there are properties injected using Spring:</p>
  * <ul>
- *  <li>There is a Map (with the property name "crosswalk") from EZID
- *  metadata field names into DSpace field names, injected by Spring.  Specify
- *  the fully-qualified names of all metadata fields to be looked up on a DSpace
- *  object and their values set on mapped fully-qualified names in the object's
- *  DataCite metadata.</li>
- *
- *  <li>A second map ("crosswalkTransform") provides Transform instances
- *  mapped from EZID metadata field names.  This allows the crosswalk to rewrite
- *  field values where the form maintained by DSpace is not directly usable in
- *  EZID metadata.</li>
+ * <li>There is a Map (with the property name "crosswalk") from EZID metadata
+ * field names into DSpace field names, injected by Spring. Specify the
+ * fully-qualified names of all metadata fields to be looked up on a DSpace
+ * object and their values set on mapped fully-qualified names in the object's
+ * DataCite metadata.</li>
+ * 
+ * <li>A second map ("crosswalkTransform") provides Transform instances mapped
+ * from EZID metadata field names. This allows the crosswalk to rewrite field
+ * values where the form maintained by DSpace is not directly usable in EZID
+ * metadata.</li>
+ * 
+ * <li>Optional: A boolean property ("generateDataciteXML") that controls the
+ * creation and inclusion of DataCite xml schema during the metadata
+ * crosswalking. The default "DataCite" dissemination plugin uses
+ * DIM2DataCite.xsl for crosswalking. Default value: false.</li>
+ * 
+ * <li>Optional: A string property ("disseminationCrosswalkName") that can be
+ * used to set the name of the dissemination crosswalk plugin for metadata
+ * crosswalking. Default value: "DataCite".</li>
  * </ul>
  *
  * @author mwood
@@ -89,6 +98,10 @@ public class EZIDIdentifierProvider
     public static final String DOI_QUALIFIER = null;
 
     private static final String DOI_SCHEME = "doi:";
+
+    protected boolean GENERATE_DATACITE_XML = false;
+
+    protected String DATACITE_XML_CROSSWALK = "DataCite";
 
     /** Map DataCite metadata into local metadata. */
     private static Map<String, String> crosswalk = new HashMap<String, String>();
@@ -661,8 +674,17 @@ public class EZIDIdentifierProvider
             }
         }
 
+        if (GENERATE_DATACITE_XML == true)
+        {
+            DataCiteXMLCreator xmlGen = new DataCiteXMLCreator();
+            xmlGen.setDisseminationCrosswalkName(DATACITE_XML_CROSSWALK);
+            String xmlString = xmlGen.getXMLString(dso);
+            mapped.put("datacite", xmlString);
+        }
+
         // Supply a default publisher, if the Item has none.
-        if (!mapped.containsKey(DATACITE_PUBLISHER))
+        if (!mapped.containsKey(DATACITE_PUBLISHER)
+                && !mapped.containsKey("datacite"))
         {
             String publisher = configurationService.getPropertyAsType(CFG_PUBLISHER, "unknown");
             log.info("Supplying default publisher:  {}", publisher);
@@ -670,7 +692,8 @@ public class EZIDIdentifierProvider
         }
 
         // Supply current year as year of publication, if the Item has none.
-        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR))
+        if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR)
+                && !mapped.containsKey("datacite"))
         {
             String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
             log.info("Supplying default publication year:  {}", year);
@@ -692,6 +715,16 @@ public class EZIDIdentifierProvider
     public void setCrosswalkTransform(Map<String, Transform> transformMap)
     {
         transforms = transformMap;
+    }
+
+    public void setGenerateDataciteXML(boolean GENERATE_DATACITE_XML)
+    {
+        this.GENERATE_DATACITE_XML = GENERATE_DATACITE_XML;
+    }
+
+    public void setDisseminationCrosswalkName(String DATACITE_XML_CROSSWALK)
+    {
+        this.DATACITE_XML_CROSSWALK = DATACITE_XML_CROSSWALK;
     }
 
     @Required
