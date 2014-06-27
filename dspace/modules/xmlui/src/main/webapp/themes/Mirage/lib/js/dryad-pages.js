@@ -1,3 +1,4 @@
+
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
     var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
@@ -663,3 +664,114 @@ function updateCountry(){
             obj = jQuery.parseJSON(data);
         });
 }
+
+//  JS behaviors for the "Describe Publication" page
+//  /handle/*/*/submit/*.continue
+//  These functions enable page-fragment reloading in place of 
+//  full-page reloads for the metadata fields in the form
+//  #aspect_submission_StepTransformer_div_submit-describe-publication
+//  The redirect buttons ("Save & Exit" and "Continue to Describe Data")
+//  still trigger a full page reload.
+jQuery(document).ready(function(){
+    // update the part of the form associated with the input button that was clicked 
+    // selector: string, jQuery selector to identify the li.ds-form-item element
+    //      to be replaced by the update
+    // data: string, HTML reponse from server (entire page)
+    var update_form_fragment = function(selector,data) {
+        var $result_doc;
+        try {
+            $result_doc = jQuery(document.createElement('div')).append(jQuery(data));
+        } catch (e) {
+            console.log('Error parsing result to Document: ' + e.toString());
+            return;
+        }
+        // update DOM with fragment selected from response document 
+        if ($result_doc.length > 0 ) { 
+            if ($result_doc.find(selector).length > 0) {
+                jQuery(selector).replaceWith(
+                    $result_doc.find(selector)
+                );
+                // refresh event bindings on updated page
+                submit_describe_publication_binders();
+            } else {
+                console.log('Failed to identify form fragment in result document.');
+            }
+        } else {
+            console.log('No handlable data from returned page.');
+        }
+    };
+    // need to save off the name of the submit button that was clicked, since
+    // there is no way to retrieve that information on the form's submit event
+    var clicked_btn_name;
+    var watch_clicked = function(e) {
+        clicked_btn_name = jQuery(e.target).attr('name');
+        return true; // propogate default event (i.e., form submission)
+    };
+    // function to handle the submit event for the form
+    var submit_describe_publication_onsubmit = function(e) {
+        var $input      = jQuery('input[name="' + clicked_btn_name +'"]')   // the <input> triggering the submit
+          , input_name  = clicked_btn_name          // localize to this scope for the ajax call
+          , $form       = jQuery(e.target)          // the entire describe-publication form
+          , form_data   = $form.serializeArray()    // the form's data
+          , success     = false                     // unsuccessful ajax call until we receive a 200
+          , ajax_data                               // ajax data, for passing to the updater function
+            // selector to use for retrieving the fragment from the response, and replacement in the current page
+          , form_li     = 'li.ds-form-item:has(label[for="' + $input.closest('li.ds-form-item').find('label.ds-form-label').attr('for') + '"])'
+          , prevent_default = false;
+        // undefine this variable, due to the flurry of onclick events raised by a button 
+        // click. TODO: determine why multiple button onclick events are raised
+        clicked_btn_name = undefined;
+        if (input_name !== undefined) {
+            // continue with full page reload for these two button click events
+            if (input_name === 'submit_cancel' || input_name === 'submit_next') {
+                return;
+            // do page-fragment reload for other form submission clicks
+            } else if (form_data.length > 0) {
+                // jQuery does not add the submission button, which is expected in the 
+                // request parameters by the DescribePublicationStep.java code; added here manually
+                form_data.push({ name: input_name, value: $input.val() });
+                prevent_default = true;
+                try {
+                    jQuery.ajax({
+                          url     : $form.attr('action')
+                        , data    : jQuery.param(form_data)
+                        , method  : "POST"
+                        , success : function(data,textStatus,jqXHR) {
+                            if (jqXHR.status === 200) {
+                                success   = true;
+                                ajax_data = data;
+                            } else {
+                                console.log('Error: Form "submit-describe-publication" returned non-success status: ' + jsXHR.status);
+                            }
+                        }
+                        , error : function(jqXHR,textStatus,errorThrown) {
+                            console.log(textStatus);
+                        }
+                        , complete : function(jqXHR,textStatus) {
+                            // update the page using data associated with the input the user selected
+                            if (success === true) {
+                                update_form_fragment(form_li,ajax_data);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.log('Error: Form "submit-describe-publication" encountered AJAX error: ' + e.toString());
+                }
+            } else {
+                console.log('Error: Form "submit-describe-publication" submitted with empty data.');
+            }
+        }
+        // prevent default form-submit action (which triggers page reload)
+        // TODO: remove this variable once the multiple-event-raising situation has been sorted out
+        if (prevent_default) {
+            e.preventDefault();
+        }
+    };
+    // these event handlers need to be registered any time the form is submitted, since the DOM is modified 
+    var submit_describe_publication_binders = function() {
+        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication input.ds-button-field').bind('click', watch_clicked);
+        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication').bind('submit', submit_describe_publication_onsubmit);
+    };
+    submit_describe_publication_binders();
+});
+
