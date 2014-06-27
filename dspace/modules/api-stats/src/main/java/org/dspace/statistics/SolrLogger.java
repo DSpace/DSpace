@@ -553,6 +553,28 @@ public class SolrLogger
         }
     }
 
+
+    /**
+     * Removes ip/dns and scrubs review link from solr for items downloaded in review
+     */
+    public static void deleteReviewIdentifiers() throws SolrServerException, IOException {
+        ResultProcessor processor = new ResultProcessor() {
+            @Override
+            public void process(SolrDocument doc) throws IOException, SolrServerException {
+                doc.removeFields("ip");
+                doc.removeFields("dns");
+                // Remove the original referrer
+                final String originalReferrer = doc.getFieldValue("referrer").toString();
+                final String cleanedReferrer = SolrLoggerUtils.replaceReviewToken(originalReferrer, SolrLoggerUtils.DUMMY_TOKEN);
+                doc.setField("referrer", cleanedReferrer);
+                SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                solr.add(newInput);
+            }
+        };
+        String query = "referrer:http*token=*";
+        processor.execute(query);
+    }
+
     /*
      * //TODO: below are not used public static void
      * update(String query, boolean addField, String fieldName, Object
