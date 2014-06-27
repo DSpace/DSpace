@@ -59,6 +59,7 @@ public class StatisticsClient
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
+        options.addOption("r", "delete-review-identifiers", false, "Delete ip/dns/token from downloads of in-review items");
         options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
@@ -88,6 +89,10 @@ public class StatisticsClient
         else if(line.hasOption('o'))
         {
             SolrLogger.optimizeSOLR();
+        }
+        else if(line.hasOption('r'))
+        {
+            SolrLogger.deleteReviewIdentifiers();
         }
         else
         {
