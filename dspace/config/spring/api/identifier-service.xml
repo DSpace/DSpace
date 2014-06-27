@@ -67,11 +67,11 @@
 
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->
-    <!-- Uncomment to enable DOI using EZID
+    <!-- 
          Set generateDataciteXML to true to send metadata in DataCite xml schema for EZID DOI mint requests.
          When generateDataciteXML is enabled, EZIDIdentifierProvider uses 
          dspace.cfg:crosswalk.dissemination.DataCite.stylesheet configuration for metadata mapping
-
+    -->
     <bean id="org.dspace.identifier.EZIDIdentifierProvider"
           class="org.dspace.identifier.EZIDIdentifierProvider"
           scope='singleton'>
@@ -87,23 +87,12 @@
         </property>
         <property name='crosswalk'>
             <map>
-                <entry key='datacite.creator' value='dc.contributor.author'/>
-                <entry key='datacite.title' value='dc.title'/>
-                <entry key='datacite.publisher' value='dc.publisher'/>
-                <entry key='datacite.publicationyear' value='dc.date.issued'/>
+                <entry key='_target' value='dc.identifier.uri'/>
             </map>
         </property>
-        <property name='crosswalkTransform'>
-            <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
-            <map>
-                <entry key='datacite.publicationyear'>
-                    <bean class='org.dspace.identifier.ezid.DateToYear'/>
-                </entry>
-            </map>
-        </property>
-        <property name='generateDataciteXML' value='false'/>
+        <property name='generateDataciteXML' value='true'/>
         <property name='disseminationCrosswalkName' value='DataCite'/>
+
     </bean>
-    -->
 
 </beans>

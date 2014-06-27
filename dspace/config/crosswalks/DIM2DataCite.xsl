@@ -49,9 +49,9 @@
 
             <!-- 
                 DataCite (1)
-                Template Call for DOI identifier.
+                Create empty DOI identifier node. (EZID will populate the DOI)
             --> 
-            <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]" />
+            <identifier identifierType="DOI" />
 
             <!-- 
                 DataCite (2)
@@ -126,72 +126,12 @@
                 </subjects>
             </xsl:if>
 
-            <!-- 
-                DataCite (7)
-                Add contributorType from configuration above.
-                Template Call for Contributors
-            --> 
-            <contributors>
-                <xsl:element name="contributor">
-                    <xsl:attribute name="contributorType">DataManager</xsl:attribute>
-                    <xsl:element name="contributorName">
-                        <xsl:value-of select="$datamanager"/>
-                    </xsl:element>    
-                </xsl:element>
-                <xsl:element name="contributor">
-                    <xsl:attribute name="contributorType">HostingInstitution</xsl:attribute>
-                    <contributorName>
-                        <xsl:value-of select="$hostinginstitution" />
-                    </contributorName>
-                </xsl:element>
-                <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]" />
-            </contributors>
-
-            <!-- 
-                DataCite (8)
-                Template Call for Dates
-            --> 
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='date']" >
-                <dates>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='date']" />
-                </dates>
-            </xsl:if>
-
             <!-- Add language(s). -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='language' and (@qualifier='iso' or @qualifier='rfc3066')]" />
 
             <!-- Add resource type. -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='type']" />
 
-            <!-- 
-                 Add alternativeIdentifiers.
-                 This element is important as it is used to recognize for which
-                 DSpace object a DOI is reserved for. See below for further 
-                 information.
-            -->
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]">
-                <xsl:element name="alternateIdentifiers">
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]" />
-                </xsl:element>
-            </xsl:if>
-
-            <!-- Add sizes. -->
-            <!--
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">             
-                <sizes>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />      
-                </sizes>
-            </xsl:if>
-            -->
-
-            <!-- Add formats. -->
-            <!--
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format']">     
-                <formats>                
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format']" />       
-                </formats>
-            </xsl:if>
-            -->
 
             <!-- Add rights. -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='rights']" />
@@ -206,13 +146,6 @@
         </resource>
     </xsl:template>
     
-
-    <!-- Add doi identifier information. -->
-    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]">
-        <identifier identifierType="DOI">
-            <xsl:value-of select="substring(., 19)"/>
-        </identifier>
-    </xsl:template>
     
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
@@ -252,56 +185,6 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
-        DataCite (7), DataCite (7.1) 
-        Adds contributor and contributorType information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
-        <xsl:if test="@qualifier='editor'"> 
-            <xsl:element name="contributor">
-                <xsl:attribute name="contributorType">Editor</xsl:attribute>
-                <contributorName>
-                    <xsl:value-of select="." />
-                </contributorName>
-            </xsl:element>
-        </xsl:if>
-    </xsl:template>
-
-    <!-- 
-        DataCite (8), DataCite (8.1)
-        Adds Date and dateType information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='date']">
-            <xsl:element name="date">
-                <xsl:if test="@qualifier='accessioned'">
-                    <xsl:attribute name="dateType">Issued</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="@qualifier='submitted'">
-                    <xsl:attribute name="dateType">Issued</xsl:attribute>
-                </xsl:if>
-                <!-- part of DublinCore DSpace to mapping but not part of DSpace default fields
-                <xsl:if test="@qualifier='dateAccepted'">
-                    <xsl:attribute name="dateType">Issued</xsl:attribute>
-                </xsl:if>
-                -->
-                <xsl:if test="@qualifier='issued'">
-                    <xsl:attribute name="dateType">Issued</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="@qualifier='available'">
-                    <xsl:attribute name="dateType">Available</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="@qualifier='copyright'">
-                    <xsl:attribute name="dateType">Copyrighted</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="@qualifier='created'">
-                    <xsl:attribute name="dateType">Created</xsl:attribute>
-                </xsl:if>
-                <xsl:if test="@qualifier='updated'">
-                    <xsl:attribute name="dateType">Updated</xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="substring(., 1, 10)" />
-            </xsl:element>
-    </xsl:template>
 
     <!-- 
         DataCite (9)
@@ -365,61 +248,7 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!--
-        DataCite (11), DataCite (11.1) 
-        Adds AlternativeIdentifier and alternativeIdentifierType information
-        Adds all identifiers except the doi.
 
-        This element is important as it is used to recognize for which DSpace
-        objet a DOI is reserved for. The DataCiteConnector will test all
-        AlternativeIdentifiers by using HandleManager.
-        resolveUrlToHandle(context, altId) until one is recognized or all have
-        been tested.
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]">
-        <xsl:element name="alternateIdentifier">
-            <xsl:if test="@qualifier">
-                <xsl:attribute name="alternateIdentifierType"><xsl:value-of select="@qualifier" /></xsl:attribute>
-            </xsl:if>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-    <!--
-        DataCite (12), DataCite (12.1) 
-        Adds RelatedIdentifier and relatedIdentifierType information
-    -->
-
-    <!-- 
-        DataCite (13)
-        Adds Size information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">
-        <xsl:element name="format">
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-    <!-- 
-        DataCite (14)
-        Adds Format information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='format']">
-        <xsl:element name="format">
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-    <!-- 
-        DataCite (16)
-        Adds Rights information
-    -->
-    <xsl:template match="//dspace:field[@mdschema='dc' and @element='rights']">
-        <xsl:element name="rights">
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-    
     <!-- 
         DataCite (17)
         Description
