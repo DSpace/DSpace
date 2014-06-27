@@ -37,6 +37,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Static SolrLogger used to hold HttpSolrClient connection pool to issue
@@ -64,6 +66,9 @@ public class SolrLogger
     private static Map metadataStorageInfo;
     private static int count = 0;
     private static int commit = 10;
+
+    private static final Pattern reviewTokenPattern = Pattern.compile("^(http.*token=)(.*)$");
+    private static final String dummyToken = "00000000-0000-0000-0000-000000000000";
 
     static
     {
@@ -135,6 +140,19 @@ public class SolrLogger
             commit = ConfigurationManager.getIntProperty("solr.statistics.interval");
     }
 
+    static String replaceReviewToken(String refererUri, String replacementText) {
+        Matcher matcher = reviewTokenPattern.matcher(refererUri);
+        return matcher.group(1) + replacementText;
+    }
+
+    static Boolean isReviewTokenPresent(String refererUrl) {
+        if(refererUrl == null) {
+            return false;
+        } else {
+            return reviewTokenPattern.matcher(refererUrl).matches();
+        }
+    }
+
     public static void post(DSpaceObject dspaceObject, HttpServletRequest request,
             EPerson currentUser)
     {
@@ -170,6 +188,17 @@ public class SolrLogger
             SolrInputDocument doc1 = new SolrInputDocument();
             // Save our basic info that we already have
 
+            final String originalReferer = request.getHeader("referer");
+            log.info("SolrLogger - referer: " + originalReferer);
+            final Boolean reviewTokenPresent = isReviewTokenPresent(originalReferer);
+            if(originalReferer!=null) {
+                String cleanedReferer = originalReferer;
+                if(reviewTokenPresent) {
+                    cleanedReferer = replaceReviewToken(originalReferer, dummyToken);
+                }
+                doc1.addField("referrer", cleanedReferer);
+            }
+
             String ip = request.getRemoteAddr();
 	    log.debug("IP is " + ip);
 	    String xff = request.getHeader("X-Forwarded-For");
@@ -190,15 +219,12 @@ public class SolrLogger
 				}
 			}
 	        }
-	    
-            doc1.addField("ip", ip);
 
+            // Don't record IP addresses for review links
+            if(!reviewTokenPresent) {
+                doc1.addField("ip", ip);
+            }
 
-
-            String referrer = request.getHeader("referer");
-            log.info("SolrLogger - referrer: " + request.getHeader("referer"));
-            if(referrer!=null)
-                doc1.addField("referrer", referrer);
 
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
@@ -220,8 +246,12 @@ public class SolrLogger
 		if(ip.equals("::1")) {
 		    doc1.addField("dns", "localhost");
 		} else {
-		    String dns = DnsLookup.reverseDns(ip);
-		    doc1.addField("dns", dns.toLowerCase());
+                    // Don't record DNS addresses for review links
+                    if(!reviewTokenPresent) {
+                        //
+                        String dns = DnsLookup.reverseDns(ip);
+                        doc1.addField("dns", dns.toLowerCase());
+                    }
 		}
             }
             catch (Exception e)
