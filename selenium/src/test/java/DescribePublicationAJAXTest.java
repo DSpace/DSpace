@@ -1,18 +1,18 @@
 package test;
 
-import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
-
 import org.openqa.selenium.support.ui.Select;
 
 public class DescribePublicationAJAXTest {
