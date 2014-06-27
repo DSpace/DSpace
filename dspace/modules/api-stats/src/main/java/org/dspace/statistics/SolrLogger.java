@@ -67,8 +67,6 @@ public class SolrLogger
     private static int count = 0;
     private static int commit = 10;
 
-    private static final Pattern REVIEW_TOKEN_PATTERN = Pattern.compile("^(http.*token=)(.*)$");
-    static final String DUMMY_TOKEN = "00000000-0000-0000-0000-000000000000";
 
     static
     {
@@ -140,34 +138,6 @@ public class SolrLogger
             commit = ConfigurationManager.getIntProperty("solr.statistics.interval");
     }
 
-    /**
-     * Replaces the review token with replacement text if token is present
-     * @param refererUri A referer string
-     * @param replacementText The text to replace the token with
-     * @return a referer string, with the token replaced
-     */
-    static String replaceReviewToken(String refererUri, String replacementText) {
-        Matcher matcher = REVIEW_TOKEN_PATTERN.matcher(refererUri);
-        if(matcher.matches()) {
-            return matcher.group(1) + replacementText;
-        } else {
-            return refererUri;
-        }
-    }
-
-    /**
-     * Returns true if a string looks like a URL and contains 'token=...'
-     * @param refererUrl The string to test
-     * @return True if a token is found, false if not.
-     */
-    static Boolean isReviewTokenPresent(String refererUrl) {
-        if(refererUrl == null) {
-            return false;
-        } else {
-            return REVIEW_TOKEN_PATTERN.matcher(refererUrl).matches();
-        }
-    }
-
     public static void post(DSpaceObject dspaceObject, HttpServletRequest request,
             EPerson currentUser)
     {
@@ -205,11 +175,11 @@ public class SolrLogger
 
             final String originalReferer = request.getHeader("referer");
             log.info("SolrLogger - referer: " + originalReferer);
-            final Boolean reviewTokenPresent = isReviewTokenPresent(originalReferer);
+            final Boolean reviewTokenPresent = SolrLoggerUtils.isReviewTokenPresent(originalReferer);
             if(originalReferer!=null) {
                 String cleanedReferer = originalReferer;
                 if(reviewTokenPresent) {
-                    cleanedReferer = replaceReviewToken(originalReferer, DUMMY_TOKEN);
+                    cleanedReferer = SolrLoggerUtils.replaceReviewToken(originalReferer, SolrLoggerUtils.DUMMY_TOKEN);
                 }
                 doc1.addField("referrer", cleanedReferer);
             }
