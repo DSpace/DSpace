@@ -22,6 +22,11 @@
 --
 
 -------------------------------------------
+-- Ensure that discoverable has a sensible default
+-------------------------------------------
+update item set discoverable=1 WHERE discoverable IS NULL;
+
+-------------------------------------------
 -- Add support for DOIs (table and seq.) --
 -------------------------------------------
 
