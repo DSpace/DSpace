@@ -414,8 +414,8 @@
 			<!-- Just an alias -->
 		</Set>
 		<Set id="openaireSet">
-			<Pattern>ec_fundedresources</Pattern>
-			<Name>EC_fundedresources set</Name>
+			<Pattern>openaire</Pattern>
+			<Name>OpenAIRE</Name>
 			<!-- Just an alias -->
 		</Set>
 		<Set id="snrdSet">
