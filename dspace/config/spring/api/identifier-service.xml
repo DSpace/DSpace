@@ -90,6 +90,14 @@
                 <entry key='_target' value='dc.identifier.uri'/>
             </map>
         </property>
+        <property name='crosswalkTransform'>
+            <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
+            <map>
+                <entry key='_target'>
+                    <bean class='org.dspace.identifier.ezid.HandleToTarget'/>
+                </entry>
+            </map>
+        </property>
         <property name='generateDataciteXML' value='true'/>
         <property name='disseminationCrosswalkName' value='DataCite'/>
 
