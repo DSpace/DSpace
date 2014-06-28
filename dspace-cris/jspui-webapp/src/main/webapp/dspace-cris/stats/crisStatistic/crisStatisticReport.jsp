@@ -55,7 +55,7 @@
 <div id="content">
 <div class="row">
 	<div class="col-lg-12">
-		<div class="form-inline">
+		<div>
 	         <div class="form-group">
 			 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.target.simpleName}</fmt:param><fmt:param><a href="${contextPath}/cris/${data.object.publicPath}/${data.object.crisID}">${data.title}</a></fmt:param></fmt:message></h1>
 			 </div>

@@ -17,13 +17,28 @@
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
 
- <div style="margin-top:1.5em;" class="form-group pull-right">
+ <div class="form-group">
 	<div class="btn-group">
-<c:forEach items="${data.rightMenu}" var="menu">
-	<c:if test="${!menu.current}">
-		<a class="btn btn-default" href="${link}&type=${menu.type}&mode=${menu.mode}"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a>
+	<c:forEach items="${data.rightMenu}" var="menu" varStatus="status">
+	<c:if test="${menu.current}">
+		<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a>
 	</c:if>
+	</c:forEach>
+				<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+   				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
+ 				</button>
+ 					<ul role="menu" class="dropdown-menu">
+			    
+<c:forEach items="${data.rightMenu}" var="menu" varStatus="status">
+
+	<c:if test="${!menu.current}">
+	<li>
+		<a class="btn btn-default" href="${link}&type=${menu.type}&mode=${menu.mode}"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a>
+	</li>
+	</c:if>	
 </c:forEach>
+	
+	</ul>
 	</div>
 	<div class="btn-group">
 			<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.statistics.label" /></a>
