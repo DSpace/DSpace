@@ -15,33 +15,34 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <c:set var="dspace.layout.head" scope="request">
 	<link href="<%=request.getContextPath() %>/css/misctable.css" type="text/css" rel="stylesheet" />
 </c:set>
 <dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.title-subscription-list">
 
-    			<div class="btn-group pull-right">
-			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
-    				<fmt:message key="jsp.mydspace.subscriptions.button.seealso"/> <span class="fa fa-caret-down"></span>	
-  				</button>
-				<ul class="dropdown-menu dropdown-menu-right" role="menu">
-					<li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-hku.item-subscription"/></a></li>
-				</ul>
-				</div>
-
+<h1><fmt:message key="jsp.mydspace.subscriptions.title"/>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
+</h1>
 
 <div id="content">
-<div class="title"><h1><fmt:message key="jsp.statistics.title-subscription-list" /></h1></div>
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+<li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-hku.item-subscription"/></a></li>
+<li class="active"><a href="<%= request.getContextPath() %>/cris/tools/stats/subscription/list.htm"><fmt:message key="jsp.layout.navbar-hku.stat-subscription"/></a></li>
+</ul>
+<div id="my-tab-content" class="tab-content">
+<div class="tab-pane active" id="contentsubscription">
 
-<div class="richeditor">
-<div class="top"></div>
-<div class="container">
+</div>
+</div>
+<div class="tab-pane" id="statisticssubscription">
+
 	<%@ include file="/dspace-cris/stats/_subscribeList.jsp" %>
+
 </div>
-<div class="bottom"></div>
 </div>
-<div class="clear"></div>
-</div>
+
 
 </dspace:layout>
+

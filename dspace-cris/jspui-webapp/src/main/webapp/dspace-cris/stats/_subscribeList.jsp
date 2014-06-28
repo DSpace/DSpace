@@ -57,7 +57,7 @@
 				     </c:if>
 				    </c:forEach>
 					/>
-					 <input type="submit" value="<fmt:message key="jsp.statistics.table.button.update" />" />
+					 <input class="btn btn-primary" type="submit" value="<fmt:message key="jsp.statistics.table.button.update" />" />
 				</form>
 			</display:column>
 			<display:column titleKey="jsp.statistics.table.remove" sortable="false">
@@ -67,8 +67,9 @@
 					 <input type="hidden" name="type" value="${objectList.type}" />					
 					 <input type="hidden" name="uid" value="${objectList.id}" />
 					 <input type="hidden" name="list" value="true" />
-					 <input type="submit" value="<fmt:message key="jsp.statistics.table.button.remove" />" />
+					 <input class="btn btn-warning" type="submit" value="<fmt:message key="jsp.statistics.table.button.remove" />" />
 				</form>	
 			</display:column>
 		</display:table>
+
 </div>

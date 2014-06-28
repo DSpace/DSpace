@@ -34,6 +34,7 @@
 <%@page import="org.dspace.app.cris.util.ResearcherPageUtils"%>
 <%@page import="java.util.List"%>
 
+
 <%
     Collection[] availableSubscriptions =
         (Collection[]) request.getAttribute("availableSubscriptions");
@@ -47,7 +48,6 @@
     List<ACrisObject> rpSubscriptions = (List<ACrisObject>) request
    	 	.getAttribute("crisobject_subscriptions");
 %>
-
 <dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
@@ -66,15 +66,18 @@
     }
 %>
 
-    			
-    			<div class="btn-group pull-right">
-			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
-    				<fmt:message key="jsp.mydspace.subscriptions.button.seealso"/> <span class="fa fa-caret-down"></span>	
-  				</button>
-				<ul class="dropdown-menu dropdown-menu-right" role="menu">
-					<li><a href="<%= request.getContextPath() %>/cris/tools/stats/subscription/list.htm"><fmt:message key="jsp.layout.navbar-hku.stat-subscription"/></a></li>
-				</ul>
-				</div>
+
+
+<div id="content">
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+<li class="active"><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-hku.item-subscription"/></a></li>
+<li><a href="<%= request.getContextPath() %>/cris/tools/stats/subscription/list.htm"><fmt:message key="jsp.layout.navbar-hku.stat-subscription"/></a></li>
+</ul>
+<div id="my-tab-content" class="tab-content">
+<div class="tab-pane active" id="contentsubscription">
+
+
+
 
 <!-- 
         <form class="form-group" action="<%= request.getContextPath() %>/subscribe" method="post">
@@ -270,5 +273,17 @@ else
 <%
 }
 %>
+
+
+
+
+</div>
+<div class="tab-pane" id="statisticssubscription">
+<h1><fmt:message key="jsp.layout.navbar-hku.stat-subscription"/></h1>
+<p></p>
+</div>
+</div>
+</div>
+
 
 </dspace:layout>
