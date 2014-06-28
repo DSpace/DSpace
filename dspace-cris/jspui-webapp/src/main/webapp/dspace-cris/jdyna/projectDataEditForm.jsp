@@ -64,6 +64,8 @@
 <c:set var="dspace.layout.head.last" scope="request">	
     <style type="text/css">@import url(<%=request.getContextPath()%>/js/jscalendar/calendar-blue.css );</style>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/commons-edit-jquery-for-cris.css" type="text/css" />
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" />
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" />
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/lang/calendar-en.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar-setup.js"> </script>
@@ -122,13 +124,15 @@
     			autoHeight: false,
     			navigation: true,
     			collapsible: true,
-    			active: 0
+    			active: 0,
+    			heightStyle: "content"
     		});
     		j(".box.expanded").accordion({
     			autoHeight: false,
     			navigation: true,
     			collapsible: true,
-    			active: 0
+    			active: 0,
+    			heightStyle: "content"
     		});
     		
     		var ajaxurlrelations = "<%=request.getContextPath()%>/cris/${specificPartPath}/viewNested.htm";
@@ -161,6 +165,7 @@
 								},
 								success : function(data) {									
 									j('#viewnested_'+id).html(data);
+									jQuery( "#ui-accordion" ).accordion( "resize" );
 									postfunction();
 								},
 								error : function(data) {
@@ -284,13 +289,11 @@
 			j('input:submit').button();
 			j('#delete').button();
 			j("#tabs").tabs({
-				selected: ${currTabIdx-1},
-				select: function(event, ui){
-					j('#newTabId').val(j(ui.tab).attr('href').substr(5));
-					j('#submit_save').click();
-				},
+				active: ${currTabIdx-1},
 				"activate": function( event, ui ) {
 					j("li.ui-tabs-active").toggleClass("ui-tabs-active ui-state-active active");
+					j('#newTabId').val(j(ui.newTab).attr('id').substr(8));
+					j('#submit_save').click();
 				},
 				"beforeActivate": function( event, ui ) {
 	   			 j("li.active").toggleClass("active");
@@ -409,7 +412,7 @@
 	</script>
 	
 </c:set>
-<dspace:layout titlekey="jsp.researcher-page.primary-data-form" navbar="off">
+<dspace:layout titlekey="jsp.researcher-page.primary-data-form" style="submission" navbar="off">
 
 <h1>${project.name} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${project.id}"> <fmt:message key="jsp.layout.hku.researcher.button.delete"/> </a></c:if></h1> 
 
@@ -443,7 +446,8 @@
 	</spring:bind>
 
 	<div class="panel panel-default">
-	
+<div class="container">
+	<div class="col-md-6">	
 			<div class="cris-edit-status">
 		<spring:bind path="status">
 			<c:set var="inputValue">
@@ -474,8 +478,9 @@
 			</span>
 		</spring:bind>
 		</div>
-		
-		
+	</div>
+	
+	<div class="col-md-6">	
 		<div class="cris-edit-record-info">
 		<c:set var="disabled" value=" readonly='readonly'"/>
 		<c:choose>
@@ -495,6 +500,9 @@
 		</div>
 			
 	</div>
+	</div>
+	</div>
+	
 	<dyna:hidden propertyPath="anagraficadto.objectId" />
 	<input type="hidden" id="newTabId" name="newTabId" />
 	
@@ -636,12 +644,12 @@
 				</c:forEach>
 <br/>
 <div class="jdyna-form-button">
-				<input id="submit_save" type="submit"
+				<input id="submit_save" class="btn btn-primary" type="submit"
 					value="<fmt:message key="jsp.layout.hku.researcher.button.save"/>" />
-				<input type="submit" name="cancel"
+				<input type="submit" class="btn btn-default" name="cancel"
 					value="<fmt:message key="jsp.layout.hku.researcher.button.cancel"/>" />
 					</div>
-</div>			
+</div>					
 </div>				
 				
 </form:form>
