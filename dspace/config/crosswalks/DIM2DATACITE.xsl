@@ -241,6 +241,27 @@
               <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
 	      </descriptions>
+		<xsl:call-template name="parse_mets"/>
 	</xsl:if>
+	</xsl:template>
+	
+	<!-- Match for file information that is outside of DIM -->
+	<xsl:template name="parse_mets">
+		<!-- Construct the mets.xml url, using the get_identifier template to find the DOI. -->
+		<xsl:variable name="mets_url">
+			<xsl:text>http://datadryad.org/resource/</xsl:text>
+	        <xsl:call-template name="get_identifier"/>
+	        <xsl:text>/mets.xml</xsl:text>
+		</xsl:variable>
+		
+		<!-- *********** Sizes - Only for data files********* -->
+		<sizes>
+			<xsl:for-each select="document($mets_url)//mets:file">
+				<size>
+					<xsl:value-of select="@SIZE"/>
+					<xsl:text> bytes</xsl:text>
+				</size>
+			</xsl:for-each>
+		</sizes>
 	</xsl:template>
 </xsl:stylesheet>
