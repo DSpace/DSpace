@@ -39,6 +39,9 @@
 		<xsl:apply-templates/>
         </resource>
 	</xsl:template>
+	<xsl:template name="get_identifier">
+		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
+	</xsl:template>
 	    <!-- ********** Creators ************* -->
 	    <creators>
 			<xsl:choose>
