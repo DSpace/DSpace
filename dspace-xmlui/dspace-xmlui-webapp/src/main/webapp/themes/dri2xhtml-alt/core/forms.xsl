@@ -191,6 +191,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
+                <xsl:variable name="help" select="dri:field/dri:help/text()"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -201,7 +202,17 @@
                                 <xsl:otherwise></xsl:otherwise>
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
-                    <xsl:text>:</xsl:text>
+                    <xsl:if test="string-length($help)>0">
+                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                    <xsl:attribute name="title">
+                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                    </xsl:attribute>
+                                </img>
+                            </xsl:if>
+                        </div>
+                    </xsl:if>
                 </label>
             </xsl:when>
             <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
@@ -222,6 +233,7 @@
 
             </xsl:when>
             <xsl:when test="dri:field">
+                <xsl:variable name="help" select="dri:help/text()"/>
                 <xsl:choose>
                         <xsl:when test="preceding-sibling::*[1][local-name()='label']">
                                 <label class="ds-form-label">
@@ -234,6 +246,17 @@
                                                 <xsl:otherwise></xsl:otherwise>
                                         </xsl:choose>
                                     <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                                    <xsl:if test="string-length($help)>0">
+                                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                            <xsl:attribute name="title">
+                                                <xsl:value-of select="substring-after($help,'.')"/>
+                                            </xsl:attribute>
+                                        </img>
+                                            </xsl:if>
+                                        </div>
+                                    </xsl:if>
                                 </label>
                             </xsl:when>
                             <xsl:otherwise>
@@ -250,6 +273,7 @@
     </xsl:template>
 
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
+        <xsl:variable name="help" select="dri:help/text()"/>
                 <xsl:attribute name="class">
                 <xsl:text>ds-form-label</xsl:text>
                <xsl:if test="@rend">
@@ -267,6 +291,17 @@
                 </xsl:otherwise>
         </xsl:choose>
         <xsl:apply-templates />
+        <xsl:if test="string-length($help)>0">
+            <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                <xsl:if test="string-length(substring-after($help,'.'))>0">
+                    <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                        <xsl:attribute name="title">
+                            <xsl:value-of select="substring-after($help,'.')"/>
+                        </xsl:attribute>
+                    </img>
+                </xsl:if>
+            </div>
+        </xsl:if>
     </xsl:template>
 
 
@@ -366,24 +401,12 @@
             <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
             <xsl:if test="dri:instance or dri:field/dri:instance">
-                <div class="ds-previous-values">
-                    <xsl:call-template name="fieldIterator">
-                        <xsl:with-param name="position">1</xsl:with-param>
-                    </xsl:call-template>
-                    <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                        <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                        <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                    </xsl:if>
-                    <xsl:for-each select="dri:field">
-                        <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                    </xsl:for-each>
-                </div>
+                <xsl:call-template name="ds-previous-values">
+                    <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
+                </xsl:call-template>            
             </xsl:if>
         </div>
     </xsl:template>
-
-
-
 
     <!-- TODO: The field section works but needs a lot of scrubbing. I would say a third of the
         templates involved are either bloated or superfluous. -->
@@ -417,24 +440,9 @@
         <xsl:apply-templates select="dri:help" mode="help"/>
         <xsl:apply-templates select="dri:error" mode="error"/>
         <xsl:if test="dri:instance">
-            <div class="ds-previous-values">
-                <!-- Iterate over the dri:instance elements contained in this field. The instances contain
-                    stored values as either "interpreted", "raw", or "default" values. -->
-                <xsl:call-template name="simpleFieldIterator">
-                    <xsl:with-param name="position">1</xsl:with-param>
-                </xsl:call-template>
-                <!-- Conclude with a DELETE button if the delete operation is specified. This allows
-                    removing one or more values stored for this field. -->
-                <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
-                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                </xsl:if>
-                <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
-                    the form still submits the information in those instances, even though they are no
-                    longer encoded as HTML fields. The DRI Reference should contain the exact attributes
-                    the hidden fields should have in order for this to work properly. -->
-                <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-            </div>
+            <xsl:call-template name="ds-previous-values">
+                <xsl:with-param name="field-iterator" select="'simpleFieldIterator'"/>
+            </xsl:call-template>            
         </xsl:if>
     </xsl:template>
 
@@ -444,7 +452,10 @@
     <xsl:template name="simpleFieldIterator">
         <xsl:param name="position"/>
         <xsl:if test="dri:instance[position()=$position]">
-            <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
+            
+            <!--<input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>-->
+            <input type="submit" value="Remove" name="{concat('submit_',@n,'_',$position,'_delete')}" class="ds-button-field ds-delete-button" />
+            
             <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
 
             <!-- look for authority value in instance. -->
@@ -561,20 +572,9 @@
         </xsl:choose>
         <br/>
         <xsl:if test="dri:instance or dri:field/dri:instance">
-            <div class="ds-previous-values">
-                <xsl:call-template name="fieldIterator">
-                    <xsl:with-param name="position">1</xsl:with-param>
-                </xsl:call-template>
-                <!-- Conclude with a DELETE button if the delete operation is specified. This allows
-                    removing one or more values stored for this field. -->
-                <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                </xsl:if>
-                <xsl:for-each select="dri:field">
-                    <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                </xsl:for-each>
-            </div>
+            <xsl:call-template name="ds-previous-values">
+                <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
+            </xsl:call-template>            
         </xsl:if>
     </xsl:template>
 
@@ -599,7 +599,10 @@
             <!-- First check to see if the composite itself has a non-empty instance value in that
                 position. In that case there is no need to go into the individual fields. -->
             <xsl:when test="count(dri:instance[position()=$position]/dri:value[@type != 'authority'])">
-                <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
+                
+                <!--<input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>-->
+                <input type="submit" value="Remove" name="{concat('submit_',@n,'_',$position,'_delete')}" class="ds-button-field ds-delete-button" />
+                
                 <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
                 <xsl:call-template name="authorityConfidenceIcon">
                   <xsl:with-param name="confidence" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
@@ -611,7 +614,11 @@
             </xsl:when>
             <!-- Otherwise, build the string from the component fields -->
             <xsl:when test="dri:field/dri:instance[position()=$position]">
-                <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
+
+                <!--<input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>-->
+                <input type="submit" value="Remove" name="{concat('submit_',@n,'_',$position,'_delete')}" class="ds-button-field ds-delete-button" />
+                
+                
                 <xsl:apply-templates select="dri:field" mode="compositeField">
                     <xsl:with-param name="position" select="$position"/>
                 </xsl:apply-templates>
@@ -779,17 +786,43 @@
                         <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
                     </xsl:if>
                 </xsl:when>
+		<xsl:when test="@rend='label-at-left'">
+		  <!-- render the label text before the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:if test="dri:label">
+		      <br/>
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		  </label>
+		</xsl:when>
+		<xsl:when test="@rend='label-at-left-nobr'">
+		  <!-- render the label text before the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:if test="dri:label">
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		  </label>
+		</xsl:when>
                 <xsl:otherwise>
-                        <label class="ds-composite-component">
-                            <xsl:if test="position()=last()">
-                                <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
-                            </xsl:if>
-                            <xsl:apply-templates select="." mode="normalField"/>
-                            <xsl:if test="dri:label">
-                                <br/>
-                                <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
-                            </xsl:if>
-                        </label>
+		  <!-- render the label text after/below the component -->
+		  <label class="ds-composite-component">
+		    <xsl:if test="position()=last()">
+		      <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		    </xsl:if>
+		    <xsl:apply-templates select="." mode="normalField"/>
+		    <xsl:if test="dri:label">
+		      <br/>
+		      <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+		    </xsl:if>
+		  </label>
                 </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -906,7 +939,6 @@
                 </xsl:when>
               </xsl:choose>
             </xsl:when>
-
             <!-- This is changing drammatically -->
             <xsl:when test="@type= 'checkbox' or @type= 'radio'">
                 <fieldset>
@@ -1125,5 +1157,49 @@
             </span>
         </xsl:if>
     </xsl:template>
-    
+
+    <xsl:template name="ds-previous-values">
+        <xsl:param name="field-iterator"/>
+        <div class="ds-previous-values">
+            <!-- Iterate over the dri:instance elements contained in this field. The instances contain
+                    stored values as either "interpreted", "raw", or "default" values. -->
+            <xsl:choose>
+                <xsl:when test="$field-iterator = 'fieldIterator'">
+                    <xsl:call-template name="fieldIterator">
+                        <xsl:with-param name="position">1</xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$field-iterator = 'simpleFieldIterator'">
+                    <xsl:call-template name="simpleFieldIterator">
+                        <xsl:with-param name="position">1</xsl:with-param>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:message terminate="yes">Unsupported field iterator: <xsl:value-of select="$field-iterator"/></xsl:message>
+                </xsl:otherwise>
+            </xsl:choose>
+            <!-- Conclude with a DELETE button if the delete operation is specified. This allows
+                    removing one or more values stored for this field. -->
+            <xsl:if test="contains(dri:params/@operations,'delete')">
+                <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                <!-- NEW: added per-entry delete:
+                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />-->
+            </xsl:if>
+            <!-- TODO: confirm that descendant::dri:instance is the right thing, per the XSD -->
+            <!--
+            <xsl:for-each select="dri:field">
+                <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
+            </xsl:for-each>
+            -->
+            <!-- 
+            <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
+            -->
+            <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
+                    the form still submits the information in those instances, even though they are no
+                    longer encoded as HTML fields. The DRI Reference should contain the exact attributes
+                    the hidden fields should have in order for this to work properly. -->
+            <xsl:apply-templates select="descendant::dri:instance" mode="hiddenInterpreter"/>
+        </div>
+    </xsl:template>
+
 </xsl:stylesheet>
