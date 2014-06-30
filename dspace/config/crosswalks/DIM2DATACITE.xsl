@@ -10,9 +10,8 @@
 	<xsl:strip-space elements="*"/>
     <xsl:output method="xml" version="1.0"
                 encoding="utf-8" indent="yes"/>
-
-      <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
-      <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
+	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
 <!-- Main match for the root node: set up the root element, <resource>	 -->
     <xsl:template match="/">
