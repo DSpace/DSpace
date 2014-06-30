@@ -20,28 +20,20 @@
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
-
-	    <!-- ********** Identifiers ********** -->
-      <xsl:if test="dspace:field[@element ='identifier']">
-          <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier)][1]">
-              <xsl:variable name="id" select="."/>
-              <xsl:choose>
-                  <xsl:when test="starts-with($id,'doi')">
-                      <identifier identifierType="DOI">
-                          <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-                      </identifier>
-                  </xsl:when>
-              </xsl:choose>
-          </xsl:for-each>
-      </xsl:if>
-      
-
 		<xsl:apply-templates/>
         </resource>
 	</xsl:template>
 	<xsl:template name="get_identifier">
 		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
 	</xsl:template>
+		
+	   <!-- ********** Identifiers ********** -->
+		<identifier identifierType="DOI">
+			<xsl:variable name="doi">
+				<xsl:call-template name="get_identifier"/>
+			</xsl:variable>
+			<xsl:value-of select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
+		</identifier>
 	    <!-- ********** Creators ************* -->
 	    <creators>
 			<xsl:choose>
