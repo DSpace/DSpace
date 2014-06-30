@@ -12,8 +12,12 @@
                 encoding="utf-8" indent="yes"/>
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	<!-- Find the DOI information. -->
+	<xsl:template name="get_identifier">
+		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
+	</xsl:template>
 
-<!-- Main match for the root node: set up the root element, <resource>	 -->
+	<!-- Main match for the root node: set up the root element, <resource> -->
     <xsl:template match="/">
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
@@ -21,10 +25,8 @@
 		<xsl:apply-templates/>
         </resource>
 	</xsl:template>
-	<xsl:template name="get_identifier">
-		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
-	</xsl:template>
 		
+	<!-- Parse datacite tags that are found in DIM -->
 	<xsl:template match="dim:dim">
 	   <!-- ********** Identifiers ********** -->
 		<identifier identifierType="DOI">
