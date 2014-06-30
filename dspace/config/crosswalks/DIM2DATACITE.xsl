@@ -7,7 +7,7 @@
                 xmlns:dryad="http://purl.org/dryad/terms/"
                 version="1.0">
 
-    <xsl:strip-space elements="*"/>
+	<xsl:strip-space elements="*"/>
     <xsl:output method="xml" version="1.0"
                 encoding="utf-8" indent="yes"/>
 
@@ -36,67 +36,67 @@
 
 	    <!-- ********** Creators ************* -->
 	    <creators>
-	        <xsl:choose>
-            <xsl:when test="dspace:field[@element ='contributor' and @qualifier='author']">
-                  <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
-                      <creator>
-                          <creatorName>
-                              <xsl:value-of select="."/>
-                          </creatorName>
-                      </creator>
-                  </xsl:for-each>
-            </xsl:when>
-            <xsl:otherwise>
-              <creator><creatorName>(:unav)</creatorName></creator>
-            </xsl:otherwise>
-          </xsl:choose>
-      </creators>
+			<xsl:choose>
+	            <xsl:when test="dspace:field[@element ='contributor' and @qualifier='author']">
+					<xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
+						<creator>
+							<creatorName>
+							  <xsl:value-of select="."/>
+							</creatorName>
+						</creator>
+					</xsl:for-each>
+	            </xsl:when>
+	            <xsl:otherwise>
+					<creator><creatorName>(:unav)</creatorName></creator>
+				</xsl:otherwise>
+			</xsl:choose>
+		</creators>
 
 	    <!-- ********* Title *************** -->
-            <xsl:if test="dspace:field[@element ='title']">
-                <titles>
-                    <xsl:for-each select="dspace:field[@element ='title']">
-                        <title>
-                            <xsl:value-of select="."/>
-                        </title>
-                    </xsl:for-each>
-                </titles>
-            </xsl:if>
+		<xsl:if test="dspace:field[@element ='title']">
+		    <titles>
+		        <xsl:for-each select="dspace:field[@element ='title']">
+		            <title>
+		                <xsl:value-of select="."/>
+		            </title>
+		        </xsl:for-each>
+		    </titles>
+		</xsl:if>
 
 	    <!-- *********** Publisher ************ -->
-            <publisher>Dryad Digital Repository</publisher>
+        <publisher>Dryad Digital Repository</publisher>
 
 	    <!-- ************ Publication Year ************** -->
-            <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
-                <xsl:for-each select="dspace:field[@qualifier='accessioned'][1]">
-                    <publicationYear>
-                        <xsl:variable name="date" select="."/>
-                        <xsl:value-of select="substring($date, 0, 5)"/>
-                    </publicationYear>
-                </xsl:for-each>
-            </xsl:if>
+        <xsl:if test="dspace:field[@element='date' and @qualifier='accessioned']">
+            <xsl:for-each select="dspace:field[@qualifier='accessioned'][1]">
+                <publicationYear>
+                    <xsl:variable name="date" select="."/>
+                    <xsl:value-of select="substring($date, 0, 5)"/>
+                </publicationYear>
+            </xsl:for-each>
+        </xsl:if>
 
 	    <!-- ************ Subjects ************** -->
-            <xsl:if test="dspace:field[@element ='subject' or @element='coverage']">
-                <subjects>
-                    <xsl:for-each select="dspace:field[@element ='subject']">
-                        <subject>
-                          <xsl:value-of select="."/>
-                        </subject>
-                    </xsl:for-each>
-                    <xsl:for-each select="dspace:field[@element ='coverage']">
-                        <subject>
-                          <xsl:value-of select="."/>
-                        </subject>
-                    </xsl:for-each>
-                    <xsl:for-each select="dspace:field[@element ='ScientificName']">
-                        <subject>
-                          <xsl:value-of select="."/>
-                        </subject>
-                    </xsl:for-each>
-                </subjects>
-            </xsl:if>
-            
+        <xsl:if test="dspace:field[@element ='subject' or @element='coverage']">
+            <subjects>
+                <xsl:for-each select="dspace:field[@element ='subject']">
+                    <subject>
+                      <xsl:value-of select="."/>
+                    </subject>
+                </xsl:for-each>
+                <xsl:for-each select="dspace:field[@element ='coverage']">
+                    <subject>
+                      <xsl:value-of select="."/>
+                    </subject>
+                </xsl:for-each>
+                <xsl:for-each select="dspace:field[@element ='ScientificName']">
+                    <subject>
+                      <xsl:value-of select="."/>
+                    </subject>
+                </xsl:for-each>
+            </subjects>
+        </xsl:if>
+        
       <!-- ************ Dates - Only for Data Files ************** -->
 	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
           <xsl:variable name="embargoedUntil"
@@ -119,10 +119,10 @@
       </xsl:if>      
 
 	    <!-- ************ Resource Type ************** -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+	  <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
   	    <resourceType resourceTypeGeneral="Dataset">DataFile</resourceType>
   	  </xsl:if>
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
+	  <xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
   	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
   	  </xsl:if>
   	  
@@ -236,7 +236,7 @@
       </xsl:if>
 
       <!-- *********** Description - Only for data files********* -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+	  <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
 	      <descriptions>
 	        <description descriptionType="Other">
               <xsl:value-of select="dspace:field[@element='description']"/>
