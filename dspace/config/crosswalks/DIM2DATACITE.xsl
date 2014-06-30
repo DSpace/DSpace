@@ -15,6 +15,8 @@
       <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
       <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
+<!-- Main match for the root node: set up the root element, <resource>	 -->
+    <xsl:template match="/">
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
@@ -34,6 +36,9 @@
       </xsl:if>
       
 
+		<xsl:apply-templates/>
+        </resource>
+	</xsl:template>
 	    <!-- ********** Creators ************* -->
 	    <creators>
 			<xsl:choose>
@@ -243,6 +248,5 @@
 	        </description>
 	      </descriptions>
       </xsl:if>
-    </resource>
   </xsl:template>
 </xsl:stylesheet>
