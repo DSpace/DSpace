@@ -11,7 +11,6 @@
     <xsl:output method="xml" version="1.0"
                 encoding="utf-8" indent="yes"/>
 
-    <xsl:template match="dim:dim">
       <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
       <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
@@ -27,6 +26,7 @@
 		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
 	</xsl:template>
 		
+	<xsl:template match="dim:dim">
 	   <!-- ********** Identifiers ********** -->
 		<identifier identifierType="DOI">
 			<xsl:variable name="doi">
@@ -242,6 +242,6 @@
               <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
 	      </descriptions>
-      </xsl:if>
-  </xsl:template>
+	</xsl:if>
+	</xsl:template>
 </xsl:stylesheet>
