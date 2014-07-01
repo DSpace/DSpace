@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataPackageUnpublishedCountTest extends ContextUnitTest {
-    private Date date_2014_06_07;
+    private Date date_2014_06_07, date_2014_06_01, date_2014_06_15, date_2014_06_30;
     private static final String STRING_2014_06 = "2014-06";
     private static final String BURIED_DATE_STRING = "2014-03-05T18:11:29Z";
     private static final String PROVENANCE_MESSAGE = "Submitted by First Last (f.last@university.edu) on " + BURIED_DATE_STRING + " workflow start=Step: requiresReviewStep - action:noUserSelectionAction\nNo. of bitstreams: 0";
@@ -32,6 +32,12 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         calendar.set(Calendar.MONTH, Calendar.JUNE);
         calendar.set(Calendar.DAY_OF_MONTH, 7);
         date_2014_06_07 = calendar.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        date_2014_06_01 = calendar.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 15);
+        date_2014_06_15 = calendar.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 30);
+        date_2014_06_30 = calendar.getTime();
     }
     /**
      * Test of bucketForDate method, of class DataPackageUnpublishedCount.
@@ -63,10 +69,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         // Get the count prior to adding a data package to the workflow.
         DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
         Map<String, Integer> results = instance.extract(journalName);
-        Integer initialCount = 0;
-        if(results != null && results.containsKey(STRING_2014_06)) {
-            initialCount = results.get(STRING_2014_06);
-        }
+        Integer initialCount = getCountOrZero(results, STRING_2014_06);
         DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
         DCDate submittedDate = new DCDate(date_2014_06_07);
         String submitterName = "Cornelius Tester";
@@ -92,5 +95,59 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         assertTrue("Results should contain a count for " + STRING_2014_06, results.containsKey(STRING_2014_06));
         resultCount = results.get(STRING_2014_06);
         assertEquals("Count mismatch", expectedCount, resultCount);
+    }
+
+    private static Integer getCountOrZero(Map<String, Integer> map, String key) {
+        if(map != null && map.containsKey(key)) {
+            return map.get(key);
+        } else {
+            return 0;
+        }
+    }
+
+    @Test
+    public void testCountUnpublishedDataPackagesInDateRange() throws Exception {
+        System.out.println("countUnpublishedDataPackagesInDateRange");
+        // Make two instances with different ranges
+        // add a data package to one range. Assert it increases and the other does not
+        DataPackageUnpublishedCount instance1 = new DataPackageUnpublishedCount(this.context);
+        instance1.setBeginDate(date_2014_06_01);
+        instance1.setEndDate(date_2014_06_15);
+        DataPackageUnpublishedCount instance2 = new DataPackageUnpublishedCount(this.context);
+        instance2.setBeginDate(date_2014_06_15);
+        instance2.setEndDate(date_2014_06_30);
+        // date_2014_06_07 is in range 1 but not range 2
+
+        String journalName = "Test Journal";
+        Map<String, Integer> results1 = instance1.extract(journalName);
+        Map<String, Integer> results2 = instance2.extract(journalName);
+
+        Integer initialCount1 = getCountOrZero(results1, STRING_2014_06);
+        Integer initialCount2 = getCountOrZero(results2, STRING_2014_06);
+
+        // now add a package with provenance for middle of june, and make sure instance2 doesnt' change
+        DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
+        DCDate submittedDate = new DCDate(date_2014_06_07);
+        String submitterName = "Cornelius Tester";
+        String submitterEmail = "test@example.com";
+        String provenanceStartId = "TEST START ID";
+        String bitstreamProvenanceMessage = "Number of Bitstreams: 0";
+        dataPackage.setPublicationName(journalName);
+        dataPackage.addSubmittedProvenance(submittedDate, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
+
+        results1 = instance1.extract(journalName);
+        results2 = instance2.extract(journalName);
+
+        Integer finalCount1 = getCountOrZero(results1, STRING_2014_06);
+        Integer finalCount2 = getCountOrZero(results2, STRING_2014_06);
+
+        // count1 should have increased
+        // count2 should not
+
+        Integer countIncrease1 = finalCount1 - initialCount1;
+        Integer countIncrease2 = finalCount2 - initialCount2;
+
+        assertTrue("Count 1 should have increased", countIncrease1 > 0);
+        assertTrue("Count 2 should not have increased", countIncrease2 == 0);
     }
 }
