@@ -105,35 +105,6 @@
                 </xsl:for-each>
             </subjects>
         </xsl:if>
-        
-      <!-- ************ Dates - Only for Data Files ************** -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-          <xsl:variable name="embargoedUntil"
-                        select="dspace:field[@element='date' and @qualifier='embargoedUntil']"/>
-          <xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
-          <xsl:if test="($embargoedUntil and not($embargoedUntil='9999-01-01')) or $dateAccepted">
-            <dates>
-              <xsl:if test="$embargoedUntil and not($embargoedUntil='9999-01-01')">
-                  <date dateType="Available">
-                      <xsl:value-of select="$embargoedUntil"/>
-                  </date>
-              </xsl:if>
-              <xsl:if test="$dateAccepted">
-                  <date dateType="Accepted">
-                      <xsl:value-of select="$dateAccepted"/>
-                  </date>
-              </xsl:if>
-            </dates>
-          </xsl:if>
-      </xsl:if>      
-
-	    <!-- ************ Resource Type ************** -->
-	  <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-  	    <resourceType resourceTypeGeneral="Dataset">DataFile</resourceType>
-  	  </xsl:if>
-	  <xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
-  	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
-  	  </xsl:if>
   	  
 		<!-- ************ Alternate Identifiers ************** -->
 		<xsl:variable name="alternateIdentifiers">
@@ -161,97 +132,35 @@
 		</xsl:if>
 
 	    <!-- *********** Related Identifiers ********* -->
-      <xsl:if test="dspace:field[@element='relation']">
-	      <relatedIdentifiers>
-                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='haspart']">
-                    <relatedIdentifier relatedIdentifierType="DOI" relationType="HasPart">
-                      <xsl:variable name="id" select="."/>
-                      <xsl:if test="starts-with($id,'doi')">
-                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-                      </xsl:if>
-                    </relatedIdentifier>
-                </xsl:for-each>
-                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='ispartof']">
-                    <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">
-                      <xsl:variable name="id" select="."/>
-                      <xsl:if test="starts-with($id,'doi')">
-                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-	              </xsl:if>
-                    </relatedIdentifier>
-                </xsl:for-each>
-                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
-                    <relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
-                      <xsl:variable name="id" select="."/>
-                      <xsl:if test="starts-with($id,'doi')">
-                        <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-                      </xsl:if>
-                    </relatedIdentifier>
-                </xsl:for-each>
-	      </relatedIdentifiers>
-            </xsl:if>
-
-      <!-- Embargo - only for data files -->
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-          <xsl:variable name="embargoedUntil"
-                        select="dspace:field[@element='date' and @qualifier='embargoedUntil']"/>
-          <xsl:variable name="embargoType"
-                        select="dspace:field[@element='type' and @qualifier='embargo']"/>
-          <xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
-          
-          <xsl:variable name="embargoText">
-            <xsl:choose>
-                <!-- If the embargoredDate is empty, this item is no longer embargoed -->
-                <xsl:when test="$embargoedUntil!=''">
-                    <xsl:choose>
-                        <xsl:when test="$embargoedUntil='9999-01-01' and $embargoType='oneyear'">
-                            <!-- The item is under one-year embargo, but the article has not been published yet,
-                                       so we don't have an end date. -->
-                        <xsl:text>At the request of the author, this item is embargoed until one year after the associated article is published.</xsl:text>
-                        </xsl:when>
-                        <xsl:when
-                                test="$embargoedUntil='9999-01-01' and ($embargoType='untilArticleAppears' or $embargoType='unknown')">
-                            <!-- The item is under embargo, but the end date is not yet known -->
-                        <xsl:text>At the request of the author, this item is embargoed until the associated article is published.</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="$embargoedUntil='9999-01-01' and $embargoType='custom'">
-                            <!-- The item is under embargo, but the end date is not yet known. The editor has approved a custom length. -->
-                            <xsl:text>At the request of the author, this item is embargoed. The journal editor has set a custom embargo length. Once the associated article is published, the exact release date of the embargo will be shown here.</xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- The item is under embargo, and the end date of the embargo is known. -->
-                            <xsl:text>At the request of the author, this item is embargoed until</xsl:text>
-                            <xsl:value-of select="$embargoedUntil"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="dspace:field[@element='rights']"/>
-                </xsl:otherwise>
-            </xsl:choose>
-          </xsl:variable>
-          <!-- ************ Rights *************** -->
-          <xsl:if test="$embargoText!=''">
-              <rights>
-                  <xsl:value-of select="$embargoText"/>
-              </rights>
-          </xsl:if>
-      </xsl:if>
-	    <xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
-	        <!--  All data package DOIs include a CC0 statement. -->
-          <!-- ************ Rights *************** -->
-          <rights>
-            <xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
-          </rights>
-      </xsl:if>
-
-      <!-- *********** Description - Only for data files********* -->
-	  <xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
-	      <descriptions>
-	        <description descriptionType="Other">
-              <xsl:value-of select="dspace:field[@element='description']"/>
-	        </description>
-	      </descriptions>
-	</xsl:if>
+		<xsl:if test="dspace:field[@element='relation']">
+			<relatedIdentifiers>
+			    <xsl:for-each select="dspace:field[@element='relation' and @qualifier='haspart']">
+					<relatedIdentifier relatedIdentifierType="DOI" relationType="HasPart">
+						<xsl:variable name="id" select="."/>
+						<xsl:if test="starts-with($id,'doi')">
+							<xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+						</xsl:if>
+					</relatedIdentifier>
+			    </xsl:for-each>
+			    <xsl:for-each select="dspace:field[@element='relation' and @qualifier='ispartof']">
+			        <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">
+						<xsl:variable name="id" select="."/>
+						<xsl:if test="starts-with($id,'doi')">
+							<xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+						</xsl:if>
+			        </relatedIdentifier>
+			    </xsl:for-each>
+			    <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
+					<relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
+						<xsl:variable name="id" select="."/>
+						<xsl:if test="starts-with($id,'doi')">
+							<xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+						</xsl:if>
+					</relatedIdentifier>
+			    </xsl:for-each>
+			</relatedIdentifiers>
+		</xsl:if>
+		
 		
 		<!-- *********** Sizes - Only for data files********* -->
 		<sizes>
@@ -262,5 +171,89 @@
 				</size>
 			</xsl:for-each>
 		</sizes>
+		<!-- ******************************************************** -->
+		<!-- ************ Handle tags for data packages: ************ -->
+		<!-- ******************************************************** -->
+		
+		<xsl:if test="dspace:field[@element='relation' and @qualifier='haspart']">
+		    <!-- ************ Resource Type ************** -->
+			<resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>	
+					
+			<!-- ************ Rights *************** -->
+			<!--  All data package DOIs include a CC0 statement. -->
+			<rights>
+				<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+			</rights>
+		</xsl:if>
+		
+		<!-- ***************************************************** -->
+		<!-- ************ Handle tags for data files: ************ -->
+		<!-- ***************************************************** -->
+		
+		<xsl:if test="dspace:field[@element='relation' and @qualifier='ispartof']">
+		    <!-- ************ Resource Type ************** -->
+			<resourceType resourceTypeGeneral="Dataset">DataFile</resourceType>
+			
+			<!-- *********** Embargo - Only for data files ********* -->
+			<xsl:variable name="embargoedUntil" select="dspace:field[@element='date' and @qualifier='embargoedUntil']"/>
+			<xsl:variable name="embargoType" select="dspace:field[@element='type' and @qualifier='embargo']"/>
+			<xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
+          
+			<!-- ************ Rights *************** -->
+			<rights>
+	            <xsl:choose>
+	                <!-- If the embargoedDate is empty, this item is no longer embargoed -->
+	                <xsl:when test="$embargoedUntil!=''">
+	                    <xsl:choose>
+							<xsl:when test="$embargoedUntil='9999-01-01' and $embargoType='oneyear'">
+								<!-- The item is under one-year embargo, but the article has not been published yet,
+								so we don't have an end date. -->
+								<xsl:text>At the request of the author, this item is embargoed until one year after the associated article is published.</xsl:text>
+							</xsl:when>
+							<xsl:when test="$embargoedUntil='9999-01-01' and ($embargoType='untilArticleAppears' or $embargoType='unknown')">
+								<!-- The item is under embargo, but the end date is not yet known -->
+								<xsl:text>At the request of the author, this item is embargoed until the associated article is published.</xsl:text>
+							</xsl:when>
+							<xsl:when test="$embargoedUntil='9999-01-01' and $embargoType='custom'">
+								<!-- The item is under embargo, but the end date is not yet known. The editor has approved a custom length. -->
+								<xsl:text>At the request of the author, this item is embargoed. The journal editor has set a custom embargo length. Once the associated article is published, the exact release date of the embargo will be shown here.</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<!-- The item is under embargo, and the end date of the embargo is known. -->
+								<xsl:text>At the request of the author, this item is embargoed until </xsl:text>
+								<xsl:value-of select="$embargoedUntil"/>
+							</xsl:otherwise>
+	                    </xsl:choose>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <xsl:value-of select="dspace:field[@element='rights']"/>
+	                </xsl:otherwise>
+	            </xsl:choose>
+			</rights>
+			
+			<!-- ************ Dates - Only for Data Files ************** -->
+			<xsl:if test="($embargoedUntil and not($embargoedUntil='9999-01-01')) or $dateAccepted">
+				<dates>
+					<xsl:if test="$embargoedUntil and not($embargoedUntil='9999-01-01')">
+						<date dateType="Available">
+							<xsl:value-of select="$embargoedUntil"/>
+						</date>
+					</xsl:if>
+					<xsl:if test="$dateAccepted">
+						<date dateType="Accepted">
+							<xsl:value-of select="$dateAccepted"/>
+						</date>
+					</xsl:if>
+				</dates>
+			</xsl:if>
+			
+			<!-- *********** Description - Only for data files ********* -->
+			<descriptions>
+				<description descriptionType="Other">
+					<xsl:value-of select="dspace:field[@element='description']"/>
+				</description>
+			</descriptions>
+			
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
