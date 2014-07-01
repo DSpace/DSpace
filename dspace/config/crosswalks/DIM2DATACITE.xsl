@@ -251,12 +251,7 @@
               <xsl:value-of select="dspace:field[@element='description']"/>
 	        </description>
 	      </descriptions>
-		<xsl:call-template name="parse_mets"/>
 	</xsl:if>
-	</xsl:template>
-	
-	<!-- Match for file information that is outside of DIM -->
-	<xsl:template name="parse_mets">
 		
 		<!-- *********** Sizes - Only for data files********* -->
 		<sizes>
