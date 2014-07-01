@@ -42,6 +42,7 @@ public class EmbargoedDataFileCount extends DataFileCount {
             ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
             collection = getCollection();
             while (itemsByJournal.hasNext()) {
+                // TODO: Filter on embargo dates
                 DryadDataFile dataFile = new DryadDataFile(itemsByJournal.next());
                 if(dataFile.isEmbargoed()) {
                     count++;
