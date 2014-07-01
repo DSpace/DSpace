@@ -135,30 +135,30 @@
   	    <resourceType resourceTypeGeneral="Dataset">DataPackage</resourceType>
   	  </xsl:if>
   	  
-  	  <!-- ************ Alternate Identifiers ************** -->
-  	  <xsl:variable name="alternateIdentifiers">
-        <xsl:if test="dspace:field[@element ='identifier']">
-            <xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier='manuscriptNumber') and not(@qualifier='uri')]">
-                <xsl:variable name="id" select="."/>
-                <xsl:choose>
-                    <xsl:when test="not(starts-with($id,'doi'))">
-                        <xsl:element name="alternateIdentifier">
-                            <xsl:attribute name="alternateIdentifierType">
-                                <xsl:value-of select="@qualifier"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="."/>
-                        </xsl:element>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:for-each>
-        </xsl:if>
-      </xsl:variable>
+		<!-- ************ Alternate Identifiers ************** -->
+		<xsl:variable name="alternateIdentifiers">
+			<xsl:if test="dspace:field[@element ='identifier']">
+				<xsl:for-each select="dspace:field[@element ='identifier' and not(@qualifier='manuscriptNumber') and not(@qualifier='uri')]">
+				    <xsl:variable name="id" select="."/>
+				    <xsl:choose>
+				        <xsl:when test="not(starts-with($id,'doi'))">
+				            <xsl:element name="alternateIdentifier">
+				                <xsl:attribute name="alternateIdentifierType">
+				                    <xsl:value-of select="@qualifier"/>
+				                </xsl:attribute>
+				                <xsl:value-of select="."/>
+				            </xsl:element>
+				        </xsl:when>
+				    </xsl:choose>
+				</xsl:for-each>
+			</xsl:if>
+		</xsl:variable>
       
-      <xsl:if test="$alternateIdentifiers!=''">
-        <alternateIdentifiers>
-          <xsl:copy-of select="$alternateIdentifiers"/>
-        </alternateIdentifiers>
-      </xsl:if>
+		<xsl:if test="$alternateIdentifiers!=''">
+			<alternateIdentifiers>
+				<xsl:copy-of select="$alternateIdentifiers"/>
+			</alternateIdentifiers>
+		</xsl:if>
 
 	    <!-- *********** Related Identifiers ********* -->
       <xsl:if test="dspace:field[@element='relation']">
