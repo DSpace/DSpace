@@ -58,9 +58,9 @@
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
         <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
-        <div class="btn-group pull-right col-md-offset-5">
-			<input class="btn btn-success" type="submit" name="submit_save" value="<fmt:message key="jsp.submit.general.save"/>" />
-			<input class="btn btn-default" type="submit" name="submit_edit_cancel" value="<fmt:message key="jsp.submit.general.cancel"/>" />
+        <div class="col-md-4 pull-right btn-group">
+			<input class="btn btn-default col-md-6" type="submit" name="submit_edit_cancel" value="<fmt:message key="jsp.submit.general.cancel"/>" />
+			<input class="btn btn-primary col-md-6" type="submit" name="submit_save" value="<fmt:message key="jsp.submit.general.save"/>" />
 		</div>
     </form>
 

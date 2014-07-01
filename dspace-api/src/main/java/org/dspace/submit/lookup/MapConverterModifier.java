@@ -7,12 +7,18 @@
  */
 package org.dspace.submit.lookup;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 
 import gr.ekt.bte.core.AbstractModifier;
 import gr.ekt.bte.core.MutableRecord;
@@ -21,111 +27,188 @@ import gr.ekt.bte.core.StringValue;
 import gr.ekt.bte.core.Value;
 
 /**
- *
- *
+ * @author Andrea Bollini
+ * @author Kostas Stamatis
+ * @author Luigi Andrea Pascarelli
+ * @author Panagiotis Koutsourakis
  */
-public class MapConverterModifier extends AbstractModifier {
+public class MapConverterModifier extends AbstractModifier
+{
 
-	String filename; //The properties filename
-	Map<String, String> mapping;
-	String defaultValue = "";
+	private String mappingFile; //The properties absolute filename
+	
+	private String converterNameFile; //The properties filename
 
-	List<String> fieldKeys;
+	private ConfigurationService configurationService;
+	
+    private Map<String, String> mapping;
 
-	private Map<String, String> regexConfig = new HashMap<String, String>();
+    private String defaultValue = "";
 
-	public final String REGEX_PREFIX = "regex.";
+    private List<String> fieldKeys;
 
-	/**
-	 * @param name
-	 */
-	public MapConverterModifier(String name) {
-		super(name);
-	}
+    private Map<String, String> regexConfig = new HashMap<String, String>();
 
-	/* (non-Javadoc)
-	 * @see gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
-	 */
-	@Override
-	public Record modify(MutableRecord record) {
-		if (mapping != null && fieldKeys != null) {
-			for (String key : fieldKeys){
-				List<Value> values = record.getValues(key);
+    public final String REGEX_PREFIX = "regex.";
 
-				if (values==null) continue;
-				
-				List<Value> newValues = new ArrayList<Value>();
+    public void init() {
+        this.mappingFile = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator + "crosswalks" + File.separator + converterNameFile;
+        
+        this.mapping = new HashMap<String, String>();
+        
+        FileInputStream fis = null;
+        try
+        {
+            fis = new FileInputStream(new File(mappingFile));
+            Properties mapConfig = new Properties();
+            mapConfig.load(fis);
+            fis.close();
+            for (Object key : mapConfig.keySet())
+            {
+                String keyS = (String)key;
+                if (keyS.startsWith(REGEX_PREFIX))
+                {
+                    String regex = keyS.substring(REGEX_PREFIX.length());
+                    String regReplace = mapping.get(keyS);
+                    if (regReplace == null)
+                    {
+                        regReplace = "";
+                    }
+                    else if (regReplace.equalsIgnoreCase("@ident@"))
+                    {
+                        regReplace = "$0";
+                    }
+                    regexConfig.put(regex,regReplace);
+                }
+                if (mapConfig.getProperty(keyS) != null)
+                    mapping.put(keyS, mapConfig.getProperty(keyS));
+                else 
+                    mapping.put(keyS, "");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("", e);
+        }
+        finally
+        {
+            if (fis != null)
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException ioe)
+                {
+                    // ...
+                }
+            }
+        }
+        for (String keyS : mapping.keySet())
+        {
+            if (keyS.startsWith(REGEX_PREFIX))
+            {
+                String regex = keyS.substring(REGEX_PREFIX.length());
+                String regReplace = mapping.get(keyS);
+                if (regReplace == null)
+                {
+                    regReplace = "";
+                }
+                else if (regReplace.equalsIgnoreCase("@ident@"))
+                {
+                    regReplace = "$0";
+                }
+                regexConfig.put(regex,regReplace);
+            }
+        }
+    }
+    /**
+     * @param name
+     */
+    public MapConverterModifier(String name)
+    {
+        super(name);
+    }
 
-				for (Value value : values){
-					String stringValue = value.getAsString();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * gr.ekt.bte.core.AbstractModifier#modify(gr.ekt.bte.core.MutableRecord)
+     */
+    @Override
+    public Record modify(MutableRecord record)
+    {
+        if (mapping != null && fieldKeys != null)
+        {
+            for (String key : fieldKeys)
+            {
+                List<Value> values = record.getValues(key);
 
-					String tmp = "";
-					if (mapping.containsKey(stringValue))
-					{
-						tmp = mapping.get(stringValue);   
-					}
-					else
-					{
-						tmp = defaultValue;
-						for (String regex : regexConfig.keySet())
-						{
-							if (stringValue != null && stringValue.matches(regex))
-							{
-								tmp = stringValue.replaceAll(regex, regexConfig.get(regex));
-							}
-						}
-					}
+                if (values == null)
+                    continue;
 
-					if ("@@ident@@".equals(tmp))
-					{
-						newValues.add(new StringValue(stringValue));
-					}
-					else if (StringUtils.isNotBlank(tmp))
-					{
-						newValues.add(new StringValue(tmp));
-					}
-					else
-						newValues.add(new StringValue(stringValue));
-				}
+                List<Value> newValues = new ArrayList<Value>();
 
-				record.updateField(key, newValues);
-			}
-		}
+                for (Value value : values)
+                {
+                    String stringValue = value.getAsString();
 
-		return record;
-	}
+                    String tmp = "";
+                    if (mapping.containsKey(stringValue))
+                    {
+                        tmp = mapping.get(stringValue);
+                    }
+                    else
+                    {
+                        tmp = defaultValue;
+                        for (String regex : regexConfig.keySet())
+                        {
+                            if (stringValue != null
+                                    && stringValue.matches(regex))
+                            {
+                                tmp = stringValue.replaceAll(regex,
+                                        regexConfig.get(regex));
+                            }
+                        }
+                    }
 
-	public void setMapping(Map<String, String> mapping) {
-		this.mapping = mapping;
-		
-		for (String keyS : mapping.keySet())
-		{
-			if (keyS.startsWith(REGEX_PREFIX))
-			{
-				String regex = keyS.substring(REGEX_PREFIX.length());
-				String regReplace = mapping.get(keyS);
-				if (regReplace == null)
-				{
-					regReplace = "";
-				}
-				else if (regReplace.equalsIgnoreCase("@ident@"))
-				{
-					regReplace = "$0";
-				}
-				regexConfig.put(regex,regReplace);
-			}
-		}
-	}
+                    if ("@@ident@@".equals(tmp))
+                    {
+                        newValues.add(new StringValue(stringValue));
+                    }
+                    else if (StringUtils.isNotBlank(tmp))
+                    {
+                        newValues.add(new StringValue(tmp));
+                    }
+                    else
+                        newValues.add(new StringValue(stringValue));
+                }
 
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
+                record.updateField(key, newValues);
+            }
+        }
 
-	public void setFieldKeys(List<String> fieldKeys) {
-		this.fieldKeys = fieldKeys;
-	}
+        return record;
+    }
 
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
+
+    public void setFieldKeys(List<String> fieldKeys)
+    {
+        this.fieldKeys = fieldKeys;
+    }
+
+    public void setDefaultValue(String defaultValue)
+    {
+        this.defaultValue = defaultValue;
+    }
+    
+    public void setConverterNameFile(String converterNameFile)
+    {
+        this.converterNameFile = converterNameFile;
+    }
+    public void setConfigurationService(ConfigurationService configurationService)
+    {
+        this.configurationService = configurationService;
+    }
 }

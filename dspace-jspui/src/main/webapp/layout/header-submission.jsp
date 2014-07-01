@@ -121,7 +121,7 @@
 
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
-    <body style="padding-top: 65px;">
+    <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
 <header class="navbar navbar-inverse navbar-fixed-top">    
     <%
@@ -133,10 +133,18 @@
             </div>
 <%
     }
+    else
+    {
+    	%>
+        <div class="container">
+            <dspace:include page="/layout/navbar-minimal.jsp" />
+        </div>
+<%    	
+    }
 %>
 </header>
 
-<main id="content" role="main" style="padding-bottom:60px;">
+<main id="content" role="main">
                 <%-- Location bar --%>
 <%
     if (locbar)

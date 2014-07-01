@@ -68,17 +68,17 @@ public class EditBitstreamPolicies extends AbstractStep
         AccessStepUtil asu = new AccessStepUtil(context);
 
         // list Policies already added
-        asu.addTablePolicies(div, submissionInfo.getBitstream());
+        asu.addTablePolicies(div, submissionInfo.getBitstream(), collection);
 
         List form = div.addList("submit-edit-policy", List.TYPE_FORM);
         form.setHead(T_head);
-
-        asu.addName(request.getParameter("name"), form, errorFlag);
 
         asu.addListGroups(request.getParameter("group_id"), form, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
         asu.addAccessRadios(request.getParameter("open_access_radios"), request.getParameter("embargo_until_date"), form, errorFlag, submissionInfo.getBitstream());
+
+	    asu.addName(request.getParameter("name"), form, errorFlag);
 
         // Reason
         asu.addReason(request.getParameter("reason"), form, errorFlag);

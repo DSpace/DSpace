@@ -22,8 +22,8 @@
     <xsl:output indent="yes"/>
 
 <!--
-    These templaes are devoted to rendering the search results for discovery.
-    Since discovery used hit highlighting seperate templates are required !
+    These templates are devoted to rendering the search results for Discovery.
+    Since Discovery uses hit highlighting separate templates are required !
 -->
 
 
@@ -119,7 +119,7 @@
         <div class="artifact-title">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
-                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -146,7 +146,7 @@
         <div class="artifact-title">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
-                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                     </xsl:when>
                     <xsl:otherwise>
@@ -191,7 +191,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title'))]">
+                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                             <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
                         </xsl:when>
                         <xsl:otherwise>

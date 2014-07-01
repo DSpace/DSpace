@@ -53,9 +53,10 @@
     void showCommunity(Community c, JspWriter out, HttpServletRequest request, ItemCounter ic,
     		Map collectionMap, Map subcommunityMap) throws ItemCountException, IOException, SQLException
     {
+		boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-list.logos", true);
         out.println( "<li class=\"media well\">" );
         Bitstream logo = c.getLogo();
-        if (logo != null)
+        if (showLogos && logo != null)
         {
         	out.println("<a class=\"pull-left col-md-2\" href=\"" + request.getContextPath() + "/handle/" 
         		+ c.getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 
@@ -83,7 +84,7 @@
                 out.println("<li class=\"media well\">");
                 
                 Bitstream logoCol = cols[j].getLogo();
-                if (logoCol != null)
+                if (showLogos && logoCol != null)
                 {
                 	out.println("<a class=\"pull-left col-md-2\" href=\"" + request.getContextPath() + "/handle/" 
                 		+ cols[j].getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 

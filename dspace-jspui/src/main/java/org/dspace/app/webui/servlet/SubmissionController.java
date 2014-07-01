@@ -531,7 +531,7 @@ public class SubmissionController extends DSpaceServlet
         
         if (!subInfo.isInWorkflow())
         {
-            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+            stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
         }
         
         if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
@@ -688,14 +688,13 @@ public class SubmissionController extends DSpaceServlet
 
             int currStep = currentStepConfig.getStepNumber();
             int currPage = AbstractProcessingStep.getCurrentPage(request);
-            double currStepAndPage = Float
-                    .parseFloat(currStep + "." + currPage);
+            double currStepAndPage = Double.parseDouble(currStep + "." + currPage);
             // default value if we are in workflow
             double stepAndPageReached = -1;
             
             if (!subInfo.isInWorkflow())
             {
-                stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+                stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
             }
             
             if (result != AbstractProcessingStep.STATUS_COMPLETE

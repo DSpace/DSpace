@@ -802,7 +802,7 @@ public class Community extends DSpaceObject
     /**
      * Return an array of collections of this community and its subcommunities
      * 
-     * @return an array of colections
+     * @return an array of collections
      */
 
     public Collection[] getAllCollections() throws SQLException
@@ -1091,8 +1091,15 @@ public class Community extends DSpaceObject
         // will call rawDelete() before removing the linkage
         Community parent = getParentCommunity();
 
-        if (parent != null)
+        if (parent == null)
         {
+            // if removing a top level Community, simulate a REMOVE event at the Site.
+            if (getParentCommunity() == null)
+            {
+                ourContext.addEvent(new Event(Event.REMOVE, Constants.SITE, Site.SITE_ID, 
+                        Constants.COMMUNITY, getID(), getHandle()));
+            }
+        } else {
             // remove the subcommunities first
             Community[] subcommunities = getSubcommunities();
             for (int i = 0; i < subcommunities.length; i++)

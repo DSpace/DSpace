@@ -40,11 +40,7 @@ public class Collection extends DSpaceObject {
 
     //Collection-Metadata
     private String license;
-    //String provenance_description;
-    //String short_description;
-    //String introductory_text;
-    //String copyright_text;
-    //String side_bar_text;
+    private String copyrightText, introductoryText, shortDescription, sidebarText;
 
     //Calculated
     private Integer numberItems;
@@ -62,6 +58,11 @@ public class Collection extends DSpaceObject {
             expandFields = Arrays.asList(expand.split(","));
         }
 
+        this.setCopyrightText(collection.getMetadata(org.dspace.content.Collection.COPYRIGHT_TEXT));
+        this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
+        this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
+        this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
+        
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
@@ -108,6 +109,9 @@ public class Collection extends DSpaceObject {
             if(collection.getLogo() != null) {
                 this.logo = new Bitstream(collection.getLogo(), null);
             }
+        }
+        else {
+        	this.addExpand("logo");
         }
 
         if(!expandFields.contains("all")) {
@@ -164,4 +168,36 @@ public class Collection extends DSpaceObject {
     public void setLicense(String license) {
         this.license = license;
     }
+
+	public String getCopyrightText() {
+		return copyrightText;
+	}
+
+	public void setCopyrightText(String copyrightText) {
+		this.copyrightText = copyrightText;
+	}
+
+	public String getIntroductoryText() {
+		return introductoryText;
+	}
+
+	public void setIntroductoryText(String introductoryText) {
+		this.introductoryText = introductoryText;
+	}
+
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+	public String getSidebarText() {
+		return sidebarText;
+	}
+
+	public void setSidebarText(String sidebarText) {
+		this.sidebarText = sidebarText;
+	}
 }

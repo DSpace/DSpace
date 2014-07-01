@@ -118,7 +118,7 @@ public class LayoutTag extends BodyTagSupport
     public LayoutTag()
     {
         super();
-        String template = ConfigurationManager.getProperty("jspui", "template.name");
+        String template = ConfigurationManager.getProperty("jspui.template.name");
         if (StringUtils.isNotBlank(template)
                 && !"default".equalsIgnoreCase(template))
         {

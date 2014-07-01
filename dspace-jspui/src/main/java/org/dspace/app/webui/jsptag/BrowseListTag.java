@@ -483,7 +483,7 @@ public class BrowseListTag extends TagSupport
                             metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
                         // format the title field correctly for withdrawn and private items (ie. don't link)
-                        else if (field.equals(titleField) && (items[i].isWithdrawn() || !isDiscoverable(hrq, items[i])))
+                        else if (field.equals(titleField) && items[i].isWithdrawn())
                         {
                             metadata = Utils.addEntities(metadataArray[0].value);
                         }
@@ -570,7 +570,24 @@ public class BrowseListTag extends TagSupport
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
-
+                    //In case title has no value, replace it with "undefined" so as the user has something to
+                	//click in order to access the item page
+                    else if (field.equals(titleField)){
+                    	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
+                    	if (items[i].isWithdrawn())
+                        {
+                            metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
+                        }
+                        // format the title field correctly (as long as the item isn't withdrawn, link to it)
+                        else
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
+                            + "<span style=\"font-style:italic\">("+undefined+")</span>"
+                            + "</a>";
+                        }
+                    }
+                    
                     // prepare extra special layout requirements for dates
                     String extras = "";
                     if (isDate[colIdx])
@@ -885,23 +902,6 @@ public class BrowseListTag extends TagSupport
         catch (UnsupportedEncodingException e)
         {
             throw new JspException("Server does not support DSpace's default encoding. ", e);
-        }
-    }
-
-    /* whether the embedded item of the bitem is discoverable or not? */
-    private boolean isDiscoverable(HttpServletRequest hrq, BrowseItem bitem)
-            throws JspException
-    {
-    	try
-    	{
-            Context c = UIUtil.obtainContext(hrq);
-            Item item = Item.find(c, bitem.getID());
-
-            return item.isDiscoverable();
-        }
-        catch (SQLException sqle)
-        {
-        	throw new JspException(sqle.getMessage(), sqle);
         }
     }
 }

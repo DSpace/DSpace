@@ -473,7 +473,7 @@ public class ItemTag extends TagSupport
                 try
                 {
                     label = I18nUtil.getMessage("metadata."
-                            + (style != null ? style + "." : "") + field,
+                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
                             context);
                 }
                 catch (MissingResourceException e)
@@ -732,7 +732,9 @@ public class ItemTag extends TagSupport
                 out.print(LocaleSupport.getLocalizedMessage(pageContext,
                           "org.dspace.app.webui.jsptag.ItemTag.appears"));
             }
-            out.print("</td><td class=\"metadataFieldValue\">");
+            out.print("</td><td class=\"metadataFieldValue\""+
+            		(style.equals("full")?"colspan=\"2\"":"")
+            		+">");
 
             for (int i = 0; i < collections.length; i++)
             {

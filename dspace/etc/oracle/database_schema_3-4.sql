@@ -22,6 +22,11 @@
 --
 
 -------------------------------------------
+-- Ensure that discoverable has a sensible default
+-------------------------------------------
+update item set discoverable=1 WHERE discoverable IS NULL;
+
+-------------------------------------------
 -- Add support for DOIs (table and seq.) --
 -------------------------------------------
 
@@ -47,7 +52,7 @@ CREATE TABLE Webapp
 (
     webapp_id INTEGER NOT NULL PRIMARY KEY,
     AppName VARCHAR2(32),
-    URL VARCHAR2,
+    URL VARCHAR2(1000),
     Started TIMESTAMP,
     isUI NUMBER(1)
 );
@@ -76,3 +81,15 @@ CREATE TABLE requestitem
 );
 
 CREATE SEQUENCE requestitem_seq;
+
+-------------------------------------------------------
+-- DS-1655 Disable "Initial Questions" page in Submission UI by default
+-------------------------------------------------------
+update workspaceitem set multiple_titles=1, published_before=1, multiple_files=1;
+update workflowitem set multiple_titles=1, published_before=1, multiple_files=1;
+
+-------------------------------------------------------
+-- DS-1811 Removing a collection fails if non-Solr DAO has been used before for item count
+-------------------------------------------------------
+delete from collection_item_count;
+delete from community_item_count;

@@ -49,7 +49,7 @@
 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#supervision\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
 </h1>
 
-<h3><fmt:message key="jsp.dspace-admin.supervise-link.choose"/></h3>
+<p class="help-block"><fmt:message key="jsp.dspace-admin.supervise-link.choose"/></p>
 
 <form method="post" action="">
 
@@ -79,11 +79,10 @@
             </select>
 </div>
 <%-- Select the workspace item to be supervised --%>
-    <tr>
-        <td>
-            <b><fmt:message key="jsp.dspace-admin.supervise-link.workspace"/></b>
+<br/>
+<div>
+            <p><b><fmt:message key="jsp.dspace-admin.supervise-link.workspace"/></b></p>
             
-            <div align="left">
             <table class="table">
                 <tr>
                     <th class="odRowOddCol"><fmt:message key="jsp.dspace-admin.supervise-link.id"/></th>
@@ -137,12 +136,11 @@
     }
 %>
             </table>
-            </div>
-
-            <input class="btn btn-default" type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
-            <input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
-
-
+</div>
+<div class="pull-right">
+  	<input class="btn btn-default" type="submit" name="submit_base" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>"/>
+	<input class="btn btn-success" type="submit" name="submit_link" value="<fmt:message key="jsp.dspace-admin.supervise-link.submit.button"/>"/>
+</div>
 </form>
 
 </dspace:layout>

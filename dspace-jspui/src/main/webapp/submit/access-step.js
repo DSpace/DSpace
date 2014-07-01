@@ -17,5 +17,8 @@
                 $("#reason").removeAttr("disabled");
             }
         });
+        $("#embargo_until_date").datepicker({
+        	dateFormat: "yy-mm-dd"    	 
+        });
     });
 })();

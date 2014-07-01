@@ -121,7 +121,7 @@ submissionLookupShowResult = function(info, suffixID){
 		for (var k=0;k<info.result[i].providers.length;k++)
 		{
 			var prov = info.result[i].providers[k];
-			divImg.append(j('<img src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
+			divImg.append(j('<img class="img-thumbnail" src="'+dspaceContextPath+'/image/submission-lookup-small-'+prov+'.jpg">'));
 		}	
 		par
 				.append(j('<span class="sl-result-title">').text(info.result[i].title))
@@ -181,9 +181,18 @@ submissionLookupShowDetails = function(info){
 	start.append(j('#jsfilldatabuttonmessage').text());
 	start.button();
 	start.click(function(){
-		j('#collectionid').val(j('#select-collection').val());
-		j('#iuuid').val(info.uuid);
-		j('#form-submission').submit();
+		var selcolid = j('#select-collection').val();
+		if (selcolid != null && selcolid != -1)
+		{
+			j('#collectionid').val(selcolid);
+			j('#iuuid').val(info.uuid);
+			j('#form-submission').submit();
+		}
+		else
+		{
+			j('#no-collection-warn').modal('show');
+			j('#loading-details').modal('hide');
+		}
 	});
 	modalfooter.append(start);
 	j('#loading-details').modal('show');

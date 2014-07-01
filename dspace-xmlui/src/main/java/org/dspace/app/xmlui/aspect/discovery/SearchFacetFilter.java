@@ -125,7 +125,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
      * <p/>
      * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
-     * hierarch, when this changes they will not be reflected in the cache.
+     * hierarchy, when this changes they will not be reflected in the cache.
      */
     public SourceValidity getValidity() {
         if (this.validity == null) {
@@ -425,7 +425,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Last add the current filter query
             url += "&filtertype=" + facetField;
             url += "&filter_relational_operator="+value.getFilterType();
-            url += "&filter=" + URLEncoder.encode(displayedValue, "UTF-8");
+            url += "&filter=" + URLEncoder.encode(value.getAsFilterQuery(), "UTF-8");
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );
         }

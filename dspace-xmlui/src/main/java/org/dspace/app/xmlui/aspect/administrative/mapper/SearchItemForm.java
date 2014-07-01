@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative.mapper;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -25,10 +26,15 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.PluginConfigurationError;
+import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,8 +58,10 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_column2 = message("xmlui.administrative.mapper.SearchItemForm.column2");
 	private static final Message T_column3 = message("xmlui.administrative.mapper.SearchItemForm.column3");
 	private static final Message T_column4 = message("xmlui.administrative.mapper.SearchItemForm.column4");
-	
-	
+
+    private static final Logger log = LoggerFactory.getLogger(SearchItemForm.class);
+
+    @Override
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -64,6 +72,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	}
 
 	
+    @Override
 	public void addBody(Body body) throws SAXException, WingException, SQLException, IOException
 	{
 		// Get our parameters and state;
@@ -163,41 +172,48 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	/**
 	 * Search the repository for items in other collections that can be mapped into this one.
 	 * 
-	 * @param collection The collection to mapp into
+	 * @param collection The collection to map into
 	 * @param query The search query.
 	 */
 	private java.util.List<Item> performSearch(Collection collection, String query) throws SQLException, IOException
 	{
-		
-		// Search the repository
-        QueryArgs queryArgs = new QueryArgs();
-        queryArgs.setQuery(query);
-        queryArgs.setPageSize(Integer.MAX_VALUE);
-        QueryResults results = DSQuery.doQuery(context, queryArgs);
-        
+        // Which search provider do we use?
+        SearchRequestProcessor processor = null;
+        try {
+            processor = (SearchRequestProcessor) PluginManager
+                    .getSinglePlugin(SearchRequestProcessor.class);
+        } catch (PluginConfigurationError e) {
+            log.warn("{} not properly configured.  Please configure the {} plugin.  {}",
+                    new Object[] {
+                        SearchItemForm.class.getName(),
+                        SearchRequestProcessor.class.getName(),
+                        e.getMessage()
+                    });
+        }
+        if (processor == null)
+        {   // Discovery is the default search provider since DSpace 4.0
+            processor = new DiscoverySearchRequestProcessor();
+        }
+
+        // Search the repository
+        List<DSpaceObject> results = processor.doItemMapSearch(context, query, collection);
 
         // Get a list of found items
         ArrayList<Item> items = new ArrayList<Item>();
-        @SuppressWarnings("unchecked")
-        java.util.List<String> handles = results.getHitHandles();
-        for (String handle : handles)
+        for (DSpaceObject resultDSO : results)
         {
-            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
-
             if (resultDSO instanceof Item)
             {
             	Item item = (Item) resultDSO;
-            	
+
             	if (!item.isOwningCollection(collection))
                 {
                     items.add(item);
                 }
             }
         }
-        
+
         return items;
     }
-	
-	
-	
+
 }

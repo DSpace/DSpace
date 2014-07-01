@@ -141,12 +141,16 @@
     }
 %>
 			</h3>
-			<!-- Wrapper for slides -->
-		  <div class="carousel-inner">
+		
 	<%
 		Item[] items = rs.getRecentSubmissions();
 		boolean first = true;
-		for (int i = 0; i < items.length; i++)
+		if(items!=null && items.length>0) 
+		{ 
+	%>	
+		<!-- Wrapper for slides -->
+		  <div class="carousel-inner">
+	<%	for (int i = 0; i < items.length; i++)
 		{
 			DCValue[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
 			String displayTitle = "Untitled";
@@ -169,8 +173,8 @@
 				first = false;
 		     }
 		%>
-		  </div>
-
+		</div>
+		
 		  <!-- Controls -->
 		  <a class="left carousel-control" href="#recent-submissions-carousel" data-slide="prev">
 		    <span class="icon-prev"></span>
@@ -185,6 +189,11 @@
 		    <li data-target="#recent-submissions-carousel" data-slide-to="<%= i %>"></li>
 		    <% } %>
 	      </ol>
+		
+		<%
+		}
+		%>
+		  
      </div></div></div>
 <%
 	}
@@ -226,7 +235,8 @@
 </div>
 <div class="row">
 <%
-    if (subcommunities.length != 0)
+	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);
+	if (subcommunities.length != 0)
     {
 %>
 	<div class="col-md-6">
@@ -241,7 +251,7 @@
 			<div class="list-group-item row">  
 <%  
 		Bitstream logoCom = subcommunities[j].getLogo();
-		if (logoCom != null) { %>
+		if (showLogos && logoCom != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCom.getID() %>" /> 
 			</div>
@@ -297,7 +307,7 @@
 			<div class="list-group-item row">  
 <%  
 		Bitstream logoCol = collections[i].getLogo();
-		if (logoCol != null) { %>
+		if (showLogos && logoCol != null) { %>
 			<div class="col-md-3">
 		        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logoCol.getID() %>" /> 
 			</div>

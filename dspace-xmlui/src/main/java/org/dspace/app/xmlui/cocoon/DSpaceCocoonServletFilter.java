@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -273,11 +274,18 @@ public class DSpaceCocoonServletFilter implements Filter
                 {   // invoke the next filter
                     arg2.doFilter(realRequest, realResponse);
                 }
-
-        } catch (RuntimeException e) {
-            ContextUtil.abortContext(realRequest);
-            LOG.error("Serious Runtime Error Occurred Processing Request!", e);
-            throw e;
+    } catch (IOException e) {
+        ContextUtil.abortContext(realRequest);
+        if (LOG.isDebugEnabled()) {
+              LOG.debug("The connection was reset", e);
+            }
+        else {
+            LOG.error("Client closed the connection before file download was complete");
+        }
+    } catch (RuntimeException e) {
+        ContextUtil.abortContext(realRequest);
+        LOG.error("Serious Runtime Error Occurred Processing Request!", e);
+        throw e;
 	} catch (Exception e) {
 	    ContextUtil.abortContext(realRequest);
             LOG.error("Serious Error Occurred Processing Request!", e);

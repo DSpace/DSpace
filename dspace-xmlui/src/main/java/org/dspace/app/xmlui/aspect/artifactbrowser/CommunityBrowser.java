@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
 /**
  * Display a list of Communities and collections.
  * 
- * This item may be configured so that it will only display to a specific depth,
+ * This item may be configured so that it will only display up to a specific depth,
  * and may include or exclude collections from the tree.
  * 
  * The configuration option available: <depth exclude-collections="true">999</depth>
@@ -106,7 +106,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
+     * This key must be unique within the space of this component.
      */
     public Serializable getKey()
     {
@@ -118,7 +118,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      * Generate the cache validity object.
      * 
      * The validity object will include a list of all communities 
-     * & collection being browsed along with there logo bitstreams.
+     * and collections being browsed along with their logo bitstreams.
      */
     public SourceValidity getValidity()
     {
@@ -352,7 +352,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
         TreeNode newRoot = new TreeNode();
 
-        // Setup for breath-first traversal
+        // Setup for breadth-first traversal
         Stack<TreeNode> stack = new Stack<TreeNode>();
 
         for (Community community : communities)
@@ -364,7 +364,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
             TreeNode node = stack.pop();
 
-            // Short circuit if we have reached our max depth.
+            // Short-circuit if we have reached our max depth.
             if (node.getLevel() >= this.depth)
             {
                 continue;

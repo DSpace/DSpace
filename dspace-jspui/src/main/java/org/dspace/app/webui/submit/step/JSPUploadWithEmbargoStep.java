@@ -9,6 +9,7 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.dspace.app.webui.util.JSONUploadResponse;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -31,7 +33,6 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
 import org.dspace.submit.step.AccessStep;
 import org.dspace.submit.step.UploadStep;
 import org.dspace.submit.step.UploadWithEmbargoStep;
@@ -82,7 +83,6 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
 
     /** JSP to edit access policy of selected policy * */
     private static final String EDIT_BITSTREAM_ACCESS_JSP = "/submit/edit-bitstream-access.jsp";
-
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPUploadWithEmbargoStep.class);
@@ -448,4 +448,11 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
         JSPStepManager.showJSP(request, response, subInfo, EDIT_POLICY_JSP);
     }
 
+    @Override
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        request.setAttribute("submission.step.uploadwithembargo", true);
+        return super.getReviewJSP(context, request, response, subInfo);
+    }
 }

@@ -100,7 +100,8 @@ public class CCLicenseStep extends AbstractProcessingStep
         session.setAttribute("inProgress", "TRUE");
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
-        if (buttonPressed.equals("submit_grant"))
+		if ("submit_grant".equalsIgnoreCase(buttonPressed)
+				|| "submit_no_cc".equalsIgnoreCase(buttonPressed))
         {
             return processCC(context, request, response, subInfo);
         }

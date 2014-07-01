@@ -85,11 +85,11 @@
          <label for="allfiles" class="control-label col-md-2"><fmt:message key="jsp.request.item.request-form.allfiles"/></label>
          <div class="col-md-10">
 	        <div class="input-group"> 
-	         <span class="input-group-addon"><input type="radio" class="form-control" name="allfiles" value="true" <%=allfiles?"checked":""%> /></span>
+	         <span class="input-group-addon"><input type="radio" name="allfiles" value="true" <%=allfiles?"checked":""%> /></span>
 	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.yes"/></span>
 	        </div>
 	        <div class="input-group">
-	         <span class="input-group-addon"><input type="radio" class="form-control" name="allfiles" value="false" <%=allfiles?"":"checked"%> /></span>
+	         <span class="input-group-addon"><input type="radio" name="allfiles" value="false" <%=allfiles?"":"checked"%> /></span>
 	         <span class="form-control"><fmt:message key="jsp.request.item.request-form.no"/></span>
 	        </div> 
          </div>

@@ -668,12 +668,11 @@ public class ItemImport
     		outputFolder = workingDir + File.separator + ".bte_output_dspace";
     	}
     	
-        TransformationEngine te  = new DSpace().getSingletonService(TransformationEngine.class);
-
-        DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+        BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
         DataLoader dataLoader = dls.getDataLoaders().get(inputType);
         Map<String, String> outputMap = dls.getOutputMap();
-
+        TransformationEngine te = dls.getTransformationEngine();
+        
         if (dataLoader==null){
             System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
             return;
@@ -716,6 +715,7 @@ public class ItemImport
         	} catch (Exception e) {
         		System.err.println("Exception");
         		e.printStackTrace();
+        		throw e;
         	}
 
         	ItemImport myloader = new ItemImport();
@@ -762,8 +762,7 @@ public class ItemImport
 
         if (d == null || !d.isDirectory())
         {
-            System.out.println("Error, cannot open source directory " + sourceDir);
-            System.exit(1);
+            throw new Exception("Error, cannot open source directory " + sourceDir);
         }
 
         String[] dircontents = d.list(directoryFilter);
@@ -793,9 +792,8 @@ public class ItemImport
 
         if (d == null || !d.isDirectory())
         {
-            System.out.println("Error, cannot open source directory "
+            throw new Exception("Error, cannot open source directory "
                     + sourceDir);
-            System.exit(1);
         }
 
         // read in HashMap first, to get list of handles & source dirs
@@ -1341,11 +1339,33 @@ public class ItemImport
                                     + sRegistrationLine);
                             continue;
                         }
-                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
+                        
+                        // look for descriptions
+                        boolean descriptionExists = false;
+                        String descriptionMarker = "\tdescription:";
+                        int dMarkerIndex = line.indexOf(descriptionMarker);
+                        int dEndIndex = 0;
+                        if (dMarkerIndex > 0)
+                        {
+                        	dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                        	if (dEndIndex == -1)
+                        	{
+                        		dEndIndex = line.length();
+                        	}
+                        	descriptionExists = true;
+                        }
+                        String sDescription = "";
+                        if (descriptionExists)
+                        {
+                        	sDescription = line.substring(dMarkerIndex, dEndIndex);
+                        	sDescription = sDescription.replaceFirst("description:", "");
+                        }
+
+                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
                         System.out.println("\tRegistering Bitstream: " + sFilePath
                                 + "\tAssetstore: " + iAssetstore
                                 + "\tBundle: " + sBundle
-                                + "\tDescription: " + sBundle);
+                                + "\tDescription: " + sDescription);
                         continue;				// process next line in contents file
                     }
 
@@ -1572,7 +1592,7 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void registerBitstream(Context c, Item i, int assetstore, 
-            String bitstreamPath, String bundleName )
+            String bitstreamPath, String bundleName, String description )
         	throws SQLException, IOException, AuthorizeException
     {
         // TODO validate assetstore number
@@ -1623,6 +1643,7 @@ public class ItemImport
 	        // FIXME - guessing format guesses license.txt incorrectly as a text file format!
 	        BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
 	        bs.setFormat(bf);
+	        bs.setDescription(description);
 
 	        bs.update();
         }
@@ -1976,6 +1997,7 @@ public class ItemImport
                     {
                         // create a new dspace context
                         context = new Context();
+                        context.setCurrentUser(eperson);
                         context.setIgnoreAuthorization(true);
                         
                         File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));

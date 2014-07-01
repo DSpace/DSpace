@@ -141,9 +141,20 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         // set the attributes for the JSP
         request.setAttribute("groups",groups);
         request.setAttribute("wsItems",wsItems);
-        
-        JSPManager.showJSP(request, response, "/dspace-admin/supervise-link.jsp" );
-        
+
+        // set error message key when there is no workspace item
+        if (wsItems.length == 0)
+        {
+            request.setAttribute("errorKey", 
+                "jsp.dspace-admin.supervise-no-workspaceitem.no-wsitems");
+            JSPManager.showJSP(request, response, 
+                "/dspace-admin/supervise-no-workspaceitem.jsp");
+            
+        }
+        else
+        { 
+            JSPManager.showJSP(request, response, "/dspace-admin/supervise-link.jsp" );
+        }
     }
     
     /**
@@ -269,6 +280,16 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         int groupID = UIUtil.getIntParameter(request,"TargetGroup");
         int wsItemID = UIUtil.getIntParameter(request,"TargetWSItem");
         
+        // set error message key when no workspace item is selected
+        if (wsItemID == -1)
+        {
+            request.setAttribute("errorKey", 
+                "jsp.dspace-admin.supervise-no-workspaceitem.unselected");
+            JSPManager.showJSP(request, response, 
+                "/dspace-admin/supervise-no-workspaceitem.jsp" );
+            return false;
+        }
+
         boolean invalid = Supervisor.isOrder(context, wsItemID, groupID);
         
         if (invalid)

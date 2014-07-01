@@ -72,6 +72,7 @@
        The examples below can be used to load some solr-contribs along 
        with their external dependencies.
     -->
+  <!--
   <lib dir="../../../contrib/extraction/lib" regex=".*\.jar" />
   <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar" />
 
@@ -83,6 +84,7 @@
 
   <lib dir="../../../contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar" />
+  -->
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 
@@ -366,10 +368,11 @@
          have some sort of hard autoCommit to limit the log size.
       -->
      <autoCommit> 
-       <maxTime>${solr.autoCommit.maxTime:15000}</maxTime> 
-       <openSearcher>false</openSearcher> 
+       <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
+       <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Default commit every 10 seconds-->
+       <openSearcher>true</openSearcher> 
      </autoCommit>
-
+     
     <!-- softAutoCommit is like autoCommit except it causes a
          'soft' commit which only ensures that changes are visible
          but does not ensure that data is synced to disk.  This is

@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 public class AbstractUnitTest
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractUnitTest.class);
+    private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
 
     //Below there are static variables shared by all the instances of the class
     
@@ -119,6 +119,9 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
+
+            // Start the mock database
+            new MockDatabaseManager();
 
             // Load the default registries. This assumes the temporary
             // filesystem is working and the in-memory DB in place.

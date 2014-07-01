@@ -85,8 +85,8 @@
     
     function updateProgressBar($, data){
     	$('#uploadForm').find('input').attr('disabled','disabled');
-    	$('#spanFile').button("disable")
-    	$('#spanFileCancel').button("disable")
+    	$('#spanFile').attr('disabled','disabled');
+    	$('#spanFileCancel').attr('disabled','disabled');
     	var percent = parseInt(data.loaded / data.total * 100, 10);
 		var progressbarArea = $("#progressBarArea");
 		var progressbar = $("#progressBar");
@@ -135,8 +135,10 @@
     				$('#spanFile').remove();
     				$('#selectedFile').remove();
     				$('<input type="file" name="file" id="tfile">').appendTo(parent);
-    				$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
-    		    	$('#tfile').on('change', function(){
+                    $('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"></span>');
+                    $('#spanFile').prepend('&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/>');
+                    $('#spanFile').prepend('<span class="glyphicon glyphicon-folder-open"></span>');
+                   	$('#tfile').on('change', function(){
     		    		 decorateFileInputChangeEvent($);
     		    	});
     		});
@@ -151,10 +153,14 @@
    		progressbarArea.find('p.progressBarProgressMsg').hide();
    		progressbarArea.find('p.progressBarCompleteMsg').hide();
    		progressbarArea.hide();
-    	$('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/></span>');
-    	$('#tfile').on('change', function(){
-    		 decorateFileInputChangeEvent($);
-   		});
+
+        $('#tfile').wrap('<span id="spanFile" class="fileinput-button btn btn-success col-md-2"></span>');
+        $('#spanFile').prepend('&nbsp;&nbsp;<fmt:message key="jsp.submit.choose-file.upload-ajax.button.select-file"/>');
+        $('#spanFile').prepend('<span class="glyphicon glyphicon-folder-open"></span>');
+        $('#tfile').on('change', function(){
+            decorateFileInputChangeEvent($);
+        });
+
    		// the skip button should not send any files
    		$('input[name="<%=UploadStep.SUBMIT_SKIP_BUTTON%>"]').on('click', function(){
    			$('#tfile').val('');
@@ -163,12 +169,16 @@
    		// track the upload progress for all the submit buttons other than the skip
    		$('input[type="submit"]').not(":disabled")
    		.on('click', function(e){   			
-   			$('#uploadForm').attr('target','uploadFormIFrame');
    			if ($('#tfile').val() != null && $('#tfile').val() != '') {
-	   			initProgressBar($);
+   				$('#uploadForm').attr('target','uploadFormIFrame');
+   	   			initProgressBar($);
 	   			setTimeout(function() {
 					monitorProgressJSON($);					
 				}, 100);
+   			}
+   			else
+  			{
+				$('#ajaxUpload').val(false);
    			}
    			$('#uploadFormIFrame').on('load',function(){
    				var resultFile = null;
@@ -182,15 +192,20 @@
    					}
 	   				resultFile = jsonResult.files[0];
    				} catch (err) {
+   					// a file has been upload, the answer is html isntead of json because 
+   					// come from a different step. Just ignore the target step and reload 
+   					// the upload list screen. We need to let the user known that the file 
+   					// has been uploaded
    					resultFile = new Object();
 	   				resultFile.status = null;
    				}
    				
-   	    		if (resultFile.status == <%= UploadStep.STATUS_COMPLETE %> || 
+   	    		if (resultFile.status == null || resultFile.status == <%= UploadStep.STATUS_COMPLETE %> || 
    	    				resultFile.status == <%= UploadStep.STATUS_UNKNOWN_FORMAT %>)
    	    		{
    	    			completeProgressBar($, resultFile.size);
-   		           	if (resultFile.status == <%= UploadStep.STATUS_COMPLETE %>)
+   		           	if (resultFile.status == null || 
+   		           			resultFile.status == <%= UploadStep.STATUS_COMPLETE %>)
    	           		{
    		           		$('#uploadFormPostAjax').removeAttr('enctype')
    		           			.append('<input type="hidden" name="<%= UploadStep.SUBMIT_UPLOAD_BUTTON %>" value="1">');
@@ -374,7 +389,7 @@
 %>
                     <%-- Please give a brief description of the contents of this file, for
                     example "Main article", or "Experiment data readings." --%>
-					<div class="alert alert-info"><fmt:message key="jsp.submit.choose-file.info9"/></div>
+					<div class="help-block"><fmt:message key="jsp.submit.choose-file.info9"/></div>
                 <%-- <td class="submitFormLabel">File Description:</td> --%>
                 <div class="row">
 					<label for="tdescription" class="col-md-<%= bSherpa?"3":"2" %>"><fmt:message key="jsp.submit.choose-file.filedescr"/></label>

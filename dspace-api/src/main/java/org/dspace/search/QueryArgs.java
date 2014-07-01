@@ -15,17 +15,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.sort.SortOption;
-
 import org.apache.commons.lang.StringUtils;
 
 /**
  * Contains the arguments for a query. Fill it out and pass to the query engine
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class QueryArgs
 {
     // the query string

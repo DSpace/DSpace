@@ -216,11 +216,9 @@
     <%-- <p><strong>PLEASE NOTE: These changes are not validated in any way.
     You are responsible for entering the data in the correct format.
     If you are not sure what the format is, please do NOT make changes.</strong></p> --%>
-     <div class="container">   
-        <p class="alert alert-danger"><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
-	 </div>
+    <p class="alert alert-danger"><strong><fmt:message key="jsp.tools.edit-item-form.note"/></strong></p>
 
-
+	<div class="row">
 	<div class="col-md-9">
 		<div class="panel panel-primary">
 			<div class="panel-heading"><fmt:message key="jsp.tools.edit-item-form.details" /></div>
@@ -275,8 +273,6 @@
 		</div>
 	</div>
 
-
-	<div class="row">
 	<div class="col-md-3">
 		<div class="panel panel-default">
 			<div class="panel-heading"><fmt:message key="jsp.actiontools"/></div>
@@ -407,9 +403,6 @@
 <%
     }
 %>
-    <p>&nbsp;</p>
-
-
     <form id="edit_metadata" name="edit_metadata" method="post" action="<%= request.getContextPath() %>/tools/edit-item">
     <div class="table-responsive">
         <table class="table" summary="Edit item withdrawn table">
@@ -493,8 +486,6 @@
 <%      row = (row.equals("odd") ? "even" : "odd");
     } %>
 
-            <tr><td>&nbsp;</td></tr>
-
             <tr>
         
                 <td headers="t1" colspan="3" class="<%= row %>RowEvenCol">
@@ -525,7 +516,7 @@
         
 	</div>
         
-        <p>&nbsp;</p>
+        <br/>
 
         <%-- <h2>Bitstreams</h2> --%>
                 <h2><fmt:message key="jsp.tools.edit-item-form.heading"/></h2>
@@ -533,7 +524,7 @@
         <%-- <p>Note that if the "user format description" field isn't empty, the format will
         always be set to "Unknown", so clear the user format description before changing the
         format field.</p> --%>
-                <p class="alert alert-info"><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
+                <p class="alert alert-warning"><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
 	<div class="table-responsive">
         <table id="bitstream-edit-form-table" class="table" summary="Bitstream data table">
             <tr>
@@ -575,15 +566,16 @@
             <tr id="<%="row_" + bundles[i].getName() + "_" + bitstreams[j].getID()%>">
             	<td headers="t10" class="<%= row %>RowEvenCol" align="center">
                 	<%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-					<a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+					<a class="btn btn-info" target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
 				</td>
                 <% if (bundles[i].getName().equals("ORIGINAL"))
                    { %>
                      <td headers="t11" class="<%= row %>RowEvenCol" align="center">
-                       <input class="form-control" type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value="<%= bitstreams[j].getID() %>"
+                       <span class="form-control">
+                       <input type="radio" name="<%= bundles[i].getID() %>_primary_bitstream_id" value="<%= bitstreams[j].getID() %>"
                            <% if (bundles[i].getPrimaryBitstreamID() == bitstreams[j].getID()) { %>
                                   checked="<%="checked" %>"
-                           <% } %> />
+                           <% } %> /></span>
                    </td>
                 <% } else { %>
                      <td headers="t11"> </td>

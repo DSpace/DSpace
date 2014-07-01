@@ -477,4 +477,5 @@
                         <input class="btn btn-warning col-md-6" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.edit-collection.form.button.cancel"/>" />
 </div>                        
     </form>
+    </div>
 </dspace:layout>

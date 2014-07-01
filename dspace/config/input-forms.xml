@@ -392,11 +392,15 @@ it, please enter the types and the actual numbers or codes below.</hint>
        <stored-value>zh</stored-value>
      </pair>
      <pair>
+       <displayed-value>Turkish</displayed-value>
+       <stored-value>tr</stored-value>
+     </pair>
+     <pair>
        <displayed-value>(Other)</displayed-value>
        <stored-value>other</stored-value>
      </pair>
    </value-pairs>
 
-    </form-value-pairs>
+ </form-value-pairs>
 
 </input-forms>

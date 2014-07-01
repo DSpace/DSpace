@@ -92,7 +92,7 @@
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
         <%-- <p align="center"><input type="submit" name="submit" value="Choose automatically-recognized type"></p> --%>
-		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.submit.get-file-format.choose.button"/>" /></p>
+		<p align="center"><input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.submit.get-file-format.choose.button"/>" /></p>
     </form>
 
 <%-- Option list put in a separate form --%>

@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Adán Román Ruiz <aroman@arvo.es> (Bugfix)
  */
 public class SimpleSearch extends AbstractSearch implements CacheableProcessingComponent {
     /**
@@ -162,7 +163,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         if(0 < filterFields.size() && filterTypes.size() == 0)
         {
-            //Display the add filters url ONLY if we have no filters selected & fitlers can be added
+            //Display the add filters url ONLY if we have no filters selected & filters can be added
             searchList.addItem().addXref("display-filters", T_filters_show);
         }
         addHiddenFormFields("search", request, fqs, mainSearchDiv);
@@ -192,8 +193,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
                     if(StringUtils.isNotBlank(filterValue))
                     {
-                        Row row = filtersTable.addRow("used-filters-" + i, Row.ROLE_DATA, "search-filter used-filter");
-                        addFilterRow(filterFields, i, row, filterType, filterOperator, filterValue);
+                        Row row = filtersTable.addRow("used-filters-" + i+1, Row.ROLE_DATA, "search-filter used-filter");
+                        addFilterRow(filterFields, i+1, row, filterType, filterOperator, filterValue);
                     }
                 }
                 filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");

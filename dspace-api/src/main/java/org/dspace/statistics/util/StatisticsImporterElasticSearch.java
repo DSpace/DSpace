@@ -41,6 +41,10 @@ import java.util.Random;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
+ * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Elastic Search
+ *
+ * @see ClassicDSpaceLogConverter
+ *
  * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class StatisticsImporterElasticSearch {
@@ -427,8 +431,8 @@ public class StatisticsImporterElasticSearch {
 
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
-     * @param <K>
-     * @param <V>
+     * @param <K> IP address
+     * @param <V> hostname looked up via DNS
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {
