@@ -162,15 +162,6 @@
 		</xsl:if>
 		
 		
-		<!-- *********** Sizes - Only for data files********* -->
-		<sizes>
-			<xsl:for-each select="document($mets_url)//mets:file">
-				<size>
-					<xsl:value-of select="@SIZE"/>
-					<xsl:text> bytes</xsl:text>
-				</size>
-			</xsl:for-each>
-		</sizes>
 		<!-- ******************************************************** -->
 		<!-- ************ Handle tags for data packages: ************ -->
 		<!-- ******************************************************** -->
@@ -254,6 +245,15 @@
 				</description>
 			</descriptions>
 			
+			<!-- *********** Sizes *********** -->
+			<sizes>
+				<xsl:for-each select="document($mets_url)//mets:file">
+					<size>
+						<xsl:value-of select="@SIZE"/>
+						<xsl:text> bytes</xsl:text>
+					</size>
+				</xsl:for-each>
+			</sizes>
 		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
