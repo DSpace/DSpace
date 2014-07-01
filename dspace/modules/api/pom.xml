@@ -19,7 +19,17 @@
       <version>1.7.3-SNAPSHOT</version>
    </parent>
 
-
+    <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-Ddspace.configuration="${default.dspace.dir}/config/dspace.cfg"</argLine>
+            </configuration>
+         </plugin>
+      </plugins>
+    </build>
    <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
