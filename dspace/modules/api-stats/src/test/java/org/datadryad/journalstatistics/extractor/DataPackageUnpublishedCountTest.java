@@ -69,7 +69,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         // Get the count prior to adding a data package to the workflow.
         DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
         Map<String, Integer> results = instance.extract(journalName);
-        Integer initialCount = getCountOrZero(results, STRING_2014_06);
+        Integer initialCount = DataPackageUnpublishedCount.getCountOrZero(results, STRING_2014_06);
         DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
         DCDate submittedDate = new DCDate(date_2014_06_07);
         String submitterName = "Cornelius Tester";
@@ -97,13 +97,6 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         assertEquals("Count mismatch", expectedCount, resultCount);
     }
 
-    private static Integer getCountOrZero(Map<String, Integer> map, String key) {
-        if(map != null && map.containsKey(key)) {
-            return map.get(key);
-        } else {
-            return 0;
-        }
-    }
 
     @Test
     public void testCountUnpublishedDataPackagesInDateRange() throws Exception {
@@ -122,8 +115,8 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         Map<String, Integer> results1 = instance1.extract(journalName);
         Map<String, Integer> results2 = instance2.extract(journalName);
 
-        Integer initialCount1 = getCountOrZero(results1, STRING_2014_06);
-        Integer initialCount2 = getCountOrZero(results2, STRING_2014_06);
+        Integer initialCount1 = DataPackageUnpublishedCount.getCountOrZero(results1, STRING_2014_06);
+        Integer initialCount2 = DataPackageUnpublishedCount.getCountOrZero(results2, STRING_2014_06);
 
         // now add a package with provenance for middle of june, and make sure instance2 doesnt' change
         DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
@@ -138,8 +131,8 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
         results1 = instance1.extract(journalName);
         results2 = instance2.extract(journalName);
 
-        Integer finalCount1 = getCountOrZero(results1, STRING_2014_06);
-        Integer finalCount2 = getCountOrZero(results2, STRING_2014_06);
+        Integer finalCount1 = DataPackageUnpublishedCount.getCountOrZero(results1, STRING_2014_06);
+        Integer finalCount2 = DataPackageUnpublishedCount.getCountOrZero(results2, STRING_2014_06);
 
         // count1 should have increased
         // count2 should not

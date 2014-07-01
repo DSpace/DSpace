@@ -92,7 +92,15 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
         }
         return results;
     }
-    
+
+    public static Integer getCountOrZero(final Map<String, Integer> map, final String key) {
+        if(map != null && map.containsKey(key)) {
+            return map.get(key);
+        } else {
+            return 0;
+        }
+    }
+
     public DataPackageUnpublishedCount(Context context) {
         super(context);
     }
