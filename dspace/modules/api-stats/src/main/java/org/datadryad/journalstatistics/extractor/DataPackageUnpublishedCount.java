@@ -78,14 +78,25 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
         try {
             List<DateItem> unpublishedItems = getUnpublishedItems(journalName);
             for(DateItem dateItem : unpublishedItems) {
-                // TODO: Check date ranges?
-                String bucket = bucketForDate(dateItem.date);
-                if(!results.containsKey(bucket)) {
-                    results.put(bucket, 0);
+                if(this.filterOnDates) {
+                    if(isDateWithinRange(dateItem.date)) {
+                        String bucket = bucketForDate(dateItem.date);
+                        if(!results.containsKey(bucket)) {
+                            results.put(bucket, 0);
+                        }
+                        Integer count = results.get(bucket);
+                        count++;
+                        results.put(bucket, count);
+                    }
+                } else {
+                    String bucket = bucketForDate(dateItem.date);
+                    if(!results.containsKey(bucket)) {
+                        results.put(bucket, 0);
+                    }
+                    Integer count = results.get(bucket);
+                    count++;
+                    results.put(bucket, count);
                 }
-                Integer count = results.get(bucket);
-                count++;
-                results.put(bucket, count);
             }
         } catch (SQLException ex) {
             log.error("SQLException getting unpublished items size per journal", ex);
