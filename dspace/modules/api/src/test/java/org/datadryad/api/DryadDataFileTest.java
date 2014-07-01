@@ -145,7 +145,7 @@ public class DryadDataFileTest extends ContextUnitTest {
     @Test
     public void testAddBitstream() throws Exception {
         System.out.println("addBitstream");
-        InputStream stream = DryadDataFileTest.class.getClassLoader().getResourceAsStream("Logo-one-tone-dark.jpg");
+        InputStream stream = DryadDataFileTest.class.getClassLoader().getResourceAsStream("DryadLogo.png");
         DryadDataFile instance = DryadDataFile.create(context);
         instance.addBitstream(stream);
     }
@@ -157,7 +157,7 @@ public class DryadDataFileTest extends ContextUnitTest {
     public void testGetTotalStorageSize() throws Exception {
         System.out.println("getTotalStorageSize");
 
-        File file1 = new File(DryadDataFileTest.class.getClassLoader().getResource("Logo-one-tone-dark.jpg").toURI());
+        File file1 = new File(DryadDataFileTest.class.getClassLoader().getResource("DryadLogo.png").toURI());
         File file2 = new File(DryadDataFileTest.class.getClassLoader().getResource("world.js").toURI());
 
         Long expResult = file1.length() + file2.length();

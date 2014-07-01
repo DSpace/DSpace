@@ -21,7 +21,7 @@ public class DataFileTotalSizeTest extends ContextUnitTest {
     public void setUp() {
         super.setUp();
         try {
-            file1 = new File(DataFileTotalSizeTest.class.getClassLoader().getResource("Logo-one-tone-dark.jpg").toURI());
+            file1 = new File(DataFileTotalSizeTest.class.getClassLoader().getResource("DryadLogo.png").toURI());
             file2 = new File(DataFileTotalSizeTest.class.getClassLoader().getResource("world.js").toURI());
             file3 = new File(DataFileTotalSizeTest.class.getClassLoader().getResource("world.js").toURI());
         } catch (Exception ex) {
