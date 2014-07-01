@@ -4,6 +4,7 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.dspace.authorize.AuthorizeException;
@@ -17,7 +18,7 @@ import org.dspace.core.Context;
  * associated with a specified Journal
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DataFileTotalSize  extends DatabaseExtractor<Long> {
+public class DataFileTotalSize extends DatabaseExtractor<Long> {
     private static Logger log = Logger.getLogger(DataItemCount.class);
     public DataFileTotalSize(Context context) {
         super(context);
@@ -35,7 +36,15 @@ public class DataFileTotalSize  extends DatabaseExtractor<Long> {
                 Item item = itemsByJournal.next();
                 if(item.getOwningCollection().equals(collection)) {
                     DryadDataFile dataFile = new DryadDataFile(item);
-                    totalSize += dataFile.getTotalStorageSize();
+                    if(this.filterOnDates) {
+                        // get the date, compare to ranges
+                        Date dateAccessioned = dataFile.getDateAccessioned();
+                        if(isDateWithinRange(dateAccessioned)) {
+                            totalSize += dataFile.getTotalStorageSize();
+                        }
+                    } else {
+                        totalSize += dataFile.getTotalStorageSize();
+                    }
                 }
             }
         } catch (AuthorizeException ex) {

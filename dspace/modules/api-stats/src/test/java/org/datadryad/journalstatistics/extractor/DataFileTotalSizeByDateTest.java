@@ -35,6 +35,7 @@ public class DataFileTotalSizeByDateTest extends ContextUnitTest {
         date_2013_06_01 = calendar.getTime();
         calendar.set(Calendar.MONTH, Calendar.JANUARY);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.YEAR, 2014);
         date_2014_01_01 = calendar.getTime();
 
         try {
