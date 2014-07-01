@@ -158,7 +158,7 @@ public class DryadDataFileTest extends ContextUnitTest {
         System.out.println("getTotalStorageSize");
 
         File file1 = new File(DryadDataFileTest.class.getClassLoader().getResource("DryadLogo.png").toURI());
-        File file2 = new File(DryadDataFileTest.class.getClassLoader().getResource("world.js").toURI());
+        File file2 = new File(DryadDataFileTest.class.getClassLoader().getResource("Dryad_web_banner_small_v4.jpg").toURI());
 
         Long expResult = file1.length() + file2.length();
         assertTrue(expResult > 0);
