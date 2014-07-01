@@ -28,7 +28,15 @@
 		
 	<!-- Parse datacite tags that are found in DIM -->
 	<xsl:template match="dim:dim">
-	   <!-- ********** Identifiers ********** -->
+	
+		<!-- Save the mets.xml url, using the get_identifier template to find the DOI. -->
+		<xsl:variable name="mets_url">
+			<xsl:text>http://datadryad.org/resource/</xsl:text>
+	        <xsl:call-template name="get_identifier"/>
+	        <xsl:text>/mets.xml</xsl:text>
+		</xsl:variable>
+
+		<!-- ********** Identifiers ********** -->
 		<identifier identifierType="DOI">
 			<xsl:variable name="doi">
 				<xsl:call-template name="get_identifier"/>
@@ -249,12 +257,6 @@
 	
 	<!-- Match for file information that is outside of DIM -->
 	<xsl:template name="parse_mets">
-		<!-- Construct the mets.xml url, using the get_identifier template to find the DOI. -->
-		<xsl:variable name="mets_url">
-			<xsl:text>http://datadryad.org/resource/</xsl:text>
-	        <xsl:call-template name="get_identifier"/>
-	        <xsl:text>/mets.xml</xsl:text>
-		</xsl:variable>
 		
 		<!-- *********** Sizes - Only for data files********* -->
 		<sizes>
