@@ -46,18 +46,8 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
             while (itemsByJournal.hasNext()) {
                 Item item = itemsByJournal.next();
                 if (item.isOwningCollection(collection)) {
-                    /*
-                     * Since comparing dates requires reading metadata from DB,
-                     * only check if filterOnDates is true
-                     */
-                    if(this.filterOnDates) {
-                        // get the date, compare to ranges
-                        DryadObject dryadObject = makeDryadObject(item);
-                        Date dateAccessioned = dryadObject.getDateAccessioned();
-                        if(isDateWithinRange(dateAccessioned)) {
-                            count++;
-                        }
-                    } else {
+                    DryadObject dryadObject = makeDryadObject(item);
+                    if(passesDateFilter(dryadObject.getDateAccessioned())) {
                         count++;
                     }
                 }

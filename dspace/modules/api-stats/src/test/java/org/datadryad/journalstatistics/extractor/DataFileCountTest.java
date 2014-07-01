@@ -30,6 +30,6 @@ public class DataFileCountTest extends ContextUnitTest {
         dataFile.setPublicationName(journalName);
         Integer expResult = initialCount + 1;
         Integer result = instance.extract(journalName);
-        assertEquals(expResult, result);
+        assertEquals("Data file count should increase by 1", expResult, result);
     }
 }

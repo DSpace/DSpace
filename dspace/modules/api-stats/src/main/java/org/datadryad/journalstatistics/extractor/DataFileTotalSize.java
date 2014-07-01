@@ -36,13 +36,7 @@ public class DataFileTotalSize extends DatabaseExtractor<Long> {
                 Item item = itemsByJournal.next();
                 if(item.getOwningCollection().equals(collection)) {
                     DryadDataFile dataFile = new DryadDataFile(item);
-                    if(this.filterOnDates) {
-                        // get the date, compare to ranges
-                        Date dateAccessioned = dataFile.getDateAccessioned();
-                        if(isDateWithinRange(dateAccessioned)) {
-                            totalSize += dataFile.getTotalStorageSize();
-                        }
-                    } else {
+                    if(passesDateFilter(dataFile.getDateAccessioned())) {
                         totalSize += dataFile.getTotalStorageSize();
                     }
                 }

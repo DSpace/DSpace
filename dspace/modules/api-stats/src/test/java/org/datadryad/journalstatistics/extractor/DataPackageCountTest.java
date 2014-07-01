@@ -29,6 +29,6 @@ public class DataPackageCountTest extends ContextUnitTest {
         dataPackage.setPublicationName(journalName);
         Integer expResult = initialCount + 1;
         Integer result = instance.extract(journalName);
-        assertEquals(expResult, result);
+        assertEquals("Data package count should increase by 1", expResult, result);
     }
 }

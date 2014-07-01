@@ -78,17 +78,7 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
         try {
             List<DateItem> unpublishedItems = getUnpublishedItems(journalName);
             for(DateItem dateItem : unpublishedItems) {
-                if(this.filterOnDates) {
-                    if(isDateWithinRange(dateItem.date)) {
-                        String bucket = bucketForDate(dateItem.date);
-                        if(!results.containsKey(bucket)) {
-                            results.put(bucket, 0);
-                        }
-                        Integer count = results.get(bucket);
-                        count++;
-                        results.put(bucket, count);
-                    }
-                } else {
+                if(passesDateFilter(dateItem.date)) {
                     String bucket = bucketForDate(dateItem.date);
                     if(!results.containsKey(bucket)) {
                         results.put(bucket, 0);
@@ -103,6 +93,8 @@ public class DataPackageUnpublishedCount extends DatabaseExtractor<Map<String, I
         }
         return results;
     }
+
+
 
     public static Integer getCountOrZero(final Map<String, Integer> map, final String key) {
         if(map != null && map.containsKey(key)) {
