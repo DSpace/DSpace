@@ -8,10 +8,10 @@
                 version="1.0">
 
 	<xsl:strip-space elements="*"/>
-    <xsl:output method="xml" version="1.0"
-                encoding="utf-8" indent="yes"/>
+    <xsl:output method="xml" version="1.0" encoding="utf-8" indent="yes"/>
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	
 	<!-- Find the DOI information. -->
 	<xsl:template name="get_identifier">
 		<xsl:value-of select="dspace:field[@element ='identifier'][@mdschema='dc']"/>
@@ -22,7 +22,7 @@
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
-		<xsl:apply-templates/>
+			<xsl:apply-templates/>
         </resource>
 	</xsl:template>
 		
