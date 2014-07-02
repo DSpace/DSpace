@@ -155,7 +155,7 @@ public class SolrBrowseDAO implements BrowseDAO
             }
             else
             {
-                query.setMaxResults(limit > 0 ? limit : 20);
+                query.setMaxResults(limit/* > 0 ? limit : 20*/);
                 if (offset > 0)
                 {
                     query.setStart(offset);
@@ -253,7 +253,7 @@ public class SolrBrowseDAO implements BrowseDAO
         List<FacetResult> facet = resp.getFacetResult(facetField);
         int count = doCountQuery();
         int start = offset > 0 ? offset : 0;
-        int max = limit > 0 ? limit : 20;
+        int max = limit > 0 ? limit : count; //if negative, return everything
         List<String[]> result = new ArrayList<String[]>();
         if (ascending)
         {

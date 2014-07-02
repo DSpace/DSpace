@@ -165,8 +165,8 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 offset = 0;
             }
 
-            // if no resultsperpage set, default to 20
-            if (resultsperpage < 0)
+            // if no resultsperpage set, default to 20 - if tag cloud enabled, leave it as is!
+            if (resultsperpage < 0 && !bi.isTagCloudEnabled())
             {
                 resultsperpage = 20;
             }
