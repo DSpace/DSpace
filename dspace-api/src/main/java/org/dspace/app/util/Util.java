@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -24,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
@@ -465,5 +467,37 @@ public class Util {
         }
 
         return toReturn;
+    }
+    
+    /**
+     * Helper method for locales
+     * 
+     */
+    public static String getMappedLocaleForLanguage(String language){
+    	int idx = 1;
+        String definition;
+        HashMap<String, String> mappings = new HashMap<String, String>();
+
+        while ( ((definition = ConfigurationManager.getProperty("webui.language.mapping." + idx))) != null)
+        {
+            String[] map = definition.split(">");
+            if (map.length==2){
+            	mappings.put(map[0].trim(), map[1].trim());
+            }
+            
+            idx++;
+        }
+        if (mappings.containsValue(language)){
+        	return language;
+        }
+        else if (mappings.containsKey(language)){
+        	return mappings.get(language);
+        }
+        else if (mappings.containsKey("*")){
+        	return mappings.get("*");
+        }
+        else {
+        	return language;
+        }
     }
 }

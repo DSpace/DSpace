@@ -61,6 +61,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
+import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -1169,7 +1170,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	if (authority != null)
                             	{
                                 	String facetValue = preferedLabel != null?preferedLabel:value;
-                                	doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+lang:"") + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
+                                	doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+Util.getMappedLocaleForLanguage(lang):"") + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
                             	}
                             	else
                             	{
@@ -1248,7 +1249,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         	lang = meta.language;
                                         }
                                         
-                                        doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+lang:"") + "_filter", indexValue.toLowerCase() + separator + indexValue);
+                                        doc.addField(searchFilter.getIndexFieldName() + (lang!=null?"_"+Util.getMappedLocaleForLanguage(lang):"") + "_filter", indexValue.toLowerCase() + separator + indexValue);
                                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                                     }
                                 }

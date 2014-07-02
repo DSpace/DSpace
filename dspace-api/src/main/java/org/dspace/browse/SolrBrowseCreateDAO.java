@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.util.Util;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -313,7 +314,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
                 for (String facet : distFValuesWithLanguage.keySet())
                 {
-                    doc.addField(bi.getDistinctTableName() + (bi.isLocaleEnabled()?"_" + distFValuesWithLanguage.get(facet):"") + "_filter", facet);
+                    doc.addField(bi.getDistinctTableName() + (bi.isLocaleEnabled()?"_" + Util.getMappedLocaleForLanguage(distFValuesWithLanguage.get(facet)):"") + "_filter", facet);
                 }
                 for (String facet : distFAuths)
                 {
