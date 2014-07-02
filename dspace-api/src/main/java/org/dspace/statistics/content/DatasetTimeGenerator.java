@@ -112,7 +112,7 @@ public class DatasetTimeGenerator extends DatasetGenerator {
 
         startDate = "" + difStart;
         //We need +1 so we can count the current month/year/...
-        endDate   = (endPos ? "+" : "") + difEnd;
+        endDate = (difEnd<0 ? "" : "+") + difEnd;
     }
 
     public String getStartDate() {
@@ -174,62 +174,27 @@ public class DatasetTimeGenerator extends DatasetGenerator {
      *  {@code date2}
      */
     private int getTimeDifference(Date date1, Date date2, int type){
-        int toAdd;
-        int elapsed = 0;
         //We need calendar objects to compare
         Calendar cal1, cal2;
         cal1 = Calendar.getInstance();
         cal2 = Calendar.getInstance();
-
         cal1.setTime(date1);
         cal2.setTime(date2);
-
-        cal1.clear(Calendar.MILLISECOND);
-        cal2.clear(Calendar.MILLISECOND);
-        cal1.clear(Calendar.SECOND);
-        cal2.clear(Calendar.SECOND);
-        cal1.clear(Calendar.MINUTE);
-        cal2.clear(Calendar.MINUTE);
-        if(type != Calendar.HOUR){
-            cal1.clear(Calendar.HOUR);
-            cal2.clear(Calendar.HOUR);
-            cal1.clear(Calendar.HOUR_OF_DAY);
-            cal2.clear(Calendar.HOUR_OF_DAY);
-            //yet i know calendar just won't clear his hours
-            cal1.set(Calendar.HOUR_OF_DAY, 0);
-            cal2.set(Calendar.HOUR_OF_DAY, 0);
-        }
-        if(type != Calendar.DATE){
-            cal1.set(Calendar.DATE, 1);
-            cal2.set(Calendar.DATE, 1);
-        }
-        if(type != Calendar.MONTH){
-            cal1.clear(Calendar.MONTH);
-            cal2.clear(Calendar.MONTH);
-        }
-
-        //Switch em if needed
-        if(cal1.after(cal2) || cal1.equals(cal2)){
-            Calendar backup = cal1;
-            cal1 = cal2;
-            cal2 = backup;
-            toAdd = 1;
-        }else
-        {
-            toAdd = -1;
-        }
-
-
+        switch (type){
+        case Calendar.HOUR:
+      	  return (int) ((date2.getTime()-date1.getTime())/(1000*60*60)*-1);
+        case Calendar.DATE:
+      	  return (int) ((date2.getTime()-date1.getTime())/(1000*60*60*24)*-1);
+      	  
+        case Calendar.MONTH:
+      	  int diffYear = cal2.get(Calendar.YEAR) - cal1.get(Calendar.YEAR);
+      	  int diffMonth = diffYear * 12 + cal2.get(Calendar.MONTH) - cal1.get(Calendar.MONTH);
+      	  return diffMonth*-1;
+        case Calendar.YEAR:
+      	  diffYear = cal2.get(Calendar.YEAR) - cal1.get(Calendar.YEAR);
+      	  return diffYear*-1;
         
-        /*if(type != Calendar.YEAR){
-            cal1.clear(Calendar.YEAR);
-            cal2.clear(Calendar.YEAR);
         }
-        */
-        while(cal1.before(cal2)){
-            cal1.add(type, 1);
-            elapsed += toAdd;
-        }
-        return elapsed;
+        return 0;
+      }
     }
-}

@@ -242,6 +242,171 @@ public class ItemsResource {
         }
     }
     
+    /**
+     * Get all statistics by its Handle: prefix/suffix
+     */
+    @GET
+    @Path("/stats/")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats getItem(
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request ) throws WebApplicationException {
+    	
+    	log.debug("input settings " + interval + " " + startDate + " " + endDate);
+    	
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+    		try{
+    			return new org.dspace.rest.common.Stats("",(org.dspace.content.DSpaceObject)null,startDate,endDate,interval);
+    		} catch (WebApplicationException e){
+    			log.error(e);
+    			throw e;
+    		} catch(Exception e){
+    			log.error(e);
+    			throw new WebApplicationException(e, 501);
+            }
+
+            
+        } catch (SQLException e)  {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @GET
+    @Path("/stats/{type}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats getItem(
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request, @PathParam("type") String type) throws WebApplicationException {
+    	
+    	log.debug("input settings " + interval + " " + startDate + " " + endDate);
+    	
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+    		try{
+    			return new org.dspace.rest.common.Stats(type,(org.dspace.content.DSpaceObject)null,startDate,endDate,interval);
+    		} catch (WebApplicationException e){
+    			log.error(e);
+    			throw e;
+    		} catch(Exception e){
+    			log.error(e);
+    			throw new WebApplicationException(e, 501);
+            }
+
+            
+        } catch (SQLException e)  {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * Get a specific Item statistics by its Handle: prefix/suffix
+     */
+    @GET
+    @Path("/{prefix}/{suffix}/stats/")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats getItem(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix,
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request ) throws WebApplicationException {
+    	
+    	log.debug("input settings " + interval + " " + startDate + " " + endDate);
+    	
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            if(dso instanceof org.dspace.content.Item){
+            	org.dspace.content.Item item = (org.dspace.content.Item)dso;
+            	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+            		try{
+            		return new org.dspace.rest.common.Stats("",dso,startDate,endDate,interval);
+            		} catch (WebApplicationException e){
+            			log.error(e);
+            			throw e;
+            		} catch(Exception e){
+            			log.error(e);
+            			throw new WebApplicationException(e, 501);
+                    }
+            	} else {
+	                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+	            }
+            	
+            } else {
+            	throw new WebApplicationException(Response.Status.NO_CONTENT);
+            }
+
+            
+        } catch (SQLException e)  {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * Get a specific Item statistics by its Handle: prefix/suffix
+     */
+    @GET
+    @Path("/{prefix}/{suffix}/stats/{type}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats getItem(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix,
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request, @PathParam("type") String type) throws WebApplicationException {
+    	
+    	log.debug("input settings " + interval + " " + startDate + " " + endDate);
+    	if(type==null){
+    		type="";
+    	}
+    	
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            if(dso instanceof org.dspace.content.Item){
+            	org.dspace.content.Item item = (org.dspace.content.Item)dso;
+            	if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+            		try{
+            		return new org.dspace.rest.common.Stats(type,dso,startDate,endDate,interval);
+            		} catch (WebApplicationException e){
+            			log.error(e);
+            			throw e;
+            		} catch(Exception e){
+            			log.error(e);
+            			throw new WebApplicationException(e, 501);
+                    }
+            	} else {
+	                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+	            }
+            	
+            } else {
+            	throw new WebApplicationException(Response.Status.NO_CONTENT);
+            }
+
+            
+        } catch (SQLException e)  {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
     
     // /items/search?q=Albert Einstein
     @GET
@@ -283,6 +448,73 @@ public class ItemsResource {
         }
     }
     
+    @GET
+    @Path("/search/stats")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats search(
+    		@QueryParam("q") String query,
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@Context HttpServletRequest request) throws WebApplicationException{
+        try {
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            ArrayList<Integer> ids;
+            if(query!=null){
+            	ids= luceneIdSearch(query,  request);
+            } else {
+            	ids= parameterIdSearch(request);
+            }
+            return new org.dspace.rest.common.Stats("",ids,startDate,endDate,interval);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+        	log.error(e.getMessage());
+        	throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+		}
+    }
+    
+    @GET
+    @Path("/search/stats/{type}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public org.dspace.rest.common.Stats search(
+    		@QueryParam("q") String query,
+    		@QueryParam("interval") String interval, @QueryParam("start") String startDate, @QueryParam("end") String endDate,
+    		@PathParam("type") String type,
+    		@Context HttpServletRequest request) throws WebApplicationException{
+        try {
+        	if(type==null){
+        		type="";
+        	}
+            if(context == null || !context.isValid()) {
+                context = new org.dspace.core.Context();
+                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
+                context.getDBConnection().setAutoCommit(true);
+            }
+            ArrayList<Integer> ids;
+            if(query!=null){
+            	ids= luceneIdSearch(query,  request);
+            } else {
+            	ids= parameterIdSearch(request);
+            }
+            return new org.dspace.rest.common.Stats(type,ids,startDate,endDate,interval);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+        	log.error(e.getMessage());
+        	throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+		}
+    }
     
     
     @GET
