@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns= "http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
+<meta http-equiv="Content-Language" content="en" />
+<title>Search Help Page</title>
+</head>
+<body>
+<h1>Search by lucene query</h1>
+<p>Use parameter 'q' and specify a correct lucene search query. E.g. /items/search?q=Albert Einstein</p>
+<p>Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.</p>
+<h1>Search by parameters</h1>
+<p>You can search on the following fields:</p>
+<table border ="1">
+{searchfields}
+</table>
+<p>All fields in a query are takens as 'and' catenations.</p>
+<p>For an exact matching string surround string with '"', e.g. "Albert Einstein". Leaving out '"' searches for items which either Albert or Einstein.</p>
+<p>You have to URL encode special characters in your query, e.g. "Alpha &amp; Omega" should be submitted as "Alpha %26 Omega"</p>
+<p>Example: /items/search?author="Albert Einstein"&amp;publisher=Oxford<br/>searches for content with the author Albert Einstein which were published by someone with Oxford in their name.</p>
+<p>Sorting can be don either ascending or descanding on one field. Use paramter 'order_asc' or 'order_desc'. You can sort by the following fields: </p>
+<table border ="1">
+{sortfields}
+</table>
+<p>Additionally you can also provide 'expand', 'limit', and 'offset' parameters to refine the search results.<br/>
+Example: /items/search?author="Albert Einstein"&amp;publisher=Oxford&amp;order_desc=title&amp;expand=metadata&amp;limit=10<br/>
+This searches for content by Albert Einstein and published by someone with Oxford in the titel; the results will contain a maximum of 10 
+itmes sorted by title in descending order with all metadata information displayed.</p>
+</body></html>
