@@ -673,6 +673,7 @@ function updateCountry(){
 //  The redirect buttons ("Save & Exit" and "Continue to Describe Data")
 //  still trigger a full page reload.
 jQuery(document).ready(function(){
+    var form_selector = '#aspect_submission_StepTransformer_div_submit-describe-publication';
     // update the part of the form associated with the input button that was clicked 
     // selector: string, jQuery selector to identify the li.ds-form-item element
     //      to be replaced by the update
@@ -686,18 +687,15 @@ jQuery(document).ready(function(){
             return;
         }
         // update DOM with fragment selected from response document 
-        if ($result_doc.length > 0 ) { 
-            if ($result_doc.find(selector).length > 0) {
-                jQuery(selector).replaceWith(
-                    $result_doc.find(selector)
-                );
-                // refresh event bindings on updated page
-                submit_describe_publication_binders();
-            } else {
-                console.log('Failed to identify form fragment in result document.');
-            }
+        if ($result_doc.length > 0 && $result_doc.find(selector).length > 0) { 
+            jQuery(selector).replaceWith($result_doc.find(selector));
+            // refresh event bindings on updated page
+            submit_describe_publication_binders();
+        // on failure to isolate form, load entire response page, which is
+        // likely to contain an error message
         } else {
             console.log('No handlable data from returned page.');
+            jQuery('html').html(data);
         }
     };
     // need to save off the name of the submit button that was clicked, since
@@ -715,9 +713,7 @@ jQuery(document).ready(function(){
           , form_data   = $form.serializeArray()    // the form's data
           , success     = false                     // unsuccessful ajax call until we receive a 200
           , ajax_data                               // ajax data, for passing to the updater function
-            // selector to use for retrieving the fragment from the response, and replacement in the current page
-          , form_li     = 'li.ds-form-item:has(label[for="' + $input.closest('li.ds-form-item').find('label.ds-form-label').attr('for') + '"])'
-          , prevent_default = false;
+          , prevent_default = false;                // whether to continue with form submission/reload
         // undefine this variable, due to the flurry of onclick events raised by a button 
         // click. TODO: determine why multiple button onclick events are raised
         clicked_btn_name = undefined;
@@ -750,7 +746,7 @@ jQuery(document).ready(function(){
                         , complete : function(jqXHR,textStatus) {
                             // update the page using data associated with the input the user selected
                             if (success === true) {
-                                update_form_fragment(form_li,ajax_data);
+                                update_form_fragment(form_selector,ajax_data);
                             }
                         }
                     });
@@ -769,8 +765,8 @@ jQuery(document).ready(function(){
     };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified 
     var submit_describe_publication_binders = function() {
-        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication input.ds-button-field').bind('click', watch_clicked);
-        jQuery('#aspect_submission_StepTransformer_div_submit-describe-publication').bind('submit', submit_describe_publication_onsubmit);
+        jQuery(form_selector + ' input.ds-button-field').bind('click', watch_clicked);
+        jQuery(form_selector).bind('submit', submit_describe_publication_onsubmit);
     };
     submit_describe_publication_binders();
 });
