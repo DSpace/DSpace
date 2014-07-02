@@ -1112,7 +1112,7 @@ public class DescribePublicationStep extends AbstractProcessingStep {
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;
-        String buttonPressed = Util.getSubmitButton(request, "");
+        String buttonPressed = Util.getSubmitButton(request, null);
 
         // Iterate through the values in the form.
         while (!foundLast)
@@ -1135,11 +1135,26 @@ public class DescribePublicationStep extends AbstractProcessingStep {
             // We're only going to add non-null values
             if (s != null)
             {
-                // Check to make sure that this value was not deleted.
-                // Previously the "remove multiple" option available in
-                // Manakin), this is now a "remove this" option
-                if (!buttonPressed.equals("submit_" + metadataField + "_" + i + "_delete"))
+                boolean addValue = true;
+
+                // Check to make sure that this value was not selected to be
+                // removed.
+                // (This is for the "remove multiple" option available in
+                // Manakin)
+                String[] selected = request.getParameterValues(metadataField
+                        + "_selected");
+
+                if (   selected != null && buttonPressed != null 
+                    && buttonPressed.equals("submit_" + metadataField + "_delete"))
                 {
+                    for (String aSelected : selected) {
+                        if (aSelected.equals(metadataField + "_" + i)) {
+                            addValue = false;
+                        }
+                    }
+                }
+
+                if (addValue){
                     if(splitChar == null)
                         vals.add(s.trim());
                     else{
