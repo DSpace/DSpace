@@ -126,7 +126,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                 // value for lookup when partial search (the item mapper tool use it)
                 Set<String> distValuesForAC = new HashSet<String>();
 
-                // now index the new details - but only if it's archived and not
+                // now index the new details - but only if it's archived or
                 // withdrawn
                 if (item.isArchived() || item.isWithdrawn())
                 {
