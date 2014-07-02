@@ -35,6 +35,7 @@ public class TagCloudTag extends SimpleTagSupport{
 	Map<String, Integer> data;
 	String index;
 	String scope;
+	String type = "0"; // 0=facet, 1=browse
 
 	/**
 	 * 
@@ -77,7 +78,7 @@ public class TagCloudTag extends SimpleTagSupport{
 			for (String subject : data.keySet()){
 				if (data.get(subject).intValue() > Integer.parseInt(parameters.getCuttingLevel())){
 					for (int i=0; i<data.get(subject).intValue(); i++){
-						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+"/simple-search?filterquery="+subject+"&filtername="+index+"&filtertype=equals");   // creates a tag
+						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+(type.equals("0")?("/simple-search?filterquery="+subject+"&filtername="+index+"&filtertype=equals"):("/browse?type="+index+"&value="+subject)));   // creates a tag
 						//tag2.setScore(subjects.get(subject).doubleValue());
 						cloud.addTag(tag2); 
 					}
@@ -205,5 +206,9 @@ public class TagCloudTag extends SimpleTagSupport{
 
 	public void setScope(String scope) {
 		this.scope = scope;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }
