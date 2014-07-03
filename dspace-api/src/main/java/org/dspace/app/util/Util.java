@@ -7,19 +7,6 @@
  */
 package org.dspace.app.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
@@ -27,6 +14,13 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.*;
 
 /**
  * Miscellaneous utility methods
@@ -465,5 +459,9 @@ public class Util {
         }
 
         return toReturn;
+    }
+
+    public static String toString(Object obj, String nullStr) {
+        return (obj == null) ? nullStr : obj.toString();
     }
 }

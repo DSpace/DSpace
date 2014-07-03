@@ -1605,4 +1605,9 @@ public class EPerson extends DSpaceObject
 
         return 0;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getNetid();
+    }
+
 }
