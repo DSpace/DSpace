@@ -174,10 +174,8 @@
             <xsl:choose>
                 <!-- handle author list as a special case to enable reordering/editing -->
                 <xsl:when test="@n = 'dc_contributor_author'">
-                    <xsl:if test="dri:instance or dri:field/dri:instance">
-                        <xsl:call-template name="ds-previous-values-dc-contributor-author">
-                            <xsl:with-param name="instance-data" select="xalan:nodeset(dri:field/dri:instance)"/>
-                        </xsl:call-template>
+                    <xsl:if test="dri:field and dri:field/dri:instance">
+                        <xsl:call-template name="ds-previous-values-dc-contributor-author"/>
                     </xsl:if>
                 </xsl:when>
                 <!-- handle non-author-list metadata -->
@@ -195,7 +193,6 @@
 
     <xsl:template name="ds-previous-values-dc-contributor-author">
         <!-- dri:instance element node-set as a xalan:nodeset -->
-        <xsl:param name="instance-data"/>
         <div class="ds-previous-values">
             <!-- TODO: put into css file -->
             <style>
@@ -214,24 +211,16 @@
                 <xsl:call-template name="fieldIterator-dc-contributor-author">
                     <xsl:with-param name="position" select="1"/>
                 </xsl:call-template>
-                <!-- Update button
-                     TODO: il8n
-                -->
+                <!-- Update button 
                 <tr>
                     <td colspan="*">
                         <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.update" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-update-button"/>
                     </td>
                 </tr>
+                -->
             </table>    
-            <div id="foo">
-                <xsl:for-each select="$instance-data">
-                    <!-- the context node in the loop is a dri:instance element -->
-                    <xsl:apply-templates select="." mode="hiddenInterpreter"/>    
-                </xsl:for-each>
-            </div>
         </div>
     </xsl:template>
-
 
     <!-- The iterator is a recursive function that creates a checkbox (to be used in deletion) for
         each value instance and interprets the value inside. It also creates a hidden field from the
@@ -241,64 +230,55 @@
         components rather than a single field, which requires it to consider several sets of instances. -->
     <xsl:template name="fieldIterator-dc-contributor-author">
         <xsl:param name="position"/>
-        <!-- TODO: delete possible per schema? -->
-        <!-- add authority value for this instance
-                <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">
-                    <xsl:call-template name="authorityInputFields">
-                        <xsl:with-param name="name" select="@n"/>
-                        <xsl:with-param name="position" select="$position"/>
-                        <xsl:with-param name="authValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/text()"/>
-                        <xsl:with-param name="confValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
-                    </xsl:call-template>
-                </xsl:if>
-        -->
-        <!-- handle current -->
-        <xsl:if test="dri:instance[position()=$position]/dri:value or dri:field/dri:instance[position()=$position]">            
+        <xsl:if test="dri:field/dri:instance[position()=$position]">            
             <tr>
                 <td>
-                    <input class="ds-author-order-col" type="text" readonly="readonly" value="{$position}"/>
+                    <span><xsl:value-of select="string($position)"/></span>
                 </td>
                 <td>
-                    <xsl:choose>
-                        <!-- First check to see if the composite itself has a non-empty instance value in that
-                        position. In that case there is no need to go into the individual fields. -->
-                        <xsl:when test="dri:instance[position()=$position]/dri:value[@type != 'authority']">
-                            <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
-                            <xsl:call-template name="authorityConfidenceIcon">
-                                <xsl:with-param name="confidence" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
-                            </xsl:call-template>
-                        </xsl:when>
-                        
-                        <!-- Otherwise, build the string from the component fields -->
-                        <xsl:when test="dri:field/dri:instance[position()=$position]">
-                            <xsl:apply-templates select="dri:field" mode="compositeField">
-                                <xsl:with-param name="position" select="$position"/>
-                            </xsl:apply-templates>
-                        </xsl:when>
-                    </xsl:choose>
+                    <!-- First check to see if the composite itself has a non-empty instance value in that
+                    position. In that case there is no need to go into the individual fields. -->
+                    <a data-title="{string(dri:label)}" data-type="text">
+                        <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
+                    </a>
+                    <xsl:apply-templates select="dri:field/dri:instance[position()=$position]" mode="hiddenInterpreter"/>
+                    <!--<input readonly="readonly" type="text" name="{concat('dc_contributor_author_last_',string($position))}">
+                        <xsl:attribute name="value">
+                            <xsl:value-of select="dri:field[@n='dc_contributor_author_last']/dri:instance[$position]/dri:value[@type='raw']"/>
+                        </xsl:attribute>
+                    </input>
+                </td>
+                <td>
+                    <input readonly="readonly" type="text" name="{concat('dc_contributor_author_first_',string($position))}">
+                        <xsl:attribute name="value">
+                            <xsl:value-of select="dri:field[@n='dc_contributor_author_first']/dri:instance[$position]/dri:value[@type='raw']"/>
+                        </xsl:attribute>
+                    </input>-->
                 </td>
                 <td>
                     <xsl:if test="contains(dri:params/@operations,'add')">
-                        <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.edit" name="{concat('submit_',@n,'_edit')}" class="ds-button-field ds-edit-button" />
+                        <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.edit" name="{concat('submit_',@n,'_',$position,'_edit')}" class="ds-button-field ds-edit-button" />
                     </xsl:if>
                 </td>
                 <td>
                     <xsl:if test="contains(dri:params/@operations,'delete')">
                         <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
                         <!-- NEW: added per-entry delete: -->
-                        <input type="hidden" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
+                        <!--<input type="hidden" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>-->
                         <!-- TODO: il8n -->
                         <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.remove" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                     </xsl:if>
                 </td>
+                <!--
+                <input type="hidden" name="dc_contributor_author_last_1" value="Jones">
+                <input type="hidden" name="dc_contributor_author_first_1" value="Buck">
+                -->
             </tr>
-
             <!-- recurse to handle subsequent authors -->
             <xsl:call-template name="fieldIterator-dc-contributor-author">
                 <xsl:with-param name="position" select="$position + 1"/>
             </xsl:call-template>
         </xsl:if>
-
     </xsl:template>
 
     <!-- The handling of the field element is more complex. At the moment, the handling of input fields in the
