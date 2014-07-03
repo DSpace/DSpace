@@ -1033,13 +1033,27 @@
                     </xsl:if>
                 </xsl:for-each>
             </xsl:variable>
+            <xsl:variable name="keywordlink">
+                <xsl:for-each
+                        select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
+                    <xsl:value-of select="node()"/>
+                    <xsl:if test="position() != last()">
+                        <xsl:text>+</xsl:text>
+                    </xsl:if>
+                </xsl:for-each>
+            </xsl:variable>
             <xsl:if test="$keywords!=''">
                 <tr>
                     <th>
                         <i18n:text>xmlui.DryadItemSummary.keywords</i18n:text>
                     </th>
                     <td>
+                       <a>
+                        <xsl:attribute name="href">
+                          <xsl:value-of select="concat('http://datadryad.org/discover?query=&amp;submit=Go&amp;fq=dc.subject%3A', translate($keywordlink,' ','+'), '&amp;filtertype=*&amp;filter=&amp;rpp=20&amp;sort_by=score&amp;order=DESC')"/>
+                       </xsl:attribute>
                         <xsl:value-of select="$keywords"/>
+                      </a>
                     </td>
                     <td>
                     </td>
