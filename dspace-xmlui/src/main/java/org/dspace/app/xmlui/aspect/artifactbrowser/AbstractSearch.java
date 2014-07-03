@@ -225,7 +225,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     protected void buildSearchResultsDivision(Division search)
             throws IOException, SQLException, WingException
     {
-        if (getQuery().length() > 0)
+         //Perform query even when spatial query is not empty
+        if ((getQuery().length() > 0) || (getSpatialQuery().length()>0))
         {
 
             // Perform the actual search
@@ -414,6 +415,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         
         Context context = ContextUtil.obtainContext(objectModel);
         String query = getQuery();
+        //get spatial query and spatial relation
+        String spatialQuery=getSpatialQuery();
+        String spatialRelation=getSpatialRelation();
+        
         DSpaceObject scope = getScope();
         int page = getParameterPage();
 
@@ -442,15 +447,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         QueryResults qResults = null;
         if (scope instanceof Community)
         {
-            qResults = DSQuery.doQuery(context, queryArgs, (Community) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Community) scope, spatialQuery, spatialRelation);
         }
         else if (scope instanceof Collection)
         {
-            qResults = DSQuery.doQuery(context, queryArgs, (Collection) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Collection) scope, spatialQuery, spatialRelation);
         }
         else
         {
-            qResults = DSQuery.doQuery(context, queryArgs);
+            qResults = DSQuery.doQuery(context, queryArgs, spatialQuery, spatialRelation);
         }
 
         this.queryResults = qResults;
@@ -536,6 +541,45 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         {
             return 0;
         }
+    }
+    
+       /**
+     * Extract the spatial query string. Under most implementations this will be derived
+     * from the url parameters.Has the following form: west,east,south,north
+     * e.g. 22.40,23.23,44.56,45.61
+     * 
+     * @return The spatial query string.
+     */
+   
+     public String getSpatialQuery() throws UIException
+    {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        //na mpei kodikas request.getParameter("bbox")
+        String spatialQuery = decodeFromURL(request.getParameter("spatial-query"));
+        if (spatialQuery == null)
+        {
+            return "";
+        }
+        return spatialQuery;
+    }
+
+    
+     /**
+     * Extract the spatial relation string. Under most implementations this will be derived
+     * from the url parameters. Spatial relations supported are Within and Intersects
+     * 
+     * @return The spatial relation string.
+     */
+    public String getSpatialRelation() throws UIException
+    {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        
+        String relation = decodeFromURL(request.getParameter("spatial-relation"));
+        if (relation == null)
+        {
+            return "";
+        }
+        return relation;
     }
 
     protected QueryResults getQueryResults() {

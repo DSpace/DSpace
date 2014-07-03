@@ -2352,4 +2352,13 @@
     <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_help">A more recent version of this item is in the Workflow.</message>
 
     <!-- End Versioning -->
+    
+    <!-- Spatial Functionality -->
+    <message key="xmlui.Spatial.Map.Tip">Press Shift Button to draw search area</message>
+    <message key="xmlui.Spatial.Map.Search">Spatial Search</message>
+    <message key="xmlui.Spatial.Map.Clear">Clear Map</message>
+    <message key="xmlui.Spatial.Map.Relation">Spatial Relation </message>
+    <message key="xmlui.Spatial.Map.Within">Is Within</message>
+    <message key="xmlui.Spatial.Map.Intersect">Intersects</message>
+    
 </catalogue>

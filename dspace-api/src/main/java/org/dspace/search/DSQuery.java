@@ -38,6 +38,17 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.sort.SortOption;
 
+import com.spatial4j.core.context.SpatialContext;
+import com.spatial4j.core.context.jts.JtsSpatialContext;
+import org.apache.lucene.spatial.query.SpatialArgs;
+import org.apache.lucene.spatial.query.SpatialOperation;
+import com.spatial4j.core.shape.impl.RectangleImpl;
+import org.apache.lucene.search.*;
+import org.apache.lucene.spatial.SpatialStrategy;
+import org.apache.lucene.spatial.prefix.RecursivePrefixTreeStrategy;
+import org.apache.lucene.spatial.prefix.tree.QuadPrefixTree;
+import org.apache.lucene.spatial.prefix.tree.SpatialPrefixTree;
+import org.dspace.content.DCBoundingBox;
 // issues
 // need to filter query string for security
 // cmd line query needs to process args correctly (seems to split them up)
@@ -101,6 +112,23 @@ public class DSQuery
     public static QueryResults doQuery(Context c, QueryArgs args)
             throws IOException
     {
+     QueryResults qr =doQuery(c, args, null,null);
+     return qr;
+    }
+    
+    /**
+     * Do a query, returning a QueryResults object
+     *
+     * @param c  context
+     * @param args query arguments in QueryArgs object
+     * @param spatialQuery  spatialQuery String
+     * @param spatialRelation spatialRelation String
+     * 
+     * @return query results QueryResults
+     */
+    public static QueryResults doQuery(Context c, QueryArgs args, String spatialQuery,String spatialRelation)
+            throws IOException
+    {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
         List<String> hitHandles = new ArrayList<String>();
@@ -144,7 +172,7 @@ public class DSQuery
 
             Query myquery = qp.parse(querystring);
             //Retrieve enough docs to get all the results we need !
-            TopDocs  hits = performQuery(args, searcher, myquery, args.getPageSize() * (args.getStart() + 1));
+            TopDocs  hits = performQuery(args, searcher, myquery, args.getPageSize() * (args.getStart() + 1), spatialQuery, spatialRelation);
             
             Date endTime = new Date();
             
@@ -222,8 +250,43 @@ public class DSQuery
         return qr;
     }
 
-    private static TopDocs performQuery(QueryArgs args, IndexSearcher searcher, Query myquery, int max) throws IOException {
+    private static TopDocs performQuery(QueryArgs args, IndexSearcher searcher, Query myquery, int max, String spatialQuery, String spatialRelation) throws IOException, ParseException {
         TopDocs hits;
+        
+         //Create Spatial filter based on spatialQuery String
+         Filter sf=null;
+         if ((spatialQuery!=null) && !(spatialQuery.equals(""))){
+         try{ 
+            
+            Double[] bbox=new DCBoundingBox(spatialQuery).toDouble(); 
+            SpatialContext SC=JtsSpatialContext.GEO;
+            SpatialArgs sa;
+            // Two spatial Relations are supported: IsWithin and Intesects
+            if (spatialRelation.equals("intersect")){
+                sa=new SpatialArgs(SpatialOperation.Intersects,new RectangleImpl(bbox[0],bbox[1],bbox[2],bbox[3],SC)); 
+            }else{
+                sa=new SpatialArgs(SpatialOperation.IsWithin,new RectangleImpl(bbox[0],bbox[1],bbox[2],bbox[3],SC));  
+            }
+            SpatialPrefixTree grid=new QuadPrefixTree(SC,10);
+            SpatialStrategy SS=new RecursivePrefixTreeStrategy(grid,"spatialIndex");
+            sf=SS.makeFilter(sa);
+            
+            //Because filter blocks results, in case myquery is empty there are no returned results so spatial search retuns nothing too
+            // even if spatialQuery is present
+            if (myquery.toString().contains("+(default:empti default:queri default:string)")){
+                    QueryParser qp = new QueryParser(DSIndexer.luceneVersion, "default", DSIndexer.getAnalyzer());
+                    myquery=qp.parse(myquery.toString().substring(myquery.toString().lastIndexOf("+location:")));
+                    // Older Lucene Implementation
+                    // myquery=new MatchAllDocsQuery();
+            }
+            
+         }catch(NumberFormatException e){
+             log.error("Cannot parse Bounding Box");
+             // Create null filter in case of parsing error
+             sf=null;
+         }
+         }
+         
         try
         {
             if (args.getSortOption() == null)
@@ -232,7 +295,7 @@ public class DSQuery
                         new SortField("search.resourcetype", SortField.Type.INT, true),
                         new SortField(null, SortField.FIELD_SCORE.getType(), SortOption.ASCENDING.equals(args.getSortOrder()))
                     };
-                hits = searcher.search(myquery, max, new Sort(sortFields));
+                hits = searcher.search(myquery, sf, max,  new Sort(sortFields));
             }
             else
             {
@@ -241,7 +304,7 @@ public class DSQuery
                         new SortField("sort_" + args.getSortOption().getName(), SortField.Type.STRING, SortOption.DESCENDING.equals(args.getSortOrder())),
                         SortField.FIELD_SCORE
                     };
-                hits = searcher.search(myquery, max, new Sort(sortFields));
+                hits = searcher.search(myquery, sf, max, new Sort(sortFields));
             }
         }
         catch (Exception e)
@@ -249,7 +312,7 @@ public class DSQuery
             // Lucene can throw an exception if it is unable to determine a sort time from the specified field
             // Provide a fall back that just works on relevancy.
             log.error("Unable to use speficied sort option: " + (args.getSortOption() == null ? "type/relevance": args.getSortOption().getName()));
-            hits = searcher.search(myquery, max, new Sort(SortField.FIELD_SCORE));
+            hits = searcher.search(myquery, sf, max,  new Sort(SortField.FIELD_SCORE));
         }
         return hits;
     }
@@ -355,6 +418,70 @@ public class DSQuery
         args.setQuery(newquery);
 
         return doQuery(c, args);
+    }
+    
+      /**
+     * Do a query, restricted to a collection
+     * 
+     * @param c
+     *            context
+     * @param args
+     *            query args
+     * @param coll
+     *            collection to restrict to
+     * @param spatialQuery
+     *            spatial query string
+     * @param spatialRelation
+     *            spatial relation string
+     * 
+     * @return QueryResults same results as doQuery, restricted to a collection
+     */
+    public static QueryResults doQuery(Context c, QueryArgs args,
+            Collection coll, String spatialQuery, String spatialRelation) throws IOException
+    {
+        String querystring = args.getQuery();
+
+        querystring = checkEmptyQuery(querystring);
+
+        String location = "l" + (coll.getID());
+
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
+
+        args.setQuery(newquery);
+
+        return doQuery(c, args, spatialQuery, spatialRelation);
+    }
+
+    /**
+     * Do a query, restricted to a community
+     * 
+     * @param c
+     *            context
+     * @param args
+     *            query args
+     * @param comm
+     *            community to restrict to
+     * @param spatialQuery
+     *            spatial query string
+     * @param spatialRelation
+     *            spatial relation string
+     * 
+     * @return QueryResults same results as doQuery, restricted to a collection
+     */
+    public static QueryResults doQuery(Context c, QueryArgs args, Community comm, String spatialQuery, String spatialRelation)
+            throws IOException
+    {
+        String querystring = args.getQuery();
+
+        querystring = checkEmptyQuery(querystring);
+
+        String location = "m" + (comm.getID());
+
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
+
+        args.setQuery(newquery);
+
+        return doQuery(c, args, spatialQuery, spatialRelation);
     }
 
 

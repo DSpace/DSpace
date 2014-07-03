@@ -272,6 +272,20 @@
                                 var runAfterJSImports = new FnArray();
             </script>
 
+            <!-- add "spatial" javascript from static, path is relative to webapp root-->
+            <script type="text/javascript">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/static/js/OpenLayers/OpenLayers.js</xsl:text>
+                </xsl:attribute>&#160;</script>
+            <script type="text/javascript">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/themes/</xsl:text>
+        	    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                    <xsl:text>/lib/js/spatial.js</xsl:text>
+	    	</xsl:attribute>&#160;</script>
+            
             <!-- Modernizr enables HTML5 elements & feature detects -->
             <script type="text/javascript">
                 <xsl:attribute name="src">

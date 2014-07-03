@@ -49,6 +49,10 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.spatial.SpatialStrategy;
+import org.apache.lucene.spatial.prefix.RecursivePrefixTreeStrategy;
+import org.apache.lucene.spatial.prefix.tree.QuadPrefixTree;
+import org.apache.lucene.spatial.prefix.tree.SpatialPrefixTree;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.Version;
 import org.dspace.content.Bitstream;
@@ -72,6 +76,12 @@ import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
+
+import com.spatial4j.core.context.SpatialContext;
+import com.spatial4j.core.context.jts.JtsSpatialContext;
+import com.spatial4j.core.shape.Rectangle;
+import com.spatial4j.core.shape.impl.RectangleImpl;
+import org.dspace.content.*;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
@@ -1170,6 +1180,25 @@ public class DSIndexer
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
                                                     Field.Index.NOT_ANALYZED));
+                            }
+                        }
+                         else if ("location".equalsIgnoreCase(indexConfigArr[i].type))
+                        {
+                            
+                            String bb=mydc[j].value;
+                            if (bb != null)
+                            {
+                                DCBoundingBox dcbb=new DCBoundingBox(bb);
+                                Double[] bbox=dcbb.toDouble();
+                                //Create Spatial Index if present
+                                //log.info("Create Spatial Index");
+                                SpatialContext SC=JtsSpatialContext.GEO;
+                                SpatialPrefixTree grid=new QuadPrefixTree(SC,10);
+                                SpatialStrategy SS=new RecursivePrefixTreeStrategy(grid,"spatialIndex");
+                                Rectangle shape=new RectangleImpl(bbox[0],bbox[1],bbox[2],bbox[3],SC);
+                                for (Field f: SS.createIndexableFields(shape)){
+                                    doc.add(f);
+                                }             
                             }
                         }
                         else

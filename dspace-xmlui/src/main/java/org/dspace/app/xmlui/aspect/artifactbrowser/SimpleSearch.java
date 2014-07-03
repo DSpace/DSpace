@@ -18,12 +18,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -94,6 +89,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             UIException, SQLException, IOException, AuthorizeException
     {
         String queryString = getQuery();
+        String spatialQueryString = getSpatialQuery();
 
         // Build the DRI Body
         Division search = body.addDivision("search","primary");
@@ -113,6 +109,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Text text = queryList.addItem().addText("query");
         text.setLabel(T_full_text_search);
         text.setValue(queryString);
+        //Hidden for map search - Activated by Theme
+        Hidden bbox=queryList.addItem().addHidden("spatial-query","spatial-search");
+        bbox.setValue(spatialQueryString);
         
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -155,6 +154,18 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         if (!"".equals(query))
         {
             parameters.put("query", encodeForURL(query));
+        }
+        
+        String spatialQuery = getSpatialQuery();
+        if (!"".equals(spatialQuery))
+        {
+            parameters.put("spatial-query", encodeForURL(spatialQuery));
+        }
+        
+        String spatialRelation = getSpatialRelation();
+        if (!"".equals(spatialRelation))
+        {
+            parameters.put("spatial-relation", encodeForURL(spatialRelation));
         }
         
         if (parameters.get("page") == null)

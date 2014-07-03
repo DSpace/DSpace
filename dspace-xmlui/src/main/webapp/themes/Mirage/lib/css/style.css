@@ -1393,3 +1393,15 @@ table.discovery-filters th.new-filter-header
     text-align: right;
     font-size: 100%;
 }
+
+div.spatial-advanced-search{
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+	width:450px;
+}
+
+div.spatial-search-div{
+	display:none;
+}
+
