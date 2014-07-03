@@ -992,13 +992,15 @@ public class SolrLogger
         // Create an array for our result
         ObjectCount[] result = new ObjectCount[dateFacet.getValueCount()
                 + (showTotal ? 1 : 0)];
-        // Run over our datefacet & store all the values
-        for (int i = 0; i < dateFacet.getValues().size(); i++)
-        {
-            FacetField.Count dateCount = dateFacet.getValues().get(i);
-            result[i] = new ObjectCount();
-            result[i].setCount(dateCount.getCount());
-            result[i].setValue(getDateView(dateCount.getName(), dateType));
+        if(dateFacet.getValues()!=null){
+	        // Run over our datefacet & store all the values
+	        for (int i = 0; i < dateFacet.getValues().size(); i++)
+	        {
+	            FacetField.Count dateCount = dateFacet.getValues().get(i);
+	            result[i] = new ObjectCount();
+	            result[i].setCount(dateCount.getCount());
+	            result[i].setValue(getDateView(dateCount.getName(), dateType));
+	        }
         }
         if (showTotal)
         {
@@ -1010,6 +1012,72 @@ public class SolrLogger
         }
         return result;
     }
+    
+    /**
+     * Query used to get values grouped by the date (in ISO string format).
+     * 
+     * @param query
+     *            the query to be used
+     * @param max
+     *            the max number of values given back (in case of 10 the top 10
+     *            will be given)
+     * @param dateType
+     *            the type to be used (example: DAY, MONTH, YEAR)
+     * @param dateStart
+     *            the start date Format:(-3, -2, ..) the date is calculated
+     *            relatively on today
+     * @param dateEnd
+     *            the end date stop Format (-2, +1, ..) the date is calculated
+     *            relatively on today
+     * @param showTotal
+     *            a boolean determining whether the total amount should be given
+     *            back as the last element of the array
+     * @return and array containing our results in ISO date format
+     * @throws SolrServerException
+     *             ...
+     */
+    public static ObjectCount[] queryFacetDateISO(String query,
+            String filterQuery, int max, String dateType, String dateStart,
+            String dateEnd, boolean showTotal) throws SolrServerException
+    {
+        QueryResponse queryResponse = query(query, filterQuery, null,0, max,
+                dateType, dateStart, dateEnd, null, null, false);
+        if (queryResponse == null)
+        {
+            return new ObjectCount[0];
+        }
+//        log.debug("queryResponse " + queryResponse.getStatus());
+//        log.debug(queryResponse.getResults());
+//        log.debug(queryResponse.getFacetDates());
+        FacetField dateFacet = queryResponse.getFacetDate("time");
+        if(dateFacet==null){
+        	return new ObjectCount[0];
+        }
+        // TODO: check if this cannot crash I checked it, it crashed!!!
+        // Create an array for our result
+        ObjectCount[] result = new ObjectCount[dateFacet.getValueCount()
+                + (showTotal ? 1 : 0)];
+        // Run over our datefacet & store all the values
+        if(dateFacet.getValues()!=null){
+        	for (int i = 0; i < dateFacet.getValues().size(); i++)
+	        {
+	            FacetField.Count dateCount = dateFacet.getValues().get(i);
+	            result[i] = new ObjectCount();
+	            result[i].setCount(dateCount.getCount());
+	            result[i].setValue(dateCount.getName());
+	        }
+	    }
+        if (showTotal)
+        {
+            result[result.length - 1] = new ObjectCount();
+            result[result.length - 1].setCount(queryResponse.getResults()
+                    .getNumFound());
+            // TODO: Make sure that this total is gotten out of the msgs.xml
+            result[result.length - 1].setValue("total");
+        }
+        return result;
+    }
+
 
     public static Map<String, Integer> queryFacetQuery(String query,
             String filterQuery, List<String> facetQueries)

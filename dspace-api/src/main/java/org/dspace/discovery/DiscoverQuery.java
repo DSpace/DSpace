@@ -39,6 +39,7 @@ public class DiscoverQuery {
     private List<DiscoverFacetField> facetFields;
     private List<String> facetQueries;
     private int facetLimit = -1;
+    private List<String> fieldList;
     private int facetMinCount = -1;
     private int facetOffset = 0;
     private Map<String, DiscoverHitHighlightingField> hitHighlighting;
@@ -57,6 +58,7 @@ public class DiscoverQuery {
         this.facetFields = new ArrayList<DiscoverFacetField>();
         this.facetQueries = new ArrayList<String>();
         this.searchFields = new ArrayList<String>();
+        this.fieldList = new ArrayList<String>();
         this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<String, List<String>>();
@@ -170,6 +172,22 @@ public class DiscoverQuery {
         return facetQueries;
     }
 
+    /**
+     * Adds a new field to the field list of the query
+     * @param field the new field to be added
+     */
+    public void addField(String field){
+    	this.fieldList.add(field);
+    }
+    
+    /**
+     * retruns the field list
+     * @return the field list for this query
+     */
+    public List<String> getFieldList(){
+    	return this.fieldList;
+    }
+    
     /**
      * Adds a new facet field
      * @param facetField the new facet field to be added
