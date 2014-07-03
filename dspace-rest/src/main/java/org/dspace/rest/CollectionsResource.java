@@ -37,11 +37,8 @@ http://localhost:8080/<webapp>/collections
 @Path("/collections")
 public class CollectionsResource {
     private static Logger log = Logger.getLogger(CollectionsResource.class);
-    
 
     @javax.ws.rs.core.Context ServletContext servletContext;
-
-    private static org.dspace.core.Context context;
     
     private static final boolean writeStatistics;
 	
@@ -53,12 +50,9 @@ public class CollectionsResource {
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.Collection[] list(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset) {
+        org.dspace.core.Context context = null;
         try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
+            context = new org.dspace.core.Context();
 
             org.dspace.content.Collection[] collections;
 
@@ -82,6 +76,14 @@ public class CollectionsResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } finally {
+            if(context != null) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage() + " occurred while trying to close");
+                }
+            }
         }
     }
 
@@ -92,17 +94,14 @@ public class CollectionsResource {
     		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+        org.dspace.core.Context context = null;
         try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
+            context = new org.dspace.core.Context();
 
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context, collection_id);
             if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
             	if(writeStatistics){
-    				writeStats(collection_id, user_ip, user_agent, xforwarderfor, headers, request);
+    				writeStats(context, collection_id, user_ip, user_agent, xforwarderfor, headers, request);
     			}
                 return new org.dspace.rest.common.Collection(collection, expand, context, limit, offset);
             } else {
@@ -111,10 +110,18 @@ public class CollectionsResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } finally {
+            if(context != null) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage() + " occurred while trying to close");
+                }
+            }
         }
     }
     
-    private void writeStats(Integer collection_id, String user_ip, String user_agent,
+    private void writeStats(org.dspace.core.Context context, Integer collection_id, String user_ip, String user_agent,
 			String xforwarderfor, HttpHeaders headers,
 			HttpServletRequest request) {
 		
