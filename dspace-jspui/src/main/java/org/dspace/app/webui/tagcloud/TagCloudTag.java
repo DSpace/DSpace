@@ -8,6 +8,7 @@
 package org.dspace.app.webui.tagcloud;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class TagCloudTag extends SimpleTagSupport{
 			for (String subject : data.keySet()){
 				if (data.get(subject).intValue() > Integer.parseInt(parameters.getCuttingLevel())){
 					for (int i=0; i<data.get(subject).intValue(); i++){
-						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+(type.equals("0")?("/simple-search?filterquery="+subject+"&filtername="+index+"&filtertype=equals"):("/browse?type="+index+"&value="+subject)));   // creates a tag
+						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+(type.equals("0")?("/simple-search?filterquery="+URLEncoder.encode(subject,"UTF-8")+"&filtername="+index+"&filtertype=equals"):("/browse?type="+index+"&value="+URLEncoder.encode(subject,"UTF-8"))));   // creates a tag
 						//tag2.setScore(subjects.get(subject).doubleValue());
 						cloud.addTag(tag2); 
 					}
