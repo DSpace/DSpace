@@ -52,6 +52,10 @@ public class Group extends DSpaceObject
     /** ID of Administrator Group */
     public static final int ADMIN_ID = 1;
 
+
+    /** Our context */
+    private Context myContext;
+
     /** The row in the table representing this object */
     private final TableRow myRow;
 
@@ -1495,4 +1499,9 @@ public class Group extends DSpaceObject
         adminGroup.setName("Administrator");
         adminGroup.update();
     }
+
+     public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }

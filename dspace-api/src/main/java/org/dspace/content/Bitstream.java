@@ -380,6 +380,16 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
+     * Get the internal id of the bitstream
+     *
+     * @return the internal id
+     */
+    public String getInternalId()
+    {
+        return bRow.getStringColumn("internal_id");
+    }
+
+    /**
      * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
      * 

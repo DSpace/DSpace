@@ -59,7 +59,30 @@ public class DCValue
     }
 
     public String getField() {
-        return schema + "." + element + (qualifier==null?"":("." + qualifier));
+        return schema + "." + element + (qualifier == null ? "" : ("." + qualifier));
+    }
+
+    public String toString() {
+        String str = schema + "." + element;
+        if (qualifier != null)
+            str = str + "." + qualifier;
+        if (language != null && language != "")
+            str = str + "[" + language + "]";
+        return str + "=" + value;
+    }
+
+    public static Object valuesFor(DCValue[] values) {
+        if (values.length == 0) {
+            return null;
+        }
+        if (values.length ==1 ) {
+            return values[0].value;
+        }
+        String vals[] = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            vals[i] = values[i].value;
+        }
+        return vals;
     }
 
     public boolean hasSameFieldAs(DCValue dcValue) {
