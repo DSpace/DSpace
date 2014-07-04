@@ -227,16 +227,17 @@
 			</div>
 		</xsl:if>
 		<!-- note row -->
-		<xsl:if test="(dim:field[@element='description' and @qualifier='note'])">
-			<xsl:for-each select="dim:field[@element='description' and @qualifier='note']">
-				<div class="simple-item-view-description">
-					<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
-					<p>
-						<xsl:value-of select="." disable-output-escaping="yes"/>
-					</p>
-				</div>
-			</xsl:for-each>	
-		</xsl:if>
+                <!-- note row -->
+                <xsl:if test="(dim:field[@element='description' and @qualifier='note'])">
+                        <div class="simple-item-view-description">
+                                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
+                                <xsl:for-each select="dim:field[@element='description' and @qualifier='note']">
+                                        <p>
+                                                <xsl:value-of select="." disable-output-escaping="yes"/>
+                                        </p>
+                                </xsl:for-each>
+                        </div>
+                </xsl:if>
 
 		<!-- Solo para el tipo tesis -->
 		<xsl:if test="dim:field[@element='type'] = $tesis">
