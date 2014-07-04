@@ -491,6 +491,12 @@
 			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
 		</xsl:call-template>
 
+		<!-- format row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'format'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='format'][not(@qualifier)]"/>
+		</xsl:call-template>
+		
 		<!-- format.medium row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'format-medium'"/>

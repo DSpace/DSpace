@@ -2236,6 +2236,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geographical references</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal references</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format">Physical description</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
