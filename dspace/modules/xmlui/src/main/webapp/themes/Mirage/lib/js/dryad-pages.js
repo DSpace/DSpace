@@ -708,7 +708,7 @@ jQuery(document).ready(function(){
     // function to handle the submit event for the form
     var submit_describe_publication_onsubmit = function(e) {
         var $input      = jQuery('input[name="' + clicked_btn_name +'"]')   // the <input> triggering the submit
-          , input_name  = clicked_btn_name          // localize to this scope for the ajax call
+          , input_name  = clicked_btn_name                                  // input name: localize to this scope for the ajax call
           , $form       = jQuery(e.target)          // the entire describe-publication form
           , form_data   = $form.serializeArray()    // the form's data
           , success     = false                     // unsuccessful ajax call until we receive a 200
@@ -727,6 +727,7 @@ jQuery(document).ready(function(){
                 // request parameters by the DescribePublicationStep.java code; added here manually
                 form_data.push({ name: input_name, value: $input.val() });
                 prevent_default = true;
+                $form.find('input').prop('disabled',true);
                 try {
                     jQuery.ajax({
                           url     : $form.attr('action')
@@ -763,11 +764,77 @@ jQuery(document).ready(function(){
             e.preventDefault();
         }
     };
+    // 
+    var reorderAuthorOrderOptions = function($select, $row, $table, to) {
+        // pull out author data rows, then reorder per user selection
+        $row.remove();
+        var rows = $table.find('tr.ds-author-input-row').remove();
+        rows.splice(to-1, 0, $row[0]);
+        // update the row's inputs and select/option data
+        jQuery.each(rows, function(i,elt) {
+            var $tr             = jQuery(elt)
+              , $selected       = $tr.find('input[name="dc_contributor_author_selected"]')
+              , $input_first    = $tr.find('input[name*=dc_contributor_author_last_]')
+              , $input_last     = $tr.find('input[name*=dc_contributor_author_first_]');
+            $tr.find('select').val(i+1);
+            $selected.val(
+                $selected.val().replace('_\d+$', (i+1).toString())
+            );
+            $input_first.attr('name',
+                $input_first.attr('name').replace(new RegExp('_[0-9]+$'),'_'.concat((i+1).toString()))
+            );
+            $input_last.attr('name', 
+                $input_last.attr('name').replace(new RegExp('_[0-9]+$'),'_'.concat((i+1).toString()))
+            );
+        });
+        $table.append(rows);
+    };
+    // event handler for the on-change event for an author's order changing
+    var handleAuthorReorderEvent = function(evt) {
+        var from    = parseInt(jQuery(evt.target).find('option[selected]').val())
+          , to      = parseInt(evt.target.value)
+          , $row    = jQuery(evt.target).closest('tr')
+          , $table  = $row.closest('table');
+        if (from !== to) {
+            $table.next('.ds-update-button').removeAttr('disabled');
+            reorderAuthorOrderOptions(jQuery(evt.target), $row, $table, to);
+        }
+    };
+    // event handler for the author's Edit button click event
+    var handleAuthorEdit = function(event) {
+        var $row    = jQuery(event.target).closest('tr')
+          , $table  = $row.closest('table')
+          , $update = $table.next('.ds-update-button')
+          , $hidden = $row.find('td.ds-author-input-col input[type="hidden"]')
+          , $shown  = $row.find('span.ds-interpreted-field');
+        // disable edit button
+        jQuery(event.target).attr('disabled','disabled');
+        // enable the order input and add event handler
+        $row.find('select.ds-author-order-select').removeAttr('disabled');
+        $row.find('select.ds-author-order-select').on('change', handleAuthorReorderEvent);
+        // show lastname/firstname input fields
+        $hidden.attr('type','text');
+        // enable Update button on a change event
+        $hidden.bind('change keyup', function(evt) {
+            $update.removeAttr('disabled');
+        });
+        // hide 'interpreted' span
+        $shown.attr('hidden', 'hidden');
+        event.preventDefault();
+    };
+    // event handler for the author's Delete button click event
+    var handleAuthorDelete = function(event) {
+        var $row    = jQuery(event.target).closest('tr')
+          , $hidden = $row.find('input[name="dc_contributor_author_selected"]');
+          clicked_btn_name = jQuery(event.target).attr('name');
+          $hidden.removeAttr('disabled');
+    };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified 
     var submit_describe_publication_binders = function() {
         jQuery(form_selector + ' input.ds-button-field').bind('click', watch_clicked);
         jQuery(form_selector).bind('submit', submit_describe_publication_onsubmit);
+        jQuery('input.ds-edit-button').bind('click',handleAuthorEdit);
+        jQuery('input.ds-delete-button').bind('click',handleAuthorDelete);
     };
     submit_describe_publication_binders();
 });
-
