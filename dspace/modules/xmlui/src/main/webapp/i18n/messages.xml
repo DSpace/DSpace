@@ -881,6 +881,8 @@
 	<message key="xmlui.Submission.submit.DescribeStep.update">Update</message>
 	<message key="xmlui.Submission.submit.DescribeStep.remove">Remove</message>
 	<message key="xmlui.Submission.submit.DescribeStep.edit">Edit</message>
+	<message key="xmlui.Submission.submit.DescribeStep.order">Order</message>
+	<message key="xmlui.Submission.submit.DescribeStep.author">Author</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
