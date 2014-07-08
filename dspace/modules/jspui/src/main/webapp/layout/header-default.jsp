@@ -51,8 +51,17 @@
     <head>
         <title><%= title %> - <%= siteName %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+<%
+        if (extraHeadData != null){ 
+%>
+        <%= extraHeadData %>
+<%
+        }
+%>
         
         <!-- Damanzano: Add Open graph metatags in order to optimize facebook sharing -->
         <meta property="og:title" content="<%= title %> - <%= siteName %>" />
@@ -89,13 +98,8 @@
         <link rel="search" type="application/opensearchdescription+xml" href="<%= request.getContextPath() %>/<%= osCtx %>description.xml" title="<%= osName %>"/>
 <%
     }
-
-    if (extraHeadData != null)
-        { %>
-<%= extraHeadData %>
-<%
-        }
 %>
+
     <!-- All scripts were sent to the end of body -->    
     <script src="<%= request.getContextPath() %>/static/js/modernizr/modernizr-2.6.2.min.js"></script>    
 

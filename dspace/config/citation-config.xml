@@ -872,7 +872,7 @@
             </field>
             
             <!-- Editor -->
-            <field show-if-exist="dc.title">
+            <field show-if-exist="dc.title;dc.publisher" op="AND">
                 <dc-schema>dc</dc-schema>
                 <dc-element>publisher</dc-element>
                 <dc-qualifier/>
@@ -880,12 +880,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- This citation is used for journal and newspapers -->
@@ -959,12 +961,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
             
         </citation>
         
@@ -1047,13 +1051,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
-            
+            -->
         </citation>
         
         <!-- This citation is used for preprint and workingPaper -->
@@ -1091,13 +1096,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
-            
+            -->
         </citation>
         
         <!-- This citation is used for books, annotations and other -->
@@ -1143,12 +1149,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- This citation is used for book chapters and book parts -->
@@ -1264,12 +1272,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- This citation is used for reports, technical reports and patents -->
@@ -1337,12 +1347,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- This citation is used for presentations, conferences posters and conference papers -->
@@ -1408,12 +1420,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- This citation is used for bachelor, master and doctoral thesis -->
@@ -1451,12 +1465,14 @@
             </field>
             
             <!-- Source -->
+            <!--
             <field show-if-exist="dc.identifier.uri">
                 <dc-schema>dc</dc-schema>
                 <dc-element>identifier</dc-element>
                 <dc-qualifier>uri</dc-qualifier>
                 <display-format> Retrieved from (@field@)</display-format>
             </field>
+            -->
         </citation>
         
         <!-- *******************************************************************

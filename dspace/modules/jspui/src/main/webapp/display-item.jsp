@@ -170,7 +170,7 @@
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well">
                     <fmt:message key="jsp.display-item.identifier"/>
-                    <p><%= citation %></p>
+                    <p><%= citation %><fmt:message key="jsp.display-item.retrieved"/> (<%= HandleManager.getCanonicalForm(handle)%>)</p>
                     <button class="visible-xs pull-right btn btn-primary" type="button" data-toggle="offcanvas" data-target=".sidebar-section">
                     <fmt:message key="jsp.display-item.collection-actions"/> <span class="glyphicon glyphicon-arrow-right"></span>
                     </button>
