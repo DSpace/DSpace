@@ -431,8 +431,8 @@ public class BrowseListTag extends TagSupport
                 
                 /*  damanzano:
                     In this results layout we are always going to show dc.type
-                    and dc.type.spa as an icon a its explanation so we hope any
-                    of the these two field to be presente in webui.itemlist.colums
+                    and dc.type.spa as an icon a its explanation so we don't hope any
+                    of the these two field to be present in webui.itemlist.colums
                 */
                 //  Get the metatdata for both fields
                 DCValue[] typeMetadataArray;
@@ -480,14 +480,22 @@ public class BrowseListTag extends TagSupport
                     }
                     typeEndLink = "</a>";
                 }
-                String typeIcon="<span class=\"icesiicon dc-type-icon icesiicon-"+Utils.addEntities(typeMetadataArray[0].value)+"\"></span>";
-                sb1.append(typeStartLink);
-                sb1.append(typeIcon);
-                sb1.append(typeEndLink);
-                String typeLink="<span class=\"icesiicon dc-type-link\">"+Utils.addEntities(typeSpaMetadataArray[0].value)+"</span>";
-                sb1.append(typeStartLink);
-                sb1.append(typeLink);
-                sb1.append(typeEndLink);
+                
+                String typeIcon="";
+                String typeLink="";
+                if(typeMetadataArray.length > 0 && typeMetadataArray[0]!=null){
+                    typeIcon="<span class=\"icesiicon dc-type-icon icesiicon-"+Utils.addEntities(typeMetadataArray[0].value)+"\"></span>";
+                }
+                if(typeSpaMetadataArray.length > 0 && typeSpaMetadataArray[0]!=null){
+                    typeLink="<span class=\"icesiicon dc-type-link\">"+Utils.addEntities(typeSpaMetadataArray[0].value)+"</span>";
+                }
+                    sb1.append(typeStartLink);
+                    sb1.append(typeIcon);
+                    sb1.append(typeEndLink);
+                    
+                    sb1.append(typeStartLink);
+                    sb1.append(typeLink);
+                    sb1.append(typeEndLink);
                 
                 //  Always print the dc.type, dc.type.spa column 
                 out.print("<div class=\"col-md-2 col-sm-2 col-xs-2\">"+sb1.toString()+"</div>");
@@ -496,7 +504,11 @@ public class BrowseListTag extends TagSupport
                     Any other metadata fields present in webui.itemlist.colums
                     will be include in a single column.
                 */
-                out.print("<div class=\"col-md-10 col-sm-10 col-xs-10\">");
+                String colSize = "col-md-10 col-sm-10 col-xs-10";
+                if(linkToEdit){
+                    colSize = "col-md-8 col-sm-8 col-xs-10";
+                }
+                out.print("<div class=\""+colSize+"\">");
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
                 {
                     String field = fieldArr[colIdx];
@@ -699,18 +711,23 @@ public class BrowseListTag extends TagSupport
                 /*  damanzano:
                     We don´t need this in our browse results layout
                 */
-//                // Add column for 'edit item' links
-//                if (linkToEdit)
-//                {
-//                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
-//
+                // Add column for 'edit item' links
+                if (linkToEdit)
+                {
+                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
+
 //                    out.print("<td headers=\"" + id + "\" class=\""
 //                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
 //                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
 //                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
 //                        + "<input type=\"submit\" value=\"Edit Item\" /></form>"
 //                        + "</td>");
-//                }
+                    out.print("<div headers=\"" + id + "\" class=\"col-md-2 col-sm-2 col-xs-12\" >"
+                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+                        + "<input class=\"btn btn-primary pull-right\" type=\"submit\" value=\"Edit Item\" /></form>"
+                        + "</div>");
+                }
 
                 //out.println("</tr>");
                 out.println("</div>");

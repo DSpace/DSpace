@@ -7,6 +7,7 @@
     http://www.dspace.org/license/
 
 --%>
+<%@page import="org.dspace.content.Item"%>
 <%--
   - HTML header for main home page
   --%>
@@ -40,6 +41,9 @@
     String dsVersion = Util.getSourceVersion();
     String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
     String analyticsKey = ConfigurationManager.getProperty("jspui.google.analytics.key");
+    
+    // Get the handle if the display page is an item
+    Item item = (Item) request.getAttribute("item");
 %>
 
 <!DOCTYPE html>
@@ -47,8 +51,23 @@
     <head>
         <title><%= title %> - <%= siteName %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+<%
+        if (extraHeadData != null){ 
+%>
+        <%= extraHeadData %>
+<%
+        }
+%>
+        
+        <!-- Damanzano: Add Open graph metatags in order to optimize facebook sharing -->
+        <meta property="og:title" content="<%= title %> - <%= siteName %>" />
+        <% if(item != null){ %>
+        <meta property="og:url" content="<%= request.getContextPath() %>/handle/<%= item.getHandle()%>" />
+        <% } %>
         
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/ui-lightness/jquery-ui-1.10.3.custom.css" type="text/css" />
@@ -79,13 +98,8 @@
         <link rel="search" type="application/opensearchdescription+xml" href="<%= request.getContextPath() %>/<%= osCtx %>description.xml" title="<%= osName %>"/>
 <%
     }
-
-    if (extraHeadData != null)
-        { %>
-<%= extraHeadData %>
-<%
-        }
 %>
+
     <!-- All scripts were sent to the end of body -->    
     <script src="<%= request.getContextPath() %>/static/js/modernizr/modernizr-2.6.2.min.js"></script>    
 

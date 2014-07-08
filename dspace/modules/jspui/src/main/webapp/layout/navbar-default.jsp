@@ -87,7 +87,7 @@
 
        <div class="navbar-header">
          <a class="navbar-brand" href="<%= request.getContextPath() %>/">
-             <img height="40px" src="<%= request.getContextPath() %>/image/icesi-logo.svg" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
+             <img height="40px" src="<%= request.getContextPath() %>/image/icesi-logo.svg" onerror="this.src='<%= request.getContextPath() %>/image/icesi-logo.png'" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/>
          </a>
          
          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".default-navigation">
