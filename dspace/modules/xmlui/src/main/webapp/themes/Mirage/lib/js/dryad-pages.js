@@ -774,30 +774,32 @@ jQuery(document).ready(function(){
         jQuery.each(rows, function(i,elt) {
             var $tr             = jQuery(elt)
               , $selected       = $tr.find('input[name="dc_contributor_author_selected"]')
-              , $input_first    = $tr.find('input[name*=dc_contributor_author_last_]')
-              , $input_last     = $tr.find('input[name*=dc_contributor_author_first_]');
-            $tr.find('select').val(i+1);
+              , $input_first    = $tr.find('input[name*="dc_contributor_author_last_"]')
+              , $input_last     = $tr.find('input[name*="dc_contributor_author_first_"]')
+              , ind             = (i+1).toString();
+            $tr.find('select').val(ind);
             $selected.val(
-                $selected.val().replace('_\d+$', (i+1).toString())
+                $selected.val().replace(new RegExp('_[0-9]+$'), ind)
             );
             $input_first.attr('name',
-                $input_first.attr('name').replace(new RegExp('_[0-9]+$'),'_'.concat((i+1).toString()))
+                $input_first.attr('name').replace(new RegExp('_[0-9]+$'), '_'.concat(ind))
             );
             $input_last.attr('name', 
-                $input_last.attr('name').replace(new RegExp('_[0-9]+$'),'_'.concat((i+1).toString()))
+                $input_last.attr('name').replace(new RegExp('_[0-9]+$'), '_'.concat(ind))
             );
         });
         $table.append(rows);
     };
     // event handler for the on-change event for an author's order changing
     var handleAuthorReorderEvent = function(evt) {
-        var from    = parseInt(jQuery(evt.target).find('option[selected]').val())
+        var from    = jQuery(evt.target).data('prev')
           , to      = parseInt(evt.target.value)
           , $row    = jQuery(evt.target).closest('tr')
           , $table  = $row.closest('table');
         if (from !== to) {
             $table.next('.ds-update-button').removeAttr('disabled');
             reorderAuthorOrderOptions(jQuery(evt.target), $row, $table, to);
+            submit_describe_publication_binders();
         }
     };
     // event handler for the author's Edit button click event
@@ -811,7 +813,6 @@ jQuery(document).ready(function(){
         jQuery(event.target).attr('disabled','disabled');
         // enable the order input and add event handler
         $row.find('select.ds-author-order-select').removeAttr('disabled');
-        $row.find('select.ds-author-order-select').on('change', handleAuthorReorderEvent);
         // show lastname/firstname input fields
         $hidden.attr('type','text');
         // enable Update button on a change event
@@ -835,6 +836,11 @@ jQuery(document).ready(function(){
         jQuery(form_selector).bind('submit', submit_describe_publication_onsubmit);
         jQuery('input.ds-edit-button').bind('click',handleAuthorEdit);
         jQuery('input.ds-delete-button').bind('click',handleAuthorDelete);
+        // bind the onchange event to this function, and also store the current value of
+        // the selected option, for use in updating the underlying input data
+        jQuery('select.ds-author-order-select').each(function(i,elt) {
+            jQuery(this).on('change', handleAuthorReorderEvent).data('prev',parseInt(this.value));
+        });
     };
     submit_describe_publication_binders();
 });
