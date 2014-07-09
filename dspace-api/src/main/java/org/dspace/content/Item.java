@@ -271,6 +271,52 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Retrieve the list of Items submitted by eperson, ordered by recently submitted, optionally limitable
+     * @param context
+     * @param eperson
+     * @param limit a positive integer to limit, -1 or null for unlimited
+     * @return
+     * @throws SQLException
+     */
+    public static ItemIterator findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException
+    {
+        String querySorted =    "SELECT \n" +
+                "  item.item_id, \n" +
+                "  item.submitter_id, \n" +
+                "  item.in_archive, \n" +
+                "  item.withdrawn, \n" +
+                "  item.owning_collection, \n" +
+                "  item.last_modified, \n" +
+                "  metadatavalue.text_value\n" +
+                "FROM \n" +
+                "  public.item, \n" +
+                "  public.metadatafieldregistry, \n" +
+                "  public.metadatavalue\n" +
+                "WHERE \n" +
+                "  metadatafieldregistry.metadata_field_id = metadatavalue.metadata_field_id AND\n" +
+                "  metadatavalue.item_id = item.item_id AND\n" +
+                "  metadatafieldregistry.element = 'date' AND \n" +
+                "  metadatafieldregistry.qualifier = 'accessioned' AND \n" +
+                "  item.submitter_id = ? AND \n" +
+                "  item.in_archive = true\n" +
+                "ORDER BY\n" +
+                "  metadatavalue.text_value desc";
+
+        TableRowIterator rows;
+
+        if(limit != null && limit > 0) {
+            querySorted += " limit ? ;";
+            rows = DatabaseManager.query(context, querySorted, eperson.getID(), limit);
+        } else {
+            querySorted += ";";
+            rows = DatabaseManager.query(context, querySorted, eperson.getID());
+        }
+
+        return new ItemIterator(context, rows);
+
+    }
+
+    /**
      * Get the internal ID of this item. In general, this shouldn't be exposed
      * to users
      *
