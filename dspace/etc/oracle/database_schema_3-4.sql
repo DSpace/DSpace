@@ -62,7 +62,7 @@ CREATE TABLE requestitem
 (
   requestitem_id INTEGER NOT NULL,
   token varchar(48),
-  item_id INDEX,
+  item_id INTEGER,
   bitstream_id INTEGER,
   allfiles NUMBER(1),
   request_email VARCHAR2(64),
