@@ -58,13 +58,7 @@ public class DCValue
         return str + "=" + value;
     }
 
-    public static Object valuesFor(DCValue[] values) {
-        if (values.length == 0) {
-            return null;
-        }
-        if (values.length ==1 ) {
-            return values[0].value;
-        }
+    public static String[] valuesFor(DCValue[] values) {
         String vals[] = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             vals[i] = values[i].value;
