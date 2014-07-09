@@ -762,13 +762,15 @@ public class WorkflowManager
             {
                 title = titles[0].value;
             }
+            if(null != ep)
+            {
+                email.addRecipient(ep.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getMetadata("name"));
+                email.addArgument(HandleManager.getCanonicalForm(handle));
 
-            email.addRecipient(ep.getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getMetadata("name"));
-            email.addArgument(HandleManager.getCanonicalForm(handle));
-
-            email.send();
+                email.send();
+            }
         }
         catch (MessagingException e)
         {

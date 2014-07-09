@@ -28,8 +28,11 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
 	public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
 			throws SQLException {
 		EPerson submitter = item.getSubmitter();
-		RequestItemAuthor author = new RequestItemAuthor(
+                RequestItemAuthor author = null;
+		if(null != submitter){
+                     author = new RequestItemAuthor(
 				submitter.getFullName(), submitter.getEmail());
+                }
 		return author;
 	}
 

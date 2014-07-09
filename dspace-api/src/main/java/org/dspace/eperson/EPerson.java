@@ -7,9 +7,11 @@
  */
 package org.dspace.eperson;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
@@ -20,20 +22,31 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowRequirementsManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Class representing an e-person.
@@ -597,8 +610,14 @@ public class EPerson extends DSpaceObject
      * 
      */
     public void delete() throws SQLException, AuthorizeException,
-            EPersonDeletionException
+            EPersonDeletionException, IOException
     {
+        deleteOnCascade(true);
+    }
+    
+    public void deleteOnCascade(boolean delete) throws SQLException, AuthorizeException,
+            EPersonDeletionException, IOException {
+        
         // authorized?
         if (!AuthorizeManager.isAdmin(ourContext))
         {
@@ -611,10 +630,49 @@ public class EPerson extends DSpaceObject
         List<String> constraintList = getDeleteConstraints();
 
         // if eperson exists in tables that have constraints
-        // on eperson, throw an exception
-        if (constraintList.size() > 0)
+        // on eperson and the Parameter delete is true, delete.
+        // Otherwise throw an exception.
+        if (constraintList.size() > 0) 
         {
-            throw new EPersonDeletionException(constraintList);
+            if (delete) 
+            {
+                Iterator<String> iterator = constraintList.iterator();
+
+                while (iterator.hasNext())
+                {
+                    String tableName = iterator.next();
+
+                    if (StringUtils.equals(tableName, "item")) {
+                        deleteFromItemTable();
+                    }
+                    else if (StringUtils.equals(tableName, "cwf_claimtask"))
+                    {
+                        unclaimCwfClaimtask();
+
+                    }
+                    else if (StringUtils.equals(tableName, "workflowitem"))
+                    {
+                        unclaimWorkflowitem();
+                    }
+                    // tasklistitem, cwf_pooltask, cwf_workflowitemrole
+                    // have  eperson_id as eperson column name and can be deleted
+                    else
+                    {
+                        DatabaseManager.updateQuery(ourContext,
+                                "DELETE FROM ? WHERE eperson_id = ? ",
+                                tableName, getID());
+                    }
+                }
+                List<ResourcePolicy> resourcePolicy = AuthorizeManager.getPoliciesForEperson(ourContext, this);
+                for(ResourcePolicy rp: resourcePolicy){
+                    rp.delete();
+                }
+            } 
+            else 
+            {
+                throw new EPersonDeletionException(constraintList);
+
+            }
         }
 
         // Delete the Dublin Core
@@ -644,7 +702,10 @@ public class EPerson extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_eperson",
                 "eperson_id=" + getID()));
     }
-
+    
+    
+    
+    
     /**
      * Get the e-person's internal identifier
      * 
@@ -1100,6 +1161,8 @@ public class EPerson extends DSpaceObject
                 tri.close();
             }
         }
+        
+        getResourcepolicyConstraints(tableList);
 
         if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
             getXMLWorkflowConstraints(tableList);
@@ -1112,6 +1175,30 @@ public class EPerson extends DSpaceObject
         return tableList;
     }
 
+    private void getResourcepolicyConstraints(List<String> tableList) throws SQLException{
+
+        // check for eperson in resourcepolicy table
+        TableRowIterator tri = DatabaseManager.query(ourContext,
+                "SELECT * from resourcepolicy where eperson_id= ? ",
+                getID());
+
+        try
+        {
+            if (tri.hasNext())
+            {
+                tableList.add("resourcepolicy");
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+    }
+    
     private void getXMLWorkflowConstraints(List<String> tableList) throws SQLException {
          TableRowIterator tri;
         // check for eperson in claimtask table
@@ -1486,6 +1573,9 @@ public class EPerson extends DSpaceObject
         } catch (EPersonDeletionException ex) {
             System.err.println(ex.getMessage());
             return 1;
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
+            return 1;
         }
 
         return 0;
@@ -1644,4 +1734,49 @@ public class EPerson extends DSpaceObject
 
         return 0;
     }
+    
+     private void deleteFromItemTable() throws IOException, AuthorizeException, SQLException {
+        ItemIterator itemIter = Item.findBySubmitter(ourContext, this);
+        while (itemIter.hasNext()) {
+            Item item = itemIter.next();
+            WorkspaceItem wsi = WorkspaceItem.findByItem(ourContext, item);
+            if (null != wsi) {
+                wsi.deleteAll();
+            } else {
+                DatabaseManager.updateQuery(ourContext,
+                        "UPDATE item SET submitter_id = null WHERE submitter_id= ?",
+                        getID());
+            }
+        }
+    }
+
+    private void unclaimCwfClaimtask() throws AuthorizeException, IOException, SQLException {
+        XmlWorkflowItem[] xmlWorkflowItems;
+       
+        try
+        {
+            xmlWorkflowItems = XmlWorkflowItem.findByEPerson(ourContext, this);
+
+            for (XmlWorkflowItem workflowItem : xmlWorkflowItems)
+            {
+                ClaimedTask pooledTask = ClaimedTask.findByWorkflowIdAndEPerson(ourContext, workflowItem.getID(), getID());
+                XmlWorkflowManager.deleteClaimedTask(ourContext, workflowItem, pooledTask);
+                WorkflowRequirementsManager.removeClaimedUser(ourContext, workflowItem, this, pooledTask.getStepID());
+            }
+        }
+        catch (WorkflowConfigurationException ex) {
+            log.error("Problem deleting eperson claimed task:  " + ex.getMessage());
+        }
+    }
+
+    private void unclaimWorkflowitem() throws SQLException, IOException, AuthorizeException {
+        WorkflowItem[] workflowItem = WorkflowItem.
+                findByOwner(ourContext, this);
+
+        for (WorkflowItem wi : workflowItem)
+        {
+            WorkflowManager.unclaim(ourContext, wi, this);
+        }
+    }
+    
 }

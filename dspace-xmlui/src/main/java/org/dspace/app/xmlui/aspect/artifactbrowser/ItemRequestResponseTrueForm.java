@@ -34,6 +34,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -132,17 +133,41 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);
+                
+                String name = null;
+                String email = null;
+                String messageBody = "itemRequest.response.body.approve";
+                        
+                        if(author != null)
+                        {
+                            name = author.getFullName();
+                            email = author.getEmail();
+                        }
+                        else
+                        {
+                            name = ConfigurationManager
+                                    .getProperty("mail.helpdesk");
+                            
+                            if (null == name) 
+                            {
+                                name = ConfigurationManager
+                                        .getProperty("mail.admin");
+                                email = name;
+                            }
+                            messageBody = "itemRequest.admin.response.body.approve";
+                                   
+                        }
 
 		Object[] args = new String[]{
 					requestItem.getReqName(), // User
 					HandleManager.getCanonicalForm(item.getHandle()), // URL
 					title, // request item title
-					author.getFullName(),
-					author.getEmail()
+					name, // # author name
+					email // # authoremail
 				};
 		
 		String subject = I18nUtil.getMessage("itemRequest.response.subject.approve", context);
-		String messageTemplate = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body.approve", context), args);
+		String messageTemplate = MessageFormat.format(I18nUtil.getMessage(messageBody, context), args);
 		
         Division itemRequest = body.addInteractiveDivision("itemRequest-form", request.getRequestURI(),Division.METHOD_POST,"primary");
         itemRequest.setHead(T_head);

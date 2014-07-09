@@ -21,11 +21,13 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@page import="java.util.List"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
+    List <String> tableList = eperson.getDeleteConstraints();
 %>
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-confirm-delete.title"
                navbar="admin"
@@ -41,7 +43,17 @@
     
     <%-- <p>Are you sure this e-person should be deleted?</p> --%>
     <div class="row col-md-offset-4">
-    	<span class="col-md-6"><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></span>
+        <% if(null == tableList){ %> 
+            <span class="col-md-6"><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></span>
+        <%}
+        else{ 
+            String allTables = "He is referring to this tables: ";
+            for(String s: tableList) allTables = allTables + s + ", ";
+            %>
+            <span class="col-md-6"><fmt:message key="jsp.dspace-admin.eperson-confirm-delete.confirm"/></span>
+            <br/>
+            <span class="col-md-6"><% out.println(allTables); %></span>
+        <%}%>
     </div>
     
     <form method="post" action="">

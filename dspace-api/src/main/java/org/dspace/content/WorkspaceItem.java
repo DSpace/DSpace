@@ -565,7 +565,9 @@ public class WorkspaceItem implements InProgressSubmission
 
          */
         if (!AuthorizeManager.isAdmin(ourContext)
-                && ((ourContext.getCurrentUser() == null) || (ourContext
+                && (item.getSubmitter() == null
+                    || (ourContext.getCurrentUser() == null)
+                    || (ourContext
                         .getCurrentUser().getID() != item.getSubmitter()
                         .getID())))
         {
@@ -573,6 +575,7 @@ public class WorkspaceItem implements InProgressSubmission
             throw new AuthorizeException("Must be an administrator or the "
                     + "original submitter to delete a workspace item");
         }
+            
 
         log.info(LogManager.getHeader(ourContext, "delete_workspace_item",
                 "workspace_item_id=" + getID() + "item_id=" + item.getID()

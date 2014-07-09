@@ -37,12 +37,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
 
 /**
  * Display to the user a simple form to send a message rejecting the file send.
@@ -81,6 +83,7 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
     
     private static final Message T_subject = 
             message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject");
+    private static Logger log = Logger.getLogger(ItemRequestResponseFalseForm.class);
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -133,17 +136,41 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);
+                
+                 String name = null;
+                 String email = null;
+                 String messageBody = "itemRequest.response.body.reject";
+                        
+                        if(null != author)
+                        {
+                            name = author.getFullName();
+                            email = author.getEmail();
+                        }
+                        else
+                        {
+                            name = ConfigurationManager
+                                    .getProperty("mail.helpdesk");
+                            if (null == name) 
+                            {
+                                name = ConfigurationManager
+                                        .getProperty("mail.admin");
+                                email = name;
+                            }
+                            messageBody ="itemRequest.admin.response.body.reject";
+                                   
+                        }
+
 
 		Object[] args = new String[]{
 					requestItem.getReqName(), // User
 					HandleManager.getCanonicalForm(item.getHandle()), // URL
 					title, // request item title
-					author.getFullName(),
-					author.getEmail()
+					name, // # author name
+					email // # author email
 				};
 		
 		String subject = I18nUtil.getMessage("itemRequest.response.subject.reject", context);
-		String messageTemplate = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body.reject", context), args);        
+		String messageTemplate = MessageFormat.format(I18nUtil.getMessage(messageBody, context), args);        
 
         Division itemRequest = body.addInteractiveDivision("itemRequest-form",
                 request.getRequestURI(),Division.METHOD_POST,"primary");
