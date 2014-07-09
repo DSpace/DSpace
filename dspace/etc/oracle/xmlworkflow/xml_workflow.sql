@@ -11,14 +11,13 @@ CREATE TABLE cwf_workflowitem
   workflowitem_id INTEGER PRIMARY KEY,
   item_id        INTEGER REFERENCES item(item_id) UNIQUE,
   collection_id  INTEGER REFERENCES collection(collection_id),
-
+  --
   -- Answers to questions on first page of submit UI
   multiple_titles       NUMBER(1),
   published_before      NUMBER(1),
   multiple_files        NUMBER(1)
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
-
 );
 
 
