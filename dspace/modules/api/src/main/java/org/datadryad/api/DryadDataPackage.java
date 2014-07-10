@@ -4,6 +4,7 @@ package org.datadryad.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
@@ -109,12 +110,39 @@ public class DryadDataPackage extends DryadObject {
         return null;
     }
 
+    /**
+     * Find any data packages containing the file by identifier. Used to prevent
+     * files from appearing in multiple packages
+     * @param context database context
+     * @param dataFile a data file with an identifier
+     * @return a set of data packages where dc.relation.haspart = the file's identifier
+     * @throws SQLException
+     */
+    static Set<DryadDataPackage> getPackagesContainingFile(Context context, DryadDataFile dataFile) throws SQLException {
+        Set<DryadDataPackage> packageSet = new HashSet<DryadDataPackage>();
+        String fileIdentifier = dataFile.getIdentifier();
+        if(fileIdentifier == null || fileIdentifier.length() == 0) {
+            throw new IllegalArgumentException("Data file must have an identifier");
+        }
+        try {
+            ItemIterator dataPackages = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, fileIdentifier);
+            while(dataPackages.hasNext()) {
+                packageSet.add(new DryadDataPackage(dataPackages.next()));
+            }
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting data packages for file", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting data packages for file", ex);
+        }
+        return packageSet;
+    }
+
     static Set<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
         // files and packages are linked by DOI
         Set<DryadDataFile> fileSet = new HashSet<DryadDataFile>();
         String packageIdentifier = dataPackage.getIdentifier();
         if(packageIdentifier == null || packageIdentifier.length() == 0) {
-            return fileSet;
+            throw new IllegalArgumentException("Data package must have an identifier");
         }
         try {
             ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier);
@@ -136,6 +164,54 @@ public class DryadDataPackage extends DryadObject {
         }
         return dataFiles;
     }
+
+    public void addDataFile(Context context, DryadDataFile dataFile) throws SQLException {
+        dataFile.setDataPackage(context, this);
+    }
+
+    /**
+     * Removes the identifier for a data file from this package's
+     * dc.relation.haspart metadata.
+     * @param dataFile
+     * @throws SQLException
+     */
+    public void removeDataFile(DryadDataFile dataFile) throws SQLException {
+        String dataFileIdentifier = dataFile.getIdentifier();
+        if(dataFileIdentifier == null) {
+            throw new IllegalArgumentException("Data file must have an identifier");
+        }
+
+        // Get the metadata
+        DCValue[] hasPartValues = getItem().getMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, Item.ANY);
+
+        Integer indexOfFileIdentifier = indexOfValue(hasPartValues, dataFileIdentifier);
+        if(indexOfFileIdentifier >= 0) {
+            // remove that element from the array
+            hasPartValues = (DCValue[]) ArrayUtils.remove(hasPartValues, indexOfFileIdentifier);
+            // clear the metadata in the database
+            getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, Item.ANY);
+            // set them
+            for(DCValue value : hasPartValues) {
+                getItem().addMetadata(value.schema, value.element, value.qualifier, value.language, value.value, value.authority, value.confidence);
+            }
+            try {
+                getItem().update();
+            } catch (AuthorizeException ex) {
+                log.error("Authorize exception removing data file from data package", ex);
+            }
+        }
+    }
+
+    static Integer indexOfValue(final DCValue[] dcValues, final String value) {
+        Integer foundIndex = -1;
+        for(Integer index = 0;index < dcValues.length;index++) {
+            if(dcValues[index].value.equals(value)) {
+                foundIndex = index;
+            }
+        }
+        return foundIndex;
+    }
+
 
     public void setPublicationName(String publicationName) throws SQLException {
         getItem().clearMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null);

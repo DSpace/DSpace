@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -53,6 +54,7 @@ public class DryadDataFile extends DryadObject {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataFile = new DryadDataFile(item);
+            // TODO: make an identifier
             dataFile.addToCollectionAndArchive(collection);
             wsi.deleteWrapper();
         } catch (AuthorizeException ex) {
@@ -89,6 +91,54 @@ public class DryadDataFile extends DryadObject {
         }
         return dataPackage;
     }
+
+    /**
+     * Assigns a data file to a data package, updating the dc.relation metadata.
+     * Enforces the invariant that a data package may contain many files, but a
+     * file may only belong to one package. Requires that both have a valid identifier.
+     * @param context database context
+     * @param dataPackage the package to which this file should belong
+     */
+    void setDataPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
+        if(dataPackage == null) {
+            throw new IllegalArgumentException("Cannot set a null dataPackage");
+        }
+        String dataPackageIdentifier = dataPackage.getIdentifier();
+        if(dataPackageIdentifier == null) {
+            throw new IllegalArgumentException("Attempted to assign a file to a package with no identifier");
+        }
+        String dataFileIdentifier = getIdentifier();
+        if(dataFileIdentifier == null) {
+            throw new IllegalArgumentException("Data file has no identifier");
+        }
+
+        // Files may only belong to one package, so clear any existing metadata for ispartof
+        getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
+        getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, null, dataPackageIdentifier);
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting file ispartof package", ex);
+        }
+        // The file now belongs to exactly one package.
+
+        // Ensure 0 packages contain the file, then the 1 specified
+        Set<DryadDataPackage> packagesContainingFile = DryadDataPackage.getPackagesContainingFile(context, this);
+        if(packagesContainingFile.size() > 0) {
+            // file is not contained by any other data packages
+            // remove file from packages
+            for(DryadDataPackage containingPackage : packagesContainingFile) {
+                containingPackage.removeDataFile(this);
+            }
+        }
+        dataPackage.getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, null, dataFileIdentifier);
+        try {
+            dataPackage.getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception assigning package haspart file", ex);
+        }
+    }
+
 
     public boolean isEmbargoed() {
         boolean isEmbargoed = false;
