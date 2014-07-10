@@ -19,6 +19,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
 
 /**
  * Wraps a DSpace Item and provides Dryad-specific behaviors
@@ -102,6 +105,18 @@ public abstract class DryadObject {
 
     public String getIdentifier() {
         return DOIIdentifierProvider.getDoiValue(getItem());
+    }
+
+    protected void createIdentifier(Context context) throws SQLException, IdentifierException {
+        if(getIdentifier() != null) {
+            throw new IllegalStateException("Object already has an identifier");
+        }
+        IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
+        try {
+            service.reserve(context, getItem());
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception reserving identifier", ex);
+        }
     }
 
     protected final void addToCollectionAndArchive(Collection collection) throws SQLException {

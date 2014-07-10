@@ -4,7 +4,6 @@ package org.datadryad.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
@@ -18,10 +17,10 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.identifier.IdentifierException;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 
 /**
  *
@@ -62,9 +61,12 @@ public class DryadDataPackage extends DryadObject {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataPackage = new DryadDataPackage(item);
+            dataPackage.createIdentifier(context);
             dataPackage.addToCollectionAndArchive(collection);
             wsi.deleteWrapper();
             return dataPackage;
+        } catch (IdentifierException ex) {
+            log.error("Identifier exception creating a Data Package", ex);
         } catch (AuthorizeException ex) {
             log.error("Authorize exception creating a Data Package", ex);
         } catch (IOException ex) {
@@ -90,7 +92,10 @@ public class DryadDataPackage extends DryadObject {
             row.setColumn(WORKFLOWITEM_COLUMN_COLLECTIONID, collection.getID());
             DatabaseManager.update(context, row);
             dataPackage = new DryadDataPackage(item);
+            dataPackage.createIdentifier(context);
             wsi.deleteWrapper();
+        } catch (IdentifierException ex) {
+            log.error("Identifier exception creating a Data Package", ex);
         } catch (AuthorizeException ex) {
             log.error("Authorize exception creating a Data Package", ex);
         } catch (IOException ex) {

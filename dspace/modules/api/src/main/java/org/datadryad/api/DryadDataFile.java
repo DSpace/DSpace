@@ -18,6 +18,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.identifier.IdentifierException;
 
 /**
  *
@@ -54,9 +55,11 @@ public class DryadDataFile extends DryadObject {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataFile = new DryadDataFile(item);
-            // TODO: make an identifier
+            dataFile.createIdentifier(context);
             dataFile.addToCollectionAndArchive(collection);
             wsi.deleteWrapper();
+        } catch (IdentifierException ex) {
+            log.error("Identifier exception creating a Data File", ex);
         } catch (AuthorizeException ex) {
             log.error("Authorize exception creating a Data File", ex);
         } catch (IOException ex) {
