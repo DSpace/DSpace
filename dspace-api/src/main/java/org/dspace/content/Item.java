@@ -227,6 +227,21 @@ public class Item extends DSpaceObject
     }
     
     /**
+     * returns the total number of items
+     * @param context
+     * @return item count; 
+     * @throws SQLException
+     */
+    public static long countAll(Context context) throws SQLException
+    {
+        //get item count
+        String myQuery = "SELECT count(*) as count FROM item WHERE in_archive='1' ";
+        TableRow row = DatabaseManager.querySingle(context, myQuery);
+
+        return row.getLongColumn("count");
+    }
+    
+    /**
      * Get all "final" items in the archive, both archived ("in archive" flag) or
      * withdrawn items are included. The order of the list is indeterminate.
      *

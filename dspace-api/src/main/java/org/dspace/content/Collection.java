@@ -1568,4 +1568,21 @@ public class Collection extends DSpaceObject
         //Also fire a modified event since the collection HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
+    
+    /**
+     * Returns the total number of collections
+     * @param context
+     * @return number of collections; -1 in case of error 
+     * @throws SQLException
+     */
+    public static long getCount(Context context) throws SQLException {
+    	String query = "SELECT count(*) as count FROM collection";
+        
+        TableRow row = DatabaseManager.querySingle(context, query);
+        if(row!=null){
+        	 return row.getLongColumn("count");
+        } else {
+        	return -1;
+        }
+    }
 }
