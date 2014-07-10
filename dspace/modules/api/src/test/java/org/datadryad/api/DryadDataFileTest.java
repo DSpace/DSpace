@@ -54,7 +54,8 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testCreate() throws Exception {
-        DryadDataFile result = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile result = DryadDataFile.create(context, dataPackage);
         assertNotNull(result);
         assertNotNull(result.getIdentifier());
     }
@@ -109,7 +110,8 @@ public class DryadDataFileTest extends ContextUnitTest {
     @Test
     public void testIsEmbargoed() throws SQLException {
         System.out.println("isEmbargoed");
-        DryadDataFile instance = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         // not initially embargoed, so set one in the past
         instance.setEmbargo("oneyear", futureDate);
         assertTrue(instance.isEmbargoed());
@@ -123,7 +125,8 @@ public class DryadDataFileTest extends ContextUnitTest {
     @Test
     public void testClearEmbargo() throws Exception {
         System.out.println("clearEmbargo");
-        DryadDataFile instance = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.clearEmbargo();
         instance.setEmbargo("oneyear", futureDate);
         instance.clearEmbargo();
@@ -136,7 +139,8 @@ public class DryadDataFileTest extends ContextUnitTest {
     @Test
     public void testSetEmbargo() throws Exception {
         System.out.println("setEmbargo");
-        DryadDataFile instance = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.setEmbargo("untilArticleAppears", futureDate);
         assertTrue(instance.isEmbargoed());
     }
@@ -147,7 +151,8 @@ public class DryadDataFileTest extends ContextUnitTest {
     public void testAddBitstream() throws Exception {
         System.out.println("addBitstream");
         InputStream stream = DryadDataFileTest.class.getClassLoader().getResourceAsStream("DryadLogo.png");
-        DryadDataFile instance = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.addBitstream(stream);
     }
 
@@ -164,7 +169,8 @@ public class DryadDataFileTest extends ContextUnitTest {
         Long expResult = file1.length() + file2.length();
         assertTrue(expResult > 0);
 
-        DryadDataFile instance = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.addBitstream(new FileInputStream(file1));
         instance.addBitstream(new FileInputStream(file2));
 

@@ -115,10 +115,9 @@ public class DryadDataPackageTest extends ContextUnitTest {
     @Test
     public void testGetPackagesContainingFile() throws Exception {
         System.out.println("getPackagesContainingFile");
-        DryadDataFile dataFile = DryadDataFile.create(context);
         DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
         DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
-        dataPackage1.addDataFile(context, dataFile);
+        DryadDataFile dataFile = DryadDataFile.create(context, dataPackage1);
         Set result = DryadDataPackage.getPackagesContainingFile(context, dataFile);
         assertTrue(result.contains(dataPackage1));
         assertFalse(result.contains(dataPackage2));
@@ -131,13 +130,15 @@ public class DryadDataPackageTest extends ContextUnitTest {
     @Test
     public void testGetFilesInPackage() throws Exception {
         System.out.println("getFilesInPackage");
-        DryadDataFile dataFile1 = DryadDataFile.create(context);
-        DryadDataFile dataFile2 = DryadDataFile.create(context);
-        DryadDataFile dataFile3 = DryadDataFile.create(context);
-        DryadDataPackage dataPackage = DryadDataPackage.create(context);
-        dataPackage.addDataFile(context, dataFile1);
-        dataPackage.addDataFile(context, dataFile2);
-        Set result = DryadDataPackage.getFilesInPackage(context, dataPackage);
+        DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
+        DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
+
+        DryadDataFile dataFile1 = DryadDataFile.create(context, dataPackage1);
+        DryadDataFile dataFile2 = DryadDataFile.create(context, dataPackage1);
+        DryadDataFile dataFile3 = DryadDataFile.create(context, dataPackage2);
+        dataPackage1.addDataFile(context, dataFile1);
+        dataPackage1.addDataFile(context, dataFile2);
+        Set result = DryadDataPackage.getFilesInPackage(context, dataPackage1);
         assertTrue(result.contains(dataFile1));
         assertTrue(result.contains(dataFile2));
         assertFalse(result.contains(dataFile3));
@@ -150,42 +151,21 @@ public class DryadDataPackageTest extends ContextUnitTest {
     public void testGetDataFiles() throws Exception {
         System.out.println("getDataFiles");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
-        DryadDataFile dataFile1 = DryadDataFile.create(context);
+        DryadDataFile dataFile1 = DryadDataFile.create(context, dataPackage);
         Integer result = dataPackage.getDataFiles(context).size();
         Integer expResult = 1;
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of addDataFile method, of class DryadDataPackage.
-     */
-    @Test
-    public void testAddDataFile() throws Exception {
-        System.out.println("addDataFile");
-        DryadDataFile dataFile = DryadDataFile.create(context);
-        DryadDataPackage dataPackage = DryadDataPackage.create(context);
-        Integer expectedNumberOfFiles = 0;
-        Integer numberOfFiles = dataPackage.getDataFiles(context).size();
-        assertEquals(expectedNumberOfFiles, numberOfFiles);
-        dataPackage.addDataFile(context, dataFile);
-        expectedNumberOfFiles = 1;
-        numberOfFiles = dataPackage.getDataFiles(context).size();
-        assertEquals(expectedNumberOfFiles, numberOfFiles);
-    }
-
     @Test
     public void testMoveDataFile() throws Exception {
         System.out.println("moveDataFile");
-        DryadDataFile dataFile = DryadDataFile.create(context);
         DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
         DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
+        DryadDataFile dataFile = DryadDataFile.create(context, dataPackage1);
 
-        Integer expResult = 0;
+        Integer expResult = 1;
         Integer result = dataPackage1.getDataFiles(context).size();
-        assertEquals(expResult, result);
-        dataPackage1.addDataFile(context, dataFile);
-        expResult = 1;
-        result = dataPackage1.getDataFiles(context).size();
         assertEquals(expResult, result);
 
         // Now move to package2 and make sure no longer in package 1
@@ -205,9 +185,8 @@ public class DryadDataPackageTest extends ContextUnitTest {
     @Test
     public void testRemoveDataFile() throws Exception {
         System.out.println("removeDataFile");
-        DryadDataFile dataFile = DryadDataFile.create(context);
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
-        dataPackage.addDataFile(context, dataFile);
+        DryadDataFile dataFile = DryadDataFile.create(context, dataPackage);
         Integer expResult = 1;
         Integer result = dataPackage.getDataFiles(context).size();
         assertEquals(expResult, result);
