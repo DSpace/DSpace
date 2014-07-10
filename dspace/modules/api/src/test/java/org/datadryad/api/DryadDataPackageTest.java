@@ -230,9 +230,9 @@ public class DryadDataPackageTest extends ContextUnitTest {
             dcValues[i].value = String.format("Value %d", i * 100);
         }
 
-        // "Value 200" should be at index 3
+        // "Value 200" should be at index 2
         String value = "Value 200";
-        Integer expResult = 3;
+        Integer expResult = 2;
         Integer result = DryadDataPackage.indexOfValue(dcValues, value);
         assertEquals(expResult, result);
     }
