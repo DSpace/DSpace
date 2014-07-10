@@ -25,10 +25,6 @@ import org.dspace.identifier.DOIIdentifierProvider;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class DryadObject {
-    private static final String PUBLICATION_NAME_SCHEMA = "prism";
-    private static final String PUBLICATION_NAME_ELEMENT = "publicationName";
-    private static final String PUBLICATION_NAME_QUALIFIER = null;
-
     private static final String DATE_ACCESSIONED_SCHEMA = "dc";
     private static final String DATE_ACCESSIONED_ELEMENT = "date";
     private static final String DATE_ACCESSIONED_QUALIFIER = "accessioned";
@@ -96,16 +92,6 @@ public abstract class DryadObject {
 
     public String getIdentifier() {
         return DOIIdentifierProvider.getDoiValue(getItem());
-    }
-
-    public void setPublicationName(String publicationName) throws SQLException {
-        getItem().clearMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null);
-        getItem().addMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null, publicationName);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting publication name", ex);
-        }
     }
 
     protected final void addToCollectionAndArchive(Collection collection) throws SQLException {

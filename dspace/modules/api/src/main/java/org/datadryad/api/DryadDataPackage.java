@@ -27,13 +27,19 @@ import org.dspace.workflow.WorkflowManager;
  */
 public class DryadDataPackage extends DryadObject {
     private static final String PACKAGES_COLLECTION_HANDLE_KEY = "stats.datapkgs.coll";
+
     private static final String PROVENANCE_SCHEMA = "dc";
     private static final String PROVENANCE_ELEMENT = "description";
     private static final String PROVENANCE_QUALIFIER = "provenance";
     private static final String PROVENANCE_LANGUAGE = "en";
+
     private static final String WORKFLOWITEM_TABLE = "workflowitem";
     private static final String WORKFLOWITEM_COLUMN_ITEMID = "item_id";
     private static final String WORKFLOWITEM_COLUMN_COLLECTIONID = "collection_id";
+
+    private static final String PUBLICATION_NAME_SCHEMA = "prism";
+    private static final String PUBLICATION_NAME_ELEMENT = "publicationName";
+    private static final String PUBLICATION_NAME_QUALIFIER = null;
 
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -113,6 +119,16 @@ public class DryadDataPackage extends DryadObject {
             throw new RuntimeException("Not yet implemented");
         }
         return dataFiles;
+    }
+
+    public void setPublicationName(String publicationName) throws SQLException {
+        getItem().clearMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null);
+        getItem().addMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null, publicationName);
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting publication name", ex);
+        }
     }
 
     /**
