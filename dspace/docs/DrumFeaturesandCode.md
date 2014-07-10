@@ -277,11 +277,9 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 
 *Configuration*
 
-* configuration is currently housed in drum-env source repository
+* [config/load/etd2dc.xsl](../config/load/etd2dc.xsl) - crosswalk Proquest metadata to dublin core
 
-* config/load/etd2dc.xsl - crosswalk Proquest metadata to dublin core
-
-* config/load/etd2marc.xsl - crosswalk Proquest metadata to Marc
+* [config/load/etd2marc.xsl](../config/load/etd2marc.xsl) - crosswalk Proquest metadata to Marc
 
 *Java Source*
 
