@@ -36,6 +36,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
         DryadDataPackage result = DryadDataPackage.create(context);
         assertNotNull(result);
         assertNull(result.getWorkflowItem(context));
+        assertNotNull(result.getIdentifier());
     }
 
     /**
@@ -47,6 +48,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
         DryadDataPackage result = DryadDataPackage.createInWorkflow(context);
         assertNotNull(result);
         assertNotNull(result.getWorkflowItem(context));
+        assertNotNull(result.getIdentifier());
     }
 
     /**

@@ -56,6 +56,7 @@ public class DryadDataFileTest extends ContextUnitTest {
     public void testCreate() throws Exception {
         DryadDataFile result = DryadDataFile.create(context);
         assertNotNull(result);
+        assertNotNull(result.getIdentifier());
     }
 
     /**
