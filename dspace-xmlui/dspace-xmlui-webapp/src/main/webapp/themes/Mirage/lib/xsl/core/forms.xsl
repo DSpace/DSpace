@@ -196,8 +196,8 @@
         <div class="ds-previous-values">
             <table>
                 <tr>
-                    <th><i18n:text>xmlui.Submission.submit.DescribeStep.order</i18n:text></th>
-                    <th colspan="*"><i18n:text>xmlui.Submission.submit.DescribeStep.author</i18n:text></th>
+                    <th align="left"><i18n:text>xmlui.Submission.submit.DescribeStep.order</i18n:text></th>
+                    <th colspan="*" align="left"><i18n:text>xmlui.Submission.submit.DescribeStep.author</i18n:text></th>
                 </tr>
                 <!-- Iterate over the dri:instance elements contained in this field. The instances contain
                         stored values as either "interpreted", "raw", or "default" values. -->
