@@ -13,6 +13,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -108,15 +109,30 @@ public class DryadDataPackage extends DryadObject {
         return null;
     }
 
-    static Set<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) {
+    static Set<DryadDataFile> getFilesInPackage(Context context, DryadDataPackage dataPackage) throws SQLException {
         // files and packages are linked by DOI
-        return new HashSet<DryadDataFile>();
+        Set<DryadDataFile> fileSet = new HashSet<DryadDataFile>();
+        String packageIdentifier = dataPackage.getIdentifier();
+        if(packageIdentifier == null || packageIdentifier.length() == 0) {
+            return fileSet;
+        }
+        try {
+            ItemIterator dataFiles = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, packageIdentifier);
+            while(dataFiles.hasNext()) {
+                fileSet.add(new DryadDataFile(dataFiles.next()));
+            }
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting files for data package", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting files for data package", ex);
+        }
+        return fileSet;
     }
 
-    public Set<DryadDataFile> getDataFiles(Context context) {
+    public Set<DryadDataFile> getDataFiles(Context context) throws SQLException {
         if(dataFiles == null) {
-            // TODO: Get data files
-            throw new RuntimeException("Not yet implemented");
+            // how are data files and packages linked? By DOI
+            dataFiles = DryadDataPackage.getFilesInPackage(context, this);
         }
         return dataFiles;
     }

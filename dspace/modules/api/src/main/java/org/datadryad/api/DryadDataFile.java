@@ -13,6 +13,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -62,10 +63,29 @@ public class DryadDataFile extends DryadObject {
         return dataFile;
     }
 
-    public DryadDataPackage getDataPackage() {
+    static DryadDataPackage getDataPackage(Context context, DryadDataFile dataFile) throws SQLException {
+        String fileIdentifier = dataFile.getIdentifier();
+        DryadDataPackage dataPackage = null;
+        if(fileIdentifier == null || fileIdentifier.length() == 0) {
+            return dataPackage;
+        }
+        try {
+            ItemIterator dataPackages = Item.findByMetadataField(context, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, fileIdentifier);
+            if(dataPackages.hasNext()) {
+                dataPackage = new DryadDataPackage(dataPackages.next());
+            }
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting files for data package", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting files for data package", ex);
+        }
+        return dataPackage;
+    }
+
+    public DryadDataPackage getDataPackage(Context context) throws SQLException {
         if(dataPackage == null) {
             // Find the data package for this file
-            throw new RuntimeException("Not yet implemented");
+            dataPackage = DryadDataFile.getDataPackage(context, this);
         }
         return dataPackage;
     }

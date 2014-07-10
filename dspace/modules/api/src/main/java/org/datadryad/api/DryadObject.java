@@ -29,6 +29,16 @@ public abstract class DryadObject {
     private static final String DATE_ACCESSIONED_ELEMENT = "date";
     private static final String DATE_ACCESSIONED_QUALIFIER = "accessioned";
 
+    // File/package relationships
+    static final String RELATION_SCHEMA = "dc";
+    static final String RELATION_ELEMENT = "relation";
+
+    // File ispartof package
+    static final String RELATION_ISPARTOF_QUALIFIER = "ispartof";
+
+    // Package haspart file
+    static final String RELATION_HASPART_QUALIFIER = "haspart";
+
     private static Logger log = Logger.getLogger(DryadObject.class);
 
     /* Considered using DCDate instead of a distinct SimpleDateFormat,
