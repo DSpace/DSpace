@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import org.junit.After;
@@ -27,32 +28,36 @@ public class DescribePublicationAJAXTest {
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
+    // seconds to wait for an AJAX response and refresh; ms/s; Selenium max timeout
+    private final int ajaxWaitSeconds = 10;
+    private final int waitSleepInterval = 1000;
+    private final int maxWaitSeconds = 10;
+
     @Before
     public void setUp() throws Exception {
-      if ("Chrome".equals(System.getProperty("selenium_test_browser"))) {
-          driver = new ChromeDriver();
-      } else if ("Safari".equals(System.getProperty("selenium_test_browser"))) {
-          driver = new SafariDriver();
-      } else {
-          LoggingPreferences logs = new LoggingPreferences();
-          logs.enable(LogType.DRIVER, Level.SEVERE);
-          logs.enable(LogType.BROWSER, Level.INFO);
-          DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-          capabilities.setCapability(CapabilityType.LOGGING_PREFS, logs);
-
-          driver = new FirefoxDriver(capabilities);
-      }
-      baseUrl = System.getProperty("selenium_test_url");
-      driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        if ("Chrome".equals(System.getProperty("selenium_test_browser"))) {
+            driver = new ChromeDriver();
+        } else if ("Safari".equals(System.getProperty("selenium_test_browser"))) {
+            driver = new SafariDriver();
+        } else {
+            LoggingPreferences logs = new LoggingPreferences();
+            logs.enable(LogType.DRIVER, Level.SEVERE);
+            logs.enable(LogType.BROWSER, Level.INFO);
+            DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+            capabilities.setCapability(CapabilityType.LOGGING_PREFS, logs);
+            driver = new FirefoxDriver(capabilities);
+        }
+        baseUrl = System.getProperty("selenium_test_url");
+        driver.manage().timeouts().implicitlyWait(maxWaitSeconds, TimeUnit.SECONDS);
     }
 
     // NOTE: this key sequence is for OSX
     private void openConsole() {
-      if (driver instanceof org.openqa.selenium.firefox.FirefoxDriver) {
-          driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.SHIFT, "j"));
-      } else if (driver instanceof org.openqa.selenium.chrome.ChromeDriver) {
-          driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.ALT, "j"));
-      }
+        if (driver instanceof org.openqa.selenium.firefox.FirefoxDriver) {
+            driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.SHIFT, "j"));
+        } else if (driver instanceof org.openqa.selenium.chrome.ChromeDriver) {
+            driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.ALT, "j"));
+        }
     }
 
     // useful constant xpaths: update button, save/exit button, save-for-later, remove-submission
@@ -98,10 +103,10 @@ public class DescribePublicationAJAXTest {
         updateAuthorOrder(authors);
         verifyAuthorOrder(authors);
 
-//        / / REMOVE AUTHOR
-//        removeAuthor(authors,2);
-//        verifyAuthorOrder(authors);
-//        verifyAuthorNames(authors);
+        // REMOVE AUTHOR
+        removeAuthor(authors,2);
+        verifyAuthorOrder(authors);
+        verifyAuthorNames(authors);
 
         // Save publication description and exit to user page
         saveAndExit();
@@ -117,57 +122,57 @@ public class DescribePublicationAJAXTest {
 
     @After
     public void tearDown() throws Exception {
-      driver.quit();
-      String verificationErrorString = verificationErrors.toString();
-      if (!"".equals(verificationErrorString)) {
-        fail(verificationErrorString);
-      }
+        driver.quit();
+        String verificationErrorString = verificationErrors.toString();
+        if (!"".equals(verificationErrorString)) {
+          fail(verificationErrorString);
+        }
     }
 
     private boolean isElementPresent(By by) {
-      try {
-        driver.findElement(by);
-        return true;
-      } catch (NoSuchElementException e) {
-        return false;
-      }
+        try {
+          driver.findElement(by);
+          return true;
+        } catch (NoSuchElementException e) {
+          return false;
+        }
     }
 
     // utility wrapper for generating page xpaths on a per-author basis
     private class AuthorXpath {
-      private Author author;
-      public AuthorXpath(Author author) {
-          this.author = author;
-      }
-      private String pred(String by) throws Exception {
-        if (by.equals("i")) return "["    + author.index  + "]";
-        if (by.equals("a")) return "[.='" + author.interp + "']";
-        throw new Exception();
-      }
-      public String row(String by) throws Exception {
-        String pred = by.equals("i")
-                    ? "[" + author.index + "]"
-                    : "[.//span" + pred(by) + "]";    // has a span descendant where name = ...
-        return "//tr[@class='ds-author-input-row']" + pred;
-      }
-      public String span_interp(String by) throws Exception {
-        return "(//span[@class='ds-interpreted-field'])" + pred(by);
-      }
-      public String input_name_last(String by) throws Exception {
-          return row(by) + "//input[starts-with(@name,'dc_contributor_author_last_')]";
-      }
-      public String input_name_first(String by) throws Exception {
-          return row(by) + "//input[starts-with(@name,'dc_contributor_author_first_')]";
-      }
-      public String edit_btn(String by) throws Exception {
-          return row(by) + "//input[@class='ds-button-field ds-edit-button']";
-      }
-      public String order_select(String by) throws Exception {
-          return row(by) + "//select[@class='ds-author-order-select']";
-      }
-      public String remove_btn(String by) throws Exception {
-          return row(by) + "//input[@name='submit_dc_contributor_author_delete']";
-      }
+        private Author author;
+        public AuthorXpath(Author author) {
+            this.author = author;
+        }
+        private String authpred(String by) throws Exception {
+          if (by.equals("i")) return "["    + author.index  + "]";
+          if (by.equals("a")) return "[.='" + author.interp + "']";
+          throw new Exception();
+        }
+        public String row(String by) throws Exception {
+          String pred = by.equals("i")
+                      ? "[" + author.index + "]"
+                      : "[" + ".//span[@class='ds-interpreted-field']" + authpred(by) + "]";    // has a span descendant where name = ...
+          return "//tr[@class='ds-author-input-row']" + pred;
+        }
+        public String span_interp(String by) throws Exception {
+          return "(//span[@class='ds-interpreted-field'])" + authpred(by);
+        }
+        public String input_name_last(String by) throws Exception {
+            return row(by) + "//input[starts-with(@name,'dc_contributor_author_last_')]";
+        }
+        public String input_name_first(String by) throws Exception {
+            return row(by) + "//input[starts-with(@name,'dc_contributor_author_first_')]";
+        }
+        public String edit_btn(String by) throws Exception {
+            return row(by) + "//input[@class='ds-button-field ds-edit-button']";
+        }
+        public String order_select(String by) throws Exception {
+            return row(by) + "//select[@class='ds-author-order-select']";
+        }
+        public String remove_btn(String by) throws Exception {
+            return row(by) + "//input[@name='submit_dc_contributor_author_delete']";
+        }
     }
 
     // data model for an author on a submission page, which
@@ -213,7 +218,7 @@ public class DescribePublicationAJAXTest {
     private void waitOnXpathsPresent(ArrayList<String> xpaths) throws InterruptedException {
       // wait for form submission to complete
       for (int second = 0;; second++) {
-        if (second >= 60) fail("timeout");
+        if (second >= ajaxWaitSeconds) fail("timeout");
         try {
             boolean done = true;
             for (String xpath : xpaths) {
@@ -221,7 +226,7 @@ public class DescribePublicationAJAXTest {
             }
             if (done) break;
         } catch (Exception e) {}
-            Thread.sleep(1000);
+            Thread.sleep(waitSleepInterval);
         }
     }
 
@@ -261,20 +266,20 @@ public class DescribePublicationAJAXTest {
         // update and wait for form submission to complete
         driver.findElement(By.xpath(update_btn_xpath)).click();
         for (int second = 0;; second++) {
-            if (second >= 60) fail("timeout");
+            if (second >= ajaxWaitSeconds) fail("timeout");
             try {
                 if (author.interp.equals(driver.findElement(By.xpath(author.xpath.span_interp("i"))).getText())) { break;}
             } catch (Exception e) {}
-            Thread.sleep(1000);
+            Thread.sleep(waitSleepInterval);
         }
     }
 
     private void updateAuthorNames(ArrayList<Author> authors) throws Exception {
         for (Author author : authors) {
-              if(!author.interp.equals(driver.findElement(By.xpath(author.xpath.span_interp("i"))).getText())) {
-                  updateAuthorName(author);
-              }
-          }
+            if(!author.interp.equals(driver.findElement(By.xpath(author.xpath.span_interp("i"))).getText())) {
+                updateAuthorName(author);
+            }
+        }
     }
 
     private void saveAndExit() throws Exception {
@@ -297,13 +302,12 @@ public class DescribePublicationAJAXTest {
         for (Author author: authors) {
             // update the selected select/option value to match the data
             // checks current index of data against found text at that index
-            if (!driver.findElement(By.xpath(author.xpath.span_interp("i"))).getText().equals(author.interp)
-            ) {
+            if (!driver.findElement(By.xpath(author.xpath.span_interp("i"))).getText().equals(author.interp))
+            {
                 driver.findElement(By.xpath(author.xpath.edit_btn("a"))).click();
                 // off-by-one for author.interp index and select/option index
                 new Select(driver.findElement(By.xpath(author.xpath.order_select("a")))).selectByIndex(author.index - 1);
             }
-Thread.sleep(4000);
             paths.add(author.xpath.span_interp("a"));
         }
         driver.findElement(By.xpath(update_btn_xpath)).click();
@@ -317,12 +321,29 @@ Thread.sleep(4000);
     }
 
     private void removeAuthor(ArrayList<Author> authors, int ind) throws Exception {
+        // remove given author, then re-set remaining authors' indices
         Author author = authors.remove(ind);
-        ArrayList<String> paths = new ArrayList<String>(authors.size());
-        for (Author a : authors) {
-            paths.add(a.xpath.row("i"));
+        for (int i = 0; i < authors.size(); i++) {
+            authors.get(i).index = i+1;
         }
-        driver.findElement(By.xpath(author.xpath.remove_btn("i"))).click();
+        ArrayList<String> paths = new ArrayList<String>(authors.size());
+        paths.add(author.xpath.remove_btn("a"));
         waitOnXpathsPresent(paths);
+        paths.clear();
+        // TODO: figure out why this event won't fire with a single click
+        // just attempt several clicks
+        while (isElementPresent(By.xpath(author.xpath.remove_btn("a")))) {
+            try {
+                driver.findElement(By.xpath(author.xpath.remove_btn("a"))).click();
+            } catch (Exception e) {}
+        }
+        // action is done once form is updated, so wait for the non-removed
+        // authors to be present again after submission
+        for (Author a : authors) {
+            paths.add(a.xpath.row("a"));
+        }
+        waitOnXpathsPresent(paths);
+        // confirm that requested author was removed
+        assertFalse(isElementPresent(By.xpath(author.xpath.span_interp("a"))));
     }
 }
