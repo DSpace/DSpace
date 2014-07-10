@@ -2,9 +2,11 @@
  */
 package org.datadryad.api;
 
+import java.util.Set;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
 import org.dspace.core.Context;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -93,7 +95,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      * Test of addSubmittedProvenance method, of class DryadDataPackage.
      */
     @Test
-    public void testAddGetSubmittedProvenance() throws Exception {
+    public void testAddSubmittedProvenance() throws Exception {
         System.out.println("addGetSubmittedProvenance");
         DCDate date = new DCDate(BURIED_DATE_STRING);
         String submitterName = "First Last";
@@ -105,5 +107,144 @@ public class DryadDataPackageTest extends ContextUnitTest {
         String result = instance.getSubmittedProvenance();
         String expResult = PROVENANCE_MESSAGE;
         assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getPackagesContainingFile method, of class DryadDataPackage.
+     */
+    @Test
+    public void testGetPackagesContainingFile() throws Exception {
+        System.out.println("getPackagesContainingFile");
+        DryadDataFile dataFile = DryadDataFile.create(context);
+        DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
+        DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
+        dataPackage1.addDataFile(context, dataFile);
+        Set result = DryadDataPackage.getPackagesContainingFile(context, dataFile);
+        assertTrue(result.contains(dataPackage1));
+        assertFalse(result.contains(dataPackage2));
+        assertEquals(1, result.size());
+    }
+
+    /**
+     * Test of getFilesInPackage method, of class DryadDataPackage.
+     */
+    @Test
+    public void testGetFilesInPackage() throws Exception {
+        System.out.println("getFilesInPackage");
+        DryadDataFile dataFile1 = DryadDataFile.create(context);
+        DryadDataFile dataFile2 = DryadDataFile.create(context);
+        DryadDataFile dataFile3 = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.addDataFile(context, dataFile1);
+        dataPackage.addDataFile(context, dataFile2);
+        Set result = DryadDataPackage.getFilesInPackage(context, dataPackage);
+        assertTrue(result.contains(dataFile1));
+        assertTrue(result.contains(dataFile2));
+        assertFalse(result.contains(dataFile3));
+    }
+
+    /**
+     * Test of getDataFiles method, of class DryadDataPackage.
+     */
+    @Test
+    public void testGetDataFiles() throws Exception {
+        System.out.println("getDataFiles");
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile dataFile1 = DryadDataFile.create(context);
+        Integer result = dataPackage.getDataFiles(context).size();
+        Integer expResult = 1;
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of addDataFile method, of class DryadDataPackage.
+     */
+    @Test
+    public void testAddDataFile() throws Exception {
+        System.out.println("addDataFile");
+        DryadDataFile dataFile = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        Integer expectedNumberOfFiles = 0;
+        Integer numberOfFiles = dataPackage.getDataFiles(context).size();
+        assertEquals(expectedNumberOfFiles, numberOfFiles);
+        dataPackage.addDataFile(context, dataFile);
+        expectedNumberOfFiles = 1;
+        numberOfFiles = dataPackage.getDataFiles(context).size();
+        assertEquals(expectedNumberOfFiles, numberOfFiles);
+    }
+
+    @Test
+    public void testMoveDataFile() throws Exception {
+        System.out.println("moveDataFile");
+        DryadDataFile dataFile = DryadDataFile.create(context);
+        DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
+        DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
+
+        Integer expResult = 0;
+        Integer result = dataPackage1.getDataFiles(context).size();
+        assertEquals(expResult, result);
+        dataPackage1.addDataFile(context, dataFile);
+        expResult = 1;
+        result = dataPackage1.getDataFiles(context).size();
+        assertEquals(expResult, result);
+
+        // Now move to package2 and make sure no longer in package 1
+        dataPackage2.addDataFile(context, dataFile);
+        expResult = 0;
+        result = dataPackage1.getDataFiles(context).size();
+        assertEquals(expResult, result);
+
+        result = dataPackage2.getDataFiles(context).size();
+        expResult = 1;
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of removeDataFile method, of class DryadDataPackage.
+     */
+    @Test
+    public void testRemoveDataFile() throws Exception {
+        System.out.println("removeDataFile");
+        DryadDataFile dataFile = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.addDataFile(context, dataFile);
+        Integer expResult = 1;
+        Integer result = dataPackage.getDataFiles(context).size();
+        assertEquals(expResult, result);
+        dataPackage.removeDataFile(dataFile);
+        expResult = 0;
+        result = dataPackage.getDataFiles(context).size();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of indexOfValue method, of class DryadDataPackage.
+     */
+    @Test
+    public void testIndexOfValue() {
+        System.out.println("indexOfValue");
+        Integer numValues = 4;
+        DCValue[] dcValues = new DCValue[numValues];
+        for(Integer i=0;i<numValues;i++) {
+            dcValues[i] = new DCValue();
+            dcValues[i].value = String.format("Value %d", i * 100);
+        }
+
+        // "Value 200" should be at index 3
+        String value = "Value 200";
+        Integer expResult = 3;
+        Integer result = DryadDataPackage.indexOfValue(dcValues, value);
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of setPublicationName method, of class DryadDataPackage.
+     */
+    @Test
+    public void testSetPublicationName() throws Exception {
+        System.out.println("setPublicationName");
+        String publicationName = "Test Publication";
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(publicationName);
     }
 }
