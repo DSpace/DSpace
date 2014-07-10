@@ -170,6 +170,20 @@ public class DryadDataPackage extends DryadObject {
         return dataFiles;
     }
 
+    void setHasPart(DryadDataFile dataFile) throws SQLException {
+        String dataFileIdentifier = dataFile.getIdentifier();
+        if(dataFileIdentifier == null || dataFileIdentifier.length() == 0) {
+            throw new IllegalArgumentException("Data file must have an identifier");
+        }
+        this.getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, null, dataFileIdentifier);
+        try {
+            this.getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception assigning package haspart file", ex);
+        }
+
+    }
+
     public void addDataFile(Context context, DryadDataFile dataFile) throws SQLException {
         dataFile.setDataPackage(context, this);
     }

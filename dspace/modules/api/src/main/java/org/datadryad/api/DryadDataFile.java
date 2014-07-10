@@ -48,14 +48,16 @@ public class DryadDataFile extends DryadObject {
         return DryadObject.collectionFromHandle(context, handle);
     }
 
-    public static DryadDataFile create(Context context) throws SQLException {
+    public static DryadDataFile create(Context context, DryadDataPackage dataPackage) throws SQLException {
         Collection collection = DryadDataFile.getCollection(context);
         DryadDataFile dataFile = null;
         try {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataFile = new DryadDataFile(item);
+            dataFile.setIsPartOf(dataPackage);
             dataFile.createIdentifier(context);
+            dataPackage.setHasPart(dataFile);
             dataFile.addToCollectionAndArchive(collection);
             wsi.deleteWrapper();
         } catch (IdentifierException ex) {
@@ -95,6 +97,21 @@ public class DryadDataFile extends DryadObject {
         return dataPackage;
     }
 
+    private void setIsPartOf(DryadDataPackage dataPackage) throws SQLException {
+        String dataPackageIdentifier = dataPackage.getIdentifier();
+        if(dataPackageIdentifier == null) {
+            throw new IllegalArgumentException("Attempted to assign a file to a package with no identifier");
+        }
+        // Files may only belong to one package, so clear any existing metadata for ispartof
+        getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
+        getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, null, dataPackageIdentifier);
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting file ispartof package", ex);
+        }
+    }
+
     /**
      * Assigns a data file to a data package, updating the dc.relation metadata.
      * Enforces the invariant that a data package may contain many files, but a
@@ -106,24 +123,11 @@ public class DryadDataFile extends DryadObject {
         if(dataPackage == null) {
             throw new IllegalArgumentException("Cannot set a null dataPackage");
         }
-        String dataPackageIdentifier = dataPackage.getIdentifier();
-        if(dataPackageIdentifier == null) {
-            throw new IllegalArgumentException("Attempted to assign a file to a package with no identifier");
-        }
         String dataFileIdentifier = getIdentifier();
         if(dataFileIdentifier == null) {
             throw new IllegalArgumentException("Data file has no identifier");
         }
-
-        // Files may only belong to one package, so clear any existing metadata for ispartof
-        getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
-        getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, null, dataPackageIdentifier);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting file ispartof package", ex);
-        }
-        // The file now belongs to exactly one package.
+        setIsPartOf(dataPackage);
 
         // Ensure 0 packages contain the file, then the 1 specified
         Set<DryadDataPackage> packagesContainingFile = DryadDataPackage.getPackagesContainingFile(context, this);
@@ -134,15 +138,8 @@ public class DryadDataFile extends DryadObject {
                 containingPackage.removeDataFile(this);
             }
         }
-        dataPackage.getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, null, dataFileIdentifier);
-        try {
-            dataPackage.getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception assigning package haspart file", ex);
-        }
+        dataPackage.setHasPart(this);
     }
-
-
     public boolean isEmbargoed() {
         boolean isEmbargoed = false;
         DCValue[] embargoLiftDateMetadata = getItem().getMetadata(EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY);
