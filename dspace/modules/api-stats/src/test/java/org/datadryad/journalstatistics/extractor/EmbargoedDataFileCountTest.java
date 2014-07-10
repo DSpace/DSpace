@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,9 @@ public class EmbargoedDataFileCountTest extends ContextUnitTest {
         Integer initialCount = instance.extract(journalName);
         // Create a new data package, do not set an embargo, assert the count does not change
         DryadDataFile dataFile = DryadDataFile.create(context);
-        dataFile.setPublicationName(journalName);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(journalName);
+        dataPackage.addDataFile(context, dataFile);
         Integer expResult = initialCount;
         Integer result = instance.extract(journalName);
         assertEquals(expResult, result);

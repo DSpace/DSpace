@@ -5,6 +5,7 @@ package org.datadryad.journalstatistics.extractor;
 import java.io.File;
 import java.io.FileInputStream;
 import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -53,14 +54,18 @@ public class DataFileTotalSizeTest extends ContextUnitTest {
         // Create a file and associate it with journal 1
 
         DryadDataFile dataFile1 = DryadDataFile.create(context);
-        dataFile1.setPublicationName(journalName1);
+        DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
+        dataPackage1.setPublicationName(journalName1);
+        dataPackage1.addDataFile(context, dataFile1);
         dataFile1.addBitstream(new FileInputStream(file1));
         dataFile1.addBitstream(new FileInputStream(file2));
 
         // Create a second file, associate with journal2 and add file3
 
         DryadDataFile dataFile2 = DryadDataFile.create(context);
-        dataFile2.setPublicationName(journalName2);
+        DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
+        dataPackage2.setPublicationName(journalName2);
+        dataPackage2.addDataFile(context, dataFile2);
         dataFile2.addBitstream(new FileInputStream(file3));
         
         Long totalSizeForJournalName1 = instance.extract(journalName1);

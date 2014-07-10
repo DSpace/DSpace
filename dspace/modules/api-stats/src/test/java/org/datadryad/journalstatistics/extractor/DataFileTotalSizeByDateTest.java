@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import org.datadryad.api.DryadDataFile;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -65,8 +66,10 @@ public class DataFileTotalSizeByDateTest extends ContextUnitTest {
         assertTrue("file has no size", expectedSizeIncrease > 0);
 
         DryadDataFile dataFile = DryadDataFile.create(context);
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(journalName);
+        dataPackage.addDataFile(context, dataFile);
         dataFile.setDateAccessioned(date_2013_03_01);
-        dataFile.setPublicationName(journalName);
         dataFile.addBitstream(new FileInputStream(file));
 
         Long totalSize1 = instance1.extract(journalName);
