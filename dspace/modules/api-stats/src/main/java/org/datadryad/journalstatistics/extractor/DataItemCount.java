@@ -48,8 +48,13 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
             ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
 
             collection = getCollection();
+            Collection dataPackageCollection = DryadDataPackage.getCollection(context);
             while (itemsByJournal.hasNext()) {
                 Item packageItem = itemsByJournal.next();
+                // Skip if the item is not a data package
+                if(!packageItem.isOwningCollection(dataPackageCollection)) {
+                    continue;
+                }
                 DryadDataPackage dataPackage = new DryadDataPackage(packageItem);
                 Set<DryadObject> objectsToConsider = dataPackage.getRelatedObjectsInCollection(context, collection);
                 for(DryadObject dryadObject : objectsToConsider) {
