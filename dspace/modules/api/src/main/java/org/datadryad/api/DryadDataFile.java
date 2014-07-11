@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -229,5 +230,12 @@ public class DryadDataFile extends DryadObject {
             }
         }
         return size;
+    }
+
+    @Override
+    Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
+        return new HashSet<DryadObject>() {{
+            add(getDataPackage(context));
+        }};
     }
 }

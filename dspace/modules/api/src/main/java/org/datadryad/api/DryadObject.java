@@ -9,6 +9,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -117,6 +120,36 @@ public abstract class DryadObject {
 
     static Date parseDate(String dateString) throws ParseException {
         return DATE_FORMAT.parse(dateString);
+    }
+
+    /**
+     * Return a set of related DryadObjects (packages or files) from the specified
+     * collection. Since many metadata fields are package-only or file-only, this
+     * allows us to easily get the related objects (or the object itself)
+     * @param c a DSpace collection, e.g. Dryad Data Files or Dryad Data Packages
+     * @return a set of objects, related to this object, and in the specified collection
+     */
+    public Set<DryadObject> getRelatedObjectsInCollection(Context context, Collection collection) throws SQLException {
+        Set<DryadObject> relatedObjects = null;
+        if(ArrayUtils.contains(this.getCollections(), collection)) {
+            final DryadObject finalThis = this;
+            relatedObjects = new HashSet<DryadObject>() {{
+               add(finalThis);
+           }};
+        } else {
+            relatedObjects = getRelatedObjects(context);
+        }
+        return relatedObjects;
+    }
+
+    /**
+     * Get the set of related Dryad objects. Packages should return their files.
+     * Files should return a set containing their package
+     * @return The set of related objects, not including the object itself.
+     */
+    abstract Set<DryadObject> getRelatedObjects(final Context context) throws SQLException;
+    protected final Collection[] getCollections() throws SQLException {
+        return getItem().getCollections();
     }
 
     public Item getItem() {

@@ -316,4 +316,9 @@ public class DryadDataPackage extends DryadObject {
             log.error("Authorize exception adding submitted provenance", ex);
         }
     }
+
+    @Override
+    Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
+        return new HashSet<DryadObject>(getDataFiles(context));
+    }
 }
