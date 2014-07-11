@@ -453,32 +453,34 @@ public class BrowseListTag extends TagSupport
                 if (!StringUtils.isEmpty(typeSpaBrowseType) && !disableCrossLinks) {
                     String argument;
                     String value;
-                    if (typeSpaMetadataArray[0].authority != null
-                            && typeSpaMetadataArray[0].confidence >= MetadataAuthorityManager.getManager()
-                            .getMinConfidence(typeSpaMetadataArray[0].schema, typeSpaMetadataArray[0].element, typeSpaMetadataArray[0].qualifier)) {
-                        argument = "authority";
-                        value = typeSpaMetadataArray[0].authority;
-                    } else {
-                        argument = "value";
-                        value = typeSpaMetadataArray[0].value;
-                    }
-                    if (typeSpaViewFull) {
-                        argument = "vfocus";
-                    }
-                    typeStartLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + typeSpaBrowseType + "&amp;"
-                            + argument + "=" + URLEncoder.encode(value, "UTF-8");
+                    if (typeSpaMetadataArray.length > 0) {
+                        if (typeSpaMetadataArray[0].authority != null
+                                && typeSpaMetadataArray[0].confidence >= MetadataAuthorityManager.getManager()
+                                .getMinConfidence(typeSpaMetadataArray[0].schema, typeSpaMetadataArray[0].element, typeSpaMetadataArray[0].qualifier)) {
+                            argument = "authority";
+                            value = typeSpaMetadataArray[0].authority;
+                        } else {
+                            argument = "value";
+                            value = typeSpaMetadataArray[0].value;
+                        }
+                        if (typeSpaViewFull) {
+                            argument = "vfocus";
+                        }
+                        typeStartLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + typeSpaBrowseType + "&amp;"
+                                + argument + "=" + URLEncoder.encode(value, "UTF-8");
 
-                    if (typeSpaMetadataArray[0].language != null) {
-                        typeStartLink += "&amp;"
-                                + argument + "_lang=" + URLEncoder.encode(typeSpaMetadataArray[0].language, "UTF-8");
-                    }
+                        if (typeSpaMetadataArray[0].language != null) {
+                            typeStartLink += "&amp;"
+                                    + argument + "_lang=" + URLEncoder.encode(typeSpaMetadataArray[0].language, "UTF-8");
+                        }
 
-                    if ("authority".equals(argument)) {
-                        typeStartLink += "\" class=\"authority " + typeSpaBrowseType + "\">";
-                    } else {
-                        typeStartLink += "\">";
+                        if ("authority".equals(argument)) {
+                            typeStartLink += "\" class=\"authority " + typeSpaBrowseType + "\">";
+                        } else {
+                            typeStartLink += "\">";
+                        }
+                        typeEndLink = "</a>";
                     }
-                    typeEndLink = "</a>";
                 }
                 
                 String typeIcon="";
