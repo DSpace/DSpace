@@ -55,6 +55,7 @@ public class DryadDataFile extends DryadObject {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataFile = new DryadDataFile(item);
+            dataFile.dataPackage = dataPackage;
             dataFile.setIsPartOf(dataPackage);
             dataFile.createIdentifier(context);
             dataPackage.setHasPart(dataFile);
@@ -70,7 +71,7 @@ public class DryadDataFile extends DryadObject {
         return dataFile;
     }
 
-    static DryadDataPackage getDataPackage(Context context, DryadDataFile dataFile) throws SQLException {
+    static DryadDataPackage getDataPackageContainingFile(Context context, DryadDataFile dataFile) throws SQLException {
         String fileIdentifier = dataFile.getIdentifier();
         DryadDataPackage dataPackage = null;
         if(fileIdentifier == null || fileIdentifier.length() == 0) {
@@ -92,24 +93,31 @@ public class DryadDataFile extends DryadObject {
     public DryadDataPackage getDataPackage(Context context) throws SQLException {
         if(dataPackage == null) {
             // Find the data package for this file
-            dataPackage = DryadDataFile.getDataPackage(context, this);
+            dataPackage = DryadDataFile.getDataPackageContainingFile(context, this);
         }
         return dataPackage;
     }
 
-    private void setIsPartOf(DryadDataPackage dataPackage) throws SQLException {
-        String dataPackageIdentifier = dataPackage.getIdentifier();
+    private void clearIsPartOf() throws SQLException {
+        getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
+    }
+
+    private void setIsPartOf(DryadDataPackage aDataPackage) throws SQLException {
+        String dataPackageIdentifier = aDataPackage.getIdentifier();
         if(dataPackageIdentifier == null) {
             throw new IllegalArgumentException("Attempted to assign a file to a package with no identifier");
         }
         // Files may only belong to one package, so clear any existing metadata for ispartof
-        getItem().clearMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, Item.ANY);
+        clearIsPartOf();
         getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, null, dataPackageIdentifier);
         try {
             getItem().update();
         } catch (AuthorizeException ex) {
             log.error("Authorize exception setting file ispartof package", ex);
         }
+        this.dataPackage.clearDataFilesCache();
+        this.dataPackage = aDataPackage;
+        aDataPackage.clearDataFilesCache();
     }
 
     /**
@@ -135,11 +143,22 @@ public class DryadDataFile extends DryadObject {
             // file is not contained by any other data packages
             // remove file from packages
             for(DryadDataPackage containingPackage : packagesContainingFile) {
-                containingPackage.removeDataFile(this);
+                containingPackage.removeDataFile(context, this);
             }
         }
         dataPackage.setHasPart(this);
     }
+
+    /**
+     * Remove the ispartof metadata from this file.
+     * @param context
+     * @throws SQLException
+     */
+    void clearDataPackage(Context context) throws SQLException {
+        dataPackage.clearDataFilesCache();
+        clearIsPartOf();
+    }
+
     public boolean isEmbargoed() {
         boolean isEmbargoed = false;
         DCValue[] embargoLiftDateMetadata = getItem().getMetadata(EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY);

@@ -190,7 +190,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
         Integer expResult = 1;
         Integer result = dataPackage.getDataFiles(context).size();
         assertEquals(expResult, result);
-        dataPackage.removeDataFile(dataFile);
+        dataPackage.removeDataFile(context, dataFile);
         expResult = 0;
         result = dataPackage.getDataFiles(context).size();
         assertEquals(expResult, result);

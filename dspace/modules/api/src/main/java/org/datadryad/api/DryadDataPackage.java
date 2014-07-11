@@ -181,11 +181,14 @@ public class DryadDataPackage extends DryadObject {
         } catch (AuthorizeException ex) {
             log.error("Authorize exception assigning package haspart file", ex);
         }
-
     }
 
     public void addDataFile(Context context, DryadDataFile dataFile) throws SQLException {
         dataFile.setDataPackage(context, this);
+    }
+
+    void clearDataFilesCache() {
+        this.dataFiles = null;
     }
 
     /**
@@ -194,7 +197,7 @@ public class DryadDataPackage extends DryadObject {
      * @param dataFile
      * @throws SQLException
      */
-    public void removeDataFile(DryadDataFile dataFile) throws SQLException {
+    public void removeDataFile(Context context, DryadDataFile dataFile) throws SQLException {
         String dataFileIdentifier = dataFile.getIdentifier();
         if(dataFileIdentifier == null) {
             throw new IllegalArgumentException("Data file must have an identifier");
@@ -218,6 +221,7 @@ public class DryadDataPackage extends DryadObject {
             } catch (AuthorizeException ex) {
                 log.error("Authorize exception removing data file from data package", ex);
             }
+            dataFile.clearDataPackage(context);
         }
     }
 
