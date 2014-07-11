@@ -65,10 +65,9 @@ public class DataFileTotalSizeByDateTest extends ContextUnitTest {
 
         assertTrue("file has no size", expectedSizeIncrease > 0);
 
-        DryadDataFile dataFile = DryadDataFile.create(context);
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile dataFile = DryadDataFile.create(context, dataPackage);
         dataPackage.setPublicationName(journalName);
-        dataPackage.addDataFile(context, dataFile);
         dataFile.setDateAccessioned(date_2013_03_01);
         dataFile.addBitstream(new FileInputStream(file));
 

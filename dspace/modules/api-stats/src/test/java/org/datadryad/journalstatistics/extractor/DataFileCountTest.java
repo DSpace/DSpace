@@ -27,10 +27,9 @@ public class DataFileCountTest extends ContextUnitTest {
         DataFileCount instance = new DataFileCount(this.context);
         Integer initialCount = instance.extract(journalName);
         // Create a new data package, and assert the count goes up by one
-        DryadDataFile dataFile = DryadDataFile.create(context);
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        DryadDataFile dataFile = DryadDataFile.create(context, dataPackage);
         dataPackage.setPublicationName(journalName);
-        dataPackage.addDataFile(context, dataFile);
         Integer expResult = initialCount + 1;
         Integer result = instance.extract(journalName);
         assertEquals("Data file count should increase by 1", expResult, result);
