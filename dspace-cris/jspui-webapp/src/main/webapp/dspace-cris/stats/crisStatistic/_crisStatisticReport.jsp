@@ -11,7 +11,7 @@
 
 <c:choose>
 <c:when test="${empty type or type == 'null' or type eq 'selectedObject'}">
-	<c:set value="(From Dec 2010)" var="condition"/>
+	<c:set value="" var="condition"/>
 	<%@include file="../common/basicReport.jsp"%>
 </c:when>
 <c:otherwise>

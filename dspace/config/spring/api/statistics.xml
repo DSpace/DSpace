@@ -13,7 +13,18 @@
 	<bean id="identifierExtraIndexer" class="org.dspace.statistics.IdentifierStatsIndexPlugin"/>
 	
 	<bean id="dspaceObjectExtraIndexer" class="org.dspace.statistics.DSpaceObjectStatsIndexPlugin"/>
+	
+	<bean id="sectionStatsExtraIndexer" 
+    	class="org.dspace.app.cris.statistics.SectionStatsIndexPlugin">
+    </bean>     
+    
+    <bean id="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData" 
+    	class="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData">
+    </bean>              
 
+    <bean id="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData" 
+    	class="org.dspace.app.cris.statistics.GeoRefAdditionalStatisticsData">
+    </bean>
 
 	<!-- Components for Cris Object -->	
 	

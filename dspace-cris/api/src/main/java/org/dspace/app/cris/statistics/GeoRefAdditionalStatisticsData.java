@@ -36,9 +36,6 @@ public class GeoRefAdditionalStatisticsData implements
             .getLogger(GeoRefAdditionalStatisticsData.class);
 
     private Properties countries2Continent = null;
-    
-
-    DSpace dspace = new DSpace();
 
     public Properties getCountries2Continent()
     {
@@ -84,10 +81,13 @@ public class GeoRefAdditionalStatisticsData implements
             DSpaceObject dspaceObject)
     {
         String ip = (String) doc1.getFieldValue("ip");
+        if (ip == null)
+            return;
         // Save the location information if valid, save the event without
         // location information if not valid
-        if (ConfigurationManager.getBooleanProperty(SolrLogger.CFG_USAGE_MODULE,
-                "test-randomize-localhost", false))
+        if (ConfigurationManager.getBooleanProperty(
+                SolrLogger.CFG_USAGE_MODULE, "randomize-localhost", false)
+                && ip.equals("127.0.0.1"))
         {
             ip = "";
             for (int j = 0; j < 4; j++)
@@ -167,12 +167,12 @@ public class GeoRefAdditionalStatisticsData implements
                 }
                 catch (IOException e)
                 {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
             else
             {
-                // System.out.println("NO SOLR DB FILE !");
+                log.error("solr.dbfile: " + dbfile + " not found!");
             }
             locationService = service;
         }

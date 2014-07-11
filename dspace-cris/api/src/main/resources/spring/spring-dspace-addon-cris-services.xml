@@ -1633,14 +1633,5 @@
 		<property name="applicationService" ref="applicationService" />
 		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
-	
-	
-	<bean id="sectionStatsExtraIndexer" 
-    	class="org.dspace.app.cris.statistics.SectionStatsIndexPlugin">
-    </bean>     
-    
-    <bean id="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData" 
-    	class="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData">
-    </bean>              
        
 </beans>

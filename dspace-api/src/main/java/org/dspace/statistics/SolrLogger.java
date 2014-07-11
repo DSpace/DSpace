@@ -353,16 +353,6 @@ public class SolrLogger
             if (request.getHeader("User-Agent") != null)
                 doc1.addField("userAgent", request.getHeader("User-Agent"));
             
-            // Do any additional indexing, depends on the plugins
-            List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
-                    .getServiceManager().getServicesByType(
-                            SolrStatsIndexPlugin.class);
-            for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
-            {
-                solrServiceIndexPlugin.additionalIndex(request, dspaceObject,
-                        doc1);
-            }
-
             try
             {
                 String dns = DnsLookup.reverseDns(ip);
@@ -387,6 +377,16 @@ public class SolrLogger
             doc1.addField("epersonid", currentUser.getID());
         }
 
+        // Do any additional indexing, depends on the plugins
+        List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
+                .getServiceManager().getServicesByType(
+                        SolrStatsIndexPlugin.class);
+        for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
+        {
+            solrServiceIndexPlugin.additionalIndex(request, dspaceObject,
+                    doc1);
+        }
+        
         return doc1;
     }
 
@@ -435,16 +435,6 @@ public class SolrLogger
         	doc1.addField("userAgent", userAgent);
         }
         
-        // Do any additional indexing, depends on the plugins
-        List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
-                .getServiceManager().getServicesByType(
-                        SolrStatsIndexPlugin.class);
-        for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
-        {
-            solrServiceIndexPlugin.additionalIndex(null, dspaceObject,
-                    doc1);
-        }
-        
         if (dns != null)
         {
             doc1.addField("dns", dns.toLowerCase());
@@ -462,6 +452,16 @@ public class SolrLogger
             doc1.addField("epersonid", currentUser.getID());
         }
 
+        // Do any additional indexing, depends on the plugins
+        List<SolrStatsIndexPlugin> solrServiceIndexPlugins = new DSpace()
+                .getServiceManager().getServicesByType(
+                        SolrStatsIndexPlugin.class);
+        for (SolrStatsIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
+        {
+            solrServiceIndexPlugin.additionalIndex(null, dspaceObject,
+                    doc1);
+        }
+                
         return doc1;
     }
 
