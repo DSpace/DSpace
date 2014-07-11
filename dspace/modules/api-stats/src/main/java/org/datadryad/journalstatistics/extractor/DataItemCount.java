@@ -19,7 +19,7 @@ import org.dspace.core.Context;
  * Counts items in a DSpace Collection, such as Dryad Data Packages or files
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public abstract class DataItemCount extends DatabaseExtractor<Integer> {
+public abstract class DataItemCount extends DatabaseExtractor<Long> {
 
     private static Logger log = Logger.getLogger(DataItemCount.class);
 
@@ -33,12 +33,22 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
     Boolean filter(DryadObject dryadObject) {
         return true; // True by default
     }
+    
+    /**
+     * The value to add when counting the object. Could be 1 for object count
+     * or number of files/file size
+     * @param dryadObject
+     * @return The count to add when aggregating data
+     */
+    Long countValue(DryadObject dryadObject) {
+        return 1l;
+    }
 
     @Override
-    public Integer extract(final String journalName) {
+    public Long extract(final String journalName) {
         Context context = this.getContext();
         Collection collection;
-        Integer count = 0;
+        Long count = 0l;
         try {
             /*
              * Initial implementation is to fetch items by metadata field ID
@@ -65,7 +75,7 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
                     Item item = dryadObject.getItem();
                     if(item.isOwningCollection(collection)) {
                         if(passesDateFilter(dryadObject.getDateAccessioned()) && filter(dryadObject)) {
-                            count++;
+                            count += countValue(dryadObject);
                         }
                     }
                 }
