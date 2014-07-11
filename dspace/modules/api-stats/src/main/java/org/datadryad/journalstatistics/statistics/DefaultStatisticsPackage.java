@@ -21,11 +21,11 @@ public class DefaultStatisticsPackage implements StatisticsPackage {
     private List<Statistic> statistics = new ArrayList<Statistic>();
     private Date beginDate, endDate;
     public DefaultStatisticsPackage(Context context) {
-        statistics.add(new Statistic<Integer>("Data packages count", new DataPackageCount(context)));
-        statistics.add(new Statistic<Integer>("Data files count", new DataFileCount(context)));
+        statistics.add(new Statistic<Long>("Data packages count", new DataPackageCount(context)));
+        statistics.add(new Statistic<Long>("Data files count", new DataFileCount(context)));
         statistics.add(new Statistic<Long>("Data files total size", new DataFileTotalSize(context)));
         statistics.add(new Statistic<Map<String, Integer>>("Unpublished data packages", new DataPackageUnpublishedCount(context)));
-        statistics.add(new Statistic<Integer>("Embargoed data files", new EmbargoedDataFileCount(context)));
+        statistics.add(new Statistic<Long>("Embargoed data files", new EmbargoedDataFileCount(context)));
     }
     @Override
     public void run(String journalName) {

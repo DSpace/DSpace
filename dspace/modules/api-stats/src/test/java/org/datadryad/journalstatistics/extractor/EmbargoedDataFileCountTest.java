@@ -41,13 +41,13 @@ public class EmbargoedDataFileCountTest extends ContextUnitTest {
         // Count the initial number of embargoed data files
         String journalName = "Test Journal";
         EmbargoedDataFileCount instance = new EmbargoedDataFileCount(this.context);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
         // Create a new data package, do not set an embargo, assert the count does not change
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile dataFile = DryadDataFile.create(context, dataPackage);
         dataPackage.setPublicationName(journalName);
-        Integer expResult = initialCount;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount;
+        Long result = instance.extract(journalName);
         assertEquals(expResult, result);
 
         // embargo the file and assert the count changes

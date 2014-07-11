@@ -23,12 +23,12 @@ public class DataPackageCountTest extends ContextUnitTest {
         // Count the initial number of data packages
         String journalName = "Test Journal";
         DataPackageCount instance = new DataPackageCount(this.context);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
         // Create a new data package, and assert the count goes up by one
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         dataPackage.setPublicationName(journalName);
-        Integer expResult = initialCount + 1;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount + 1;
+        Long result = instance.extract(journalName);
         assertEquals("Data package count should increase by 1", expResult, result);
     }
 }

@@ -64,13 +64,13 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
         instance.setEndDate(futureDate);
         // Assert we're filtering on dates
         assert(instance.filterOnDates);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
 
         // Create a new data package. It will have today's date as accessioned
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         dataPackage.setPublicationName(journalName);
-        Integer expResult = initialCount + 1;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount + 1;
+        Long result = instance.extract(journalName);
         assertEquals(expResult, result);
     }
 
@@ -85,13 +85,13 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
         instance.setEndDate(lastYearDate);
         // Assert we're filtering on dates
         assert(instance.filterOnDates);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
 
         // Create a new data package. It will have today's date as accessioned
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         dataPackage.setPublicationName(journalName);
-        Integer expResult = initialCount;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount;
+        Long result = instance.extract(journalName);
         assertEquals(expResult, result);
     }
 
@@ -113,14 +113,14 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setBeginDate(customDate_2008_07_25);
         instance.setEndDate(customDate_2012_03_21);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
         
         DryadDataPackage dataPackage = DryadDataPackage.create(this.context);
         dataPackage.setPublicationName(journalName);
         dataPackage.setDateAccessioned(customDate_2010_01_01);
 
-        Integer expResult = initialCount + 1;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount + 1;
+        Long result = instance.extract(journalName);
         assertEquals(expResult, result);
     }
 
@@ -133,14 +133,14 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setBeginDate(customDate_2008_07_25);
         instance.setEndDate(customDate_2010_01_01);
-        Integer initialCount = instance.extract(journalName);
+        Long initialCount = instance.extract(journalName);
 
         DryadDataPackage dataPackage = DryadDataPackage.create(this.context);
         dataPackage.setPublicationName(journalName);
         dataPackage.setDateAccessioned(customDate_2010_01_01);
 
-        Integer expResult = initialCount + 1;
-        Integer result = instance.extract(journalName);
+        Long expResult = initialCount + 1;
+        Long result = instance.extract(journalName);
         assertEquals(expResult, result);
 
         dataPackage.setDateAccessioned(customDate_2010_01_02);
