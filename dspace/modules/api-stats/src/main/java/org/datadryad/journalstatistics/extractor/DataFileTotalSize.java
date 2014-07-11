@@ -2,15 +2,10 @@
  */
 package org.datadryad.journalstatistics.extractor;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.datadryad.api.DryadObject;
 import org.dspace.core.Context;
 
 /**
@@ -18,37 +13,21 @@ import org.dspace.core.Context;
  * associated with a specified Journal
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DataFileTotalSize extends DatabaseExtractor<Long> {
-    private static Logger log = Logger.getLogger(DataItemCount.class);
+public class DataFileTotalSize extends DataFileCount {
+    private static Logger log = Logger.getLogger(DataFileTotalSize.class);
     public DataFileTotalSize(Context context) {
         super(context);
     }
 
     @Override
-    public Long extract(final String journalName) {
-        Context context = this.getContext();
-        Collection collection;
-        Long totalSize = 0L;
+    Long countValue(DryadObject dryadObject) {
+        DryadDataFile dataFile = (DryadDataFile)dryadObject;
+        Long totalSize = 0l;
         try {
-            ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
-            collection = DryadDataFile.getCollection(context);
-            while (itemsByJournal.hasNext()) {
-                Item item = itemsByJournal.next();
-                if(item.getOwningCollection().equals(collection)) {
-                    DryadDataFile dataFile = new DryadDataFile(item);
-                    if(passesDateFilter(dataFile.getDateAccessioned())) {
-                        totalSize += dataFile.getTotalStorageSize();
-                    }
-                }
-            }
-        } catch (AuthorizeException ex) {
-            log.error("AuthorizeException getting total size per journal", ex);
-        } catch (IOException ex) {
-            log.error("IOException getting total size per journal", ex);
+            totalSize = dataFile.getTotalStorageSize();
         } catch (SQLException ex) {
-            log.error("SQLException getting total size per journal", ex);
+            log.error("Error getting total size of data file", ex);
         }
         return totalSize;
     }
-
 }
