@@ -5,7 +5,9 @@ package org.datadryad.journalstatistics.extractor;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Set;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadObject;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -41,14 +43,21 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
              *
              * Note: findByMetadataField only returns items in archive
              */
+
+            // Only data packages have publicationName metadata
             ItemIterator itemsByJournal = Item.findByMetadataField(this.getContext(), JOURNAL_SCHEMA, JOURNAL_ELEMENT, JOURNAL_QUALIFIER, journalName);
+
             collection = getCollection();
             while (itemsByJournal.hasNext()) {
-                Item item = itemsByJournal.next();
-                if (item.isOwningCollection(collection)) {
-                    DryadObject dryadObject = makeDryadObject(item);
-                    if(passesDateFilter(dryadObject.getDateAccessioned())) {
-                        count++;
+                Item packageItem = itemsByJournal.next();
+                DryadDataPackage dataPackage = new DryadDataPackage(packageItem);
+                Set<DryadObject> objectsToConsider = dataPackage.getRelatedObjectsInCollection(context, collection);
+                for(DryadObject dryadObject : objectsToConsider) {
+                    Item item = dryadObject.getItem();
+                    if(item.isOwningCollection(collection)) {
+                        if(passesDateFilter(dryadObject.getDateAccessioned())) {
+                            count++;
+                        }
                     }
                 }
             }
