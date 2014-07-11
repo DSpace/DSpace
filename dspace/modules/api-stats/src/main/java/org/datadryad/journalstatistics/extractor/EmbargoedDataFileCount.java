@@ -2,15 +2,9 @@
  */
 package org.datadryad.journalstatistics.extractor;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadObject;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
 /**

@@ -4,7 +4,6 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
