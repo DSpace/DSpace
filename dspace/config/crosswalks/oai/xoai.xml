@@ -218,7 +218,7 @@
 		<Filter id="driveraccessFilter">
 			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
 			<Parameter key="field">
-				<Value>dc.accessRights</Value>
+				<Value>dc.rights.accessRights</Value>
 			</Parameter>
 			<Parameter key="operator">
 				<Value>contains</Value>
