@@ -55,7 +55,6 @@ public class DryadDataFile extends DryadObject {
             WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
             Item item = wsi.getItem();
             dataFile = new DryadDataFile(item);
-            dataFile.dataPackage = dataPackage;
             dataFile.setIsPartOf(dataPackage);
             dataFile.createIdentifier(context);
             dataPackage.setHasPart(dataFile);
@@ -115,7 +114,9 @@ public class DryadDataFile extends DryadObject {
         } catch (AuthorizeException ex) {
             log.error("Authorize exception setting file ispartof package", ex);
         }
-        this.dataPackage.clearDataFilesCache();
+        if(this.dataPackage != null) {
+            this.dataPackage.clearDataFilesCache();
+        }
         this.dataPackage = aDataPackage;
         aDataPackage.clearDataFilesCache();
     }
@@ -135,8 +136,6 @@ public class DryadDataFile extends DryadObject {
         if(dataFileIdentifier == null) {
             throw new IllegalArgumentException("Data file has no identifier");
         }
-        setIsPartOf(dataPackage);
-
         // Ensure 0 packages contain the file, then the 1 specified
         Set<DryadDataPackage> packagesContainingFile = DryadDataPackage.getPackagesContainingFile(context, this);
         if(packagesContainingFile.size() > 0) {
@@ -146,6 +145,7 @@ public class DryadDataFile extends DryadObject {
                 containingPackage.removeDataFile(context, this);
             }
         }
+        setIsPartOf(dataPackage);
         dataPackage.setHasPart(this);
     }
 
@@ -157,6 +157,11 @@ public class DryadDataFile extends DryadObject {
     void clearDataPackage(Context context) throws SQLException {
         dataPackage.clearDataFilesCache();
         clearIsPartOf();
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception clearing file ispartof", ex);
+        }
     }
 
     public boolean isEmbargoed() {
