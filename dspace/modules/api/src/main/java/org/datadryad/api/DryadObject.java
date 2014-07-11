@@ -57,6 +57,26 @@ public abstract class DryadObject {
         }
         this.item = item;
     }
+
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        }
+        if (getClass() != otherObject.getClass()) {
+            return false;
+        }
+        final DryadObject otherDryadObject = (DryadObject)otherObject;
+        return getItem().equals(otherDryadObject.getItem());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 113 * hash + (this.getItem() != null ? this.getItem().hashCode() : 0);
+        return hash;
+    }
+
     protected static Collection collectionFromHandle(Context context, String handle) throws SQLException {
         DSpaceObject object = HandleManager.resolveToObject(context, handle);
         if(object.getType() == Constants.COLLECTION) {
