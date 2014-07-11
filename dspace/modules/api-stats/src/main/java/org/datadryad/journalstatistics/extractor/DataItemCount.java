@@ -30,6 +30,10 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
     protected abstract Collection getCollection() throws SQLException;
     protected abstract DryadObject makeDryadObject(Item item);
 
+    Boolean filter(DryadObject dryadObject) {
+        return true; // True by default
+    }
+
     @Override
     public Integer extract(final String journalName) {
         Context context = this.getContext();
@@ -60,7 +64,7 @@ public abstract class DataItemCount extends DatabaseExtractor<Integer> {
                 for(DryadObject dryadObject : objectsToConsider) {
                     Item item = dryadObject.getItem();
                     if(item.isOwningCollection(collection)) {
-                        if(passesDateFilter(dryadObject.getDateAccessioned())) {
+                        if(passesDateFilter(dryadObject.getDateAccessioned()) && filter(dryadObject)) {
                             count++;
                         }
                     }
