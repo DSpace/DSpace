@@ -172,6 +172,15 @@
 				  <xsl:text>(:tba)</xsl:text>
 				</rights>
 
+				<!-- *********** Sizes *********** -->
+				<sizes>
+					<xsl:for-each select="document($mets_url)//mets:file">
+						<size>
+							<xsl:value-of select="@SIZE"/>
+							<xsl:text> bytes</xsl:text>
+						</size>
+					</xsl:for-each>
+				</sizes>
 
 
 				<!-- *********** Description - Only for data files ********* -->
