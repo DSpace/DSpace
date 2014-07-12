@@ -57,23 +57,23 @@
 			<xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 			<!-- ********** Identifiers ********** -->
 			<identifier identifierType="DOI">
-			<xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
+				<xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
 			</identifier>
 
 			<!-- ********** Creators ************* -->
 			<creators>
-			  <creator>
-				<creatorName>
-				  <xsl:text>(:tba)</xsl:text>
-				</creatorName>
-			  </creator>
+				<creator>
+					<creatorName>
+						<xsl:text>(:tba)</xsl:text>
+					</creatorName>
+				</creator>
 			</creators>
 
 			<!-- ********* Title *************** -->
 			<titles>
 				<title>
-				  <xsl:text>Dryad Item </xsl:text>
-				  <xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
+					<xsl:text>Dryad Item </xsl:text>
+					<xsl:value-of select="translate(substring-after($identifier-doi,'doi:'), $smallcase, $uppercase)"/>
 				</title>
 			</titles>
 
@@ -87,9 +87,9 @@
 
 			<!-- ************ Subjects ************** -->
 			<subjects>
-			  <subject>
-			  <xsl:text>(:tba)</xsl:text>
-			</subject>
+				<subject>
+					<xsl:text>(:tba)</xsl:text>
+				</subject>
 			</subjects>
 
 			<!-- ************ Dates - Only for Data Files ************** -->
@@ -169,7 +169,7 @@
 			<xsl:if test="$datatype='DataFile'">
 				<!-- ************ Rights *************** -->
 				<rights>
-				  <xsl:text>(:tba)</xsl:text>
+					<xsl:text>(:tba)</xsl:text>
 				</rights>
 
 				<!-- *********** Sizes *********** -->
@@ -185,9 +185,9 @@
 
 				<!-- *********** Description - Only for data files ********* -->
 				<descriptions>
-				<description descriptionType="Other">
-				  <xsl:text>(:tba)</xsl:text>
-				</description>
+					<description descriptionType="Other">
+						<xsl:text>(:tba)</xsl:text>
+					</description>
 				</descriptions>
 
 			</xsl:if>
