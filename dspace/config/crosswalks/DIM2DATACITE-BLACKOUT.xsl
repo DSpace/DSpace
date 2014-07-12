@@ -54,10 +54,6 @@
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
 
-	    <!-- ************ Publication Year ************** -->
-	    <publicationYear>
-        <xsl:text>9999</xsl:text>
-	    </publicationYear>
 			<xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 			<!-- ********** Identifiers ********** -->
 			<identifier identifierType="DOI">
@@ -84,6 +80,10 @@
 		    <!-- *********** Publisher ************ -->
 	        <publisher>Dryad Digital Repository</publisher>
 
+			<!-- ************ Publication Year ************** -->
+			<publicationYear>
+				<xsl:text>0000</xsl:text>
+			</publicationYear>
 
 			<!-- ************ Subjects ************** -->
 			<subjects>
