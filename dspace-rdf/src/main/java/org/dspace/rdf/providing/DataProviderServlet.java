@@ -47,6 +47,9 @@ public class DataProviderServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        // set all incoming encoding to UTF-8
+        request.setCharacterEncoding("UTF-8");
+
         // we expect either a path containing only the language information
         // or a path in the form /handle/<prefix>/<suffix>[/language].
         String lang = this.detectLanguage(request);
@@ -153,9 +156,9 @@ public class DataProviderServlet extends HttpServlet {
             return;
         }
         
+        response.setContentType(contentType);
         PrintWriter out = response.getWriter();
         log.debug("Set content-type to " + contentType + ".");
-        response.setContentType(contentType);
         try {
             result.write(out, lang);
         }
