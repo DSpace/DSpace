@@ -20,6 +20,7 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
     private int facetLimit = -1;
     private DiscoveryConfigurationParameters.SORT sortOrder = DiscoveryConfigurationParameters.SORT.COUNT;
     private boolean localeEnabled = false;
+    private boolean inputFormEnabled = false;
     public static final String FILTER_TYPE_FACET = "facet";
 
 
@@ -59,5 +60,13 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
 
 	public void setLocaleEnabled(boolean localeEnabled) {
 		this.localeEnabled = localeEnabled;
+	}
+
+	public boolean isInputFormEnabled() {
+		return inputFormEnabled;
+	}
+
+	public void setInputFormEnabled(boolean inputFormEnabled) {
+		this.inputFormEnabled = inputFormEnabled;
 	}
 }

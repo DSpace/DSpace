@@ -300,6 +300,7 @@
         <!-- Enable or disable multilanguage support in discovery facets (depending on the session current locale)
         	 If missing, "false" is meant by default -->
         <property name="localeEnabled" value="true"/>
+        <property name="inputFormEnabled" value="true"/>
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">

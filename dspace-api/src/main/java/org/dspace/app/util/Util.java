@@ -409,7 +409,7 @@ public class Util {
         // Replace the values of DCValue[] with the correct ones in case of
         // controlled vocabularies
         String currentField = schema + "." + element
-                + (qualifier == null ? "" : "." + qualifier);
+                + (qualifier == null || qualifier.equals("*") ? "" : "." + qualifier);
 
         if (inputSet != null)
         {
@@ -429,7 +429,7 @@ public class Util {
                         String inputField = inputs[i].getSchema()
                                 + "."
                                 + inputs[i].getElement()
-                                + (inputs[i].getQualifier() == null ? "" : "."
+                                + (inputs[i].getQualifier() == null || qualifier.equals("*") ? "" : "."
                                         + inputs[i].getQualifier());
                         if (currentField.equals(inputField))
                         {
@@ -467,6 +467,89 @@ public class Util {
         }
 
         return toReturn;
+    }
+    
+    public static String getDisplayValueForStoredValue(
+    		Item item, String value, String schema, String element,
+    		String qualifier, Locale locale) throws SQLException,
+    		DCInputsReaderException
+    		{
+    	DCInput myInputs = null;
+    	boolean myInputsFound = false;
+    	String formFileName = I18nUtil.getInputFormsFileName(locale);
+    	String col_handle = "";
+
+    	Collection collection = item.getOwningCollection();
+
+    	if (collection == null)
+    	{
+    		// set an empty handle so to get the default input set
+    		col_handle = "";
+    	}
+    	else
+    	{
+    		col_handle = collection.getHandle();
+    	}
+
+    	// Read the input form file for the specific collection
+    	DCInputsReader inputsReader = new DCInputsReader(formFileName);
+
+    	DCInputSet inputSet = inputsReader.getInputs(col_handle);
+
+    	// Replace the values of DCValue[] with the correct ones in case of
+    	// controlled vocabularies
+    	String currentField = schema + "." + element
+    			+ (qualifier == null || "*".equals(qualifier) ? "" : "." + qualifier);
+
+    	if (inputSet != null)
+    	{
+
+    		int pageNums = inputSet.getNumberPages();
+
+    		for (int p = 0; p < pageNums; p++)
+    		{
+
+    			DCInput[] inputs = inputSet.getPageRows(p, false, false);
+
+    			if (inputs != null)
+    			{
+
+    				for (int i = 0; i < inputs.length; i++)
+    				{
+    					String inputField = inputs[i].getSchema()
+    							+ "."
+    							+ inputs[i].getElement()
+    							+ (inputs[i].getQualifier() == null || "*".equals(qualifier) ? "" : "."
+    									+ inputs[i].getQualifier());
+    					if (currentField.equals(inputField))
+    					{
+
+    						myInputs = inputs[i];
+    						myInputsFound = true;
+    						break;
+
+    					}
+    				}
+    			}
+    			if (myInputsFound)
+    				break;
+    		}
+    	}
+
+    	if (myInputsFound)
+    	{
+    		String pairsName = myInputs.getPairsType();
+    		String displayVal = myInputs.getDisplayString(pairsName, value);
+
+    		if (displayVal != null && !"".equals(displayVal))
+    		{
+
+    			return displayVal;
+    		}
+
+    	}
+
+    	return value;
     }
     
     /**
