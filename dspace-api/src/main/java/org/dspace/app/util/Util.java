@@ -95,7 +95,6 @@ public class Util {
         public static String encodeBitstreamName(String stringIn, String encoding) throws java.io.UnsupportedEncodingException {
             // FIXME: This should be moved elsewhere, as it is used outside the UI
             String stringOut = java.net.URLEncoder.encode(stringIn, encoding);
-            log.debug("Encode '" + stringIn + "' -> '" + stringOut + "'");
             return stringOut;
         }
 

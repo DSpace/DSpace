@@ -155,8 +155,16 @@ public class BitstreamServlet extends DSpaceServlet
             }
         }
 
-        if (bitstream == null || filename == null
-                || !filename.equals(bitstream.getName()))
+        Boolean invalidId = bitstream == null || filename == null;
+        if (!invalidId) {
+            // take into account that bitstream is referred to via an encode url 1
+            String encoded = UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
+            invalidId = !encoded.equals(filename);
+            if (log.isDebugEnabled() && invalidId) {
+                log.debug("invalidId because  '" + encoded + "' != '" + filename);
+            }
+        }
+        if (invalidId)
         {
             // No bitstream found or filename was wrong -- ID invalid
             log.info(LogManager.getHeader(context, "invalid_id", "path="
