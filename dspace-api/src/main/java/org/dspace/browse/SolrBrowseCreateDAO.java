@@ -7,15 +7,18 @@
  */
 package org.dspace.browse;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
@@ -24,6 +27,7 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
 import org.dspace.sort.OrderFormat;
@@ -154,6 +158,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                             "discovery.browse.authority.ignore",
                                                             new Boolean(false)),
                                             true);
+                            
                             for (int x = 0; x < values.length; x++)
                             {
                                 // Ensure that there is a value to index before
@@ -283,6 +288,47 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                 distValuesForAC.add(var);
                                             }
                                         }
+                                    }
+                                    else if (bi.isValuePairIndexingEnabled()){
+                                    	Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+
+                                    	// Get the display value of the respective stored value
+                                    	for (Locale locale : supportedLocales)
+                                    	{
+                                    		for (int l=0; l<bi.getMetadataCount(); l++){
+                                    			String[] metadata = bi.getMdBits(l);
+                                    			
+                                    			String displayValue = null;
+                                    			try {
+                                    				displayValue = Util.getDisplayValueForStoredValue(item, values[x].value, metadata[0],
+                                    						metadata[1],
+                                    						metadata.length>2?metadata[2]:null, locale);
+                                    			} catch (SQLException e) {
+                                    				e.printStackTrace();
+                                    			} catch (DCInputsReaderException e) {
+                                    				e.printStackTrace();
+                                    			}
+
+                                    			if (displayValue != null)
+                                    			{
+                                    				String nVal = OrderFormat
+                                    						.makeSortString(
+                                    								displayValue,
+                                    								locale.getLanguage(),
+                                    								bi.getDataType());
+                                    				distFValues
+                                    				.add(nVal
+                                    						+ SolrServiceImpl.FILTER_SEPARATOR
+                                    						+ displayValue);
+                                    				distFValuesWithLanguage
+                                    				.put(nVal
+                                    						+ SolrServiceImpl.FILTER_SEPARATOR
+                                    						+ displayValue, locale.getLanguage());
+                                    				distFVal.add(displayValue);
+                                    				distValuesForAC.add(displayValue);
+                                    			}
+                                    		}
+                                    	}
                                     }
                                     else
                                     // put it in the browse index as if it

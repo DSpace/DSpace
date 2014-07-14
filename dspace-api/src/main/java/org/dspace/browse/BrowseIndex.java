@@ -813,4 +813,12 @@ public final class BrowseIndex
 
     	return Boolean.parseBoolean(definition);
     }
+    
+    public boolean isValuePairIndexingEnabled(){
+    	String definition = ConfigurationManager.getProperty("webui.browse.index.inputforms." + number);
+    	if (definition == null)
+    		return false;
+
+    	return Boolean.parseBoolean(definition);
+    }
 }
