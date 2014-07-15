@@ -409,7 +409,7 @@ public class Util {
         // Replace the values of DCValue[] with the correct ones in case of
         // controlled vocabularies
         String currentField = schema + "." + element
-                + (qualifier == null || qualifier.equals("*") ? "" : "." + qualifier);
+                + (qualifier == null || "*".equals(qualifier) ? "" : "." + qualifier);
 
         if (inputSet != null)
         {
@@ -429,7 +429,7 @@ public class Util {
                         String inputField = inputs[i].getSchema()
                                 + "."
                                 + inputs[i].getElement()
-                                + (inputs[i].getQualifier() == null || qualifier.equals("*") ? "" : "."
+                                + (inputs[i].getQualifier() == null || "*".equals(qualifier) ? "" : "."
                                         + inputs[i].getQualifier());
                         if (currentField.equals(inputField))
                         {
