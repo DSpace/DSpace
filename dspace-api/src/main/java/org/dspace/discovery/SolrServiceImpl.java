@@ -1186,6 +1186,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             			if (displayValue != null)
                             			{
                             				data.put(displayValue, locale.getLanguage());
+                            				
+                            				doc.addField(searchFilter.getIndexFieldName() + "_keyword", displayValue);
                             			}
                             		}
                             	}
@@ -1209,11 +1211,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	for (String myValue : data.keySet()){
                             		if (authority != null)
                             		{
-                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", value.toLowerCase() + separator + value + AUTHORITY_SEPARATOR + authority);
+                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", myValue.toLowerCase() + separator + myValue + AUTHORITY_SEPARATOR + authority);
                             		}
                             		else
                             		{
-                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", value.toLowerCase() + separator + value);
+                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", myValue.toLowerCase() + separator + myValue);
                             		}
                             	}
                             }else
