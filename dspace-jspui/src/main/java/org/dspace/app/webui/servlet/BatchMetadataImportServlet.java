@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.FileUploadRequest;
@@ -57,76 +58,129 @@ public class BatchMetadataImportServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        // First, see if we have a multipart request (uploading a metadata file)
-        String contentType = request.getContentType();     
-        if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
-        {
-        	String message = null;
-        	
-        	// Process the file uploaded
-        	try {
-        		// Wrap multipart request to get the submission info
-        		FileUploadRequest wrapper = new FileUploadRequest(request);
-        		File f = wrapper.getFile("file");
+    	
+    	int type = -1;
 
-        		int colId = Integer.parseInt(wrapper.getParameter("collection"));
-        		Collection collection = Collection.find(context, colId);
-        		
-        		String inputType = wrapper.getParameter("inputType");
-        		
-        		try {
-					ItemImport.processUploadableImport(f, new Collection[]{collection}, inputType, context);
+    	String typeS = request.getParameter("type");
+    	if (typeS != null){
+    		try {
+    			type = Integer.parseInt(typeS);
+    		} catch (NumberFormatException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+    	}
+
+    	//Get all collections
+		List<Collection> collections = null;
+		String colIdS = request.getParameter("colId");
+		if (colIdS!=null){
+			collections = new ArrayList<Collection>();
+			collections.add(Collection.find(context, Integer.parseInt(colIdS)));
+
+		}
+		else {
+			collections = Arrays.asList(Collection.findAll(context));
+		}
+
+		request.setAttribute("collections", collections);
+		
+    	if (type != 0){
+    		// First, see if we have a multipart request (uploading a metadata file)
+    		String contentType = request.getContentType();     
+    		if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
+    		{
+    			String message = null;
+
+    			// Process the file uploaded
+    			try {
+    				// Wrap multipart request to get the submission info
+    				FileUploadRequest wrapper = new FileUploadRequest(request);
+    				File f = wrapper.getFile("file");
+
+    				int colId = Integer.parseInt(wrapper.getParameter("collection"));
+    				Collection collection = Collection.find(context, colId);
+
+    				String inputType = wrapper.getParameter("inputType");
+
+    				try {
+    					ItemImport.processUploadableImport(f, new Collection[]{collection}, inputType, context);
+
+    					request.setAttribute("has-error", "false");
+
+    				} catch (Exception e) {
+    					request.setAttribute("has-error", "true");
+    					message = e.getMessage();
+    					e.printStackTrace();
+    				}
+    			} catch (FileSizeLimitExceededException e) {
+    				request.setAttribute("has-error", "true");
+    				message = e.getMessage();
+    				e.printStackTrace();
+    			} catch (Exception e) {
+    				request.setAttribute("has-error", "true");
+    				message = e.getMessage();
+    				e.printStackTrace();
+    			}
+
+    			//Get all the possible data loaders from the Spring configuration
+    			BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
+    			List<String> inputTypes =dls.getFileDataLoaders();
+
+    			request.setAttribute("input-types", inputTypes);
+
+    			request.setAttribute("message", message);
+
+    			// Show the upload screen
+    			JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
+
+    		}
+    		else
+    		{
+    			request.setAttribute("has-error", "true");
+
+    			// Show the upload screen
+    			JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
+    		}
+    	}
+    	else {
+    		request.setAttribute("type", type);
+    		
+    		String message = null;
+    		
+    		String zipurl = request.getParameter("zipurl");
+    		if (StringUtils.isEmpty(zipurl)) {
+    			request.setAttribute("has-error", "true");
+    		}
+    		else {
+    			
+    			Collection owningCollection = null;
+    			if (request.getParameter("collection") != null) {
+    				int colId = Integer.parseInt(request.getParameter("collection"));
+    				if (colId > 0)
+    					owningCollection = Collection.find(context, colId);
+    			}
+				
+				//request.getParameter("collections")
+    			Collection[] otherCollections = new Collection[0];
+				
+				try {
+					
+					ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
 					
 					request.setAttribute("has-error", "false");
 					
 				} catch (Exception e) {
 					request.setAttribute("has-error", "true");
-					message = e.getMessage();
-					e.printStackTrace();
+    				message = e.getMessage();
+    				e.printStackTrace();
 				}
-        	} catch (FileSizeLimitExceededException e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	} catch (Exception e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	}
-        	
-        	//Get all the possible data loaders from the Spring configuration
-        	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-        	List<String> inputTypes =dls.getFileDataLoaders();
-        	
-        	request.setAttribute("input-types", inputTypes);
-        	
-        	//Get all collections
-        	List<Collection> collections = null;
-        	String colIdS = request.getParameter("colId");
-        	if (colIdS!=null){
-        		collections = new ArrayList<Collection>();
-        		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
-        		
-        	}
-        	else {
-        		collections = Arrays.asList(Collection.findAll(context));
-        	}
-        	
-        	request.setAttribute("collections", collections);
-        	
-        	request.setAttribute("message", message);
-        	
-        	// Show the upload screen
-    		JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
-
-        }
-        else
-        {
-        	request.setAttribute("has-error", "true");
-        	
-            // Show the upload screen
-            JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
-        }
+    		}
+    		
+    		request.setAttribute("message", message);
+    		
+    		JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
+    	}
     }
     
     /**
@@ -148,27 +202,47 @@ public class BatchMetadataImportServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	//Get all the possible data loaders from the Spring configuration
-    	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-    	List<String> inputTypes = dls.getFileDataLoaders();
-    	request.setAttribute("input-types", inputTypes);
+    	
+    	String typeS = request.getParameter("type");
+    	
+    	int type = -1;
+    	try {
+			type = Integer.parseInt(typeS);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	request.setAttribute("type", type);
     	
     	//Get all collections
-    	List<Collection> collections = null;
-    	String colIdS = request.getParameter("colId");
-    	if (colIdS!=null){
-    		collections = new ArrayList<Collection>();
-    		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
+		List<Collection> collections = null;
+		String colIdS = request.getParameter("colId");
+		if (colIdS!=null){
+			collections = new ArrayList<Collection>();
+			collections.add(Collection.find(context, Integer.parseInt(colIdS)));
+
+		}
+		else {
+			collections = Arrays.asList(Collection.findAll(context));
+		}
+
+		request.setAttribute("collections", collections);
+		
+    	if (type==0){
+    		// Show the upload screen
     		
+    		JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
     	}
     	else {
-    		collections = Arrays.asList(Collection.findAll(context));
+    		//Get all the possible data loaders from the Spring configuration
+    		BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
+    		List<String> inputTypes = dls.getFileDataLoaders();
+    		request.setAttribute("input-types", inputTypes);
+
+    		// Show the upload screen
+    		JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
     	}
-    	
-    	request.setAttribute("collections", collections);
-    	
-        // Show the upload screen
-        JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
     }
 
 }
