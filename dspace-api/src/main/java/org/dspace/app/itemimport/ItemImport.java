@@ -738,6 +738,11 @@ public class ItemImport
 
         // create the mapfile
         File outFile = null;
+        boolean directoryFileCollections = false;
+        if (mycollections == null)
+        {
+            directoryFileCollections = true;
+        }
 
         if (!isTest)
         {
@@ -778,7 +783,8 @@ public class ItemImport
             }
             else
             {
-                if (mycollections == null) {
+                Collection [] clist;
+                if (directoryFileCollections) {
                     String path = sourceDir + File.separatorChar + dircontents[i];
                     try {
                         Collection[] cols = processCollectionFile(c, path, "collections");
@@ -786,7 +792,7 @@ public class ItemImport
                             System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
                             continue;
                         }
-                        mycollections = cols;
+                        clist = cols;
                     }
                     catch (IllegalArgumentException e)
                     {
@@ -794,8 +800,12 @@ public class ItemImport
                         continue;
                     }
                 }
+                else
+                {
+                    clist = mycollections;
+                }
 
-                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
+                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }
