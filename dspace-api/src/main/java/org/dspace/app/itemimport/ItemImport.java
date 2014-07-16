@@ -780,13 +780,19 @@ public class ItemImport
             {
                 if (mycollections == null) {
                     String path = sourceDir + File.separatorChar + dircontents[i];
-                    Collection [] cols = processCollectionFile(c, path, "collections");
-                    if (cols == null) {
-                        System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                    try {
+                        Collection[] cols = processCollectionFile(c, path, "collections");
+                        if (cols == null) {
+                            System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                            continue;
+                        }
+                        mycollections = cols;
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.out.println(e.getMessage() + " Skipping." );
                         continue;
                     }
-
-                    mycollections = cols;
                 }
 
                 addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
@@ -1221,7 +1227,8 @@ public class ItemImport
      * @return
      */
 
-    private Collection[] processCollectionFile(Context c, String path, String filename) throws IOException, SQLException {
+    private Collection[] processCollectionFile(Context c, String path, String filename) throws IOException, SQLException
+    {
         File file = new File(path + File.separatorChar + filename);
         ArrayList<Collection> collections = new ArrayList<Collection>();
         Collection[] result = null;
@@ -1251,7 +1258,7 @@ public class ItemImport
                     }
 
                     if (obj == null) {
-                        throw new IllegalArgumentException("Cannot resolve " + line + " to a collection");
+                        throw new IllegalArgumentException("Cannot resolve " + line + " to a collection.");
                     }
                     collections.add((Collection)obj);
 
