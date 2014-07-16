@@ -16,6 +16,7 @@ import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -2177,6 +2178,175 @@ public class ItemImport
         }
     }
 
+	/**
+	 * Given an uploaded file, this method calls the method to instantiate a BTE instance to
+	 * transform the input data and batch import them to DSpace
+	 * @param file The input file to read data from
+	 * @param collections The collections the created items will be inserted to
+	 * @param bteInputType The input type of the data (bibtex, csv, etc.)
+	 * @param context The context
+	 * @throws Exception
+	 */
+	public static void processUploadableImport(String url, Collection owningCollection, Collection[] collections, Context context) throws Exception
+	{
+		final EPerson eperson = context.getCurrentUser();
+		final Collection[] otherCollections = collections;
+		final Collection theOwningCollection = owningCollection;
+		final String zipurl = url;
+
+		/*Thread go = new Thread()
+		{
+			public void run()
+			{
+				Context context = null;
+*/
+				try {
+					
+					// create a new dspace context
+//					context = new Context();
+//					context.setCurrentUser(eperson);
+//					context.setIgnoreAuthorization(true);
+					
+					InputStream is = new URL(zipurl).openStream();
+
+					String importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (new GregorianCalendar()).getTimeInMillis();
+					File importDirFile = new File(importDir);
+					if (!importDirFile.exists()){
+						boolean success = importDirFile.mkdirs();
+						if (!success) {
+							log.info("Cannot create batch import directory!");
+							throw new Exception("Cannot create batch import directory!");
+						}
+					}
+
+					String dataZipPath = importDirFile + File.separator + "data.zip";
+					
+					OutputStream os = new FileOutputStream(dataZipPath);
+
+					byte[] b = new byte[2048];
+					int length;
+
+					while ((length = is.read(b)) != -1) {
+						os.write(b, 0, length);
+					}
+
+					is.close();
+					os.close();
+
+					
+					String mapFilePath = importDirFile + File.separator + "mapfile";
+					
+					context.complete();
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					try {
+						throw new Exception(e.getMessage());
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+//			}
+
+//		};
+
+//		go.isDaemon();
+//		go.start();
+		// if the file exists
+		/*if (file.exists())
+        {
+            Thread go = new Thread()
+            {
+                public void run()
+                {
+                    Context context = null;
+                    ItemIterator iitems = null;
+                    try
+                    {
+                        // create a new dspace context
+                        context = new Context();
+                        context.setCurrentUser(eperson);
+                        context.setIgnoreAuthorization(true);
+
+                        File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
+                        if (!importDir.exists()){
+                        	boolean success = importDir.mkdir();
+                        	if (!success) {
+                        		log.info("Cannot create batch import directory!");
+                        		throw new Exception();
+                        	}
+                        }
+                        //Generate a random filename for the subdirectory of the specific import in case
+                        //more that one batch imports take place at the same time
+                        String subDirName = generateRandomFilename(false);
+                        String workingDir = importDir.getAbsolutePath() + File.separator + subDirName;
+
+                        //Create the import working directory
+                        boolean success = (new File(workingDir)).mkdir();
+                    	if (!success) {
+                    		log.info("Cannot create batch import working directory!");
+                    		throw new Exception();
+                    	}
+
+                        //Create random mapfile;
+                        String mapfile = workingDir + File.separator+ "mapfile";
+
+                        ItemImport myloader = new ItemImport();
+                        myloader.addBTEItems(context, mycollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, workingDir);
+
+                        // email message letting user know the file is ready for
+                        // download
+                        emailSuccessMessage(context, eperson, mapfile);
+
+                        // return to enforcing auths
+                        context.setIgnoreAuthorization(false);
+                    }
+                    catch (Exception e1)
+                    {
+                        try
+                        {
+                            emailErrorMessage(eperson, e1.getMessage());
+                        }
+                        catch (Exception e)
+                        {
+                            // wont throw here
+                        }
+                        throw new IllegalStateException(e1);
+                    }
+                    finally
+                    {
+                        if (iitems != null)
+                        {
+                            iitems.close();
+                        }
+
+                        // close the mapfile writer
+                        if (mapOut != null)
+                        {
+                            mapOut.close();
+                        }
+
+                        // Make sure the database connection gets closed in all conditions.
+                    	try {
+							context.complete();
+						} catch (SQLException sqle) {
+							context.abort();
+						}
+                    }
+                }
+
+            };
+
+            go.isDaemon();
+            go.start();
+        }
+        else {
+        	log.error("Unable to find the uploadable file");
+        }*/
+	}
+	
     /**
      * Since the BTE batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplish this
