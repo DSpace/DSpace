@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.lang3.StringUtils;
@@ -161,12 +162,41 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     					owningCollection = Collection.find(context, colId);
     			}
 				
-				//request.getParameter("collections")
-    			Collection[] otherCollections = new Collection[0];
+    			String[] reqCollections = request.getParameterValues("collections");
+				
+    			if (owningCollection==null && reqCollections.length > 0){
+    				request.setAttribute("has-error", "true");
+    				
+    				Locale locale = request.getLocale();
+    		        ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
+    		        String ms = msgs.getString("jsp.layout.navbar-admin.batchimport.owningcollection");
+    		        if (ms == null){
+    		        	ms = "???jsp.layout.navbar-admin.batchimport.owningcollection???";
+    		        }
+    				request.setAttribute("message", ms);
+        		
+    				JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
+    				
+    				return;
+    			}
+    			
+    			List<Collection> collectionList = new ArrayList<Collection>();
+    			if (reqCollections != null){
+    				for (String colID : reqCollections){
+    					int colId = Integer.parseInt(colID);
+    					if (colId != owningCollection.getID()){
+    						Collection col = Collection.find(context, colId);
+    						if (col != null){
+    							collectionList.add(col);
+    						}
+    					}
+    				}
+    			}
+    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
 				
 				try {
 					
-					ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
+				ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
 					
 					request.setAttribute("has-error", "false");
 					
