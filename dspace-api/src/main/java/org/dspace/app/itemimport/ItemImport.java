@@ -2336,6 +2336,22 @@ public class ItemImport
                         // wont throw here
                     }
 				}
+				
+				finally
+                {
+                    // close the mapfile writer
+                    if (mapOut != null)
+                    {
+                        mapOut.close();
+                    }
+
+                    // Make sure the database connection gets closed in all conditions.
+                	try {
+						context.complete();
+					} catch (SQLException sqle) {
+						context.abort();
+					}
+                }
 /*			}
 
 		};
