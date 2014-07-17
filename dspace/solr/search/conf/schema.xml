@@ -544,6 +544,7 @@
 
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
+    <copyField source="fulltext" dest="fulltext_hl" />
 
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
