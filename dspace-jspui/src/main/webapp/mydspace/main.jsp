@@ -42,6 +42,7 @@
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="java.util.List" %>
+<%@page import="org.dspace.app.itemimport.BatchUpload"%>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -65,6 +66,8 @@
         (SupervisedItem[]) request.getAttribute("supervised.items");
     
     List<String> exportsAvailable = (List<String>)request.getAttribute("export.archives");
+    
+    List<BatchUpload> importsAvailable = (List<BatchUpload>)request.getAttribute("import.uploads");
     
     // Is the logged in user an admin
     Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
@@ -399,6 +402,16 @@
 		<% } %>
 	</ol>
 	<%} %>
+	
+	<%if(importsAvailable!=null && importsAvailable.size()>0){ %>
+	<h3><fmt:message key="jsp.mydspace.main.heading8"/></h3>
+	<ol class="exportArchives">
+		<%for(BatchUpload batchUpload : importsAvailable){%>
+			<li><%= batchUpload.getDateFormatted() + " --- " + (batchUpload.isSuccessful()?"Success":"Unsuccess") %></li> 
+		<% } %>
+	</ol>
+	<%} %>
+	
 	</div>
 </div>	
 </dspace:layout>

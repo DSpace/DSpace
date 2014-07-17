@@ -20,6 +20,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
+import org.dspace.app.itemimport.BatchUpload;
+import org.dspace.app.itemimport.ItemImport;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.webui.util.UIUtil;
@@ -728,6 +730,15 @@ public class MyDSpaceServlet extends DSpaceServlet
 			// nothing to do they just have no export archives available for download
 		}
         
+        // imports available for view
+        List<BatchUpload> importUploads = null;
+        try{
+        	importUploads = ItemImport.getImportsAvailable(currentUser);
+        }
+        catch (Exception e) {
+			// nothing to do they just have no export archives available for download
+		}
+        
         
         // Set attributes
         request.setAttribute("mydspace.user", currentUser);
@@ -739,6 +750,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
+        request.setAttribute("import.uploads", importUploads);
 
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");

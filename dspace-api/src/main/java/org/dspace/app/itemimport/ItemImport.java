@@ -2323,9 +2323,7 @@ public class ItemImport
 	                
 					//Delete file
 					if (importDir != null){
-						FileDeleteStrategy.FORCE.delete(new File(importDir));
-						boolean success = (new File(importDir)).delete();
-						System.out.println();
+						//FileDeleteStrategy.FORCE.delete(new File(importDir));
 					}
 					
 					try
@@ -2408,5 +2406,50 @@ public class ItemImport
         {
             log.warn("error during item export error notification", e);
         }
+    }
+    
+    
+    public static List<BatchUpload> getImportsAvailable(EPerson eperson)
+            throws Exception
+    {
+        File uploadDir = new File(getImportUploadableDirectory(eperson.getID()));
+        if (!uploadDir.exists() || !uploadDir.isDirectory())
+        {
+            return null;
+        }
+
+        List<BatchUpload> fileNames = new ArrayList<BatchUpload>();
+
+        for (String fileName : uploadDir.list())
+        {
+            File file = new File(uploadDir + File.separator + fileName);
+            if (file.isDirectory()){
+            	
+            	BatchUpload upload = new BatchUpload(file);
+            	
+            	fileNames.add(upload);
+            }
+        }
+
+        if (fileNames.size() > 0)
+        {
+            return fileNames;
+        }
+
+        return null;
+    }
+    
+    public static String getImportUploadableDirectory(int ePersonID)
+            throws Exception
+    {
+        String uploadDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+        if (uploadDir == null)
+        {
+            throw new Exception(
+                    "A dspace.cfg entry for 'org.dspace.app.batchitemimport.work.dir' does not exist.");
+        }
+
+        return uploadDir + File.separator + "batchuploads" + File.separator + ePersonID;
+
     }
 }
