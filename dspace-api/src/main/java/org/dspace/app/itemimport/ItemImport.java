@@ -34,6 +34,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -804,7 +805,8 @@ public class ItemImport
                     clist = mycollections;
                 }
 
-                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
+				addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
+				
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }
@@ -2194,22 +2196,24 @@ public class ItemImport
 		final Collection theOwningCollection = owningCollection;
 		final String zipurl = url;
 
-		/*Thread go = new Thread()
+/*		Thread go = new Thread()
 		{
 			public void run()
 			{
 				Context context = null;
 */
+				String importDir = null;
+				
 				try {
 					
 					// create a new dspace context
-//					context = new Context();
-//					context.setCurrentUser(eperson);
-//					context.setIgnoreAuthorization(true);
+	//				context = new Context();
+	//				context.setCurrentUser(eperson);
+	//				context.setIgnoreAuthorization(true);
 					
 					InputStream is = new URL(zipurl).openStream();
 
-					String importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (new GregorianCalendar()).getTimeInMillis();
+					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (new GregorianCalendar()).getTimeInMillis();
 					File importDirFile = new File(importDir);
 					if (!importDirFile.exists()){
 						boolean success = importDirFile.mkdirs();
@@ -2220,6 +2224,7 @@ public class ItemImport
 					}
 
 					String dataZipPath = importDirFile + File.separator + "data.zip";
+					String dataZipDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					
 					OutputStream os = new FileOutputStream(dataZipPath);
 
@@ -2232,119 +2237,113 @@ public class ItemImport
 
 					is.close();
 					os.close();
-
 					
+					
+					
+					ZipFile zf = new ZipFile(dataZipPath);
+                    ZipEntry entry;
+                    Enumeration<? extends ZipEntry> entries = zf.entries();
+                    while (entries.hasMoreElements())
+                    {
+                        entry = entries.nextElement();
+                        if (entry.isDirectory())
+                        {
+                            if (!new File(dataZipDir + entry.getName()).mkdir())
+                            {
+                                log.error("Unable to create contents directory");
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("Extracting file: " + entry.getName());
+                            int index = entry.getName().lastIndexOf('/');
+                            if (index == -1)
+                            {
+                                // Was it created on Windows instead?
+                                index = entry.getName().lastIndexOf('\\');
+                            }
+                            if (index > 0)
+                            {
+                                File dir = new File(dataZipDir + entry.getName().substring(0, index));
+                                if (!dir.mkdirs())
+                                {
+                                    log.error("Unable to create directory");
+                                }
+                            }
+                            byte[] buffer = new byte[1024];
+                            int len;
+                            InputStream in = zf.getInputStream(entry);
+                            BufferedOutputStream out = new BufferedOutputStream(
+                                new FileOutputStream(dataZipDir + entry.getName()));
+                            while((len = in.read(buffer)) >= 0)
+                            {
+                                out.write(buffer, 0, len);
+                            }
+                            in.close();
+                            out.close();
+                        }
+                    }
+                    zf.close();
+                    
+					
+					String sourcePath = dataZipDir;
 					String mapFilePath = importDirFile + File.separator + "mapfile";
 					
+					
+					ItemImport myloader = new ItemImport();
+					
+					Collection[] finalCollections = null;
+					if (theOwningCollection != null){
+						finalCollections = new Collection[otherCollections.length + 1];
+						finalCollections[0] = theOwningCollection;
+						for (int i=0; i<otherCollections.length; i++){
+							finalCollections[i+1] = otherCollections[i];
+						}
+					}
+					
+					myloader.addItems(context, finalCollections, sourcePath, mapFilePath, template);
+					
+					// email message letting user know the file is ready for
+                    // download
+                    emailSuccessMessage(context, eperson, mapFilePath);
+                    
 					context.complete();
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					try {
-						throw new Exception(e.getMessage());
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					
+					// abort all operations
+	                if (mapOut != null)
+	                {
+	                    mapOut.close();
+	                }
+
+	                mapOut = null;
+	                
+					//Delete file
+					if (importDir != null){
+						FileDeleteStrategy.FORCE.delete(new File(importDir));
+						boolean success = (new File(importDir)).delete();
+						System.out.println();
 					}
+					
+					try
+                    {
+                        emailErrorMessage(eperson, e.getMessage());
+                        throw new Exception(e.getMessage());
+                    }
+                    catch (Exception e2)
+                    {
+                        // wont throw here
+                    }
 				}
-//			}
+/*			}
 
-//		};
+		};
 
-//		go.isDaemon();
-//		go.start();
-		// if the file exists
-		/*if (file.exists())
-        {
-            Thread go = new Thread()
-            {
-                public void run()
-                {
-                    Context context = null;
-                    ItemIterator iitems = null;
-                    try
-                    {
-                        // create a new dspace context
-                        context = new Context();
-                        context.setCurrentUser(eperson);
-                        context.setIgnoreAuthorization(true);
-
-                        File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
-                        if (!importDir.exists()){
-                        	boolean success = importDir.mkdir();
-                        	if (!success) {
-                        		log.info("Cannot create batch import directory!");
-                        		throw new Exception();
-                        	}
-                        }
-                        //Generate a random filename for the subdirectory of the specific import in case
-                        //more that one batch imports take place at the same time
-                        String subDirName = generateRandomFilename(false);
-                        String workingDir = importDir.getAbsolutePath() + File.separator + subDirName;
-
-                        //Create the import working directory
-                        boolean success = (new File(workingDir)).mkdir();
-                    	if (!success) {
-                    		log.info("Cannot create batch import working directory!");
-                    		throw new Exception();
-                    	}
-
-                        //Create random mapfile;
-                        String mapfile = workingDir + File.separator+ "mapfile";
-
-                        ItemImport myloader = new ItemImport();
-                        myloader.addBTEItems(context, mycollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, workingDir);
-
-                        // email message letting user know the file is ready for
-                        // download
-                        emailSuccessMessage(context, eperson, mapfile);
-
-                        // return to enforcing auths
-                        context.setIgnoreAuthorization(false);
-                    }
-                    catch (Exception e1)
-                    {
-                        try
-                        {
-                            emailErrorMessage(eperson, e1.getMessage());
-                        }
-                        catch (Exception e)
-                        {
-                            // wont throw here
-                        }
-                        throw new IllegalStateException(e1);
-                    }
-                    finally
-                    {
-                        if (iitems != null)
-                        {
-                            iitems.close();
-                        }
-
-                        // close the mapfile writer
-                        if (mapOut != null)
-                        {
-                            mapOut.close();
-                        }
-
-                        // Make sure the database connection gets closed in all conditions.
-                    	try {
-							context.complete();
-						} catch (SQLException sqle) {
-							context.abort();
-						}
-                    }
-                }
-
-            };
-
-            go.isDaemon();
-            go.start();
-        }
-        else {
-        	log.error("Unable to find the uploadable file");
-        }*/
+		go.isDaemon();
+		go.start();*/
 	}
 	
     /**
