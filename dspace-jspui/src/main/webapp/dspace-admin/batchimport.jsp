@@ -24,7 +24,9 @@
 
 	List<Collection> collections = (List<Collection>)request.getAttribute("collections");
 	String hasErrorS = (String)request.getAttribute("has-error");
-	boolean hasError = (hasErrorS==null) ? true : (Boolean.parseBoolean((String)request.getAttribute("has-error")));
+	boolean hasError = (hasErrorS==null) ? false : (Boolean.parseBoolean((String)request.getAttribute("has-error")));
+	
+	String uploadId = (String)request.getAttribute("uploadId");
 	
     String message = (String)request.getAttribute("message");
     
@@ -63,9 +65,13 @@
 	}
 %>
 
-    <form method="post" action="">
+    <form method="post" action="<%= request.getContextPath() %>/dspace-admin/batchmetadataimport">
 	
 		<input type="hidden" name=type value="<%= type %>"/>
+		
+		<% if (uploadId != null) { %>
+		<input type="hidden" name=uploadid value="<%= uploadId %>"/>
+		<% } %>
 		
 		<div class="form-group">
 			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selecturl"/></label><br/>
