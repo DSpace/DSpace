@@ -2189,10 +2189,10 @@ public class ItemImport
 	 * @param context The context
 	 * @throws Exception
 	 */
-	public static void processUploadableImport(String url, Collection owningCollection, Collection[] collections, Context context) throws Exception
+	public static void processUploadableImport(String url, Collection owningCollection, String[] collections, Context context2) throws Exception
 	{
-		final EPerson eperson = context.getCurrentUser();
-		final Collection[] otherCollections = collections;
+		final EPerson eperson = context2.getCurrentUser();
+		final String[] otherCollections2 = collections;
 		final Collection theOwningCollection = owningCollection;
 		final String zipurl = url;
 
@@ -2204,6 +2204,7 @@ public class ItemImport
 
 				String importDir = null;
 				
+				
 				try {
 					
 					// create a new dspace context
@@ -2211,6 +2212,20 @@ public class ItemImport
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
 					
+					List<Collection> collectionList = new ArrayList<Collection>();
+	    			if (otherCollections2 != null){
+	    				for (String colID : otherCollections2){
+	    					int colId = Integer.parseInt(colID);
+	    					if (colId != theOwningCollection.getID()){
+	    						Collection col = Collection.find(context, colId);
+	    						if (col != null){
+	    							collectionList.add(col);
+	    						}
+	    					}
+	    				}
+	    			}
+	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
+	    			
 					InputStream is = new URL(zipurl).openStream();
 
 					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (new GregorianCalendar()).getTimeInMillis();
@@ -2291,6 +2306,7 @@ public class ItemImport
 					
 					
 					ItemImport myloader = new ItemImport();
+					myloader.isResume = false;
 					
 					Collection[] finalCollections = null;
 					if (theOwningCollection != null){
@@ -2307,7 +2323,6 @@ public class ItemImport
                     // download
                     emailSuccessMessage(context, eperson, mapFilePath);
                     
-					context.complete();
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -2360,10 +2375,10 @@ public class ItemImport
 		go.start();
 	}
 	
-	public static void processResumableImport(String url, Collection owningCollection, Collection[] collections, String resumeDir, Context context) throws Exception
+	public static void processResumableImport(String url, Collection owningCollection, String[] collections, String resumeDir, Context context) throws Exception
 	{
 		final EPerson eperson = context.getCurrentUser();
-		final Collection[] otherCollections = collections;
+		final String[] otherCollections2 = collections;
 		final Collection theOwningCollection = owningCollection;
 		final String zipurl = url;
 		final String resumePath = resumeDir;
@@ -2383,6 +2398,20 @@ public class ItemImport
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
 					
+					List<Collection> collectionList = new ArrayList<Collection>();
+	    			if (otherCollections2 != null){
+	    				for (String colID : otherCollections2){
+	    					int colId = Integer.parseInt(colID);
+	    					if (colId != theOwningCollection.getID()){
+	    						Collection col = Collection.find(context, colId);
+	    						if (col != null){
+	    							collectionList.add(col);
+	    						}
+	    					}
+	    				}
+	    			}
+	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
+	    			
 					InputStream is = new URL(zipurl).openStream();
 
 					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + resumePath;

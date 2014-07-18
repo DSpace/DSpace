@@ -185,28 +185,13 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     				return;
     			}
     			
-    			List<Collection> collectionList = new ArrayList<Collection>();
-    			if (reqCollections != null){
-    				for (String colID : reqCollections){
-    					int colId = Integer.parseInt(colID);
-    					if (colId != owningCollection.getID()){
-    						Collection col = Collection.find(context, colId);
-    						if (col != null){
-    							collectionList.add(col);
-    						}
-    					}
-    				}
-    			}
-    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
-				
-				try {
-					
+    			try {
 					//Decide if it is a new upload or a resume one!
 					if (uploadId != null){ //resume upload
-						ItemImport.processResumableImport(zipurl, owningCollection, otherCollections, uploadId, context);
+						ItemImport.processResumableImport(zipurl, owningCollection, reqCollections, uploadId, context);
 					}
 					else { //New upload
-						ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
+						ItemImport.processUploadableImport(zipurl, owningCollection, reqCollections, context);
 					}
 					
 					request.setAttribute("has-error", "false");
