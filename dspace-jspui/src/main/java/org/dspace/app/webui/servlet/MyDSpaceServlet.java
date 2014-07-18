@@ -7,12 +7,18 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -75,6 +81,9 @@ public class MyDSpaceServlet extends DSpaceServlet
     /** The "request export migrate archive for download" page */
     public static final int REQUEST_MIGRATE_ARCHIVE = 6;
 
+    public static final int REQUEST_BATCH_IMPORT_ACTION = 7;
+    
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -126,6 +135,11 @@ public class MyDSpaceServlet extends DSpaceServlet
 
             break;
 
+        case REQUEST_BATCH_IMPORT_ACTION:
+            processBatchImportAction(context, request, response);
+
+            break;
+            
         default:
             log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
                     .getRequestLogInfo(request)));
@@ -676,6 +690,81 @@ public class MyDSpaceServlet extends DSpaceServlet
     	
     	
     }
+    
+    private void processBatchImportAction(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+    	String buttonPressed = UIUtil.getSubmitButton(request, "submit_mapfile");
+
+    	String uploadId = request.getParameter("uploadid");
+    	
+    	if (buttonPressed.equals("submit_mapfile")){
+    		
+    		String mapFilePath = null;
+    		try {
+    			mapFilePath = ItemImport.getImportUploadableDirectory(context.getCurrentUser().getID()) + File.separator + uploadId + File.separator + "mapfile";
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
+				showMainPage(context, request, response);
+				return;
+			}
+    		
+    		File file = new File(mapFilePath);
+    		int length   = 0;
+    		ServletOutputStream outStream = response.getOutputStream();
+    		String mimetype ="application/octet-stream";
+    		
+    		response.setContentType(mimetype);
+    		response.setContentLength((int)file.length());
+    		String fileName = file.getName();
+
+    		// sets HTTP header
+    		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+    		byte[] byteBuffer = new byte[1024];
+    		DataInputStream in = new DataInputStream(new FileInputStream(file));
+
+    		// reads the file's bytes and writes them to the response stream
+    		while ((in != null) && ((length = in.read(byteBuffer)) != -1))
+    		{
+    			outStream.write(byteBuffer,0,length);
+    		}
+
+    		in.close();
+    		outStream.close();
+    	}
+    	else if (buttonPressed.equals("submit_delete")){
+    		ItemImport itemImport = new ItemImport();
+    		try {
+				itemImport.deleteButchUpload(context, uploadId);
+				showMainPage(context, request, response);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	else if (buttonPressed.equals("submit_resume")){
+    		// Set attributes
+            request.setAttribute("uploadId", uploadId);
+            request.setAttribute("type", 0);
+        	
+        	//Get all collections
+    		List<Collection> collections = Arrays.asList(Collection.findAll(context));
+    		request.setAttribute("collections", collections);
+
+            // Forward to main mydspace page
+            JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
+    	}
+    	else {
+    		showMainPage(context, request, response);
+    	}
+    }
+    
+    
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR SHOWING FORMS
