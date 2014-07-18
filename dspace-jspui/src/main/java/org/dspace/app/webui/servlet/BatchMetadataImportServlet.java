@@ -149,6 +149,11 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     		
     		String message = null;
     		
+    		String uploadId = request.getParameter("uploadid");
+    		if (uploadId != null){
+    			request.setAttribute("uploadid", uploadId);
+    		}
+    		
     		String zipurl = request.getParameter("zipurl");
     		if (StringUtils.isEmpty(zipurl)) {
     			request.setAttribute("has-error", "true");
@@ -196,14 +201,22 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 				
 				try {
 					
-				ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
+					//Decide if it is a new upload or a resume one!
+					if (uploadId != null){ //resume upload
+						ItemImport.processResumableImport(zipurl, owningCollection, otherCollections, uploadId, context);
+					}
+					else { //New upload
+						ItemImport.processUploadableImport(zipurl, owningCollection, otherCollections, context);
+					}
 					
 					request.setAttribute("has-error", "false");
+					
 					
 				} catch (Exception e) {
 					request.setAttribute("has-error", "true");
     				message = e.getMessage();
     				e.printStackTrace();
+    				
 				}
     		}
     		
