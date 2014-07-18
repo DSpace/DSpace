@@ -20,4 +20,6 @@ Instructions for installing in UMD Libraries development environments (Mac OS X)
 
 ### Features
 
-* [Features](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to base DSpace functionality
+* [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to base DSpace functionality
+* [DrumFeaturesandCode](dspace/docs/DrumFeaturesandCode.md) - DRUM enhancements with implementation details
+* [docs](dspace/docs) - additional documentation
