@@ -41,6 +41,14 @@
            (NOTE: individual POMs can override specific settings). -->
       <pluginManagement>
           <plugins>
+	      <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+        	  <artifactId>maven-javadoc-plugin</artifactId>
+        	  <configuration>
+          	     <minmemory>128m</minmemory>
+          	     <maxmemory>1g</maxmemory>
+        	  </configuration>
+      	      </plugin>
               <plugin>
                   <artifactId>maven-compiler-plugin</artifactId>
                   <version>2.3.2</version>
