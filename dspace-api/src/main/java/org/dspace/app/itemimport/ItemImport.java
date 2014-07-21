@@ -515,6 +515,7 @@ public class ItemImport
                 // If this is a zip archive, unzip it first
                 if (zip)
                 {
+                    String sourceDirForZip = sourcedir;
                     ZipFile zf = new ZipFile(zipfilename);
                     ZipEntry entry;
                     Enumeration<? extends ZipEntry> entries = zf.entries();
@@ -544,6 +545,17 @@ public class ItemImport
                                 {
                                     log.error("Unable to create directory");
                                 }
+
+                                //Entries could have too many directories, and we need to adjust the sourcedir
+                                //regex supports either windows or *nix file paths
+                                String[] entryChunks = entry.getName().split("/|\\\\");
+                                if(entryChunks.length > 1) {
+                                    if(sourceDirForZip == sourcedir) {
+                                        sourceDirForZip += "/" + entryChunks[0];
+                                    }
+                                }
+
+
                             }
                             byte[] buffer = new byte[1024];
                             int len;
@@ -557,6 +569,11 @@ public class ItemImport
                             in.close();
                             out.close();
                         }
+                    }
+
+                    if(sourceDirForZip != sourcedir) {
+                        sourcedir = sourceDirForZip;
+                        System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
                     }
                 }
 
