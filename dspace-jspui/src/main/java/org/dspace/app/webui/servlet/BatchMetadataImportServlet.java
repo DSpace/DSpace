@@ -59,7 +59,7 @@ public class BatchMetadataImportServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	
+
     	int type = -1;
 
     	String typeS = request.getParameter("type");
@@ -85,10 +85,10 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 		}
 
 		request.setAttribute("collections", collections);
-		
+
     	if (type != 0){
     		// First, see if we have a multipart request (uploading a metadata file)
-    		String contentType = request.getContentType();     
+    		String contentType = request.getContentType();
     		if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
     		{
     			String message = null;
@@ -146,32 +146,32 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     	}
     	else {
     		request.setAttribute("type", type);
-    		
+
     		String message = null;
-    		
+
     		String uploadId = request.getParameter("uploadid");
     		if (uploadId != null){
     			request.setAttribute("uploadid", uploadId);
     		}
-    		
+
     		String zipurl = request.getParameter("zipurl");
     		if (StringUtils.isEmpty(zipurl)) {
     			request.setAttribute("has-error", "true");
     		}
     		else {
-    			
+
     			Collection owningCollection = null;
     			if (request.getParameter("collection") != null) {
     				int colId = Integer.parseInt(request.getParameter("collection"));
     				if (colId > 0)
     					owningCollection = Collection.find(context, colId);
     			}
-				
+
     			String[] reqCollections = request.getParameterValues("collections");
-				
-    			if (owningCollection==null && reqCollections.length > 0){
+
+    			if (owningCollection==null && reqCollections != null && reqCollections.length > 0){
     				request.setAttribute("has-error", "true");
-    				
+
     				Locale locale = request.getLocale();
     		        ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
     		        String ms = msgs.getString("jsp.layout.navbar-admin.batchimport.owningcollection");
@@ -179,12 +179,12 @@ public class BatchMetadataImportServlet extends DSpaceServlet
     		        	ms = "???jsp.layout.navbar-admin.batchimport.owningcollection???";
     		        }
     				request.setAttribute("message", ms);
-        		
+
     				JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
-    				
+
     				return;
     			}
-    			
+
     			try {
 					//Decide if it is a new upload or a resume one!
 					if (uploadId != null){ //resume upload
@@ -193,27 +193,27 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 					else { //New upload
 						ItemImport.processUploadableImport(zipurl, owningCollection, reqCollections, context);
 					}
-					
+
 					request.setAttribute("has-error", "false");
-					
-					
+
+
 				} catch (Exception e) {
 					request.setAttribute("has-error", "true");
     				message = e.getMessage();
     				e.printStackTrace();
-    				
+
 				}
     		}
-    		
+
     		request.setAttribute("message", message);
-    		
+
     		JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
     	}
     }
-    
+
     /**
      * GET request is only ever used to show the upload form
-     * 
+     *
      * @param context
      *            a DSpace Context object
      * @param request
@@ -230,9 +230,9 @@ public class BatchMetadataImportServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	
+
     	String typeS = request.getParameter("type");
-    	
+
     	int type = -1;
     	try {
 			type = Integer.parseInt(typeS);
@@ -240,9 +240,9 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
+
     	request.setAttribute("type", type);
-    	
+
     	//Get all collections
 		List<Collection> collections = null;
 		String colIdS = request.getParameter("colId");
@@ -256,10 +256,10 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 		}
 
 		request.setAttribute("collections", collections);
-		
+
     	if (type==0){
     		// Show the upload screen
-    		
+
     		JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
     	}
     	else {
