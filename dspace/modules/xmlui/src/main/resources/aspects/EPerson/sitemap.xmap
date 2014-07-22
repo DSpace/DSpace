@@ -55,6 +55,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
             <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.eperson.Navigation"/>
 			
 			<map:transformer name="StartRegistration" src="org.dspace.app.xmlui.aspect.eperson.PasswordLogin"/>
+			<map:transformer name="AlreadyRegister" src="org.dspace.app.xmlui.aspect.eperson.AlreadyRegister"/>
 			<map:transformer name="VerifyEmail" src="org.dspace.app.xmlui.aspect.eperson.VerifyEmail"/>
 			<map:transformer name="EditProfile" src="org.dspace.app.xmlui.aspect.eperson.EditProfile"/>
 			<map:transformer name="RegistrationFinished" src="org.dspace.app.xmlui.aspect.eperson.RegistrationFinished"/>
@@ -245,6 +246,12 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 					</map:transform>
 				</map:match>
 				
+				<map:match pattern="register/exist">
+					<map:transform type="AlreadyRegister">
+						<map:parameter name="email" value="{flow-attribute:email}"/>
+					</map:transform>
+        </map:match>
+
 				<map:match pattern="register/verify">
 					<map:transform type="VerifyEmail">
 						<map:parameter name="email" value="{flow-attribute:email}"/>
