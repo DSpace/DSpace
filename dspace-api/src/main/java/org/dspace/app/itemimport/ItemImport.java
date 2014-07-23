@@ -373,10 +373,10 @@ public class ItemImport
             }
 
             // can only resume for adds
-            if (isResume && !"add".equals(command))
+            if (isResume && !"add".equals(command) && !"add-bte".equals(command))
             {
                 System.out
-                        .println("Error - resume option only works with --add command");
+                        .println("Error - resume option only works with the --add or the --add-bte commands");
                 System.exit(1);
             }
 
