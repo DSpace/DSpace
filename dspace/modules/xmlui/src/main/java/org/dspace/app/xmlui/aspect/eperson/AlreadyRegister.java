@@ -177,8 +177,6 @@ public class AlreadyRegister extends AbstractDSpaceTransformer implements Cachea
            submit.addButton("submit_forgot").setValue(T_submit_reset);
            
            exists.addHidden("email").setValue(this.email);
-           exists.addHidden("eperson-continue").setValue(knot.getId()); 
-       
        
    }
    
