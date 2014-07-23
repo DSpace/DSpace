@@ -49,29 +49,8 @@ public class ScriptLauncher
             System.exit(1);
         }
 
-        // Initialise the service manager kernel
-        try {
-            kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
-            {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-            }
-        } catch (Exception e)
-        {
-            // Failed to start so destroy it and log and throw an exception
-            try
-            {
-                kernelImpl.destroy();
-            }
-            catch (Exception e1)
-            {
-                // Nothing to do
-            }
-            String message = "Failure during filter init: " + e.getMessage();
-            System.err.println(message + ":" + e);
-            throw new IllegalStateException(message, e);
-        }
-
+        initialiseKernelService();
+        
         // Look up command in the configuration, and execute.
         int status;
         status = runOneCommand(args);
@@ -283,4 +262,32 @@ public class ScriptLauncher
                                ": " + command.getChild("description").getValue());
         }
     }
+    
+    
+    
+    private static void initialiseKernelService(){
+                    // Initialise the service manager kernel
+        try {
+            kernelImpl = DSpaceKernelInit.getKernel(null);
+            if (!kernelImpl.isRunning())
+            {
+                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+            }
+        } catch (Exception e)
+        {
+            // Failed to start so destroy it and log and throw an exception
+            try
+            {
+                kernelImpl.destroy();
+            }
+            catch (Exception e1)
+            {
+                // Nothing to do
+            }
+            String message = "Failure during filter init: " + e.getMessage();
+            System.err.println(message + ":" + e);
+            throw new IllegalStateException(message, e);
+        }
+    }    
+            
 }
