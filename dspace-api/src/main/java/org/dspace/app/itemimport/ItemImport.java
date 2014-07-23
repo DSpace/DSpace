@@ -344,10 +344,8 @@ public class ItemImport
 
                 if (collections == null)
                 {
-                    System.out
-                            .println("Error - at least one destination collection must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
+                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
+                    commandLineCollections = false;
                 }
 
                 if (bteInputType == null)
