@@ -33,15 +33,12 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -271,47 +268,15 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
                     browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
                     params, info), getNextPageURL(params, info));
 
-        // Reference all the browsed items
+            // Reference all the browsed items
 	        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type, ReferenceSet.TYPE_SUMMARY_LIST, type, null);
 
-        // Are we browsing items, or unique metadata?
-        if (isItemBrowse(info))
-        {
             // Add the items to the browse results
             for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
             {
                 referenceSet.addReference(item);
             }
         }
-        else    // browsing a list of unique metadata entries
-        {
-            // Create a table for the results
-		        Table singleTable = results.addTable("browse-by-" + type + "-results", browseInfo.getResultCount() + 1, 1);
-
-            // Add the column heading
-            singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
-
-            // Iterate each result
-            for (String[] singleEntry : browseInfo.getStringResults())
-            {
-                // Create a Map of the query parameters for the link
-                Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, encodeForURL(type));
-                if (singleEntry[1] != null)
-                {
-				        queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(singleEntry[1]));
-                }
-                else
-                {
-				        queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(singleEntry[0]));
-                }
-                // Create an entry in the table, and a linked entry
-                Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(PRIVATE_URL_BASE, queryParams), singleEntry[0]);
-            }
-        }
-    }
         else
         {
             results.addPara(T_no_results);
@@ -470,34 +435,30 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
         Para controlsForm = controls.addPara();
 
-        // If we are browsing a list of items
-        if (isItemBrowse(info)) //  && info.isSecondLevel()
-        {
-            try
-            {
-                // Create a drop down of the different sort columns available
-                Set<SortOption> sortOptions = SortOption.getSortOptions();
+        try
+	    {
+	        // Create a drop down of the different sort columns available
+	        Set<SortOption> sortOptions = SortOption.getSortOptions();
 
-                // Only generate the list if we have multiple columns
-                if (sortOptions.size() > 1)
-                {
-                    controlsForm.addContent(T_sort_by);
-                    Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
+	        // Only generate the list if we have multiple columns
+	        if (sortOptions.size() > 1)
+	        {
+	            controlsForm.addContent(T_sort_by);
+	            Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
 
-                    for (SortOption so : sortOptions)
-                    {
-                        sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
-                                message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
-                    }
-                }
-            }
-            catch (SortException se)
-            {
-                throw new WingException("Unable to get sort options", se);
-            }
-        }
+	            for (SortOption so : sortOptions)
+	            {
+	                sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
+	                        message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
+	            }
+	        }
+	    }
+	    catch (SortException se)
+	    {
+	        throw new WingException("Unable to get sort options", se);
+	    }
 
-        // Create a control to changing ascending / descending order
+	    // Create a control to changing ascending / descending order
         controlsForm.addContent(T_order);
         Select orderSelect = controlsForm.addSelect(BrowseParams.ORDER);
         orderSelect.addOption("ASC".equals(params.scope.getOrder()), "ASC", T_order_asc);
@@ -770,18 +731,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
         return this.browseInfo;
     }
 
-    /**
-     * Is this a browse on a list of items, or unique metadata values?
-     *
-     * @param info
-     * @return
-     */
-    private boolean isItemBrowse(BrowseInfo info)
-    {
-        return info.getBrowseIndex().isItemIndex() || info.isSecondLevel();
-    }
-
-    /**
+	/**
      * Is this browse sorted by date?
      * @param info
      * @return
