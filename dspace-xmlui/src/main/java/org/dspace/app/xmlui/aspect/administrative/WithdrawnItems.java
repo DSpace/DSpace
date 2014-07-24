@@ -776,37 +776,17 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         {
             BrowseIndex bix = info.getBrowseIndex();
 
-            // For a second level browse (ie. items for author),
-            // get the value we are focussing on (ie. author).
-            // (empty string if none).
-            String value = (info.hasValue() ? "\"" + info.getValue() + "\"" : "");
-
-            // Get the name of any scoping element (collection / community)
-            String scopeName = "";
-
-            if (info.getBrowseContainer() != null)
+	        if (bix.isMetadataIndex())
             {
-                scopeName = info.getBrowseContainer().getName();
-            }
-            else
-            {
-                scopeName = "";
-            }
-
-            if (bix.isMetadataIndex())
-            {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata." + bix.getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.metadata." + bix.getName());
             }
             else if (info.getSortOption() != null)
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.item." + info.getSortOption().getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.item." + info.getSortOption().getName());
             }
             else
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.title.item." + bix.getSortOption().getName())
-                        .parameterize(scopeName, value);
+                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.item." + bix.getSortOption().getName());
             }
         }
 
@@ -819,32 +799,17 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         {
             BrowseIndex bix = info.getBrowseIndex();
 
-            // Get the name of any scoping element (collection / community)
-            String scopeName = "";
-
-            if (info.getBrowseContainer() != null)
-            {
-                scopeName = info.getBrowseContainer().getName();
-            }
-            else
-            {
-                scopeName = "";
-            }
-
             if (bix.isMetadataIndex())
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.metadata." + bix.getName());
             }
             else if (info.getSortOption() != null)
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.item." + info.getSortOption().getName());
             }
             else
             {
-                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
-                        .parameterize(scopeName);
+                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.item." + bix.getSortOption().getName());
             }
         }
 
