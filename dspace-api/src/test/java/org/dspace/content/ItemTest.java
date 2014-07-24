@@ -107,7 +107,9 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     @Test
     public void testItemFind() throws Exception
     {
-        int id = 1;
+        // Get ID of item created in init()
+        int id = this.it.getID();
+        // Make sure we can find it via its ID
         Item found =  Item.find(context, id);
         assertThat("testItemFind 0", found, notNullValue());
         assertThat("testItemFind 1", found.getID(), equalTo(id));

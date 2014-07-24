@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-oai</artifactId>
     <packaging>war</packaging>
-    <name>DSpace OAI 2.0</name>
-    <description>Parent project for the OAI API and Webapp</description>
+    <name>DSpace OAI-PMH</name>
+    <description>DSpace OAI-PMH Web Application and API</description>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
@@ -52,8 +52,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
                         <exclude>src/main/webapp/**</exclude>
