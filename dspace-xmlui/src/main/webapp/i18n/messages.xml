@@ -709,7 +709,7 @@
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
-	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
+	<message key="batch">Select a collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection you wish to submit an item to.</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
@@ -1442,6 +1442,11 @@
 
     <!-- Batch Import Tool -->
     <!-- org.dspace.app.xmlui.administrative.batchimport -->
+    <message key="xmlui.administrative.batchimport.general.select_collection">Select a collection</message>
+    <message key="xmlui.administrative.batchimport.general.collection">Collection</message>
+    <message key="xmlui.administrative.batchimport.general.collection_help">Select the collection you wish to submit an item to.</message>
+    <message key="xmlui.administrative.batchimport.general.collection_default">Select a collection...</message>
+
     <message key="xmlui.administrative.batchimport.general.title">Import Batch Load (ZIP)</message>
     <message key="xmlui.administrative.batchimport.general.head1">Import Batch Load (ZIP)</message>
     <message key="xmlui.administrative.batchimport.general.trail">Import Batch Load (ZIP)</message>
@@ -1454,6 +1459,7 @@
     <message key="xmlui.administrative.batchimport.flow.upload_badelement">Unknown metadata element in heading</message>
     <message key="xmlui.administrative.batchimport.flow.import_successful">Import successful</message>
     <message key="xmlui.administrative.batchimport.flow.import_failed">Import failed</message>
+    <message key="xmlui.administrative.batchimport.flow.failed_no_collection">No Destination Collection Specified</message>
 
     <!-- org.dspace.app.xmlui.administrative.batchimport.BatchImportConfirm -->
     <message key="xmlui.administrative.batchimport.BatchmportMain.submit_upload">Upload SimpleArchiveFormat ZIP</message>

@@ -25,6 +25,7 @@ import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.app.itemimport.ItemImport;
 import org.dspace.app.itemimport.ItemImportOptions;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -32,6 +33,7 @@ import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
 
 /**
  * Utility methods to processes BatchImport actions. These methods are used
@@ -53,6 +55,7 @@ public class FlowBatchImportUtils {
     private static final Message T_import_failed = new Message("default", "xmlui.administrative.batchimport.flow.import_failed");
     private static final Message T_over_limit = new Message("default", "xmlui.administrative.batchimport.flow.over_limit");
     private static final Message T_no_changes = new Message("default", "xmlui.administrative.batchimport.general.no_changes");
+    private static final Message T_failed_no_collection = new Message("default", "xmlui.administrative.batchimport.flow.failed_no_collection");
 
     // Other variables
     private static final int limit = ConfigurationManager.getIntProperty("bulkedit", "gui-item-limit", 20);
@@ -121,11 +124,28 @@ public class FlowBatchImportUtils {
                 name = name.substring(name.indexOf('\\') + 1);
             }
 
-
             log.info(LogManager.getHeader(context, "batchimport", "loading file"));
 
             // Process CSV without import
             ItemImport itemImport = new ItemImport();
+
+            String collectionHandle = null;
+            if (request.get("collectionHandle") != null) {
+                collectionHandle = request.get("collectionHandle").toString();
+            } else {
+                //fail
+                log.info("batch fail");
+                result.setContinue(false);
+                result.setOutcome(false);
+                result.setMessage(T_failed_no_collection);
+                return result;
+            }
+
+            Collection collection = (Collection) HandleManager.resolveToObject(context, collectionHandle);
+            Collection[] collections = new Collection[1];
+            collections[0] = collection;
+
+            log.info("Batch to collection: " + collection.getName());
 
             /*
             ItemImportOptions itemImportOptions = new ItemImportOptions();
@@ -169,17 +189,9 @@ public class FlowBatchImportUtils {
                   -R,--resume             resume a failed import (add only)
              */
 
-
             String sourceBatchDir = ItemImport.unzip(file);
 
-
-
-            Collection col10 = Collection.find(context, 10);
-            Collection[] collections = new Collection[1];
-            collections[0] = col10;
             itemImport.addItems(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
-
-
 
             if(true)
             {
