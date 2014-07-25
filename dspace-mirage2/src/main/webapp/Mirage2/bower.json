@@ -1,0 +1,16 @@
+{
+    "name": "Mirage2",
+    "version": "0.1.1",
+    "dependencies": {
+        "bootstrap-sass-official": "latest",
+        "modernizr": "latest",
+        "jquery": "~1.10.2",
+        "jquery-ui": "1.10.3",
+        "jqueryuibootstrap": "4f3772cd37b898f456c0126c4b44178ce8d4aad7",
+        "handlebars": "latest",
+        "respond": "latest",
+        "html5shiv": "latest",
+        "holderjs": "latest"
+    },
+    "devDependencies": {}
+}

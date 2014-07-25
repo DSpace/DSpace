@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-mirage2</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace Mirage2 - src</name>
+   <description>
+      This project generates an overlay war for inclusion in XMLUI using the overlay mechanism.
+   </description>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/..</root.basedir>
+
+   </properties>
+
+   <build>
+       <filters>
+           <!-- Filter using the properties file defined by dspace-parent POM -->
+           <filter>${filters.file}</filter>
+       </filters>
+      <plugins>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+                    <warSourceExcludes>themes/**</warSourceExcludes>
+               <webResources>
+                  <resource>
+                     <filtering>false</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+
+                  </resource>
+
+               </webResources>
+               <overlays>
+                  <!--  
+                     the priority of overlays is determined here
+                     1.) default: anything in the current project has highest
+                     2.) anything defined here has precedence in the order defined
+                     3.) any war found transitively in the dependencies will be applied
+                     next. the order is unpredictable.
+                  -->
+
+               </overlays>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+          <plugin>
+              <groupId>com.mycila</groupId>
+              <artifactId>license-maven-plugin</artifactId>
+              <configuration>
+                  <!-- Exclude license check for essential config files, these files cannot have a license comment or Mirage 2 will not compile -->
+                  <excludes>
+                      <exclude>**/*.json</exclude>
+                      <exclude>**/*.LICENSE</exclude>
+                      <exclude>**/readme.txt</exclude>
+                      <exclude>**/.bowerrc</exclude>
+                  </excludes>
+              </configuration>
+          </plugin>
+
+      </plugins>
+   </build>
+
+
+
+
+   <dependencies>
+
+
+   </dependencies>
+
+</project>
