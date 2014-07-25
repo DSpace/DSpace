@@ -9,14 +9,14 @@ package org.dspace.app.xmlui.aspect.administrative.batchimport;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
 /**
@@ -32,8 +32,13 @@ public class BatchImportMain extends AbstractDSpaceTransformer {
 
     private static final Message T_title = message("xmlui.administrative.batchimport.general.title");
     private static final Message T_head1 = message("xmlui.administrative.batchimport.general.head1");
-    private static final Message T_submit_upload = message("xmlui.administrative.batchimport.MetadataImportMain.submit_upload");
+    private static final Message T_submit_upload = message("xmlui.administrative.batchimport.BatchmportMain.submit_upload");
     private static final Message T_trail = message("xmlui.administrative.batchimport.general.trail");
+
+    private static final Message T_select_collection = message("xmlui.administrative.batchimport.general.select_collection");
+    private static final Message T_collection = message("xmlui.administrative.batchimport.general.collection");
+    private static final Message T_collection_help = message("xmlui.administrative.batchimport.general.collection_help");
+    private static final Message T_collection_default = message("xmlui.administrative.batchimport.general.collection_default");
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -51,6 +56,23 @@ public class BatchImportMain extends AbstractDSpaceTransformer {
         Division div = body.addInteractiveDivision("batch-import",contextPath + "/admin/batchimport", Division.METHOD_MULTIPART,"primary administrative");
         div.setHead(T_head1);
 
+        //Choose Destination Collection
+        Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+
+        List list = div.addList("select-collection", List.TYPE_FORM);
+        list.setHead(T_select_collection);
+        Select select = list.addItem().addSelect("collectionHandle");
+        select.setAutofocus("autofocus");
+        select.setLabel(T_collection);
+        select.setHelp(T_collection_help);
+
+        select.addOption("",T_collection_default);
+        for (Collection collection : collections)
+        {
+            select.addOption(collection.getHandle(), CollectionDropDown.collectionPath(collection));
+        }
+
+        //Zip File Upload
         Para file = div.addPara();
         file.addFile("file");
 
