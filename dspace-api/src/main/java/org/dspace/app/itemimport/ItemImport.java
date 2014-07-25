@@ -111,6 +111,8 @@ public class ItemImport
 
     private static PrintWriter mapOut = null;
 
+    private static final String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
+
     // File listing filter to look for metadata files
     private static FilenameFilter metadataFileFilter = new FilenameFilter()
     {
@@ -276,7 +278,6 @@ public class ItemImport
 
             boolean zip = false;
             String zipfilename = "";
-            String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
             if (line.hasOption('z'))
             {
                 zip = true;
@@ -396,39 +397,6 @@ public class ItemImport
                 System.exit(1);
             }
 
-            // does the zip file exist and can we write to the temp directory
-            if (zip)
-            {
-                File zipfile = new File(sourcedir);
-                if (!zipfile.canRead())
-                {
-                    System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
-                    System.exit(1);
-                }
-
-                if (ziptempdir == null)
-                {
-                    System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
-                    System.exit(1);
-                }
-                zipfile = new File(ziptempdir);
-                if (!zipfile.isDirectory())
-                {
-                    System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
-                                       "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
-                                       "is not a valid directory");
-                    System.exit(1);
-                }
-                File tempdir = new File(ziptempdir);
-                if (!tempdir.exists() && !tempdir.mkdirs())
-                {
-                    log.error("Unable to create temporary directory");
-                }
-                sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
-                ziptempdir = ziptempdir + System.getProperty("file.separator") +
-                             line.getOptionValue("z") + System.getProperty("file.separator");
-            }
-
             ItemImport myloader = new ItemImport();
 
             // create a context
@@ -515,69 +483,10 @@ public class ItemImport
             try
             {
                 // If this is a zip archive, unzip it first
-                if (zip)
-                {
-                    String sourceDirForZip = sourcedir;
-                    ZipFile zf = new ZipFile(zipfilename);
-                    ZipEntry entry;
-                    Enumeration<? extends ZipEntry> entries = zf.entries();
-                    while (entries.hasMoreElements())
-                    {
-                        entry = entries.nextElement();
-                        if (entry.isDirectory())
-                        {
-                            if (!new File(ziptempdir + entry.getName()).mkdir())
-                            {
-                                log.error("Unable to create contents directory");
-                            }
-                        }
-                        else
-                        {
-                            System.out.println("Extracting file: " + entry.getName());
-                            int index = entry.getName().lastIndexOf('/');
-                            if (index == -1)
-                            {
-                                // Was it created on Windows instead?
-                                index = entry.getName().lastIndexOf('\\');
-                            }
-                            if (index > 0)
-                            {
-                                File dir = new File(ziptempdir + entry.getName().substring(0, index));
-                                if (!dir.mkdirs())
-                                {
-                                    log.error("Unable to create directory");
-                                }
-
-                                //Entries could have too many directories, and we need to adjust the sourcedir
-                                //regex supports either windows or *nix file paths
-                                String[] entryChunks = entry.getName().split("/|\\\\");
-                                if(entryChunks.length > 1) {
-                                    if(sourceDirForZip == sourcedir) {
-                                        sourceDirForZip += "/" + entryChunks[0];
-                                    }
-                                }
-
-
-                            }
-                            byte[] buffer = new byte[1024];
-                            int len;
-                            InputStream in = zf.getInputStream(entry);
-                            BufferedOutputStream out = new BufferedOutputStream(
-                                new FileOutputStream(ziptempdir + entry.getName()));
-                            while((len = in.read(buffer)) >= 0)
-                            {
-                                out.write(buffer, 0, len);
-                            }
-                            in.close();
-                            out.close();
-                        }
-                    }
-
-                    if(sourceDirForZip != sourcedir) {
-                        sourcedir = sourceDirForZip;
-                        System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
-                    }
+                if (zip) {
+                    sourcedir = unzip(sourcedir, zipfilename);
                 }
+
 
                 c.turnOffAuthorisationSystem();
 
@@ -741,7 +650,7 @@ public class ItemImport
         }
     }
 
-    private void addItems(Context c, Collection[] mycollections,
+    public void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
         Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
@@ -2069,6 +1978,103 @@ public class ItemImport
         return (pathDeleted);
     }
 
+    public static String unzip(File zipfile) throws IOException {
+        log.info("ZIPFILE: " + zipfile.getAbsolutePath());
+
+        // 2
+        // does the zip file exist and can we write to the temp directory
+        if (!zipfile.canRead())
+        {
+            log.error("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
+        }
+
+
+        File tempdir = new File(ziptempdir);
+        if (!tempdir.isDirectory())
+        {
+            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+                    "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+                    "is not a valid directory");
+        }
+
+        if (!tempdir.exists() && !tempdir.mkdirs())
+        {
+            log.error("Unable to create temporary directory");
+        }
+        String sourcedir = ziptempdir + System.getProperty("file.separator") + zipfile.getName();
+        String zipDir = ziptempdir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+
+
+        // 3
+        String sourceDirForZip = sourcedir;
+        ZipFile zf = new ZipFile(zipfile);
+        ZipEntry entry;
+        Enumeration<? extends ZipEntry> entries = zf.entries();
+        while (entries.hasMoreElements())
+        {
+            entry = entries.nextElement();
+            if (entry.isDirectory())
+            {
+                if (!new File(zipDir + entry.getName()).mkdir())
+                {
+                    log.error("Unable to create contents directory");
+                }
+            }
+            else
+            {
+                System.out.println("Extracting file: " + entry.getName());
+                int index = entry.getName().lastIndexOf('/');
+                if (index == -1)
+                {
+                    // Was it created on Windows instead?
+                    index = entry.getName().lastIndexOf('\\');
+                }
+                if (index > 0)
+                {
+                    File dir = new File(zipDir + entry.getName().substring(0, index));
+                    if (!dir.mkdirs())
+                    {
+                        log.error("Unable to create directory");
+                    }
+
+                    //Entries could have too many directories, and we need to adjust the sourcedir
+                    //regex supports either windows or *nix file paths
+                    String[] entryChunks = entry.getName().split("/|\\\\");
+                    if(entryChunks.length > 1) {
+                        if(sourceDirForZip == sourcedir) {
+                            sourceDirForZip += "/" + entryChunks[0];
+                        }
+                    }
+
+
+                }
+                byte[] buffer = new byte[1024];
+                int len;
+                InputStream in = zf.getInputStream(entry);
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(zipDir + entry.getName()));
+                while((len = in.read(buffer)) >= 0)
+                {
+                    out.write(buffer, 0, len);
+                }
+                in.close();
+                out.close();
+            }
+        }
+
+        if(sourceDirForZip != sourcedir) {
+            sourcedir = sourceDirForZip;
+            System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
+        }
+
+        return sourcedir;
+    }
+
+    public static String unzip(String sourcedir, String zipfilename) throws IOException {
+        File zipfile = new File(sourcedir + File.separator + zipfilename);
+        return unzip(zipfile);
+    }
+    
     /**
      * Generate a random filename based on current time
      * @param hidden: add . as a prefix to make the file hidden
