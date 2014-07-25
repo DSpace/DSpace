@@ -344,10 +344,11 @@ public class SolrBrowseDAO implements BrowseDAO
         {
             query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
         }
+	    boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
         try
         {
-            resp = searcher.search(context, query);
+            resp = searcher.search(context, query, includeUnDiscoverable);
         }
         catch (SearchServiceException e)
         {
