@@ -59,77 +59,21 @@
 
     <h1>Welcome to the repository for University of Maryland research.</h1>
 
-    <p><strong>Any UM Faculty member can make digital works
-    permanently accessible and available across the Internet with
-    DRUM.</strong><a href="<%= request.getContextPath() %>/help/about_submitting.jsp">  Find out
-    more about depositing your work.</a></p>
-
-    <table class="standard" width="95%" align="center">
-        <tr>
-            <td class="standard">
-                <dspace:include page="/components/home-links.jsp" />
-            </td>
-        </tr>
-    </table>
-
+    <p>The Digital Repository at the University of Maryland (DRUM) collects, preserves, and provides public access to the scholarly output of the university. Faculty and researchers can upload research products for rapid dissemination, global visibility and impact, and long-term preservation.</p>
+    <p>You can use DRUM to share and preserve <a href="http://drum.lib.umd.edu/help/scope_of_drum_content.jsp">a wide range of research products</a>, such as:</p>
+    <ul>
+    	<li>Articles, papers, books, and technical reports</li>
+    	<li>Data and code</li>
+    	<li>Supplemental material for journal articles</li>
+    	<li>Presentations and posters</li>
+    	<li>Theses and dissertations</li>
+    </ul>
+    <p>You can track views and downloads of your research, and everything in DRUM is indexed by Google and Google Scholar. You receive a permanent DOI for your items, making it easy for other researchers to cite your work.</p>
+    <p>Depositing research in DRUM can help you satisfy data management and sharing requirements from the NSF, NIH, and other funding agencies and journals.</p>
+    <button type="button"><a href="http://drum.lib.umd.edu/mydspace">Submit</a></button> 
+            
     <br>
 
-    <table class="standard" width="95%" align="center">
-        <tr>
-            <td class="standard">
-              <h2>The following communities of digital works are available:</h2>
-
-            </td>
-        </tr>
-    </table>
-
-    <br>
-
-
-<%
-    for (int k = 0; k < groups.length; k++) 
-    {
-%>
-    <table class="standard" width="95%" align="center">
-        <tr>
-            <td class="standard">
-                <p><b><%=groups[k].getName()%></b></p> 
-                <table border=0 cellpadding=8>
-<%
-                    Community[] communities = 
-		       (Community[]) communityMap.get(
-		         new Integer(groups[k].getID()));
-
-                    for (int i = 0; i < communities.length; i++)
-                    {
-%>                 
-		    <tr>
-                        <td class="standard">
-                            <A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %> </A>
-<%
-        if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
-        {
-%>
-            [<%= communities[i].countItems() %>]
-<%
-        }
-
-%>
-                        </td>
-                    </tr>
-<%
-                    }
-%>
-
-                </table>
-
-            </tr>
-        </td>
-    </table>
-    <br>
-<%
-    }
-%>
 
 
 
