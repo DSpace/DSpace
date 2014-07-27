@@ -1,2 +1,5 @@
 language: java
-script: "mvn clean package license:check -Dmaven.test.skip=false"
+script: "travis_retry mvn clean package license:check -Dmaven.test.skip=false"
+cache:
+  directories:
+  - $HOME/.m2

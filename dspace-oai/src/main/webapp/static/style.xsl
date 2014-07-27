@@ -165,12 +165,17 @@
                 </tr>
             </xsl:for-each>
             <tr>
-                <td><b>Description</b></td>
+                <td><b>Repository identifier</b></td>
+                <td>
+                    <xsl:value-of select="oai:description/oai:oai-identifier/oai:repositoryIdentifier/text()" />
+                </td>
+            </tr>
+            <tr>
+                <td><b>Sample identifier</b></td>
                 <td>
                     <xsl:value-of
-                            select="oai:description/node()/text()" />
+                            select="oai:description/oai:oai-identifier/oai:sampleIdentifier/text()" />
                 </td>
-
             </tr>
             <tr>
                 <td><b>Protocol Version</b></td>

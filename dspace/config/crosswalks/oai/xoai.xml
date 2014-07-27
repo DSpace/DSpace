@@ -48,7 +48,7 @@
             <Transformer ref="driverTransformer"/>
             <!-- The driver filter -->
             <Filter ref="driverFilter"/>
-            <!-- Just an alias, if fact it returns all items within the driver context -->
+            <!-- Just an alias, in fact it returns all items within the driver context -->
             <Set ref="driverSet"/>
             <!-- Metadata Formats -->
             <Format ref="oaidc"/>
@@ -73,7 +73,7 @@
             <Transformer ref="openaireTransformer"/>
             <!-- OpenAIRE filter -->
             <Filter ref="openAireFilter"/>
-            <!-- Just an alias, if fact it returns all items within the driver context -->
+            <!-- Just an alias, in fact it returns all items within the driver context -->
             <Set ref="openaireSet"/>
             <!-- Metadata Formats -->
             <Format ref="oaidc"/>

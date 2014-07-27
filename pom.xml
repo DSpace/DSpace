@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
         <relativePath />
     </parent>
 
@@ -46,7 +46,7 @@
           <plugins>
               <plugin>
                   <artifactId>maven-compiler-plugin</artifactId>
-                  <version>2.3.2</version>
+                  <version>3.1</version>
                   <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -55,7 +55,7 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -68,11 +68,7 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <!-- We'd rather this be an open-ended range of versions.
-                     But, because of a Maven bug, we must force a specific version:
-                     http://jira.codehaus.org/browse/MNG-2742
-                     Once the bug is fixed, we should put open-ended range in dspace-pom -->
-                <version>2.1.1</version>
+                <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <archive>
@@ -86,12 +82,14 @@
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.17</version>
                 <!-- tests whose name starts by Abstract will be ignored -->
                 <configuration>
                     <excludes>
                         <exclude>**/Abstract*</exclude>
                     </excludes>
+                    <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <!--
                     Enable to debug Maven Surefire tests in remote proces
                     <debugForkedProcess>true</debugForkedProcess>
@@ -100,12 +98,12 @@
              </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
              </plugin>
              <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.9.0</version>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.6</version>
              </plugin>
           </plugins>
       </pluginManagement>
@@ -147,7 +145,7 @@
 
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.3.2</version>
+            <version>2.5</version>
             <configuration>
                 <!-- During release:perform, enable the "release" profile (see below) -->
                 <releaseProfiles>release</releaseProfiles>
@@ -159,8 +157,8 @@
             </configuration>
          </plugin>
          <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
                     <header>${root.basedir}/LICENSE_HEADER</header>
@@ -1075,10 +1073,10 @@
       <mailingList>
          <name>DSpace Technical Users List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+            http://lists.sourceforge.net/lists/listinfo/dspace-tech
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+            http://lists.sourceforge.net/lists/listinfo/dspace-tech
          </unsubscribe>
          <post>dspace-tech AT lists.sourceforge.net</post>
          <archive>
@@ -1088,10 +1086,10 @@
       <mailingList>
          <name>DSpace Developers List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+            http://lists.sourceforge.net/lists/listinfo/dspace-devel
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+            http://lists.sourceforge.net/lists/listinfo/dspace-devel
          </unsubscribe>
          <post>dspace-devel AT lists.sourceforge.net</post>
          <archive>
@@ -1101,10 +1099,10 @@
       <mailingList>
          <name>DSpace General Issues List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-general
+            http://lists.sourceforge.net/lists/listinfo/dspace-general
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-general
+            http://lists.sourceforge.net/lists/listinfo/dspace-general
          </unsubscribe>
          <post>dspace-general AT lists.sourceforge.net</post>
          <archive>
@@ -1114,10 +1112,10 @@
       <mailingList>
          <name>DSpace SCM Commit Change-Log</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+            http://lists.sourceforge.net/lists/listinfo/dspace-changelog
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+            http://lists.sourceforge.net/lists/listinfo/dspace-changelog
          </unsubscribe>
          <post>noreply AT lists.sourceforge.net</post>
          <archive>
@@ -1328,7 +1326,7 @@
    </contributors>
 
    <!--
-      The Subversion repository location is used by Continuum to update against
+      The SCM repository location is used by Continuum to update against
       when changes have occurred.  This spawns a new build cycle and releases
       snapshots into the snapshot repository below.
    -->
@@ -1336,8 +1334,8 @@
       <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
       <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
       <url>git@github.com:DSpace/DSpace.git</url>
-     <tag>HEAD</tag>
-  </scm>
+      <tag>HEAD</tag>
+   </scm>
 
     <!--
         Distribution Management is currently used by the Continuum
