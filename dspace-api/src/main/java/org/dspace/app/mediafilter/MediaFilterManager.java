@@ -734,6 +734,11 @@ public class MediaFilterManager
             return false;
         }
         
+        if(isVerbose) {
+            System.out.println("PROCESSING: bitstream " + source.getID()
+                + " (item: " + item.getHandle() + ")");
+        }
+
         InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
         if (destStream == null)
         {
