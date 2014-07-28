@@ -44,25 +44,9 @@ public class BatchImportUpload extends AbstractDSpaceTransformer {
 
     /** Language strings */
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-    private static final Message T_submit_return = message("xmlui.general.return");
     private static final Message T_trail = message("xmlui.administrative.batchimport.general.trail");
-    private static final Message T_no_changes = message("xmlui.administrative.batchimport.general.no_changes");
-    private static final Message T_new_item = message("xmlui.administrative.batchimport.general.new_item");
     private static final Message T_title = message("xmlui.administrative.batchimport.general.title");
     private static final Message T_head1 = message("xmlui.administrative.batchimport.general.head1");
-
-    private static final Message T_para = message("xmlui.administrative.batchimport.BatchImportUpload.hint");
-    private static final Message T_submit_confirm = message("xmlui.administrative.batchimport.BatchImportUpload.submit_confirm");
-    private static final Message T_changes_pending = message("xmlui.administrative.batchimport.BatchImportUpload.changes_pending");
-    private static final Message T_item_addition = message("xmlui.administrative.batchimport.BatchImportUpload.item_add");
-    private static final Message T_item_deletion = message("xmlui.administrative.batchimport.BatchImportUpload.item_remove");
-    private static final Message T_collection_newowner = message("xmlui.administrative.batchimport.BatchImportUpload.collection_newowner");
-    private static final Message T_collection_oldowner = message("xmlui.administrative.batchimport.BatchImportUpload.collection_oldowner");
-    private static final Message T_collection_mapped = message("xmlui.administrative.batchimport.BatchImportUpload.collection_mapped");
-    private static final Message T_collection_unmapped = message("xmlui.administrative.batchimport.BatchImportUpload.collection_unmapped");
-    private static final Message T_item_delete = message("xmlui.administrative.batchimport.BatchImportUpload.item_delete");
-    private static final Message T_item_withdraw = message("xmlui.administrative.batchimport.BatchImportUpload.item_withdraw");
-    private static final Message T_item_reinstate = message("xmlui.administrative.batchimport.BatchImportUpload.item_reinstate");
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {

@@ -40,7 +40,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
-import org.dspace.app.itemexport.ItemExportException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -48,8 +47,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -109,9 +106,20 @@ public class ItemImport
 
     private static boolean template = false;
 
-    private static PrintWriter mapOut = null;
+    private static final String tempWorkDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
 
-    private static final String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
+    static {
+        //Ensure tempWorkDir exists
+        File tempWorkDirFile = new File(tempWorkDir);
+        if (!tempWorkDirFile.exists()){
+            boolean success = tempWorkDirFile.mkdir();
+            if (success) {
+                log.info("Created org.dspace.app.batchitemimport.work.dir of: " + tempWorkDir);
+            } else {
+                log.error("Cannot create batch import directory! " + tempWorkDir);
+            }
+        }
+    }
 
     // File listing filter to look for metadata files
     private static FilenameFilter metadataFileFilter = new FilenameFilter()
@@ -512,14 +520,6 @@ public class ItemImport
             }
             catch (Exception e)
             {
-                // abort all operations
-                if (mapOut != null)
-                {
-                    mapOut.close();
-                }
-
-                mapOut = null;
-
                 c.abort();
                 e.printStackTrace();
                 System.out.println(e);
@@ -532,19 +532,16 @@ public class ItemImport
                 if (zip)
                 {
                     System.gc();
-                    System.out.println("Deleting temporary zip directory: " + ziptempdir);
-                    ItemImport.deleteDirectory(new File(ziptempdir));
+                    System.out.println("Deleting temporary zip directory: " + tempWorkDir);
+                    ItemImport.deleteDirectory(new File(tempWorkDir));
                 }
             }
             catch (Exception ex)
             {
-                System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
+                System.out.println("Unable to delete temporary zip archive location: " + tempWorkDir);
             }
 
-            if (mapOut != null)
-            {
-                mapOut.close();
-            }
+
 
             if (isTest)
             {
@@ -661,6 +658,9 @@ public class ItemImport
 
         // create the mapfile
         File outFile = null;
+
+        PrintWriter mapOut = null;
+
         boolean directoryFileCollections = false;
         if (mycollections == null)
         {
@@ -734,6 +734,10 @@ public class ItemImport
                 c.clearCache();
             }
         }
+
+        //TODO null check?
+        mapOut.flush();
+        mapOut.close();
     }
 
     private void replaceItems(Context c, Collection[] mycollections,
@@ -841,7 +845,7 @@ public class ItemImport
     private Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
-        String mapOutput = null;
+        String mapOutputString = null;
 
         System.out.println("Adding item from directory " + itemname);
 
@@ -889,7 +893,7 @@ public class ItemImport
                 }
 
                 // send ID to the mapfile
-                mapOutput = itemname + " " + myitem.getID();
+                mapOutputString = itemname + " " + myitem.getID();
             }
         }
         else
@@ -906,7 +910,7 @@ public class ItemImport
                 // find the handle, and output to map file
                 myhandle = HandleManager.findHandle(c, myitem);
 
-                mapOutput = itemname + " " + myhandle;
+                mapOutputString = itemname + " " + myhandle;
             }
 
             // set permissions if specified in contents file
@@ -932,7 +936,7 @@ public class ItemImport
         // made it this far, everything is fine, commit transaction
         if (mapOut != null)
         {
-            mapOut.println(mapOutput);
+            mapOut.println(mapOutputString);
         }
 
         c.commit();
@@ -1979,8 +1983,6 @@ public class ItemImport
     }
 
     public static String unzip(File zipfile) throws IOException {
-        log.info("ZIPFILE: " + zipfile.getAbsolutePath());
-
         // 2
         // does the zip file exist and can we write to the temp directory
         if (!zipfile.canRead())
@@ -1989,7 +1991,7 @@ public class ItemImport
         }
 
 
-        File tempdir = new File(ziptempdir);
+        File tempdir = new File(tempWorkDir);
         if (!tempdir.isDirectory())
         {
             log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
@@ -1999,10 +2001,10 @@ public class ItemImport
 
         if (!tempdir.exists() && !tempdir.mkdirs())
         {
-            log.error("Unable to create temporary directory");
+            log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
-        String sourcedir = ziptempdir + System.getProperty("file.separator") + zipfile.getName();
-        String zipDir = ziptempdir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+        String sourcedir = tempWorkDir + System.getProperty("file.separator") + zipfile.getName();
+        String zipDir = tempWorkDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
 
 
         // 3
@@ -2017,7 +2019,7 @@ public class ItemImport
             {
                 if (!new File(zipDir + entry.getName()).mkdir())
                 {
-                    log.error("Unable to create contents directory");
+                    log.error("Unable to create contents directory: " + zipDir + entry.getName());
                 }
             }
             else
@@ -2034,7 +2036,7 @@ public class ItemImport
                     File dir = new File(zipDir + entry.getName().substring(0, index));
                     if (!dir.mkdirs())
                     {
-                        log.error("Unable to create directory");
+                        log.error("Unable to create directory: " + dir.getAbsolutePath());
                     }
 
                     //Entries could have too many directories, and we need to adjust the sourcedir
@@ -2214,7 +2216,7 @@ public class ItemImport
                         {
                             iitems.close();
                         }
-
+                        
                         // close the mapfile writer
                         if (mapOut != null)
                         {
@@ -2568,5 +2570,9 @@ public class ItemImport
         c.commit();
         
 		FileDeleteStrategy.FORCE.delete(new File(uploadDir));
+    }
+
+    public static String getTempWorkDir() {
+        return tempWorkDir;
     }
 }
