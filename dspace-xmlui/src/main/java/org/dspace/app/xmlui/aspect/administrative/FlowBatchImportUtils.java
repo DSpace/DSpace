@@ -7,33 +7,24 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.io.File;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.apache.cocoon.servlet.multipart.PartOnDisk;
-import org.dspace.app.bulkedit.BulkEditChange;
-import org.dspace.app.bulkedit.DSpaceCSV;
-import org.dspace.app.bulkedit.MetadataImport;
-import org.dspace.app.bulkedit.MetadataImportException;
-import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.itemimport.ItemImport;
-import org.dspace.app.itemimport.ItemImportOptions;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Utility methods to processes BatchImport actions. These methods are used
@@ -49,16 +40,12 @@ public class FlowBatchImportUtils {
      */
     private static final Message T_upload_successful = new Message("default", "xmlui.administrative.batchimport.flow.upload_successful");
     private static final Message T_upload_failed = new Message("default", "xmlui.administrative.batchimport.flow.upload_failed");
-    private static final Message T_upload_badschema = new Message("default", "xmlui.administrative.batchimport.flow.upload_badschema");
-    private static final Message T_upload_badelement = new Message("default", "xmlui.administrative.batchimport.flow.upload_badelement");
     private static final Message T_import_successful = new Message("default", "xmlui.administrative.batchimport.flow.import_successful");
     private static final Message T_import_failed = new Message("default", "xmlui.administrative.batchimport.flow.import_failed");
-    private static final Message T_over_limit = new Message("default", "xmlui.administrative.batchimport.flow.over_limit");
     private static final Message T_no_changes = new Message("default", "xmlui.administrative.batchimport.general.no_changes");
     private static final Message T_failed_no_collection = new Message("default", "xmlui.administrative.batchimport.flow.failed_no_collection");
 
     // Other variables
-    private static final int limit = ConfigurationManager.getIntProperty("bulkedit", "gui-item-limit", 20);
     private static Logger log = Logger.getLogger(FlowBatchImportUtils.class);
 
     public static FlowResult processBatchImport(Context context, Request request) throws SQLException, AuthorizeException, IOException, Exception {
@@ -67,7 +54,6 @@ public class FlowBatchImportUtils {
         result.setContinue(false);
 
         String zipFile = (String) request.getSession().getAttribute("zip");
-        log.info(zipFile);
 
         if (zipFile != null) {
             // Commit the changes
@@ -76,6 +62,7 @@ public class FlowBatchImportUtils {
 
             log.debug(LogManager.getHeader(context, "batchimport", " items changed"));
 
+            //TODO: I don't think this section actually does anything.
             if (true) {
                 result.setContinue(true);
                 result.setOutcome(true);
@@ -124,17 +111,13 @@ public class FlowBatchImportUtils {
                 name = name.substring(name.indexOf('\\') + 1);
             }
 
-            log.info(LogManager.getHeader(context, "batchimport", "loading file"));
-
             // Process CSV without import
             ItemImport itemImport = new ItemImport();
 
-            String collectionHandle = null;
-            if (request.get("collectionHandle") != null) {
-                collectionHandle = request.get("collectionHandle").toString();
-            } else {
+            String collectionHandle = String.valueOf(request.get("collectionHandle"));
+            if (StringUtils.isEmpty(collectionHandle) || !collectionHandle.contains("/")) {
                 //fail
-                log.info("batch fail");
+                log.error("UIBatchImport failed due to no collection.");
                 result.setContinue(false);
                 result.setOutcome(false);
                 result.setMessage(T_failed_no_collection);
@@ -145,27 +128,12 @@ public class FlowBatchImportUtils {
             Collection[] collections = new Collection[1];
             collections[0] = collection;
 
-            log.info("Batch to collection: " + collection.getName());
+            File tempWorkDir = new File(itemImport.getTempWorkDir());
+            File mapFile = File.createTempFile("batch-", ".map", tempWorkDir);
 
-            /*
-            ItemImportOptions itemImportOptions = new ItemImportOptions();
-
-            itemImportOptions.setZipFilePath(file);
-
-            Collection destCollection = Collection.find(context, 10);
-            itemImportOptions.setCollection(destCollection);
-
-            EPerson epersonSubmitter = EPerson.findByEmail(context, "peter@longsight.com");
-            itemImportOptions.setEpersonSubmitter(epersonSubmitter);
-
-            itemImportOptions.setUseTemplate(true);
-*/
-            File mapFile = File.createTempFile("batch", "map");
-/*               PrintWriter mapOut = new PrintWriter(new FileWriter(mapFile));
-            itemImportOptions.setMapFileOut(mapOut);
-            log.info("MapFile: " + mapFile.getAbsolutePath());
-            //Process ItemImport with ZIP, and other options.
-*/
+            log.info("Attempt UIBatchImport to collection: " + collection.getName()
+                                         + ", zip: " + file.getName()
+                                         + ", map: "+ mapFile.getAbsolutePath());
 
             /*
              // equivalent command-line would be:
@@ -193,35 +161,23 @@ public class FlowBatchImportUtils {
 
             itemImport.addItems(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
 
-            if(true)
-            {
-                // Success!
-                // Set session and request attributes
+            // Success!
+            // Set session and request attributes
+            result.setContinue(true);
+            result.setOutcome(true);
+            result.setMessage(T_upload_successful);
+            result.setCharacters(FileUtils.readFileToString(mapFile));
 
-                //request.setAttribute("changes", changes);
-                //request.getSession().setAttribute("csv", csv);
-                log.info("batch success");
-
-                result.setContinue(true);
-                result.setOutcome(true);
-                result.setMessage(T_upload_successful);
-            }
-            else
-            {
-                //fail
-                log.info("batch fail");
-                result.setContinue(false);
-                result.setOutcome(false);
-                result.setMessage(T_no_changes);
-            }
-        }
-        else
-        {
+            log.info("Success! UIBatchImport to collection: " + collection.getName()
+                    + ", zip: " + file.getName()
+                    + ", map: "+ mapFile.getAbsolutePath());
+        } else {
+            //No ZIP File, or upload failed
             result.setContinue(false);
             result.setOutcome(false);
             result.setMessage(T_upload_failed);
         }
 
-            return result;
-        }
+        return result;
+    }
 }

@@ -1454,7 +1454,7 @@
     <message key="xmlui.administrative.batchimport.general.no_changes">No changes were detected</message>
     <message key="xmlui.administrative.batchimport.general.new_item">New item</message>
     <message key="xmlui.administrative.batchimport.flow.upload_successful">Upload successful</message>
-    <message key="xmlui.administrative.batchimport.flow.upload_failed">Upload failed</message>
+    <message key="xmlui.administrative.batchimport.flow.upload_failed">Upload failed or no file selected</message>
     <message key="xmlui.administrative.batchimport.flow.upload_badschema">Unknown metadata schema in heading</message>
     <message key="xmlui.administrative.batchimport.flow.upload_badelement">Unknown metadata element in heading</message>
     <message key="xmlui.administrative.batchimport.flow.import_successful">Import successful</message>
