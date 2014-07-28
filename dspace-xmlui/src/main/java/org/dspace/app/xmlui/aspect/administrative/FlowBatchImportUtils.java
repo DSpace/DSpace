@@ -129,7 +129,7 @@ public class FlowBatchImportUtils {
             collections[0] = collection;
 
             File tempWorkDir = new File(itemImport.getTempWorkDir());
-            File mapFile = File.createTempFile("batch-", ".map", tempWorkDir);
+            File mapFile = File.createTempFile(file.getName(), ".map", tempWorkDir);
 
             log.info("Attempt UIBatchImport to collection: " + collection.getName()
                                          + ", zip: " + file.getName()
