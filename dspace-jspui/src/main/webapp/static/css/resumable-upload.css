@@ -7,7 +7,7 @@
  */
 
 /* Uploader: Drag & Drop */
-.resumable-error {display:none; font-size:14px; font-style:italic;}
+.resumable-error {font-size:14px; font-style:italic;}
 .resumable-drop {padding:30px; font-size:200%; text-align:center; color:#666; font-weight:bold; background-color: #5b4b4b; /*border:2px dashed #666;*/ opacity: 0.65; margin-top: 10px; margin-bottom: 30px; z-index:1; display:none; height: 200px; top: 50%; vertical-align: middle !important; min-height: 6em; vertical-align: middle;}
 .resumable-dragover {padding:30px; color:#555; background-color:#ddd; border:1px solid #999; opacity: 1;}
 
@@ -41,10 +41,11 @@
 .is-error .uploader-item-creating-thumbnail {display:none;}
 
 
-#resumable-upload { text-align: center; }
+#resumable-upload { display: none; text-align: center; }
 .resumable-drop a { text-decoration: none; font-weight: lighter; color: #fff; }
 .resumable-drop a:hover { text-decoration: underline; cursor: pointer; }
 .resumable-drop .glyphicon-upload { /*color: #c50e1f;*/ color: #fff; font-size: 200%; display: block; margin-bottom: 20px; }
+.resumable-files {display: none;}
 .resumable-files table tbody tr:nth-child(even) { background-color: #eee; }
 
 .glyphicon-ok-sign { color: #5cb85c; }

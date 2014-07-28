@@ -44,6 +44,8 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
 
 import com.google.gson.Gson;
+import java.util.Collections;
+import javax.servlet.http.HttpSession;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -112,9 +114,7 @@ public class SubmissionController extends DSpaceServlet
     
     private String tempDir = null;
     
-    /** list to store files uploaded using resumable.js. Resumable.js transfers
-        files as chunks that needs to be assembled after transmission completed.*/
-    private List<File> assembledFiles = new ArrayList<File>();
+    private static Object mutex = new Object();
     
     /** log4j logger */
     private static Logger log = Logger
@@ -251,9 +251,11 @@ public class SubmissionController extends DSpaceServlet
                     
                     if (!StringUtils.isEmpty(resumableFilename))
                     {
+                        log.debug("resumable Filename: '" + resumableFilename + "'.");
                         File completedFile = null;
                         try
                         {
+                            log.debug("Starting doPostResumable method.");
                             completedFile = doPostResumable(request);
                         } catch(IOException e){
                             // we were unable to receive the complete chunk => initialize reupload
@@ -263,6 +265,7 @@ public class SubmissionController extends DSpaceServlet
                         if (completedFile == null)
                         {
                             // if a part/chunk was uploaded, but the file is not completly uploaded yet
+                            log.debug("Got one file chunk, but the upload is not completed yet.");
                             return;
                         }
                         else
@@ -270,7 +273,19 @@ public class SubmissionController extends DSpaceServlet
                             // We got the complete file. Add the file to the 
                             // list of files that should be saved into the 
                             // request when the user clicks the next button.
-                            assembledFiles.add(completedFile);
+                            log.debug("Going to assemble file chunks.");
+                            HttpSession session = request.getSession(false);
+                            if (session != null)
+                            {
+                                synchronized(mutex)
+                                {
+                                    if (session.getAttribute("assembled_files") == null)
+                                    {
+                                        session.setAttribute("assembled_files", new ArrayList<File>());
+                                    }
+                                    ((List<File>) session.getAttribute("assembled_files")).add(completedFile);
+                                }
+                            }
                             return;
                         }
                    }
@@ -1484,9 +1499,24 @@ public class SubmissionController extends DSpaceServlet
                 // Wrap multipart request to get the submission info
                 wrapper = new FileUploadRequest(request);
             }
-            //check if we are uploading files using resumable.js
-            if (!assembledFiles.isEmpty())
+
+            HttpSession session = request.getSession(false);
+            List<File> assembledFiles = null;
+            if (session != null)
             {
+                synchronized(mutex)
+                {
+                    assembledFiles = (List<File>) session.getAttribute("assembled_files");
+                    if (assembledFiles != null)
+                    {
+                        session.removeAttribute("assembled_files");
+                    }
+                }
+            }
+            if (assembledFiles != null)
+            {
+                log.debug("Recoginzed resumable upload, will assemble files...");
+
                 for (File file : assembledFiles)
                 {
                     if (file != null && file.length() > 0)
@@ -1513,6 +1543,8 @@ public class SubmissionController extends DSpaceServlet
             }
             else // falling back to unresumable upload
             {
+                log.debug("Did not recoginze resumable upload, falling back to "
+                        + "simple upload.");
                 Enumeration fileParams = wrapper.getFileParameterNames();
                 while (fileParams.hasMoreElements()) 
                 {

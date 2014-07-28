@@ -373,7 +373,7 @@
             
 <%if (html5Upload) {%>
       <div class="resumable-error">
-        Your browser, unfortunately, is not supported by Resumable.js. The library requires support for <a href="http://www.w3.org/TR/FileAPI/">the HTML5 File API</a> along with <a href="http://www.w3.org/TR/FileAPI/#normalization-of-params">file slicing</a>.
+          <fmt:message key="jsp.submit.choose-file.upload-resumable.unsupported"/>
       </div>
       <div id="resumable-upload">
           <div class="resumable-drop col-md-12" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
@@ -419,22 +419,16 @@
             simultaneousUploads:1,
             testChunks: true,
             throttleProgressCallbacks:1,
-            method: "multipart",
-//            forceChunkSize: false
+            method: "multipart"
           });
         // Resumable.js isn't supported, fall back on a different method
 
-      $('.resumable-files').hide();
-
-        if(!r.support) {
-          //$('.resumable-error').show();
-          $('#resumable-upload').hide();
-          $('#simple-upload').show();
-        } else {
+        if(r.support) {
           // Show a place for dropping/selecting files
-          $('.resumable-drop').show();
+          $('.resumable-error').hide();
           $('#simple-upload').hide();
-          $('#resumable-upload').show();
+          $('.resumable-drop').show();
+          $('#resumable-upload').show(); // done
           r.assignDrop($('.resumable-drop')[0]);
           r.assignBrowse($('.resumable-browse')[0]);
 
