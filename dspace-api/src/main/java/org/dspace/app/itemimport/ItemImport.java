@@ -2025,6 +2025,8 @@ public class ItemImport
             else
             {
                 System.out.println("Extracting file: " + entry.getName());
+                log.info("Extracting file: " + entry.getName());
+
                 int index = entry.getName().lastIndexOf('/');
                 if (index == -1)
                 {
@@ -2034,17 +2036,23 @@ public class ItemImport
                 if (index > 0)
                 {
                     File dir = new File(zipDir + entry.getName().substring(0, index));
-                    if (!dir.mkdirs())
+                    if (!dir.exists() && !dir.mkdirs())
                     {
                         log.error("Unable to create directory: " + dir.getAbsolutePath());
                     }
 
                     //Entries could have too many directories, and we need to adjust the sourcedir
+                    // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                    //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                    // or
+                    // file2.zip (item1 / contents|dublin_core|...
+                    //            item2 / contents|dublin_core|...
+
                     //regex supports either windows or *nix file paths
                     String[] entryChunks = entry.getName().split("/|\\\\");
-                    if(entryChunks.length > 1) {
+                    if(entryChunks.length > 2) {
                         if(sourceDirForZip == sourcedir) {
-                            sourceDirForZip += "/" + entryChunks[0];
+                            sourceDirForZip = sourcedir + "/" + entryChunks[0];
                         }
                     }
 
@@ -2067,6 +2075,7 @@ public class ItemImport
         if(sourceDirForZip != sourcedir) {
             sourcedir = sourceDirForZip;
             System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
+            log.info("Set sourceDir using path inside of Zip: " + sourcedir);
         }
 
         return sourcedir;
