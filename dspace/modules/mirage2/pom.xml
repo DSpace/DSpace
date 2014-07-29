@@ -45,6 +45,9 @@
                           <excludes>
                               WEB-INF/**,META-INF/**
                           </excludes>
+                          <includeArtifactIds>
+                              dspace-mirage2
+                          </includeArtifactIds>
                       </configuration>
                   </execution>
               </executions>
