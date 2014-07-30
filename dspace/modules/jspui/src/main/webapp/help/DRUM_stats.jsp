@@ -4,6 +4,19 @@
 
 <dspace:layout title="About Download Statistics">
 
-    <dspace:include page="/help/DRUM_stats.html" />
+<h1>Metrics</h1>
+
+<p>To help you monitor your impact, DRUM provides information about views and downloads of your research. You can track the following statistics:<p>
+
+<ul>
+<li>Total downloads of each file</li>
+<li>Total visits to your research description/abstract</li>
+<li>Visits to your research description/abstract in the last 7 months</li>
+<li>Top countries and cities visiting your research</li>
+</ul>
+
+<p><strong>Contact us with questions or comments</strong><br />
+General inquiries: <a href="mailto:drum-help@umd.edu">drum-help@umd.edu</a>, (301) 314-1328<br />
+DRUM Coordinator: Terry Owen, <a href="mailto:towen@umd.edu">towen@umd.edu</a></p>
 
 </dspace:layout>
