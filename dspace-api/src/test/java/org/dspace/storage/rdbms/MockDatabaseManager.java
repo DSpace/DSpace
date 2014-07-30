@@ -1725,7 +1725,7 @@ public class MockDatabaseManager
             // Need to be able to catch other exceptions. Pretend they are
             // SQLExceptions, but do log
             log.warn("Exception initializing DB pool", e);
-            throw new SQLException(e.toString());
+            throw new SQLException(e);
         }
     }
 
