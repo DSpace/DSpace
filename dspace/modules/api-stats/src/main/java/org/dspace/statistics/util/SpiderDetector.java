@@ -374,6 +374,7 @@ public class SpiderDetector {
             if (line.startsWith("# UA") || line.startsWith("#UA") ) {
                 try{
                     String pattern = StringEscapeUtils.escapeJava(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    pattern = Pattern.quote(pattern);
                     patterns.add(pattern);
                 }catch (Exception e)
                 {
