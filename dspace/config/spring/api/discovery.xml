@@ -95,9 +95,10 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterContentType" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterAuthor" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -105,6 +106,7 @@
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
+                <ref bean="searchFilterContentType" />
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
@@ -375,18 +377,40 @@
         <property name="metadataFields">
             <list>
                 <value>dc.contributor.author</value>
-                <value>dc.creator</value>
+                <value>dc.contributor.corporatename</value>
+                <value>dc.contributor.editor</value>
+                <value>dc.contributor.meetingname</value>
+                <value>dc.contributor.illustrator</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
     </bean>
 
+    <bean id="searchFilterContentType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="contentType"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.type</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+
+
+
+
+
     <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
-                <value>dc.subject.*</value>
+                <value>dc.subject.lcsh</value>
+                <value>dc.subject.mesh</value>
+                <value>dc.subject.spatial</value>
+                <value>dc.subject.temporal</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
