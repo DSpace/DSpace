@@ -251,6 +251,12 @@ public class SpiderDetector {
                                 } 
                                 table.add(ip);
                             }
+
+                            for (String pattern : readAgentCommentPatterns(file)) {
+                                log.debug("Loading {}"+ pattern);
+                                agents.add(Pattern.compile(pattern));
+                            }
+
                             log.info("Loaded Spider IP file: " + file);
                         }
                     }
@@ -336,8 +342,37 @@ public class SpiderDetector {
                     patterns.add(line);
                 }
             } else {
+                // ... add this functionality later
+            }
+        }
+        in.close();
+        return patterns;
+    }
+
+    /**
+     * Utility method which reads lines from a file & returns them in a Set.
+     *
+     * @param patternFile the location of our spider file
+     * @return a vector full of patterns
+     * @throws IOException could not happen since we check the file be4 we use it
+     */
+    public static Set<String> readAgentCommentPatterns(File patternFile)
+            throws IOException
+    {
+        Set<String> patterns = new HashSet<String>();
+
+        if (!patternFile.exists() || !patternFile.isFile())
+        {
+            return patterns;
+        }
+
+        //Read our file & get all them patterns.
+        BufferedReader in = new BufferedReader(new FileReader(patternFile));
+        String line;
+        while ((line = in.readLine()) != null) {
+            if (line.startsWith("#")) {
                 try{
-                    //                patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
                 }catch (Exception e)
                 {
                     log.error("error loading user agents" + line);
