@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.util;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.SolrLogger;
@@ -370,9 +371,10 @@ public class SpiderDetector {
         BufferedReader in = new BufferedReader(new FileReader(patternFile));
         String line;
         while ((line = in.readLine()) != null) {
-            if (line.startsWith("#")) {
+            if (line.startsWith("# UA") || line.startsWith("#UA") ) {
                 try{
-                    patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    String pattern = StringEscapeUtils.escapeJava(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    patterns.add(pattern);
                 }catch (Exception e)
                 {
                     log.error("error loading user agents" + line);
