@@ -17,7 +17,6 @@ import org.dspace.app.itemimport.ItemImport;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -82,7 +81,7 @@ public class FlowBatchImportUtils {
         return result;
     }
 
-    public static FlowResult processUploadZIP(Context context, Request request) throws SQLException, AuthorizeException, IOException, Exception {
+    public static FlowResult processUploadZIP(Context context, Request request) {
         FlowResult result = new FlowResult();
         result.setContinue(false);
 
@@ -124,14 +123,37 @@ public class FlowBatchImportUtils {
                 return result;
             }
 
-            Collection collection = (Collection) HandleManager.resolveToObject(context, collectionHandle);
             Collection[] collections = new Collection[1];
-            collections[0] = collection;
 
-            File tempWorkDir = new File(itemImport.getTempWorkDir());
-            File mapFile = File.createTempFile(file.getName(), ".map", tempWorkDir);
+            try {
+                Collection collection = (Collection) HandleManager.resolveToObject(context, collectionHandle);
+                collections[0] = collection;
+            } catch (SQLException e) {
+                log.error("UIBatchImport failed due to collection not existing.", e);
+                result.setContinue(false);
+                result.setOutcome(false);
+                result.setMessage(T_failed_no_collection);
+                return result;
+            }
 
-            log.info("Attempt UIBatchImport to collection: " + collection.getName()
+
+
+
+            File tempWorkDir = new File(ItemImport.getTempWorkDir());
+
+            File mapFile = null;
+            try {
+                mapFile = File.createTempFile(file.getName(), ".map", tempWorkDir);
+            } catch (IOException e) {
+                log.error("BatchImportUI Unable to create mapfile", e);
+                result.setContinue(false);
+                result.setOutcome(false);
+                result.setMessage(T_import_failed);
+                return result;
+            }
+
+
+            log.info("Attempt UIBatchImport to collection: " + collections[0].getName()
                                          + ", zip: " + file.getName()
                                          + ", map: "+ mapFile.getAbsolutePath());
 
@@ -157,18 +179,45 @@ public class FlowBatchImportUtils {
                   -R,--resume             resume a failed import (add only)
              */
 
-            String sourceBatchDir = ItemImport.unzip(file);
+            String sourceBatchDir = null;
+            try {
+                sourceBatchDir = ItemImport.unzip(file);
+            } catch (IOException e) {
+                log.error("BatchImportUI Unable to unzip", e);
+                result.setContinue(false);
+                result.setOutcome(false);
+                result.setMessage(T_import_failed);
+                return result;
+            }
 
-            itemImport.addItems(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
+            //TODO, Should we run this in TEST mode first, to ensure we get a clean pass?
+            try {
+                itemImport.addItems(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
+            } catch (Exception e) {
+                log.error("BatchImportUI - Failure during import", e);
+                result.setContinue(false);
+                result.setOutcome(false);
+                result.setMessage(T_import_failed);
+                try {
+                    result.setCharacters(FileUtils.readFileToString(mapFile) + e.getMessage());
+                } catch (IOException ioe) {
+                    log.error("BatchImportUI - Unable to print the mapfile to response", ioe);
+                }
+                return result;
+            }
 
             // Success!
             // Set session and request attributes
             result.setContinue(true);
             result.setOutcome(true);
             result.setMessage(T_upload_successful);
-            result.setCharacters(FileUtils.readFileToString(mapFile));
+            try {
+                result.setCharacters(FileUtils.readFileToString(mapFile));
+            } catch (IOException e) {
+                log.error("BatchImportUI - Unable to print the mapfile to response", e);
+            }
 
-            log.info("Success! UIBatchImport to collection: " + collection.getName()
+            log.info("Success! UIBatchImport to collection: " + collections[0].getName()
                     + ", zip: " + file.getName()
                     + ", map: "+ mapFile.getAbsolutePath());
         } else {

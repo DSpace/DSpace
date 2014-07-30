@@ -650,15 +650,19 @@ public class ItemImport
     public void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
-        Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
-        // mode
+        // create the mapfile
+        File outFile = null;
+        PrintWriter mapOut = null;
 
-        System.out.println("Adding items from directory: " + sourceDir);
-        System.out.println("Generating mapfile: " + mapFile);
+        try {
+            Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
+            // mode
+
+            System.out.println("Adding items from directory: " + sourceDir);
+            System.out.println("Generating mapfile: " + mapFile);
 
         // create the mapfile
         File outFile = null;
-
         PrintWriter mapOut = null;
 
         boolean directoryFileCollections = false;
@@ -676,26 +680,26 @@ public class ItemImport
                 skipItems = readMapFile(mapFile);
             }
 
-            // sneaky isResume == true means open file in append mode
-            outFile = new File(mapFile);
-            mapOut = new PrintWriter(new FileWriter(outFile, isResume));
+                // sneaky isResume == true means open file in append mode
+                outFile = new File(mapFile);
+                mapOut = new PrintWriter(new FileWriter(outFile, isResume));
 
-            if (mapOut == null)
-            {
-                throw new Exception("can't open mapfile: " + mapFile);
+                if (mapOut == null)
+                {
+                    throw new Exception("can't open mapfile: " + mapFile);
+                }
             }
-        }
 
-        // open and process the source directory
-        File d = new java.io.File(sourceDir);
+            // open and process the source directory
+            File d = new java.io.File(sourceDir);
 
-        if (d == null || !d.isDirectory())
-        {
-            throw new Exception("Error, cannot open source directory " + sourceDir);
-        }
+            if (d == null || !d.isDirectory())
+            {
+                throw new Exception("Error, cannot open source directory " + sourceDir);
+            }
 
         String[] dircontents = d.list(directoryFilter);
-
+        
         Arrays.sort(dircontents);
 
         for (int i = 0; i < dircontents.length; i++)
@@ -727,17 +731,18 @@ public class ItemImport
                 {
                     clist = mycollections;
                 }
-
-				addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
-				
+                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }
         }
 
-        //TODO null check?
-        mapOut.flush();
-        mapOut.close();
+        } finally {
+            if(mapOut!=null) {
+                mapOut.flush();
+                mapOut.close();
+            }
+        }
     }
 
     private void replaceItems(Context c, Collection[] mycollections,
