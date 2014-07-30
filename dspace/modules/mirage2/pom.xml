@@ -120,6 +120,9 @@
                                 <echo>${env.PATH}</echo>
                                 <echo>${env.GEM_PATH}</echo>
                                 <echo>${env.GEM_HOME}</echo>
+                                <echo>${mirage2.deps.included}</echo>
+                                <echo>${grunt.color.scheme}</echo>
+                                <echo>${grunt.environment}</echo>
                             </tasks>
                         </configuration>
                     </execution>
@@ -190,7 +193,6 @@
         <profile>
            <id>mirage2-deps-preinstalled-fast</id>
            <activation>
-               <activeByDefault>true</activeByDefault>
                <property>
                    <name>mirage2.deps.included</name>
                    <value>false</value>
@@ -249,7 +251,7 @@
        <profile>
            <id>mirage2-deps-included-slow</id>
            <activation>
-                <activeByDefault>false</activeByDefault>
+               <activeByDefault>true</activeByDefault>
                <property>
                    <name>mirage2.deps.included</name>
                    <value>true</value>
