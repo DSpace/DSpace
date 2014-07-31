@@ -14,6 +14,9 @@
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <!--
         Package DSpace's common testing environment (configuration, etc.)
+        into a "testEnvironment.zip". This essentially creates a zipped up, test
+        version of a DSpace installation directory, complete with bin, configs,
+        even a dummy assetstore, etc.
 	-->
     <id>testEnvironment</id>
     <formats>
@@ -22,13 +25,16 @@
     <includeBaseDirectory>false</includeBaseDirectory>
 
     <moduleSets>
+        <!-- First, copy the following from our 'dspace' assembly project into
+             a "dspace" subdirectory in the final ZIP file. -->
         <moduleSet>
+            <includes>
+                <include>org.dspace:dspace</include>
+            </includes>
             <sources>
                 <outputDirectoryMapping>dspace</outputDirectoryMapping>
                 <fileSets>
-                    <fileSet> <!-- installable DSpace files -->
-                        <directory />
-                        <outputDirectory />
+                    <fileSet>
                         <!-- Copy necessary DSpace subdirectories into Test environment -->
                         <includes>
                             <include>bin/**</include>
@@ -51,13 +57,29 @@
                         </includes>
                         <filtered>true</filtered>
                     </fileSet>
-                    <fileSet> <!-- test data -->
+                </fileSets>
+            </sources>
+        </moduleSet>
+        <!-- Next, search for a 'src/test/data/dspaceFolder' data directory in
+             ANY of our modules. If found, copy its contents into the same "dspace"
+             subdirectory in the final ZIP file, as this is data to be used in testing.
+             NOTE: This *might* overwrite/overlay default files copied from above. -->
+        <moduleSet>
+            <includes>
+                <include>org.dspace:*</include>
+            </includes>
+            <sources>
+                <outputDirectoryMapping>dspace</outputDirectoryMapping>
+                <fileSets>
+                    <fileSet>
                         <directory>src/test/data/dspaceFolder</directory>
-                        <outputDirectory />
                     </fileSet>
                 </fileSets>
             </sources>
         </moduleSet>
+        <!-- Finally, copy the 'dspace.cfg.more' from the 'dspace-api' into
+             the root directory of the ZIP. This config will be merged/weaved
+             into the default dspace.cfg (see fileweaver maven plugin) -->
         <moduleSet>
             <includes>
                 <include>org.dspace:dspace-api</include>

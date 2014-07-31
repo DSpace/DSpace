@@ -261,7 +261,10 @@
             <build>
                 <plugins>
                     <!-- This plugin builds the testEnvironment.zip package
-                         based on the specifications in testEnvironment.xml -->
+                         based on the specifications in testEnvironment.xml.
+                         TestEnvironment.zip is an entire DSpace installation
+                         directory, which is installed by 'dspace-api' and
+                         used to run our DSpace Unit/Integration tests.  -->
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
