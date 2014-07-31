@@ -69,7 +69,7 @@
 <ol>
 	<li>Create a basic description of your work (author, title, date, abstract, etc. - <a href="http://drum.lib.umd.edu/handle/1903/13387">example</a>)</li>
 	<li>Upload files</li>
-<ol>
+</ol>
 <p>We can provide advice and assistance at any stage. If you would like to submit a complex research study with multiple data files and supporting documents, we can help you prepare your materials and organize your submission. <a href="mailto:drum-help@umd.edu">Email us</a> in advance.</p>
 
 <h2>Get your permanent DOI</h2>
