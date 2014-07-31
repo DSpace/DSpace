@@ -70,25 +70,17 @@ public class EZIDIdentifierProviderTest
             throws SQLException, AuthorizeException, IOException
     {
         ctx.turnOffAuthorisationSystem();
-        ctx.setCurrentUser(eperson);
-
-        // Create an Item to play with
-        WorkspaceItem wsItem = WorkspaceItem.create(ctx, collection, false);
-
-        // Get it from the workspace and set some metadata
-        Item item = wsItem.getItem();
+       
+         //Install a fresh item
+        WorkspaceItem wsItem = WorkspaceItem.create(context, collection, false);
+        Item item = InstallItem.installItem(context, wsItem);
+       
         itemID = item.getID();
 
         item.addMetadata("dc", "contributor", "author", null, "Author, A. N.");
         item.addMetadata("dc", "title", null, null, "A Test Object");
         item.addMetadata("dc", "publisher", null, null, "DSpace Test Harness");
         item.update();
-
-        // I think we have to do this?
-        WorkflowItem wfItem = WorkflowManager.startWithoutNotify(ctx, wsItem);
-        WorkflowManager.advance(ctx, wfItem, ctx.getCurrentUser());
-        wfItem.update();
-        wfItem.deleteWrapper();
 
         // Commit work, clean up
         ctx.commit();
