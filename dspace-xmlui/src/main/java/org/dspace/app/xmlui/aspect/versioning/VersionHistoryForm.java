@@ -170,7 +170,12 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 addItemIdentifier(row.addCell(), item, version);
 
                 EPerson editor = version.getEperson();
-                row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName());
+                if (editor != null)
+                {
+                    row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName());
+                } else {
+                    row.addCell().addContent("");
+                }
                 row.addCell().addContent(new DCDate(version.getVersionDate()).toString());
                 row.addCell().addContent(version.getSummary());
 

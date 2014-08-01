@@ -34,13 +34,10 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -87,10 +84,10 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {      
-		String token = parameters.getParameter("token", "");
-		String decision = parameters.getParameter("decision", "");
+        String token = parameters.getParameter("token", "");
+        String decision = parameters.getParameter("decision", "");
 
-		return HashUtil.hash(token+"-"+decision);
+        return HashUtil.hash(token+"-"+decision);
     }
 
     /**
@@ -115,60 +112,63 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
             UIException, SQLException, IOException, AuthorizeException
     {
     	Request request = ObjectModelHelper.getRequest(objectModel);
-		Context context = ContextUtil.obtainContext(objectModel);
+        Context context = ContextUtil.obtainContext(objectModel);
+
 
         String token = (String) request.getAttribute("token");
         RequestItem requestItem = RequestItem.findByToken(context, token);
 
-		String title;
-		Item item = Item.find(context, requestItem.getItemID());
-		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-		if (titleDC != null || titleDC.length > 0)
-			title = titleDC[0].value;
+        String title;
+        Item item = Item.find(context, requestItem.getItemID());
+        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
+        if (titleDC != null || titleDC.length > 0)
+        {
+            title = titleDC[0].value;
+        }
 		else
-			title = "untitled";
-		
-		RequestItemAuthor author = new DSpace()
-				.getServiceManager()
-				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
-						RequestItemAuthorExtractor.class)
-				.getRequestItemAuthor(context, item);
-                
-                String name = null;
-                String email = null;
-                String messageBody = "itemRequest.response.body.approve";
-                        
-                        if(author != null)
-                        {
-                            name = author.getFullName();
-                            email = author.getEmail();
-                        }
-                        else
-                        {
-                            name = ConfigurationManager
-                                    .getProperty("mail.helpdesk");
-                            
-                            if (null == name) 
-                            {
-                                name = ConfigurationManager
-                                        .getProperty("mail.admin");
-                                email = name;
-                            }
-                            messageBody = "itemRequest.admin.response.body.approve";
-                                   
-                        }
+        {
+            title = "untitled";
+        }
 
-		Object[] args = new String[]{
-					requestItem.getReqName(), // User
-					HandleManager.getCanonicalForm(item.getHandle()), // URL
-					title, // request item title
-					name, // # author name
-					email // # authoremail
-				};
-		
-		String subject = I18nUtil.getMessage("itemRequest.response.subject.approve", context);
-		String messageTemplate = MessageFormat.format(I18nUtil.getMessage(messageBody, context), args);
-		
+        RequestItemAuthor author = new DSpace()
+                .getServiceManager()
+                .getServiceByName(RequestItemAuthorExtractor.class.getName(),
+                                RequestItemAuthorExtractor.class)
+                .getRequestItemAuthor(context, item);
+
+        String name = null;
+        String email = null;
+        String messageBody = "itemRequest.response.body.approve";
+
+        if(author != null)
+        {
+            name = author.getFullName();
+            email = author.getEmail();
+        }
+        else
+        {
+            email = (new DSpace()).getConfigurationService().getProperty("mail.helpdesk");
+
+            if (null == email)
+            {
+                email = (new DSpace()).getConfigurationService().getProperty("mail.admin");
+            }
+            name = email;
+
+            messageBody = "itemRequest.admin.response.body.approve";
+        }
+
+        Object[] args = new String[]{
+                                requestItem.getReqName(), // User
+                                HandleManager.getCanonicalForm(item.getHandle()), // URL
+                                title, // request item title
+                                name, // # author name
+                                email // # authoremail
+                        };
+
+        String subject = I18nUtil.getMessage("itemRequest.response.subject.approve", context);
+        String messageTemplate = MessageFormat.format(I18nUtil.getMessage(messageBody, context), args);
+
         Division itemRequest = body.addInteractiveDivision("itemRequest-form", request.getRequestURI(),Division.METHOD_POST,"primary");
         itemRequest.setHead(T_head);
         

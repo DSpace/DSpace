@@ -109,20 +109,37 @@ public class SendItemRequestAction extends AbstractAction
         if (titleDC != null && titleDC.length > 0) {
             title = titleDC[0].value;
         }
+        String emailRequest;
+
+        RequestItemAuthor author = new DSpace()
+                        .getServiceManager()
+                        .getServiceByName(RequestItemAuthorExtractor.class.getName(),
+                                        RequestItemAuthorExtractor.class)
+                        .getRequestItemAuthor(context, item);
         
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
-                .getServiceByName(
-                        RequestItemAuthorExtractor.class.getName(),
-                        RequestItemAuthorExtractor.class
-                )
-                .getRequestItemAuthor(context, item);
+        String recipientEmail = null;
+        String recipientName = null;
+        if (author != null)
+        {
+            recipientEmail = author.getEmail();
+            recipientName = author.getFullName();
+        }
+        if(recipientEmail!=null){
+            emailRequest=recipientEmail;
+        } else {
+            emailRequest=ConfigurationManager.getProperty("mail.helpdesk");
+            recipientName = "helpdesk team";
+        }
+        if(emailRequest==null){
+            emailRequest=ConfigurationManager.getProperty("mail.admin");
+            recipientName = "DSpace administrator";
+        }
 
         RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
 
         // All data is there, send the email
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "request_item.author"));
-        email.addRecipient(requestItemAuthor.getEmail());
+        email.addRecipient(emailRequest);
 
         email.addArgument(requesterName);    
         email.addArgument(requesterEmail);   
@@ -131,8 +148,8 @@ public class SendItemRequestAction extends AbstractAction
         email.addArgument(title);    // request item title
         email.addArgument(message);   // message
         email.addArgument(getLinkTokenEmail(context,requestItem));
-        email.addArgument(requestItemAuthor.getFullName());    //   corresponding author name
-        email.addArgument(requestItemAuthor.getEmail());    //   corresponding author email
+        email.addArgument(recipientName);    //   corresponding author name
+        email.addArgument(recipientEmail);    //   corresponding author email
         email.addArgument(ConfigurationManager.getProperty("dspace.name"));
         email.addArgument(ConfigurationManager.getProperty("mail.helpdesk"));
 

@@ -8,14 +8,33 @@
 
 package org.dspace.eperson;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.*;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
 import org.junit.*;
+
+import javax.mail.MessagingException;
+
 import static org.junit.Assert.*;
 
 /**
@@ -24,7 +43,7 @@ import static org.junit.Assert.*;
  */
 public class EPersonTest extends AbstractUnitTest
 {
-    private static TableRow row1;
+    private static final Logger log = Logger.getLogger("EPersonTest.class");
 
     public EPersonTest()
     {
@@ -42,7 +61,10 @@ public class EPersonTest extends AbstractUnitTest
     public void init()
     {
         super.init();
+    }
 
+    protected static TableRow prepareTableRow()
+    {
         // Build a TableRow for an EPerson to wrap
         final ArrayList<String> epersonColumns = new ArrayList<String>();
         epersonColumns.add("eperson_id");
@@ -50,611 +72,8 @@ public class EPersonTest extends AbstractUnitTest
         epersonColumns.add("salt");
         epersonColumns.add("digest_algorithm");
 
-        row1 = new TableRow("EPerson", epersonColumns);   
+        return new TableRow("EPerson", epersonColumns);
     }
-
-    /**
-     * Test of equals method, of class EPerson.
-     */
-/*
-    @Test
-    public void testEquals()
-    {
-        System.out.println("equals");
-        Object obj = null;
-        EPerson instance = null;
-        boolean expResult = false;
-        boolean result = instance.equals(obj);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of hashCode method, of class EPerson.
-     */
-/*
-    @Test
-    public void testHashCode()
-    {
-        System.out.println("hashCode");
-        EPerson instance = null;
-        int expResult = 0;
-        int result = instance.hashCode();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of find method, of class EPerson.
-     */
-/*
-    @Test
-    public void testFind()
-            throws Exception
-    {
-        System.out.println("find");
-        Context context = null;
-        int id = 0;
-        EPerson expResult = null;
-        EPerson result = EPerson.find(context, id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of findByEmail method, of class EPerson.
-     */
-/*
-    @Test
-    public void testFindByEmail()
-            throws Exception
-    {
-        System.out.println("findByEmail");
-        Context context = null;
-        String email = "";
-        EPerson expResult = null;
-        EPerson result = EPerson.findByEmail(context, email);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of findByNetid method, of class EPerson.
-     */
-/*
-    @Test
-    public void testFindByNetid()
-            throws Exception
-    {
-        System.out.println("findByNetid");
-        Context context = null;
-        String netid = "";
-        EPerson expResult = null;
-        EPerson result = EPerson.findByNetid(context, netid);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of search method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSearch_Context_String()
-            throws Exception
-    {
-        System.out.println("search");
-        Context context = null;
-        String query = "";
-        EPerson[] expResult = null;
-        EPerson[] result = EPerson.search(context, query);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of search method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSearch_4args()
-            throws Exception
-    {
-        System.out.println("search");
-        Context context = null;
-        String query = "";
-        int offset = 0;
-        int limit = 0;
-        EPerson[] expResult = null;
-        EPerson[] result = EPerson.search(context, query, offset, limit);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of searchResultCount method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSearchResultCount()
-            throws Exception
-    {
-        System.out.println("searchResultCount");
-        Context context = null;
-        String query = "";
-        int expResult = 0;
-        int result = EPerson.searchResultCount(context, query);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of findAll method, of class EPerson.
-     */
-/*
-    @Test
-    public void testFindAll()
-            throws Exception
-    {
-        System.out.println("findAll");
-        Context context = null;
-        int sortField = 0;
-        EPerson[] expResult = null;
-        EPerson[] result = EPerson.findAll(context, sortField);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of create method, of class EPerson.
-     */
-/*
-    @Test
-    public void testCreate()
-            throws Exception
-    {
-        System.out.println("create");
-        Context context = null;
-        EPerson expResult = null;
-        EPerson result = EPerson.create(context);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of delete method, of class EPerson.
-     */
-/*
-    @Test
-    public void testDelete()
-            throws Exception
-    {
-        System.out.println("delete");
-        EPerson instance = null;
-        instance.delete();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getID method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetID()
-    {
-        System.out.println("getID");
-        EPerson instance = null;
-        int expResult = 0;
-        int result = instance.getID();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getLanguage method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetLanguage()
-    {
-        System.out.println("getLanguage");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getLanguage();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setLanguage method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetLanguage()
-    {
-        System.out.println("setLanguage");
-        String language = "";
-        EPerson instance = null;
-        instance.setLanguage(language);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getHandle method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetHandle()
-    {
-        System.out.println("getHandle");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getHandle();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getEmail method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetEmail()
-    {
-        System.out.println("getEmail");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getEmail();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setEmail method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetEmail()
-    {
-        System.out.println("setEmail");
-        String s = "";
-        EPerson instance = null;
-        instance.setEmail(s);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getNetid method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetNetid()
-    {
-        System.out.println("getNetid");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getNetid();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setNetid method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetNetid()
-    {
-        System.out.println("setNetid");
-        String s = "";
-        EPerson instance = null;
-        instance.setNetid(s);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getFullName method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetFullName()
-    {
-        System.out.println("getFullName");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getFullName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getFirstName method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetFirstName()
-    {
-        System.out.println("getFirstName");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getFirstName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setFirstName method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetFirstName()
-    {
-        System.out.println("setFirstName");
-        String firstname = "";
-        EPerson instance = null;
-        instance.setFirstName(firstname);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getLastName method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetLastName()
-    {
-        System.out.println("getLastName");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getLastName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setLastName method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetLastName()
-    {
-        System.out.println("setLastName");
-        String lastname = "";
-        EPerson instance = null;
-        instance.setLastName(lastname);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setCanLogIn method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetCanLogIn()
-    {
-        System.out.println("setCanLogIn");
-        boolean login = false;
-        EPerson instance = null;
-        instance.setCanLogIn(login);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of canLogIn method, of class EPerson.
-     */
-/*
-    @Test
-    public void testCanLogIn()
-    {
-        System.out.println("canLogIn");
-        EPerson instance = null;
-        boolean expResult = false;
-        boolean result = instance.canLogIn();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setRequireCertificate method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetRequireCertificate()
-    {
-        System.out.println("setRequireCertificate");
-        boolean isrequired = false;
-        EPerson instance = null;
-        instance.setRequireCertificate(isrequired);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getRequireCertificate method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetRequireCertificate()
-    {
-        System.out.println("getRequireCertificate");
-        EPerson instance = null;
-        boolean expResult = false;
-        boolean result = instance.getRequireCertificate();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setSelfRegistered method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetSelfRegistered()
-    {
-        System.out.println("setSelfRegistered");
-        boolean sr = false;
-        EPerson instance = null;
-        instance.setSelfRegistered(sr);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getSelfRegistered method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetSelfRegistered()
-    {
-        System.out.println("getSelfRegistered");
-        EPerson instance = null;
-        boolean expResult = false;
-        boolean result = instance.getSelfRegistered();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getMetadata method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetMetadata()
-    {
-        System.out.println("getMetadata");
-        String field = "";
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getMetadata(field);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setMetadata method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetMetadata()
-    {
-        System.out.println("setMetadata");
-        String field = "";
-        String value = "";
-        EPerson instance = null;
-        instance.setMetadata(field, value);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setPassword method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetPassword()
-    {
-        System.out.println("setPassword");
-        String s = "";
-        EPerson instance = null;
-        instance.setPassword(s);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of setPasswordHash method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSetPasswordHash()
-    {
-        System.out.println("setPasswordHash");
-        PasswordHash password = null;
-        EPerson instance = null;
-        instance.setPasswordHash(password);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of getPasswordHash method, of class EPerson.
-     */
-/*
-    @Test
-    public void testGetPasswordHash()
-    {
-        System.out.println("getPasswordHash");
-        EPerson instance = null;
-        PasswordHash expResult = null;
-        PasswordHash result = instance.getPasswordHash();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
 
     /**
      * Test of checkPassword method, of class EPerson.
@@ -664,7 +83,7 @@ public class EPersonTest extends AbstractUnitTest
             throws SQLException, DecoderException
     {
         final String attempt = "secret";
-        EPerson instance = new EPerson(context, row1);
+        EPerson instance = new EPerson(context, prepareTableRow());
 
         // Test old unsalted MD5 hash
         final String hash = "5ebe2294ecd0e0f08eab7690d2a6ee69"; // MD5("secret");
@@ -682,22 +101,6 @@ public class EPersonTest extends AbstractUnitTest
     }
 
     /**
-     * Test of update method, of class EPerson.
-     */
-/*
-    @Test
-    public void testUpdate()
-            throws Exception
-    {
-        System.out.println("update");
-        EPerson instance = null;
-        instance.update();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
      * Test of getType method, of class EPerson.
      */
     @Test
@@ -705,44 +108,513 @@ public class EPersonTest extends AbstractUnitTest
             throws SQLException
     {
         System.out.println("getType");
-        EPerson instance = new EPerson(context, row1);
+        EPerson instance = new EPerson(context, prepareTableRow());
         int expResult = Constants.EPERSON;
         int result = instance.getType();
         assertEquals("Should return Constants.EPERSON", expResult, result);
     }
 
     /**
-     * Test of getDeleteConstraints method, of class EPerson.
+     * Test creation of an EPerson.
      */
-/*
     @Test
-    public void testGetDeleteConstraints()
-            throws Exception
+    public void testEPersonCreation()
+            throws SQLException, AuthorizeException
     {
-        System.out.println("getDeleteConstraints");
-        EPerson instance = null;
-        List expResult = null;
-        List result = instance.getDeleteConstraints();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        final int id = this.prepareEPerson();
+
+        TableRow myRow = DatabaseManager.findByUnique(context, "eperson", "eperson_id", id);
+        assertNotNull("Cannot find an EPerson's table row by its ID.", myRow);
+        assertEquals("The id of an EPerson was not or not correctly stored in the database.",
+                     id, myRow.getIntColumn("eperson_id"));
     }
-*/
 
     /**
-     * Test of getName method, of class EPerson.
+     * Test persistence of an EPerson.
      */
-/*
     @Test
-    public void testGetName()
+    public void testEPersonPersistence()
+            throws SQLException, AuthorizeException
     {
-        System.out.println("getName");
-        EPerson instance = null;
-        String expResult = "";
-        String result = instance.getName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testepersonpersistence@example.org";
+        final int id = prepareEPerson(email);
+
+        TableRow myRow = DatabaseManager.findByUnique(context, "eperson", "eperson_id", id);
+        assertNotNull("Cannot find an EPerson's table row by its ID.", myRow);
+        assertEquals("The id of an EPerson was not or not correctly stored in the database.",
+                     id,
+                     myRow.getIntColumn("eperson_id"));
+        assertEquals("The email address of an EPerson was not stored correctly.", email, myRow.getStringColumn("email"));
     }
-*/
+
+    /**
+     * Simple test if deletion of an EPerson throws any exceptions.
+     */
+    @Test
+    public void testDeleteEPerson() throws SQLException, AuthorizeException
+    {
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testdeleteeperson@example.org";
+        final int id = prepareEPerson(email);
+
+        context.turnOffAuthorisationSystem();
+        try
+        {
+            EPerson ep = EPerson.find(context, id);
+            ep.delete();
+        }
+        catch (SQLException | IOException | EPersonDeletionException | AuthorizeException ex)
+        {
+            log.error("Cannot delete EPersion, caught " + ex.getClass().getName() + ":", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        context.restoreAuthSystemState();
+        context.commit();
+        context.clearCache();
+
+        TableRowIterator tri = DatabaseManager.query(context, "SELECT * FROM eperson WHERE eperson_id = ?", id);
+        assertFalse("EPerson has not been deleted correctly!", tri.hasNext());
+    }
+
+    /**
+     * Test to delete an EPerson to which metadata were added.
+     */
+    @Test
+    public void testDeleteEPersonWithMetadata() throws SQLException, AuthorizeException
+    {
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testdeleteepersonwithmetadata@example.org";
+        final int id = prepareEPerson(email);
+
+        context.turnOffAuthorisationSystem();
+        EPerson ep = EPerson.find(context, id);
+        ep.setFirstName("Jane");
+        ep.setLastName("Doe");
+        ep.addMetadata("dc", "description", null, "en", "EPerson created during a unit test.");
+        ep.update();
+        // commit and clear cache
+        context.restoreAuthSystemState();
+        context.commit();
+        context.clearCache();
+        context.turnOffAuthorisationSystem();
+        try
+        {
+            // reload eperson
+            ep = EPerson.find(context, id);
+            ep.delete();
+        }
+        catch (SQLException | IOException | EPersonDeletionException | AuthorizeException ex)
+        {
+            log.error("Cannot delete EPersion, caught " + ex.getClass().getName() + ":", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Test that an EPerson does not get deleted if it submitted an Item.
+     */
+    @Test
+    public void testNonCascadingDeletionOfSubmitter()
+            throws SQLException, AuthorizeException
+    {
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testnoncascadingdeletionofsubmitter@example.org";
+        final int id = prepareEPerson(email);
+        EPerson ep = EPerson.find(context, id);
+
+        try
+        {
+            Item item = prepareItem(ep);
+        }
+        catch (SQLException | AuthorizeException | IOException ex)
+        {
+            log.error("Caught an Exception while initializing an Item. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while initializing an Item. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+
+        context.turnOffAuthorisationSystem();
+
+        try
+        {
+            ep.delete(false);
+        }
+        catch (SQLException | IOException | AuthorizeException ex)
+        {
+            log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        catch (EPersonDeletionException ex)
+        {
+            List<String> tableList = ex.getTables();
+            Iterator<String> iterator = tableList.iterator();
+            while (iterator.hasNext())
+            {
+                String tableName = iterator.next();
+                if (StringUtils.equalsIgnoreCase(tableName, "item"))
+                {
+                    return;
+                }
+            }
+        }
+        // if we did not get and EPersonDeletionException or it did not contain the item table, we should fail
+        // because it was not recognized that the EPerson is used as submitter.
+        fail("It was not recognized that a EPerson should be deleted that is referenced in the item table.");
+    }
+
+    /**
+     * Test that the submitter is set to null if the specified EPerson was deleted using cascading.
+     */
+    @Test
+    public void testCascadingDeletionOfSubmitter()
+            throws SQLException, AuthorizeException
+    {
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testcascadingdeletionofsubmitter@example.org";
+        final int id = prepareEPerson(email);
+        EPerson ep = EPerson.find(context, id);
+        Item item = null;
+        try
+        {
+            item = prepareItem(ep);
+        }
+        catch (SQLException | AuthorizeException | IOException ex)
+        {
+            log.error("Caught an Exception while initializing an Item. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while initializing an Item. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        assertNotNull(item);
+        final int itemID = item.getID();
+
+        context.turnOffAuthorisationSystem();
+        try
+        {
+            ep.delete(true);
+        }
+        catch (SQLException | IOException | AuthorizeException ex)
+        {
+            log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        catch (EPersonDeletionException ex)
+        {
+            fail("Caught an EPersonDeletionException while trying to cascading delete an EPerson: " + ex.getMessage());
+        }
+
+        // clear the context cache, reload item, check submitter
+        context.clearCache();
+
+        item = Item.find(context, itemID);
+        assertNotNull("Could not load item after cascading deletion of the submitter.", item);
+        assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted item null.",
+                   item.getSubmitter());
+    }
+
+    /**
+     * Test that an unsubmitted workspace items get deleted when an EPerson gets deleted.
+     */
+    @Test
+    public void testCascadingDeletionOfUnsubmittedWorkspaceItem()
+            throws SQLException, AuthorizeException, IOException
+    {
+        // email has to be unique. We use the name of the current test as local part here
+        final String email = "testcascadingdeletionofunsbumittedworkspaceitem@example.org";
+        final int id = prepareEPerson(email);
+        EPerson ep = EPerson.find(context, id);
+
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem wsi = prepareWorkspaceItem(ep);
+        Item item = wsi.getItem();
+        item.addMetadata("dc", "title", null, "en", "Testdocument 1");
+        item.update();
+        final int wsiID = wsi.getID();
+        final int itemID = item.getID();
+        context.restoreAuthSystemState();
+        context.commit();
+        context.clearCache();
+
+        context.turnOffAuthorisationSystem();
+        try
+        {
+            ep.delete(true);
+        }
+        catch (SQLException | IOException | AuthorizeException ex)
+        {
+            log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        catch (EPersonDeletionException ex)
+        {
+            fail("Caught an EPersonDeletionException while trying to cascading delete an EPerson: " + ex.getMessage());
+        }
+
+        context.restoreAuthSystemState();
+        context.commit();
+        // clear the context cache, reload item, check submitter
+        context.clearCache();
+
+        try
+        {
+            WorkspaceItem restoredWsi = WorkspaceItem.find(context, wsiID);
+            Item restoredItem = Item.find(context, itemID);
+            assertNull("An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.", restoredWsi);
+            assertNull("An unsubmited Item wasn't deleted while cascading deleting the submitter.", restoredItem);
+        }
+        catch (SQLException ex)
+        {
+            log.error("SQLException while trying to load previously stored");
+        }
+    }
+
+    /**
+     * Test that submitted but not yet archived items do not get delete while cascading deletion of an EPerson.
+     */
+    @Test
+    public void testCascadingDeleteSubmitterPreservesWorkflowItems()
+            throws SQLException, AuthorizeException, IOException, MessagingException
+    {
+        // create an item used in the test
+        final String email =" testCascadingDeleteSubmitterPreservesWorkflowItems@example.org";
+        final int id = prepareEPerson(email);
+        EPerson ep = EPerson.find(context, id);
+        WorkspaceItem wsi = null;
+        try
+        {
+            wsi = prepareWorkspaceItem(ep);
+        }
+        catch (SQLException | AuthorizeException | IOException ex)
+        {
+            log.error("Caught an Exception while initializing an WorkspaceItem. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while initializing an WorkspaceItem. " + ex.getClass().getName() + ": "
+                         + ex.getMessage());
+        }
+        assertNotNull(wsi);
+        context.turnOffAuthorisationSystem();
+
+        // for this test we need an workflow item that is not yet submitted. Currently the Workflow advance
+        // automatically if nobody is defined to perform a step (see comments of DS-1941).
+        // We need to configure a collection to have a workflow step and set a person to perform this step. Then we can
+        // create an item, start the workflow and delete the item's submitter.
+        Group wfGroup = wsi.getCollection().createWorkflowGroup(1);
+        wsi.getCollection().update();
+        EPerson groupMember = EPerson.create(context);
+        groupMember.setEmail("testCascadingDeleteSubmitterPreservesWorkflowItems2@example.org");
+        groupMember.update();
+        wfGroup.addMember(groupMember);
+        wfGroup.update();
+
+        // DSpace currently contains two workflow systems. The newer XMLWorfklow needs additional tables that are not
+        // part of the test database yet. While it is expected that it becomes the default workflow system (DS-2059)
+        // one day, this won't happen before it its backported to JSPUI (DS-2121).
+        // TODO: add tests using the configurable workflowsystem
+        final int wfiID = WorkflowManager.startWithoutNotify(context, wsi).getID();
+
+        context.restoreAuthSystemState();
+        context.commit();
+        context.clearCache();
+        context.turnOffAuthorisationSystem();
+
+        // check that the workflow item exists.
+        TableRow tr = DatabaseManager.findByUnique(context, "WorkflowItem", "workflow_id", wfiID);
+        assertNotNull("Cannot find currently created WorkflowItem!", tr);
+
+        // delete the submitter
+        try
+        {
+            ep.delete(true);
+        }
+        catch (SQLException | IOException | AuthorizeException ex)
+        {
+            log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        catch (EPersonDeletionException ex)
+        {
+            fail("Caught an EPersonDeletionException while trying to cascading delete an EPerson: " + ex.getMessage());
+        }
+        context.restoreAuthSystemState();
+        context.commit();
+        context.turnOffAuthorisationSystem();
+        context.clearCache();
+
+        // check whether the workflow item still exists.
+        WorkflowItem wfi = WorkflowItem.find(context, wfiID);
+        assertNotNull("Could not load WorkflowItem after cascading deletion of the submitter.", wfi);
+        assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.",
+                   wfi.getSubmitter());
+    }
+
+    /**
+     * Test that deleting a Person that claimed a task, repools the task.
+     */
+    @Test
+    public void testDeletingAnTaskHolderUnclaimsTask()
+            throws SQLException, AuthorizeException, MessagingException, IOException
+    {
+        // create an item used in the test
+        final String email =" testDeletingAnTaskHolderUnclaimsTask@example.org";
+        EPerson submitter = EPerson.find(context, prepareEPerson(email));
+        WorkspaceItem wsi = null;
+        try
+        {
+            wsi = prepareWorkspaceItem(submitter);
+        }
+        catch (SQLException | AuthorizeException | IOException ex)
+        {
+            log.error("Caught an Exception while initializing an WorkspaceItem. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while initializing an WorkspaceItem. " + ex.getClass().getName() + ": "
+                         + ex.getMessage());
+        }
+        assertNotNull(wsi);
+        context.turnOffAuthorisationSystem();
+
+        // for this test we need an workflow item that is not yet submitted. Currently the Workflow advance
+        // automatically if nobody is defined to perform a step (see comments of DS-1941).
+        // We need to configure a collection to have a workflow step and set at least two persons to perform this step.
+        // Then we can create an item, start the workflow, claim the task and delete the person who claimed it.
+        Group wfGroup = wsi.getCollection().createWorkflowGroup(1);
+        wsi.getCollection().update();
+        EPerson ep = EPerson.create(context);
+        ep.setEmail("testDeletingAnTaskHolderUnclaimsTask2@example.org");
+        ep.update();
+        final int id = ep.getID();
+        wfGroup.addMember(ep);
+        EPerson coWorker = EPerson.create(context);
+        coWorker.setEmail("testDeletingAnTaskHolderUnclamisTask3example.org");
+        coWorker.update();
+        wfGroup.addMember(coWorker);
+        wfGroup.update();
+        context.restoreAuthSystemState();
+        context.commit();
+        context.turnOffAuthorisationSystem();
+
+        // DSpace currently contains two workflow systems. The newer XMLWorfklow needs additional tables that are not
+        // part of the test database yet. While it is expected that it becomes the default workflow system (DS-2059)
+        // one day, this won't happen before it its backported to JSPUI (DS-2121).
+        // TODO: add tests using the configurable xmlworkflow system
+        WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
+        final int wfiID = wfi.getID();
+        context.commit();
+
+        WorkflowManager.claim(context, wfi, ep);
+        context.restoreAuthSystemState();
+        context.commit();
+        context.clearCache();
+        context.turnOffAuthorisationSystem();
+
+        // delete the task owner
+        try
+        {
+            ep.delete(true);
+        }
+        catch (SQLException | IOException | AuthorizeException ex)
+        {
+            log.error("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": ", ex);
+            fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        catch (EPersonDeletionException ex)
+        {
+            fail("Caught an EPersonDeletionException while trying to cascading delete an EPerson: " + ex.getMessage());
+        }
+        context.restoreAuthSystemState();
+        context.commit();
+        context.turnOffAuthorisationSystem();
+        context.clearCache();
+
+        // check whether the workflow item still exists and is unclaimed.
+        wfi = WorkflowItem.find(context, wfiID);
+        assertNotNull("Could not load WorkflowItem after cascading deletion of its owner.", wfi);
+        assertNull("Cascading deletion of an EPerson did not repooled a claimed task.", wfi.getOwner());
+    }
+
+    /**
+     * Creates an item, sets the specified submitter.
+     *
+     * This method is just an shortcut, so we must not use all the code again and again.
+     * @param submitter
+     * @return the created item.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    private Item prepareItem(EPerson submitter)
+            throws SQLException, AuthorizeException, IOException
+    {
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem wsi = prepareWorkspaceItem(submitter);
+        Item item = InstallItem.installItem(context, wsi);
+        //we need to commit the changes so we don't block the table for testing
+        context.restoreAuthSystemState();
+        context.commit();
+
+        return item;
+    }
+
+    /**
+     * Creates a WorkspaceItem and sets the specified submitter.
+     *
+     * This method is just an shortcut, so we must not use all the code again and again.
+     * @param submitter
+     * @return the created WorkspaceItem.
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    private WorkspaceItem prepareWorkspaceItem(EPerson submitter)
+            throws SQLException, AuthorizeException, IOException
+    {
+        context.turnOffAuthorisationSystem();
+        // create a community, a collection and a WorkspaceItem
+        Community community = Community.create(null, context);
+        Collection collection = community.createCollection();
+        WorkspaceItem wsi = WorkspaceItem.create(context, collection, false);
+        // set the submitter
+        Item item = wsi.getItem();
+        item.setSubmitter(submitter);
+        item.update();
+        wsi.update();
+        context.restoreAuthSystemState();
+        context.commit();
+
+        return wsi;
+    }
+
+    /**
+     * Creates an EPerson.
+     *
+     * Shortcut for calling prepareEPerson(null).
+     *
+     * @return The id of the create EPerson.
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private int prepareEPerson()
+            throws SQLException, AuthorizeException
+    {
+        return prepareEPerson(null);
+    }
+
+    /**
+     * Creates an EPerson and sets the email adress if the attribute is not empty or null.
+     * @param email the email address or null
+     * @return The id of the created EPerson
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    private int prepareEPerson(String email)
+            throws SQLException, AuthorizeException
+    {
+        context.turnOffAuthorisationSystem();
+        EPerson ep = EPerson.create(context);
+        if (StringUtils.isNotEmpty(email))
+        {
+            ep.setEmail(email);
+        }
+        ep.update();
+        context.restoreAuthSystemState();
+        context.commit();
+        int id = ep.getID();
+        context.clearCache();
+        return id;
+    }
 }

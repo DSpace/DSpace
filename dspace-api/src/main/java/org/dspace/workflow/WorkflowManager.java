@@ -740,30 +740,33 @@ public class WorkflowManager
         {
             // Get submitter
             EPerson ep = i.getSubmitter();
-            // Get the Locale
-            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            // Get the item handle to email to user
-            String handle = HandleManager.findHandle(c, i);
-
-            // Get title
-            Metadatum[] titles = i.getDC("title", null, Item.ANY);
-            String title = "";
-            try
-            {
-                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            }
-            catch (MissingResourceException e)
-            {
-                title = "Untitled";
-            }
-            if (titles.length > 0)
-            {
-                title = titles[0].value;
-            }
+            // send the notification only if the person was not deleted in the
+            // meantime between submission and archiving.
             if(null != ep)
             {
+                // Get the Locale
+                Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+
+                // Get the item handle to email to user
+                String handle = HandleManager.findHandle(c, i);
+
+                // Get title
+                Metadatum[] titles = i.getDC("title", null, Item.ANY);
+                String title = "";
+                try
+                {
+                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                }
+                catch (MissingResourceException e)
+                {
+                    title = "Untitled";
+                }
+                if (titles.length > 0)
+                {
+                    title = titles[0].value;
+                }
                 email.addRecipient(ep.getEmail());
                 email.addArgument(title);
                 email.addArgument(coll.getMetadata("name"));

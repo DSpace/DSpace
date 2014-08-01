@@ -291,9 +291,9 @@ public class FlowEPersonUtils {
     	{
     		EPerson personDeleted = EPerson.find(context, Integer.valueOf(id));
     		try {
-				personDeleted.delete();
+                    personDeleted.delete();
     		} 
-    		catch (EPersonDeletionException epde)
+    		catch (EPersonDeletionException | IOException ex)
     		{
     			String firstName = personDeleted.getFirstName();
     			String lastName = personDeleted.getLastName();

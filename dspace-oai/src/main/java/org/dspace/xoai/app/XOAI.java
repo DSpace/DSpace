@@ -247,9 +247,7 @@ public class XOAI {
         if(null != item.getSubmitter())
         {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
-        }else{
-        doc.addField("item.submitter", null);
-    }
+        }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",

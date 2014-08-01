@@ -37,7 +37,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -123,42 +122,39 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
         String token = (String) request.getAttribute("token");
         RequestItem requestItem = RequestItem.findByToken(context, token);
 
-		String title;
-		Item item = Item.find(context, requestItem.getItemID());
-		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-		if (titleDC != null || titleDC.length > 0)
-			title = titleDC[0].value;
-		else
-			title = "untitled";
-		
-		RequestItemAuthor author = new DSpace()
-				.getServiceManager()
-				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
-						RequestItemAuthorExtractor.class)
-				.getRequestItemAuthor(context, item);
+        String title;
+        Item item = Item.find(context, requestItem.getItemID());
+        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
+        if (titleDC != null || titleDC.length > 0)
+                title = titleDC[0].value;
+        else
+                title = "untitled";
+
+        RequestItemAuthor author = new DSpace()
+                .getServiceManager()
+                .getServiceByName(RequestItemAuthorExtractor.class.getName(),
+                                RequestItemAuthorExtractor.class)
+                .getRequestItemAuthor(context, item);
                 
-                 String name = null;
-                 String email = null;
-                 String messageBody = "itemRequest.response.body.reject";
-                        
-                        if(null != author)
-                        {
-                            name = author.getFullName();
-                            email = author.getEmail();
-                        }
-                        else
-                        {
-                            name = ConfigurationManager
-                                    .getProperty("mail.helpdesk");
-                            if (null == name) 
-                            {
-                                name = ConfigurationManager
-                                        .getProperty("mail.admin");
-                                email = name;
-                            }
-                            messageBody ="itemRequest.admin.response.body.reject";
-                                   
-                        }
+        String name = null;
+        String email = null;
+        String messageBody = "itemRequest.response.body.reject";
+        if(null != author)
+        {
+            name = author.getFullName();
+            email = author.getEmail();
+        }
+        else
+        {
+            email = (new DSpace()).getConfigurationService().getProperty("mail.helpdesk");
+            if (email == null)
+            {
+                email = (new DSpace()).getConfigurationService().getProperty("mail.admin");
+            }
+            email = name;
+            messageBody ="itemRequest.admin.response.body.reject";
+
+        }
 
 
 		Object[] args = new String[]{

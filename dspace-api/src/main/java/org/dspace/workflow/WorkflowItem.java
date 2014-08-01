@@ -213,7 +213,14 @@ public class WorkflowItem implements InProgressSubmission
         return wfItems.toArray(new WorkflowItem[wfItems.size()]);
     }
     
-public static WorkflowItem[] findByOwner(Context context, EPerson owner)
+    /**
+     * Find all WorkflowItems owend by a specified EPerson.
+     * @param context
+     * @param owner
+     * @return
+     * @throws SQLException 
+     */
+    public static WorkflowItem[] findByOwner(Context context, EPerson owner)
             throws SQLException
     {
         List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();

@@ -155,9 +155,9 @@ public class RequestItemServlet extends DSpaceServlet
             title = titleDC[0].value;
         }
         else
-		{
-			title = I18nUtil.getMessage("jsp.general.untitled", context);
-		}
+        {
+                title = I18nUtil.getMessage("jsp.general.untitled", context);
+        }
           
         // User email from context
         String requesterEmail = request.getParameter("email");
@@ -240,41 +240,35 @@ public class RequestItemServlet extends DSpaceServlet
 						.getProperty("mail.helpdesk"));
                     email.setReplyTo(requesterEmail);
                     email.send();
-                }
-                
-                else
-                {
+                } else {
                     email = Email.getEmail(I18nUtil.getEmailFilename(
 				context.getCurrentLocale(), "request_item.to_admin"));
                     
                     String emailRequest = ConfigurationManager
 							.getProperty("mail.helpdesk");
 				
-				
-				if (emailRequest == null) {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.admin");
-				}
-				email.addRecipient(emailRequest);
+                    if (emailRequest == null)
+                    {
+                            emailRequest = ConfigurationManager.getProperty("mail.admin");
+                    }
+                    email.addRecipient(emailRequest);
 
-				email.addArgument(reqname);
-				email.addArgument(requesterEmail);
-				email.addArgument(allfiles ? I18nUtil
-						.getMessage("itemRequest.all") : Bitstream.find(
-						context, Integer.parseInt(bitstream_id)).getName());
-				email.addArgument(HandleManager.getCanonicalForm(item
-						.getHandle()));
-				email.addArgument(title); // request item title
-				email.addArgument(coment); // message
-				email.addArgument(RequestItemManager.getLinkTokenEmail(context,
-						bitstream_id, item.getID(), requesterEmail, reqname,
-						allfiles));
-                                
-				email.addArgument(ConfigurationManager
-						.getProperty("dspace.name"));
+                    email.addArgument(reqname);
+                    email.addArgument(requesterEmail);
+                    email.addArgument(allfiles ? I18nUtil
+                                    .getMessage("itemRequest.all") : Bitstream.find(
+                                    context, Integer.parseInt(bitstream_id)).getName());
+                    email.addArgument(HandleManager.getCanonicalForm(item
+                                    .getHandle()));
+                    email.addArgument(title); // request item title
+                    email.addArgument(coment); // message
+                    email.addArgument(RequestItemManager.getLinkTokenEmail(context,
+                                    bitstream_id, item.getID(), requesterEmail, reqname,
+                                    allfiles));
+
+                    email.addArgument(ConfigurationManager.getProperty("dspace.name"));
                     email.setReplyTo(requesterEmail);
                     email.send();
-                                    
                  }
 
                 log.info(LogManager.getHeader(context,

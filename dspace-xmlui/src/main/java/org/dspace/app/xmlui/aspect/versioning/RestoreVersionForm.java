@@ -88,7 +88,12 @@ public class RestoreVersionForm extends AbstractDSpaceTransformer
 
         Row row = table.addRow();
         row.addCell().addContent(version.getVersionNumber());
-        row.addCell().addContent(version.getEperson().getEmail());
+        if (version.getEperson() != null)
+        {
+            row.addCell().addContent(version.getEperson().getEmail());
+        } else {
+            row.addCell().addContent("");
+        }
         row.addCell().addContent(new DCDate(version.getVersionDate()).toString());
         row.addCell().addContent(version.getSummary());
 

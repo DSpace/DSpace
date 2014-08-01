@@ -7,6 +7,9 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.lang.ArrayUtils;
+
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +41,10 @@ public class EPersonDeletionException extends Exception
      */
     public EPersonDeletionException(List<String> tableList)
     {
-        super();
+        // this may not be the most beautiful way to print the tablenames as part or the error message.
+        // but it has to be a one liner, as the super() call must be the first statement in the constructor.
+        super("Cannot delete EPerson as it is referenced by the following database tables: "
+                      + ArrayUtils.toString(tableList.toArray()));
         myTableList = tableList;
     }
 
