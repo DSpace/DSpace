@@ -67,6 +67,9 @@ public class SolrLogger
     private static int count = 0;
     private static int commit = 10;
 
+    private static final String REFERRER_SOLR_FIELD = "referrer";
+    private static final String REFERRER_HTTP_HEADER = "referer";
+
     static
     {
     	log.info("solr.spidersfile:" + ConfigurationManager.getProperty("solr.spidersfile"));
@@ -172,15 +175,15 @@ public class SolrLogger
             SolrInputDocument doc1 = new SolrInputDocument();
             // Save our basic info that we already have
 
-            final String originalReferer = request.getHeader("referer");
-            log.info("SolrLogger - referer: " + originalReferer);
-            final Boolean reviewTokenPresent = SolrLoggerUtils.isReviewTokenPresent(originalReferer);
-            if(originalReferer!=null) {
-                String cleanedReferer = originalReferer;
+            final String originalReferrer = request.getHeader(REFERRER_HTTP_HEADER);
+            log.info("SolrLogger - referrer: " + originalReferrer);
+            final Boolean reviewTokenPresent = SolrLoggerUtils.isReviewTokenPresent(originalReferrer);
+            if(originalReferrer!=null) {
+                String cleanedReferrer = originalReferrer;
                 if(reviewTokenPresent) {
-                    cleanedReferer = SolrLoggerUtils.replaceReviewToken(originalReferer, SolrLoggerUtils.DUMMY_TOKEN);
+                    cleanedReferrer = SolrLoggerUtils.replaceReviewToken(originalReferrer, SolrLoggerUtils.DUMMY_TOKEN);
                 }
-                doc1.addField("referrer", cleanedReferer);
+                doc1.addField(REFERRER_SOLR_FIELD, cleanedReferrer);
             }
 
             String ip = request.getRemoteAddr();
@@ -567,12 +570,12 @@ public class SolrLogger
                 // Remove the original referrer
                 final String originalReferrer = doc.getFieldValue("referrer").toString();
                 final String cleanedReferrer = SolrLoggerUtils.replaceReviewToken(originalReferrer, SolrLoggerUtils.DUMMY_TOKEN);
-                doc.setField("referrer", cleanedReferrer);
+                doc.setField(REFERRER_SOLR_FIELD, cleanedReferrer);
                 SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
                 documents.add(newInput);
             }
         };
-        String query = "referrer:http*token=*";
+        String query = REFERRER_SOLR_FIELD + ":http*token=*";
         processor.execute(query);
         solr.deleteByQuery(query);
         solr.add(documents);
