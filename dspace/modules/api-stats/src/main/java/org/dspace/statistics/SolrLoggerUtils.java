@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utilities for checking/replacing review tokens in referer strings.
+ * Utilities for checking/replacing review tokens in referrer strings.
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class SolrLoggerUtils {
@@ -15,29 +15,29 @@ public class SolrLoggerUtils {
 
         /**
      * Replaces the review token with replacement text if token is present
-     * @param refererUri A referer string
+     * @param referrerUri A referrer string
      * @param replacementText The text to replace the token with
-     * @return a referer string, with the token replaced
+     * @return a referrer string, with the token replaced
      */
-    static String replaceReviewToken(String refererUri, String replacementText) {
-        Matcher matcher = REVIEW_TOKEN_PATTERN.matcher(refererUri);
+    static String replaceReviewToken(String referrerUri, String replacementText) {
+        Matcher matcher = REVIEW_TOKEN_PATTERN.matcher(referrerUri);
         if(matcher.matches()) {
             return matcher.group(1) + replacementText;
         } else {
-            return refererUri;
+            return referrerUri;
         }
     }
 
     /**
      * Returns true if a string looks like a URL and contains 'token=...'
-     * @param refererUrl The string to test
+     * @param referrerUrl The string to test
      * @return True if a token is found, false if not.
      */
-    static Boolean isReviewTokenPresent(String refererUrl) {
-        if(refererUrl == null) {
+    static Boolean isReviewTokenPresent(String referrerUrl) {
+        if(referrerUrl == null) {
             return false;
         } else {
-            return REVIEW_TOKEN_PATTERN.matcher(refererUrl).matches();
+            return REVIEW_TOKEN_PATTERN.matcher(referrerUrl).matches();
         }
     }
 }
