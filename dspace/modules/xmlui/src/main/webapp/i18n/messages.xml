@@ -3555,5 +3555,5 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.no_value">No Value</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.update">Update</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.return">Return</message>
-
+    <message key="xmlui.PaymentSystem.shoppingcart.order.help.title">Total price is calculated based on the currency and rate at the time of submission</message>
 </catalogue>
