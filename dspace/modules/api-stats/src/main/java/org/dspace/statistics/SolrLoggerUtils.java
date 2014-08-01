@@ -30,14 +30,14 @@ public class SolrLoggerUtils {
 
     /**
      * Returns true if a string looks like a URL and contains 'token=...'
-     * @param referrerUrl The string to test
+     * @param referrerUri The string to test
      * @return True if a token is found, false if not.
      */
-    static Boolean isReviewTokenPresent(String referrerUrl) {
-        if(referrerUrl == null) {
+    static Boolean isReviewTokenPresent(String referrerUri) {
+        if(referrerUri == null) {
             return false;
         } else {
-            return REVIEW_TOKEN_PATTERN.matcher(referrerUrl).matches();
+            return REVIEW_TOKEN_PATTERN.matcher(referrerUri).matches();
         }
     }
 }
