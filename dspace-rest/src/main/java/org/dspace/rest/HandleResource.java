@@ -32,18 +32,14 @@ import java.sql.SQLException;
 @Path("/handle")
 public class HandleResource {
     private static Logger log = Logger.getLogger(HandleResource.class);
-    private static org.dspace.core.Context context;
 
     @GET
     @Path("/{prefix}/{suffix}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.DSpaceObject getObject(@PathParam("prefix") String prefix, @PathParam("suffix") String suffix, @QueryParam("expand") String expand) {
+        org.dspace.core.Context context = null;
         try {
-            if(context == null || !context.isValid() ) {
-                context = new Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
+            context = new org.dspace.core.Context();
 
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
             if(dso == null) {
@@ -68,6 +64,14 @@ public class HandleResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } finally {
+            if(context != null) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage() + " occurred while trying to close");
+                }
+            }
         }
     }
 }

@@ -92,7 +92,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         assertThat("testSetNamespace 1",ms.getNamespace(),not(equalTo("")));
         assertThat("testSetNamespace 2",ms.getNamespace(),equalTo(namespace));
 
-        //we restore the old namespace to avoid issues
+        //we restore the old namespace to avoid issues in other tests
         ms.setNamespace(oldnamespace);
     }
 
@@ -110,13 +110,17 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of setName method, of class MetadataSchema.
      */
     @Test
-    public void testSetName() 
+    public void testSetName()
     {
+        String oldname = ms.getName();
         String name = "new name";
         ms.setName(name);
         assertThat("testSetName 0",ms.getName(),notNullValue());
         assertThat("testSetName 1",ms.getName(),not(equalTo("")));
         assertThat("testSetName 2",ms.getName(),equalTo(name));
+
+        //we restore the old name to avoid issues in other tests
+        ms.setName(oldname);
     }
 
     /**

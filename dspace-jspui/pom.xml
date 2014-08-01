@@ -53,8 +53,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!--Exclude license check for JSPUI files which don't need it-->
                     <excludes>
@@ -65,6 +65,7 @@
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
                         <exclude>**/bootstrap/**</exclude>
+                        <exclude>**/fonts/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -73,11 +73,11 @@
 				<xsl:for-each select="doc:metadata/doc:element[@name='bitstreams']/doc:element[@name='bitstream']/doc:field[@name='format']">
 					<dc:format><xsl:value-of select="." /></dc:format>
 				</xsl:for-each>
-				<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='covarage']/doc:element/doc:field[@name='value']">
-					<dc:covarage><xsl:value-of select="." /></dc:covarage>
+				<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:field[@name='value']">
+					<dc:coverage><xsl:value-of select="." /></dc:coverage>
 				</xsl:for-each>
-				<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='covarage']/doc:element/doc:element/doc:field[@name='value']">
-					<dc:covarage><xsl:value-of select="." /></dc:covarage>
+				<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:element/doc:field[@name='value']">
+					<dc:coverage><xsl:value-of select="." /></dc:coverage>
 				</xsl:for-each>
 				<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:field[@name='value']">
 					<dc:publisher><xsl:value-of select="." /></dc:publisher>

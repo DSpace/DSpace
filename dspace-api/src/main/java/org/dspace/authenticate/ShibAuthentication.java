@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -1094,6 +1095,22 @@ public class ShibAuthentication implements AuthenticationMethod
 			value = request.getHeader(name.toLowerCase());
 		if (StringUtils.isEmpty(value))
 			value = request.getHeader(name.toUpperCase());
+                
+                boolean reconvertAttributes = 
+                        ConfigurationManager.getBooleanProperty(
+                            "authentication-shibboleth",
+                            "reconvert.attributes",
+                            false);
+                
+                if (!StringUtils.isEmpty(value) && reconvertAttributes)
+                {
+                    try {
+                        value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        log.warn("Failed to reconvert shibboleth attribute ("
+                                + name + ").", ex);
+                    }
+                }
 		
 		return value;
 	}

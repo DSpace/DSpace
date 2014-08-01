@@ -107,7 +107,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         Item item = (Item) dso;
 
         // faceting for metadata browsing. It is different than search facet
-        // because if there are authority with variants support we wan't all the
+        // because if there are authority with variants support we want all the
         // variants to go in the facet... they are sorted by count so just the
         // prefered label is relevant
         for (BrowseIndex bi : bis)
@@ -126,7 +126,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                 // value for lookup when partial search (the item mapper tool use it)
                 Set<String> distValuesForAC = new HashSet<String>();
 
-                // now index the new details - but only if it's archived and not
+                // now index the new details - but only if it's archived or
                 // withdrawn
                 if (item.isArchived() || item.isWithdrawn())
                 {
