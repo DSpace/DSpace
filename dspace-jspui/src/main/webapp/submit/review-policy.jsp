@@ -69,7 +69,7 @@
 			<div class="row">
 				<span class="metadataFieldLabel col-md-10"><fmt:message key="jsp.submit.access.plist.heading"/></span>
 			</div>
-			<div class="container row">	
+			<div class="row">
 				<dspace:policieslist policies="<%= rpolicies %>" showButton="false" />
 			</div>
 		<% } else { %>

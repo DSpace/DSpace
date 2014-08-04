@@ -26,7 +26,7 @@
 %>
 
 <dspace:layout style="submission" titlekey="jsp.tools.move-item.title">
-	<div class="container">
+	<div>
    	<form class="form-horizontal" action="<%=request.getContextPath()%>/tools/edit-item" method="post">
 			<div class="form-group">   		
 				  <label><fmt:message key="jsp.tools.move-item.item.name.msg"/></label>

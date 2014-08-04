@@ -68,7 +68,7 @@
 %>
 
 <!--Progress Bar-->
-<div class="row container btn-group">
+<div class="btn-group">
 <%    
     //get progress bar info, used to build progress bar
 	HashMap progressBarInfo = (HashMap) subInfo.getProgressBarInfo();

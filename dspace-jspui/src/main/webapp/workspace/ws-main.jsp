@@ -44,7 +44,7 @@
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.workspace.ws-main.title">
-<div class="container">
+<div>
         <h2>
 <%
 		if (titleArray.length > 0)

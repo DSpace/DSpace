@@ -178,7 +178,7 @@ if (submissions != null && submissions.count() > 0)
     <%= sideNews %>
 </div>
 </div>
-<div class="container row">
+<div class="row">
 <%
 if (communities != null && communities.length != 0)
 {

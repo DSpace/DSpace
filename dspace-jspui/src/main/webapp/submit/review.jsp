@@ -69,7 +69,7 @@
         <p><fmt:message key="jsp.submit.review.info3"/></p>
 
         <p><fmt:message key="jsp.submit.review.info4"/></p>
-		<div class="container">
+		<div>
 <%
 		//loop through the list of review JSPs
 		while(reviewIterator.hasNext())

@@ -31,11 +31,11 @@
 	<div class="col-md-3">
                     <%= sidebar %>
     </div>
-    </div>       
+    </div>  <!-- row -->
 <%
     }
 %>
-</div>
+</div> <!-- Page contents -->
 </main>
             <%-- Page footer --%>
              <footer class="navbar navbar-inverse navbar-bottom">

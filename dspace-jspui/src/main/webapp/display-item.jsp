@@ -190,7 +190,7 @@
 %>
     <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
-<div class="container row">
+<div class="row">
 <%
     String locationLink = request.getContextPath() + "/handle/" + handle;
 
