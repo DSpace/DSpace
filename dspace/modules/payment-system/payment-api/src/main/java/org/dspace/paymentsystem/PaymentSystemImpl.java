@@ -247,9 +247,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
         boolean discount = hasDiscount(context,shoppingcart,journal);
         double fileSizeSurcharge = getSurchargeLargeFileFee(context, shoppingcart);
         double basicFee = shoppingcart.getBasicFee();
-        double fileSizeFee = getSurchargeLargeFileFee(context, shoppingcart);
         double nonIntegratedFee = getNoIntegrateFee(context, shoppingcart, journal);
-        double price = calculateTotal(discount, fileSizeSurcharge, basicFee, fileSizeFee);
+        double price = calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
         return price;
     }
 
