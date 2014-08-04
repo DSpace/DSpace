@@ -318,8 +318,38 @@ mail.alert.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
 mail.registration.notify = <ENTER-AN-EMAIL-ADDRESS-HERE>
 
 
+## ETD Loader Email settings (optional)
+
+mail.etdmarc.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+mail.etd.recipient = <ENTER-AN-EMAIL-ADDRESS-HERE>
+
 # HANDLE CONFIGURATION 
 handle.prefix = <HANDLE-PREFIX>
+
+### ADDITIONAL CONFIGURATION 
+
+#### Used by daily subscription mailer
+eperson.subscription.limiteperson =
+
+#### Used by daily groovy/update_stats_nightly (stats from apache logs) cron job
+update.stats.apachelog.dir =
+
+#### Used by etd loader cron job
+etdloader.transfermarc =
+
+### Identifier providers.
+#### Following are configuration values for the EZID DOI provider, with appropriate
+#### values for testing.  Replace the values with your assigned "shoulder" and
+#### credentials.
+identifier.doi.ezid.shoulder = 10.5072/FK2
+identifier.doi.ezid.user = apitest
+identifier.doi.ezid.password = apitest
+#### A default publisher, for Items not previously published.
+#### If generateDataciteXML bean property is enabled. Set default publisher in the
+#### XSL file configured by: crosswalk.dissemination.DataCite.stylesheet file.
+identifier.doi.ezid.publisher = a publisher
+
+
 ```
 
 ####Build the Installation Package

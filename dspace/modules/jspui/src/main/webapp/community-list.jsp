@@ -147,8 +147,7 @@
 %>
     <H1>Communities and Collections</H1>
 
-    <P>Shown below is a list of communities and the collections and sub-communities within them.
-    Click on a name to view that community or collection home page.</P>
+    <P>For each department or group, items are organized into Research Works (faculty research) and Theses and Dissertations.</P>
 <%
     }
 %>
