@@ -166,7 +166,6 @@
             </xsl:if>
         </xsl:for-each>
         </xsl:variable>
-        <p>Bingo</p>
         <table>
             <xsl:call-template name="copy-attributes"/>
             <xsl:apply-templates select="dri:head"/>
