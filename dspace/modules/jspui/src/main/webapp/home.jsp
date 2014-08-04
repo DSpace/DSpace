@@ -60,7 +60,7 @@
     <h1>Welcome to the repository for University of Maryland research.</h1>
 
     <p>The Digital Repository at the University of Maryland (DRUM) collects, preserves, and provides public access to the scholarly output of the university. Faculty and researchers can upload research products for rapid dissemination, global visibility and impact, and long-term preservation.</p>
-    <p>You can use DRUM to share and preserve <a href="http://drum.lib.umd.edu/help/scope_of_drum_content.jsp">a wide range of research products</a>, such as:</p>
+    <p>You can use DRUM to share and preserve <a href="<%= request.getContextPath() %>/help/scope_of_drum_content.jsp">a wide range of research products</a>, such as:</p>
     <ul>
     	<li>Articles, papers, books, and technical reports</li>
     	<li>Data and code</li>
@@ -70,7 +70,7 @@
     </ul>
     <p>You can track views and downloads of your research, and everything in DRUM is indexed by Google and Google Scholar. You receive a permanent DOI for your items, making it easy for other researchers to cite your work.</p>
     <p>Depositing research in DRUM can help you satisfy data management and sharing requirements from the NSF, NIH, and other funding agencies and journals.</p>
-    <button type="button"><a href="http://drum.lib.umd.edu/mydspace">Submit</a></button> 
+    <a href="<%= request.getContextPath() %>/mydspace"><button type="button">Submit</button></a> 
             
     <br>
 

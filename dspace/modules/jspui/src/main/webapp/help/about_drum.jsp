@@ -53,7 +53,7 @@
 
 <p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent DOI for each submission that other researchers can use to cite your work.</p>
 
-<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. <a href=" ">How to submit<a>.</p>
+<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. <a href="<%= request.getContextPath() %>/help/about_submitting.jsp">How to submit</a>.</p>
 
 <h2>Preserve your work for the long term</h2>
 
@@ -68,11 +68,11 @@
 
 <p>You can use DRUM to satisfy data management or data sharing requirements from the NSF, NIH, and other funding agencies or publishers. If you’re writing a data management or data sharing plan, you can name DRUM as your method of sharing and preserving your data, code, documentation, and related materials.</p>
 
-<p>For assistance with data management planning, please contact <a href="http://www.lib.umd.edu/data">Research Data Services.</p>
+<p>For assistance with data management planning, please contact <a href="http://www.lib.umd.edu/data">Research Data Services</a>.</p>
 
 <h2>Retain all your copyrights</h2>
 
-<p>When you submit items to DRUM, you agree to the <a href="http://drum.lib.umd.edu/help/license_text.jsp">DRUM license</a> and grant the University of Maryland a non-exclusive right to retain, preserve, and provide access to your material. The term "non-exclusive" means that you retain all copyright to your work. You can still enter into agreements with other organizations (such as publishers) granting them rights to use your material.</p>
+<p>When you submit items to DRUM, you agree to the <a href="<%= request.getContextPath() %>/help/license_text.jsp">DRUM license</a> and grant the University of Maryland a non-exclusive right to retain, preserve, and provide access to your material. The term "non-exclusive" means that you retain all copyright to your work. You can still enter into agreements with other organizations (such as publishers) granting them rights to use your material.</p>
 
 <p>If you need to remove items from DRUM because of a copyright agreement with another entity, please <a href="mailto:drum-help@umd.edu">email us</a>.</p>
 

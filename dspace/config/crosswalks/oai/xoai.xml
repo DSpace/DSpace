@@ -24,7 +24,6 @@
 			<Format refid="rdf" />
 			<Format refid="etdms" />
 			<Format refid="mods" />
-			<Format refid="qdc" />
 			<Format refid="marc" />
 			<Format refid="uketd_dc" />
 		</Context> 
