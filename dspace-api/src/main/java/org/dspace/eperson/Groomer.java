@@ -9,7 +9,8 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.cli.*;
@@ -26,6 +27,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class Groomer
 {
+    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+
     /**
      * Command line tool for "grooming" the EPerson collection.
      */
@@ -43,7 +46,10 @@ public class Groomer
         Options options = new Options();
         options.addOptionGroup(verbs);
 
-        options.addOption("b", "last-used-before", true, "date of last login was before this");
+        options.addOption("b", "last-used-before", true,
+                "date of last login was before this (for example:  "
+                        + dateFormat.format(Calendar.getInstance().getTime())
+                        + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
         PosixParser parser = new PosixParser();
@@ -94,7 +100,7 @@ public class Groomer
 
             Date before = null;
             try {
-                before = new SimpleDateFormat().parse(command.getOptionValue('b'));
+                before = dateFormat.parse(command.getOptionValue('b'));
             } catch (java.text.ParseException ex) {
                 System.err.println(ex.getMessage());
                 System.exit(1);
@@ -106,7 +112,7 @@ public class Groomer
             final TableRowIterator tri = DatabaseManager.queryTable(myContext,
                     "EPerson",
                     "SELECT eperson_id, email, netid FROM EPerson WHERE last_login < ?",
-                    before);
+                    new java.sql.Date(before.getTime()));
 
             myContext.ignoreAuthorization();
             for (TableRow row = tri.next(); tri.hasNext(); row = tri.next())
