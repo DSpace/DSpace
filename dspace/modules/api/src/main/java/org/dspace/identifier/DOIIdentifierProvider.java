@@ -545,6 +545,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private DOI calculateDOIDataFile(Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
         String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
+        log.debug("adding a baseuri");
+        item.addMetadata("dryad","baseuri","testtesttest",null,null);
 
         if (pkgLink == null) {
             throw new RuntimeException("Not linked to a data package");
@@ -811,8 +813,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             dataFile.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY);
 
            dataFile.addMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY,ids[0].value);
-            log.debug("adding a baseuri");
-            dataFile.addMetadata("dryad","baseuri","testtesttest",null,null);
            dataFile.update();
         }
     }
