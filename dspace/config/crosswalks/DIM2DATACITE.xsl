@@ -217,6 +217,9 @@
 			<!-- ************ Handle tags for data files: ************ -->
 			<!-- ***************************************************** -->
 			
+			<xsl:comment>
+			this is a test
+			</xsl:comment>
 			<xsl:if test="$datatype='DataFile'">
 				<!-- *********** Sizes *********** -->
 				<sizes>
