@@ -33,6 +33,11 @@ import org.dspace.core.Context;
  * times for known EPersons, and then update EPerson records with the latest
  * dates.
  *
+ * Set the system property "verbose" to see more about what the class is doing.
+ *
+ * Set the system property "pretend" to get a TSV table of what the class would
+ * do, instead of doing it.
+ *
  * @author mwood
  */
 public class LoadLastLogin
@@ -48,6 +53,7 @@ public class LoadLastLogin
             + "login:type=(implicit|explicit)";
 
         final boolean VERBOSE = null != System.getProperty("verbose");
+        final boolean PRETEND = null != System.getProperty("pretend");
 
         // Set up a "table" that can overflow to storage
         final Properties rmProps = new Properties();
@@ -126,9 +132,21 @@ public class LoadLastLogin
             Date previous = ePerson.getLastActive();
             if ((null == previous) || date.after(previous))
             {
-                ePerson.setLastActive(date);
-                ePerson.update();
-                ctx.commit();
+                if (PRETEND)
+                {
+                    System.out.printf("%d\t%s\t%s\t%s\t%s\n",
+                            ePerson.getID(),
+                            date,
+                            ePerson.getEmail(),
+                            ePerson.getNetid(),
+                            ePerson.getFullName());
+                }
+                else
+                {
+                    ePerson.setLastActive(date);
+                    ePerson.update();
+                    ctx.commit();
+                }
             }
         }
 
