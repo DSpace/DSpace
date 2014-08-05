@@ -811,7 +811,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             dataFile.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY);
 
            dataFile.addMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY,ids[0].value);
-           dataFile.addMetadata("dryad","baseuri","testtesttest",null,null);
+            log.debug("adding a baseuri");
+            dataFile.addMetadata("dryad","baseuri","testtesttest",null,null);
            dataFile.update();
         }
     }
