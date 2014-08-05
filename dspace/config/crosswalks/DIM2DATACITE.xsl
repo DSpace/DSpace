@@ -218,7 +218,7 @@
 			<!-- ***************************************************** -->
 			
 			<xsl:comment>
-			this is a test
+			this is a test <xsl:value-of select="$mets_url"/>
 			</xsl:comment>
 			<xsl:if test="$datatype='DataFile'">
 				<!-- *********** Sizes *********** -->
