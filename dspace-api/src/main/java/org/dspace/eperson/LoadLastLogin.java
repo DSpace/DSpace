@@ -25,6 +25,11 @@ import jdbm.btree.BTree;
 import jdbm.helper.StringComparator;
 import jdbm.helper.Tuple;
 import jdbm.helper.TupleBrowser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
@@ -33,11 +38,6 @@ import org.dspace.core.Context;
  * times for known EPersons, and then update EPerson records with the latest
  * dates.
  *
- * Set the system property "verbose" to see more about what the class is doing.
- *
- * Set the system property "pretend" to get a TSV table of what the class would
- * do, instead of doing it.
- *
  * @author mwood
  */
 public class LoadLastLogin
@@ -45,6 +45,9 @@ public class LoadLastLogin
     public static void main(String[] argv)
             throws IOException, SQLException, AuthorizeException
     {
+        final String USAGE = "LoadLastLogin [options] path...path\n\n"
+                + "'path's are paths to DSpace log files";
+
         final String loginRE =
             "([0-9-]+) ([0-9:]+)[^@]+@ " // Date(1), time(2), goop
             + "([^:]+):" // user(3)
@@ -52,8 +55,35 @@ public class LoadLastLogin
             + "ip_addr=[0-9a-f.:]+:"
             + "login:type=(implicit|explicit)";
 
-        final boolean VERBOSE = null != System.getProperty("verbose");
-        final boolean PRETEND = null != System.getProperty("pretend");
+        // Handle options, if any
+        Options options = new Options();
+        options.addOption("h", "help", false, "Explain options");
+        options.addOption("p", "pretend", false, "Output TSV instead of updating database");
+        options.addOption("v", "verbose", false, "Talk more about what we are doing");
+
+        PosixParser parser = new PosixParser();
+        CommandLine command = null;
+        try {
+            command = parser.parse(options, argv);
+        } catch (org.apache.commons.cli.ParseException ex) {
+            System.err.println(ex.getMessage());
+            if (! (ex instanceof MissingOptionException))
+                new HelpFormatter().printHelp(USAGE, options);
+            System.exit(1);
+        }
+
+        if (command.hasOption('h'))
+        {
+            System.out.println("Load users' last_active dates into the database from DSpace logs.");
+            System.out.println();
+            new HelpFormatter().printHelp(USAGE, options);
+            System.exit(0);
+        }
+
+        final boolean VERBOSE = command.hasOption('v');
+        final boolean PRETEND = command.hasOption('p');
+
+        String[] args = command.getArgs();
 
         // Set up a "table" that can overflow to storage
         final Properties rmProps = new Properties();
@@ -69,7 +99,7 @@ public class LoadLastLogin
         final Pattern loginCracker = Pattern.compile(loginRE);
         final SimpleDateFormat dateEncoder = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        for (String logName : argv)
+        for (String logName : args)
         {
             BufferedReader logReader = new BufferedReader(new FileReader(logName));
             while(true)

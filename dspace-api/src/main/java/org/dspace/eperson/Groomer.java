@@ -35,7 +35,7 @@ public class Groomer
     static public void main(String[] argv)
             throws SQLException
     {
-        final String USAGE = "EPerson -verb [option...]";
+        final String USAGE = "Groomer -verb [option...]";
 
         OptionGroup verbs = new OptionGroup();
         verbs.setRequired(true);
