@@ -546,7 +546,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
         log.debug("adding a baseuri");
-        item.addMetadata("dryad","baseuri","testtesttest",null,null);
+        item.addMetadata("dryad","baseuri","testtesttest",null,"test");
 
         if (pkgLink == null) {
             throw new RuntimeException("Not linked to a data package");
