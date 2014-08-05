@@ -111,12 +111,16 @@ public class Groomer
             Context myContext = new Context();
             final TableRowIterator tri = DatabaseManager.queryTable(myContext,
                     "EPerson",
-                    "SELECT eperson_id, email, netid FROM EPerson WHERE last_login < ?",
+                    "SELECT eperson_id, email, netid FROM EPerson WHERE last_active < ?",
                     new java.sql.Date(before.getTime()));
 
             myContext.ignoreAuthorization();
-            for (TableRow row = tri.next(); tri.hasNext(); row = tri.next())
+            while (tri.hasNext())
             {
+                TableRow row = tri.next();
+                if (null == row)
+                    break;
+
                 int id = row.getIntColumn("eperson_id");
                 EPerson account = EPerson.find(myContext, id);
 
