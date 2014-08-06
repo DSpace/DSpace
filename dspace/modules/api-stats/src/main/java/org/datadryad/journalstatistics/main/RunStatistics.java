@@ -3,6 +3,7 @@
 package org.datadryad.journalstatistics.main;
 
 import java.util.Date;
+import java.util.IllegalFormatException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -30,10 +31,20 @@ public class RunStatistics {
         Date beginDate = null;
         Date endDate = null;
         if(line.hasOption("f")) {
-            beginDate = parseDate(line.getOptionValue("f"));
+            try {
+                beginDate = parseDate(line.getOptionValue("f"));
+            } catch (IllegalArgumentException ex) {
+                System.err.println("Error parsing date: " + ex.getMessage());
+                printHelp(options, 1);
+            }
         }
         if(line.hasOption("t")) {
-            endDate = parseDate(line.getOptionValue("t"));
+            try {
+                endDate = parseDate(line.getOptionValue("t"));
+            } catch (IllegalArgumentException ex) {
+                System.err.println("Error parsing date: " + ex.getMessage());
+                printHelp(options, 1);
+            }
         }
 
         if(line.hasOption("j")) {
@@ -53,7 +64,11 @@ public class RunStatistics {
         }
     }
 
-    private static Date parseDate(String dateString) {
+    private static Date parseDate(String dateString) throws IllegalArgumentException {
+        final Date returnDate = new DCDate(dateString).toDate();
+        if(returnDate == null) {
+            throw new IllegalArgumentException("Unparseable date: " + dateString);
+        }
         return new DCDate(dateString).toDate();
     }
 
