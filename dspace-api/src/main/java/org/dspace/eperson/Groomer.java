@@ -114,7 +114,7 @@ public class Groomer
                     "SELECT eperson_id, email, netid FROM EPerson WHERE last_active < ?",
                     new java.sql.Date(before.getTime()));
 
-            myContext.ignoreAuthorization();
+            myContext.turnOffAuthorisationSystem();
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
