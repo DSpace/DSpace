@@ -170,12 +170,10 @@
 
 				<!-- *********** Sizes *********** -->
 				<sizes>
-					<xsl:for-each select="document($mets_url)//mets:file">
-						<size>
-							<xsl:value-of select="@SIZE"/>
-							<xsl:text> bytes</xsl:text>
-						</size>
-					</xsl:for-each>
+					<size>
+						<xsl:value-of select="dspace:field[@element='format' and @qualifier='extent']"/>
+						<xsl:text> bytes</xsl:text>
+					</size>
 				</sizes>
 
 
