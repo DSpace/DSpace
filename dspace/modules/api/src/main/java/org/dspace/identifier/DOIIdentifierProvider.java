@@ -546,7 +546,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
         log.warn("adding a baseuri");
-        String testMessage = InstallItem.getBitstreamProvenanceMessage(item);
+        String testMessage = InstallItem.getBitstreamSizes(item);
         item.addDC("format","extent",null,testMessage);
 
         if (pkgLink == null) {
