@@ -352,6 +352,15 @@ function updateOrder(){
 
 /* JS behavior (currency conversion) for Pricing and Integrated Journal pages */
 jQuery(document).ready(function() {
+    // initialize dataTable scroller
+    jQuery('#journal-policies').dataTable({
+          "autoWidth" : false
+        , "ordering"  : false   //
+        , "paging"    : true    // 
+        , "scrollY"   : 500     // px tbody height
+        , "scrollX"   : false   //
+        , "searching" : true    //
+    });
     var $currencySelector = jQuery('select[name=displayed-currency]');
     // in this case, we just want to update a few displayed values wherever
     // they appear (look for SPANs with marker classes)

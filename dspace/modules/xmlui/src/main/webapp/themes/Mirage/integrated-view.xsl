@@ -94,7 +94,21 @@
               <a>
                 <!-- Download Link -->
                 <xsl:attribute name="href">
-                    <xsl:value-of select="mets:FLocat/@xlink:href"/>
+                     <xsl:choose>
+                         <xsl:when test="mets:FLocat[@LOCTYPE='TXT']/@xlink:text">
+                           <xsl:choose>
+                             <xsl:when test="starts-with(mets:FLocat[@LOCTYPE='TXT']/@xlink:title,'//')">
+                               <xsl:value-of select="concat('http:',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:when>
+                             <xsl:otherwise>
+                               <xsl:value-of select="concat('http://',mets:FLocat[@LOCTYPE='TXT']/@xlink:title)"/>
+                             </xsl:otherwise>
+                           </xsl:choose>
+                         </xsl:when>
+                         <xsl:otherwise>
+                          <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                        </xsl:otherwise>
+                      </xsl:choose>
                 </xsl:attribute>
 
                 <xsl:value-of select="mets:FLocat/@xlink:title"/>
@@ -145,6 +159,8 @@
               <xsl:otherwise>
                 <xsl:variable name="my_doi"
                               select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
+                <xsl:variable name="my_full_doi"
+                  select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'http://dx.doi')]"/>
                 <xsl:variable name="my_uri"
                               select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
                 <xsl:attribute name="href">
@@ -154,6 +170,11 @@
                         <xsl:with-param name="doiIdentifier" select="$my_doi"/>
                       </xsl:call-template>
                     </xsl:when>
+                    <xsl:when test="$my_full_doi">
+                      <xsl:call-template name="checkURL">
+                        <xsl:with-param name="doiIdentifier" select="$my_full_doi"/>
+                      </xsl:call-template>
+                     </xsl:when>
                     <xsl:otherwise>
                       <xsl:value-of select="$my_uri"/>
                     </xsl:otherwise>

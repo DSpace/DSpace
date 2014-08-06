@@ -165,7 +165,15 @@
                                                       </xsl:when>
                                                   </xsl:choose>
                                               </xsl:attribute>
-                                              <xsl:value-of select="$article_doi"/>
+                                                  <xsl:choose>
+                                                      <xsl:when test="starts-with($article_doi, 'http')">
+                                                          <xsl:value-of select="$article_doi"/>
+                                                      </xsl:when>
+                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
+                                                          <xsl:value-of
+                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                      </xsl:when>
+                                                  </xsl:choose>
                                           </a>
                                       </xsl:when>
                                       <xsl:when test="$article_doi">
@@ -175,7 +183,15 @@
                                                   <xsl:value-of
                                                           select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                               </xsl:attribute>
-                                              <xsl:value-of select="$article_doi"/>
+                                                  <xsl:choose>
+                                                      <xsl:when test="starts-with($article_doi, 'http')">
+                                                          <xsl:value-of select="$article_doi"/>
+                                                      </xsl:when>
+                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
+                                                          <xsl:value-of
+                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                      </xsl:when>
+                                                  </xsl:choose>
                                           </a>
                                       </xsl:when>
                                       <xsl:otherwise>
@@ -207,7 +223,15 @@
                                                               </xsl:when>
                                                           </xsl:choose>
                                                       </xsl:attribute>
-                                                      <xsl:value-of select="$article_doi"/>
+                                                  <xsl:choose>
+                                                      <xsl:when test="starts-with($article_doi, 'http')">
+                                                          <xsl:value-of select="$article_doi"/>
+                                                      </xsl:when>
+                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
+                                                          <xsl:value-of
+                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                      </xsl:when>
+                                                  </xsl:choose>
                                                   </a>
                                               </xsl:if>
                                           </span>
@@ -250,7 +274,10 @@
                                     test="not(/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned'])">
                                 <xsl:choose>
                                     <xsl:when test="starts-with($id, 'doi')">
-                                        <xsl:value-of select="$id"/>
+                                        <xsl:value-of  select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
+                                    </xsl:when>
+                                    <xsl:when test="starts-with($id,'http://dx.doi')">
+                                      <xsl:value-of select="$id"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
@@ -266,6 +293,9 @@
                                                 <xsl:value-of
                                                         select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
                                             </xsl:when>
+                                            <xsl:when test="starts-with($id,'http://dx.doi')">
+                                               <xsl:value-of select="$id"/>
+                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
                                             </xsl:otherwise>
@@ -275,8 +305,12 @@
                                     <!-- text -->
                                     <xsl:choose>
                                         <xsl:when test="starts-with($id, 'doi')">
-                                            <xsl:value-of select="$id"/>
+                                            <xsl:value-of 
+                                                        select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
                                         </xsl:when>
+                                        <xsl:when test="starts-with($id,'http://dx.doi')">
+                                           <xsl:value-of select="$id"/>
+                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
                                         </xsl:otherwise>
@@ -507,7 +541,8 @@
                                                 <xsl:value-of
                                                         select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                             </xsl:attribute>
-                                            <xsl:value-of select="$article_doi"/>
+                                            <xsl:value-of
+                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                         </a>
                                     </xsl:when>
                                     <xsl:when test="$article_doi">
@@ -517,7 +552,8 @@
                                                 <xsl:value-of
                                                         select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                             </xsl:attribute>
-                                            <xsl:value-of select="$article_doi"/>
+                                            <xsl:value-of
+                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                         </a>
                                     </xsl:when>
                                     <xsl:when test="$article_pmid">
@@ -546,7 +582,8 @@
                                                         <xsl:value-of
                                                                 select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                     </xsl:attribute>
-                                                    <xsl:value-of select="$article_doi"/>
+                                                    <xsl:value-of 
+                                                                select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                 </a>
                                             </xsl:if>
                                         </span>
@@ -672,6 +709,9 @@
                                                     <xsl:value-of
                                                             select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
                                                 </xsl:when>
+                                                <xsl:when test="$my_full_doi">
+                                                  <xsl:value-of select="$my_full_doi"/>
+                                                </xsl:when>
                                                 <xsl:otherwise>
                                                     <xsl:value-of select="$my_uri"/>
                                                 </xsl:otherwise>
@@ -681,7 +721,11 @@
                                         <!-- text -->
                                         <xsl:choose>
                                             <xsl:when test="$my_doi">
-                                                <xsl:value-of select="$my_doi"/>
+                                                <xsl:value-of
+                                                            select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                                            </xsl:when>
+                                           <xsl:when test="$my_full_doi">
+                                              <xsl:value-of select="$my_full_doi"/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:value-of select="$my_uri"/>
@@ -908,8 +952,11 @@
                             <!--<xsl:with-param name="doiIdentifier" select="$my_doi"/>-->
                             <!--</xsl:call-template>-->
                             <!--</xsl:attribute>-->
-                            <xsl:value-of select="$my_doi"/>
+                            <xsl:value-of select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
                             <!--</a>-->
+                        </xsl:when>
+                        <xsl:when test="$my_full_doi">
+                          <xsl:value-of select="$my_full_doi"/>
                         </xsl:when>
                         <xsl:when test="$my_uri">
                             <a>

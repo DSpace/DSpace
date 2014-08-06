@@ -177,9 +177,14 @@
                 <span class="doi">
                     <xsl:variable name="id"
                                   select="dim:field[@element='identifier'][not(@qualifier)][@mdschema='dc'][1]"/>
-                    <xsl:if test="$id[starts-with(., 'doi')]">
-                        <xsl:value-of select="$id"/>
-                    </xsl:if>
+                     <xsl:choose>         
+                       <xsl:when test="$id[starts-with(., 'doi')]">
+                        <xsl:value-of select="concat('http://dx.doi.org/',substring-after($id,'doi:'))"/>
+                       </xsl:when>
+                       <xsl:when test="$id[starts-with(.,'http')]">
+                         <xsl:value-of select="$id"/>
+                       </xsl:when>
+                     </xsl:choose>
                 </span>
             </xsl:element>
             <span class="Z3988">

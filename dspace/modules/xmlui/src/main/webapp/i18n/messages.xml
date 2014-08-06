@@ -2643,6 +2643,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
+  <message key="xmlui.dri2xhtml.METS-1.0.files-external-head">Find this item in an external repository</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Name</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Size</message>
@@ -3554,5 +3555,5 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.no_value">No Value</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.update">Update</message>
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.return">Return</message>
-
+    <message key="xmlui.PaymentSystem.shoppingcart.order.help.title">Total price is calculated based on the currency and rate at the time of submission</message>
 </catalogue>
