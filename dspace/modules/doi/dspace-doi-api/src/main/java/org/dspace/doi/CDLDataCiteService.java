@@ -560,6 +560,7 @@ public class CDLDataCiteService {
 
     private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadataInput, String dataCiteMetadataKey) {
         DCValue[] values = item.getMetadata(itemMetadataInput);
+        log.debug("adding metadata " + dataCiteMetadataKey);
         if (values != null && values.length > 0) {
             metadataList.put(dataCiteMetadataKey, values[0].value);
         }

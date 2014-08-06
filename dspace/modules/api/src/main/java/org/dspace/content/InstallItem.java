@@ -311,4 +311,29 @@ public class InstallItem
 
         return mymessage;
     }
+    /**
+     * Generate provenance-worthy description of the bitstreams contained in an
+     * item.
+     *
+     * @param myitem  the item generate description for
+     *
+     * @return provenance description
+     */
+    public static String getBitstreamSizes(Item myitem)
+            throws SQLException
+    {
+        // Get non-internal format bitstreams
+        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
+        String mymessage = "";
+        if (bitstreams.length > 0) {
+            mymessage = String.valueOf(bitstreams[0].getSize());
+
+            // Add sizes and checksums of bitstreams
+            for (int j = 1; j < bitstreams.length; j++)
+            {
+                mymessage = mymessage + "," + String.valueOf(bitstreams[j].getSize());
+            }
+        }
+        return mymessage;
+    }
 }
