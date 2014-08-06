@@ -23,15 +23,7 @@
 	</xsl:template>
 		
 	<!-- Parse datacite tags that are found in DIM -->
-	<xsl:template match="dim:dim">
-	
-		<!-- Save the mets.xml url, using the get_identifier template to find the DOI. -->
-		<xsl:variable name="mets_url">
-			<xsl:text>http://datadryad.org/resource/</xsl:text>
-	        <xsl:call-template name="get_identifier"/>
-	        <xsl:text>/mets.xml</xsl:text>
-		</xsl:variable>
-		
+	<xsl:template match="dim:dim">		
 		<xsl:variable name="datatype">
 			<xsl:choose>
 				<xsl:when test="dspace:field[@element='relation' and @qualifier='ispartof']">
@@ -220,12 +212,10 @@
 			<xsl:if test="$datatype='DataFile'">
 				<!-- *********** Sizes *********** -->
 				<sizes>
-					<xsl:for-each select="document($mets_url)//mets:file">
-						<size>
-							<xsl:value-of select="@SIZE"/>
-							<xsl:text> bytes</xsl:text>
-						</size>
-					</xsl:for-each>
+					<size>
+						<xsl:value-of select="dspace:field[@element='format' and @qualifier='extent']"/>
+						<xsl:text> bytes</xsl:text>
+					</size>
 				</sizes>
 					          
 				<!-- ************ Rights *************** -->
