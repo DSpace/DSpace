@@ -311,4 +311,29 @@ public class InstallItem
 
         return mymessage;
     }
+    /**
+     * Generate comma-separated string of sizes (in bytes) of the bitstreams contained in an
+     * item.
+     *
+     * @param myitem  the item
+     *
+     * @return comma-separated string of sizes (in bytes)
+     */
+    public static String getBitstreamSizes(Item myitem)
+            throws SQLException
+    {
+        // Get non-internal format bitstreams
+        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
+        String sizes = "";
+        if (bitstreams.length > 0) {
+            sizes = String.valueOf(bitstreams[0].getSize());
+
+            // Add sizes and checksums of bitstreams
+            for (int j = 1; j < bitstreams.length; j++)
+            {
+                sizes = sizes + "," + String.valueOf(bitstreams[j].getSize());
+            }
+        }
+        return sizes;
+    }
 }
