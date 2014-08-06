@@ -120,6 +120,14 @@ public class BitstreamServlet extends DSpaceServlet
             sequenceID = -1;
         }
         
+        /**
+         * damanzano: Esto se realiza con el fin de que las solicitudes que se hagan las las urls <code>/bitstream/item/sequence_id/filename</code>
+         * se redireccionen a <code>/bitstream/handle/sequence_id/filename</code>
+         * 
+         * handle se extrae del archivo de configuración
+         */
+        handle = handle.replace("item", ConfigurationManager.getProperty("handle.prefix"));
+
         // Now try and retrieve the item
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
         
