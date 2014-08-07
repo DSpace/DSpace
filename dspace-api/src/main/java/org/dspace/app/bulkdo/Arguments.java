@@ -69,8 +69,8 @@ class Arguments {
     public static String WHO = "w";
     public static String WHO_LONG = "who";
 
-    public static String DRYRUN  = "y";
-    public static String DRYRUN_LONG = "dryrun";
+    public static String DRYRUN  = "t";
+    public static String DRYRUN_LONG = "test";
 
     public static final String[] actionText = {"ADD", "DEL", "REPLACE", "LIST"};
     public static final char DO_ADD = 'A';
