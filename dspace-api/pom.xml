@@ -85,7 +85,7 @@
                 </configuration>
             </plugin>
             <!-- Unit/Integration Testing setup: This plugin unzips the
-                 'testEnvironment.zip' file (reated by dspace-parent POM), into
+                 'testEnvironment.zip' file (created by dspace-parent POM), into
                  the 'target/testing/' folder, to essentially create a test
                  install of DSpace, against which Tests can be run. -->
             <plugin>
@@ -420,7 +420,7 @@
             <artifactId>dspace-services</artifactId>
         </dependency>
         <dependency> <!-- Keep jmockit before junit -->
-            <groupId>com.googlecode.jmockit</groupId>
+            <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
             <scope>test</scope>
         </dependency>
