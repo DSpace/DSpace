@@ -17,8 +17,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadBase.IOFileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -93,17 +95,41 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                 }
                 else
                 {
-                    parameters.put(item.getFieldName(), item.getName());
-                    fileitems.put(item.getFieldName(), item);
-                    filenames.add(item.getName());
-
-                    String filename = getFilename(item.getName());
-                    if (filename != null && !"".equals(filename))
+                    if (parameters.containsKey("resumableIdentifier")) 
                     {
-                        item.write(new File(tempDir + File.separator
-                                        + filename));
+                        String filename = getFilename(parameters.get("resumableFilename"));
+                        if (!StringUtils.isEmpty(filename)) 
+                        {
+                            String chunkDirPath = tempDir + File.separator + parameters.get("resumableIdentifier");
+                            String chunkPath = chunkDirPath + File.separator + "part" + parameters.get("resumableChunkNumber");
+                            File fileDir = new File(chunkDirPath);
+                            
+                            if(fileDir.exists())
+                            {
+                                item.write(new File(chunkPath));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        parameters.put(item.getFieldName(), item.getName());
+                        fileitems.put(item.getFieldName(), item);
+                        filenames.add(item.getName());
+
+                        String filename = getFilename(item.getName());
+                        if (filename != null && !"".equals(filename))
+                        {
+                            item.write(new File(tempDir + File.separator
+                                            + filename));
+                        }
                     }
                 }
+            }
+        }
+        catch(IOFileUploadException e){
+            if (!(e.getMessage().contains("Stream ended unexpectedly")))
+            {
+                throw new IOException(e.getMessage(), e);
             }
         }
         catch (Exception e)
