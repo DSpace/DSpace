@@ -1846,8 +1846,8 @@ public class Item extends DSpaceObject
 
         // update bitstream sizes too.
         String bitstreamSizes = InstallItem.getBitstreamSizes(this);
-        item.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        item.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,bitstreamSizes);
+        clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
+        addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,bitstreamSizes);
 
         // Update item in DB
         update();
