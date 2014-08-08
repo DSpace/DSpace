@@ -1,6 +1,5 @@
 ## Ignore the MVN compiled output directories from version tracking
 target/
-bin/
 
 ## Ignore project files created by Eclipse
 .settings/
