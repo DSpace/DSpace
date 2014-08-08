@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -28,6 +30,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -37,6 +42,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -45,6 +51,12 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Class representing an item in DSpace.
@@ -585,6 +597,108 @@ public class Item extends DSpaceObject
         }
         
         return values;
+    }
+
+    public List<DCValue> getMetadata(String mdString, String authority) {
+        String[] elements = getElements(mdString);
+        return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
+    }
+
+    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+        DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<DCValue> dcValues = Arrays.asList(metadata);
+        if (!authority.equals(Item.ANY)) {
+            Iterator<DCValue> iterator = dcValues.iterator();
+            while (iterator.hasNext()) {
+                DCValue dcValue = iterator.next();
+                if (!authority.equals(dcValue.authority)) {
+                    iterator.remove();
+                }
+            }
+        }
+        return dcValues;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * Values in the returned array can be empty or null.
+     */
+    public static String[] getElements(String fieldName) {
+        String[] tokens = StringUtils.split(fieldName, ".");
+
+        int add = 4 - tokens.length;
+        if (add > 0) {
+            tokens = (String[]) ArrayUtils.addAll(tokens, new String[add]);
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
+     */
+    public static String[] getElementsFilled(String fieldName) {
+        String[] elements = getElements(fieldName);
+        for (int i = 0; i < elements.length; i++) {
+            if (StringUtils.isBlank(elements[i])) {
+                elements[i] = Item.ANY;
+            }
+        }
+        return elements;
+    }
+
+    public void replaceMetadataValue(DCValue oldValue, DCValue newValue) {
+        // check both dcvalues are for the same field
+        if (oldValue.hasSameFieldAs(newValue)) {
+
+            String schema = oldValue.schema;
+            String element = oldValue.element;
+            String qualifier = oldValue.qualifier;
+
+            // Save all metadata for this field
+            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            clearMetadata(schema, element, qualifier, Item.ANY);
+
+            for (DCValue dcvalue : dcvalues) {
+                if (dcvalue.equals(oldValue)) {
+                    addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
+                } else {
+                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
+                }
+            }
+        }
+    }
+
+    public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
+        String[] elements = getElementsFilled(mdString);
+        String schema = elements[0], element = elements[1], qualifier = elements[2];
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
+                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        TableRowIterator rows = null;
+        if (Item.ANY.equals(authority)) {
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        } else {
+            query += " AND metadatavalue.authority = ?";
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), authority);
+        }
+        return new ItemIterator(context, rows);
     }
 
     /**
