@@ -836,6 +836,7 @@ CREATE TABLE requestitem
   allfiles bool,
   request_email varchar(64),
   request_name varchar(64),
+  request_message TEXT,
   request_date timestamp,
   accept_request bool,
   decision_date timestamp,
