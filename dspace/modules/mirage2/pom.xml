@@ -314,70 +314,107 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>0.0.14</version>
-                        <configuration>
-                            <workingDirectory>${project.build.directory}/themes/Mirage2</workingDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <phase>process-resources</phase>
-                                <configuration>
-                                    <nodeVersion>v0.10.18</nodeVersion>
-                                    <npmVersion>1.3.8</npmVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>npm install &amp;&amp; bower install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>prepare-package</phase>
-                                <configuration>
-                                    <arguments>install</arguments>
-                                    <workingDirectory>${project.build.directory}/themes/Mirage2</workingDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>grunt</id>
-                                <goals>
-                                    <goal>grunt</goal>
-                                </goals>
-                                <phase>prepare-package</phase>
-                                <configuration>
-                                    <arguments>${grunt.color.scheme} no-compass-${grunt.environment}</arguments>
-                                    <workingDirectory>${project.build.directory}/themes/Mirage2</workingDirectory>
-                                    <!--<environmentVariables>-->
-                                    <!--<PATH>${env.PATH}</PATH>-->
-                                    <!--<GEM_PATH>${env.GEM_PATH}</GEM_PATH>-->
-                                    <!--<GEM_HOME>${env.GEM_HOME}</GEM_HOME>-->
-                                    <!--<LC_CTYPE>UTF-8</LC_CTYPE>-->
-                                    <!--</environmentVariables>-->
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>de.saumya.mojo</groupId>
                         <artifactId>gem-maven-plugin</artifactId>
                         <version>1.0.0-rc</version>
                         <executions>
                             <execution>
-                                <id>run compass</id>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>initialize</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.soebes.maven.plugins</groupId>
+                        <artifactId>iterator-maven-plugin</artifactId>
+                        <version>0.3</version>
+                        <executions>
+                            <execution>
                                 <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>iterator</goal>
+                                </goals>
                                 <configuration>
-                                    <launchDirectory>${project.build.directory}/themes/Mirage2</launchDirectory>
-                                    <execArgs>${project.build.directory}/rubygems/bin/compass compile -c
-                                        config-${grunt.environment}.rb
-                                    </execArgs>
+                                    <folder>${basedir}/src/main/webapp/themes/</folder>
+                                    <pluginExecutors>
+                                        <pluginExecutor>
+                                            <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-resources-plugin</artifactId>
+                                                <version>2.6</version>
+                                            </plugin>
+                                            <goal>copy-resources</goal>
+                                            <configuration>
+                                                <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
+                                                <resources>
+                                                    <resource>
+                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <filtering>false</filtering>
+                                                    </resource>
+                                                </resources>
+                                            </configuration>
+                                        </pluginExecutor>
+                                        <pluginExecutor>
+                                            <!--<id>install node and npm</id>-->
+                                            <plugin>
+                                                <groupId>com.github.eirslett</groupId>
+                                                <artifactId>frontend-maven-plugin</artifactId>
+                                                <version>0.0.14</version>
+                                            </plugin>
+                                            <goal>install-node-and-npm</goal>
+                                            <!--<phase>process-resources</phase>-->
+                                            <configuration>
+                                                <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
+                                                <nodeVersion>v0.10.18</nodeVersion>
+                                                <npmVersion>1.3.8</npmVersion>
+                                            </configuration>
+                                        </pluginExecutor>
+                                        <pluginExecutor>
+                                            <!--<id>npm install &amp;&amp; bower install</id>-->
+                                            <plugin>
+                                                <groupId>com.github.eirslett</groupId>
+                                                <artifactId>frontend-maven-plugin</artifactId>
+                                                <version>0.0.14</version>
+                                            </plugin>
+                                            <goal>npm</goal>
+                                            <!--<phase>prepare-package</phase>-->
+                                            <configuration>
+                                                <arguments>install</arguments>
+                                                <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
+                                            </configuration>
+                                        </pluginExecutor>
+                                        <pluginExecutor>
+                                            <!--<id>grunt</id>-->
+                                            <plugin>
+                                                <groupId>com.github.eirslett</groupId>
+                                                <artifactId>frontend-maven-plugin</artifactId>
+                                                <version>0.0.14</version>
+                                            </plugin>
+                                            <goal>grunt</goal>
+                                            <!--<phase>prepare-package</phase>-->
+                                            <configuration>
+                                                <arguments>${grunt.color.scheme} no-compass-${grunt.environment}
+                                                </arguments>
+                                                <workingDirectory>${project.build.directory}/themes/@item@</workingDirectory>
+                                            </configuration>
+                                        </pluginExecutor>
+                                        <pluginExecutor>
+                                            <plugin>
+                                                <groupId>de.saumya.mojo</groupId>
+                                                <artifactId>gem-maven-plugin</artifactId>
+                                                <version>1.0.0-rc</version>
+                                            </plugin>
+                                            <goal>exec</goal>
+                                            <configuration>
+                                                <launchDirectory>${project.build.directory}/themes/@item@</launchDirectory>
+                                                <execArgs>${project.build.directory}/rubygems/bin/compass compile -c
+                                                    config-${grunt.environment}.rb
+                                                </execArgs>
+                                            </configuration>
+                                        </pluginExecutor>
+                                    </pluginExecutors>
                                 </configuration>
                             </execution>
                         </executions>
