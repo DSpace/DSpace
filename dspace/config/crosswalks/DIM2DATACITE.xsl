@@ -19,7 +19,25 @@
 
 	<!-- Main match for the root node: set up the root element, <resource> -->
     <xsl:template match="/">
-			<xsl:apply-templates/>
+		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<!-- Parse comma-separated list of sizes-->
+	<xsl:template match="text()" name="split_sizes">
+		<xsl:param name="csv" select="."/>
+		
+		<xsl:if test="string-length($csv) > 0">
+			<xsl:variable name="token" select="substring-before(concat($csv,','),',')"/>
+			<size xmlns="http://datacite.org/schema/kernel-2.2">
+				<xsl:value-of select="$token"/>
+				<xsl:text> bytes</xsl:text>
+			</size>
+			
+			<!-- Parse the rest of the string -->
+			<xsl:call-template name="split_sizes">
+				<xsl:with-param name="csv" select="substring-after($csv,',')"/>
+			</xsl:call-template>
+		</xsl:if>
 	</xsl:template>
 		
 	<!-- Parse datacite tags that are found in DIM -->
@@ -212,10 +230,9 @@
 			<xsl:if test="$datatype='DataFile'">
 				<!-- *********** Sizes *********** -->
 				<sizes>
-					<size>
-						<xsl:value-of select="dspace:field[@element='format' and @qualifier='extent']"/>
-						<xsl:text> bytes</xsl:text>
-					</size>
+					<xsl:call-template name="split_sizes">
+						<xsl:with-param name="csv" select="dspace:field[@element='format' and @qualifier='extent']"/>
+					</xsl:call-template>
 				</sizes>
 					          
 				<!-- ************ Rights *************** -->
