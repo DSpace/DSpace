@@ -545,9 +545,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private DOI calculateDOIDataFile(Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
         String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
-        log.warn("adding a baseuri");
-        String testMessage = InstallItem.getBitstreamSizes(item);
-        item.addDC("format","extent",null,testMessage);
 
         if (pkgLink == null) {
             throw new RuntimeException("Not linked to a data package");
