@@ -546,10 +546,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
 
-        String bitstreamSizes = InstallItem.getBitstreamSizes(item);
-        item.clearMetadata(identifierMetadata.schema,"format","extent",null);
-        item.addMetadata(identifierMetadata.schema,"format","extent",null,bitstreamSizes);
-
         if (pkgLink == null) {
             throw new RuntimeException("Not linked to a data package");
         }
