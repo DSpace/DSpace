@@ -10,3 +10,14 @@
  * You can put your own style in this file.
  * It will be included in all color schemes
  */
+
+//example mixin to set the text-selection style
+@mixin selection {
+    ::-moz-selection { @content; }
+    ::selection { @content; }
+}
+
+@include selection {
+    color: white;
+    background: hotpink;
+}

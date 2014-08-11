@@ -175,7 +175,7 @@
                             <artifactId>dspace-mirage2</artifactId>
                             <type>war</type>
                             <excludes>
-                                <exclude>Mirage2/**</exclude>
+                                <exclude>**</exclude>
                             </excludes>
                         </overlay>
                     </overlays>
