@@ -16,6 +16,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../..</root.basedir>
+        <license.skip>true</license.skip>
     </properties>
 
     <!-- The 'additions' module must *always* be built, as it is included
