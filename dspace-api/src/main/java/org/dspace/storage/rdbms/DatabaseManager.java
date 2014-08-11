@@ -49,7 +49,7 @@ import org.dspace.core.Context;
 public class DatabaseManager
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(DatabaseManager.class);
+    private static final Logger log = Logger.getLogger(DatabaseManager.class);
 
     /** True if initialization has been done */
     private static boolean initialized = false;
@@ -1077,6 +1077,7 @@ public class DatabaseManager
 
             switch (jdbctype)
             {
+                case Types.BOOLEAN:
                 case Types.BIT:
                     row.setColumn(name, results.getBoolean(i));
                     break;
@@ -1581,6 +1582,7 @@ public class DatabaseManager
             {
                 switch (jdbctype)
                 {
+                    case Types.BOOLEAN:
                     case Types.BIT:
                         statement.setBoolean(count, row.getBooleanColumn(column));
                         break;
