@@ -607,13 +607,20 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     {
         new NonStrictExpectations(AuthorizeUtil.class)
         {{
+            // Allow manage AdminGroup perms (needed to possibly create group first)
+            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
+                result = null;
             // Allow remove AdminGroup perms
             AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
                 result = null;
         }};
 
+        // Ensure admin group is created first
+        Group result = c.createAdministrators();
+        assertThat("testRemoveAdministratorsAuth 0",c.getAdministrators(), notNullValue());
+        assertThat("testRemoveAdministratorsAuth 1",c.getAdministrators(), equalTo(result));
         c.removeAdministrators();
-        assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), nullValue());
+        assertThat("testRemoveAdministratorsAuth 2", c.getAdministrators(), nullValue());
     }
 
     /**
@@ -624,11 +631,18 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     {
         new NonStrictExpectations(AuthorizeUtil.class)
         {{
+            // Allow manage AdminGroup perms (needed to possibly create group first)
+            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
+                result = null;
             // Disallow remove AdminGroup perms
             AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
                 result = new AuthorizeException();
         }};
 
+        // Ensure admin group is created first
+        Group result = c.createAdministrators();
+        assertThat("testRemoveAdministratorsAuth 0",c.getAdministrators(), notNullValue());
+        assertThat("testRemoveAdministratorsAuth 1",c.getAdministrators(), equalTo(result));
         c.removeAdministrators();
         fail("Exception expected");
     }
