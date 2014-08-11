@@ -17,7 +17,7 @@ import org.dspace.eperson.Group;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
-import mockit.*;
+import mockit.NonStrictExpectations;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
@@ -53,11 +53,9 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         try
         {
             //we have to create a new community in the database
-            context.turnOffAuthorisationSystem();
             this.c = Collection.create(context);
             this.dspaceObject = c;
             //we need to commit the changes so we don't block the table for testing
-            context.restoreAuthSystemState();
             context.commit();
         }
         catch (AuthorizeException ex)
@@ -296,18 +294,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testSetLogoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD, true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE, true); result = true;
-                 AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE, true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = c.setLogo(new FileInputStream(f));
@@ -323,18 +322,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testSetLogoAuth2() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                 AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = c.setLogo(new FileInputStream(f));
@@ -350,18 +350,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testSetLogoAuth3() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                 AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = c.setLogo(new FileInputStream(f));
@@ -377,18 +378,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testSetLogoAuth4() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                 AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = c.setLogo(new FileInputStream(f));
@@ -404,18 +406,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testSetLogoNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = c.setLogo(new FileInputStream(f));
@@ -428,14 +431,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCreateWorkflowGroupAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageWorkflowsGroup((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage WorkflowsGroup perms
+            AuthorizeUtil.authorizeManageWorkflowsGroup((Context) any, (Collection) any);
+                result = null;
+        }};
 
         int step = 1;
         Group result = c.createWorkflowGroup(step);
@@ -448,14 +449,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateWorkflowGroupNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageWorkflowsGroup((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage WorkflowsGroup perms
+            AuthorizeUtil.authorizeManageWorkflowsGroup((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         int step = 1;
         Group result = c.createWorkflowGroup(step);
@@ -468,7 +467,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testSetWorkflowGroup() throws SQLException, AuthorizeException
     {
-        context.turnOffAuthorisationSystem();
+        context.turnOffAuthorisationSystem(); //must be an Admin to create a Group
         int step = 1;
         Group g = Group.create(context);
         context.commit();
@@ -495,14 +494,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCreateSubmittersAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage SubmittersGroup perms
+            AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
+                result = null;
+        }};
 
         Group result = c.createSubmitters();
         assertThat("testCreateSubmittersAuth 0",result, notNullValue());
@@ -514,14 +511,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateSubmittersNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage SubmittersGroup perms
+            AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         Group result = c.createSubmitters();
         fail("Exception expected");
@@ -533,14 +528,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testRemoveSubmittersAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage SubmittersGroup perms
+            AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
+                result = null;
+        }};
 
         c.removeSubmitters();
         assertThat("testRemoveSubmittersAuth 0", c.getSubmitters(), nullValue());
@@ -552,14 +545,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testRemoveSubmittersNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage SubmittersGroup perms
+            AuthorizeUtil.authorizeManageSubmittersGroup((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         c.removeSubmitters();
         fail("Exception expected");
@@ -580,14 +571,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCreateAdministratorsAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage AdminGroup perms
+            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
+                result = null;
+        }};
 
         Group result = c.createAdministrators();
         assertThat("testCreateAdministratorsAuth 0", result, notNullValue());
@@ -599,14 +588,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage AdminGroup perms
+            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         Group result = c.createAdministrators();
         fail("Exception expected");
@@ -618,14 +605,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testRemoveAdministratorsAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow remove AdminGroup perms
+            AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
+                result = null;
+        }};
 
         c.removeAdministrators();
         assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), nullValue());
@@ -637,14 +622,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testRemoveAdministratorsNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow remove AdminGroup perms
+            AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         c.removeAdministrators();
         fail("Exception expected");
@@ -717,14 +700,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCreateTemplateItemAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage TemplateItem  perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                result = null;
+        }};
 
         c.createTemplateItem();
         assertThat("testCreateTemplateItemAuth 0",c.getTemplateItem(), notNullValue());
@@ -736,14 +717,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateTemplateItemNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage TemplateItem  perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         c.createTemplateItem();
         fail("Exception expected");
@@ -755,14 +734,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testRemoveTemplateItemAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                    result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Allow manage TemplateItem  perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                result = null;
+        }};
 
         c.removeTemplateItem();
         assertThat("testRemoveTemplateItemAuth 0",c.getTemplateItem(), nullValue());
@@ -774,14 +751,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testRemoveTemplateItemNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                    result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class)
+        {{
+            // Disallow manage TemplateItem  perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                result = new AuthorizeException();
+        }};
 
         c.removeTemplateItem();
         fail("Exception expected");
@@ -793,14 +768,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testAddItemAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Collection ADD permissions
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = null;
+        }};
 
         Item item = Item.create(context);
         c.addItem(item);
@@ -822,18 +795,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testAddItemNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Collection ADD permissions
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = new AuthorizeException();
+        }};
 
         Item item = Item.create(context);
         c.addItem(item);
-        fail("Excep[tion expected");
+        fail("Exception expected");
     }
 
     /**
@@ -842,16 +813,14 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testRemoveItemAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = null;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.REMOVE); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Collection ADD/REMOVE permissions
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = null;
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.REMOVE); result = null;
+        }};
 
         Item item = Item.create(context);
         c.addItem(item);
@@ -875,16 +844,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testRemoveItemNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.ADD); result = null;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.REMOVE); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Collection ADD permissions
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.ADD); result = null;
+            // Disallow Collection REMOVE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.REMOVE); result = new AuthorizeException();
+        }};
 
         Item item = Item.create(context);
         c.addItem(item);
@@ -899,18 +867,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testUpdateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check update?
         c.update();
@@ -922,18 +891,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testUpdateAuth2() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check update?
         c.update();
@@ -945,18 +915,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testUpdateAuth3() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check update?
         c.update();
@@ -968,18 +939,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testUpdateAuth4() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check update?
         c.update();
@@ -991,18 +963,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         c.update();
         fail("Exception expected");
@@ -1014,18 +987,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth 0", c.canEditBoolean());
     }
@@ -1036,18 +1010,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth2() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth2 0", c.canEditBoolean());
     }
@@ -1058,18 +1033,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth3() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth3 0", c.canEditBoolean());
     }
@@ -1080,18 +1056,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth4() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth4 0", c.canEditBoolean());
     }
@@ -1102,18 +1079,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         assertFalse("testCanEditBooleanNoAuth 0", c.canEditBoolean());
     }
@@ -1124,18 +1102,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth_boolean 0", c.canEditBoolean(true));
     }
@@ -1146,18 +1125,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth2_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth2_boolean 0", c.canEditBoolean(true));
     }
@@ -1168,18 +1148,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth3_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth3_boolean 0", c.canEditBoolean(true));
     }
@@ -1190,18 +1171,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth4_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth4_boolean 0", c.canEditBoolean(true));
     }
@@ -1212,18 +1194,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth5_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth5_boolean 0", c.canEditBoolean(false));
     }
@@ -1234,18 +1217,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth6_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth6_boolean 0", c.canEditBoolean(false));
     }
@@ -1256,18 +1240,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth7_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth7_boolean 0", c.canEditBoolean(false));
     }
@@ -1278,18 +1263,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanAuth8_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         assertTrue("testCanEditBooleanAuth8_boolean 0", c.canEditBoolean(false));
     }
@@ -1300,18 +1286,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanNoAuth_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         assertFalse("testCanEditBooleanNoAuth_boolean 0",c.canEditBoolean(true));
     }
@@ -1322,18 +1309,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditBooleanNoAuth2_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = new AuthorizeException();
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = new AuthorizeException();
+        }};
 
         assertFalse("testCanEditBooleanNoAuth_boolean 0",c.canEditBoolean(false));
     }
@@ -1344,18 +1332,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth_0args() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check??
         c.canEdit();
@@ -1367,18 +1356,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth2_0args() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check??
         c.canEdit();
@@ -1390,18 +1380,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth3_0args() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check??
         c.canEdit();
@@ -1413,18 +1404,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth4_0args() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TODO: how to check??
         c.canEdit();
@@ -1436,18 +1428,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCanEditNoAuth_0args() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         c.canEdit();
         fail("Exception expected");
@@ -1459,18 +1452,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(true);
@@ -1482,18 +1476,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth2_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(true);
@@ -1505,18 +1500,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth3_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(true);
@@ -1528,18 +1524,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth4_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = null;
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(true);
@@ -1551,18 +1548,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth5_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = true;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(false);
@@ -1574,18 +1572,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth6_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = true;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Allow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = true;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(false);
@@ -1597,18 +1596,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth7_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = true;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = true;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(false);
@@ -1620,18 +1620,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testCanEditAuth8_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = null;
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = null;
+        }};
 
         //TOO: how to check?
         c.canEdit(false);
@@ -1643,18 +1644,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCanEditNoAuth_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,false); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,false); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,false); result = new AuthorizeException();
-            }
-        };
+        // Test inheritance of permissions
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,true); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,true); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = new AuthorizeException();
+        }};
 
         //TOO: how to check?
         c.canEdit(false);
@@ -1667,18 +1669,19 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCanEditNoAuth2_boolean() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.WRITE,true); result = false;
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD,true); result = false;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE,true); result = new AuthorizeException();
-            }
-        };
+        // Test permissions with inheritance turned *OFF*
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow parent Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD,false); result = false;
+            // Disallow parent Community WRITE perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.WRITE,false); result = false;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,false); result = new AuthorizeException();
+        }};
 
         //TOO: how to check?
         c.canEdit(true);
@@ -1691,17 +1694,15 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testDeleteAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authUtil;
-            AuthorizeManager authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                 result = null;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE, anyBoolean); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class, AuthorizeManager.class)
+        {{
+            // Allow manage TemplateItem perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                    result = null;
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE, anyBoolean); result = null;
+        }};
 
         int id = c.getID();
         c.delete();
@@ -1714,19 +1715,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authUtil;
-            AuthorizeManager authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                 result = new AuthorizeException();
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE, anyBoolean); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class, AuthorizeManager.class)
+        {{
+            // Disallow manage TemplateItem perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                    result = new AuthorizeException();
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE, anyBoolean); result = null;
+        }};
 
-        int id = c.getID();
         c.delete();
         fail("Exception expected");
     }
@@ -1737,19 +1735,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth2() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeUtil authUtil;
-            AuthorizeManager authManager;
-            {
-                AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-                 result = null;
-                AuthorizeManager.authorizeAction((Context) any, (Collection) any,
-                        Constants.WRITE, anyBoolean); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeUtil.class, AuthorizeManager.class)
+        {{
+            // Allow manage TemplateItem perms
+            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
+                    result = null;
+            // Disallow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE, anyBoolean); result = new AuthorizeException();
+        }};
 
-        int id = c.getID();
         c.delete();
         fail("Exception expected");
     }
@@ -1771,15 +1766,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Collection) any,
-                        Constants.ADD); result = true;
-            }
-        };
-
         assertFalse("testEquals 0",c.equals(null));
         assertFalse("testEquals 1",c.equals(Collection.create(context)));
         assertTrue("testEquals 2", c.equals(c));
