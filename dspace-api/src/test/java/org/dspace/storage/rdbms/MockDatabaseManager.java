@@ -129,7 +129,7 @@ public final class MockDatabaseManager
      
     /**
      * Override/Mock the default "process()" method in order to add some custom 
-     * H2-specific code (look for the comments with "H2" in them).
+     * H2-specific code (look for the comments with "H2" in them below).
      * 
      * Convert the current row in a ResultSet into a TableRow object.
      *
@@ -146,6 +146,7 @@ public final class MockDatabaseManager
     @Mock
     static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException
     {
+        // Added for H2 debugging
         log.debug("Mocked process() method for H2 database");
         
         ResultSetMetaData meta = results.getMetaData();
@@ -164,6 +165,9 @@ public final class MockDatabaseManager
         {
             String name = meta.getColumnName(i);
             int jdbctype = meta.getColumnType(i);
+
+            // Added for H2 debugging
+            log.debug("In mocked process(), column '" + name + "' is of SQL Type " + jdbctype);
 
             switch (jdbctype)
             {
@@ -193,6 +197,33 @@ public final class MockDatabaseManager
                     break;
 
                 case Types.DECIMAL:
+                    // For H2 database, NUMBER() fields are mapped to DECIMAL data type.
+                    // See: http://www.h2database.com/html/datatypes.html#decimal_type
+                    // But, our Oracle schema uses NUMBER() to represent INTEGER values 1 or 0
+                    // (which are then mapped to Boolean true/false by TableRow.getBooleanColumn()).
+                    // So, for H2 to "act like Oracle", we need to try to convert
+                    // DECIMAL types to INTEGER values, so they can be mapped to
+                    // corresponding Boolean.
+                    if (isOracle)
+                    {
+                        long longValue = results.getLong(i);
+                        // If this value actually a valid Integer, convert it to an int
+                        if (longValue <= (long)Integer.MAX_VALUE)
+                        {
+                            row.setColumn(name, (int) longValue);
+                        }
+                        else // Otherwise, leave it as a long value
+                        {
+                            row.setColumn(name, longValue);
+                        }
+                    }
+                    else
+                    {
+                        row.setColumn(name, results.getLong(i));
+                    }
+                    break;
+                    //END ADDED for H2
+
                 case Types.BIGINT:
                     row.setColumn(name, results.getLong(i));
                     break;
@@ -232,11 +263,12 @@ public final class MockDatabaseManager
                         log.error("Unable to parse text from database", e);
                     }*/
                     
-                    // H2 assumes that "getBytes" should return hexidecimal. So,
-                    // the above code will throw a JdbcSQLException: 
+                    // H2 assumes that "getBytes()" should return hexidecimal.
+                    // So, the above commented out code will throw a JdbcSQLException:
                     // "Hexadecimal string contains non-hex character"
                     // Instead, we just want to get the value as a string.
                     row.setColumn(name, results.getString(i));
+                    // END ADDED for H2
                     break;
 
                 case Types.DATE:
