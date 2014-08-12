@@ -13,5 +13,11 @@ BEGIN;
 ------------------------------------------------------
 ALTER TABLE requestitem ADD request_message TEXT;
 
+------------------------------------------------------
+-- DS-1955 resize rpdescription for embargo reason
+------------------------------------------------------
+ALTER TABLE resourcepolicy ALTER COLUMN rpdescription TYPE TEXT;
+
+
 
 COMMIT;
