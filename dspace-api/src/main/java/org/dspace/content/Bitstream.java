@@ -212,7 +212,7 @@ public class Bitstream extends DSpaceObject
         bitstream.setFormat(null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
-                bitstreamID, null, bitstream.lookupIdentifiers(context)));
+                bitstreamID, null, bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -248,7 +248,7 @@ public class Bitstream extends DSpaceObject
         bitstream.setFormat(null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
-                bitstreamID, "REGISTER", bitstream.lookupIdentifiers(context)));
+                bitstreamID, "REGISTER", bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -509,14 +509,14 @@ public class Bitstream extends DSpaceObject
         if (modified)
         {
             bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, 
-                    getID(), null, lookupIdentifiers(bContext)));
+                    getID(), null, getIdentifiers(bContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
             bContext.addEvent(new Event(Event.MODIFY_METADATA, 
                     Constants.BITSTREAM, getID(), getDetails(),
-                    lookupIdentifiers(bContext)));
+                    getIdentifiers(bContext)));
             modifiedMetadata = false;
             clearDetails();
         }
@@ -544,7 +544,7 @@ public class Bitstream extends DSpaceObject
                 "bitstream_id=" + getID()));
 
         bContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), 
-                String.valueOf(getSequenceID()), lookupIdentifiers(bContext)));
+                String.valueOf(getSequenceID()), getIdentifiers(bContext)));
 
         // Remove from cache
         bContext.removeCached(this, getID());
@@ -751,6 +751,6 @@ public class Bitstream extends DSpaceObject
     {
         //Also fire a modified event since the bitstream HAS been modified
         bContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), 
-                null, lookupIdentifiers(bContext)));
+                null, getIdentifiers(bContext)));
     }
 }

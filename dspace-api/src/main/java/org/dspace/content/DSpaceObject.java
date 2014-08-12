@@ -29,6 +29,8 @@ public abstract class DSpaceObject
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     private StringBuffer eventDetails = null;
+    
+    private String[] identifiers = null;
 
     /**
      * Reset the cache of event details.
@@ -109,26 +111,52 @@ public abstract class DSpaceObject
      * Tries to lookup all Identifiers of this DSpaceObject.
      * @return An array containing all found identifiers or an array with a length of 0.
      */
-    public String[] lookupIdentifiers(Context context)
+    public String[] getIdentifiers(Context context)
     {
-        String[] identifiers = new String[0];
-        IdentifierService identifierService = 
-                new DSpace().getSingletonService(IdentifierService.class);
-        
-        if (identifierService != null)
+        if (identifiers == null)
         {
-            return identifierService.lookup(context, this);
-        }
-        
-        log.warn("No IdentifierService found, will return an array containing "
-                + "the Handle only.");
-        
-        if (getHandle() != null)
-        {
-            return new String[] { HandleManager.getCanonicalForm(getHandle()) };
+            log.debug("This DSO's identifiers cache is empty, looking for identifiers...");
+            identifiers = new String[0];
+
+            IdentifierService identifierService = 
+                    new DSpace().getSingletonService(IdentifierService.class);
+
+            if (identifierService != null)
+            {
+                identifiers = identifierService.lookup(context, this);
+            } else {
+                log.warn("No IdentifierService found, will return an array containing "
+                        + "the Handle only.");
+                if (getHandle() != null)
+                {
+                    identifiers = new String[] { HandleManager.getCanonicalForm(getHandle()) };
+                }
+            }
         }
 
-        return new String[0];
+        if (log.isDebugEnabled())
+        {
+            StringBuilder dbgMsg = new StringBuilder();
+            for (String id : identifiers)
+            {
+                if (dbgMsg.capacity() == 0)
+                {
+                    dbgMsg.append("This DSO's Identifiers are: ");
+                } else {
+                    dbgMsg.append(", ");
+                }
+                dbgMsg.append(id);
+            }
+            dbgMsg.append(".");
+            log.debug(dbgMsg.toString());
+        }
+
+        return identifiers;
+    }
+    
+    public void resetIdentifiersCache()
+    {
+        identifiers = null;
     }
 
     /**

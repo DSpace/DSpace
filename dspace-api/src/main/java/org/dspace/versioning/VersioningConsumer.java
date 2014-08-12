@@ -57,7 +57,7 @@ public class VersioningConsumer implements Consumer {
                             //and browse index we need to fire a new event
                             ctx.addEvent(new Event(Event.MODIFY, 
                                     previousItem.getType(), previousItem.getID(),
-                                    null, previousItem.lookupIdentifiers(ctx)));
+                                    null, previousItem.getIdentifiers(ctx)));
                         }
                     }
                 }

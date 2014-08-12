@@ -215,7 +215,7 @@ public class Group extends DSpaceObject
                 + g.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(),
-                null, g.lookupIdentifiers(context)));
+                null, g.getIdentifiers(context)));
 
         return g;
     }
@@ -273,7 +273,7 @@ public class Group extends DSpaceObject
 
         myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), 
                 Constants.EPERSON, e.getID(), e.getEmail(), 
-                lookupIdentifiers(myContext)));
+                getIdentifiers(myContext)));
     }
 
     /**
@@ -297,7 +297,7 @@ public class Group extends DSpaceObject
 
         myContext.addEvent(new Event(Event.ADD, Constants.GROUP, getID(), 
                 Constants.GROUP, g.getID(), g.getName(), 
-                lookupIdentifiers(myContext)));
+                getIdentifiers(myContext)));
     }
 
     /**
@@ -315,7 +315,7 @@ public class Group extends DSpaceObject
             epeopleChanged = true;
             myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), 
                     Constants.EPERSON, e.getID(), e.getEmail(), 
-                    lookupIdentifiers(myContext)));
+                    getIdentifiers(myContext)));
         }
     }
 
@@ -333,7 +333,7 @@ public class Group extends DSpaceObject
             groupsChanged = true;
             myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), 
                     Constants.GROUP, g.getID(), g.getName(),
-                    lookupIdentifiers(myContext)));
+                    getIdentifiers(myContext)));
         }
     }
 
@@ -1007,7 +1007,7 @@ public class Group extends DSpaceObject
         // FIXME: authorizations
 
         myContext.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), 
-                getName(), lookupIdentifiers(myContext)));
+                getName(), getIdentifiers(myContext)));
 
         // Remove from cache
         myContext.removeCached(this, getID());
@@ -1116,7 +1116,7 @@ public class Group extends DSpaceObject
         if (modifiedMetadata)
         {
             myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, 
-                    getID(), getDetails(), lookupIdentifiers(myContext)));
+                    getID(), getDetails(), getIdentifiers(myContext)));
             modifiedMetadata = false;
             clearDetails();
         }

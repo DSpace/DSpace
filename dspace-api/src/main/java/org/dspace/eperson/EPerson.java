@@ -547,7 +547,7 @@ public class EPerson extends DSpaceObject
                 + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), 
-                null, e.lookupIdentifiers(context)));
+                null, e.getIdentifiers(context)));
 
         return e;
     }
@@ -578,7 +578,7 @@ public class EPerson extends DSpaceObject
         }
 
         myContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), 
-                getEmail(), lookupIdentifiers(myContext)));
+                getEmail(), getIdentifiers(myContext)));
 
         // Remove from cache
         myContext.removeCached(this, getID());
@@ -1008,13 +1008,13 @@ public class EPerson extends DSpaceObject
         if (modified)
         {
             myContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, 
-                    getID(), null, lookupIdentifiers(myContext)));
+                    getID(), null, getIdentifiers(myContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
             myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.EPERSON, 
-                    getID(), getDetails(), lookupIdentifiers(myContext)));
+                    getID(), getDetails(), getIdentifiers(myContext)));
             modifiedMetadata = false;
             clearDetails();
         }

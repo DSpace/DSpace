@@ -448,7 +448,7 @@ public class Bundle extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), 
                 Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID()),
-                lookupIdentifiers(ourContext)));
+                getIdentifiers(ourContext)));
 
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
@@ -553,7 +553,7 @@ public class Bundle extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), 
                 Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID()),
-                lookupIdentifiers(ourContext)));
+                getIdentifiers(ourContext)));
 
         //Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject();
@@ -614,13 +614,13 @@ public class Bundle extends DSpaceObject
         if (modified)
         {
             ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(),
-                    null, lookupIdentifiers(ourContext)));
+                    null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
             ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE,
-                    getID(), null, lookupIdentifiers(ourContext)));
+                    getID(), null, getIdentifiers(ourContext)));
             modifiedMetadata = false;
         }
 
@@ -638,7 +638,7 @@ public class Bundle extends DSpaceObject
                 + getID()));
 
         ourContext.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), 
-                getName(), lookupIdentifiers(ourContext)));
+                getName(), getIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
