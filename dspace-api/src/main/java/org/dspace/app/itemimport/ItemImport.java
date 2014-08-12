@@ -647,6 +647,22 @@ public class ItemImport
         }
     }
 
+    public void addItemsAtomic(Context c, Collection[] mycollections, String sourceDir, String mapFile, boolean template) throws Exception {
+        try {
+            addItems(c, mycollections, sourceDir, mapFile, template);
+        } catch (Exception addException) {
+            log.error("AddItems encountered an error, will try to revert. Error: " + addException.getMessage());
+            try {
+                deleteItems(c, mapFile);
+                log.info("Was able to undo the import, by deleting the imported items");
+                throw addException;
+            } catch (Exception deleteException) {
+                log.error("Error occurred while cleaning up from failed import: + " + deleteException.getMessage());
+                throw deleteException;
+            }
+        }
+    }
+
     public void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
@@ -2588,5 +2604,18 @@ public class ItemImport
 
     public static String getTempWorkDir() {
         return tempWorkDir;
+    }
+
+    public static File getTempWorkDirFile() {
+        File tempDirFile = new File(getTempWorkDir());
+        if(!tempDirFile.exists()) {
+            tempDirFile.mkdirs();
+        }
+        return tempDirFile;
+    }
+
+    public static void cleanupZipTemp() {
+        System.out.println("Deleting temporary zip directory: " + tempWorkDir);
+        ItemImport.deleteDirectory(new File(tempWorkDir));
     }
 }

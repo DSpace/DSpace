@@ -46,22 +46,10 @@ public class BatchImportConfirm extends AbstractDSpaceTransformer {
     private static final Message T_submit_return = message("xmlui.general.return");
     private static final Message T_trail = message("xmlui.administrative.metadataimport.general.trail");
     private static final Message T_changes = message("xmlui.administrative.metadataimport.general.changes");
-    private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
-    private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
     private static final Message T_title = message("xmlui.administrative.metadataimport.general.title");
     private static final Message T_head1 = message("xmlui.administrative.metadataimport.general.head1");
 
     private static final Message T_success = message("xmlui.administrative.metadataimport.MetadataImportConfirm.success");
-    private static final Message T_changes_committed = message("xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed");
-    private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_added");
-    private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed");
-    private static final Message T_collection_newowner = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_newowner");
-    private static final Message T_collection_oldowner = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner");
-    private static final Message T_collection_mapped = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped");
-    private static final Message T_collection_unmapped = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped");
-    private static final Message T_item_deleted = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_deleted");
-    private static final Message T_item_withdrawn = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_withdrawn");
-    private static final Message T_item_reinstated = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_reinstated");
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -77,179 +65,16 @@ public class BatchImportConfirm extends AbstractDSpaceTransformer {
         // Get list of changes
 
         Request request = ObjectModelHelper.getRequest(objectModel);
-        ArrayList<BulkEditChange> changes = null;
-
-        if(request.getAttribute("changes") != null)
-        {
-            changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
-        }
-
-        if (changes == null)
-        {
-            changes = new ArrayList<BulkEditChange>();
-        }
 
         // DIVISION: metadata-import
         Division div = body.addInteractiveDivision("batch-import",contextPath + "/admin/batchimport", Division.METHOD_MULTIPART,"primary administrative");
         div.setHead(T_head1);
         Para para = div.addPara();
         para.addContent(T_success);
-        para.addContent(" " + changes.size() + " ");
+
         para.addContent(T_changes);
 
-        if(changes.size() > 0) {
-            Table mdchanges = div.addTable("metadata-changes", changes.size(), 2);
 
-            // Display the changes
-            for (BulkEditChange change : changes)
-            {
-                // Get the changes
-                List<DCValue> adds = change.getAdds();
-                List<DCValue> removes = change.getRemoves();
-                List<Collection> newCollections = change.getNewMappedCollections();
-                List<Collection> oldCollections = change.getOldMappedCollections();
-
-                if ((adds.size() > 0) || (removes.size() > 0) ||
-                        (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                        (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
-                        (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated()))
-                {
-                    Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
-                    // Show the item
-                    if (!change.isNewItem())
-                    {
-                        Item i = change.getItem();
-                        Cell cell = headerrow.addCell();
-                        cell.addContent(T_changes_committed);
-                        cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
-                    }
-                    else
-                    {
-                        headerrow.addCellContent(T_new_item);
-                    }
-                    headerrow.addCell();
-                }
-
-                // Show actions
-                if (change.isDeleted())
-                {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-delete");
-
-                    Cell cell = mdrow.addCell();
-                    cell.addContent(T_item_deleted);
-                    mdrow.addCellContent("");
-                }
-                if (change.isWithdrawn())
-                {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-withdraw");
-
-                    Cell cell = mdrow.addCell();
-                    cell.addContent(T_item_withdrawn);
-                    mdrow.addCellContent("");
-                }
-                if (change.isReinstated())
-                {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-reinstate");
-
-                    Cell cell = mdrow.addCell();
-                    cell.addContent(T_item_reinstated);
-                    mdrow.addCellContent("");
-                }
-
-                // Show new owning collection
-                if (change.getNewOwningCollection() != null)
-                {
-                    Collection c = change.getNewOwningCollection();
-                    if (c != null)
-                    {
-                        String cHandle = c.getHandle();
-                        String cName = c.getName();
-                        Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                        colrow.addCellContent(T_collection_newowner);
-                        colrow.addCellContent(cHandle + " (" + cName + ")");
-                    }
-                }
-
-                // Show old owning collection
-                if (change.getOldOwningCollection() != null)
-                {
-                    Collection c = change.getOldOwningCollection();
-                    if (c != null)
-                    {
-                        String cHandle = c.getHandle();
-                        String cName = c.getName();
-                        Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                        colrow.addCellContent(T_collection_oldowner);
-                        colrow.addCellContent(cHandle + " (" + cName + ")");
-                    }
-                }
-
-                // Show new mapped collections
-                for (Collection c : newCollections)
-                {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                    colrow.addCellContent(T_collection_mapped);
-                    colrow.addCellContent(cHandle + " (" + cName + ")");
-                }
-
-                // Show old mapped collections
-                for (Collection c : oldCollections)
-                {
-                    String cHandle = c.getHandle();
-                    String cName = c.getName();
-                    Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                    colrow.addCellContent(T_collection_unmapped);
-                    colrow.addCellContent(cHandle + " (" + cName + ")");
-                }
-
-                // Show additions
-                for (DCValue dcv : adds)
-                {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                    String md = dcv.schema + "." + dcv.element;
-                    if (dcv.qualifier != null)
-                    {
-                        md += "." + dcv.qualifier;
-                    }
-                    if (dcv.language != null)
-                    {
-                        md += "[" + dcv.language + "]";
-                    }
-
-                    Cell cell = mdrow.addCell();
-                    cell.addContent(T_item_addition);
-                    cell.addContent(" (" + md + ")");
-                    mdrow.addCellContent(dcv.value);
-                }
-
-                // Show removals
-                for (DCValue dcv : removes)
-                {
-                    Row mdrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                    String md = dcv.schema + "." + dcv.element;
-                    if (dcv.qualifier != null)
-                    {
-                        md += "." + dcv.qualifier;
-                    }
-                    if (dcv.language != null)
-                    {
-                        md += "[" + dcv.language + "]";
-                    }
-
-                    Cell cell = mdrow.addCell();
-                    cell.addContent(T_item_deletion);
-                    cell.addContent(" (" + md + ")");
-                    mdrow.addCellContent(dcv.value);
-                }
-            }
-        }
-        else
-        {
-            Para nochanges = div.addPara();
-            nochanges.addContent(T_no_changes);
-        }
         Para actions = div.addPara();
         Button cancel = actions.addButton("submit_return");
         cancel.setValue(T_submit_return);
