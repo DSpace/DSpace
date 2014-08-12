@@ -140,6 +140,10 @@
             <version>1.2.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
