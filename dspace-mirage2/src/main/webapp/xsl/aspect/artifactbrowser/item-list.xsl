@@ -311,21 +311,4 @@
             </div>
         </xsl:template>
 
-
-        <!-- Generate the thunbnail, if present, from the file section -->
-        <xsl:template match="mets:fileSec" mode="artifact-preview">
-            <xsl:if test="mets:fileGrp[@USE='THUMBNAIL']">
-                <div class="artifact-preview">
-                    <a href="{ancestor::mets:METS/@OBJID}">
-                        <img alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
-                            <xsl:attribute name="src">
-                                <xsl:value-of select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
-                            </xsl:attribute>
-                        </img>
-                    </a>
-                </div>
-            </xsl:if>
-        </xsl:template>
-
-
 </xsl:stylesheet>
