@@ -136,7 +136,7 @@
                 </property>
             </activation>
             <modules>
-                <module>mirage2</module>
+                <module>xmlui-mirage2</module>
             </modules>
         </profile>
     </profiles>

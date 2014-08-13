@@ -457,14 +457,14 @@
       Builds MIRAGE2 WAR for DSpace
    -->
        <profile>
-           <id>dspace-mirage2</id>
+           <id>dspace-xmlui-mirage2</id>
            <activation>
                <file>
-                   <exists>dspace-mirage2/pom.xml</exists>
+                   <exists>dspace-xmlui-mirage2/pom.xml</exists>
                </file>
            </activation>
            <modules>
-               <module>dspace-mirage2</module>
+               <module>dspace-xmlui-mirage2</module>
            </modules>
        </profile>
         <!--
@@ -515,7 +515,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-             <module>dspace-mirage2</module>
+             <module>dspace-xmlui-mirage2</module>
              <module>dspace-xmlui</module>
              <module>dspace-lni</module>
              <module>dspace-oai</module>

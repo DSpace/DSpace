@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace.modules</groupId>
-    <artifactId>mirage2</artifactId>
+    <artifactId>xmlui-mirage2</artifactId>
     <packaging>war</packaging>
     <name>DSpace Mirage2 :: local customisations</name>
     <description>
@@ -47,7 +47,7 @@
                                 WEB-INF/**,META-INF/**
                             </excludes>
                             <includeArtifactIds>
-                                dspace-mirage2
+                                dspace-xmlui-mirage2
                             </includeArtifactIds>
                         </configuration>
                     </execution>
@@ -172,7 +172,7 @@
                         -->
                         <overlay>
                             <groupId>org.dspace</groupId>
-                            <artifactId>dspace-mirage2</artifactId>
+                            <artifactId>dspace-xmlui-mirage2</artifactId>
                             <type>war</type>
                             <excludes>
                                 <exclude>**</exclude>
@@ -440,7 +440,7 @@
 
         <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-mirage2</artifactId>
+            <artifactId>dspace-xmlui-mirage2</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
