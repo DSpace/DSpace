@@ -184,7 +184,7 @@ Now, if you run `mvn package -Dmirage2.on=true` in the dspace project root, bowe
 
 # Customizing the theme #
 
-To create your own, customized version of Mirage 2, you can't do so to `src/dspace/modules/xmlui/src/main/webapp/themes`. Because of its build process, Mirage 2 works a little different. There is a separate module called `xmlui-mirage2` in `src/dspace/modules/`. Any theme you put in that module will be considered a Mirage 2 based theme, and its theme folder only needs to contain the files that differ from the vanilla Mirage 2.
+To create your own, customized version of Mirage 2, you can't do so in `src/dspace/modules/xmlui/src/main/webapp/themes`. Because of its build process, Mirage 2 works a little different. There is a separate module called `xmlui-mirage2` in `src/dspace/modules/`. Any theme you put in that module will be considered a Mirage 2 based theme, and its theme folder only needs to contain the files that differ from the vanilla Mirage 2.
 
 To get you started the module already contains a Mirage 2 folder containing nothing but the `_styles.scss` file. You can copy other files you want to modify to that folder as you go.
 
