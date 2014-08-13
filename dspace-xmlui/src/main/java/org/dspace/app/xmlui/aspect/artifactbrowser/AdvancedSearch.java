@@ -138,6 +138,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         {
             numSearchField = "3";
         }
+        String spatialQueryString = getSpatialQuery();
     	
         // Build the DRI Body
         Division search = body.addDivision("advanced-search","primary");
@@ -187,6 +188,19 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	query.addHidden("query"+i).setValue(field.getQuery());
         }
 
+        //Spatial query passes as filter in Lucene search so it has no value to be added as conjuction field
+        //Element for spatial searching
+        //User can enter a bounding box in the form e.g. "25.1742,27.5031,37.5952,39.5727"
+        Text bbox = queryList.addItem().addText("bbox");
+        //It should be an new entry in messages.xml
+        bbox.setLabel("Spatial Search");
+        bbox.setValue(spatialQueryString);
+        
+        //An alternative implemnentation could be the following so the bbox element to be activated by Theme
+        //Hidden bbox=queryList.addItem().addHidden("bbox");
+        //bbox.setValue(spatialQueryString);
+        
+        
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
         
@@ -333,6 +347,12 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             parameters.put("query" + index, query);
         }
         
+        String spatialquery = getSpatialQuery();
+        if (!"".equals(spatialquery))
+        {
+            parameters.put("bbox", encodeForURL(spatialquery));
+        }
+        
         if (parameters.get("page") == null)
         {
             parameters.put("page", String.valueOf(getParameterPage()));
@@ -371,6 +391,18 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         Request request = ObjectModelHelper.getRequest(objectModel);   
         return AdvancedSearchUtils.buildQuery(getSearchFields(request));
     }
+    
+     protected String getSpatialQuery() throws UIException
+    {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String query = decodeFromURL(request.getParameter("bbox"));
+        if (query == null)
+        {
+            return "";
+        }
+        return query;
+    }
+
 
     private java.util.List<AdvancedSearchUtils.SearchField> getSearchFields(Request request) throws UIException {
         if (fields == null){

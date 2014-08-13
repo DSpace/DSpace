@@ -94,6 +94,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             UIException, SQLException, IOException, AuthorizeException
     {
         String queryString = getQuery();
+        //Hold the spatial query
+        String spatialQueryString = getSpatialQuery();
 
         // Build the DRI Body
         Division search = body.addDivision("search","primary");
@@ -114,6 +116,17 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         text.setLabel(T_full_text_search);
         text.setValue(queryString);
         
+        //Element for spatial searching
+        //User can enter a bounding box in the form e.g. "25.1742,27.5031,37.5952,39.5727"
+        Text bbox = queryList.addItem().addText("bbox");
+        //It should be an new entry in messages.xml
+        bbox.setLabel("Spatial Search");
+        bbox.setValue(spatialQueryString);
+        
+        //An alternative implemnentation could be the following so the bbox element to be activated by Theme
+        //Hidden bbox=queryList.addItem().addHidden("bbox");
+        //bbox.setValue(spatialQueryString);
+        
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
 
@@ -130,6 +143,22 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String query = decodeFromURL(request.getParameter("query"));
+        if (query == null)
+        {
+            return "";
+        }
+        return query;
+    }
+    
+    
+       /**
+     * Get the spatial search query from the URL parameter, if none is found the empty
+     * string is returned.
+     */
+    public String getSpatialQuery() throws UIException
+    {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String query = decodeFromURL(request.getParameter("bbox"));
         if (query == null)
         {
             return "";
@@ -156,6 +185,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         {
             parameters.put("query", encodeForURL(query));
         }
+        
+        String spatialquery = getSpatialQuery();
+        if (!"".equals(spatialquery))
+        {
+            parameters.put("bbox", encodeForURL(spatialquery));
+        }
+        
         
         if (parameters.get("page") == null)
         {

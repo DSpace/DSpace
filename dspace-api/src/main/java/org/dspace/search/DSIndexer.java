@@ -7,6 +7,10 @@
  */
 package org.dspace.search;
 
+import com.spatial4j.core.context.SpatialContext;
+import com.spatial4j.core.context.jts.JtsSpatialContext;
+import com.spatial4j.core.shape.Rectangle;
+import com.spatial4j.core.shape.impl.RectangleImpl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +51,10 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.spatial.SpatialStrategy;
+import org.apache.lucene.spatial.prefix.RecursivePrefixTreeStrategy;
+import org.apache.lucene.spatial.prefix.tree.QuadPrefixTree;
+import org.apache.lucene.spatial.prefix.tree.SpatialPrefixTree;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
@@ -1080,20 +1088,55 @@ public class DSIndexer
         int j;
         if (indexConfigArr.length > 0)
         {
-            DCValue[] mydc;
+            DCValue[] mydc=null;
+            String eastBound=null;
+            String westBound=null;
+            String southBound=null;
+            String northBound=null;
 
             for (int i = 0; i < indexConfigArr.length; i++)
             {
-                // extract metadata (ANY is wildcard from Item class)
-                if (indexConfigArr[i].qualifier!= null && indexConfigArr[i].qualifier.equals("*"))
+                //Get Geographic Bounding Box indexes
+                //This means that metadata that represent coordinates should have the structure:
+                // [schema].GeographicBoundingBox.EastBoundLongtitude
+                // [schema].GeographicBoundingBox.WestBoundLongtitude
+                // [schema].GeographicBoundingBox.NorthBoundLongtitude
+                // [schema].GeographicBoundingBox.SouthBoundLongtitude
+                // In a more abstract implementation the "spatial" metadata items could be defined in dspace.cfg
+                if (indexConfigArr[i].element.equals("GeographicBoundingBox"))
                 {
-                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, Item.ANY, Item.ANY);
+                    log.info("get Bounding Box");
+                    try{
+                    if (indexConfigArr[i].qualifier.equals("EastBoundLongtitude"))
+                    {
+                        eastBound= item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY)[0].value;     
+                    }
+                    if (indexConfigArr[i].qualifier.equals("WestBoundLongtitude"))
+                    {
+                        westBound= item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY)[0].value;   
+                    }
+                    if (indexConfigArr[i].qualifier.equals("NorthBoundLatitude"))
+                    {
+                        northBound= item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY)[0].value;   
+                    }
+                    if (indexConfigArr[i].qualifier.equals("SouthBoundLatitude"))
+                    {
+                        southBound= item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY)[0].value;
+                    }
+                    }catch (ArrayIndexOutOfBoundsException e){
+                        log.error("Skipping Bounding Box");                    
+                    }
+                }else{
+                    // extract metadata (ANY is wildcard from Item class)
+                    if (indexConfigArr[i].qualifier!= null && indexConfigArr[i].qualifier.equals("*"))
+                    {
+                        mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, Item.ANY, Item.ANY);
+                    }
+                    else
+                    {
+                        mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
+                    }
                 }
-                else
-                {
-                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
-                }
-
 
                 //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
                 if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
@@ -1234,6 +1277,19 @@ public class DSIndexer
                         doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.ANALYZED));
                     }
                 }
+            }
+            //Create Spatial Index if present
+            if ((eastBound!=null) && (westBound!=null) && (northBound!=null) && (southBound!=null))
+            {
+                log.info("Create Spatial Index");
+                SpatialContext SC=JtsSpatialContext.GEO;
+                SpatialPrefixTree grid=new QuadPrefixTree(SC,10);
+                SpatialStrategy SS=new RecursivePrefixTreeStrategy(grid,"bbox");
+                Rectangle shape=new RectangleImpl(Double.valueOf(eastBound.trim()),Double.valueOf(westBound.trim()),Double.valueOf(southBound.trim()),Double.valueOf(northBound.trim()),SC);
+                for (IndexableField f: SS.createIndexableFields(shape))
+                {
+                    doc.add(f);
+                }         
             }
         }
 
