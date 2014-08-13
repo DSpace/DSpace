@@ -103,8 +103,11 @@ public class SendItemRequestAction extends AbstractAction
         Item item = (Item) dso;
         String title="";
         DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+        if (titleDC == null || titleDC.length == 0) {
+            titleDC = item.getDC("title", Item.ANY, Item.ANY); // dc.title with qualifier term
+        }
         if (titleDC != null || titleDC.length > 0) {
-        	title=titleDC[0].value;
+            title = titleDC[0].value;
         }
         
 		RequestItemAuthor requestItemAuthor = new DSpace()
