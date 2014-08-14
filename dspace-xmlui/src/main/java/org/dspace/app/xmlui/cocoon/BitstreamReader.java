@@ -12,8 +12,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.mail.internet.MimeUtility;
@@ -44,18 +42,11 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.google.recording.GoogleRecorder;
 import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.LogManager;
@@ -375,7 +366,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                                 bitstream));
 
             // Tell Google Analytics about the download.
-            recordGoogleAnalytics();
+            GoogleRecorder.getInstance().recordXMLUIBitstreamDownload(this.request.getRequestURI(), this.bitstreamMimeType);
 
             // If we created the database connection close it, otherwise leave it open.
             if (BitstreamReaderOpenedContext)
@@ -700,41 +691,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         return this.bitstreamMimeType;
     }
 
-    private void recordGoogleAnalytics() throws IOException {
-        String analyticsKey = new DSpace().getConfigurationService().getProperty("xmlui.google.analytics.key");
-
-        if (analyticsKey != null ) {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            // Comment - I thought about sticking this in config but it is already hardcoded elsewhere so I went
-            // for consistency.
-            HttpPost httpPost = new HttpPost("https://www.google-analytics.com/collect");
-
-            // Question - what values to post? I've tried to record values that we might want to subsequently
-            // query on. Any other suggestions?
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("v", "1"));
-            nvps.add(new BasicNameValuePair("tid", analyticsKey));
-            //Note: cid is not relevant here but is a required field.
-            nvps.add(new BasicNameValuePair("cid", "999"));
-            nvps.add(new BasicNameValuePair("t", "event"));
-            nvps.add(new BasicNameValuePair("dp", this.request.getRequestURI()));
-            nvps.add(new BasicNameValuePair("ec", "bitstream"));
-            nvps.add(new BasicNameValuePair("ea", "download"));
-            nvps.add(new BasicNameValuePair("el", bitstreamMimeType));
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-
-            CloseableHttpResponse response2 = httpclient.execute(httpPost);
-            try {
-                // I can't find a list of what are acceptable responses, so I log the response but take no action.
-                log.info("Google Analytics response is " + response2.getStatusLine());
-            } finally {
-                response2.close();
-            }
-
-            log.info("Posted to Google Analytics - " +  this.request.getRequestURI());
-        }
-    }
-    
     /**
          * Recycle
          */

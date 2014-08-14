@@ -10,8 +10,6 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -31,18 +29,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.google.recording.GoogleRecorder;
 import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-
 
 /**
  * Servlet for retrieving bitstreams. The bits are simply piped to the user. If
@@ -191,9 +181,9 @@ public class BitstreamServlet extends DSpaceServlet
         				context, 
         				bitstream));
 
-        // Send a note to GA of the download.
-        recordGoogleAnalytics(request, bitstream);
-        
+        // Tell Google Analytics about the download.
+        GoogleRecorder.getInstance().recordJSPUIBitstreamDownload(request.getRequestURI(), bitstream.getFormat().getMIMEType());
+
         // Modification date
         // Only use last-modified if this is an anonymous access
         // - caching content that may be generated under authorisation
@@ -235,37 +225,5 @@ public class BitstreamServlet extends DSpaceServlet
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
-    }
-
-    private void recordGoogleAnalytics(HttpServletRequest request, Bitstream bitstream) throws IOException {
-        String analyticsKey = new DSpace().getConfigurationService().getProperty("xmlui.google.analytics.key");
-
-        if (analyticsKey != null ) {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            // Comment - I thought about sticking this in config but it is already hardcoded elsewhere so I went
-            // for consistency.
-            HttpPost httpPost = new HttpPost("https://www.google-analytics.com/collect");
-
-            // Question - what values to post? I've tried to record values that we might want to subsequently
-            // query on. Any other suggestions?
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("v", "1"));
-            nvps.add(new BasicNameValuePair("tid", analyticsKey));
-            //Note: cid is not relevant here but is a required field.
-            nvps.add(new BasicNameValuePair("cid", "999"));
-            nvps.add(new BasicNameValuePair("t", "event"));
-            nvps.add(new BasicNameValuePair("dp", request.getRequestURI()));
-            nvps.add(new BasicNameValuePair("ec", "bitstream"));
-            nvps.add(new BasicNameValuePair("ea", "download"));
-            nvps.add(new BasicNameValuePair("el", bitstream.getFormat().getMIMEType()));
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-
-            try (CloseableHttpResponse response2 = httpclient.execute(httpPost)) {
-                // I can't find a list of what are acceptable responses, so I log the response but take no action.
-                log.info("Google Analytics response is " + response2.getStatusLine());
-            }
-
-            log.info("Posted to Google Analytics - " + request.getRequestURI());
-        }
     }
 }
