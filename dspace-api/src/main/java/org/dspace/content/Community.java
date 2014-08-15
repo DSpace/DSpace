@@ -1128,7 +1128,7 @@ public class Community extends DSpaceObject
         // MUST have either REMOVE permissions on parent community (if exists)
         // OR have DELETE permissions on current community
         if (parent!= null && !AuthorizeManager.authorizeActionBoolean(ourContext,
-                getParentCommunity(), Constants.REMOVE))
+                parent, Constants.REMOVE))
         {
             // If we don't have Parent Community REMOVE permissions, then
             // we MUST at least have current Community DELETE permissions
