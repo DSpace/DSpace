@@ -1027,15 +1027,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     {
         new NonStrictExpectations(AuthorizeManager.class)
         {{
-            // Allow current Community ADD perms
+            // Allow Community ADD perms (in order to add a new subcommunity to parent)
             AuthorizeManager.authorizeAction((Context) any, (Community) any,
-                    Constants.ADD); result = null;
-            // Allow *parent* Community ADD perms
-            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                    Constants.ADD); result = true;
-            // Allow current Community REMOVE perms
+                    Constants.ADD, true); result = null;
+            // Allow Community REMOVE perms (needed to unmap/remove subcommunity)
             AuthorizeManager.authorizeAction((Context) any, (Community) any,
-                    Constants.REMOVE); result = null;
+                    Constants.REMOVE, true); result = null;
+            // Allow Community DELETE perms (needed to actually delete subcommunity)
+            AuthorizeManager.authorizeAction((Context) any, (Community) any,
+                    Constants.DELETE, true); result = null;
         }};
 
         // Turn off authorization temporarily to create a new top-level community
