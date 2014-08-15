@@ -739,11 +739,6 @@
             <version>1.7.0</version>
          </dependency>
          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.1</version>
-         </dependency>
-         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>${lucene.version}</version>
@@ -999,6 +994,11 @@
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
             <version>0.1.12</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.2</version>
          </dependency>
          <dependency>
             <groupId>org.apache.httpcomponents</groupId>
