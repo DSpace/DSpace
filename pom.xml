@@ -261,7 +261,10 @@
             <build>
                 <plugins>
                     <!-- This plugin builds the testEnvironment.zip package
-                         based on the specifications in testEnvironment.xml -->
+                         based on the specifications in testEnvironment.xml.
+                         TestEnvironment.zip is an entire DSpace installation
+                         directory, which is installed by 'dspace-api' and
+                         used to run our DSpace Unit/Integration tests.  -->
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
@@ -1025,28 +1028,31 @@
              <artifactId>slf4j-log4j12</artifactId>
              <version>${slf4j.version}</version>
          </dependency>
+         <!-- JMockit and JUnit are used for Unit/Integration tests -->
          <dependency> <!-- Keep jmockit before junit -->
-            <groupId>com.googlecode.jmockit</groupId>
+            <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
-            <version>1.1</version>
+            <version>1.10</version>
             <scope>test</scope>
          </dependency>
          <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.11</version>
             <scope>test</scope>
          </dependency>
+         <!-- H2 is an in-memory database used for Unit/Integration tests -->
          <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.2.137</version>
+            <version>1.4.180</version>
             <scope>test</scope>
          </dependency>
+         <!-- Contiperf is used for performance tests within our Unit/Integration tests -->
          <dependency>
             <groupId>org.databene</groupId>
             <artifactId>contiperf</artifactId>
-            <version>1.06</version>
+            <version>2.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

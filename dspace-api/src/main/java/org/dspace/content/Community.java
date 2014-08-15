@@ -994,10 +994,15 @@ public class Community extends DSpaceObject
     }
 
     /**
-     * Remove a collection. Any items then orphaned are deleted.
+     * Remove a collection. If it only belongs to one parent community,
+     * then it is permanently deleted. If it has more than one parent community,
+     * it is simply unmapped from the current community.
      * 
      * @param c
      *            collection to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeCollection(Collection c) throws SQLException,
             AuthorizeException, IOException
@@ -1005,149 +1010,185 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the collection an orphan?
-        TableRow trow = DatabaseManager.querySingle(ourContext,
-                "SELECT COUNT(DISTINCT community_id) AS num FROM community2collection WHERE collection_id= ? ",
-                c.getID());
-        DatabaseManager.setConstraintDeferred(ourContext, "comm2coll_collection_fk");
-        
-        if (trow.getLongColumn("num") == 1)
+        // Do the removal in a try/catch, so that we can rollback on error
+        try
         {
-            // Orphan; delete it            
-            c.delete();
-        }
-        
-        log.info(LogManager.getHeader(ourContext, "remove_collection",
-                "community_id=" + getID() + ",collection_id=" + c.getID()));
-        
-        // Remove any mappings
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM community2collection WHERE community_id= ? "+
-                "AND collection_id= ? ", getID(), c.getID());
+            // Capture ID & Handle of Collection we are removing, so we can trigger events later
+            int removedId = c.getID();
+            String removedHandle = c.getHandle();
 
-        DatabaseManager.setConstraintImmediate(ourContext, "comm2coll_collection_fk");
+            // How many parent(s) does this collection have?
+            TableRow trow = DatabaseManager.querySingle(ourContext,
+                    "SELECT COUNT(DISTINCT community_id) AS num FROM community2collection WHERE collection_id= ? ",
+                    c.getID());
+            long numParents = trow.getLongColumn("num");
+
+            // Remove the parent/child mapping with this collection
+            // We do this before deletion, so that the deletion doesn't throw database integrity violations
+            DatabaseManager.updateQuery(ourContext,
+                    "DELETE FROM community2collection WHERE community_id= ? "+
+                    "AND collection_id= ? ", getID(), c.getID());
+
+            // As long as this Collection only had one parent, delete it
+            // NOTE: if it had multiple parents, we will keep it around,
+            // and just remove that single parent/child mapping
+            if (numParents == 1)
+            {
+                c.delete();
+            }
         
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+            // log the removal & trigger any associated event(s)
+            log.info(LogManager.getHeader(ourContext, "remove_collection",
+                    "community_id=" + getID() + ",collection_id=" + removedId));
+        
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, removedId, removedHandle));
+        }
+        catch(SQLException|IOException e)
+        {
+            // Immediately abort the deletion, rolling back the transaction
+            ourContext.abort();
+            // Pass exception upwards for additional reporting/handling as needed
+            throw e;
+        }
     }
 
     /**
-     * Remove a subcommunity. Any substructure then orphaned is deleted.
+     * Remove a subcommunity. If it only belongs to one parent community,
+     * then it is permanently deleted. If it has more than one parent community,
+     * it is simply unmapped from the current community.
      * 
      * @param c
      *            subcommunity to remove
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void removeSubcommunity(Community c) throws SQLException,
             AuthorizeException, IOException
     {
-        // Check authorisation
+        // Check authorisation.
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the subcommunity an orphan?
-        TableRow trow = DatabaseManager.querySingle(ourContext,
-                "SELECT COUNT(DISTINCT parent_comm_id) AS num FROM community2community WHERE child_comm_id= ? ",
-                c.getID());
-
-        DatabaseManager.setConstraintDeferred(ourContext, "com2com_child_fk");
-        if (trow.getLongColumn("num") == 1)
+        // Do the removal in a try/catch, so that we can rollback on error
+        try
         {
-            // Orphan; delete it
-            c.rawDelete();
+            // Capture ID & Handle of Community we are removing, so we can trigger events later
+            int removedId = c.getID();
+            String removedHandle = c.getHandle();
+        
+            // How many parent(s) does this subcommunity have?
+            TableRow trow = DatabaseManager.querySingle(ourContext,
+                    "SELECT COUNT(DISTINCT parent_comm_id) AS num FROM community2community WHERE child_comm_id= ? ",
+                    c.getID());
+            long numParents = trow.getLongColumn("num");
+
+            // Remove the parent/child mapping with this subcommunity
+            // We do this before deletion, so that the deletion doesn't throw database integrity violations
+            DatabaseManager.updateQuery(ourContext,
+                    "DELETE FROM community2community WHERE parent_comm_id= ? " +
+                    " AND child_comm_id= ? ", getID(),c.getID());
+
+            // As long as this Community only had one parent, delete it
+            // NOTE: if it had multiple parents, we will keep it around,
+            // and just remove that single parent/child mapping
+            if (numParents == 1)
+            {
+                c.rawDelete();
+            }
+
+            // log the removal & trigger any related event(s)
+            log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
+                    "parent_comm_id=" + getID() + ",child_comm_id=" + removedId));
+
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, removedId, removedHandle));
         }
-
-        log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
-                "parent_comm_id=" + getID() + ",child_comm_id=" + c.getID()));
-        
-        // Remove any mappings
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM community2community WHERE parent_comm_id= ? " +
-                " AND child_comm_id= ? ", getID(),c.getID());
-
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
-        
-        DatabaseManager.setConstraintImmediate(ourContext, "com2com_child_fk");
+        catch(SQLException|IOException e)
+        {
+            // Immediately abort the deletion, rolling back the transaction
+            ourContext.abort();
+            // Pass exception upwards for additional reporting/handling as needed
+            throw e;
+        }
     }
 
     /**
-     * Delete the community, including the metadata and logo. Collections and
-     * subcommunities that are then orphans are deleted.
+     * Delete the community, including the metadata and logo. Any children
+     * (subcommunities or collections) are also deleted.
+     * 
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     public void delete() throws SQLException, AuthorizeException, IOException
     {
-        // Check authorisation
-        // FIXME: If this was a subcommunity, it is first removed from it's
-        // parent.
-        // This means the parentCommunity == null
-        // But since this is also the case for top-level communities, we would
-        // give everyone rights to remove the top-level communities.
-        // The same problem occurs in removing the logo
-        if (!AuthorizeManager.authorizeActionBoolean(ourContext,
-                getParentCommunity(), Constants.REMOVE))
+        // Check for a parent Community
+        Community parent = getParentCommunity();
+
+        // Check authorisation.
+        // MUST have either REMOVE permissions on parent community (if exists)
+        // OR have DELETE permissions on current community
+        if (parent!= null && !AuthorizeManager.authorizeActionBoolean(ourContext,
+                parent, Constants.REMOVE))
         {
+            // If we don't have Parent Community REMOVE permissions, then
+            // we MUST at least have current Community DELETE permissions
             AuthorizeManager
                     .authorizeAction(ourContext, this, Constants.DELETE);
         }
 
-        // If not a top-level community, have parent remove me; this
-        // will call rawDelete() before removing the linkage
-        Community parent = getParentCommunity();
-
+        // Check if this is a top-level Community or not
         if (parent == null)
         {
-            // if removing a top level Community, simulate a REMOVE event at the Site.
-            if (getParentCommunity() == null)
-            {
-                ourContext.addEvent(new Event(Event.REMOVE, Constants.SITE, Site.SITE_ID, 
-                        Constants.COMMUNITY, getID(), getHandle()));
-            }
+            // Call rawDelete to clean up all sub-communities & collections
+            // under this Community, then delete the Community itself
+            rawDelete();
+
+            // Since this is a top level Community, simulate a REMOVE event at the Site.
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.SITE, Site.SITE_ID,
+                    Constants.COMMUNITY, getID(), getHandle()));
         } else {
-            // remove the subcommunities first
-            Community[] subcommunities = getSubcommunities();
-            for (int i = 0; i < subcommunities.length; i++)
-            {
-                subcommunities[i].delete();
-            }
-            // now let the parent remove the community
+            // This is a subcommunity, so let the parent remove it
+            // NOTE: this essentially just logs event and calls "rawDelete()"
             parent.removeSubcommunity(this);
-
-            return;
         }
-
-        rawDelete();        
     }
     
     /**
-     * Internal method to remove the community and all its childs from the database without aware of eventually parent  
+     * Internal method to remove the community and all its children from the
+     * database, and perform any pre/post-cleanup
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
      */
     private void rawDelete() throws SQLException, AuthorizeException, IOException
     {
         log.info(LogManager.getHeader(ourContext, "delete_community",
                 "community_id=" + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, getID(), getHandle()));
+        // Capture ID & Handle of object we are removing, so we can trigger events later
+        int deletedId = getID();
+        String deletedHandle = getHandle();
 
-        // Remove from cache
+        // Remove Community object from cache
         ourContext.removeCached(this, getID());
 
-        // Remove collections
-        Collection[] cols = getCollections();
-
-        for (int i = 0; i < cols.length; i++)
+        // Remove any collections directly under this Community
+        for (Collection collection : getCollections())
         {
-            removeCollection(cols[i]);
+            removeCollection(collection);
         }
 
-        // delete subcommunities
-        Community[] comms = getSubcommunities();
-
-        for (int j = 0; j < comms.length; j++)
+        // Remove any SubCommunities under this Community
+        for (Community community : getSubcommunities())
         {
-            comms[j].delete();
+            removeSubcommunity(community);
         }
 
-        // Remove the logo
+        // Remove the Community logo
         setLogo(null);
 
-        // Remove all authorization policies
+        // Remove all associated authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
         // get rid of the content count cache if it exists
@@ -1163,19 +1204,22 @@ public class Community extends DSpaceObject
             throw new IllegalStateException(e.getMessage(),e);
         }
 
-        // Remove any Handle
+        // Unbind any handle associated with this Community
         HandleManager.unbindHandle(ourContext, this);
 
-        // Delete community row
+        // Delete community row (which actually removes the Community)
         DatabaseManager.delete(ourContext, communityRow);
 
-        // Remove administrators group - must happen after deleting community
+        // Remove Community administrators group (if exists)
+        // NOTE: this must happen AFTER deleting community
         Group g = getAdministrators();
-
         if (g != null)
         {
             g.delete();
         }
+
+        // If everything above worked, then trigger any associated events
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, deletedId, deletedHandle));
     }
 
     /**

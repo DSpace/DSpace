@@ -61,11 +61,9 @@ public class MetadataFieldTest extends AbstractUnitTest
         super.init();
         try
         {
-            context.turnOffAuthorisationSystem();
             this.mf = MetadataField.findByElement(context,
                     MetadataSchema.DC_SCHEMA_ID, element, qualifier);
             this.mf.setScopeNote(scopeNote);
-            context.restoreAuthSystemState();
         }
         catch (AuthorizeException ex)
         {
@@ -189,13 +187,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testCreateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String elem = "elem1";
         String qual = "qual1";
@@ -215,13 +211,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String elem = "elem1";
         String qual = "qual1";
@@ -239,13 +233,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test(expected=NonUniqueMetadataException.class)
     public void testCreateRepeated() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String elem = element;
         String qual = qualifier;
@@ -319,13 +311,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testUpdateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String elem = "elem2";
         String qual = "qual2";
@@ -346,13 +336,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String elem = "elem2";
         String qual = "qual2";
@@ -370,13 +358,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test(expected=NonUniqueMetadataException.class)
     public void testUpdateRepeated() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String elem = element;
         String qual = qualifier;
@@ -396,13 +382,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testDeleteAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String elem = "elem3";
         String qual = "qual3";
@@ -425,13 +409,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String elem = "elem3";
         String qual = "qual3";
@@ -462,15 +444,11 @@ public class MetadataFieldTest extends AbstractUnitTest
     @Test
     public void testFind() throws Exception
     {
-        context.turnOffAuthorisationSystem();
-
-        mf.update(context);
         int id = mf.getFieldID();
         
         MetadataField found = MetadataField.find(context, id);
         assertThat("testFind 0",found, notNullValue());
         assertThat("testFind 1",found.getFieldID(), equalTo(mf.getFieldID()));
-        context.restoreAuthSystemState();
     }
 
 }

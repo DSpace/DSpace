@@ -252,7 +252,8 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
+  -- name: ORIGINAL | THUMBNAIL | TEXT
+  name               VARCHAR(16),
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
@@ -530,11 +531,10 @@ CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
 CREATE TABLE WorkflowItem
 (
   workflow_id    INTEGER PRIMARY KEY,
-  item_id        INTEGER REFERENCES Item(item_id) UNIQUE,
+  item_id        INTEGER UNIQUE REFERENCES Item(item_id),
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
-
   -- Answers to questions on first page of submit UI
   multiple_titles       BOOL,
   published_before      BOOL,
@@ -621,9 +621,9 @@ CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
 -- Community2Item view
 ------------------------------------------------------
 CREATE VIEW Community2Item as
-SELECT Community2Collection.community_id, Collection2Item.item_id
-FROM Community2Collection, Collection2Item
-WHERE Collection2Item.collection_id   = Community2Collection.collection_id
+ SELECT Community2Collection.community_id, Collection2Item.item_id
+ FROM Community2Collection, Collection2Item
+ WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
 
 -------------------------------------------------------------------------
@@ -705,61 +705,61 @@ CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 -- possible
 
 insert into checksum_results
-values
+ values
 (
     'INVALID_HISTORY',
     'Install of the cheksum checking code do not consider this history as valid'
 );
 
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_NOT_FOUND',
     'The bitstream could not be found'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_MATCH',
     'Current checksum matched previous checksum'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_NO_MATCH',
     'Current checksum does not match previous checksum'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_PREV_NOT_FOUND',
     'Previous checksum was not found: no comparison possible'
 );
 
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_INFO_NOT_FOUND',
     'Bitstream info not found'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_ALGORITHM_INVALID',
     'Invalid checksum algorithm'
 );
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_NOT_PROCESSED',
     'Bitstream marked to_be_processed=false'
 );
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_MARKED_DELETED',
     'Bitstream marked deleted in bitstream table'
