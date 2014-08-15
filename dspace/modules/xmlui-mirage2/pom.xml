@@ -362,6 +362,7 @@
                                 <configuration>
                                     <folder>${basedir}/src/main/webapp/themes/</folder>
                                     <pluginExecutors>
+
                                         <pluginExecutor>
                                             <plugin>
                                                 <groupId>org.apache.maven.plugins</groupId>
@@ -376,6 +377,30 @@
                                                     <resource>
                                                         <directory>${project.build.directory}/mirage2-source-extracted</directory>
                                                         <filtering>false</filtering>
+                                                        <excludes>
+                                                            <exclude>sitemap.xmap</exclude>
+                                                        </excludes>
+                                                    </resource>
+                                                </resources>
+                                            </configuration>
+                                        </pluginExecutor>
+                                        <pluginExecutor>
+                                            <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-resources-plugin</artifactId>
+                                                <version>2.6</version>
+                                            </plugin>
+                                            <goal>copy-resources</goal>
+                                            <configuration>
+                                                <outputDirectory>${project.build.directory}/themes/@item@</outputDirectory>
+                                                <overwrite>false</overwrite>
+                                                <resources>
+                                                    <resource>
+                                                        <directory>${project.build.directory}/mirage2-source-extracted</directory>
+                                                        <filtering>true</filtering>
+                                                        <includes>
+                                                            <include>sitemap.xmap</include>
+                                                        </includes>
                                                     </resource>
                                                 </resources>
                                             </configuration>

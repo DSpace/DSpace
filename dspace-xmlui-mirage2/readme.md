@@ -173,11 +173,7 @@ Add the following to the `<themes>` section of  `src/dspace/config/xmlui.xconf`,
     <theme name="Mirage 2" regex=".*" path="Mirage2/" /> 
 ```
 
-Furthermore uncomment the Mirage2 aspect to get the messages.
 
-```xml
-    <aspect name="Mirage2" path="resource://aspects/Mirage2/" /> 
-```
 
 Now, if you run `mvn package -Dmirage2.on=true` in the dspace project root, bower will download all Mirage 2 dependencies, and grunt will trigger a number of plugins to preprocess, concatenate and minify all the theme's resources. 
 

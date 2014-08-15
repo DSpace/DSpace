@@ -112,10 +112,7 @@
              PLEASE NOTE: in order to use the configurable workflow you must also run the
              database migration scripts as detailed in the DSpace Documentation -->
         <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
-        <!-- The messages for the Mirage2 theme are gathered in the Mirage2 aspect in order to keep them separate from the default xmlui messages
-            Please enable them here if you enable the Mirage2 theme below.
-        -->
-        <!--<aspect name="Mirage2" path="resource://aspects/Mirage2/" />-->
+
 
         <!-- ==============
              Search Engines
@@ -184,7 +181,7 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
         <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
-        <theme name="Atmire Mirage Theme" regex=".*" path="Mirage2/" />
+        <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" />
 
         <!-- Reference theme, the default Manakin XMLUI layout up to DSpace 1.8 -->
         <!-- <theme name="Default Reference Theme" regex=".*" path="Reference/" /> -->
