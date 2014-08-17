@@ -28,7 +28,8 @@ import java.util.jar.JarFile;
  *
  * @author Mark H. Wood
  */
-public class PathsClassLoader extends ClassLoader
+public class PathsClassLoader
+        extends ClassLoader
 {
     /** Filesystem paths to be searched. */
     private final String[] classpath;
@@ -103,7 +104,7 @@ public class PathsClassLoader extends ClassLoader
                 try
                 {
                     jar = new JarFile(pathFile);
-                    JarEntry entry = jar.getJarEntry(bodyPath);
+                    JarEntry entry = jar.getJarEntry(bodyPath + ".class");
                     if (null == entry)
                     {
                         continue;
@@ -117,7 +118,7 @@ public class PathsClassLoader extends ClassLoader
                     {
                         len = bodyStream.read(body, pos, bodySize);
                         pos += len;
-                    } while (len > 0);
+                    } while (pos < bodySize);
                 } catch (IOException e)
                 {
                     throw new ClassNotFoundException("Class body not read", e);
@@ -168,5 +169,4 @@ public class PathsClassLoader extends ClassLoader
     {
     }
      */
-
 }
