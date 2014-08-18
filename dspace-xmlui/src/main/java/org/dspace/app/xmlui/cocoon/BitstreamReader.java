@@ -42,6 +42,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.google.recording.GoogleRecorder;
 import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
@@ -363,7 +364,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                                 ObjectModelHelper.getRequest(objectModel),
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
-            
+
+            // Tell Google Analytics about the download.
+            GoogleRecorder.getInstance().recordXMLUIBitstreamDownload(this.request.getRequestURI(), this.bitstreamMimeType);
+
             // If we created the database connection close it, otherwise leave it open.
             if (BitstreamReaderOpenedContext)
             	context.complete();
@@ -686,7 +690,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     {
         return this.bitstreamMimeType;
     }
-    
+
     /**
          * Recycle
          */

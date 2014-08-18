@@ -29,6 +29,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.google.recording.GoogleRecorder;
 import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
@@ -179,7 +180,10 @@ public class BitstreamServlet extends DSpaceServlet
         				request, 
         				context, 
         				bitstream));
-        
+
+        // Tell Google Analytics about the download.
+        GoogleRecorder.getInstance().recordJSPUIBitstreamDownload(request.getRequestURI(), bitstream.getFormat().getMIMEType());
+
         // Modification date
         // Only use last-modified if this is an anonymous access
         // - caching content that may be generated under authorisation
