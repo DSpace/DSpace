@@ -153,12 +153,28 @@ public class TableRow
             throw new IllegalArgumentException("Column " + column + " not present");
         }
 
-        if (!(value instanceof Integer))
+        if (value instanceof Integer)
+        {
+            return ((Integer) value);
+        }
+        else if (value instanceof Long)
+        {
+            long longValue = (Long)value;
+            if ((longValue > Integer.MAX_VALUE) || longValue < Integer.MIN_VALUE)
+                throw new IllegalArgumentException("Value for " + column + " does not fit in an Integer");
+            else
+            {
+                return (int)longValue;
+            }
+        }
+        else if (value instanceof BigDecimal)
+        {
+            return ((BigDecimal)value).intValueExact();
+        }
+        else
         {
             throw new IllegalArgumentException("Value for " + column + " is not an integer");
         }
-
-        return ((Integer) value).intValue();
     }
 
     /**
@@ -192,13 +208,18 @@ public class TableRow
         {
             return ((Integer) value).longValue();
         }
-        
-        if (!(value instanceof Long))
+        else if (value instanceof Long)
+        {
+            return ((Long) value);
+        }
+        else if (value instanceof BigDecimal)
+        {
+            return ((BigDecimal)value).longValueExact();
+        }
+        else
         {
             throw new IllegalArgumentException("Value for " + column + " is not a long");
         }
-
-        return ((Long) value).longValue();
     }
 
     /**
@@ -341,6 +362,14 @@ public class TableRow
             }
 
             return true; // nonzero is true
+        }
+        else if (value instanceof Long)
+        {
+            return ((Long) value) != 0;
+        }
+        else if (value instanceof BigDecimal)
+        {
+            return ! ((BigDecimal) value).equals(BigDecimal.ZERO);
         }
         else
         {
