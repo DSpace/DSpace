@@ -987,7 +987,7 @@
                             <xsl:variable name="keyword" select="."/>
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:value-of select="concat('http://datadryad.org/discover?query=&amp;submit=Go&amp;fq=dc.subject%3A', translate($keyword,' ','+'), '&amp;filtertype=*&amp;filter=&amp;rpp=20&amp;sort_by=score&amp;order=DESC')"/>
+                                    <xsl:value-of select="concat('/discover?query=&amp;submit=Go&amp;fq=dc.subject%3A', translate($keyword,' ','+'), '&amp;filtertype=*&amp;filter=&amp;rpp=20&amp;sort_by=score&amp;order=DESC')"/>
                                 </xsl:attribute>
                                 <xsl:value-of select="$keyword"/>
                             </a>
