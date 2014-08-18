@@ -38,6 +38,7 @@
 package org.dspace.content;
 
 import java.io.IOException;
+import java.lang.String;
 import java.sql.SQLException;
 import java.util.Calendar;
 
@@ -218,9 +219,8 @@ public class InstallItem
         // Add provenance description
         item.addDC("description", "provenance", "en", provDescription);
 
-        String bitstreamSizes = getBitstreamSizes(item);
         item.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        item.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,bitstreamSizes);
+        item.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,getBitstreamSizes(item));
 
       	//Check if we are a part of a publication
         /*
@@ -323,19 +323,17 @@ public class InstallItem
      *
      * @return comma-separated string of sizes (in bytes)
      */
-    public static String getBitstreamSizes(Item myitem)
+    public static String[] getBitstreamSizes(Item myitem)
             throws SQLException
     {
         // Get non-internal format bitstreams
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
-        String sizes = "";
+        String[] sizes = new String[bitstreams.length];
         if (bitstreams.length > 0) {
-            sizes = String.valueOf(bitstreams[0].getSize());
-
             // Add sizes and checksums of bitstreams
-            for (int j = 1; j < bitstreams.length; j++)
+            for (int j = 0; j < bitstreams.length; j++)
             {
-                sizes = sizes + "," + String.valueOf(bitstreams[j].getSize());
+                sizes[j] = String.valueOf(bitstreams[j].getSize());
             }
         }
         return sizes;
