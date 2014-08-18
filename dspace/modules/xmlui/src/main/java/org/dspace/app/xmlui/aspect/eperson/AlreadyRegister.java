@@ -31,20 +31,12 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.xml.sax.SAXException;
 
 /**
- * Display the new user registration form, allowing the user to enter 
- * in an email address and have the system verify the email address
- * before allowing the user create an account
- * 
- * There are two parameters that may be given to the form:
- * 
- * email - The email of the new account account
- * 
- * retry - A boolean value indicating that the previously entered email was invalid.
- * 
- * accountExists - A boolean value indicating the email previously entered allready
- *   belongs to a user.
- *   
- * @author Scott Phillips
+ * Display the "you've already registered" form, allowing the user to
+ * request a password reset.
+ *
+ * Adapted from the PasswordLogin class.
+ *
+ * @author Yonghao Yu
  */
 
 public class AlreadyRegister extends AbstractDSpaceTransformer implements CacheableProcessingComponent
