@@ -36,7 +36,6 @@ import org.dspace.core.ConfigurationManager;
  */
 public abstract class IMImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
 {
-	private static Logger log = Logger.getLogger(IMImageMagickThumbnail.class);
 	private int width = 180;
 	private int height = 120;
 	private String bitstreamDescription = "IM Thumbnail";
@@ -49,11 +48,15 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
 		ProcessStarter.setGlobalSearchPath(s);
 		width = ConfigurationManager.getIntProperty("thumbnail.maxwidth", width);
 		height = ConfigurationManager.getIntProperty("thumbnail.maxheight", height);
-		description = ConfigurationManager.getStringProperty(pre + ".bitstreamDescription", bitstreamDescription);
+		String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
+		if (description != null) {
+			bitstreamDescription = description;
+		}
 		try {
-		    replaceRegex = Pattern.compile(ConfigurationManager.getStringProperty(pre + ".replaceRegex", defaultPattern));
+			String patt = ConfigurationManager.getProperty(pre + ".replaceRegex");
+		    replaceRegex = Pattern.compile(patt == null ? defaultPattern : patt);
 		} catch(PatternSyntaxException e) {
-			log.error("Invalid thumbnail replacement pattern: "+e.getMessage());
+			System.err.println("Invalid thumbnail replacement pattern: "+e.getMessage());
 		}
 	}
 	
@@ -81,11 +84,11 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
     }
 
     /**
-     * @return String description
+     * @return String bitstreamDescription
      */
     public String getDescription()
     {
-        return description;
+        return bitstreamDescription;
     }
 
     public File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
@@ -111,7 +114,9 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
 		op.addImage(f.getAbsolutePath());
 		op.thumbnail(width, height);
 		op.addImage(f2.getAbsolutePath());
-		log.debug("THUMB: "+op);
+        if (MediaFilterManager.isVerbose) {
+		    System.out.println("IM Thumbnail Param: "+op);
+        }
 		cmd.run(op);
 		return f2;
     }
@@ -124,7 +129,9 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
 		String s = "[" + page + "]";
 		op.addImage(f.getAbsolutePath()+s);
 		op.addImage(f2.getAbsolutePath());
-		log.debug("IMAGE: "+op);
+        if (MediaFilterManager.isVerbose) {
+		    System.out.println("IM Image Param: "+op);
+        }
 		cmd.run(op);
 		return f2;
     }
@@ -144,10 +151,20 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
      	    	String description = bit.getDescription();
     	    	//If anything other than a generated thumbnail is found, halt processing
     	    	if (description != null) {
-        	    	if (replaceRegex.matcher(description).matches()) continue;
-        	    	if (description.equals(bitstreamDescription)) continue;    	    		
+        	    	if (replaceRegex.matcher(description).matches()) {
+        	            if (MediaFilterManager.isVerbose) {
+        	    		    System.out.println(description + " " + nsrc + " matches pattern and is replacable.");
+        	            }
+        	    		continue;
+        	    	}
+        	    	if (description.equals(bitstreamDescription)) {
+        	            if (MediaFilterManager.isVerbose) {
+        	    		    System.out.println(bitstreamDescription + " " + nsrc + " is replacable.");
+        	            }
+        	    		continue;    	    		
+        	    	}
     	    	}
-    			log.info("Custom Thumbnail exists for " + nsrc + " for item " + item.getHandle() + ".  Thumbnail will not be generated. ");
+    			System.out.println("Custom Thumbnail exists for " + nsrc + " for item " + item.getHandle() + ".  Thumbnail will not be generated. ");
     			return false;
     		}
     	}
