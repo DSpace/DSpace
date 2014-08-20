@@ -419,4 +419,12 @@
         </step>
     </command>
 
+    <command>
+        <name>index-authority</name>
+        <description>Indexes all metadata fields that use solr authority</description>
+        <step>
+            <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
+        </step>
+    </command>
+
 </commands>

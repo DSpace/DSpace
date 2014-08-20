@@ -8,7 +8,6 @@
 package org.dspace.authority;
 
 import org.apache.log4j.Logger;
-import org.dspace.authority.config.AuthorityTypeConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +37,6 @@ public class AuthorityTypes {
     private List<AuthorityValue> types = new ArrayList<AuthorityValue>();
 
     private Map<String, AuthorityValue> fieldDefaults = new HashMap<String, AuthorityValue>();
-
-    private Map<String, AuthoritySource> externalSources = new HashMap<String, AuthoritySource>();
-
-    private List<AuthorityTypeConfiguration> config;
 
     public List<AuthorityValue> getTypes() {
         return types;
@@ -78,27 +73,4 @@ public class AuthorityTypes {
         return result;
     }
 
-    public void setExternalSources(Map<String,AuthoritySource> externalSources) {
-        this.externalSources = externalSources;
-    }
-
-    public Map<String, AuthoritySource> getExternalSources() {
-        return externalSources;
-    }
-
-
-    public void setConfig(List<AuthorityTypeConfiguration> config) {
-        this.config = config;
-    }
-
-    public AuthorityTypeConfiguration getConfigForType(String type)
-    {
-        AuthorityTypeConfiguration result = null;
-        for (AuthorityTypeConfiguration authorityTypeConfiguration : config) {
-            if (authorityTypeConfiguration.getType().getAuthorityType().equals(type)) {
-                return authorityTypeConfiguration;
-            }
-        }
-        return result;
-    }
 }

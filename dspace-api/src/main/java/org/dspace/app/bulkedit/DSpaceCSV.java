@@ -7,6 +7,11 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.dspace.authority.AuthorityValue;
+import org.dspace.app.bulkedit.DSpaceCSVLine;
+import org.dspace.app.bulkedit.MetadataImport;
+import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
+import org.dspace.content.Collection;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -129,6 +134,14 @@ public class DSpaceCSV implements Serializable
                 }
                 else if (!"id".equals(element))
                 {
+                    String authorityPrefix = "";
+                    AuthorityValue authorityValueType = MetadataImport.getAuthorityValueType(element);
+                    if (authorityValueType != null) {
+                        String authorityType = authorityValueType.getAuthorityType();
+                        authorityPrefix = element.substring(0, authorityType.length() + 1);
+                        element = element.substring(authorityPrefix.length());
+                    }
+
                     // Verify that the heading is valid in the metadata registry
                     String[] clean = element.split("\\[");
                     String[] parts = clean[0].split("\\.");
@@ -164,7 +177,7 @@ public class DSpaceCSV implements Serializable
                     }
 
                     // Store the heading
-                    headings.add(element);
+                    headings.add(authorityPrefix + element);
                 }
             }
 

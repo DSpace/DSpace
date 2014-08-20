@@ -7,7 +7,6 @@
  */
 package org.dspace.authority.rest;
 
-import org.dspace.authority.AuthoritySource;
 import org.dspace.authority.AuthorityValue;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public abstract class RestSource implements AuthoritySource {
+public abstract class RestSource {
 
     protected RESTConnector restConnector;
 
@@ -27,9 +26,8 @@ public abstract class RestSource implements AuthoritySource {
         this.restConnector = new RESTConnector(url);
     }
 
-    public abstract List<AuthorityValue> queryAuthorities(String text, int max);
-    
     public abstract List<AuthorityValue> queryAuthorities(String field, String text, int start, int max);
+    public abstract List<AuthorityValue> queryAuthorities(String text, int max);
 
     public abstract AuthorityValue queryAuthorityID(String id);
 }

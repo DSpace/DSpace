@@ -63,6 +63,7 @@
                         <exclude>**/cocoon/**</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/Datatables/**</exclude>
                         <exclude>**/modernizr*</exclude>
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>

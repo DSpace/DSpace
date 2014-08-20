@@ -241,6 +241,7 @@
               <map:parameter name="javascript.static#5" value="static/js/scriptaculous/builder.js"/>
               <map:parameter name="javascript.static#6" value="static/js/scriptaculous/controls.js"/>
               <map:parameter name="javascript.static#7" value="static/js/choice-support.js"/>
+              <map:parameter name="javascript.static#8" value="static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js"/>
             </map:transform>
           </map:match>
 

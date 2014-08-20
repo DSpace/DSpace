@@ -16,9 +16,9 @@ import java.util.UUID;
 /**
  * This class generates AuthorityValue that do not have a solr record yet.
  * <p/>
- * This class parses the ‚ÄπAuthorityValue‚Ä∫.generateString(),
+ * This class parses the ‹AuthorityValue›.generateString(),
  * creates an AuthorityValue instance of the appropriate type
- * and then generates another instance using ‚ÄπAuthorityValue‚Ä∫.newInstance(info).
+ * and then generates another instance using ‹AuthorityValue›.newInstance(info).
  *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -62,13 +62,9 @@ public class AuthorityValueGenerator {
             nextValue = authorityType.newInstance(info);
         } else {
             Map<String, AuthorityValue> fieldDefaults = AuthorityValue.getAuthorityTypes().getFieldDefaults();
-            nextValue = fieldDefaults.get(field);
+            nextValue = fieldDefaults.get(field).newInstance(null);
             if (nextValue == null) {
                 nextValue = new AuthorityValue();
-            }
-            else
-            {
-                nextValue = nextValue.newInstance(null);
             }
             nextValue.setValue(content);
         }

@@ -18,11 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.authority.Concept;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -38,19 +34,9 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
      * log4j logger
      */
     private static Logger log = Logger.getLogger(OrcidAuthorityValue.class);
-    public static final String ORCID = "orcid";
-
-    public static final String ORCIDID = "meta_person_orcid_id";
-    public static final String LABEL = "meta_person_label_";
-    public static final String COUNTRY = "meta_person_country";
-    public static final String BIOGRAPHY = "meta_person_biography";
-    public static final String KEYWORD = "meta_person_keyword";
-    public static final String RESEARCHERURL = "meta_person_researcher_url";
-    public static final String EXIDENTIFIER = "meta_person_external_identifier";
-
 
     private String orcid_id;
-
+    private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
     private boolean update; // used in setValues(Bio bio)
 
 
@@ -74,37 +60,53 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
         this.orcid_id = orcid_id;
     }
 
+    public Map<String, List<String>> getOtherMetadata() {
+        return otherMetadata;
+    }
+
+    public void addOtherMetadata(String label, String data) {
+        List<String> strings = otherMetadata.get(label);
+        if (strings == null) {
+            strings = new ArrayList<String>();
+        }
+        strings.add(data);
+        otherMetadata.put(label, strings);
+    }
 
     @Override
     public SolrInputDocument getSolrInputDocument() {
         SolrInputDocument doc = super.getSolrInputDocument();
         if (StringUtils.isNotBlank(getOrcid_id())) {
-            doc.addField(ORCIDID, getOrcid_id());
+            doc.addField("orcid_id", getOrcid_id());
         }
 
-        //TODO SEE IF THIS CAN GO INTO ALTERNATE LABEL and Concept.setAlternateTerm
-        for (String t : getOtherMetadata().keySet()) {
-            List<String> data = getOtherMetadata().get(t);
+        for (String t : otherMetadata.keySet()) {
+            List<String> data = otherMetadata.get(t);
             for (String data_entry : data) {
-                doc.addField(LABEL + t, data_entry);
+                doc.addField("label_" + t, data_entry);
             }
         }
         return doc;
     }
 
     @Override
-    public void setValues(Concept concept) throws SQLException {
-        super.setValues(concept);
-        if(concept.getMetadata(PERSON,ORCID,"id",Item.ANY)!=null){
-            this.orcid_id = concept.getMetadata(PERSON,ORCID,"id",Item.ANY)[0].value;
-        }
-
-    }
-
-    @Override
     public void setValues(SolrDocument document) {
         super.setValues(document);
-        this.orcid_id = String.valueOf(document.getFieldValue(ORCIDID));
+        this.orcid_id = String.valueOf(document.getFieldValue("orcid_id"));
+
+        otherMetadata = new HashMap<String, List<String>>();
+        for (String fieldName : document.getFieldNames()) {
+            String labelPrefix = "label_";
+            if (fieldName.startsWith(labelPrefix)) {
+                String label = fieldName.substring(labelPrefix.length());
+                List<String> list = new ArrayList<String>();
+                Collection<Object> fieldValues = document.getFieldValues(fieldName);
+                for (Object o : fieldValues) {
+                    list.add(String.valueOf(o));
+                }
+                otherMetadata.put(label, list);
+            }
+        }
     }
 
     public static OrcidAuthorityValue create() {
@@ -154,30 +156,30 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
             }
         }
 
-        if (updateOtherMetadata(COUNTRY, bio.getCountry())) {
-            addOtherMetadata(COUNTRY, bio.getCountry());
+        if (updateOtherMetadata("country", bio.getCountry())) {
+            addOtherMetadata("country", bio.getCountry());
         }
 
         for (String keyword : bio.getKeywords()) {
-            if (updateOtherMetadata(KEYWORD, keyword)) {
-                addOtherMetadata(KEYWORD, keyword);
+            if (updateOtherMetadata("keyword", keyword)) {
+                addOtherMetadata("keyword", keyword);
             }
         }
 
         for (BioExternalIdentifier externalIdentifier : bio.getBioExternalIdentifiers()) {
-            if (updateOtherMetadata(EXIDENTIFIER, externalIdentifier.toString())) {
-                addOtherMetadata(EXIDENTIFIER, externalIdentifier.toString());
+            if (updateOtherMetadata("external_identifier", externalIdentifier.toString())) {
+                addOtherMetadata("external_identifier", externalIdentifier.toString());
             }
         }
 
         for (BioResearcherUrl researcherUrl : bio.getResearcherUrls()) {
-            if (updateOtherMetadata(RESEARCHERURL, researcherUrl.toString())) {
-                addOtherMetadata(RESEARCHERURL, researcherUrl.toString());
+            if (updateOtherMetadata("researcher_url", researcherUrl.toString())) {
+                addOtherMetadata("researcher_url", researcherUrl.toString());
             }
         }
 
-        if (updateOtherMetadata(BIOGRAPHY, bio.getBiography())) {
-            addOtherMetadata(BIOGRAPHY, bio.getBiography());
+        if (updateOtherMetadata("biography", bio.getBiography())) {
+            addOtherMetadata("biography", bio.getBiography());
         }
 
         setValue(getName());
@@ -217,13 +219,13 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 
         Map<String, String> map = super.choiceSelectMap();
 
-        map.put(ORCID, getOrcid_id());
+        map.put("orcid", getOrcid_id());
 
         return map;
     }
 
     public String getAuthorityType() {
-        return ORCID;
+        return "orcid";
     }
 
     @Override
@@ -289,15 +291,26 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
             return false;
         }
 
-        return true;
-    }
-
-
-    public void updateConceptFromAuthorityValue(Concept concept) throws SQLException,AuthorizeException {
-
-        super.updateConceptFromAuthorityValue(concept);
-        if(orcid_id!=null)  {
-        concept.addMetadata(PERSON,ORCID,"id",null,orcid_id,null,-1);
+        for (String key : otherMetadata.keySet()) {
+            if(otherMetadata.get(key) != null){
+                List<String> metadata = otherMetadata.get(key);
+                List<String> otherMetadata = that.otherMetadata.get(key);
+                if (otherMetadata == null) {
+                    return false;
+                } else {
+                    HashSet<String> metadataSet = new HashSet<String>(metadata);
+                    HashSet<String> otherMetadataSet = new HashSet<String>(otherMetadata);
+                    if (!metadataSet.equals(otherMetadataSet)) {
+                        return false;
+                    }
+                }
+            }else{
+                if(that.otherMetadata.get(key) != null){
+                    return false;
+                }
+            }
         }
+
+        return true;
     }
 }
