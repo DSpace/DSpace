@@ -17,7 +17,7 @@ import java.io.InputStream;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  */
-public class LitImageThumbnailFilter extends LitImageMagickThumbnailFilter 
+public class ImageMagickImageThumbnailFilter extends ImageMagickThumbnailFilter 
 {
 
     /**
@@ -29,7 +29,7 @@ public class LitImageThumbnailFilter extends LitImageMagickThumbnailFilter
     public InputStream getDestinationStream(InputStream source)
             throws Exception
     {
-		File f = inputStreamToTempFile(source, "litthumb", ".tmp");
+		File f = inputStreamToTempFile(source, "imthumb", ".tmp");
     	File f2 = getThumbnailFile(f);
 		return new FileInputStream(f2);
     }

@@ -11,11 +11,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-public class LitPdfThumbnailFilter extends LitImageMagickThumbnailFilter {
+public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
    public InputStream getDestinationStream(InputStream source)
         throws Exception
     {
-		File f = inputStreamToTempFile(source, "litpdfthumb", ".pdf");
+		File f = inputStreamToTempFile(source, "impdfthumb", ".pdf");
 		File f2 = getImageFile(f, 0);
     	File f3 = getThumbnailFile(f2);
     	return new FileInputStream(f3);
