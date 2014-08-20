@@ -34,7 +34,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  */
-public abstract class IMImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
+public abstract class ImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
 {
 	private int width = 180;
 	private int height = 120;
@@ -42,8 +42,8 @@ public abstract class IMImageMagickThumbnailFilter extends MediaFilter implement
 	static final String defaultPattern = "Generated Thumbnail";
 	private Pattern replaceRegex = Pattern.compile(defaultPattern);
 	
-	public IMImageMagickThumbnailFilter() {
-		String pre = IMImageMagickThumbnailFilter.class.getName();
+	public ImageMagickThumbnailFilter() {
+		String pre = ImageMagickThumbnailFilter.class.getName();
 		String s = ConfigurationManager.getProperty(pre + ".ProcessStarter");
 		ProcessStarter.setGlobalSearchPath(s);
 		width = ConfigurationManager.getIntProperty("thumbnail.maxwidth", width);
