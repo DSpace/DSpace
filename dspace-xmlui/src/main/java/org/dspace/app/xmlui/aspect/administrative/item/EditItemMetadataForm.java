@@ -91,6 +91,13 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
                 pageMeta.addMetadata("title").addContent(T_title);
 
+                pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+        //        pageMeta.addMetadata("stylesheet", "screen", null, true).addContent("../../themes/AtmireModules/lib/css/datatables-overrides.css");
+                pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("lib/css/person-lookup.css");
+                pageMeta.addMetadata("javascript", "static", null, true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
+                pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("lib/js/person-lookup.js");
+
+
                 pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
                 pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
                 pageMeta.addTrail().addContent(T_trail);
@@ -271,7 +278,11 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                             if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
                             {
                                 mdValue.setChoices(fieldKey);
-                                mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                if(Params.PRESENTATION_AUTHORLOOKUP.equals(cmgr.getPresentation(fieldKey))){
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_AUTHORLOOKUP);
+                                }else{
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                }
                                 mdValue.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
                             }
                         }
