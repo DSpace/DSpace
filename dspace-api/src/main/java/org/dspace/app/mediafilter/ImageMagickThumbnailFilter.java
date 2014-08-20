@@ -36,13 +36,13 @@ import org.dspace.core.ConfigurationManager;
  */
 public abstract class ImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
 {
-	private int width = 180;
-	private int height = 120;
-	private String bitstreamDescription = "IM Thumbnail";
+	private static int width = 180;
+	private static int height = 120;
+	static String bitstreamDescription = "IM Thumbnail";
 	static final String defaultPattern = "Generated Thumbnail";
-	private Pattern replaceRegex = Pattern.compile(defaultPattern);
+	static Pattern replaceRegex = Pattern.compile(defaultPattern);
 	
-	public ImageMagickThumbnailFilter() {
+	static {
 		String pre = ImageMagickThumbnailFilter.class.getName();
 		String s = ConfigurationManager.getProperty(pre + ".ProcessStarter");
 		ProcessStarter.setGlobalSearchPath(s);
@@ -58,6 +58,10 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		} catch(PatternSyntaxException e) {
 			System.err.println("Invalid thumbnail replacement pattern: "+e.getMessage());
 		}
+		
+	}
+	
+	public ImageMagickThumbnailFilter() {
 	}
 	
 	
@@ -91,7 +95,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
         return bitstreamDescription;
     }
 
-    public File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
+    public static File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
 		File f = File.createTempFile(prefix, suffix);
 		f.deleteOnExit();
     	FileOutputStream fos = new FileOutputStream(f);
@@ -106,7 +110,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		return f;
     }
     
-    public File getThumbnailFile(File f) throws IOException, InterruptedException, IM4JavaException {
+    public static File getThumbnailFile(File f) throws IOException, InterruptedException, IM4JavaException {
     	File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
@@ -121,7 +125,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		return f2;
     }
     
-    public File getImageFile(File f, int page) throws IOException, InterruptedException, IM4JavaException {
+    public static File getImageFile(File f, int page) throws IOException, InterruptedException, IM4JavaException {
     	File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
