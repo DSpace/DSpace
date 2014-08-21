@@ -2,8 +2,11 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div id="file.news.div.news" n="news" rend="primary">
-<head>DSpace Repository</head>
-<p>DSpace is a digital service that collects, preserves, and distributes digital material. Repositories are important tools for preserving an organization&apos;s legacy; they facilitate digital preservation and scholarly communication.</p>
+<head>MOspace Repository</head>
+<p>MOspace is an online repository for scholarly work and resources
+created by faculty, staff and students at the University of Missouri. MOspace makes created knowledge and research
+products from UM available to the wider community of researchers and students and assures preservation of these
+materials for the future. [<xref target="/xmlui/pages/about">read more</xref>]</p>
 </div>
 </body>
 <options/>

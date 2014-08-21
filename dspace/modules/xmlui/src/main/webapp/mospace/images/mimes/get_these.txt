@@ -1,0 +1,15 @@
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/pdf.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/audio.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/video.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/image.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/mspowerpoint.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/oopresentation.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/msword.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/ootext.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/msexcel.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/oospreadsheet.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/iso.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/archive.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/rtf.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/html.png
+http://lernzdb.its.waikato.ac.nz/themes/LERNZDb/images/mimes/text.png

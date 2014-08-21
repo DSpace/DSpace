@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:readers>
+            <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
+        </map:readers>
+    </map:components>
+
+    <map:pipelines>
+
+		<!--
+			Define global theme variables that are used later in this
+			sitemap. Two variables are typically defined here, the theme's
+			path and name. The path is the directory name where this theme
+			is located, such as "Reference" for the reference theme. The
+			theme's name is used only for descriptive purposes to describe
+			the theme.
+		-->
+		<map:component-configurations>
+			<global-variables>
+				<theme-path>mospace</theme-path>
+				<theme-name>mospace</theme-name>
+			</global-variables>
+        </map:component-configurations>
+
+
+		<map:pipeline>
+			<!-- Allow the browser to cache static content for an hour -->
+			<map:parameter name="expires" value="access plus 1 hours"/>
+
+
+            <!-- handle static js and css -->
+            <map:match pattern="themes/*/**.js">
+                    <map:read type="ConcatenationReader" src="{2}.js">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            <map:match pattern="themes/*/**.css">
+                    <map:read type="ConcatenationReader" src="{2}.css">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            <map:match pattern="themes/*/**.json">
+                    <map:read type="ConcatenationReader" src="{2}.json">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+
+			<!-- Static content -->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}"/>
+			</map:match>
+		</map:pipeline>
+
+		<!--
+			The theme's pipeline is used to process all requests handled
+			by the theme. It is broken up into two parts, the first part
+			handles all static theme content while the second part handle
+			all dynamic aspect generated content. The static content is
+			such things as stylesheets, images, or static pages. Typically
+			these are just stored on disk and passed directly to the
+			browser without any processing.
+		-->
+		<map:pipeline>
+			<!-- Never allow the browser to cache dynamic content -->
+			<map:parameter name="expires" value="now"/>
+
+			<!-- Aspect content
+
+			There are five steps to processing aspect content:
+
+			1: Generate the DRI page
+
+				The first step is to generate a DRI page for the request;
+				this is handled by the aspect chain. Once it is generated
+				it is the beginning of a theme's pipeline, the DRI page is
+				ultimately transformed in the resulting XHTML that is
+				given to the user's browser.
+
+			2: Add page metadata
+
+				The next step is to add theme specific metadata to the
+				DRI page. This is metadata about where the theme is
+				located and its name. Typically this metadata is different
+				depending on the users browser, this allows us to give
+				different stylesheets to Internet Explorer than for other
+				browsers.
+
+			3: Transform to XHTML
+
+				The third step is the main component of a theme the XSL
+				transformations will turn the DRI page from the aspects
+				into an XHTML page useable by browsers.
+
+			4: Localize the page
+
+				The second to last step is to localize the content for the
+				particular user, if they user is requesting a page in a
+				particular language then those language strings are inserted
+				into the resulting XHTML.
+
+			5: Serialize to the browser
+
+				The last step sends the page to the user's browser.
+
+			-->
+			<map:match pattern="**">
+
+				<!-- Step 1: Generate the DRI page -->
+				<map:generate type="file" src="cocoon://DRI/{1}"/>
+
+				<!-- Step 2 Add page metadata -->
+
+                <!--3 different IncludePageMeta transformers to ensure that the
+                stylesheets end up in the correct order-->
+                <map:transform type="IncludePageMeta">
+                    <map:parameter name="stylesheet.screen#1" value="lib/css/reset.css"/>
+                    <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
+                    <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
+                    <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.8.15.custom.css"/>
+                    <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
+                    <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
+                </map:transform>
+
+                <map:transform type="IncludePageMeta">
+                    <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
+                    <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
+                </map:transform>
+
+                <map:transform type="IncludePageMeta">
+                    <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
+                    <map:parameter name="javascript" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+                    <map:parameter name="theme.path" value="{global:theme-path}"/>
+                    <map:parameter name="theme.name" value="{global:theme-name}"/>
+                </map:transform>
+
+				<!-- Debuging output -->
+				<map:match type="request" pattern="XML">
+					<map:serialize type="xml"/>
+				</map:match>
+
+				<!-- Step 3: Transform to XHTML -->
+				<map:transform src="{global:theme-name}.xsl"/>
+			    <!-- <map:transform src="mospace.xsl"/> -->
+
+				<!-- Step 4: Localize the page -->
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}"/>
+					</map:transform>
+				</map:act>
+
+				<!-- Step 5: Serialize to the browser -->
+				<map:serialize type="xhtml"/>
+
+			</map:match>
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>
