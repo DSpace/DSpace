@@ -604,11 +604,7 @@ public class WorkflowManager {
 
         // Add message to the DC
         myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
-        
-        // Add bitstream sizes to the DC in a separate entry
-        myitem.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(myitem));
-        
+
         myitem.update();
     }
 

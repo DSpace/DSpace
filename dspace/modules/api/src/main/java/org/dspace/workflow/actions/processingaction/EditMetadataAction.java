@@ -165,10 +165,6 @@ public class EditMetadataAction extends ProcessingAction {
         for(Item dataFile : dataFiles) {
             dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
-            // update bitstream sizes.
-            dataFile.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-            dataFile.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(dataFile));
-
             dataFile.update();
         }
     }

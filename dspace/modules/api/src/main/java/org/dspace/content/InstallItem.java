@@ -219,9 +219,6 @@ public class InstallItem
         // Add provenance description
         item.addDC("description", "provenance", "en", provDescription);
 
-        item.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        item.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,getBitstreamSizes(item));
-
       	//Check if we are a part of a publication
         /*
         Item publication = DryadWorkflowUtils.getDataPackage(c, item);

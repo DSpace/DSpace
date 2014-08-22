@@ -1844,10 +1844,6 @@ public class Item extends DSpaceObject
 
         addDC("description", "provenance", "en", prov.toString());
 
-        // update bitstream sizes too.
-        clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(this));
-
         // Update item in DB
         update();
 
