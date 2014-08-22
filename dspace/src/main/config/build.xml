@@ -553,6 +553,7 @@ Common usage:
         </copy>
 
         <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+        <chmod dir="${dspace.dir}/bin" perm="g+x" includes="**/*" />
 
         <move todir="${dspace.dir}/lib.bak-${build.date}" failonerror="no">
             <fileset dir="${dspace.dir}/lib">
