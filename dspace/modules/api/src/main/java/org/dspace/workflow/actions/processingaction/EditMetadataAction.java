@@ -63,6 +63,10 @@ public class EditMetadataAction extends ProcessingAction {
     }
 
     public ActionResult processMainPage(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+        // update bitstream sizes.
+        wfi.getItem().clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
+        wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(wfi.getItem()));
+
         if(request.getParameter("submit_approve") != null){
             //Delete the tasks
             addApprovedProvenance(c, wfi);
