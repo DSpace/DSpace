@@ -8,7 +8,6 @@
 package org.dspace.storage.rdbms;
 
 import java.io.*;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;

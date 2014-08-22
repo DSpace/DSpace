@@ -217,7 +217,7 @@ public class TableRowTest
     {
         System.out.println("getNumericColumn");
         String column = "fifth";
-        List columns = new ArrayList<String>();
+        List columns = new ArrayList<>();
         columns.add(column);
         TableRow instance = new TableRow("row", columns);
         instance.setColumn(column, BigDecimal.ONE);
@@ -390,7 +390,7 @@ public class TableRowTest
     {
         System.out.println("setColumn");
         String column = "Corinthian";
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
         columns.add(column);
         BigDecimal bd = BigDecimal.ONE;
         TableRow instance = new TableRow("row", columns);
