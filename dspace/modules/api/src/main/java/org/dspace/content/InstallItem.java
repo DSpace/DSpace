@@ -313,12 +313,12 @@ public class InstallItem
         return mymessage;
     }
     /**
-     * Generate comma-separated string of sizes (in bytes) of the bitstreams contained in an
+     * Generate String array of sizes (in bytes) of the bitstreams contained in an
      * item.
      *
      * @param myitem  the item
      *
-     * @return comma-separated string of sizes (in bytes)
+     * @return String[] of sizes (in bytes)
      */
     public static String[] getBitstreamSizes(Item myitem)
             throws SQLException
