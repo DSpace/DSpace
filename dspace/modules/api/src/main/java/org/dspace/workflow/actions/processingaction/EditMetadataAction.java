@@ -63,10 +63,6 @@ public class EditMetadataAction extends ProcessingAction {
     }
 
     public ActionResult processMainPage(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
-        // update bitstream sizes.
-        wfi.getItem().clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
-        wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(wfi.getItem()));
-
         if(request.getParameter("submit_approve") != null){
             //Delete the tasks
             addApprovedProvenance(c, wfi);
@@ -163,6 +159,17 @@ public class EditMetadataAction extends ProcessingAction {
         // Add to item as a DC field
         wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
         wfi.getItem().update();
+
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, dataPackage);
+        for(Item dataFile : dataFiles) {
+            dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+
+            // update bitstream sizes.
+            dataFile.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
+            dataFile.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(dataFile));
+
+            dataFile.update();
+        }
     }
 
     private void addBlackoutProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
@@ -182,6 +189,11 @@ public class EditMetadataAction extends ProcessingAction {
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, dataPackage);
         for(Item dataFile : dataFiles) {
             dataFile.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+
+            // update bitstream sizes.
+            dataFile.clearMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null);
+            dataFile.addMetadata(MetadataSchema.DC_SCHEMA,"format","extent",null,InstallItem.getBitstreamSizes(dataFile));
+
             dataFile.update();
         }
     }
