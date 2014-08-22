@@ -165,7 +165,7 @@ public class CDLDataCiteService {
 
     private void logMetadata(String target, Map<String, String> metadata) {
         log.debug("Adding the following Metadata:");
-//	log.debug("_target: " + target);
+	log.debug("_target: " + target);
         if (metadata != null) {
             Set<String> keys = metadata.keySet();
             for (String key : keys) {
@@ -173,7 +173,7 @@ public class CDLDataCiteService {
             }
         }
 
-//	log.debug("Anvl form of metadata:" + encodeAnvl(target, metadata));
+	log.debug("Anvl form of metadata:" + encodeAnvl(target, metadata));
     }
 
 
