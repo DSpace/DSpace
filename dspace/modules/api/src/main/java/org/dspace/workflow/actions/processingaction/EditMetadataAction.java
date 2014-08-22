@@ -147,6 +147,7 @@ public class EditMetadataAction extends ProcessingAction {
     }
 
     private void addApprovedProvenance(Context c, WorkflowItem wfi) throws SQLException, AuthorizeException {
+        Item dataPackage = wfi.getItem();
         //Add the provenance for the accept
         String now = DCDate.getCurrent().toString();
 
