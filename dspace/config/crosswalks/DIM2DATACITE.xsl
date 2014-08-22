@@ -192,25 +192,8 @@
 			</xsl:if>
 			
 			
-			<!-- ******************************************************** -->
-			<!-- ************ Handle tags for data packages: ************ -->
-			<!-- ******************************************************** -->
-			
-			<xsl:if test="$datatype='DataPackage'">
-						
-				<!-- ************ Rights *************** -->
-				<!--  All data package DOIs include a CC0 statement. -->
-				<rights>
-					<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
-				</rights>
-			</xsl:if>
-			
-			<!-- ***************************************************** -->
-			<!-- ************ Handle tags for data files: ************ -->
-			<!-- ***************************************************** -->
-			
-			<xsl:if test="$datatype='DataFile'">
-				<!-- *********** Sizes *********** -->
+			<!-- *********** Sizes *********** -->
+			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
 						<size xmlns="http://datacite.org/schema/kernel-2.2">
@@ -219,8 +202,17 @@
 						</size>
 					</xsl:for-each>
 				</sizes>
-					          
-				<!-- ************ Rights *************** -->
+			</xsl:if>
+			
+			<!-- ************ Rights *************** -->
+			<xsl:if test="$datatype='DataPackage'">
+				<!--  All data package DOIs include a CC0 statement. -->
+				<rights>
+					<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+				</rights>
+			</xsl:if>
+
+			<xsl:if test="$datatype='DataFile'">
 				<rights>
 					<xsl:variable name="embargoType" select="dspace:field[@element='type' and @qualifier='embargo']"/>
 
@@ -253,14 +245,15 @@
 		                </xsl:otherwise>
 		            </xsl:choose>
 				</rights>
-								
-				<!-- *********** Description - Only for data files ********* -->
+			</xsl:if>
+
+			<!-- *********** Description - Only for data files ********* -->
+			<xsl:if test="$datatype='DataFile'">
 				<descriptions>
 					<description descriptionType="Other">
 						<xsl:value-of select="dspace:field[@element='description']"/>
 					</description>
 				</descriptions>
-				
 			</xsl:if>
         </resource>
 	</xsl:template>
