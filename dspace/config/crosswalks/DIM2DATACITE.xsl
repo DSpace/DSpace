@@ -251,7 +251,7 @@
 			<xsl:if test="$datatype='DataFile'">
 				<descriptions>
 					<description descriptionType="Other">
-						<xsl:value-of select="dspace:field[@element='description']"/>
+						<xsl:value-of select="dspace:field[@element='description' and @qualifier='']"/>
 					</description>
 				</descriptions>
 			</xsl:if>
