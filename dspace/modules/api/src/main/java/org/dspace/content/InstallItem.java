@@ -38,6 +38,7 @@
 package org.dspace.content;
 
 import java.io.IOException;
+import java.lang.String;
 import java.sql.SQLException;
 import java.util.Calendar;
 
@@ -310,5 +311,28 @@ public class InstallItem
         }
 
         return mymessage;
+    }
+    /**
+     * Generate String array of sizes (in bytes) of the bitstreams contained in an
+     * item.
+     *
+     * @param myitem  the item
+     *
+     * @return String[] of sizes (in bytes)
+     */
+    public static String[] getBitstreamSizes(Item myitem)
+            throws SQLException
+    {
+        // Get non-internal format bitstreams
+        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
+        String[] sizes = new String[bitstreams.length];
+        if (bitstreams.length > 0) {
+            // Add sizes and checksums of bitstreams
+            for (int j = 0; j < bitstreams.length; j++)
+            {
+                sizes[j] = String.valueOf(bitstreams[j].getSize());
+            }
+        }
+        return sizes;
     }
 }
