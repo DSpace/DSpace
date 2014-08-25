@@ -20,6 +20,7 @@ import mockit.MockUp;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+
 import static org.dspace.storage.rdbms.DatabaseManager.getColumnNames;
 
 /**
@@ -177,7 +178,6 @@ public final class MockDatabaseManager
                     break;
 
                 case Types.INTEGER:
-                case Types.NUMERIC:
                     if (isOracle)
                     {
                         long longValue = results.getLong(i);
@@ -196,33 +196,10 @@ public final class MockDatabaseManager
                     }
                     break;
 
+                case Types.NUMERIC:
                 case Types.DECIMAL:
-                    // For H2 database, NUMBER() fields are mapped to DECIMAL data type.
-                    // See: http://www.h2database.com/html/datatypes.html#decimal_type
-                    // But, our Oracle schema uses NUMBER() to represent INTEGER values 1 or 0
-                    // (which are then mapped to Boolean true/false by TableRow.getBooleanColumn()).
-                    // So, for H2 to "act like Oracle", we need to try to convert
-                    // DECIMAL types to INTEGER values, so they can be mapped to
-                    // corresponding Boolean.
-                    if (isOracle)
-                    {
-                        long longValue = results.getLong(i);
-                        // If this value actually a valid Integer, convert it to an int
-                        if (longValue <= (long)Integer.MAX_VALUE)
-                        {
-                            row.setColumn(name, (int) longValue);
-                        }
-                        else // Otherwise, leave it as a long value
-                        {
-                            row.setColumn(name, longValue);
-                        }
-                    }
-                    else
-                    {
-                        row.setColumn(name, results.getLong(i));
-                    }
+                    row.setColumn(name, results.getBigDecimal(i));
                     break;
-                    //END ADDED for H2
 
                 case Types.BIGINT:
                     row.setColumn(name, results.getLong(i));
@@ -298,5 +275,4 @@ public final class MockDatabaseManager
         row.resetChanged();
         return row;
     }
-    
 }
