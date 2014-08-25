@@ -68,11 +68,11 @@
     	<li>Presentations and posters</li>
     	<li>Theses and dissertations</li>
     </ul>
+    <p>To get started, review our short <a href="http://drumstage.lib.umd.edu/help/about_submitting.jsp">guide to submitting your research</a>.</p>
     <p>You can track views and downloads of your research, and everything in DRUM is indexed by Google and Google Scholar. You receive a permanent DOI for your items, making it easy for other researchers to cite your work.</p>
     <p>Depositing research in DRUM can help you satisfy data management and sharing requirements from the NSF, NIH, and other funding agencies and journals.</p>
-    <a href="<%= request.getContextPath() %>/mydspace"><button type="button">Submit</button></a> 
-            
-    <br>
+    <button type="button"><a href="http://drum.lib.umd.edu/mydspace">Submit</a></button> 
+
 
 
 
