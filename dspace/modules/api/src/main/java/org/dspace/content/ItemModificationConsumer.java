@@ -32,7 +32,20 @@ public class ItemModificationConsumer implements Consumer {
             ctx.turnOffAuthorisationSystem();
 
             switch (st) {
-                case Constants.ITEM: {
+                case Constants.BITSTREAM:
+                {
+                    log.debug("ItemModificationConsumer is consuming " + event.toString());
+                    Bitstream bitstream = (Bitstream)event.getSubject(ctx);
+                    Bundle bundle = (Bundle)bitstream.getParentObject();
+                    Item item = (Item)bundle.getParentObject();
+                    // update bitstream sizes.
+                    item.clearMetadata(MetadataSchema.DC_SCHEMA, "format", "extent", null);
+                    item.addMetadata(MetadataSchema.DC_SCHEMA, "format", "extent", null, InstallItem.getBitstreamSizes(item));
+                    item.update();
+                }
+                break;
+                case Constants.ITEM:
+                {
                     Item item = (Item) event.getSubject(ctx);
                     log.debug("ItemModificationConsumer is consuming " + event.toString());
                     // update bitstream sizes.
