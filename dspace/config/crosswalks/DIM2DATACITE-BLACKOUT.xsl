@@ -141,8 +141,7 @@
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
 						<size xmlns="http://datacite.org/schema/kernel-2.2">
-							<xsl:value-of select="."/>
-							<xsl:text> bytes</xsl:text>
+							<xsl:text>(:tba)</xsl:text>
 						</size>
 					</xsl:for-each>
 				</sizes>
