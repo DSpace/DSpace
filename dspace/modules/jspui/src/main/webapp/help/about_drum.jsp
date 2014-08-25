@@ -47,19 +47,19 @@
 
 <h1>About DRUM</h1>
 
-<p>DRUM is supported and developed by <a href="http://www.lib.umd.edu/digital">Digital Systems and Stewardship</a> in the University of Maryland Libraries. There is no fee for using DRUM.</p>
+<p>DRUM is supported and developed by <a href="http://www.lib.umd.edu/dss">Digital Systems and Stewardship</a> in the University of Maryland Libraries. There is no fee for using DRUM.</p>
 
 <h2>Increase the visibility and impact of your research</h2>
 
-<p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent DOI for each submission that other researchers can use to cite your work.</p>
+<p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent DOI for each submission. Colleagues and other researchers can use the DOI to cite your work.</p>
 
-<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. <a href="<%= request.getContextPath() %>/help/about_submitting.jsp">How to submit</a>.</p>
+<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. Review our short <a href="http://drumstage.lib.umd.edu/help/about_submitting.jsp">guide to submitting your research</a>.</p>.</p>
 
 <h2>Preserve your work for the long term</h2>
 
 <p>You can use DRUM to ensure the long-term preservation of your research products. The University Libraries intend to preserve all your submissions indefinitely, and we’ll maintain your material even if you leave the university.</p>
 
-<p>DRUM is built on <a href="http://www.dspace.org">DSpace software</a>, a widely used, reliable digital repository platform. DRUM performs nightly bit-level integrity tests on all files. DRUM conforms to the digital preservation principles outlined in the University of Maryland Libraries’ <a href="http://drum.lib.umd.edu/handle/1903/14745">Digital Preservation Policy</a>. 
+<p>DRUM is built on <a href="http://www.dspace.org">DSpace software</a>, a widely used, reliable digital repository platform. DRUM performs nightly bit-level integrity tests on all files. DRUM conforms to the digital preservation principles outlined in the University of Maryland Libraries’ <a href="http://hdl.handle.net/1903/14745">Digital Preservation Policy</a>. 
 </p>
 
 <p>The University of Maryland Libraries reserve the right to migrate your materials to new file formats to reduce the risk of technological obsolescence. However, we cannot guarantee that we will migrate any or all materials in the repository.</p>
@@ -90,14 +90,12 @@
 <h2>Policy for full-text and other full data items in DRUM</h2>
 <ol>
 <li>Anyone may access full items free of charge.</li>
-<li>Copies of full items generally can be:</li>
-	<ul>
-	<li>reproduced and displayed publicly in any format or medium for personal research or study and educational and other not-for-profit purposes without prior permission or charge provided all public uses and copies include<li>
+<li>Copies of full items generally can be reproduced and displayed publicly in any format or medium for personal research or study and educational and other not-for-profit purposes without prior permission or charge provided all public uses and copies include<li>
 	<ul>
 	<li>the author(s), title, and full bibliographic details and</li>
     <li>a hyperlink and/or URL to the original metadata page and</li>
     <li>the content is not changed in any way.</li>
-    </ul></ul>
+    </ul>
 <li>Full items must not be sold commercially in any format or medium without formal permission of the copyright holders.</li>
 </ol> 
 

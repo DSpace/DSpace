@@ -74,7 +74,7 @@
 
 <h2>Get your permanent DOI</h2>
 
-<p>After we review your submission, you will receive an email that contains the permanent DOI to your materials. Use the link in publications and wherever you refer to the materials.</p>
+<p>After we review your submission, you will receive an email that contains a link to your materials and your DOI. You can use the DOI in publications and wherever you refer to the materials.</p>
 
 <h2>Recommendations for specific materials</h2>
 
@@ -86,7 +86,7 @@
 
 <p><strong>2. Data</strong></p>
 
-<p>Submit comma-separated, tab-separated, or other delimited or fixed-width files for tabular or 'ascii' data (e.g txt, csv, tab, tsv). Excel and Access files are acceptable, but avoid submitting data in specialized instrument formats. See our <a href="http://www.lib.umd.edu/data/formats">file format recommendations</a> for additional suggestions.</p>
+<p>Submit comma-separated, tab-separated, or other delimited or fixed-width files for tabular or 'ascii' data (e.g. txt, csv, tab, tsv). Excel and Access files are acceptable, but avoid submitting data in specialized instrument formats. See our <a href="http://www.lib.umd.edu/data/formats">file format recommendations</a> for additional suggestions.</p>
 
 <p>Data should be accompanied by a 'readme' file, data dictionary, codebook, or similar document that contains, where applicable:</p>
 
@@ -102,7 +102,7 @@
 	<li>contact information</li>
 </ul>
 
-<p><strong>2. Code</strong></p>
+<p><strong>3. Code</strong></p>
 
 <p>Submit code files with the appropriate language extension (e.g. mat, py, r, pl, f). Software should be accompanied by a 'readme' file that contains, where applicable:</p>
 
