@@ -3,6 +3,7 @@
 package org.datadryad.api;
 
 import java.util.Set;
+import org.apache.log4j.Logger;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -16,6 +17,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DryadDataPackageTest extends ContextUnitTest {
+    private static Logger log = Logger.getLogger(DryadDataPackageTest.class);
     private static final String BURIED_DATE_STRING = "2014-03-05T18:11:29Z";
     private static final String PROVENANCE_MESSAGE = "Submitted by First Last (f.last@university.edu) on " + BURIED_DATE_STRING + " workflow start=Step: requiresReviewStep - action:noUserSelectionAction\nNo. of bitstreams: 0";
 
@@ -24,6 +26,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetCollection() throws Exception {
+        log.info("getCollection");
         Context context = this.context;
         Collection result = DryadDataPackage.getCollection(context);
         assertEquals(result.getName(), "Dryad Data Packages");
@@ -34,7 +37,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testCreate() throws Exception {
-        System.out.println("create");
+        log.info("create");
         DryadDataPackage result = DryadDataPackage.create(context);
         assertNotNull(result);
         assertNull(result.getWorkflowItem(context));
@@ -46,7 +49,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testCreateInWorkflow() throws Exception {
-        System.out.println("createInWorkflow");
+        log.info("createInWorkflow");
         DryadDataPackage result = DryadDataPackage.createInWorkflow(context);
         assertNotNull(result);
         assertNotNull(result.getWorkflowItem(context));
@@ -58,7 +61,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testMakeSubmittedProvenance() {
-        System.out.println("makeSubmittedProvenance");
+        log.info("makeSubmittedProvenance");
         DCDate date = new DCDate(BURIED_DATE_STRING);
         String submitterName = "First Last";
         String submitterEmail = "f.last@university.edu";
@@ -75,7 +78,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetSubmittedProvenance() throws Exception {
-        System.out.println("getSubmittedProvenance");
+        log.info("getSubmittedProvenance");
         DCDate date1 = new DCDate(BURIED_DATE_STRING);
         String submitterName = "First Last";
         String submitterEmail = "f.last@university.edu";
@@ -96,7 +99,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testAddSubmittedProvenance() throws Exception {
-        System.out.println("addGetSubmittedProvenance");
+        log.info("addGetSubmittedProvenance");
         DCDate date = new DCDate(BURIED_DATE_STRING);
         String submitterName = "First Last";
         String submitterEmail = "f.last@university.edu";
@@ -114,7 +117,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetPackagesContainingFile() throws Exception {
-        System.out.println("getPackagesContainingFile");
+        log.info("getPackagesContainingFile");
         DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
         DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
         DryadDataFile dataFile = DryadDataFile.create(context, dataPackage1);
@@ -129,7 +132,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetFilesInPackage() throws Exception {
-        System.out.println("getFilesInPackage");
+        log.info("getFilesInPackage");
         DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
         DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
 
@@ -149,7 +152,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetDataFiles() throws Exception {
-        System.out.println("getDataFiles");
+        log.info("getDataFiles");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile dataFile1 = DryadDataFile.create(context, dataPackage);
         Integer result = dataPackage.getDataFiles(context).size();
@@ -159,7 +162,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
 
     @Test
     public void testMoveDataFile() throws Exception {
-        System.out.println("moveDataFile");
+        log.info("moveDataFile");
         DryadDataPackage dataPackage1 = DryadDataPackage.create(context);
         DryadDataPackage dataPackage2 = DryadDataPackage.create(context);
         DryadDataFile dataFile = DryadDataFile.create(context, dataPackage1);
@@ -184,7 +187,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testRemoveDataFile() throws Exception {
-        System.out.println("removeDataFile");
+        log.info("removeDataFile");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile dataFile = DryadDataFile.create(context, dataPackage);
         Integer expResult = 1;
@@ -201,7 +204,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testIndexOfValue() {
-        System.out.println("indexOfValue");
+        log.info("indexOfValue");
         Integer numValues = 4;
         DCValue[] dcValues = new DCValue[numValues];
         for(Integer i=0;i<numValues;i++) {
@@ -221,7 +224,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testSetPublicationName() throws Exception {
-        System.out.println("setPublicationName");
+        log.info("setPublicationName");
         String publicationName = "Test Publication";
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         dataPackage.setPublicationName(publicationName);

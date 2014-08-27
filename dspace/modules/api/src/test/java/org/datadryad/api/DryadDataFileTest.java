@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -21,7 +22,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DryadDataFileTest extends ContextUnitTest {
-
+    private static Logger log = Logger.getLogger(DryadDataFileTest.class);
     private Calendar calendar;
     private Date pastDate;
     private Date nowDate;
@@ -44,6 +45,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testGetCollection() throws Exception {
+        log.info("getCollection");
         Context context = this.context;
         Collection result = DryadDataFile.getCollection(context);
         assertEquals(result.getName(), "Dryad Data Files");
@@ -54,6 +56,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testCreate() throws Exception {
+        log.info("create");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile result = DryadDataFile.create(context, dataPackage);
         assertNotNull(result);
@@ -65,6 +68,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testParseDate() throws Exception {
+        log.info("parseDate");
         String dateString = "2014-06-12";
         Date expResult = null;
         Date result = DryadDataFile.parseDate(dateString);
@@ -79,6 +83,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testFormatDate() {
+        log.info("formatDate");
         calendar.set(Calendar.YEAR, 2015);
         calendar.set(Calendar.MONTH, Calendar.JULY);
         calendar.set(Calendar.DAY_OF_MONTH, 25);
@@ -93,7 +98,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testGetEarliestDate_DateArr() {
-        System.out.println("getEarliestDate");
+        log.info("getEarliestDate");
         Date[] dates = {
             futureDate,
             pastDate,
@@ -109,7 +114,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testIsEmbargoed() throws SQLException {
-        System.out.println("isEmbargoed");
+        log.info("isEmbargoed");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         // not initially embargoed, so set one in the past
@@ -124,7 +129,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testClearEmbargo() throws Exception {
-        System.out.println("clearEmbargo");
+        log.info("clearEmbargo");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.clearEmbargo();
@@ -138,7 +143,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testSetEmbargo() throws Exception {
-        System.out.println("setEmbargo");
+        log.info("setEmbargo");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile instance = DryadDataFile.create(context, dataPackage);
         instance.setEmbargo("untilArticleAppears", futureDate);
@@ -149,7 +154,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testAddBitstream() throws Exception {
-        System.out.println("addBitstream");
+        log.info("addBitstream");
         InputStream stream = DryadDataFileTest.class.getClassLoader().getResourceAsStream("DryadLogo.png");
         DryadDataPackage dataPackage = DryadDataPackage.create(context);
         DryadDataFile instance = DryadDataFile.create(context, dataPackage);
@@ -161,7 +166,7 @@ public class DryadDataFileTest extends ContextUnitTest {
      */
     @Test
     public void testGetTotalStorageSize() throws Exception {
-        System.out.println("getTotalStorageSize");
+        log.info("getTotalStorageSize");
 
         File file1 = new File(DryadDataFileTest.class.getClassLoader().getResource("DryadLogo.png").toURI());
         File file2 = new File(DryadDataFileTest.class.getClassLoader().getResource("Dryad_web_banner_small_v4.jpg").toURI());
