@@ -189,8 +189,6 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 
     public String[] getInputExtensions()
     {
-        // Temporarily disabled as JDK 1.6 only
-        // return ImageIO.getReaderFileSuffixes();
-        return null;
+        return ImageIO.getReaderFileSuffixes();
     }
 }
