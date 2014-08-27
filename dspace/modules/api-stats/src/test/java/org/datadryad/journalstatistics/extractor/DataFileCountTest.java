@@ -3,6 +3,7 @@
 package org.datadryad.journalstatistics.extractor;
 
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
@@ -14,6 +15,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataFileCountTest extends ContextUnitTest {
+    private static Logger log = Logger.getLogger(DataFileCountTest.class);
 
     /**
      * Test of extract method, of class DataFileCount.
@@ -22,6 +24,7 @@ public class DataFileCountTest extends ContextUnitTest {
      */
     @Test
     public void testCountDataFiles() throws SQLException {
+        log.info("countDataFiles");
         // Count the initial number of data files
         String journalName = "Test Journal";
         DataFileCount instance = new DataFileCount(this.context);

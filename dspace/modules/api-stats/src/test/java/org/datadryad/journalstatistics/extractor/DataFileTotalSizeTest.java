@@ -4,6 +4,7 @@ package org.datadryad.journalstatistics.extractor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
@@ -16,6 +17,7 @@ import org.junit.Before;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataFileTotalSizeTest extends ContextUnitTest {
+    private static Logger log = Logger.getLogger(DataFileTotalSizeTest.class);
     private File file1, file2, file3;
 
     @Before
@@ -34,7 +36,7 @@ public class DataFileTotalSizeTest extends ContextUnitTest {
      */
     @Test
     public void testCountDataFileTotalSize() throws Exception {
-        System.out.println("countDataFileTotalSize");
+        log.info("countDataFileTotalSize");
         String journalName1 = "Test Journal 1";
         String journalName2 = "Test Journal 2";
         DataFileTotalSize instance = new DataFileTotalSize(context);

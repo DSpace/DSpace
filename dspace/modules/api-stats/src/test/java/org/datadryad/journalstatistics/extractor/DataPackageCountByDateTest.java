@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.junit.Before;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataPackageCountByDateTest extends ContextUnitTest{
+    private static Logger log = Logger.getLogger(DataPackageCountByDateTest.class);
     private Date futureDate;
     private Date lastYearDate;
     private Date customDate_2008_07_25;
@@ -59,6 +61,7 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
      */
     @Test
     public void testCountDataPackagesByDate() throws SQLException {
+        log.info("countDataPackagesByDate");
         // Count the initial number of data packages
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setEndDate(futureDate);
@@ -81,6 +84,7 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
      */
     @Test
     public void testCountDataPackagesByDatePast() throws SQLException {
+        log.info("countDataPackagesByDatePast");
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setEndDate(lastYearDate);
         // Assert we're filtering on dates
@@ -97,6 +101,7 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
 
     @Test(expected=IllegalStateException.class)
     public void testThrowsExceptionWithBadDateOrder() {
+        log.info("throwsExceptionWithBadDateOrder");
         DataPackageCount instance = new DataPackageCount(this.context);
         assert(futureDate.after(lastYearDate));
         instance.setBeginDate(futureDate);
@@ -110,6 +115,7 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
      */
     @Test
     public void testCountDataPackagesByDateCustom() throws SQLException {
+        log.info("countDataPackagesByDateCustom");
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setBeginDate(customDate_2008_07_25);
         instance.setEndDate(customDate_2012_03_21);
@@ -130,6 +136,7 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
      */
     @Test
     public void testCountDataPackagesFencePost() throws SQLException {
+        log.info("countDataPackagesFencePost");
         DataPackageCount instance = new DataPackageCount(this.context);
         instance.setBeginDate(customDate_2008_07_25);
         instance.setEndDate(customDate_2010_01_01);

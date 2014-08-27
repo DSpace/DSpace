@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.datadryad.journalstatistics.extractor.DataFileCount;
 import org.datadryad.journalstatistics.extractor.DataFileTotalSize;
 import org.datadryad.journalstatistics.extractor.DataPackageCount;
@@ -18,6 +19,7 @@ import org.dspace.core.Context;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DefaultStatisticsPackage implements StatisticsPackage {
+    private static Logger log = Logger.getLogger(DefaultStatisticsPackage.class);
     private List<Statistic> statistics = new ArrayList<Statistic>();
     private Date beginDate, endDate;
     public DefaultStatisticsPackage(Context context) {
@@ -33,7 +35,7 @@ public class DefaultStatisticsPackage implements StatisticsPackage {
             s.setBeginDate(beginDate);
             s.setEndDate(endDate);
             s.extractAndStore(journalName);
-            System.out.println(s);
+            log.info(s);
         }
     }
 

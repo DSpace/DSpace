@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class EmbargoedDataFileCountTest extends ContextUnitTest {
-
+    private static Logger log = Logger.getLogger(EmbargoedDataFileCountTest.class);
     private Date futureDate;
 
     @Before

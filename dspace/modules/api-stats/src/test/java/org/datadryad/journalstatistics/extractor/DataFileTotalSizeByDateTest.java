@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataFile;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
@@ -19,6 +20,7 @@ import org.junit.Before;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataFileTotalSizeByDateTest extends ContextUnitTest {
+    private static Logger log = Logger.getLogger(DataFileTotalSizeByDateTest.class);
     private File file;
     private Date date_2013_01_01, date_2013_06_01, date_2014_01_01, date_2013_03_01;
 
@@ -50,7 +52,7 @@ public class DataFileTotalSizeByDateTest extends ContextUnitTest {
      */
     @Test
     public void testCountDataFileTotalSizeByDate() throws Exception {
-        System.out.println("countDataFileTotalSizeByDate");
+        log.info("countDataFileTotalSizeByDate");
         String journalName = "Test Journal";
         DataFileTotalSize instance1 = new DataFileTotalSize(context);
         instance1.setBeginDate(date_2013_01_01);

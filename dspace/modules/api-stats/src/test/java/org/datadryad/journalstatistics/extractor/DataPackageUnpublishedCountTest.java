@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.DCDate;
@@ -18,6 +19,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DataPackageUnpublishedCountTest extends ContextUnitTest {
+    private static Logger log = Logger.getLogger(DataPackageUnpublishedCountTest.class);
     private Date date_2014_06_07, date_2014_06_01, date_2014_06_15, date_2014_06_30;
     private static final String STRING_2014_06 = "2014-06";
     private static final String BURIED_DATE_STRING = "2014-03-05T18:11:29Z";
@@ -44,7 +46,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
      */
     @Test
     public void testBucketForDate() {
-        System.out.println("bucketForDate");
+        log.info("bucketForDate");
         String expResult = STRING_2014_06;
         String result = DataPackageUnpublishedCount.bucketForDate(date_2014_06_07);
         assertEquals(expResult, result);
@@ -55,7 +57,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
      */
     @Test
     public void testExtractDateStringFromProvenance() throws Exception {
-        System.out.println("extractDateStringFromProvenance");
+        log.info("extractDateStringFromProvenance");
         String provenance = PROVENANCE_MESSAGE;
         String expResult = BURIED_DATE_STRING;
         String result = DataPackageUnpublishedCount.extractDateStringFromProvenance(provenance);
@@ -64,7 +66,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
 
     @Test
     public void testCountUnpublishedDataPackages() throws Exception {
-        System.out.println("countUnpublishedDataPackages");
+        log.info("countUnpublishedDataPackages");
         String journalName = "Test Journal";
         // Get the count prior to adding a data package to the workflow.
         DataPackageUnpublishedCount instance = new DataPackageUnpublishedCount(this.context);
@@ -100,7 +102,7 @@ public class DataPackageUnpublishedCountTest extends ContextUnitTest {
 
     @Test
     public void testCountUnpublishedDataPackagesInDateRange() throws Exception {
-        System.out.println("countUnpublishedDataPackagesInDateRange");
+        log.info("countUnpublishedDataPackagesInDateRange");
         // Make two instances with different ranges
         // add a data package to one range. Assert it increases and the other does not
         DataPackageUnpublishedCount instance1 = new DataPackageUnpublishedCount(this.context);
