@@ -77,7 +77,7 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     private static Organization organizationFromTableRow(TableRow row) {
         if(row != null) {
             Organization organization = new Organization();
-            organization.organizationId = row.getLongColumn(COLUMN_ID);
+            organization.organizationId = row.getIntColumn(COLUMN_ID);
             organization.organizationCode = row.getStringColumn(COLUMN_CODE);
             organization.organizationName = row.getStringColumn(COLUMN_NAME);
             return organization;
