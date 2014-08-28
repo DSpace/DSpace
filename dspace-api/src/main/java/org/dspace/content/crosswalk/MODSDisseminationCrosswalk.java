@@ -363,6 +363,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             }
             String value = dcvs[i].value;
 
+            // skip writing out this attribute if the value is null
+            if (null == value) continue;
+
             modsTriple trip = modsMap.get(qdc);
             if (trip == null)
             {
