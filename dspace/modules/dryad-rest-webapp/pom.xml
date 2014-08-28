@@ -1,10 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.datadryad</groupId>
+    <groupId>org.dspace.modules</groupId>
     <artifactId>dryad-rest-webapp</artifactId>
     <packaging>war</packaging>
     <name>dryad-rest-webapp Jersey Webapp</name>
+    <description>Dryad REST API</description>
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
@@ -35,6 +36,24 @@
           </plugin>
         </plugins>
     </build>
+    <profiles>
+      <!-- when activated a dspace.config configuration file location passed 
+        on the commandline (-Ddspace.config=...) can be passed through to be used 
+        as a filter source by projects for tasks such as updating the ${dspace.dir} 
+        in web.xml etc. -->
+      <profile>
+        <activation>
+          <property>
+            <name>dspace.config</name>
+          </property>
+        </activation>
+        <build>
+          <filters>
+            <filter>${dspace.config}</filter>
+          </filters>
+        </build>
+      </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -98,7 +117,6 @@
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <properties>
