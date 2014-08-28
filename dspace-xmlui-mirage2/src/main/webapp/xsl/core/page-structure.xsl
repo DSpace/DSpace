@@ -744,7 +744,7 @@
             <!--we can't use $theme-path, because that contains the context path,
             and cocoon:// urls don't need the context path-->
             <xsl:value-of select="$pagemeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-            <xsl:text>scripts.xml</xsl:text>
+            <xsl:text>scripts-dist.xml</xsl:text>
         </xsl:variable>
         <xsl:for-each select="document($scriptURL)/scripts/script">
             <script src="{$theme-path}{@src}">&#160;</script>

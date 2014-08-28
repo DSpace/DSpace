@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     The contents of this file are subject to the license and copyright
@@ -38,7 +39,8 @@
     <script src="scripts/vendor-extensions.js">&#160;</script>
     <script src="scripts/templates.js">&#160;</script>
     <!-- endbuild -->
-    <!-- build:remove -->
-    <script src="scripts/set-devmode.js">&#160;</script>
-    <!-- endbuild -->
+
+    <!--the build comments below need to be inline to fix the 'undefined'
+    issue mentioned at https://github.com/yeoman/grunt-usemin/issues/128 -->
+    <!-- build:remove --><script src="scripts/set-devmode.js">&#160;</script><!-- endbuild -->
 </scripts>

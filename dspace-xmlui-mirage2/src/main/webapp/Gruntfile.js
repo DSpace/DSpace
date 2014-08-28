@@ -31,6 +31,14 @@ module.exports = function (grunt) {
                         dest: 'styles/main.scss'
                     }
                 ]
+            },
+            scriptsxml: {
+                files: [
+                    {
+                        src: ['scripts.xml'],
+                        dest: 'scripts-dist.xml'
+                    }
+                ]
             }
         },
         compass: {
@@ -71,25 +79,16 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare:{
-            prod: {
-                src: ['scripts.xml'],
-                options: {
-                    // fool usemin in to putting theme.js straight into the scripts
-                    // folder, and not in a separate dist folder. And no, you can't
-                    // just use an empty string, I tried ;)
-                    dest: 'dist/../'
-                }
-            },
-            dev: {
-                src: ['scripts.xml'],
-                options: {
-                    // same deal
-                    dest: 'dist/../'
-                }
+            src: ['scripts-dist.xml'],
+            options: {
+                // fool usemin in to putting theme.js straight into the scripts
+                // folder, and not in a separate dist folder. And no, you can't
+                // just use an empty string, I tried ;)
+                dest: 'dist/../'
             }
         } ,
         usemin: {
-            html:'scripts.xml'
+            html:'scripts-dist.xml'
         }
     });
 
@@ -100,11 +99,14 @@ module.exports = function (grunt) {
     grunt.registerTask('bootstrap_color_scheme', [
         'copy:bootstrap_color_scheme'
     ]);
+    grunt.registerTask('shared-steps', [
+        'copy:scriptsxml', 'coffee', 'handlebars', 'useminPrepare','concat'
+    ]);
     grunt.registerTask('no-compass-prod', [
-        'coffee', 'handlebars', 'useminPrepare:prod','concat','uglify','usemin'
+        'shared-steps','uglify','usemin'
     ]);
     grunt.registerTask('no-compass-dev', [
-        'coffee', 'handlebars', 'useminPrepare:dev','concat','uglify:generated'
+        'shared-steps','uglify:generated'
     ]);
     grunt.registerTask('prod', [
         'compass:prod', 'no-compass-prod'
