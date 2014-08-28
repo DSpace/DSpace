@@ -1,6 +1,6 @@
 /*
  */
-package org.datadryad.rest.storage;
+package org.datadryad.rest.storage.json;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.storage.AbstractManuscriptStorage;
+import org.datadryad.rest.storage.StorageException;
 
 // TODO: Much of this code is shared by OrganizationJSONStorage
 
