@@ -117,7 +117,16 @@ public class IdentifierServiceImpl implements IdentifierService {
                    if (result != null){
                        return result;
                    }
-               } catch (IdentifierException e) {
+               }
+               catch (IdentifierNotFoundException ex)
+               {
+                   log.info(service.getClass().getName() + " doesn't find an "
+                           + "Identifier for " + dso.getTypeText() + ", " 
+                           + Integer.toString(dso.getID()) + ".");
+                   log.debug(ex.getMessage(), ex);
+               }
+               catch (IdentifierException e)
+               {
                    log.error(e.getMessage(),e);
                }
             }
