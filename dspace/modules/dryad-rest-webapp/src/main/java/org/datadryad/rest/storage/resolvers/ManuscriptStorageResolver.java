@@ -1,11 +1,13 @@
 /*
  */
-package org.datadryad.rest.storage;
+package org.datadryad.rest.storage.resolvers;
 
+import org.datadryad.rest.storage.json.ManuscriptJSONStorageImpl;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.io.File;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
+import org.datadryad.rest.storage.AbstractManuscriptStorage;
 
 /**
  *
