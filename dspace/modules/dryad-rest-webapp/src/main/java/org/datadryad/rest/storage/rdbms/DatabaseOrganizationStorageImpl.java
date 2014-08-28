@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.storage.rdbms;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -32,8 +34,22 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
             COLUMN_ID,
             COLUMN_CODE,
             COLUMN_NAME);
-    private Context context;
 
+    public DatabaseOrganizationStorageImpl(String configFileName) {
+        // Temp workaround
+        setConfigFile(configFileName);
+    }
+
+    public void setConfigFile(String configFileName) {
+	File configFile = new File(configFileName);
+
+	if (configFile != null) {
+	    if (configFile.exists() && configFile.canRead() && configFile.isFile()) {
+		ConfigurationManager.loadConfig(configFile.getAbsolutePath());
+            }
+        }
+    }
+    
     private static Context getContext() {
         Context context = null;
         try {
@@ -99,20 +115,23 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     private void insertOrganization(Organization organization) throws SQLException {
+        Context context = getContext();
         TableRow row = tableRowFromOrganization(organization);
         if(row != null) {
-            DatabaseManager.insert(getContext(), row);
-            completeContext(getContext());
+            DatabaseManager.insert(context, row);
+            completeContext(context);
         }
     }
 
     private void deleteOrganization(Organization organization) throws SQLException {
+        Context context = getContext();
         if(organization.organizationId == null) {
             throw new SQLException("NULL Column ID");
         }
         TableRow row = tableRowFromOrganization(organization);
         row.setColumn(COLUMN_ID, organization.organizationId);
-        DatabaseManager.delete(getContext(), row);
+        DatabaseManager.delete(context, row);
+        completeContext(context);
     }
 
     @Override
@@ -135,6 +154,8 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
         }
     }
 
+    // TODO: discern between insert and update. API nominally suports update
+    // but this will not.
     @Override
     protected void saveObject(Organization organization) throws StorageException {
         try {
