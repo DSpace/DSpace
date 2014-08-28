@@ -789,7 +789,7 @@ CREATE TABLE requestitem
   allfiles NUMBER(1),
   request_email VARCHAR2(64),
   request_name VARCHAR2(64),
-  request_message TEXT,
+  request_message VARCHAR2(2000),
   request_date TIMESTAMP,
   accept_request NUMBER(1),
   decision_date TIMESTAMP,
