@@ -46,6 +46,12 @@ public class OrganizationResource {
         return Boolean.TRUE;
     }
 
+    private static final String[] fieldArray = {"organizationCode"};
+    private static String[] valueArray(String code) {
+        String[] array = new String[1];
+        array[0] = code;
+        return array;
+    }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganizations() {
@@ -85,7 +91,7 @@ public class OrganizationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganization(@PathParam("organizationCode") String organizationCode) {
         try {
-            Organization organization = storage.findByValue("organizationCode", organizationCode);
+            Organization organization = storage.findByValue(fieldArray, valueArray(organizationCode));
             if(organization == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -139,7 +145,7 @@ public class OrganizationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteOrganization(@PathParam("organizationCode") String organizationCode) {
         try {
-            storage.deleteByValue("organizationCode", organizationCode);
+            storage.deleteByValue(fieldArray, valueArray(organizationCode));
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }

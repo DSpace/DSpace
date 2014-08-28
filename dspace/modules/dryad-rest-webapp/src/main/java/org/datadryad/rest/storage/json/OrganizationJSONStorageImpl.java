@@ -81,7 +81,8 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected Organization readObject(String organizationCode) throws StorageException {
+    protected Organization readObject(String codePath[]) throws StorageException {
+        String organizationCode = codePath[0];
         String baseFileName = getBaseFileName(organizationCode);
         if(fileExists(baseFileName)) {
             // read the file
@@ -98,7 +99,8 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void deleteObject(String organizationCode) throws StorageException {
+    protected void deleteObject(String codePath[]) throws StorageException {
+        String organizationCode = codePath[0];
         String baseFileName = getBaseFileName(organizationCode);
         if(fileExists(baseFileName)) {
             // read the file

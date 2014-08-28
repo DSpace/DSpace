@@ -37,11 +37,27 @@ public class ManuscriptResource {
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
 
+    private static final String[] codeFieldArray = {"organizationCode"};
+    private static String[] codeValueArray(String code) {
+        String[] array = new String[1];
+        array[0] = code;
+        return array;
+    }
+    
+    private static final String[] manuscriptFieldArray = {"organizationCode", "manuscriptId"};
+    private static String[] manuscriptValueArray(String code, String manuscriptId) {
+        String[] array = new String[2];
+        array[0] = code;
+        array[1] = manuscriptId;
+        return array;
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getManuscripts() {
         try {
             // Returning a list requires POJO turned on
+            // TODO: get manuscripts from code
             return Response.ok(storage.getAll()).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
@@ -53,7 +69,7 @@ public class ManuscriptResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getManuscript(@PathParam("organizationCode") String organizationId, @PathParam("manuscriptId") String manuscriptId) {
         try {
-            Manuscript manuscript = storage.findByValue("manuscriptId", manuscriptId);
+            Manuscript manuscript = storage.findByValue(manuscriptFieldArray, manuscriptValueArray(organizationId, manuscriptId));
             if(manuscript == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -101,9 +117,9 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteManuscript(@PathParam("manuscriptId") String manuscriptId) {
+    public Response deleteManuscript(@PathParam("organizationCode") String organizationId, @PathParam("manuscriptId") String manuscriptId) {
         try {
-            storage.deleteByValue("manuscriptId", manuscriptId);
+            storage.deleteByValue(manuscriptFieldArray, manuscriptValueArray(organizationId, manuscriptId));
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }

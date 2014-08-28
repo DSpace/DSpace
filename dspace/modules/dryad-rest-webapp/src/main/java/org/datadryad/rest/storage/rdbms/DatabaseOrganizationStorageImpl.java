@@ -166,7 +166,8 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected Organization readObject(String organizationCode) throws StorageException {
+    protected Organization readObject(String codePath[]) throws StorageException {
+        String organizationCode = codePath[0];
         try {
             Organization organization = getOrganizationByCode(organizationCode);
             return organization;
@@ -176,7 +177,9 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected void deleteObject(String organizationCode) throws StorageException {
+    protected void deleteObject(String codePath[]) throws StorageException {
+        String organizationCode = codePath[0];
+
         try {
             Organization organization = getOrganizationByCode(organizationCode);
             if(organization == null) {

@@ -4,7 +4,6 @@ package org.datadryad.rest.storage;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.datadryad.rest.models.Manuscript;
 
 /**
  *
@@ -12,8 +11,8 @@ import org.datadryad.rest.models.Manuscript;
  */
 public abstract class AbstractStorage<T> implements StorageInterface<T> {
     protected abstract void saveObject(T object) throws StorageException;
-    protected abstract T readObject(String objectId) throws StorageException;
-    protected abstract void deleteObject(String objectId) throws StorageException;
+    protected abstract T readObject(String objectPath[]) throws StorageException;
+    protected abstract void deleteObject(String objectPath[]) throws StorageException;
     protected abstract void addAll(List<T> objects) throws StorageException;
 
     @Override
@@ -27,19 +26,23 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
 
     // If this returns null, not found
     @Override
-    public T findByValue(String field, String value) throws StorageException {
+    public T findByValue(String fields[], String values[]) throws StorageException {
         // can search by organization code id
-        checkFindParameters(field, value);
+        checkFindParameters(fields, values);
         // find parameters are valid, must be organization code
-        return readObject(value);
+        return readObject(values);
     }
 
+    /*
     @Override
     public T findById(Integer id) throws StorageException {
         String value = String.valueOf(id);
-        checkFindParameters("id", value);
-        return findByValue("id", value);
+        String fields[] = {"id"};
+        String values[] = {value};
+        checkFindParameters(fields, values);
+        return findByValue(fields, values);
     }
+    */
 
     @Override
     public void update(T object) throws StorageException {
@@ -59,15 +62,19 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     }
 
     @Override
-    public void deleteByValue(String field, String value) throws StorageException {
-        this.checkFindParameters(field, value);
-        this.deleteObject(value);
+    public void deleteByValue(String fields[], String values[]) throws StorageException {
+        this.checkFindParameters(fields, values);
+        this.deleteObject(values);
     }
 
+    /*
     @Override
     public void deleteById(Integer id) throws StorageException {
         String value = String.valueOf(id);
-        checkFindParameters("id", value);
-        deleteByValue("id", value);
+        String fields[] = {"id"};
+        String values[] = {value};
+        checkFindParameters(fields, values);
+        deleteByValue(fields, values);
     }
+    */
 }
