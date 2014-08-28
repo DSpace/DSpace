@@ -2,7 +2,7 @@
 --
 
 -- Organizations
-CREATE SEQUENCE 'organization_seq';
+CREATE SEQUENCE organization_seq;
 CREATE TABLE organization
 (
   organization_id INTEGER PRIMARY KEY not null default nextval('organization_seq'),
@@ -10,7 +10,7 @@ CREATE TABLE organization
   name VARCHAR(255) not null
 );
 
-CREATE UNIQUE INDEX org_code_idx on organization(organization_code);
+CREATE UNIQUE INDEX org_code_idx on organization(code);
 
 -- Manuscripts
 CREATE SEQUENCE manuscript_seq;
