@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -135,7 +136,7 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    public Boolean objectExists(Organization organization) throws StorageException {
+    public Boolean objectExists(StoragePath path, Organization organization) throws StorageException {
         try {
             String code = organization.organizationCode;
             Organization databaseOrganization = getOrganizationByCode(code);
@@ -146,7 +147,7 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected void addAll(List<Organization> organizations) throws StorageException {
+    protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
         try {
             organizations.addAll(getOrganizations());
         } catch (SQLException ex) {
@@ -157,7 +158,7 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     // TODO: discern between insert and update. API nominally suports update
     // but this will not.
     @Override
-    protected void saveObject(Organization organization) throws StorageException {
+    protected void saveObject(StoragePath path, Organization organization) throws StorageException {
         try {
             insertOrganization(organization);
         } catch (SQLException ex) {
@@ -166,8 +167,8 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected Organization readObject(String codePath[]) throws StorageException {
-        String organizationCode = codePath[0];
+    protected Organization readObject(StoragePath path) throws StorageException {
+        String organizationCode = path.getValuePath().get(0);
         try {
             Organization organization = getOrganizationByCode(organizationCode);
             return organization;
@@ -177,8 +178,8 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected void deleteObject(String codePath[]) throws StorageException {
-        String organizationCode = codePath[0];
+    protected void deleteObject(StoragePath path) throws StorageException {
+        String organizationCode = path.getValuePath().get(0);
 
         try {
             Organization organization = getOrganizationByCode(organizationCode);
