@@ -29,6 +29,7 @@ import org.apache.oltu.oauth2.rs.response.OAuthRSResponse;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
 
 /**
  *
@@ -46,12 +47,6 @@ public class OrganizationResource {
         return Boolean.TRUE;
     }
 
-    private static final String[] fieldArray = {"organizationCode"};
-    private static String[] valueArray(String code) {
-        String[] array = new String[1];
-        array[0] = code;
-        return array;
-    }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganizations() {
@@ -80,7 +75,7 @@ public class OrganizationResource {
 
         try {
             // Returning a list requires POJO turned on
-            return Response.ok(storage.getAll()).build();
+            return Response.ok(storage.getAll(new StoragePath())).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
         }
@@ -90,8 +85,10 @@ public class OrganizationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganization(@PathParam("organizationCode") String organizationCode) {
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
         try {
-            Organization organization = storage.findByValue(fieldArray, valueArray(organizationCode));
+            Organization organization = storage.findByPath(path);
             if(organization == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -110,7 +107,7 @@ public class OrganizationResource {
         // Check required fields
         if(organization.isValid()) {
             try {
-                storage.create(organization);
+                storage.create(new StoragePath(), organization);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
@@ -125,12 +122,14 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateOrganization(Organization organization) {
+    public Response updateOrganization(@PathParam("organizationCode") String organizationCode, Organization organization) {
         System.err.println("Organization received with name: " + organization.organizationName + ", Code: " + organization.organizationCode);
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
         // Check required fields
         if(organization.isValid()) {
             try {
-                storage.update(organization);
+                storage.update(path, organization);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
@@ -144,8 +143,10 @@ public class OrganizationResource {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteOrganization(@PathParam("organizationCode") String organizationCode) {
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
         try {
-            storage.deleteByValue(fieldArray, valueArray(organizationCode));
+            storage.deleteByPath(path);
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }

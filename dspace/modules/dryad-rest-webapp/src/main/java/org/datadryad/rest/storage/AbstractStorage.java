@@ -10,71 +10,61 @@ import java.util.List;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class AbstractStorage<T> implements StorageInterface<T> {
-    protected abstract void saveObject(T object) throws StorageException;
-    protected abstract T readObject(String objectPath[]) throws StorageException;
-    protected abstract void deleteObject(String objectPath[]) throws StorageException;
-    protected abstract void addAll(List<T> objects) throws StorageException;
+    protected abstract void saveObject(StoragePath path, T object) throws StorageException;
+    protected abstract T readObject(StoragePath path) throws StorageException;
+    protected abstract void deleteObject(StoragePath path) throws StorageException;
+    protected abstract void addAll(StoragePath path, List<T> objects) throws StorageException;
+
+    final void checkPath(StoragePath path, List<String> expectedKeyPath) throws StorageException {
+        if(path == null) {
+            throw new StorageException("Null path");
+        } else if(path.size() != expectedKeyPath.size()) {
+            throw new StorageException("Path length should be " + expectedKeyPath.size());
+        } else if(!path.getKeyPath().equals(expectedKeyPath)) {
+            throw new StorageException("Invalid path " + path.toString());
+        } else if(!path.validElements()) {
+            throw new StorageException("Invalid path elements" + path.toString());
+        }
+    }
 
     @Override
-    public void create(T object) throws StorageException {
-        if(objectExists(object)) {
+    public void create(StoragePath path, T object) throws StorageException {
+        if(objectExists(path, object)) {
             throw new StorageException("Unable to create, object already exists");
         } else {
-            saveObject(object);
+            saveObject(path, object);
         }
     }
 
     // If this returns null, not found
     @Override
-    public T findByValue(String fields[], String values[]) throws StorageException {
+    public T findByPath(StoragePath path) throws StorageException {
         // can search by organization code id
-        checkFindParameters(fields, values);
+        checkObjectPath(path);
         // find parameters are valid, must be organization code
-        return readObject(values);
+        return readObject(path);
     }
 
-    /*
     @Override
-    public T findById(Integer id) throws StorageException {
-        String value = String.valueOf(id);
-        String fields[] = {"id"};
-        String values[] = {value};
-        checkFindParameters(fields, values);
-        return findByValue(fields, values);
-    }
-    */
-
-    @Override
-    public void update(T object) throws StorageException {
+    public void update(StoragePath path, T object) throws StorageException {
         // find the existing organization
-        if(!objectExists(object)){
+        if(!objectExists(path, object)){
             throw new StorageException("Unable to update, object does not exist");
         } else {
-            saveObject(object);
+            saveObject(path, object);
         }
     }
 
     @Override
-    public List<T> getAll() throws StorageException {
+    public List<T> getAll(StoragePath path) throws StorageException {
         List<T> objects = new ArrayList<T>();
-        addAll(objects);
+        addAll(path, objects);
         return objects;
     }
 
     @Override
-    public void deleteByValue(String fields[], String values[]) throws StorageException {
-        this.checkFindParameters(fields, values);
-        this.deleteObject(values);
+    public void deleteByPath(StoragePath path) throws StorageException {
+        this.checkObjectPath(path);
+        this.deleteObject(path);
     }
-
-    /*
-    @Override
-    public void deleteById(Integer id) throws StorageException {
-        String value = String.valueOf(id);
-        String fields[] = {"id"};
-        String values[] = {value};
-        checkFindParameters(fields, values);
-        deleteByValue(fields, values);
-    }
-    */
 }

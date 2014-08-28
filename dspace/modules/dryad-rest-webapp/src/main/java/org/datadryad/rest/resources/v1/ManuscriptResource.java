@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
 
 // TODO: shares a lot of code with OrganizationResource
 // TODO: include nested organizationCode
@@ -37,28 +38,13 @@ public class ManuscriptResource {
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
 
-    private static final String[] codeFieldArray = {"organizationCode"};
-    private static String[] codeValueArray(String code) {
-        String[] array = new String[1];
-        array[0] = code;
-        return array;
-    }
-    
-    private static final String[] manuscriptFieldArray = {"organizationCode", "manuscriptId"};
-    private static String[] manuscriptValueArray(String code, String manuscriptId) {
-        String[] array = new String[2];
-        array[0] = code;
-        array[1] = manuscriptId;
-        return array;
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getManuscripts() {
         try {
             // Returning a list requires POJO turned on
             // TODO: get manuscripts from code
-            return Response.ok(storage.getAll()).build();
+            return Response.ok(storage.getAll(new StoragePath())).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
         }
@@ -67,9 +53,12 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscript(@PathParam("organizationCode") String organizationId, @PathParam("manuscriptId") String manuscriptId) {
+    public Response getManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
         try {
-            Manuscript manuscript = storage.findByValue(manuscriptFieldArray, manuscriptValueArray(organizationId, manuscriptId));
+            StoragePath path = new StoragePath();
+            path.addPathElement("organizationCode", organizationCode);
+            path.addPathElement("manuscriptId", manuscriptId);
+            Manuscript manuscript = storage.findByPath(path);
             if(manuscript == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -83,14 +72,17 @@ public class ManuscriptResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createManuscript(Manuscript manuscript) {
+    public Response createManuscript(@PathParam("organizationCode") String organizationCode, Manuscript manuscript) {
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
         if(manuscript.isValid()) {
             try {
-                storage.create(manuscript);
+                storage.create(path, manuscript);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
+            // TODO: include the org code
             URI uri = ub.path(manuscript.manuscriptId).build();
             return Response.created(uri).build();
         } else {
@@ -101,10 +93,13 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateManuscript(Manuscript manuscript) {
+    public Response updateManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId, Manuscript manuscript) {
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement("manuscriptId", manuscriptId);
         if(manuscript.isValid()) {
             try {
-                storage.update(manuscript);
+                storage.update(path, manuscript);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
@@ -117,9 +112,12 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteManuscript(@PathParam("organizationCode") String organizationId, @PathParam("manuscriptId") String manuscriptId) {
+    public Response deleteManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement("manuscriptId", manuscriptId);
         try {
-            storage.deleteByValue(manuscriptFieldArray, manuscriptValueArray(organizationId, manuscriptId));
+            storage.deleteByPath(path);
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }

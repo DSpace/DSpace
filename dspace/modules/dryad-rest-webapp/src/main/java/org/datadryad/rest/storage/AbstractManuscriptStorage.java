@@ -2,6 +2,8 @@
  */
 package org.datadryad.rest.storage;
 
+import java.util.Arrays;
+import java.util.List;
 import org.datadryad.rest.models.Manuscript;
 
 /**
@@ -9,25 +11,18 @@ import org.datadryad.rest.models.Manuscript;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscript> {
-    private static final String ORGANIZATION_SEARCH_FIELD = "organizationCode";
-    private static final String MANUSCRIPT_SEARCH_FIELD = "manuscriptId";
+    private static final String ORGANIZATION_KEY = "organizationCode";
+    private static final String MANUSCRIPT_KEY = "manuscriptId";
+
     @Override
-    public final void checkFindParameters(String fields[], String values[]) throws StorageException {
-        // field and value should both be length 1
-        if(fields == null || fields.length == 0) {
-            throw new StorageException("Empty field");
-        } else if(values == null || values.length == 0) {
-            throw new StorageException("Empty values");
-        } else if(fields.length != 2 || values.length != 2) {
-            throw new StorageException("Path length should be 2");
-        } else if(!fields[0].equalsIgnoreCase(ORGANIZATION_SEARCH_FIELD)) {
-            throw new StorageException("Unsupported path" + fields[0]);
-        } else if(!fields[1].equalsIgnoreCase(MANUSCRIPT_SEARCH_FIELD)) {
-            throw new StorageException("Unsupported path" + fields[1]);
-        } else if(values[0] == null || values[0].length() == 0) {
-            throw new StorageException("Empty value");
-        } else if(values[1] == null || values[1].length() == 0) {
-            throw new StorageException("Empty value");
-        }
+    public final void checkCollectionPath(StoragePath path) throws StorageException {
+        final List<String> expectedKeyPath = Arrays.asList(ORGANIZATION_KEY);
+        checkPath(path, expectedKeyPath);
+
+    }
+
+    public final void checkObjectPath(StoragePath path) throws StorageException {
+        final List<String> expectedKeyPath = Arrays.asList(ORGANIZATION_KEY, MANUSCRIPT_KEY);
+        checkPath(path, expectedKeyPath);
     }
 }
