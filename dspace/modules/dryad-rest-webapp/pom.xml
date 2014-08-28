@@ -11,42 +11,28 @@
         <version>1.7.3-SNAPSHOT</version>
     </parent>
     <build>
-        <finalName>dryad-rest-webapp</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <!-- Run the application using "mvn embedded-glassfish:run" -->
-            <!-- May not work with Dspace dependencies -->            
-            <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>${glassfish.version}</version>
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>/Users/dan/Code/java/target/${project.build.finalName}.war</app>
-                    <autoDelete>true</autoDelete>
-                    <port>8080</port>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-servlet</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>javax.servlet-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archiveClasses>false</archiveClasses>
+              <webResources>
+                <resource>
+                  <filtering>true</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                  <includes>
+                    <include>WEB-INF/web.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>prepare-package</phase>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
     </build>
     <dependencies>
