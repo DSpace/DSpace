@@ -39,6 +39,7 @@
         <module>versioning</module>
         <module>atmire-solr-authority</module>
         <module>payment-system</module>
+        <module>dryad-rest-webapp</module>
         <!--module>solr-load-tester</module-->
 	</modules>
 
