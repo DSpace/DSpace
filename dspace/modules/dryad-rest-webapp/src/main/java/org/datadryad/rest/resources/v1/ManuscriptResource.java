@@ -40,11 +40,12 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts() {
+    public Response getManuscripts(@PathParam("organizationCode") String organizationCode) {
         try {
             // Returning a list requires POJO turned on
-            // TODO: get manuscripts from code
-            return Response.ok(storage.getAll(new StoragePath())).build();
+            StoragePath path = new StoragePath();
+            path.addPathElement("organizationCode", organizationCode);
+            return Response.ok(storage.getAll(path)).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
         }
