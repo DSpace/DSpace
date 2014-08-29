@@ -43,6 +43,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
         try {
             DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_ID, TEST_ORGANIZATION_ID);
             DatabaseManager.insert(context, row);
+            context.commit();
         } catch (SQLException ex) {
             fail("Exception setting up test organization: " + ex);
         }
@@ -52,6 +53,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     public void tearDown() {
         try {
             DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_ID, 1);
+            context.complete();
         } catch (SQLException ex) {
             fail("Exception clearing test organization: " + ex);
         }
