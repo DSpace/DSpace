@@ -34,16 +34,17 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static final ObjectReader reader = mapper.reader(Manuscript.class);
 
     // Database objects
-    private static final String MANUSCRIPT_TABLE = "manuscript";
+    static final String MANUSCRIPT_TABLE = "manuscript";
 
-    private static final String COLUMN_ID = "manuscript_id";
-    private static final String COLUMN_ORGANIZATION_ID = "organization_id";
-    private static final String COLUMN_MSID = "msid";
-    private static final String COLUMN_VERSION = "version";
-    private static final String COLUMN_ACTIVE = "active";
-    private static final String COLUMN_JSON_DATA = "json_data";
+    static final String COLUMN_ID = "manuscript_id";
+    static final String COLUMN_ORGANIZATION_ID = "organization_id";
+    static final String COLUMN_MSID = "msid";
+    static final String COLUMN_VERSION = "version";
+    // active is stored as String because DatabaseManager doesn't support Boolean
+    static final String COLUMN_ACTIVE = "active";
+    static final String COLUMN_JSON_DATA = "json_data";
 
-    private static final List<String> MANUSCRIPT_COLUMNS = Arrays.asList(
+    static final List<String> MANUSCRIPT_COLUMNS = Arrays.asList(
             COLUMN_ID,
             COLUMN_ORGANIZATION_ID,
             COLUMN_MSID,
@@ -52,10 +53,14 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             COLUMN_JSON_DATA);
 
     private static final Integer NOT_FOUND = -1;
-
+    private static final String ACTIVE_TRUE = String.valueOf(true);
+    private static final String ACTIVE_FALSE = String.valueOf(false);
+    
     public ManuscriptDatabaseStorageImpl(String configFileName) {
-        // Temp workaround
         setConfigFile(configFileName);
+    }
+    public ManuscriptDatabaseStorageImpl() {
+        
     }
 
     public final void setConfigFile(String configFileName) {
@@ -109,7 +114,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         context.abort();
     }
 
-    private static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
+    static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
         if(row != null) {
             String json_data = row.getStringColumn(COLUMN_JSON_DATA);
             Manuscript manuscript = reader.readValue(json_data);
@@ -133,7 +138,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private Integer getManuscriptInternalId(String msid, Integer organizationId) throws SQLException {
         String query = "SELECT * FROM manuscript where msid like ? and organization_id = ? and active = ?";
-        TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
+        TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
         if(row != null) {
             return row.getIntColumn("manuscript_id");
         } else {
@@ -142,7 +147,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
 
-    private static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
+    static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
         if(manuscript != null) {
             String json_data = writer.writeValueAsString(manuscript);
             TableRow row = new TableRow(MANUSCRIPT_TABLE, MANUSCRIPT_COLUMNS);
@@ -161,7 +166,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         Integer version = oldRow.getIntColumn(COLUMN_VERSION);
         version++;
         newRow.setColumn(COLUMN_VERSION, version);
-        newRow.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
+        newRow.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
     }
 
     private Manuscript getManuscriptById(String msid, String organizationCode) throws SQLException, IOException {
@@ -170,7 +175,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return null;
         } else {
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-            TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
+            TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
             Manuscript manuscript = manuscriptFromTableRow(row);
             return manuscript;
         }
@@ -183,7 +188,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             return manuscripts;
         } else {
             String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ?";
-            TableRowIterator rows = DatabaseManager.queryTable(getContext(), MANUSCRIPT_TABLE, query, organizationId, Boolean.TRUE);
+            TableRowIterator rows = DatabaseManager.queryTable(getContext(), MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 manuscripts.add(manuscriptFromTableRow(row));
@@ -197,7 +202,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         Integer organizationId = getOrganizationInternalId(organizationCode);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_VERSION, 1);
-        row.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
+        row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
         if(row != null) {
             DatabaseManager.insert(context, row);
             completeContext(context);
@@ -211,10 +216,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         // Fetch original row
         String msid = manuscript.manuscriptId;
         String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
+        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
 
         // deactivate the existing row
-        existingRow.setColumn(COLUMN_ACTIVE, Boolean.FALSE);
+        existingRow.setColumn(COLUMN_ACTIVE, ACTIVE_FALSE);
 
         TableRow newRow = tableRowFromManuscript(manuscript, organizationId);
         if(existingRow != null && newRow != null) {
@@ -233,7 +238,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         Integer manuscriptId = getManuscriptInternalId(manuscript.manuscriptId, organizationId);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_ID, manuscriptId);
-        row.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
+        row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
         DatabaseManager.delete(context, row);
         completeContext(context);
     }
