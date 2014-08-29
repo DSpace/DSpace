@@ -125,6 +125,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
         OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
         Organization organization = instance.readObject(path);
         assertNull("Object must not exist before creating", organization);
+        organization = new Organization();
         organization.organizationCode = TEST_ORGANIZATION_CODE_2;
         organization.organizationName = TEST_ORGANIZATION_NAME_2;
         path = new StoragePath();
