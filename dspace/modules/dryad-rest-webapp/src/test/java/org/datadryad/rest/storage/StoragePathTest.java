@@ -26,7 +26,7 @@ public class StoragePathTest {
         StoragePath instance = new StoragePath();
         assertEquals(0, instance.size());
         instance.addPathElement(key, value);
-        assertEquals(1, instance.size());
+        assertEquals("Path size should be 1", 1, instance.size());
     }
 
     /**
@@ -41,7 +41,7 @@ public class StoragePathTest {
         List expResult = Arrays.asList(key);
         instance.addPathElement(key, value);
         List result = instance.getKeyPath();
-        assertEquals(expResult, result);
+        assertEquals("key Path should be a list containing only the test key", expResult, result);
     }
 
     /**
@@ -55,7 +55,7 @@ public class StoragePathTest {
         String value = "value";
         List expResult = Arrays.asList(value);
         List result = instance.getValuePath();
-        assertEquals(expResult, result);
+        assertEquals("value path should be a list containing only the test value", expResult, result);
     }
 
     /**
@@ -71,7 +71,7 @@ public class StoragePathTest {
         instance.addPathElement(key, invalidValue);
         Boolean expResult = false;
         Boolean result = instance.validElements();
-        assertEquals(expResult, result);
+        assertEquals("Storage Path with zero-length value should not be valid", expResult, result);
     }
 
     /**
@@ -87,7 +87,7 @@ public class StoragePathTest {
         instance.addPathElement(key, validValue);
         Boolean expResult = true;
         Boolean result = instance.validElements();
-        assertEquals(expResult, result);
+        assertEquals("Storage path with nonzero-length value should be valid", expResult, result);
     }
 
 }
