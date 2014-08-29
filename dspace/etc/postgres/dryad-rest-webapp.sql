@@ -19,23 +19,12 @@ CREATE TABLE manuscript
   manuscript_id INTEGER PRIMARY KEY not null default nextval('manuscript_seq'),
   organization_id INTEGER not null REFERENCES organization(organization_id),
   msid VARCHAR(255) not null,
-  version INTEGER not null,
+  version INTEGER not null default 1,
   json_data text 
 );
 
 CREATE UNIQUE INDEX manuscript_msid_ver_idx on manuscript(msid, version);
 CREATE INDEX manuscript_msid_idx ON manuscript(msid);
-
--- Manuscript versions
-CREATE SEQUENCE manuscript_active_version_seq;
-CREATE TABLE manuscript_active_version
-(
-  manuscript_active_version_id INTEGER PRIMARY KEY not null default nextval('manuscript_active_version_seq'),
-  manuscript_id INTEGER not null REFERENCES manuscript(manuscript_id),
-  version INTEGER not null
-);
-
-CREATE UNIQUE INDEX manuscript_ver_ms_id_idx on manuscript_active_version(manuscript_id);
 
 -- OAuth2 Tokens
 CREATE SEQUENCE oauth_token_seq;
