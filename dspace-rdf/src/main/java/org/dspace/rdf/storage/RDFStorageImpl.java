@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.apache.jena.web.DatasetGraphAccessor;
+import org.apache.jena.web.DatasetGraphAccessorHTTP;
 import org.apache.log4j.Logger;
 import org.dspace.rdf.RDFConfiguration;
 import org.dspace.services.ConfigurationService;
@@ -155,10 +156,10 @@ implements RDFStorage
         {
             HttpAuthenticator httpAuthenticator = new SimpleAuthenticator(
                     GRAPHSTORE_LOGIN, GRAPHSTORE_PASSWORD.toCharArray());
-            accessor = new CustomDatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT,
+            accessor = new DatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT,
                     httpAuthenticator);
         } else {
-            accessor = new CustomDatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT);
+            accessor = new DatasetGraphAccessorHTTP(GRAPHSTORE_ENDPOINT);
         }
         return accessor;
     }
