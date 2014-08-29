@@ -15,6 +15,6 @@ import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
 @Provider
 public class ManuscriptStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
     public ManuscriptStorageResolver() {
-        super(AbstractManuscriptStorage.class, new ManuscriptDatabaseStorageImpl("/opt/dryad/config/dspace.cfg"));
+        super(AbstractManuscriptStorage.class, new ManuscriptDatabaseStorageImpl());
     }
 }

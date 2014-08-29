@@ -15,6 +15,6 @@ import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 @Provider
 public class OrganizationStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractOrganizationStorage> {
     public OrganizationStorageResolver() {
-        super(AbstractOrganizationStorage.class, new OrganizationDatabaseStorageImpl("/opt/dryad/config/dspace.cfg"));
+        super(AbstractOrganizationStorage.class, new OrganizationDatabaseStorageImpl());
     }
 }
