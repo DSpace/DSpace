@@ -11,6 +11,7 @@ import org.codehaus.jackson.map.ObjectWriter;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
 
 /**
  *
@@ -30,6 +31,15 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
         reader = mapper.reader(Organization.class);
     }
 
+    private String getBaseFileName(StoragePath path) {
+        if(path.size() >= 1) {
+            String organizationCode = path.get(0).value;
+            return organizationCode;
+        } else {
+            return null;
+        }
+    }
+
     private static String getBaseFileName(String organizationCode) {
         return organizationCode;
     }
@@ -47,7 +57,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    public Boolean objectExists(Organization organization) throws StorageException {
+    public Boolean objectExists(StoragePath path, Organization organization) throws StorageException {
         String baseFileName = getBaseFileName(organization);
         return fileExists(baseFileName);
     }
@@ -58,7 +68,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void addAll(List<Organization> organizations) throws StorageException {
+    protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
         File[] files = this.storageDirectory.listFiles();
         try {
             for(File file : files) {
@@ -70,7 +80,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void saveObject(Organization organization) throws StorageException {
+    protected void saveObject(StoragePath path, Organization organization) throws StorageException {
         String baseFileName = getBaseFileName(organization);
         File outptutFile = buildFile(this.storageDirectory, baseFileName);
         try {
@@ -81,9 +91,8 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected Organization readObject(String codePath[]) throws StorageException {
-        String organizationCode = codePath[0];
-        String baseFileName = getBaseFileName(organizationCode);
+    protected Organization readObject(StoragePath path) throws StorageException {
+        String baseFileName = getBaseFileName(path);
         if(fileExists(baseFileName)) {
             // read the file
             File f = buildFile(storageDirectory, baseFileName);
@@ -99,9 +108,8 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void deleteObject(String codePath[]) throws StorageException {
-        String organizationCode = codePath[0];
-        String baseFileName = getBaseFileName(organizationCode);
+    protected void deleteObject(StoragePath path) throws StorageException {
+        String baseFileName = getBaseFileName(path);
         if(fileExists(baseFileName)) {
             // read the file
             File f = buildFile(storageDirectory, baseFileName);

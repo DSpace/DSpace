@@ -5,13 +5,13 @@ package org.datadryad.rest.storage.json;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
 
 // TODO: Much of this code is shared by OrganizationJSONStorage
 
@@ -22,7 +22,6 @@ import org.datadryad.rest.storage.StorageException;
 public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     // stores XML/JSON on filesystem.
     private static final String FILE_EXTENSION = "json";
-    private static final String SEPARATOR = "___";
     private File storageDirectory;
     ObjectReader reader;
     ObjectWriter writer;
@@ -34,16 +33,34 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
         reader = mapper.reader(Manuscript.class);
     }
 
-    private static String getBaseFileName(String objectPath[]) {
-        return StringUtils.join(objectPath, SEPARATOR);
+    private File getSubdirectory(StoragePath path) {
+        if(path.size() >= 1) {
+            String organizationCodeDirectory = path.get(0).value;
+            File directory = new File(this.storageDirectory, organizationCodeDirectory);
+            return directory;
+        } else {
+            return this.storageDirectory;
+        }
+    }
+
+    private String getBaseFileName(StoragePath path) {
+        if(path.size() >= 2) {
+            String manuscriptId = path.get(1).value;
+            return manuscriptId;
+        } else {
+            return null;
+        }
+    }
+
+    private static String getBaseFileName(String manuscriptId) {
+        return manuscriptId;
     }
 
     private static String getBaseFileName(Manuscript manuscript) throws StorageException {
         if(!manuscript.isValid()) {
             throw new StorageException("Manuscript object is not valid");
         }
-        String objectPath[] = {manuscript.manuscriptId};
-        return getBaseFileName(objectPath);
+        return getBaseFileName(manuscript.manuscriptId);
     }
 
     private static File buildFile(File directory, String baseName) {
@@ -52,19 +69,21 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    public Boolean objectExists(Manuscript manuscript) throws StorageException {
+    public Boolean objectExists(StoragePath path, Manuscript manuscript) throws StorageException {
         String baseFileName = getBaseFileName(manuscript);
-        return fileExists(baseFileName);
+        File subdirectory = getSubdirectory(path);
+        return fileExists(subdirectory, baseFileName);
     }
 
-    private Boolean fileExists(String baseFileName) {
-        File file = buildFile(this.storageDirectory, baseFileName);
+    private Boolean fileExists(File subdirectory, String baseFileName) {
+        File file = buildFile(subdirectory, baseFileName);
         return file.exists();
     }
 
     @Override
-    protected void addAll(List<Manuscript> manuscripts) throws StorageException {
-        File[] files = this.storageDirectory.listFiles();
+    protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
+        File subdirectory = getSubdirectory(path);
+        File[] files = subdirectory.listFiles();
         try {
             for(File file : files) {
                 manuscripts.add((Manuscript)reader.readValue(file));
@@ -75,9 +94,10 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected void saveObject(Manuscript manuscript) throws StorageException {
+    protected void saveObject(StoragePath path, Manuscript manuscript) throws StorageException {
+        File subdirectory = getSubdirectory(path);
         String baseFileName = getBaseFileName(manuscript);
-        File outputFile = buildFile(this.storageDirectory, baseFileName);
+        File outputFile = buildFile(subdirectory, baseFileName);
         try {
             writer.writeValue(outputFile, manuscript);
         } catch (IOException ex) {
@@ -86,11 +106,12 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected Manuscript readObject(String objectPath[]) throws StorageException {
-        String baseFileName = getBaseFileName(objectPath);
-        if(fileExists(baseFileName)) {
+    protected Manuscript readObject(StoragePath path) throws StorageException {
+        File subdirectory = getSubdirectory(path);
+        String baseFileName = getBaseFileName(path);
+        if(fileExists(subdirectory, baseFileName)) {
             // read the file
-            File f = buildFile(storageDirectory, baseFileName);
+            File f = buildFile(subdirectory, baseFileName);
             try {
                 Manuscript manuscript = reader.readValue(f);
                 return manuscript;
@@ -103,11 +124,11 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected void deleteObject(String objectPath[]) throws StorageException {
-        String baseFileName = getBaseFileName(objectPath);
-        if(fileExists(baseFileName)) {
-            // read the file
-            File f = buildFile(storageDirectory, baseFileName);
+    protected void deleteObject(StoragePath path) throws StorageException {
+        File subdirectory = getSubdirectory(path);
+        String baseFileName = getBaseFileName(path);
+        if(fileExists(subdirectory, baseFileName)) {
+            File f = buildFile(subdirectory, baseFileName);
             if(!f.delete()) {
                 throw new StorageException("Unable to delete file: " + baseFileName);
             }
