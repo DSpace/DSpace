@@ -22,8 +22,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage {
-    private static Logger log = Logger.getLogger(DatabaseOrganizationStorageImpl.class);
+public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage {
+    private static Logger log = Logger.getLogger(OrganizationDatabaseStorageImpl.class);
 
     // Database objects
     private static final String ORGANIZATION_TABLE = "organization";
@@ -36,7 +36,7 @@ public class DatabaseOrganizationStorageImpl extends AbstractOrganizationStorage
             COLUMN_CODE,
             COLUMN_NAME);
 
-    public DatabaseOrganizationStorageImpl(String configFileName) {
+    public OrganizationDatabaseStorageImpl(String configFileName) {
         // Temp workaround
         setConfigFile(configFileName);
     }
