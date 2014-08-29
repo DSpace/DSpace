@@ -53,8 +53,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             COLUMN_JSON_DATA);
 
     private static final Integer NOT_FOUND = -1;
-    private static final String ACTIVE_TRUE = String.valueOf(true);
-    private static final String ACTIVE_FALSE = String.valueOf(false);
+    static final String ACTIVE_TRUE = String.valueOf(true);
+    static final String ACTIVE_FALSE = String.valueOf(false);
     
     public ManuscriptDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
@@ -162,7 +162,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     // Replaces JSON data with new data and increments version
     private static void updateTableRow(final TableRow oldRow, TableRow newRow) {
-        newRow.setColumn(COLUMN_JSON_DATA, oldRow.getStringColumn(COLUMN_JSON_DATA));
         Integer version = oldRow.getIntColumn(COLUMN_VERSION);
         version++;
         newRow.setColumn(COLUMN_VERSION, version);
@@ -224,6 +223,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         TableRow newRow = tableRowFromManuscript(manuscript, organizationId);
         if(existingRow != null && newRow != null) {
             updateTableRow(existingRow, newRow);
+            DatabaseManager.update(context, existingRow); // Deactivates old version
             DatabaseManager.insert(context, newRow);
             completeContext(context);
         }
@@ -315,7 +315,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         String manuscriptId = getManuscriptId(path);
-        if(manuscriptId.equals(manuscript.manuscriptId)) {
+        if(!manuscriptId.equals(manuscript.manuscriptId)) {
             throw new StorageException("Unable to change manuscript ID in update - use delete and create instead");
         }
 
