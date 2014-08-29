@@ -20,6 +20,7 @@ CREATE TABLE manuscript
   organization_id INTEGER not null REFERENCES organization(organization_id),
   msid VARCHAR(255) not null,
   version INTEGER not null default 1,
+  active BOOLEAN not null default TRUE,
   json_data text 
 );
 
