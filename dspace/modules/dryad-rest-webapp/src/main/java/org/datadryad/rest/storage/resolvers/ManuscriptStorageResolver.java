@@ -15,7 +15,7 @@ import org.datadryad.rest.storage.AbstractManuscriptStorage;
  */
 @Provider
 public class ManuscriptStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
-    private static final String PATH = "/tmp/dryad_rest_manuscripts";
+    private static final String PATH = "/tmp/dryad_rest";
     public ManuscriptStorageResolver() {
         super(AbstractManuscriptStorage.class, new ManuscriptJSONStorageImpl(new File(PATH)));
         File directory = new File(PATH);
