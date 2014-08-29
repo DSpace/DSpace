@@ -40,6 +40,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
     private static final String COLUMN_ORGANIZATION_ID = "organization_id";
     private static final String COLUMN_MSID = "msid";
     private static final String COLUMN_VERSION = "version";
+    private static final String COLUMN_ACTIVE = "active";
     private static final String COLUMN_JSON_DATA = "json_data";
 
     private static final List<String> MANUSCRIPT_COLUMNS = Arrays.asList(
@@ -47,6 +48,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
             COLUMN_ORGANIZATION_ID,
             COLUMN_MSID,
             COLUMN_VERSION,
+            COLUMN_ACTIVE,
             COLUMN_JSON_DATA);
 
     private static final Integer NOT_FOUND = -1;
@@ -130,8 +132,8 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
     }
 
     private Integer getManuscriptInternalId(String msid, Integer organizationId) throws SQLException {
-        String query = "SELECT * FROM manuscript where msid like ? and organization_id = ?";
-        TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId);
+        String query = "SELECT * FROM manuscript where msid like ? and organization_id = ? and active = ?";
+        TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
         if(row != null) {
             return row.getIntColumn("manuscript_id");
         } else {
@@ -156,9 +158,10 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
     // Replaces JSON data with new data and increments version
     private static void updateTableRow(final TableRow oldRow, TableRow newRow) {
         newRow.setColumn(COLUMN_JSON_DATA, oldRow.getStringColumn(COLUMN_JSON_DATA));
-        Integer oldVersion = oldRow.getIntColumn(COLUMN_VERSION);
-        oldVersion++;
-        newRow.setColumn(COLUMN_VERSION, oldVersion);
+        Integer version = oldRow.getIntColumn(COLUMN_VERSION);
+        version++;
+        newRow.setColumn(COLUMN_VERSION, version);
+        newRow.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
     }
 
     private Manuscript getManuscriptById(String msid, String organizationCode) throws SQLException, IOException {
@@ -166,8 +169,8 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         if(organizationId == NOT_FOUND) {
             return null;
         } else {
-            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ?";
-            TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId);
+            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
+            TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
             Manuscript manuscript = manuscriptFromTableRow(row);
             return manuscript;
         }
@@ -179,8 +182,8 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         if(organizationId == NOT_FOUND) {
             return manuscripts;
         } else {
-            String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ?";
-            TableRowIterator rows = DatabaseManager.queryTable(getContext(), MANUSCRIPT_TABLE, query, organizationId);
+            String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ?";
+            TableRowIterator rows = DatabaseManager.queryTable(getContext(), MANUSCRIPT_TABLE, query, organizationId, Boolean.TRUE);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 manuscripts.add(manuscriptFromTableRow(row));
@@ -194,6 +197,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         Integer organizationId = getOrganizationInternalId(organizationCode);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_VERSION, 1);
+        row.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
         if(row != null) {
             DatabaseManager.insert(context, row);
             completeContext(context);
@@ -206,8 +210,12 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
 
         // Fetch original row
         String msid = manuscript.manuscriptId;
-        String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ?";
-        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId);
+        String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
+        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, Boolean.TRUE);
+
+        // deactivate the existing row
+        existingRow.setColumn(COLUMN_ACTIVE, Boolean.FALSE);
+
         TableRow newRow = tableRowFromManuscript(manuscript, organizationId);
         if(existingRow != null && newRow != null) {
             updateTableRow(existingRow, newRow);
@@ -225,6 +233,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         Integer manuscriptId = getManuscriptInternalId(manuscript.manuscriptId, organizationId);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_ID, manuscriptId);
+        row.setColumn(COLUMN_ACTIVE, Boolean.TRUE);
         DatabaseManager.delete(context, row);
         completeContext(context);
     }
@@ -301,6 +310,10 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
     protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         String manuscriptId = getManuscriptId(path);
+        if(manuscriptId.equals(manuscript.manuscriptId)) {
+            throw new StorageException("Unable to change manuscript ID in update - use delete and create instead");
+        }
+
         try {
             updateManuscript(manuscript, organizationCode);
         } catch (SQLException ex) {
