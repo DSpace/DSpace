@@ -32,16 +32,16 @@ import org.dspace.sort.OrderFormat;
 public class BrowseEngine
 {
     /** the logger for this class */
-    private static Logger log = Logger.getLogger(BrowseEngine.class);
+    private static final Logger log = Logger.getLogger(BrowseEngine.class);
 
     /** the browse scope which is the basis for our browse */
     private BrowserScope scope;
 
     /** the DSpace context */
-    private Context context;
+    private final Context context;
 
     /** The Data Access Object for the browse tables */
-    private BrowseDAO dao;
+    private final BrowseDAO dao;
 
     /** The Browse Index associated with the Browse Scope */
     private BrowseIndex browseIndex;
@@ -49,7 +49,7 @@ public class BrowseEngine
     /**
      * Create a new instance of the Browse engine, using the given DSpace
      * Context object.  This will automatically assign a Data Access Object
-     * for the Browse Engine, based on the dspace.cfg setting for db.name
+     * for the Browse Engine, based on the brand of the provided DBMS.
      *
      * @param context       the DSpace context
      * @throws BrowseException

@@ -7,6 +7,11 @@
  */
 package org.dspace.storage.rdbms;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp.*;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
@@ -15,13 +20,8 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
-import javax.sql.DataSource;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 public class DataSourceInit {
-    private static Logger log = Logger.getLogger(DataSourceInit.class);
+    private static final Logger log = Logger.getLogger(DataSourceInit.class);
 
     private static DataSource dataSource = null;
 
@@ -94,12 +94,6 @@ public class DataSourceInit {
             //
             String validationQuery = "SELECT 1";
 
-            // Oracle has a slightly different validation query
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                validationQuery = "SELECT 1 FROM DUAL";
-            }
-
             GenericKeyedObjectPoolFactory statementFactory = null;
             if (useStatementPool)
             {
@@ -139,6 +133,16 @@ public class DataSourceInit {
             poolingDataSource.setPool(connectionPool);
 
             dataSource = poolingDataSource;
+
+            // Set the proper validation query by DBMS brand.
+            Connection connection = dataSource.getConnection();
+            if ("oracle".equals(connection.getMetaData().getDatabaseProductName().toLowerCase()))
+            {
+                poolableConnectionFactory.setValidationQuery("SELECT 1 FROM DUAL");
+            }
+            connection.close();
+
+            // Ready to use
             return poolingDataSource;
         }
         catch (Exception e)

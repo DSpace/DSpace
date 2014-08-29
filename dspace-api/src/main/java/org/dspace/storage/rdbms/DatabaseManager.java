@@ -26,18 +26,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes SQL queries.
@@ -48,8 +47,8 @@ import org.dspace.core.Context;
  */
 public class DatabaseManager
 {
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(DatabaseManager.class);
+    /** logging category */
+    private static final Logger log = LoggerFactory.getLogger(DatabaseManager.class);
 
     /** True if initialization has been done */
     private static boolean initialized = false;
@@ -59,22 +58,11 @@ public class DatabaseManager
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
 
-    static
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            isOracle = true;
-            isPostgres = false;
-        }
-        else
-        {
-            isOracle = false;
-            isPostgres = true;
-        }
-    }
-
     /** DataSource (retrieved from jndi */
     private static DataSource dataSource = null;
+
+    /** Name of the DBMS, as returned by its driver. */
+    private static String dbms;
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
@@ -989,18 +977,12 @@ public class DatabaseManager
                     // If the messages are bogus, give them a low priority
                     if (isDrop || isNoResults)
                     {
-                        if (log.isDebugEnabled())
-                        {
-                            log.debug(msg, sqle);
-                        }
+                        log.debug(msg, sqle);
                     }
                     // Otherwise, we need to know!
                     else
                     {
-                        if (log.isEnabledFor(Level.WARN))
-                        {
-                            log.warn(msg, sqle);
-                        }
+                        log.warn(msg, sqle);
                     }
                 }
 
@@ -1487,6 +1469,33 @@ public class DatabaseManager
                 dataSource = DataSourceInit.getDatasource();
             }
 
+            // What brand of DBMS do we have?
+            Connection connection = dataSource.getConnection();
+            DatabaseMetaData meta = connection.getMetaData();
+            dbms = meta.getDatabaseProductName();
+            String dbms_lc = dbms.toLowerCase(Locale.ROOT);
+            if (dbms_lc.contains("postgresql"))
+            {
+                isPostgres = true;
+                log.info("DBMS is PostgreSQL");
+            }
+            else if (dbms_lc.contains("oracle"))
+            {
+                isOracle = true;
+                log.info("DBMS is Oracle Database");
+            }
+            else if (dbms_lc.contains("h2")) // Used in testing
+            {
+                isOracle = true;
+                log.info("DBMS is H2");
+            }
+            else
+            {
+                log.error("DBMS {} is unsupported", dbms);
+            }
+            log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
+            connection.close();
+
             initialized = true;
         }
         catch (SQLException se)
@@ -1503,7 +1512,17 @@ public class DatabaseManager
         }
     }
 
-	/**
+    /**
+     * What is the name of our DBMS?
+     *
+     * @return name returned by the DBMS driver.
+     */
+    public static String getDbName()
+    {
+        return dbms;
+    }
+
+    /**
 	 * Iterate over the given parameters and add them to the given prepared statement. 
 	 * Only a select number of datatypes are supported by the JDBC driver.
 	 *
