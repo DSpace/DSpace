@@ -110,13 +110,7 @@ public class RDFConfiguration {
 
     public static String[] getConverterPlugins()
     {
-        String pluginNames = (new DSpace()).getConfigurationService().getProperty(
-                CONVERTER_PLUGINS_KEY);
-        if (StringUtils.isEmpty(pluginNames))
-        {
-            return null;
-        }        
-        return pluginNames.split(",\\s*");
+        return RDFConfiguration.loadConfigurationArray(CONVERTER_PLUGINS_KEY);
     }
     
     public static String[] getDSOTypesToConvert()
@@ -236,6 +230,24 @@ public class RDFConfiguration {
         }
         return storage;
     }
+    
+    /**
+     * Load a comma separated value out of the configuration an split it into a 
+     * string array.
+     * @param key Key of the configuration value.
+     * @return Null if the configuration value was not found or empty. A String
+     *         array representing the configuration value splitted on commas.  
+     */
+    public static String[] loadConfigurationArray(String key)
+    {
+        String value = (new DSpace()).getConfigurationService().getProperty(key);
+        if (StringUtils.isEmpty(value))
+        {
+            return null;
+        }        
+        return value.split(",\\s*");
+    }
+
     
     /*
      * This method must by static, so we can use it from 
