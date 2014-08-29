@@ -10,7 +10,8 @@ import java.util.List;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class AbstractStorage<T> implements StorageInterface<T> {
-    protected abstract void saveObject(StoragePath path, T object) throws StorageException;
+    protected abstract void createObject(StoragePath path, T object) throws StorageException;
+    protected abstract void updateObject(StoragePath path, T object) throws StorageException;
     protected abstract T readObject(StoragePath path) throws StorageException;
     protected abstract void deleteObject(StoragePath path) throws StorageException;
     protected abstract void addAll(StoragePath path, List<T> objects) throws StorageException;
@@ -32,7 +33,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
         if(objectExists(path, object)) {
             throw new StorageException("Unable to create, object already exists");
         } else {
-            saveObject(path, object);
+            createObject(path, object);
         }
     }
 
@@ -51,7 +52,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
         if(!objectExists(path, object)){
             throw new StorageException("Unable to update, object does not exist");
         } else {
-            saveObject(path, object);
+            updateObject(path, object);
         }
     }
 

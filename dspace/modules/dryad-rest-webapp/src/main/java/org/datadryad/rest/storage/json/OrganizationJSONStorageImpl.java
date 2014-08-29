@@ -101,7 +101,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void saveObject(StoragePath path, Organization organization) throws StorageException {
+    protected void createObject(StoragePath path, Organization organization) throws StorageException {
         String baseFileName = getBaseFileName(organization);
         File outputFile = buildFile(this.storageDirectory, baseFileName);
         File subdirectory = getSubdirectory(baseFileName);
@@ -150,5 +150,11 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
                 throw new StorageException("Unable to delete directory: " + baseFileName);
             }
         }
+    }
+
+    @Override
+    protected void updateObject(StoragePath path, Organization object) throws StorageException {
+        // On filesystem, create and update are the same
+        createObject(path, object);
     }
 }

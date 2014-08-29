@@ -101,7 +101,7 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected void saveObject(StoragePath path, Manuscript manuscript) throws StorageException {
+    protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         File subdirectory = getSubdirectory(path);
         String baseFileName = getBaseFileName(manuscript);
         File outputFile = buildFile(subdirectory, baseFileName);
@@ -140,5 +140,10 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
                 throw new StorageException("Unable to delete file: " + baseFileName);
             }
         }
+    }
+
+    @Override
+    protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
+        createObject(path, manuscript);
     }
 }

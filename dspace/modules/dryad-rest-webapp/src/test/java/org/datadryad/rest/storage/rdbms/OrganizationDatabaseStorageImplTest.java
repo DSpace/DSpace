@@ -115,19 +115,37 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     }
 
     /**
-     * Test of saveObject method, of class OrganizationDatabaseStorageImpl.
+     * Test of createObject method, of class OrganizationDatabaseStorageImpl.
      */
     @Test
-    public void testSaveObject() throws Exception {
-        log.info("saveObject");
+    public void testCreateObject() throws Exception {
+        log.info("createObject");
         StoragePath path = new StoragePath();
-        Organization organization = new Organization();
+        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_2);
+        OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
+        Organization organization = instance.readObject(path);
+        assertNull("Object must not exist before creating", organization);
         organization.organizationCode = TEST_ORGANIZATION_CODE_2;
         organization.organizationName = TEST_ORGANIZATION_NAME_2;
-        OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
-        instance.saveObject(path, organization);
+        path = new StoragePath();
+        instance.createObject(path, organization);
         Boolean exists = instance.objectExists(path, organization);
         assertTrue("Newly saved object should exist", exists);
+    }
+
+    @Test
+    public void testUpdateObject() throws Exception {
+        log.info("updateObject");
+        OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
+        StoragePath path = new StoragePath();
+        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_1);
+        Organization organization = instance.readObject(path);
+        assertNotNull("Object must exist before updating", organization);
+        organization.organizationName = TEST_ORGANIZATION_NAME_2;
+        instance.updateObject(path, organization);
+        organization = instance.readObject(path);
+        assertEquals("Updated object should have updated name", TEST_ORGANIZATION_NAME_2, organization.organizationName);
+        assertEquals("Updated object should have original code", TEST_ORGANIZATION_CODE_1, organization.organizationCode);
     }
 
     /**

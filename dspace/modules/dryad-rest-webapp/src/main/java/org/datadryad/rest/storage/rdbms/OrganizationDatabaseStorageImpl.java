@@ -127,6 +127,17 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
+    private void updateOrganization(Organization organization) throws SQLException {
+        Context context = getContext();
+        Organization originalOrganization = getOrganizationByCode(organization.organizationCode);
+        TableRow row = tableRowFromOrganization(organization);
+        row.setColumn(COLUMN_ID, originalOrganization.organizationId);
+        if(row != null) {
+            DatabaseManager.update(context, row);
+            completeContext(context);
+        }
+    }
+
     private void deleteOrganization(Organization organization) throws SQLException {
         Context context = getContext();
         if(organization.organizationId == null) {
@@ -161,7 +172,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     // TODO: discern between insert and update. API nominally suports update
     // but this will not.
     @Override
-    protected void saveObject(StoragePath path, Organization organization) throws StorageException {
+    protected void createObject(StoragePath path, Organization organization) throws StorageException {
         try {
             insertOrganization(organization);
         } catch (SQLException ex) {
@@ -192,6 +203,15 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             deleteOrganization(organization);
         } catch (SQLException ex) {
             throw new StorageException("Exception deleting organization", ex);
+        }
+    }
+
+    @Override
+    protected void updateObject(StoragePath path, Organization organization) throws StorageException {
+        try {
+            updateOrganization(organization);
+        } catch (SQLException ex) {
+            throw new StorageException("Exception saving organization", ex);
         }
     }
 

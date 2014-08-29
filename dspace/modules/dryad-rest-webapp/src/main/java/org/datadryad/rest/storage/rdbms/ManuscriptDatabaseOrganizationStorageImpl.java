@@ -153,6 +153,14 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         }
     }
 
+    // Replaces JSON data with new data and increments version
+    private static void updateTableRow(final TableRow oldRow, TableRow newRow) {
+        newRow.setColumn(COLUMN_JSON_DATA, oldRow.getStringColumn(COLUMN_JSON_DATA));
+        Integer oldVersion = oldRow.getIntColumn(COLUMN_VERSION);
+        oldVersion++;
+        newRow.setColumn(COLUMN_VERSION, oldVersion);
+    }
+
     private Manuscript getManuscriptById(String msid, String organizationCode) throws SQLException, IOException {
         Integer organizationId = getOrganizationInternalId(organizationCode);
         if(organizationId == NOT_FOUND) {
@@ -188,6 +196,22 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         row.setColumn(COLUMN_VERSION, 1);
         if(row != null) {
             DatabaseManager.insert(context, row);
+            completeContext(context);
+        }
+    }
+
+    private void updateManuscript(Manuscript manuscript, String organizationCode) throws SQLException, IOException {
+        Context context = getContext();
+        Integer organizationId = getOrganizationInternalId(organizationCode);
+
+        // Fetch original row
+        String msid = manuscript.manuscriptId;
+        String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ?";
+        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId);
+        TableRow newRow = tableRowFromManuscript(manuscript, organizationId);
+        if(existingRow != null && newRow != null) {
+            updateTableRow(existingRow, newRow);
+            DatabaseManager.insert(context, newRow);
             completeContext(context);
         }
     }
@@ -232,7 +256,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
     }
 
     @Override
-    protected void saveObject(StoragePath path, Manuscript manuscript) throws StorageException {
+    protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         try {
             insertManuscript(manuscript, organizationCode);
@@ -270,6 +294,19 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
             throw new StorageException("Exception deleting manuscript", ex);
         } catch (IOException ex) {
             throw new StorageException("Exception reading manuscript for deletion", ex);
+        }
+    }
+
+    @Override
+    protected void updateObject(StoragePath path, Manuscript manuscript) throws StorageException {
+        String organizationCode = getOrganizationCode(path);
+        String manuscriptId = getManuscriptId(path);
+        try {
+            updateManuscript(manuscript, organizationCode);
+        } catch (SQLException ex) {
+            throw new StorageException("Exception saving manuscript", ex);
+        } catch (IOException ex) {
+            throw new StorageException("Exception writing manuscript", ex);
         }
     }
 }
