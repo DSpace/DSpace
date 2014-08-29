@@ -26,18 +26,22 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     private static Logger log = Logger.getLogger(OrganizationDatabaseStorageImpl.class);
 
     // Database objects
-    private static final String ORGANIZATION_TABLE = "organization";
+    static final String ORGANIZATION_TABLE = "organization";
 
-    private static final String COLUMN_ID = "organization_id";
-    private static final String COLUMN_CODE = "code";
-    private static final String COLUMN_NAME = "name";
-    private static final List<String> ORGANIZATION_COLUMNS = Arrays.asList(
+    static final String COLUMN_ID = "organization_id";
+    static final String COLUMN_CODE = "code";
+    static final String COLUMN_NAME = "name";
+    static final List<String> ORGANIZATION_COLUMNS = Arrays.asList(
             COLUMN_ID,
             COLUMN_CODE,
             COLUMN_NAME);
 
     public OrganizationDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
+    }
+
+    public OrganizationDatabaseStorageImpl() {
+        // For use when ConfigurationManager is already configured
     }
 
     public final void setConfigFile(String configFileName) {
@@ -74,7 +78,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         context.abort();
     }
 
-    private static Organization organizationFromTableRow(TableRow row) {
+    static Organization organizationFromTableRow(TableRow row) {
         if(row != null) {
             Organization organization = new Organization();
             organization.organizationId = row.getIntColumn(COLUMN_ID);
@@ -86,7 +90,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    private static TableRow tableRowFromOrganization(Organization organization) {
+    static TableRow tableRowFromOrganization(Organization organization) {
         if(organization != null) {
             TableRow row = new TableRow(ORGANIZATION_TABLE, ORGANIZATION_COLUMNS);
             row.setColumn(COLUMN_CODE, organization.organizationCode);
