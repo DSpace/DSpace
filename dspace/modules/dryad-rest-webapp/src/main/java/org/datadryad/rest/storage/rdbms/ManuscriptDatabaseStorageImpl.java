@@ -26,8 +26,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscriptStorage {
-    private static Logger log = Logger.getLogger(ManuscriptDatabaseOrganizationStorageImpl.class);
+public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
+    private static Logger log = Logger.getLogger(ManuscriptDatabaseStorageImpl.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final ObjectWriter writer = mapper.writerWithType(Manuscript.class).withDefaultPrettyPrinter();
@@ -53,7 +53,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
 
     private static final Integer NOT_FOUND = -1;
 
-    public ManuscriptDatabaseOrganizationStorageImpl(String configFileName) {
+    public ManuscriptDatabaseStorageImpl(String configFileName) {
         // Temp workaround
         setConfigFile(configFileName);
     }

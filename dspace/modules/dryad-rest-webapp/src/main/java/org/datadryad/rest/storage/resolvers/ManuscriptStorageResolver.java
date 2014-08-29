@@ -6,7 +6,7 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
-import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseOrganizationStorageImpl;
+import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
 
 /**
  *
@@ -15,6 +15,6 @@ import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseOrganizationStorageImp
 @Provider
 public class ManuscriptStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
     public ManuscriptStorageResolver() {
-        super(AbstractManuscriptStorage.class, new ManuscriptDatabaseOrganizationStorageImpl("/opt/dryad/config/dspace.cfg"));
+        super(AbstractManuscriptStorage.class, new ManuscriptDatabaseStorageImpl("/opt/dryad/config/dspace.cfg"));
     }
 }
