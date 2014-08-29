@@ -31,6 +31,20 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
         reader = mapper.reader(Organization.class);
     }
 
+    private File getSubdirectory(StoragePath path) {
+        if(path.size() >= 1) {
+            String organizationCode = path.get(0).value;
+            return getSubdirectory(organizationCode);
+        } else {
+            return this.storageDirectory;
+        }
+    }
+
+    private File getSubdirectory(String organizationCode) {
+        File directory = new File(this.storageDirectory, organizationCode);
+        return directory;
+    }
+
     private String getBaseFileName(StoragePath path) {
         if(path.size() >= 1) {
             String organizationCode = path.get(0).value;
@@ -82,9 +96,11 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     @Override
     protected void saveObject(StoragePath path, Organization organization) throws StorageException {
         String baseFileName = getBaseFileName(organization);
-        File outptutFile = buildFile(this.storageDirectory, baseFileName);
+        File outputFile = buildFile(this.storageDirectory, baseFileName);
+        File subdirectory = getSubdirectory(baseFileName);
         try {
-            writer.writeValue(outptutFile, organization);
+            writer.writeValue(outputFile, organization);
+            subdirectory.mkdirs();
         } catch (IOException ex) {
             throw new StorageException("IO Exception writing " + baseFileName, ex);
         }
@@ -113,8 +129,18 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
         if(fileExists(baseFileName)) {
             // read the file
             File f = buildFile(storageDirectory, baseFileName);
+            File subdirectory = getSubdirectory(baseFileName);
             if(!f.delete()) {
                 throw new StorageException("Unable to delete file: " + baseFileName);
+            }
+            File files[] = subdirectory.listFiles();
+            for(File eachFile : files) {
+                if(!eachFile.delete()) {
+                    throw new StorageException("Unable to delete file: " + eachFile.getName());
+                }
+            }
+            if(!subdirectory.delete()) {
+                throw new StorageException("Unable to delete directory: " + baseFileName);
             }
         }
     }
