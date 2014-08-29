@@ -54,6 +54,7 @@ public class StoragePathTest {
         String key = "key";
         String value = "value";
         List expResult = Arrays.asList(value);
+        instance.addPathElement(key, value);
         List result = instance.getValuePath();
         assertEquals("value path should be a list containing only the test value", expResult, result);
     }
