@@ -9,13 +9,9 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.test.ContextUnitTest;
-import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -25,7 +21,6 @@ import static org.junit.Assert.*;
  */
 public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     private static Logger log = Logger.getLogger(OrganizationDatabaseStorageImplTest.class);
-    private static final Integer TEST_ORGANIZATION_ID = 1;
     private static final String TEST_ORGANIZATION_CODE_1 = "test1";
     private static final String TEST_ORGANIZATION_NAME_1 = "Test Organization 1";
     private static final String TEST_ORGANIZATION_CODE_2 = "test2";
@@ -39,9 +34,9 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
         organization.organizationCode = TEST_ORGANIZATION_CODE_1;
         organization.organizationName = TEST_ORGANIZATION_NAME_1;
         TableRow row = OrganizationDatabaseStorageImpl.tableRowFromOrganization(organization);
-        row.setColumn(OrganizationDatabaseStorageImpl.COLUMN_ID, TEST_ORGANIZATION_ID);
         try {
-            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_ID, TEST_ORGANIZATION_ID);
+            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE_1);
+            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE_2);
             DatabaseManager.insert(context, row);
             context.commit();
         } catch (SQLException ex) {
@@ -52,8 +47,8 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     @Override
     public void tearDown() {
         try {
-            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_ID, 1);
-            context.complete();
+            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE_1);
+            DatabaseManager.deleteByValue(context, OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE_2);
         } catch (SQLException ex) {
             fail("Exception clearing test organization: " + ex);
         }
