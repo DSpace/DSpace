@@ -2,12 +2,12 @@
  */
 package org.datadryad.rest.storage.resolvers;
 
-import org.datadryad.rest.storage.json.ManuscriptJSONStorageImpl;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import java.io.File;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
+import org.datadryad.rest.storage.AbstractOrganizationStorage;
+import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseOrganizationStorageImpl;
 
 /**
  *
@@ -15,12 +15,7 @@ import org.datadryad.rest.storage.AbstractManuscriptStorage;
  */
 @Provider
 public class ManuscriptStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
-    private static final String PATH = "/tmp/dryad_rest";
     public ManuscriptStorageResolver() {
-        super(AbstractManuscriptStorage.class, new ManuscriptJSONStorageImpl(new File(PATH)));
-        File directory = new File(PATH);
-        if(!directory.exists()) {
-            directory.mkdir();
-        }
+        super(AbstractOrganizationStorage.class, new ManuscriptDatabaseOrganizationStorageImpl("/opt/dryad/config/dspace.cfg"));
     }
 }
