@@ -3,6 +3,7 @@
 package org.datadryad.rest.storage.json;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -83,7 +84,13 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
 
     @Override
     protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
-        File[] files = this.storageDirectory.listFiles();
+        File[] files = this.storageDirectory.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File file, String string) {
+                return string.endsWith(FILE_EXTENSION);
+            }
+        });
         try {
             for(File file : files) {
                 organizations.add((Organization)reader.readValue(file));
