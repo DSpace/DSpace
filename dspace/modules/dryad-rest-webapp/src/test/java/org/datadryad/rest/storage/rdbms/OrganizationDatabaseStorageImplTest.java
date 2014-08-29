@@ -56,6 +56,34 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     }
 
     /**
+     * Test of organizationFromTableRow method, of class OrganizationDatabaseStorageImpl.
+     */
+    @Test
+    public void testOrganizationFromTableRow() {
+        log.info("organizationFromTableRow");
+        TableRow row = new TableRow(OrganizationDatabaseStorageImpl.ORGANIZATION_TABLE, OrganizationDatabaseStorageImpl.ORGANIZATION_COLUMNS);
+        row.setColumn(OrganizationDatabaseStorageImpl.COLUMN_CODE, TEST_ORGANIZATION_CODE_1);
+        row.setColumn(OrganizationDatabaseStorageImpl.COLUMN_NAME, TEST_ORGANIZATION_NAME_1);
+        Organization organization = OrganizationDatabaseStorageImpl.organizationFromTableRow(row);
+        assertEquals("Organization code should match", organization.organizationCode, TEST_ORGANIZATION_CODE_1);
+        assertEquals("Organization name should match", organization.organizationName, TEST_ORGANIZATION_NAME_1);
+    }
+
+    /**
+     * Test of tableRowFromOrganization method, of class OrganizationDatabaseStorageImpl.
+     */
+    @Test
+    public void testTableRowFromOrganization() {
+        log.info("tableRowFromOrganization");
+        Organization organization = new Organization();
+        organization.organizationCode = TEST_ORGANIZATION_CODE_2;
+        organization.organizationName = TEST_ORGANIZATION_NAME_2;
+        TableRow row = OrganizationDatabaseStorageImpl.tableRowFromOrganization(organization);
+        assertEquals("Organization code should match", row.getStringColumn(OrganizationDatabaseStorageImpl.COLUMN_CODE), TEST_ORGANIZATION_CODE_2);
+        assertEquals("Organization name should match", row.getStringColumn(OrganizationDatabaseStorageImpl.COLUMN_NAME), TEST_ORGANIZATION_NAME_2);
+    }
+
+    /**
      * Test of objectExists method, of class OrganizationDatabaseStorageImpl.
      */
     @Test
