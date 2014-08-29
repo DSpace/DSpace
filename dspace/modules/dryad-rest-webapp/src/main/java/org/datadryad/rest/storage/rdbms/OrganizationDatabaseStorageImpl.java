@@ -37,11 +37,10 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             COLUMN_NAME);
 
     public OrganizationDatabaseStorageImpl(String configFileName) {
-        // Temp workaround
         setConfigFile(configFileName);
     }
 
-    public void setConfigFile(String configFileName) {
+    public final void setConfigFile(String configFileName) {
 	File configFile = new File(configFileName);
 
 	if (configFile != null) {
