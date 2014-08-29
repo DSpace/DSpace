@@ -185,6 +185,7 @@ public class ManuscriptDatabaseOrganizationStorageImpl extends AbstractManuscrip
         Context context = getContext();
         Integer organizationId = getOrganizationInternalId(organizationCode);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
+        row.setColumn(COLUMN_VERSION, 1);
         if(row != null) {
             DatabaseManager.insert(context, row);
             completeContext(context);
