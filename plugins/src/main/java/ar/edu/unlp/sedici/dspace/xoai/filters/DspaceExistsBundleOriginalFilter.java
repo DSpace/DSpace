@@ -60,11 +60,11 @@ public class DspaceExistsBundleOriginalFilter extends DSpaceFilter{
                     "EXISTS (SELECT distinct r.bundle_id FROM" + 
                     		"(SELECT a.bundle_id FROM" + 
                     			"(SELECT * FROM item it inner join item2bundle i2b on (it.item_id = i2b.item_id)" + 
-                    			"where in_archive and item_id = i.item_id)" +                    		
-							"as a inner join bundle b on a.bundle_id = b.bundle_id" +
-							"where name = ?)" + 
-					"as r inner join bundle2bitstream as b2b on r.bundle_id = b2b.bundle_id" +
-					"order by r.bundle_id)", bundleFilterName);
+                    			"where in_archive and it.item_id = i.item_id)" +                    		
+							"as a inner join bundle b on a.bundle_id = b.bundle_id " +
+							" WHERE name = ?)" + 
+					"as r inner join bundle2bitstream as b2b on r.bundle_id = b2b.bundle_id " +
+					" ORDER BY r.bundle_id)", bundleFilterName);
         }
 		catch (Exception e)
 		{
