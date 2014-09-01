@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.util;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.SolrLogger;
@@ -251,6 +252,12 @@ public class SpiderDetector {
                                 } 
                                 table.add(ip);
                             }
+
+                            for (String pattern : readAgentCommentPatterns(file)) {
+                                log.debug("Loading {}"+ pattern);
+                                agents.add(Pattern.compile(pattern));
+                            }
+
                             log.info("Loaded Spider IP file: " + file);
                         }
                     }
@@ -336,8 +343,39 @@ public class SpiderDetector {
                     patterns.add(line);
                 }
             } else {
+                // ... add this functionality later
+            }
+        }
+        in.close();
+        return patterns;
+    }
+
+    /**
+     * Utility method which reads lines from a file & returns them in a Set.
+     *
+     * @param patternFile the location of our spider file
+     * @return a vector full of patterns
+     * @throws IOException could not happen since we check the file be4 we use it
+     */
+    public static Set<String> readAgentCommentPatterns(File patternFile)
+            throws IOException
+    {
+        Set<String> patterns = new HashSet<String>();
+
+        if (!patternFile.exists() || !patternFile.isFile())
+        {
+            return patterns;
+        }
+
+        //Read our file & get all them patterns.
+        BufferedReader in = new BufferedReader(new FileReader(patternFile));
+        String line;
+        while ((line = in.readLine()) != null) {
+            if (line.startsWith("# UA") || line.startsWith("#UA") ) {
                 try{
-                    //                patterns.add(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    String pattern = StringEscapeUtils.escapeJava(line.replaceFirst("#","").replaceFirst("UA","").replaceAll("\"","").trim().replaceAll(" ","\\ "));
+                    pattern = Pattern.quote(pattern);
+                    patterns.add(pattern);
                 }catch (Exception e)
                 {
                     log.error("error loading user agents" + line);

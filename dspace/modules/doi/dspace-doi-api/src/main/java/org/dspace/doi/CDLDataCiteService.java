@@ -519,6 +519,9 @@ public class CDLDataCiteService {
 	    log.error("unable to create metadata list for " + item.getHandle(), e);
         } catch (IOException e) {
 	    log.error("unable to create metadata list for " + item.getHandle(), e);
+        } catch (NullPointerException e) {
+            // When crosswalk cannot be found, NPE is triggered
+	    log.error("unable to create metadata list for " + item.getHandle(), e);
         }
         return metadata;
     }

@@ -389,4 +389,11 @@
             <class>com.atmire.authority.IndexClient</class>
         </step>
     </command>
+    <command>
+        <name>journal-stats</name>
+        <description>Generate statistics by journal</description>
+        <step>
+            <class>org.datadryad.journalstatistics.main.RunStatistics</class>
+        </step>
+    </command>
 </commands>

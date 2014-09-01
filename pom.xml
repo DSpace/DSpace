@@ -151,7 +151,7 @@
       </profile>
 
       <!-- skip tests by default, but allow override
-      on command line by setting property "-Dmaven.test.skip"-->
+      on command line by setting property "-DskipTests"-->
       <!-- Disabled by default, change activeByDefault to true to enable -->
       <profile>
         <id>skiptests</id>
@@ -159,7 +159,7 @@
             <activeByDefault>true</activeByDefault>
          </activation>
         <properties>
-         <maven.test.skip>true</maven.test.skip>
+         <skipTests>true</skipTests>
         </properties>
       </profile>
    </profiles>
