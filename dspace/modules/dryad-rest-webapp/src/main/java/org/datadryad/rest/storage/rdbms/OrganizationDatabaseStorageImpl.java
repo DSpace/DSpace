@@ -169,8 +169,6 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    // TODO: discern between insert and update. API nominally suports update
-    // but this will not.
     @Override
     protected void createObject(StoragePath path, Organization organization) throws StorageException {
         try {

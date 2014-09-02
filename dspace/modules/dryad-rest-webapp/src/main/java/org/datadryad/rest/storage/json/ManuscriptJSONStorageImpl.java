@@ -14,8 +14,6 @@ import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 
-// TODO: Much of this code is shared by OrganizationJSONStorage
-
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>

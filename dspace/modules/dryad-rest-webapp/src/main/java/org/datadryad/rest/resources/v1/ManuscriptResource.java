@@ -23,9 +23,6 @@ import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 
-// TODO: shares a lot of code with OrganizationResource
-// TODO: include nested organizationCode
-
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
