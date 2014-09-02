@@ -80,7 +80,6 @@ public class ManuscriptResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
-            // TODO: include the org code
             URI uri = ub.path(manuscript.manuscriptId).build();
             return Response.created(uri).build();
         } else {
