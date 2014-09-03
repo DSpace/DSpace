@@ -57,9 +57,6 @@ public class Collection extends DSpaceObject
     /** log4j category */
     private static Logger log = Logger.getLogger(Collection.class);
 
-    /** Our context */
-    private Context ourContext;
-
     /** The table row corresponding to this item */
     private TableRow collectionRow;
 
@@ -74,9 +71,6 @@ public class Collection extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Groups corresponding to workflow steps - NOTE these start from one, so
@@ -108,7 +102,7 @@ public class Collection extends DSpaceObject
      */
     Collection(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
         collectionRow = row;
 
         // Get the logo bitstream
@@ -150,7 +144,6 @@ public class Collection extends DSpaceObject
         context.cache(this, row.getIntColumn("collection_id"));
 
         modified = false;
-        modifiedMetadata = false;
         clearDetails();
     }
 
@@ -298,10 +291,26 @@ public class Collection extends DSpaceObject
      * @return the collections in the system
      * @throws SQLException
      */
-    public static Collection[] findAll(Context context) throws SQLException
-    {
-        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
-                "SELECT * FROM collection ORDER BY name");
+    public static Collection[] findAll(Context context) throws SQLException {
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM collection c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
+            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COLLECTION,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Collections - ",e);
+            throw e;
+        }
 
         List<Collection> collections = new ArrayList<Collection>();
 
@@ -350,9 +359,28 @@ public class Collection extends DSpaceObject
      */
     public static Collection[] findAll(Context context, Integer limit, Integer offset) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
-                "SELECT * FROM collection ORDER BY name limit ? offset ?", limit, offset);
+        TableRowIterator tri = null;
+        try{
+            String query = "SELECT c.* FROM collection c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
 
+            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+            query += " limit ? offset ?";
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COLLECTION,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
+                    limit,
+                    offset
+            );
+        } catch (SQLException e) {
+            log.error("Find all Collections offset/limit - ",e);
+            throw e;
+        }
         List<Collection> collections = new ArrayList<Collection>();
 
         try
@@ -485,10 +513,12 @@ public class Collection extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
+    @Deprecated
     public String getMetadata(String field)
     {
-    	String metadata = collectionRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+        String[] MDValue = getMDValueByLegacyField(field);
+        String value = getMetadataFirstValue(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -503,10 +533,9 @@ public class Collection extends DSpaceObject
      *                if the requested metadata field doesn't exist
      * @exception MissingResourceException
      */
-    public void setMetadata(String field, String value) throws MissingResourceException
-    {
-        if ((field.trim()).equals("name")
-                && (value == null || value.trim().equals("")))
+    @Deprecated
+    public void setMetadata(String field, String value) throws MissingResourceException {
+        if ((field.trim()).equals("name") && (value == null || value.trim().equals("")))
         {
             try
             {
@@ -518,6 +547,8 @@ public class Collection extends DSpaceObject
             }
         }
 
+        String[] MDValue = getMDValueByLegacyField(field);
+
         /*
          * Set metadata field to null if null
          * and trim strings to eliminate excess
@@ -525,20 +556,21 @@ public class Collection extends DSpaceObject
          */
 		if(value == null)
         {
-            collectionRow.setColumnNull(field);
+            clearMetadata(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            modifiedMetadata = true;
         }
         else
         {
-            collectionRow.setColumn(field, value.trim());
+            setMetadataSingleValue(MDValue[0], MDValue[1], MDValue[2], null, value);
         }
 
-        modifiedMetadata = true;
         addDetails(field);
     }
 
     public String getName()
     {
-        return getMetadata("name");
+        String value = getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -892,8 +924,7 @@ public class Collection extends DSpaceObject
      * @param license
      *            the license, or <code>null</code>
      */
-    public void setLicense(String license)
-    {
+    public void setLicense(String license) {
         setMetadata("license",license);
     }
 
@@ -1065,8 +1096,7 @@ public class Collection extends DSpaceObject
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.COLLECTION, getID(), getDetails()));
-            modifiedMetadata = false;
+            updateMetadata();
             clearDetails();
         }
     }
@@ -1296,6 +1326,8 @@ public class Collection extends DSpaceObject
         {
             g.delete();
         }
+
+        removeMetadataFromDatabase();
     }
 
     /**

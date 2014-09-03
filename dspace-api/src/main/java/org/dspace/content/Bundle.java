@@ -42,9 +42,6 @@ public class Bundle extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bundle.class);
 
-    /** Our context */
-    private Context ourContext;
-
     /** The table row corresponding to this bundle */
     private TableRow bundleRow;
 
@@ -53,9 +50,6 @@ public class Bundle extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Construct a bundle object with the given table row
@@ -67,7 +61,7 @@ public class Bundle extends DSpaceObject
      */
     Bundle(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
         String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
@@ -134,7 +128,6 @@ public class Bundle extends DSpaceObject
         context.cache(this, row.getIntColumn("bundle_id"));
 
         modified = false;
-        modifiedMetadata = false;
     }
 
     /**
@@ -223,7 +216,7 @@ public class Bundle extends DSpaceObject
      */
     public String getName()
     {
-        return bundleRow.getStringColumn("name");
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
     }
 
     /**
@@ -235,8 +228,7 @@ public class Bundle extends DSpaceObject
      */
     public void setName(String name)
     {
-        bundleRow.setColumn("name", name);
-        modifiedMetadata = true;
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, null, name);
     }
 
     /**
@@ -604,6 +596,8 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_bundle", "bundle_id="
                 + getID()));
 
+        DatabaseManager.update(ourContext, bundleRow);
+
         if (modified)
         {
             ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
@@ -611,11 +605,8 @@ public class Bundle extends DSpaceObject
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
-            modifiedMetadata = false;
+            updateMetadata();
         }
-
-        DatabaseManager.update(ourContext, bundleRow);
     }
 
     /**
@@ -646,6 +637,8 @@ public class Bundle extends DSpaceObject
 
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
+
+        removeMetadataFromDatabase();
     }
 
     /**

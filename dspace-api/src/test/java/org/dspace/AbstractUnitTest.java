@@ -36,6 +36,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -169,6 +170,7 @@ public class AbstractUnitTest
                 indexer.createIndex(ctx);
                 ctx.commit();
             }
+            Group.initDefaultGroupNames(ctx);
             ctx.restoreAuthSystemState();
             if(ctx.isValid())
             {

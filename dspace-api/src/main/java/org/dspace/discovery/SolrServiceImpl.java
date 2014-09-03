@@ -1316,7 +1316,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
 
-            DCValue[] values = item.getMetadata("dc.relation.ispartof");
+            DCValue[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
 
             if(values != null && values.length > 0 && values[0] != null && values[0].value != null)
             {

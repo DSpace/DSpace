@@ -334,7 +334,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testGetMetadata 0",c.getMetadata("name"), equalTo(""));
         assertThat("testGetMetadata 1",c.getMetadata("short_description"), equalTo(""));
         assertThat("testGetMetadata 2",c.getMetadata("introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(""));
         assertThat("testGetMetadata 4",c.getMetadata("copyright_text"), equalTo(""));
         assertThat("testGetMetadata 5",c.getMetadata("side_bar_text"), equalTo(""));
     }
@@ -348,21 +347,18 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         String name = "name";
         String sdesc = "short description";
         String itext = "introductory text";
-        String logo = "1";
         String copy = "copyright declaration";
         String sidebar = "side bar text";
 
         c.setMetadata("name", name);
         c.setMetadata("short_description", sdesc);
         c.setMetadata("introductory_text", itext);
-        c.setMetadata("logo_bitstream_id", logo);
         c.setMetadata("copyright_text", copy);
         c.setMetadata("side_bar_text", sidebar);
 
         assertThat("testSetMetadata 0",c.getMetadata("name"), equalTo(name));
         assertThat("testSetMetadata 1",c.getMetadata("short_description"), equalTo(sdesc));
         assertThat("testSetMetadata 2",c.getMetadata("introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(logo));
         assertThat("testSetMetadata 4",c.getMetadata("copyright_text"), equalTo(copy));
         assertThat("testSetMetadata 5",c.getMetadata("side_bar_text"), equalTo(sidebar));
     }

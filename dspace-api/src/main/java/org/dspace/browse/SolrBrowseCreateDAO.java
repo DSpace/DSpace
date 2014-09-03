@@ -336,7 +336,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         {
             for (SortOption so : SortOption.getSortOptions())
             {
-                DCValue[] dcvalue = item.getMetadata(so.getMetadata());
+                DCValue[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
                 if (dcvalue != null && dcvalue.length > 0)
                 {
                     String nValue = OrderFormat

@@ -265,7 +265,7 @@ public class SyndicationFeed
                         df = df.replaceAll("\\(date\\)", "");
                     }
              
-                    DCValue dcv[] = item.getMetadata(df);
+                    DCValue dcv[] = item.getMetadataByMetadataString(df);
                     if (dcv.length > 0)
                     {
                         String fieldLabel = labels.get(MSG_METADATA + df);
@@ -298,7 +298,7 @@ public class SyndicationFeed
                 }
 
                 // This gets the authors into an ATOM feed
-                DCValue authors[] = item.getMetadata(authorField);
+                DCValue authors[] = item.getMetadataByMetadataString(authorField);
                 if (authors.length > 0)
                 {
                     List<SyndPerson> creators = new ArrayList<SyndPerson>();
@@ -318,7 +318,7 @@ public class SyndicationFeed
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null)
                     {
-                        DCValue dcAuthors[] = item.getMetadata(dcCreatorField);
+                        DCValue dcAuthors[] = item.getMetadataByMetadataString(dcCreatorField);
                         if (dcAuthors.length > 0)
                         {
                             List<String> creators = new ArrayList<String>();
@@ -331,7 +331,7 @@ public class SyndicationFeed
                     }
                     if (dcDateField != null && !hasDate)
                     {
-                        DCValue v[] = item.getMetadata(dcDateField);
+                        DCValue v[] = item.getMetadataByMetadataString(dcDateField);
                         if (v.length > 0)
                         {
                             dc.setDate((new DCDate(v[0].value)).toDate());
@@ -339,7 +339,7 @@ public class SyndicationFeed
                     }
                     if (dcDescriptionField != null)
                     {
-                        DCValue v[] = item.getMetadata(dcDescriptionField);
+                        DCValue v[] = item.getMetadataByMetadataString(dcDescriptionField);
                         if (v.length > 0)
                         {
                             StringBuffer descs = new StringBuffer();
@@ -381,7 +381,7 @@ public class SyndicationFeed
                         }
                         //Also try to add an external value from dc.identifier.other
                         // We are assuming that if this is set, then it is a media file
-                        DCValue[] externalMedia = item.getMetadata(externalSourceField);
+                        DCValue[] externalMedia = item.getMetadataByMetadataString(externalSourceField);
                         if(externalMedia.length > 0)
                         {
                             for(int i = 0; i< externalMedia.length; i++)
@@ -567,7 +567,7 @@ public class SyndicationFeed
     // spoonful of syntactic sugar when we only need first value
     private String getOneDC(Item item, String field)
     {
-        DCValue dcv[] = item.getMetadata(field);
+        DCValue dcv[] = item.getMetadataByMetadataString(field);
         return (dcv.length > 0) ? dcv[0].value : null;
     }
 }
