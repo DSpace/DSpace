@@ -1,6 +1,6 @@
 /*
  */
-package org.datadryad.rest.storage.resolvers;
+package org.datadryad.rest.resolvers;
 
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import javax.ws.rs.core.Context;
