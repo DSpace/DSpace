@@ -1,5 +1,8 @@
 language: java
 jdk: openjdk6
+cache:
+    directories:
+    - $HOME/.m2
 before_install:
 - ./test/bin/travis-install-maven.sh
 - psql -U postgres -c "create user dryad_test_user with createdb;"
