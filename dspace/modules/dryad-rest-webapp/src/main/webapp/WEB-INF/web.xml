@@ -11,7 +11,7 @@
         <servlet-class>org.datadryad.rest.servlet.DryadAPIServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.datadryad.rest.resources.v1,org.datadryad.rest.storage,org.datadryad.rest.endpoints.v1</param-value>
+            <param-value>org.datadryad.rest.resources.v1,org.datadryad.rest.providers,org.datadryad.rest.endpoints.v1</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
