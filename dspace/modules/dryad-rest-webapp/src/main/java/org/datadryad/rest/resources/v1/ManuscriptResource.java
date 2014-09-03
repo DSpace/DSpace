@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.apache.log4j.Logger;
+import org.datadryad.rest.handler.ManuscriptHandlerGroup;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
@@ -30,10 +32,11 @@ import org.datadryad.rest.storage.StoragePath;
 @Path("organizations/{organizationCode}/manuscripts")
 
 public class ManuscriptResource {
-
+    private static final Logger log = Logger.getLogger(ManuscriptResource.class);
     @Context AbstractManuscriptStorage storage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
+    @Context ManuscriptHandlerGroup handlers;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -79,6 +82,8 @@ public class ManuscriptResource {
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
+            // call handlers
+            handlers.handleObjectCreated(path, manuscript);
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(manuscript.manuscriptId).build();
             return Response.created(uri).build();
@@ -100,6 +105,8 @@ public class ManuscriptResource {
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
+            // call handlers
+            handlers.handleObjectUpdated(path, manuscript);
             return Response.noContent().build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Manuscript ID not found").build();
@@ -118,6 +125,7 @@ public class ManuscriptResource {
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }
+        // TODO: handle the deleted object
         return Response.noContent().build();
     }
 }
