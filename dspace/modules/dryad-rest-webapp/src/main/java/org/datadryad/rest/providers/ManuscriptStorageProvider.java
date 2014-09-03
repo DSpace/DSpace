@@ -1,6 +1,6 @@
 /*
  */
-package org.datadryad.rest.resolvers;
+package org.datadryad.rest.providers;
 
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import javax.ws.rs.core.Context;
@@ -13,8 +13,8 @@ import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @Provider
-public class ManuscriptStorageResolver extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
-    public ManuscriptStorageResolver() {
+public class ManuscriptStorageProvider extends SingletonTypeInjectableProvider<Context, AbstractManuscriptStorage> {
+    public ManuscriptStorageProvider() {
         super(AbstractManuscriptStorage.class, new ManuscriptDatabaseStorageImpl());
     }
 }
