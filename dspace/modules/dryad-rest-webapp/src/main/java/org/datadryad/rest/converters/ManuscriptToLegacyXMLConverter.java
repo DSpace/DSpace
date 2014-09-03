@@ -20,20 +20,18 @@ public class ManuscriptToLegacyXMLConverter {
     public static void main(String args[]) {
         Manuscript manuscript = new Manuscript();
         manuscript.configureTestValues();
-        convertToInternalXML(manuscript, System.out);
-    }
-
-    static void convertToInternalXML(Manuscript manuscript, OutputStream outputStream) {
-        JAXBContext context = null;
         try {
-            LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript);
-            context = JAXBContext.newInstance(LegacyManuscript.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(legacyManuscript, outputStream);
+            convertToInternalXML(manuscript, System.out);
         } catch (JAXBException ex) {
             System.err.println("Error converting manuscript to internal XML:" + ex);
         }
     }
 
+    public static void convertToInternalXML(Manuscript manuscript, OutputStream outputStream) throws JAXBException {
+        LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript);
+        JAXBContext context = JAXBContext.newInstance(LegacyManuscript.class);
+        Marshaller marshaller = context.createMarshaller();
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.marshal(legacyManuscript, outputStream);
+    }
 }
