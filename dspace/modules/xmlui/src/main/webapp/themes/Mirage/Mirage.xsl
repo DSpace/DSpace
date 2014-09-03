@@ -1409,4 +1409,38 @@ parameter that is being used (see variable defined above) -->
         </li>
     </xsl:template>
 
+    <!-- Add Confirmations to destructive buttons -->
+    <xsl:template match="//dri:field[@id='aspect.administrative.item.EditItemEmbargoForm.field.submit_lift_embargo']">
+        <!-- Adapted from normalField in dri2xhtml-alt/core/forms.xsl -->
+        <xsl:variable name="submitButtonId" select="translate(@id,'.','_')"/>
+        <input>
+            <xsl:call-template name="fieldAttributes"/>
+            <xsl:if test="@type='button'">
+                <xsl:attribute name="type">submit</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="value">
+                <xsl:choose>
+                    <xsl:when test="./dri:value[@type='raw']">
+                        <xsl:value-of select="./dri:value[@type='raw']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:if test="dri:value/i18n:text">
+                <xsl:attribute name="i18n:attr">value</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onclick">
+                <xsl:text>if(confirm('Are you sure you would like to lift this embargo now?')){ </xsl:text>
+                <xsl:text>  jQuery('#</xsl:text><!--
+                --><xsl:value-of select="$submitButtonId" /><!--
+                --><xsl:text>').submit(); } else {</xsl:text>
+                <xsl:text>return false;</xsl:text>
+                <xsl:text>}</xsl:text>
+            </xsl:attribute>
+            <xsl:apply-templates />
+        </input>
+    </xsl:template>
+
 </xsl:stylesheet>
