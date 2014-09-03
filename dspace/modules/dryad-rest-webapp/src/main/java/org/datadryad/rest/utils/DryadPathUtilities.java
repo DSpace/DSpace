@@ -28,6 +28,9 @@ public class DryadPathUtilities {
         if(organizationCode == null) {
             throw new IllegalArgumentException("Organization must have a code to get output directory");
         }
+        // Unfortunately, the journal properties interface expects a full name
+        // and not a code/key. So we must consider that...
+
         Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(organizationCode);
         if(properties == null) {
             throw new IllegalArgumentException("Organization code " + organizationCode + " not found by DryadJournalSubmissionUtils");
