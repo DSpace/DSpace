@@ -5,6 +5,7 @@ package org.datadryad.rest.utils;
 import java.util.Map;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.storage.StoragePath;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 /**
@@ -12,6 +13,7 @@ import org.dspace.submit.utils.DryadJournalSubmissionUtils;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class DryadPathUtilities {
+    private static final String ORGANIZATION_KEY = "organizationCode";
     public static String getOutputDirectory(Organization organization) {
         // Requires configuration to be loaded and will change with atmire authority control
         if(organization == null) {
@@ -19,6 +21,10 @@ public class DryadPathUtilities {
         }
 
         final String organizationCode = organization.organizationCode;
+        return getOutputDirectory(organizationCode);
+    }
+
+    public static String getOutputDirectory(String organizationCode) {
         if(organizationCode == null) {
             throw new IllegalArgumentException("Organization must have a code to get output directory");
         }
@@ -39,5 +45,14 @@ public class DryadPathUtilities {
             throw new IllegalArgumentException("manuscriptId is empty");
         }
         return DryadJournalSubmissionUtils.escapeFilename(manuscriptId);
+    }
+
+    public static String getOrganizationCode(StoragePath path) {
+        int index = path.getKeyPath().indexOf(ORGANIZATION_KEY);
+        if(index != -1) {
+            return path.getValuePath().get(index);
+        } else {
+            return null;
+        }
     }
 }
