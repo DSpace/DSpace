@@ -1409,6 +1409,7 @@ parameter that is being used (see variable defined above) -->
         </li>
     </xsl:template>
 
+    <!-- Confirmations for destructive buttons -->
     <xsl:template name="destructiveSubmitButton">
       <xsl:param name="confirmationText" select="'Are you sure?'" />
         <!-- Adapted from normalField in dri2xhtml-alt/core/forms.xsl -->
@@ -1445,12 +1446,18 @@ parameter that is being used (see variable defined above) -->
         </input>
     </xsl:template>
 
-    <!-- Add Confirmations to destructive buttons -->
+    <!-- Confirm before lifting embargo -->
     <xsl:template match="//dri:field[@id='aspect.administrative.item.EditItemEmbargoForm.field.submit_lift_embargo']">
         <xsl:call-template name="destructiveSubmitButton">
             <xsl:with-param name="confirmationText" select="'Are you sure you would like to lift this embargo now?'" />
         </xsl:call-template>
+    </xsl:template>
 
+    <!-- Confirm before deleting data files in submission overview -->
+    <xsl:template match="//dri:field[starts-with(@id,'aspect.submission.submit.OverviewStep.field.submit_delete_dataset')]">
+        <xsl:call-template name="destructiveSubmitButton">
+            <xsl:with-param name="confirmationText" select="'Are you sure you would like to delete this Data file?'" />
+        </xsl:call-template>
     </xsl:template>
 
 </xsl:stylesheet>
