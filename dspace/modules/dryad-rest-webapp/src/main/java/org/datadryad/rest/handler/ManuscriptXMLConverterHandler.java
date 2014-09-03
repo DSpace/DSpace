@@ -38,7 +38,14 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
     private void writeXML(StoragePath path, Manuscript manuscript) throws HandlerException {
         String organizationCode = DryadPathUtilities.getOrganizationCode(path);
         String fileName = DryadPathUtilities.getTargetFilename(manuscript);
-        String outputDirectory = DryadPathUtilities.getOutputDirectory(organizationCode);
+        String outputDirectory;
+        try {
+             outputDirectory = DryadPathUtilities.getOutputDirectory(organizationCode);
+        } catch (IllegalArgumentException ex) {
+            // Code may not exist in database, write it somewhere...
+             throw new HandlerException("Organization code "+ organizationCode
+                     + "does not exist in journal configuration");
+        }
         File outputFile = new File(outputDirectory, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(outputFile);
