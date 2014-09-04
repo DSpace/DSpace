@@ -20,15 +20,16 @@ public class ManuscriptToLegacyXMLConverter {
     public static void main(String args[]) {
         Manuscript manuscript = new Manuscript();
         manuscript.configureTestValues();
+        String journalName = "Dryad Test Journal";
         try {
-            convertToInternalXML(manuscript, System.out);
+            convertToInternalXML(manuscript, journalName, System.out);
         } catch (JAXBException ex) {
             System.err.println("Error converting manuscript to internal XML:" + ex);
         }
     }
 
-    public static void convertToInternalXML(Manuscript manuscript, OutputStream outputStream) throws JAXBException {
-        LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript);
+    public static void convertToInternalXML(Manuscript manuscript, String journalName, OutputStream outputStream) throws JAXBException {
+        LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript, journalName);
         JAXBContext context = JAXBContext.newInstance(LegacyManuscript.class);
         Marshaller marshaller = context.createMarshaller();
         // Encoding is UTF-8 by default - http://docs.oracle.com/javaee/5/api/javax/xml/bind/Marshaller.html

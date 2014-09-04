@@ -15,6 +15,7 @@ import org.datadryad.rest.models.Manuscript;
 @XmlRootElement(name="DryadEmailSubmission")
 public class LegacyManuscript {
     public String Abstract;
+    public String Journal;
     public String Article_Status;
     public LegacyAuthorsList Authors = new LegacyAuthorsList();
     public LegacySubmissionMetadata Submission_Metadata = new LegacySubmissionMetadata();
@@ -27,7 +28,8 @@ public class LegacyManuscript {
     public LegacyClassifications Classification = new LegacyClassifications();
 
     public LegacyManuscript() {}
-    public LegacyManuscript(Manuscript manuscript) {
+    public LegacyManuscript(Manuscript manuscript, String journalName) {
+        this.Journal = journalName;
         this.Submission_Metadata.Manuscript = manuscript.manuscriptId;
         this.Submission_Metadata.Article_Title = manuscript.title;
         this.Article_Status = manuscript.status;

@@ -41,7 +41,7 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
         String baseName = DryadPathUtilities.getTargetBaseFilename(manuscript);
         String extension = XML_EXTENSION;
         String fileName = String.format("%s.%s", baseName, extension);
-        String outputDirectory;
+        String outputDirectory, journalName = null;
         try {
              outputDirectory = DryadPathUtilities.getOutputDirectory(organizationCode);
         } catch (IllegalArgumentException ex) {
@@ -52,7 +52,7 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
         File outputFile = new File(outputDirectory, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(outputFile);
-            ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, fos);
+            ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, journalName, fos);
         } catch (FileNotFoundException ex) {
             throw new HandlerException("Unable to write XML file", ex);
         } catch (JAXBException ex) {
