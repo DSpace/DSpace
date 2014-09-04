@@ -126,6 +126,11 @@
             <artifactId>api</artifactId>
         </dependency>
         <dependency>
+            <!-- Requires payment-api because workflow references it now -->
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>payment-api</artifactId>
+        </dependency>
+        <dependency>
            <groupId>org.dspace.modules</groupId>
            <artifactId>api</artifactId>
             <version>${project.version}</version>
