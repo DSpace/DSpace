@@ -24,7 +24,7 @@ CREATE TABLE manuscript
   json_data text 
 );
 
-CREATE UNIQUE INDEX manuscript_msid_ver_idx on manuscript(msid, version);
+CREATE UNIQUE INDEX manuscript_msid_org_ver_idx on manuscript(msid, organization_id, version);
 CREATE INDEX manuscript_msid_idx ON manuscript(msid);
 
 -- OAuth2 Tokens
