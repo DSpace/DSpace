@@ -77,10 +77,21 @@ public class ApproveRejectReviewItem {
                     getSearchService().search(c, "dc.identifier.manuscriptNumber: " + manuscriptNumber, 0, 2, false);
             if(manuscriptItems.size() > 0){
                 wfi = WorkflowItem.findByItemId(c, manuscriptItems.get(0).getID());
+                reviewItem(c, approved, wfi);
             } else {
                 throw new IllegalArgumentException("No item found with manuscript number: " + manuscriptNumber);
             }
         } catch (SQLException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (AuthorizeException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (WorkflowConfigurationException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IOException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (MessagingException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
     }
