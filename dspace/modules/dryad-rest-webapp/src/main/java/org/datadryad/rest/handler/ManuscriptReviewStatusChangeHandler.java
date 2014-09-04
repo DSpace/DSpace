@@ -2,9 +2,13 @@
  */
 package org.datadryad.rest.handler;
 
+import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.utils.DryadPathUtilities;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ApproveRejectReviewItemException;
 
@@ -13,6 +17,28 @@ import org.dspace.workflow.ApproveRejectReviewItemException;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Manuscript> {
+    private static final Logger log = Logger.getLogger(ManuscriptReviewStatusChangeHandler.class);
+    private DSpaceKernelImpl kernelImpl;
+    public ManuscriptReviewStatusChangeHandler() {
+        // Requires DSpace kernel to be running
+        try {
+            kernelImpl = DSpaceKernelInit.getKernel(null);
+            if (!kernelImpl.isRunning())
+            {
+                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+            }
+        } catch (Exception ex) {
+            // Failed to start so destroy it and log and throw an exception
+            try {
+                if(kernelImpl != null) {
+                    kernelImpl.destroy();
+                }
+            } catch (Exception e1) {
+                // Nothing to do
+            }
+            log.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+        }
+    }
 
     @Override
     public void handleCreate(StoragePath path, Manuscript manuscript) throws HandlerException {
@@ -35,6 +61,12 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
     }
 
     private void processChange(String organizationCode, Manuscript manuscript) throws HandlerException {
+        if(kernelImpl == null) {
+            throw new HandlerException("Cannot process change, DSpace Kernel is not initialized");
+        } else if(!kernelImpl.isRunning()) {
+            throw new HandlerException("Cannot process change, DSpace Kernel is not running");
+        }
+
         String status = manuscript.status;
         if(Manuscript.STATUS_SUBMITTED.equals(status)) {
             // Do nothing for submitted
