@@ -43,12 +43,12 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
 
     @Override
     public void handleCreate(StoragePath path, Manuscript manuscript) throws HandlerException {
-        processChange(path, manuscript);
+        processChange(manuscript);
     }
 
     @Override
     public void handleUpdate(StoragePath path, Manuscript manuscript) throws HandlerException {
-        processChange(path, manuscript);
+        processChange(manuscript);
     }
 
     @Override
@@ -56,12 +56,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
         // Do nothing
     }
 
-    private void processChange(StoragePath path, Manuscript manuscript) throws HandlerException {
-        String organizationCode = Organization.getOrganizationCode(path);
-        processChange(organizationCode, manuscript);
-    }
-
-    private void processChange(String organizationCode, Manuscript manuscript) throws HandlerException {
+    private void processChange(Manuscript manuscript) throws HandlerException {
         if(kernelImpl == null) {
             throw new HandlerException("Cannot process change, DSpace Kernel is not initialized");
         } else if(!kernelImpl.isRunning()) {
@@ -73,14 +68,14 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
             // Do nothing for submitted
         } else if(Manuscript.STATUS_ACCEPTED.equals(status) || Manuscript.STATUS_PUBLISHED.equals(status)) {
             // accept for accepted or published
-            accept(organizationCode, manuscript);
+            accept(manuscript);
         } else if (Manuscript.STATUS_REJECTED.equals(status) || Manuscript.STATUS_NEEDS_REVISION.equals(status)) {
             // reject for rejected or needs revision
-            reject(organizationCode, manuscript);
+            reject(manuscript);
         }
     }
 
-    private void accept(String organizationCode, Manuscript manuscript) throws HandlerException {
+    private void accept(Manuscript manuscript) throws HandlerException {
         // dspace review-item -a true
         try {
             ApproveRejectReviewItem.reviewItem(Boolean.TRUE, manuscript.manuscriptId);
@@ -89,7 +84,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
         }
     }
 
-    private void reject(String organizationCode, Manuscript manuscript) throws HandlerException {
+    private void reject(Manuscript manuscript) throws HandlerException {
         // dspace review-item -a false
         try {
             ApproveRejectReviewItem.reviewItem(Boolean.FALSE, manuscript.manuscriptId);
