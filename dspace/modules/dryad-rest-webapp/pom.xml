@@ -4,7 +4,7 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>dryad-rest-webapp</artifactId>
     <packaging>war</packaging>
-    <name>dryad-rest-webapp Jersey Webapp</name>
+    <name>Dryad REST API Webapp</name>
     <description>Dryad REST API</description>
     <parent>
         <groupId>org.dspace</groupId>
