@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBException;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
-import org.datadryad.rest.utils.DryadPathUtilities;
+import org.datadryad.rest.utils.JournalPropertiesUtilities;
 
 /**
  * Saves manuscripts as XML files when created or updated
@@ -37,13 +37,13 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
     }
 
     private void writeXML(StoragePath path, Manuscript manuscript) throws HandlerException {
-        String organizationCode = DryadPathUtilities.getOrganizationCode(path);
-        String baseName = DryadPathUtilities.getTargetBaseFilename(manuscript);
+        String organizationCode = JournalPropertiesUtilities.getOrganizationCode(path);
+        String baseName = JournalPropertiesUtilities.getTargetBaseFilename(manuscript);
         String extension = XML_EXTENSION;
         String fileName = String.format("%s.%s", baseName, extension);
         String outputDirectory, journalName = null;
         try {
-             outputDirectory = DryadPathUtilities.getOutputDirectory(organizationCode);
+             outputDirectory = JournalPropertiesUtilities.getOutputDirectory(organizationCode);
         } catch (IllegalArgumentException ex) {
             // Code may not exist in database, write it somewhere...
              throw new HandlerException("Organization code "+ organizationCode

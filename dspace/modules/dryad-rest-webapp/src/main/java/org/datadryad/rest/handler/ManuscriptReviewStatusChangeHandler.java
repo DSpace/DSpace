@@ -5,7 +5,7 @@ package org.datadryad.rest.handler;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
-import org.datadryad.rest.utils.DryadPathUtilities;
+import org.datadryad.rest.utils.JournalPropertiesUtilities;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -56,7 +56,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
     }
 
     private void processChange(StoragePath path, Manuscript manuscript) throws HandlerException {
-        String organizationCode = DryadPathUtilities.getOrganizationCode(path);
+        String organizationCode = JournalPropertiesUtilities.getOrganizationCode(path);
         processChange(organizationCode, manuscript);
     }
 

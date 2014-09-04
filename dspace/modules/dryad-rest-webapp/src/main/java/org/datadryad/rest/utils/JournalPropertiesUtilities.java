@@ -12,7 +12,7 @@ import org.dspace.submit.utils.DryadJournalSubmissionUtils;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DryadPathUtilities {
+public class JournalPropertiesUtilities {
     private static final String ORGANIZATION_KEY = "organizationCode";
     /**
      * Get the metadata directory for writing legacy xml files, based on an
