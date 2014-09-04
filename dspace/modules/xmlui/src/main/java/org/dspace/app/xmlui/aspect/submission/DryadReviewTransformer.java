@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -75,8 +76,22 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         if (token != null) {
             String reviewerKey = getItemToken();
             authorized = token.equals(reviewerKey);
-            if (authorized)
+            if (authorized) {
                 request.getSession().setAttribute("reviewerToken", token);
+            }
+        }
+
+        String requestDoi = request.getParameter("doi");
+        if(requestDoi != null) {
+            // Must match the item's DOI
+            DryadDataPackage dataPackage = new DryadDataPackage(wfItem.getItem());
+            String packageDOI = dataPackage.getIdentifier();
+            authorized = requestDoi.equals(packageDOI);
+            if(authorized) {
+                // We authorize based on the DOI but still use the token for the session
+                String reviewerKey = getItemToken();
+                request.getSession().setAttribute("reviewerToken", reviewerKey);
+            }
         }
     }
 
