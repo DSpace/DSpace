@@ -54,6 +54,9 @@ public class Manuscript {
     }
 
     @JsonIgnore
+    public Organization organization;
+
+    @JsonIgnore
     public Boolean isValid() {
         // TODO: Check other validations
         // if corresponding author present, must be one of the authors
