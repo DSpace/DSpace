@@ -18,6 +18,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 @XmlRootElement
 public class Manuscript {
+    public static final String MANUSCRIPT_ID = "manuscriptId";
+
     public static final String STATUS_SUBMITTED = "submitted";
     public static final String STATUS_ACCEPTED = "accepted";
     public static final String STATUS_REJECTED = "rejected";

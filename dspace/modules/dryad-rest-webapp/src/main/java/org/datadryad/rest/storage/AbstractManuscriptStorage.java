@@ -12,7 +12,6 @@ import org.datadryad.rest.models.Organization;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscript> {
-    private static final String MANUSCRIPT_KEY = "manuscriptId";
 
     @Override
     public final void checkCollectionPath(StoragePath path) throws StorageException {
@@ -22,7 +21,7 @@ public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscri
     }
 
     public final void checkObjectPath(StoragePath path) throws StorageException {
-        final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE, MANUSCRIPT_KEY);
+        final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE, Manuscript.MANUSCRIPT_ID);
         checkPath(path, expectedKeyPath);
     }
 }

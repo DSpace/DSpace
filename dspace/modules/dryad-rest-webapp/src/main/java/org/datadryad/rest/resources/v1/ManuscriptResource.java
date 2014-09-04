@@ -55,11 +55,11 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
+    public Response getManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         try {
             StoragePath path = new StoragePath();
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            path.addPathElement("manuscriptId", manuscriptId);
+            path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
             Manuscript manuscript = storage.findByPath(path);
             if(manuscript == null) {
                 return Response.status(Status.NOT_FOUND).build();
@@ -96,10 +96,10 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId, Manuscript manuscript) {
+    public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId, Manuscript manuscript) {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-        path.addPathElement("manuscriptId", manuscriptId);
+        path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         if(manuscript.isValid()) {
             try {
                 storage.update(path, manuscript);
@@ -117,10 +117,10 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
+    public Response deleteManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-        path.addPathElement("manuscriptId", manuscriptId);
+        path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         try {
             storage.deleteByPath(path);
         } catch (StorageException ex) {
