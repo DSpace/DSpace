@@ -125,10 +125,17 @@
             <groupId>org.dspace.modules</groupId>
             <artifactId>api</artifactId>
         </dependency>
+        <!-- These dependencies are required so that classes loaded by dspace
+          are present when changing items in review -->
         <dependency>
-            <!-- Requires payment-api because workflow references it now -->
+            <!-- payment api classes are referenced in workflow -->
             <groupId>org.dspace.modules</groupId>
             <artifactId>payment-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- dspace.cfg consumer/event setup specifies com.atmire.authority.AuthorityConsumer -->
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-authority</artifactId>
         </dependency>
         <dependency>
            <groupId>org.dspace.modules</groupId>
