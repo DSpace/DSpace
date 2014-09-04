@@ -67,7 +67,7 @@ public class ApproveRejectReviewItem {
             return;
         }
     }
-
+    // TODO: Should take publication name too.
     public static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
         try {
