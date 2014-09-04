@@ -13,20 +13,6 @@ import org.datadryad.rest.storage.StoragePath;
 @XmlRootElement
 public class Organization {
     public static final String ORGANIZATION_CODE = "organizationCode";
-
-    /**
-     * Extracts the organizationCode from a StoragePath
-     * @param path the StoragePath
-     * @return the value of the path key for "organizationCode", or null if not found
-     */
-    public static String getOrganizationCode(StoragePath path) {
-        int index = path.getKeyPath().indexOf(Organization.ORGANIZATION_CODE);
-        if (index != -1) {
-            return path.getValuePath().get(index);
-        } else {
-            return null;
-        }
-    }
     public Integer organizationId;
     public String organizationCode;
     public String organizationName;
