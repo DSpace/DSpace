@@ -5,6 +5,7 @@ package org.datadryad.rest.models;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,6 +18,19 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 @XmlRootElement
 public class Manuscript {
+    public static final String STATUS_SUBMITTED = "submitted";
+    public static final String STATUS_ACCEPTED = "accepted";
+    public static final String STATUS_REJECTED = "rejected";
+    public static final String STATUS_NEEDS_REVISION = "needs revision";
+    public static final String STATUS_PUBLISHED = "published";
+
+    public static final List<String> MANUSCRIPT_STATUSES = Arrays.asList(
+            STATUS_SUBMITTED,
+            STATUS_ACCEPTED,
+            STATUS_REJECTED,
+            STATUS_NEEDS_REVISION,
+            STATUS_PUBLISHED
+    );
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @XmlElement(name="abstract")
@@ -40,7 +54,6 @@ public class Manuscript {
     @JsonIgnore
     public Boolean isValid() {
         // TODO: Check other validations
-        // status in  “submitted”, “accepted”, “needs revision”, and “rejected”
         // if corresponding author present, must be one of the authors
         // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
 
@@ -48,7 +61,8 @@ public class Manuscript {
                 (manuscriptId != null && manuscriptId.length() > 0) &&
                 (status != null && status.length() > 0) &&
                 (authors != null && authors.author != null && authors.author.size() > 0) &&
-                (title != null && title.length() > 0)
+                (title != null && title.length() > 0) &&
+                MANUSCRIPT_STATUSES.contains(status)
                 );
     }
 
@@ -94,7 +108,7 @@ public class Manuscript {
         } catch (ParseException ex) {
             System.err.println("Parse exception" + ex);
         }
-        this.status = "accepted";
+        this.status = STATUS_SUBMITTED;
         this.title = "Title of article 1";
     }
 }
