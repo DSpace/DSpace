@@ -334,8 +334,8 @@
 
                 <xsl:variable name="label-1">
                         <xsl:choose>
-                            <xsl:when test="confman:getProperty('mirage2','item-view.bitstream.href.label.1')">
-                                <xsl:value-of select="confman:getProperty('mirage2','item-view.bitstream.href.label.1')"/>
+                            <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.1')">
+                                <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.1')"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>label</xsl:text>
@@ -345,8 +345,8 @@
 
                 <xsl:variable name="label-2">
                         <xsl:choose>
-                            <xsl:when test="confman:getProperty('mirage2','item-view.bitstream.href.label.2')">
-                                <xsl:value-of select="confman:getProperty('mirage2','item-view.bitstream.href.label.2')"/>
+                            <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.2')">
+                                <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.2')"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>title</xsl:text>
