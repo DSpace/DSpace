@@ -32,7 +32,7 @@ public class LegacyManuscript {
         this.Submission_Metadata.Article_Title = manuscript.title;
         this.Article_Status = manuscript.status;
         for(Author author : manuscript.authors.author) {
-            this.Authors.author.add(author.fullName());
+            this.Authors.Author.add(author.fullName());
         }
         this.Corresponding_Author = manuscript.correspondingAuthor.author.fullName();
         this.Email = manuscript.correspondingAuthor.email;
