@@ -15,11 +15,11 @@ public class SolrLoggerUtilsTest {
     private static final String REFERRER_NO_TOKEN = "https://datadryad.org/handle/10255/2/submit/eff2d3c77151079f94669152d2a43c02eff2d3c7.continue?processonly=true";
     private static final String REFERRER_TOKEN_1 = "http://datadryad.org/review?wfID=12345&token=07cae063-87f0-4d25-ac8c-595a80ac7ea8";
     private static final String REFERRER_TOKEN_2 = "http://datadryad.org/review?wfID=12345&token=sometokenimadeup";
-    private static final String REFERRER_DOI = "http://datadryad.org/review?wfID=12345&doi=doi:10.5061/dryad.11234";
+    private static final String REFERRER_DOI = "http://datadryad.org/review?doi=doi:10.5061/dryad.11234";
     private static final String DUMMY_TOKEN = SolrLoggerUtils.DUMMY_TOKEN;
     private static final String DUMMY_DOI = SolrLoggerUtils.DUMMY_DOI;
     private static final String REFERRER_TOKEN_REPLACED = "http://datadryad.org/review?wfID=12345&token=" + DUMMY_TOKEN;
-    private static final String REFERRER_DOI_REPLACED = "http://datadryad.org/review?wfID=12345&doi=" + DUMMY_DOI;
+    private static final String REFERRER_DOI_REPLACED = "http://datadryad.org/review?doi=" + DUMMY_DOI;
 
     public SolrLoggerUtilsTest() {
     }

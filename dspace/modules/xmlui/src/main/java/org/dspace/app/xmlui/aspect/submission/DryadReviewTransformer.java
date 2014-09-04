@@ -20,7 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -32,7 +31,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -67,30 +65,29 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        int wfItemId;
+        // Reviewers may access with either
+        // 1. wfID + token
+        // 2. provisional DOI (since it is not yet public)
 
-        if ( (wfItem=getWFItem(request)) == null) return;
-
-
-        String token = request.getParameter("token");
-        if (token != null) {
-            String reviewerKey = getItemToken();
-            authorized = token.equals(reviewerKey);
-            if (authorized) {
-                request.getSession().setAttribute("reviewerToken", token);
-            }
+        wfItem = getWFItem(request); // Looks up by wfID or doi params in request
+        if(wfItem == null) {
+            return;
         }
-
         String requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
-            // Must match the item's DOI
-            DryadDataPackage dataPackage = new DryadDataPackage(wfItem.getItem());
-            String packageDOI = dataPackage.getIdentifier();
-            authorized = requestDoi.equals(packageDOI);
-            if(authorized) {
-                // We authorize based on the DOI but still use the token for the session
+            // DOI is present. Set authorized and the reviewerToken for downloads
+            authorized = true;
+            String reviewerKey = getItemToken();
+            request.getSession().setAttribute("reviewerToken", reviewerKey);
+        } else {
+            // DOI not present, require token
+            String token = request.getParameter("token");
+            if (token != null) {
                 String reviewerKey = getItemToken();
-                request.getSession().setAttribute("reviewerToken", reviewerKey);
+                authorized = token.equals(reviewerKey);
+                if (authorized) {
+                    request.getSession().setAttribute("reviewerToken", token);
+                }
             }
         }
     }
