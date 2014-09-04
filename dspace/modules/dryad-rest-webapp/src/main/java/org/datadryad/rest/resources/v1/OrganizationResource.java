@@ -38,7 +38,7 @@ import org.datadryad.rest.storage.StoragePath;
 
 @Path("organizations")
 public class OrganizationResource {
-    @Context AbstractOrganizationStorage storage;
+    @Context AbstractOrganizationStorage organizationStorage;
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 
@@ -75,7 +75,7 @@ public class OrganizationResource {
 
         try {
             // Returning a list requires POJO turned on
-            return Response.ok(storage.getAll(new StoragePath())).build();
+            return Response.ok(organizationStorage.getAll(new StoragePath())).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
         }
@@ -88,7 +88,7 @@ public class OrganizationResource {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         try {
-            Organization organization = storage.findByPath(path);
+            Organization organization = organizationStorage.findByPath(path);
             if(organization == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -107,7 +107,7 @@ public class OrganizationResource {
         // Check required fields
         if(organization.isValid()) {
             try {
-                storage.create(new StoragePath(), organization);
+                organizationStorage.create(new StoragePath(), organization);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
@@ -129,7 +129,7 @@ public class OrganizationResource {
         // Check required fields
         if(organization.isValid()) {
             try {
-                storage.update(path, organization);
+                organizationStorage.update(path, organization);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
@@ -146,7 +146,7 @@ public class OrganizationResource {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         try {
-            storage.deleteByPath(path);
+            organizationStorage.deleteByPath(path);
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }
