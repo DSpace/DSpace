@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import javax.xml.bind.JAXBException;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.utils.JournalPropertiesUtilities;
 
@@ -37,7 +38,7 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
     }
 
     private void writeXML(StoragePath path, Manuscript manuscript) throws HandlerException {
-        String organizationCode = JournalPropertiesUtilities.getOrganizationCode(path);
+        String organizationCode = Organization.getOrganizationCode(path);
         String baseName = JournalPropertiesUtilities.getTargetBaseFilename(manuscript);
         String extension = XML_EXTENSION;
         String fileName = String.format("%s.%s", baseName, extension);

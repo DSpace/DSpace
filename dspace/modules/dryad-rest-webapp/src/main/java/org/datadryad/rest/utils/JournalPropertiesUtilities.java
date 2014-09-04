@@ -5,7 +5,6 @@ package org.datadryad.rest.utils;
 import java.util.Map;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
-import org.datadryad.rest.storage.StoragePath;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 
 /**
@@ -87,19 +86,5 @@ public class JournalPropertiesUtilities {
             throw new IllegalArgumentException("manuscriptId is empty");
         }
         return DryadJournalSubmissionUtils.escapeFilename(manuscriptId);
-    }
-
-    /**
-     * Extracts the organizationCode from a StoragePath
-     * @param path the StoragePath
-     * @return the value of the path key for "organizationCode", or null if not found
-     */
-    public static String getOrganizationCode(StoragePath path) {
-        int index = path.getKeyPath().indexOf(Organization.ORGANIZATION_CODE);
-        if(index != -1) {
-            return path.getValuePath().get(index);
-        } else {
-            return null;
-        }
     }
 }
