@@ -23,6 +23,7 @@ import org.datadryad.rest.handler.ManuscriptHandlerGroup;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
+import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 
@@ -34,7 +35,8 @@ import org.datadryad.rest.storage.StoragePath;
 
 public class ManuscriptResource {
     private static final Logger log = Logger.getLogger(ManuscriptResource.class);
-    @Context AbstractManuscriptStorage storage;
+    @Context AbstractManuscriptStorage manuscriptStorage;
+    @Context AbstractOrganizationStorage organizationStorage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
     @Context ManuscriptHandlerGroup handlers;
@@ -46,7 +48,7 @@ public class ManuscriptResource {
             // Returning a list requires POJO turned on
             StoragePath path = new StoragePath();
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            return Response.ok(storage.getAll(path)).build();
+            return Response.ok(manuscriptStorage.getAll(path)).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
         }
@@ -57,10 +59,10 @@ public class ManuscriptResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         try {
-            StoragePath path = new StoragePath();
-            path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
-            Manuscript manuscript = storage.findByPath(path);
+            StoragePath manuscriptPath = new StoragePath();
+            manuscriptPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+            manuscriptPath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+            Manuscript manuscript = manuscriptStorage.findByPath(manuscriptPath);
             if(manuscript == null) {
                 return Response.status(Status.NOT_FOUND).build();
             } else {
@@ -75,16 +77,18 @@ public class ManuscriptResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Manuscript manuscript) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        StoragePath organizationPath = new StoragePath();
+        organizationPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         if(manuscript.isValid()) {
             try {
-                storage.create(path, manuscript);
+                // Find the organization in database first.
+                manuscript.organization = organizationStorage.findByPath(organizationPath);
+                manuscriptStorage.create(organizationPath, manuscript);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
-            // call handlers
-            handlers.handleObjectCreated(path, manuscript);
+            // call handlers - must set organization first
+            handlers.handleObjectCreated(organizationPath, manuscript);
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(manuscript.manuscriptId).build();
             return Response.created(uri).build();
@@ -102,11 +106,14 @@ public class ManuscriptResource {
         path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         if(manuscript.isValid()) {
             try {
-                storage.update(path, manuscript);
+                StoragePath organizationPath = new StoragePath();
+                organizationPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+                manuscript.organization = organizationStorage.findByPath(organizationPath);
+                manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
             }
-            // call handlers
+            // call handlers - must set organization first.
             handlers.handleObjectUpdated(path, manuscript);
             return Response.noContent().build();
         } else {
@@ -122,11 +129,11 @@ public class ManuscriptResource {
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
         try {
-            storage.deleteByPath(path);
+            manuscriptStorage.deleteByPath(path);
         } catch (StorageException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }
-        // TODO: handle the deleted object
+        // TODO: handle the deleted object - if we need to
         return Response.noContent().build();
     }
 }
