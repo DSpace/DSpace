@@ -43,6 +43,6 @@
   "manuscriptId": "MS12345", 
   "publicationDOI": "doi:10.12345/987cba", 
   "publicationDate": "2014-10-17T00:00:00-04:00", 
-  "status": "accepted", 
+  "status": "submitted", 
   "title": "Title of article 1"
 }
