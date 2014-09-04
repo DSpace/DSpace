@@ -74,12 +74,12 @@ public class DryadPathUtilities {
     }
 
     /**
-     * Generate a valid filename for saving a manuscript to the filesystem. Does
-     * not include directory name
+     * Generate a valid base filename for saving a manuscript to the filesystem. Does
+     * not include directory name or extension
      * @param manuscript manuscript with an ID
      * @return an escaped filename, using DryadJournalSubmission.escapeFilename.
      */
-    public static String getTargetFilename(Manuscript manuscript) {
+    public static String getTargetBaseFilename(Manuscript manuscript) {
         if(manuscript == null) {
             throw new IllegalArgumentException("Must provide a manuscript object");
         }

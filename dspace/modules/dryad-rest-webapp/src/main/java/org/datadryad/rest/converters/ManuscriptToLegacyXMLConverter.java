@@ -31,6 +31,7 @@ public class ManuscriptToLegacyXMLConverter {
         LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript);
         JAXBContext context = JAXBContext.newInstance(LegacyManuscript.class);
         Marshaller marshaller = context.createMarshaller();
+        // Encoding is UTF-8 by default - http://docs.oracle.com/javaee/5/api/javax/xml/bind/Marshaller.html
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.marshal(legacyManuscript, outputStream);
     }

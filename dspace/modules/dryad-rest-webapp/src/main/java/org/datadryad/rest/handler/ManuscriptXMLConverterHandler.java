@@ -5,6 +5,7 @@ package org.datadryad.rest.handler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import javax.xml.bind.JAXBException;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
@@ -16,7 +17,7 @@ import org.datadryad.rest.utils.DryadPathUtilities;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
-
+    private static final String XML_EXTENSION = "xml";
     public ManuscriptXMLConverterHandler() {
     }
 
@@ -37,7 +38,9 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
 
     private void writeXML(StoragePath path, Manuscript manuscript) throws HandlerException {
         String organizationCode = DryadPathUtilities.getOrganizationCode(path);
-        String fileName = DryadPathUtilities.getTargetFilename(manuscript);
+        String baseName = DryadPathUtilities.getTargetBaseFilename(manuscript);
+        String extension = XML_EXTENSION;
+        String fileName = String.format("%s.%s", baseName, extension);
         String outputDirectory;
         try {
              outputDirectory = DryadPathUtilities.getOutputDirectory(organizationCode);
