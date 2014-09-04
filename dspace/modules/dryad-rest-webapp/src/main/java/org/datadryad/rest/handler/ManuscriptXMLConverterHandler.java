@@ -38,11 +38,11 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
     }
 
     private void writeXML(StoragePath path, Manuscript manuscript) throws HandlerException {
-        String organizationCode = Organization.getOrganizationCode(path);
+        String organizationCode = manuscript.organization.organizationCode;
         String baseName = JournalPropertiesUtilities.getTargetBaseFilename(manuscript);
         String extension = XML_EXTENSION;
         String fileName = String.format("%s.%s", baseName, extension);
-        String outputDirectory, journalName = null;
+        String outputDirectory;
         try {
              outputDirectory = JournalPropertiesUtilities.getOutputDirectory(organizationCode);
         } catch (IllegalArgumentException ex) {
@@ -53,7 +53,7 @@ class ManuscriptXMLConverterHandler implements HandlerInterface<Manuscript> {
         File outputFile = new File(outputDirectory, fileName);
         try {
             FileOutputStream fos = new FileOutputStream(outputFile);
-            ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, journalName, fos);
+            ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, fos);
         } catch (FileNotFoundException ex) {
             throw new HandlerException("Unable to write XML file", ex);
         } catch (JAXBException ex) {
