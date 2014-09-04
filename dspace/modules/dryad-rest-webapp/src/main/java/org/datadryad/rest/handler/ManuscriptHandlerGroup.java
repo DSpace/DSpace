@@ -10,8 +10,10 @@ import org.datadryad.rest.models.Manuscript;
  */
 public class ManuscriptHandlerGroup extends AbstractHandlerGroup<Manuscript> {
     public ManuscriptHandlerGroup() {
-        // Add some concrete handlers 
+        // Save manuscripts as XML files for submission system
         addHandler(new ManuscriptXMLConverterHandler());
+        // If review status changed, process the item
+        addHandler(new ManuscriptReviewStatusChangeHandler());
     }
 
 }

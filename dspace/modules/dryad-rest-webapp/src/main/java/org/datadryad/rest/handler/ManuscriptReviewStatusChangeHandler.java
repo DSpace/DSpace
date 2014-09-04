@@ -5,6 +5,8 @@ package org.datadryad.rest.handler;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.utils.DryadPathUtilities;
+import org.dspace.workflow.ApproveRejectReviewItem;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 
 /**
  * Processes accept/reject status and moves items in review.
@@ -27,12 +29,12 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
         // Do nothing
     }
 
-    private void processChange(StoragePath path, Manuscript manuscript) {
+    private void processChange(StoragePath path, Manuscript manuscript) throws HandlerException {
         String organizationCode = DryadPathUtilities.getOrganizationCode(path);
         processChange(organizationCode, manuscript);
     }
 
-    private void processChange(String organizationCode, Manuscript manuscript) {
+    private void processChange(String organizationCode, Manuscript manuscript) throws HandlerException {
         String status = manuscript.status;
         if(Manuscript.STATUS_SUBMITTED.equals(status)) {
             // Do nothing for submitted
@@ -45,16 +47,22 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
         }
     }
 
-    private void accept(String organizationCode, Manuscript manuscript) {
+    private void accept(String organizationCode, Manuscript manuscript) throws HandlerException {
         // dspace review-item -a true
-        // org.dspace.workflow.ApproveRejectReviewItem only works from CLI right now
-        // refactoring
+        try {
+            ApproveRejectReviewItem.reviewItem(Boolean.TRUE, manuscript.manuscriptId);
+        } catch (ApproveRejectReviewItemException ex) {
+            throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);
+        }
     }
 
-    private void reject(String organizationCode, Manuscript manuscript) {
+    private void reject(String organizationCode, Manuscript manuscript) throws HandlerException {
         // dspace review-item -a false
-        // org.dspace.workflow.ApproveRejectReviewItem only works from CLI right now
-        // refactoring
+        try {
+            ApproveRejectReviewItem.reviewItem(Boolean.FALSE, manuscript.manuscriptId);
+        } catch (ApproveRejectReviewItemException ex) {
+            throw new HandlerException("Exception handling rejection notice for manuscript " + manuscript.manuscriptId, ex);
+        }
     }
 
 }
