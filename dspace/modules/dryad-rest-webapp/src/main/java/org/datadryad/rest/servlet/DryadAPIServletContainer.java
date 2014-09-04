@@ -15,10 +15,12 @@ public class DryadAPIServletContainer extends ServletContainer {
     private final static Logger log = Logger.getLogger(DryadAPIServletContainer.class);
     @Override
     public void init(ServletConfig config) throws ServletException {
-        super.init(config);
         log.info("initializing DryadAPIServletContainer - loading dspace config");
         String configFile = config.getServletContext().getInitParameter("dspace.config");
         ConfigurationManager.loadConfig(configFile);
         log.info("initialized DryadAPIServletContainer");
+        // Must load configFile before initializing, some singletons depend on
+        // configured DSpace
+        super.init(config);
     }
 }
