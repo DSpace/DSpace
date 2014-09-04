@@ -11,6 +11,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 @XmlRootElement
 public class Organization {
+    public static final String ORGANIZATION_CODE = "organizationCode";
     public Integer organizationId;
     public String organizationCode;
     public String organizationName;

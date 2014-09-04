@@ -84,9 +84,9 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrganization(@PathParam("organizationCode") String organizationCode) {
+    public Response getOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         try {
             Organization organization = storage.findByPath(path);
             if(organization == null) {
@@ -122,10 +122,10 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateOrganization(@PathParam("organizationCode") String organizationCode, Organization organization) {
+    public Response updateOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Organization organization) {
         System.err.println("Organization received with name: " + organization.organizationName + ", Code: " + organization.organizationCode);
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         // Check required fields
         if(organization.isValid()) {
             try {
@@ -142,9 +142,9 @@ public class OrganizationResource {
     @Path("/{organizationCode}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteOrganization(@PathParam("organizationCode") String organizationCode) {
+    public Response deleteOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         try {
             storage.deleteByPath(path);
         } catch (StorageException ex) {

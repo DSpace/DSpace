@@ -13,7 +13,6 @@ import org.dspace.submit.utils.DryadJournalSubmissionUtils;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class JournalPropertiesUtilities {
-    private static final String ORGANIZATION_KEY = "organizationCode";
     /**
      * Get the metadata directory for writing legacy xml files, based on an
      * organization.
@@ -96,7 +95,7 @@ public class JournalPropertiesUtilities {
      * @return the value of the path key for "organizationCode", or null if not found
      */
     public static String getOrganizationCode(StoragePath path) {
-        int index = path.getKeyPath().indexOf(ORGANIZATION_KEY);
+        int index = path.getKeyPath().indexOf(Organization.ORGANIZATION_CODE);
         if(index != -1) {
             return path.getValuePath().get(index);
         } else {

@@ -21,6 +21,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.handler.ManuscriptHandlerGroup;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -40,11 +41,11 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam("organizationCode") String organizationCode) {
+    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = new StoragePath();
-            path.addPathElement("organizationCode", organizationCode);
+            path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
             return Response.ok(storage.getAll(path)).build();
         } catch (StorageException ex) {
             return Response.serverError().entity(ex.getMessage()).build();
@@ -54,10 +55,10 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
+    public Response getManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
         try {
             StoragePath path = new StoragePath();
-            path.addPathElement("organizationCode", organizationCode);
+            path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
             path.addPathElement("manuscriptId", manuscriptId);
             Manuscript manuscript = storage.findByPath(path);
             if(manuscript == null) {
@@ -73,9 +74,9 @@ public class ManuscriptResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createManuscript(@PathParam("organizationCode") String organizationCode, Manuscript manuscript) {
+    public Response createManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Manuscript manuscript) {
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         if(manuscript.isValid()) {
             try {
                 storage.create(path, manuscript);
@@ -95,9 +96,9 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId, Manuscript manuscript) {
+    public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId, Manuscript manuscript) {
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         path.addPathElement("manuscriptId", manuscriptId);
         if(manuscript.isValid()) {
             try {
@@ -116,9 +117,9 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteManuscript(@PathParam("organizationCode") String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
+    public Response deleteManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam("manuscriptId") String manuscriptId) {
         StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", organizationCode);
+        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         path.addPathElement("manuscriptId", manuscriptId);
         try {
             storage.deleteByPath(path);
