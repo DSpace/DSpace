@@ -79,7 +79,7 @@ public class ApproveRejectReviewItem {
                 wfi = WorkflowItem.findByItemId(c, manuscriptItems.get(0).getID());
                 reviewItem(c, approved, wfi);
             } else {
-                throw new IllegalArgumentException("No item found with manuscript number: " + manuscriptNumber);
+                throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
@@ -117,7 +117,7 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi) throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, MessagingException, WorkflowException {
+    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi) throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, MessagingException, WorkflowException, ApproveRejectReviewItemException {
 	// get a List of ClaimedTasks, using the WorkflowItem
         List<ClaimedTask> claimedTasks = null;
 
@@ -128,7 +128,7 @@ public class ApproveRejectReviewItem {
         //Check for a valid task
         // There must be a claimed actions & it must be in the review stage, else it isn't a valid workflowitem
         if(claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")){
-            throw new IllegalArgumentException("Item not found or not in review");
+            throw new ApproveRejectReviewItemException("Item not found or not in review");
         } else {
             ClaimedTask claimedTask = claimedTasks.get(0);
             Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
