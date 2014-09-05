@@ -56,7 +56,7 @@ import org.dspace.search.DSIndexer;
  */
 public class MediaFilterManager
 {
-    private static Logger log = Logger.getLogger(MediaFilterManager.class);
+    private static final Logger log = Logger.getLogger(MediaFilterManager.class);
 
 	//key (in dspace.cfg) which lists all enabled filters by name
     public static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
@@ -85,12 +85,12 @@ public class MediaFilterManager
     
     private static FormatFilter[] filterClasses = null;
     
-    private static Map<String, List<String>> filterFormats = new HashMap<String, List<String>>();
-    
+    private static final Map<String, List<String>> filterFormats = new HashMap<>();
+
     private static List<String> skipList = null; //list of identifiers to skip during processing
 
-    private static List<String> publicFiltersClasses = null;
-    
+    private static final List<String> publicFiltersClasses = new ArrayList<>();
+
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static final String FILTER_PLUGIN_SEPARATOR = "\034";
@@ -99,7 +99,6 @@ public class MediaFilterManager
         String publicPermissionFilters = ConfigurationManager.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
         if(publicPermissionFilters != null) {
             String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
-            publicFiltersClasses = new ArrayList<String>();
             for(String filter : publicPermisionFiltersArray) {
                 publicFiltersClasses.add(filter.trim());
             }
