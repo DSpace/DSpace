@@ -134,6 +134,13 @@ public abstract class DSpaceObject
             }
         }
 
+        // it the DSO has no identifiers at all including handle, we should return an empty array.
+        // G.e. items during submission (workspace items) have no handle and no other identifier.
+        if (identifiers == null)
+        {
+            identifiers = new String[] {};
+        }
+
         if (log.isDebugEnabled())
         {
             StringBuilder dbgMsg = new StringBuilder();
