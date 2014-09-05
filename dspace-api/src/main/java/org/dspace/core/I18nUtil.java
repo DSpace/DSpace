@@ -237,7 +237,7 @@ public class I18nUtil
         return fileName;
     }
     /**
-     * et the i18n message string for a given key and use the default Locale
+     * Get the i18n message string for a given key and use the default Locale.
      *
      * @param key
      *        String - name of the key to get the message for
@@ -247,17 +247,10 @@ public class I18nUtil
      *
      *
      */
-    public static String getMessage(String key) throws MissingResourceException
+    public static String getMessage(String key)
     {
-        try {
-            String message = getMessage(key.trim(), DEFAULTLOCALE);
-            return message;
-        } catch (java.util.MissingResourceException e) {
-            log.error("Missing Setting for key: " + key);
-            return key;
-        }
+        return getMessage(key.trim(), DEFAULTLOCALE);
     }
-
     
     /**
      * Get the i18n message string for a given key and locale
@@ -269,20 +262,22 @@ public class I18nUtil
      *
      * @return message
      *         String of the message
-     *
-     *
      */
-    public static String getMessage(String key, Locale locale) throws MissingResourceException
+    public static String getMessage(String key, Locale locale)
     {
-        String message = "";
         if (locale == null)
         {
             locale = DEFAULTLOCALE;
         }
         ResourceBundle messages = ResourceBundle.getBundle("Messages", locale);
-        message = messages.getString(key.trim());
-        
-        return message;
+        try {
+            String message = messages.getString(key.trim());
+            return message;
+        } catch (MissingResourceException e) {
+            log.error("'" + key + "' translation undefined in locale '"
+                    + locale.toString() + "'");
+            return key;
+        }
     }
     
     /**
@@ -298,7 +293,7 @@ public class I18nUtil
      *
      *
      */
-    public static String getMessage(String key, Context c) throws MissingResourceException
+    public static String getMessage(String key, Context c)
     {
         return getMessage(key.trim(), c.getCurrentLocale());
     }
