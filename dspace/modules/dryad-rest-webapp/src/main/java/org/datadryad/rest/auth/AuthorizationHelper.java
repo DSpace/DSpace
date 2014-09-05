@@ -32,11 +32,12 @@ public class AuthorizationHelper {
         OAuthTokenDatabaseStorageImpl storage = new OAuthTokenDatabaseStorageImpl();
         try {
             OAuthToken oAuthToken = storage.getToken(accessToken);
-            if(oAuthToken != null && oAuthToken.isValid()) {
-                return oAuthToken.getEPersonId();
-            } else {
+            if(oAuthToken == null || !oAuthToken.isValid()) {
+                // Token not found or invalid
                 // TODO: Handle expirations separately;
                 return OAuthToken.INVALID_PERSON_ID;
+            } else {
+                return oAuthToken.getEPersonId();
             }
         } catch (StorageException ex) {
             log.error("Exception getting Token", ex);
