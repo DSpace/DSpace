@@ -2,11 +2,9 @@
  */
 package org.datadryad.rest.auth;
 
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
@@ -15,11 +13,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
 import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
-import org.apache.oltu.oauth2.rs.response.OAuthRSResponse;
-import org.dspace.eperson.EPerson;
 
 /**
  *
