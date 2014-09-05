@@ -32,7 +32,7 @@ public class AuthorizationHelper {
         OAuthTokenDatabaseStorageImpl storage = new OAuthTokenDatabaseStorageImpl();
         try {
             OAuthToken oAuthToken = storage.getToken(accessToken);
-            if(oAuthToken.isValid()) {
+            if(oAuthToken != null && oAuthToken.isValid()) {
                 return oAuthToken.getEPersonId();
             } else {
                 // TODO: Handle expirations separately;
