@@ -779,6 +779,16 @@
                    })();
            </xsl:text></script>
         </xsl:if>
+
+        <!-- Add a contextpath to a JS variable -->
+                <script type="text/javascript"><xsl:text>
+                         if(typeof window.orcid === 'undefined'){
+                            window.orcid={};
+                          };
+                        window.orcid.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
+                    <xsl:text>window.orcid.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
+                </script>
+
     </xsl:template>
 
 </xsl:stylesheet>
