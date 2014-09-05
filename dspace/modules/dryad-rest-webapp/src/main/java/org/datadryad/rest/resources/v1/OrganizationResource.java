@@ -42,37 +42,10 @@ public class OrganizationResource {
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 
-    static Boolean isValidToken(String accessToken) {
-        System.out.println("Access token: " + accessToken);
-        return Boolean.TRUE;
-    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganizations() {
-        // Check Token
-
-        try {
-            // This allows us to get tokens out of query parameter or header
-            OAuthAccessResourceRequest oAuthRequest = new OAuthAccessResourceRequest(request, ParameterStyle.QUERY, ParameterStyle.HEADER);
-            String accessToken = oAuthRequest.getAccessToken();
-            // TODO: Check if token is valid
-            //
-            if(!isValidToken(accessToken)) {
-            // Return the OAuth error message
-                OAuthResponse oauthResponse = OAuthRSResponse
-                        .errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
-                        .setRealm("Dryad REST API")
-                        .setError(OAuthError.ResourceResponse.INVALID_TOKEN)
-                        .buildHeaderMessage();
-            }
-        } catch (OAuthProblemException ex) {
-            return Response.status(Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (OAuthSystemException ex) {
-            return Response.serverError().entity(ex.getMessage()).build();
-        }
-
-
         try {
             // Returning a list requires POJO turned on
             return Response.ok(organizationStorage.getAll(new StoragePath())).build();
