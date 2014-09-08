@@ -1427,4 +1427,9 @@ public class Group extends DSpaceObject
     {
 
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }

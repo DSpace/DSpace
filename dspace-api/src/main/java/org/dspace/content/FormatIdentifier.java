@@ -7,11 +7,11 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
-
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import java.sql.SQLException;
 
 /**
  * This class handles the recognition of bitstream formats, using the format
@@ -34,9 +34,22 @@ public class FormatIdentifier
      * @return a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
-            Bitstream bitstream) throws SQLException
-    {
-         String filename = bitstream.getName();
+            Bitstream bitstream) throws SQLException {
+        return guessFormat(context, bitstream.getName());
+    }
+
+    /**
+     * Attempt to identify the format of a particular filename. If the format
+     * is unknown, null is returned.
+     *
+     * @param filename
+     *            the bitstream to identify the format of
+     *
+     * @return a format from the bitstream format registry, or null
+     */
+    public static BitstreamFormat guessFormat(Context context,
+                                              String filename) throws SQLException {
+
         // FIXME: Just setting format to first guess
         // For now just get the file name       
 

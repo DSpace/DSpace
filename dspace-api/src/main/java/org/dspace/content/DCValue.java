@@ -46,6 +46,23 @@ public class DCValue
      * @return
      */
     public String getField() {
-        return schema + "." + element + (qualifier==null?"":("." + qualifier));
+        return schema + "." + element + (qualifier == null ? "" : ("." + qualifier));
+    }
+
+    public String toString() {
+        String str = schema + "." + element;
+        if (qualifier != null)
+            str = str + "." + qualifier;
+        if (language != null && language != "")
+            str = str + "[" + language + "]";
+        return str + "=" + value;
+    }
+
+    public static String[] valuesFor(DCValue[] values) {
+        String vals[] = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            vals[i] = values[i].value;
+        }
+        return vals;
     }
 }
