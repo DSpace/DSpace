@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.auth;
 
+import com.sun.istack.logging.Logger;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -20,21 +21,18 @@ import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class AuthorizationRequestFilter implements ContainerRequestFilter {
+public class AuthenticationRequestFilter implements ContainerRequestFilter {
+    private static final Logger log = Logger.getLogger(AuthenticationRequestFilter.class);
     @Context private HttpServletRequest servletRequest;
-    static Boolean isValidToken(String accessToken) {
-        System.out.println("Access token: " + accessToken);
-        return Boolean.TRUE;
-    }
-
     @Override
     public ContainerRequest filter(ContainerRequest containerRequest) {
+        log.info("Filtering request for authentication");
         // TODO: Make sure HTTPs if we can
         try {
             // This allows us to get tokens out of query parameter or header
             OAuthAccessResourceRequest oAuthRequest = new OAuthAccessResourceRequest(servletRequest, ParameterStyle.QUERY, ParameterStyle.HEADER);
             String accessToken = oAuthRequest.getAccessToken();
-            EPersonUserPrincipal userPrincipal = AuthorizationHelper.getPrincipalFromToken(accessToken);
+            EPersonUserPrincipal userPrincipal = AuthHelper.getPrincipalFromToken(accessToken);
             if(userPrincipal == null) {
                 throwExceptionResponse(null, Status.UNAUTHORIZED, OAuthError.ResourceResponse.INVALID_TOKEN);
             } else {

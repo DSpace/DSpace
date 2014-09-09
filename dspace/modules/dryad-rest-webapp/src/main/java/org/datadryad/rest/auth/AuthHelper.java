@@ -3,6 +3,8 @@
 package org.datadryad.rest.auth;
 
 import java.sql.SQLException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.OAuthToken;
 import org.datadryad.rest.storage.StorageException;
@@ -14,9 +16,8 @@ import org.dspace.eperson.EPerson;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class AuthorizationHelper {
-    // Uses DSpace Context to look up users by access token
-    private static final Logger log = Logger.getLogger(AuthorizationHelper.class);
+public class AuthHelper {
+    private static final Logger log = Logger.getLogger(AuthHelper.class);
 
     static EPerson getEPerson(Integer id) throws SQLException {
         if(id == OAuthToken.INVALID_PERSON_ID) {
@@ -61,5 +62,15 @@ public class AuthorizationHelper {
             log.error("SQL Exception getting EPerson", ex);
         }
         return principal;
+    }
+
+    static void throwExceptionResponse(Throwable throwable, Response.Status status, String responseString) throws WebApplicationException {
+        Response.ResponseBuilder builder;
+        builder = Response.status(status).entity(responseString);
+        if(throwable == null) {
+            throw new WebApplicationException(builder.build());
+        } else {
+            throw new WebApplicationException(throwable, builder.build());
+        }
     }
 }
