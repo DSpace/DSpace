@@ -21,6 +21,10 @@
             <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
             <param-value>org.datadryad.rest.auth.AuthenticationRequestFilter</param-value>
         </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ResourceFilters</param-name>
+            <param-value>org.datadryad.rest.auth.ResourceAuthorizationFilterFactory</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
