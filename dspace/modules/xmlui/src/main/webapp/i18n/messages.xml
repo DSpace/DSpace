@@ -3423,6 +3423,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep">Publication Blackout: Payment information must be reauthorized</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_claimed">Publication Blackout: Reauthorize payment : claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationPaymentStep_pool">Publication Blackout: Reauthorize payment : Unclaimed</message>
+
+
+
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep">Credit information must be reauthorized</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep_claimed">Reauthorize credit : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reAuthorizationCreditStep_pool">Reauthorize credit : Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep">Publication Blackout: Credit information must be reauthorized</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep_claimed">Publication Blackout: Reauthorize credit : claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationReAuthorizationCreditStep_pool">Publication Blackout: Reauthorize credit : Unclaimed</message>
+
     <message key="xmlui.administrative.Navigation.administrative_access_shoppingcart">Shopping Cart</message>
 
     <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>

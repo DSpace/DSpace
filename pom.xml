@@ -563,6 +563,12 @@
             <version>1.06</version>
             <scope>test</scope>
         </dependency>
+
+          <dependency>
+              <groupId>org.apache.solr</groupId>
+              <artifactId>solr-solrj</artifactId>
+              <version>1.4.1</version>
+          </dependency>
       </dependencies>
    </dependencyManagement>
 

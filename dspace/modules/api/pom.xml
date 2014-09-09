@@ -114,12 +114,17 @@
 
    <dependencies>
 
-       <!-- DSpace API -->
        <dependency>
            <groupId>com.atmire</groupId>
            <artifactId>atmire-workflow-api</artifactId>
            <version>1.7.3-SNAPSHOT</version>
        </dependency>
+
+       <!--<dependency>-->
+           <!--<groupId>com.atmire</groupId>-->
+           <!--<artifactId>atmire-authority-api</artifactId>-->
+           <!--<version>1.7.3-SNAPSHOT</version>-->
+       <!--</dependency>-->
 
        <dependency>
            <groupId>org.dspace.discovery</groupId>
@@ -143,7 +148,7 @@
        <dependency>
            <groupId>org.dspace.dependencies.solr</groupId>
            <artifactId>dspace-solr-solrj</artifactId>
-           <version>1.4.0.1-SNAPSHOT</version>
+           <version>1.4.0.1</version>
        </dependency>
        <!---->
        <!--<dependency>-->

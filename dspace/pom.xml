@@ -794,6 +794,13 @@
 	  <artifactId>discovery-solr-provider</artifactId>
 	  <version>0.9.4-SNAPSHOT</version>
 	</dependency>
+
+
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-authority-api</artifactId>
+            <version>${version}</version>
+        </dependency>
 	<dependency>
 	  <groupId>org.dspace</groupId>
 	  <artifactId>dspace-api</artifactId>
@@ -852,11 +859,7 @@
 	  <version>1.2.5</version>
 	</dependency>
 	
-        <dependency>
-	  <groupId>com.atmire</groupId>
-	  <artifactId>atmire-authority</artifactId>
-	  <version>${pom.version}</version>
-        </dependency>
+
 	
     </dependencies>      
 </project>
