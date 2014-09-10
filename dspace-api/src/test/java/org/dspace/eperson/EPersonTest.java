@@ -705,7 +705,7 @@ public class EPersonTest extends AbstractUnitTest
             throws SQLException
     {
         System.out.println("getType");
-        EPerson instance = new EPerson(new Context(), row1);
+        EPerson instance = new EPerson(context, row1);
         int expResult = Constants.EPERSON;
         int result = instance.getType();
         assertEquals("Should return Constants.EPERSON", expResult, result);
