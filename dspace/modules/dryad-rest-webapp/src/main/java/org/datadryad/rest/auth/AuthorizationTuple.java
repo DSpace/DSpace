@@ -2,8 +2,6 @@
  */
 package org.datadryad.rest.auth;
 
-import org.datadryad.rest.models.OAuthToken;
-
 /**
  * Encapsulates the 3 things we need to check to determine if a request is authorized
  * @author Dan Leehr <dan.leehr@nescent.org>
