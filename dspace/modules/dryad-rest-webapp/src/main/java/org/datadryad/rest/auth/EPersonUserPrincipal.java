@@ -24,7 +24,14 @@ public class EPersonUserPrincipal implements Principal {
         // TODO: come up with role scheme and determine if user is in it
         // e.g. CREATE_MANUSCRIPT_JOURNAL1
         return true;
+    }
 
+    public final Integer getID() {
+        if(eperson != null) {
+            return eperson.getID();
+        } else {
+            return null;
+        }
     }
 
 }

@@ -34,7 +34,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
             String accessToken = oAuthRequest.getAccessToken();
             EPersonUserPrincipal userPrincipal = AuthHelper.getPrincipalFromToken(accessToken);
             if(userPrincipal == null) {
-                throwExceptionResponse(null, Status.UNAUTHORIZED, OAuthError.ResourceResponse.INVALID_TOKEN);
+                AuthHelper.throwExceptionResponse(null, Status.UNAUTHORIZED, OAuthError.ResourceResponse.INVALID_TOKEN);
             } else {
                 // User found, set it into the context.
                 EPersonSecurityContext securityContext = new EPersonSecurityContext(userPrincipal);
@@ -42,21 +42,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
                 return containerRequest;
             }
         } catch (OAuthProblemException ex) {
-            throwExceptionResponse(ex, Status.INTERNAL_SERVER_ERROR, "OAuth Problem");
+            AuthHelper.throwExceptionResponse(ex, Status.INTERNAL_SERVER_ERROR, "OAuth Problem");
         } catch (OAuthSystemException ex) {
-            throwExceptionResponse(ex, Status.INTERNAL_SERVER_ERROR, "OAuth System Exception");
+            AuthHelper.throwExceptionResponse(ex, Status.INTERNAL_SERVER_ERROR, "OAuth System Exception");
         }
         return containerRequest;
     }
-
-    private static void throwExceptionResponse(Throwable throwable, Status status, String responseString) throws WebApplicationException {
-        ResponseBuilder builder;
-        builder = Response.status(status).entity(responseString);
-        if(throwable == null) {
-            throw new WebApplicationException(builder.build());
-        } else {
-            throw new WebApplicationException(throwable, builder.build());
-        }
-    }
-
 }

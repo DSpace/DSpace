@@ -73,4 +73,18 @@ public class AuthHelper {
             throw new WebApplicationException(throwable, builder.build());
         }
     }
+
+    static Boolean isAuthorized(AuthorizationTuple tuple) {
+        if(tuple == null) {
+            return Boolean.FALSE;
+        }
+        if(!tuple.isComplete()) {
+            return Boolean.FALSE;
+        }
+        if(tuple.ePersonId == OAuthToken.INVALID_PERSON_ID) {
+            return Boolean.FALSE;
+        }
+        // TODO: check database
+        return Boolean.TRUE;
+    }
 }
