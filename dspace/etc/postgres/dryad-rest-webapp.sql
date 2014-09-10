@@ -37,5 +37,12 @@ CREATE TABLE oauth_token
   expires DATE
 );
 
--- API users and permissions
--- should these just be tied to dspace resource policy?
+-- API resource permissions - eperson, method, resource path
+CREATE SEQUENCE rest_resource_authz_seq;
+CREATE TABLE rest_resource_authz
+(
+  rest_resource_authz_id INTEGER PRIMARY KEY not null default nextval('rest_resource_authz_seq'),
+  eperson_id INTEGER not null REFERENCES eperson(eperson_id),
+  http_method VARCHAR(8) not null,
+  resource_path VARCHAR(1024) not null
+)
