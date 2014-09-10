@@ -328,7 +328,8 @@ public class DOIIdentifierProvider
         }
         
         doiRow.setColumn("status", IS_REGISTERED);
-        DatabaseManager.update(context, doiRow);        
+        DatabaseManager.update(context, doiRow);
+        dso.resetIdentifiersCache();
     }
     
     public void updateMetadata(Context context, DSpaceObject dso, String identifier)
