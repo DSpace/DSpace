@@ -7,7 +7,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.OAuthToken;
+import org.datadryad.rest.storage.AuthorizationStorageInterface;
+import org.datadryad.rest.storage.OAuthTokenStorageInterface;
 import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.rdbms.AuthorizationDatabaseStorageImpl;
 import org.datadryad.rest.storage.rdbms.OAuthTokenDatabaseStorageImpl;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -30,7 +33,7 @@ public class AuthHelper {
 
     static Integer getEPersonIdFromToken(String accessToken) {
         // TODO: switch storage to provider.
-        OAuthTokenDatabaseStorageImpl storage = new OAuthTokenDatabaseStorageImpl();
+        OAuthTokenStorageInterface storage = new OAuthTokenDatabaseStorageImpl();
         try {
             OAuthToken oAuthToken = storage.getToken(accessToken);
             if(oAuthToken == null || !oAuthToken.isValid()) {
@@ -84,7 +87,13 @@ public class AuthHelper {
         if(tuple.ePersonId == OAuthToken.INVALID_PERSON_ID) {
             return Boolean.FALSE;
         }
-        // TODO: check database
-        return Boolean.TRUE;
+        // TODO: switch storage to provider.
+        AuthorizationStorageInterface storage = new AuthorizationDatabaseStorageImpl();
+        try {
+            return storage.isAuthorized(tuple);
+        } catch(StorageException ex) {
+            log.error("Exception checking auth", ex);
+            return Boolean.FALSE;
+        }
     }
 }

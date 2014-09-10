@@ -34,6 +34,10 @@ public class OAuthTokenDatabaseStorageImpl implements OAuthTokenStorageInterface
             COLUMN_TOKEN,
             COLUMN_EXPIRES);
 
+    /**
+     * Get a DSpace context to access the database
+     * @return
+     */
     private static Context getContext() {
         Context context = null;
         try {
@@ -44,6 +48,11 @@ public class OAuthTokenDatabaseStorageImpl implements OAuthTokenStorageInterface
         return context;
     }
 
+    /**
+     * Commits changes. Not used in this class since tokens are read-only.
+     * @param context
+     * @throws SQLException
+     */
     private static void completeContext(Context context) throws SQLException {
         try {
             context.complete();
