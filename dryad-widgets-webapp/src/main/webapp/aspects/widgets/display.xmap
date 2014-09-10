@@ -83,6 +83,7 @@
         <!-- data-file content handler -->
         <map:pipeline type="noncaching">
             <map:parameter name="expires" value="now"/>
+
             <map:match pattern="dataFileFrame">
                 <map:aggregate element="parts">
                     <map:part src="http://datadryad.org/mn/meta/{request-param:doi}"              element="meta"/>
@@ -185,8 +186,6 @@
             </map:handle-errors>
                                                             
         </map:pipeline>
-
-
 
     </map:pipelines>
 </map:sitemap>
