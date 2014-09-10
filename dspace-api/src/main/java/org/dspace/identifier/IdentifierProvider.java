@@ -54,6 +54,9 @@ public abstract class IdentifierProvider {
 
     /**
      * Create and apply an identifier to a DSpaceObject.
+     * If you just mark an identifier for an asynchronous registration, please call
+     * {@link org.dspace.content.DSpaceObject#resetIdentifiersCache()} after its registration. If you register
+     * identifiers directly in this method the IdentifierService will call this method for you.
      * 
      * @param context
      * @param item object to be named.
