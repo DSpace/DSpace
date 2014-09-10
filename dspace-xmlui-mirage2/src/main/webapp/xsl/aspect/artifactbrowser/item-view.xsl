@@ -368,16 +368,16 @@
                         </xsl:with-param>
                     </xsl:call-template>
                                     <xsl:choose>
-                                        <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+                                        <xsl:when test="contains($label-1, 'label') and string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:label)!=0">
                                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
                                         </xsl:when>
-                                        <xsl:when test="contains($label-1, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
+                                        <xsl:when test="contains($label-1, 'title') and string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:title)!=0">
                                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                                         </xsl:when>
-                                        <xsl:when test="contains($label-2, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+                                        <xsl:when test="contains($label-2, 'label') and string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:label)!=0">
                                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
                                         </xsl:when>
-                                        <xsl:when test="contains($label-2, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
+                                        <xsl:when test="contains($label-2, 'title') and string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:title)!=0">
                                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                                         </xsl:when>
                                         <xsl:otherwise>
