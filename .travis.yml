@@ -23,8 +23,9 @@ before_install:
   - gem install compass
   - compass version
 
-# Skip 'mvn install', not really needed for our tests
-install: "echo 'Skipping install, dependencies will be downloaded during build and test.'"
+# Run a quick version of "mvn install" to download module dependencies
+# Skip building the "dspace" assembly module, as we'll do that below
+install: "mvn install -P !dspace"
 
 # Build and test 
 #  travis_retry => Retry build/test up to 3 times
