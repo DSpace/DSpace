@@ -200,6 +200,7 @@ public class ItemUtils
                     String cka = bit.getChecksumAlgorithm();
                     String oname = bit.getSource();
                     String name = bit.getName();
+                    String description = bit.getDescription();
 
                     if (name != null)
                         bitstream.getField().add(
@@ -207,6 +208,9 @@ public class ItemUtils
                     if (oname != null)
                         bitstream.getField().add(
                                 createValue("originalName", name));
+                    if (description != null)
+                        bitstream.getField().add(
+                                createValue("description", description));
                     bitstream.getField().add(
                             createValue("format", bit.getFormat()
                                     .getMIMEType()));
