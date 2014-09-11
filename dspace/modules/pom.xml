@@ -73,7 +73,9 @@
         <profile>
             <id>dspace-rdf</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>rdf/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>rdf</module>
