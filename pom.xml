@@ -247,13 +247,34 @@
            </properties>
        </profile>
 
+       <!-- Skip Unit Tests by default, but allow override on command line
+           by setting property "-Dmaven.test.skip=false" -->
+       <profile>
+           <id>skiptests</id>
+           <activation>
+               <!-- This profile should be active at all times, unless the user
+                    specifies a different value for "maven.test.skip" -->
+               <property>
+                   <name>!maven.test.skip</name>
+               </property>
+           </activation>
+           <properties>
+               <maven.test.skip>true</maven.test.skip>
+           </properties>
+       </profile>
 
-        <!-- This profile ensures that we ONLY generate the Unit Test Environment
-             if the testEnvironment.xml file is found. That way the Test Environment
-             is NOT built when running a 'mvn package' on a "binary" release. -->
+        <!-- This profile ensures that we ONLY generate the Unit Test Environment,
+             if the testEnvironment.xml file is found AND we are not skipping Unit 
+             Tests (see also skiptests profile). That way the Test Environment is 
+             also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
                 <file>
                     <exists>src/main/assembly/testEnvironment.xml</exists>
                 </file>
@@ -458,10 +479,11 @@
                 <module>dspace-swordv2</module>
             </modules>
         </profile>
-       <!--
-      Builds MIRAGE2 WAR for DSpace
-   -->
-       <profile>
+
+        <!--
+           Builds MIRAGE2 WAR for DSpace
+        -->
+        <profile>
            <id>dspace-xmlui-mirage2</id>
            <activation>
                <file>
@@ -471,7 +493,8 @@
            <modules>
                <module>dspace-xmlui-mirage2</module>
            </modules>
-       </profile>
+        </profile>
+        
         <!--
            Builds XMLUI WAR for DSpace
         -->
@@ -486,8 +509,6 @@
                 <module>dspace-xmlui</module>
             </modules>
         </profile>
-
-
 
         <!--
            Builds LNI WAR & Client for DSpace
@@ -530,24 +551,6 @@
          </modules>
       </profile>
 
-      <!-- Skip Unit Tests by default, but allow override on command line
-           by setting property "-Dmaven.test.skip=false" -->
-      <profile>
-        <id>skiptests</id>
-        <activation>
-            <!-- This profile should be active at all times, unless the user
-                 specifies a different value for "maven.test.skip" -->
-            <property>
-                <name>!maven.test.skip</name>
-            </property>
-        </activation>
-        <properties>
-            <maven.test.skip>true</maven.test.skip>
-        </properties>
-      </profile>
-
-
-    
    </profiles>
 
    <!--
