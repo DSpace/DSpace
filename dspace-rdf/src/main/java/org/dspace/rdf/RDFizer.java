@@ -77,7 +77,7 @@ public class RDFizer {
     /**
      * This method allows you to override the context used for conversion and to
      * determine which DSpaceObjects should be deleted from the triplestore,
-     * consider well if this is really neccessary.
+     * consider well if this is really necessary.
      * If this method is not used the context of an anonymous user will be used. 
      * <p>
      * Please consider: If your triplestore offers a public sparql endpoint 
@@ -511,6 +511,15 @@ public class RDFizer {
                     + "and --delete-all together.");
             System.exit(1);
         }
+
+        if (line.hasOption("convert-all")
+                && (line.hasOption("delete") || line.hasOption("delete-all")))
+        {
+            usage(options);
+            System.err.println("\n\nYou cannot use the option --convert-all "
+                    + "together with --delete or --delete-all.");
+            System.exit(1);
+        }
         if (line.hasOption("identifiers")
                 && (line.hasOption("delete") || line.hasOption("delete-all")))
         {
@@ -626,20 +635,25 @@ public class RDFizer {
             report("Conversion ended.");
             System.exit(0);
         }
+
+        if (line.hasOption("convert-all"))
+        {
+            try {
+                this.convertAll();
+            }
+            catch (SQLException ex)
+            {
+                log.error(ex);
+                System.err.println("A problem with the database connection "
+                        + "occured. Canceled pending actions.");
+                System.err.println(ex.getMessage());
+                ex.printStackTrace(System.err);
+                System.exit(1);
+            }
+            System.exit(0);
+        }
         
-        try
-        {
-            this.convertAll();
-        }
-        catch (SQLException ex)
-        {
-            log.error(ex);
-            System.err.println("A problem with the database connection "
-                    + "occured. Canceled pending actions.");
-            System.err.println(ex.getMessage());
-            ex.printStackTrace(System.err);
-            System.exit(1);
-        }
+        this.usage(options);
         System.exit(0);
     }
 
@@ -690,27 +704,23 @@ public class RDFizer {
         
     protected Options createOptions() {
         Options options = new Options();
-        
+
         options.addOption("h", "help", false, "Print usage information and exit.");
         options.addOption("v", "verbose", false, "Print verbose information to "
                 + "stderr while converting data.");
         options.addOption("n", "dry-run", false, "Don't store the converted "
                 + "data in the triple store, don't delete data from the "
                 + "triplestore. Make a dry run, simulation what would happen.");
+        options.addOption("o", "stdout", false, "Print all converted data to " +
+                "stdout using turtle as serialization.");
+        options.addOption("n", "dry-run", false, "Don't send any data or commands " +
+                "to the triplestore. Usefull for debugging or in conjunction " +
+                "with --stdout.");
+        options.addOption("c", "convert-all", false, "Convert all DSpace Objects" +
+                " that are readable for an anonymous user. This may take a long time" +
+                "depending on the number of stored communties, collections and " +
+                "items. Existing information in the triple store will be updated.");
 
-        Option optStdout = OptionBuilder.withLongOpt("stdout")
-            .withDescription("Print all converted data to stdout using turtle "
-                    + "as serialization.")
-            .create('o');
-        options.addOption(optStdout);
-        
-        Option optDryRun = OptionBuilder.withLongOpt("dry-run")
-                .withDescription("Don't send any data or commands to the "
-                        + "triplestore. Usefull for debugging or in conjunction "
-                        + "with --stdout.")
-                .create('n');
-        options.addOption(optDryRun);
-        
         Option optIdentifiers = OptionBuilder.withLongOpt("identifiers")
             .hasArgs()
             .withArgName("handle")
@@ -750,13 +760,10 @@ public class RDFizer {
     {
         String cliSyntax = "[dspace-bin]/bin/dspace rdf-converter [OPTIONS...]";
         String header = "";
-        String footer = "\nYou cannot use the options --identifiers or --stdout "
-                + "together with --delete or --delete-all.\n\n"
-                + "If you use neither the option --delete nor --delete-all "
-                + "nor --identifiers all DSpace Objects that are readable for an "
-                + "anonymous user will be converted. This may take a long time"
-                + "depending on the number of stored communties, collections and "
-                + "items.";
+        String footer = "\nYou cannot use the options --convert-all, --identifiers " +
+                "or --stdout together with --delete or --delete-all.\n" +
+                "Please use at least one option out of --convert-all, --delete, " +
+                "--delete-all or --identifiers.\n";
         
         PrintWriter err = new PrintWriter(System.err);
         HelpFormatter helpformater = new HelpFormatter();
