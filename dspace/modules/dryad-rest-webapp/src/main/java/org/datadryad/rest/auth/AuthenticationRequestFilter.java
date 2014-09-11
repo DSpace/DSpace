@@ -21,6 +21,8 @@ import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
     private static final Logger log = Logger.getLogger(AuthenticationRequestFilter.class);
     @Context private HttpServletRequest servletRequest;
+    @Context private AuthHelper authHelper;
+
     @Override
     public ContainerRequest filter(ContainerRequest containerRequest) {
         log.info("Filtering request for authentication");
@@ -29,7 +31,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
             // This allows us to get tokens out of query parameter or header
             OAuthAccessResourceRequest oAuthRequest = new OAuthAccessResourceRequest(servletRequest, ParameterStyle.QUERY, ParameterStyle.HEADER);
             String accessToken = oAuthRequest.getAccessToken();
-            EPersonUserPrincipal userPrincipal = AuthHelper.getPrincipalFromToken(accessToken);
+            EPersonUserPrincipal userPrincipal = authHelper.getPrincipalFromToken(accessToken);
             if(userPrincipal == null) {
                 AuthHelper.throwExceptionResponse(null, Status.UNAUTHORIZED, OAuthError.ResourceResponse.INVALID_TOKEN);
             } else {

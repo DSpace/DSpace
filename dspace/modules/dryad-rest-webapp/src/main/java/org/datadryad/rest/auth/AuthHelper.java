@@ -7,8 +7,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.OAuthToken;
-import org.datadryad.rest.storage.AuthorizationStorageInterface;
-import org.datadryad.rest.storage.OAuthTokenStorageInterface;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.rdbms.AuthorizationDatabaseStorageImpl;
 import org.datadryad.rest.storage.rdbms.OAuthTokenDatabaseStorageImpl;
@@ -21,6 +19,12 @@ import org.dspace.eperson.EPerson;
  */
 public class AuthHelper {
     private static final Logger log = Logger.getLogger(AuthHelper.class);
+    private final OAuthTokenDatabaseStorageImpl tokenStorage;
+    private final AuthorizationDatabaseStorageImpl authzStorage;
+    public AuthHelper(OAuthTokenDatabaseStorageImpl tokenStorage, AuthorizationDatabaseStorageImpl authzStorage) {
+        this.tokenStorage = tokenStorage;
+        this.authzStorage = authzStorage;
+    }
 
     static EPerson getEPerson(Integer id) throws SQLException {
         if(id == OAuthToken.INVALID_PERSON_ID) {
@@ -31,11 +35,10 @@ public class AuthHelper {
         return eperson;
     }
 
-    static Integer getEPersonIdFromToken(String accessToken) {
+    Integer getEPersonIdFromToken(String accessToken) {
         // TODO: switch storage to provider.
-        OAuthTokenStorageInterface storage = new OAuthTokenDatabaseStorageImpl();
         try {
-            OAuthToken oAuthToken = storage.getToken(accessToken);
+            OAuthToken oAuthToken = tokenStorage.getToken(accessToken);
             if(oAuthToken == null || !oAuthToken.isValid()) {
                 // Token not found or invalid
                 // TODO: Handle expirations separately;
@@ -50,7 +53,7 @@ public class AuthHelper {
     }
 
 
-    static EPersonUserPrincipal getPrincipalFromToken(String accessToken) {
+    EPersonUserPrincipal getPrincipalFromToken(String accessToken) {
         EPersonUserPrincipal principal = null;
         if(accessToken == null) {
             return null;
@@ -77,7 +80,7 @@ public class AuthHelper {
         }
     }
 
-    static Boolean isAuthorized(AuthorizationTuple tuple) {
+    Boolean isAuthorized(AuthorizationTuple tuple) {
         if(tuple == null) {
             return Boolean.FALSE;
         }
@@ -87,10 +90,8 @@ public class AuthHelper {
         if(tuple.ePersonId == OAuthToken.INVALID_PERSON_ID) {
             return Boolean.FALSE;
         }
-        // TODO: switch storage to provider.
-        AuthorizationStorageInterface storage = new AuthorizationDatabaseStorageImpl();
         try {
-            return storage.isAuthorized(tuple);
+            return authzStorage.isAuthorized(tuple);
         } catch(StorageException ex) {
             log.error("Exception checking auth", ex);
             return Boolean.FALSE;

@@ -23,10 +23,12 @@ import org.apache.log4j.Logger;
 public class ResourceAuthorizationFilter implements ResourceFilter, ContainerRequestFilter {
     private static final Logger log = Logger.getLogger(ResourceAuthorizationFilter.class);
     private final HttpContext httpContext;
+    private final AuthHelper authHelper;
     private static final String NO_ACCESS = "You do not have access to the requested resource";
     private final AbstractMethod abstractMethod;
-    public ResourceAuthorizationFilter(HttpContext httpContext, AbstractMethod abstractMethod) {
+    public ResourceAuthorizationFilter(HttpContext httpContext, AuthHelper authHelper, AbstractMethod abstractMethod) {
         this.httpContext = httpContext;
+        this.authHelper = authHelper;
         this.abstractMethod = abstractMethod;
     }
 
@@ -46,7 +48,7 @@ public class ResourceAuthorizationFilter implements ResourceFilter, ContainerReq
         log.info("Filtering request for authorization");
         SecurityContext securityContext = containerRequest.getSecurityContext();
         AuthorizationTuple tuple = getTupleFromSecurityContext(securityContext);
-        if(!AuthHelper.isAuthorized(tuple)) {
+        if(!authHelper.isAuthorized(tuple)) {
             AuthHelper.throwExceptionResponse(null, Status.UNAUTHORIZED, NO_ACCESS);
             return null;
         }

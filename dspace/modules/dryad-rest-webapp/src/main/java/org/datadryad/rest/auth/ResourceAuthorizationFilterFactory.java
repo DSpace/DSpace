@@ -16,15 +16,16 @@ import javax.ws.rs.core.Context;
  */
 public class ResourceAuthorizationFilterFactory implements ResourceFilterFactory {
     private final HttpContext httpContext;
-
-    public ResourceAuthorizationFilterFactory(@Context HttpContext httpContext) {
+    private final AuthHelper authHelper;
+    public ResourceAuthorizationFilterFactory(@Context HttpContext httpContext, @Context AuthHelper authHelper) {
         this.httpContext = httpContext;
+        this.authHelper = authHelper;
     }
 
     @Override
-    public List<ResourceFilter> create(AbstractMethod am) {
+    public List<ResourceFilter> create(AbstractMethod abstractMethod) {
         List<ResourceFilter> filters = new ArrayList<ResourceFilter>();
-        filters.add(new ResourceAuthorizationFilter(httpContext, am));
+        filters.add(new ResourceAuthorizationFilter(httpContext, authHelper, abstractMethod));
         return filters;
     }
 
