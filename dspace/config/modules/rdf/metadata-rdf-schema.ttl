@@ -4,10 +4,10 @@
 @prefix owl:    <http://www.w3.org/2002/07/owl#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 
-@prefix :    <http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.2.0#> .
+@prefix :    <http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0#> .
 
 
-<http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.2.0>
+<http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0>
     rdfs:comment    "Vocabulary for describing mappings of DSpace metadata to rdf." ;
     dc:contributor  "Pascal-Nicolas Becker" ;
     dc:title        "DSpace Metadata RDF Mapping Spec" ;
