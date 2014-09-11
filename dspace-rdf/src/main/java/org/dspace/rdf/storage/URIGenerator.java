@@ -40,7 +40,7 @@ public interface URIGenerator {
      * @return May return null, if no URI could be generated.
      * @see org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)
      */
-    public String generateIdentifier(Context context, int type, int id, String handle)
+    public String generateIdentifier(Context context, int type, int id, String handle, String[] identifiers)
             throws SQLException;
     
     /**
