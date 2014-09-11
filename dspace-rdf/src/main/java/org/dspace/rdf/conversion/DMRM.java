@@ -16,14 +16,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 /**
  * Schema for DSpace Metadata RDF Mappings.
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
- * @see http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.2.0
+ * @see http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0
  */
 public class DMRM {
     /** <p>The RDF model that holds the vocabulary terms</p> */
     private static Model m_model = ModelFactory.createDefaultModel();
     
     /** <p>The namespace of the vocabulary as a string</p> */
-    public static final String NS = "http://www.pnjb.de/rdf/namespace/dspace/metadata-rdf-mapping/0.2.0#";
+    public static final String NS = "http://digital-repositories.org/ontologies/dspace-metadata-mapping/0.2.0#";
     
     /** <p>The namespace of the vocabulary as a string</p>
      *  @see #NS */
