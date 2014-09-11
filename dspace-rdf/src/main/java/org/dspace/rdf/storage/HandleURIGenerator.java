@@ -24,7 +24,8 @@ import org.dspace.utils.DSpace;
 public class HandleURIGenerator implements URIGenerator {
     private static final Logger log = Logger.getLogger(HandleURIGenerator.class);
     
-    public String generateIdentifier(Context context, int type, int id, String handle)
+    public String generateIdentifier(Context context, int type, int id, 
+            String handle, String[] identifiers)
     {
         if (type == Constants.SITE)
         {
@@ -59,6 +60,7 @@ public class HandleURIGenerator implements URIGenerator {
             return null;
         }
         
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle());
+        return generateIdentifier(context, dso.getType(), dso.getID(), 
+                dso.getHandle(), dso.getIdentifiers(context));
     }
 }

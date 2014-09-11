@@ -111,7 +111,7 @@ public class RDFConsumer implements Consumer
                 Item[] items = b.getItems();
                 for (Item i : items)
                 {
-                    DSOIdentifier id = new DSOIdentifier(i);
+                    DSOIdentifier id = new DSOIdentifier(i, ctx);
                     if (!this.toDelete.contains(id) && !this.toConvert.contains(id))
                     {
                         this.toConvert.addLast(id);
@@ -156,7 +156,7 @@ public class RDFConsumer implements Consumer
             Item[] items = bundle.getItems();
             for (Item i : items)
             {
-                DSOIdentifier id = new DSOIdentifier(i);
+                DSOIdentifier id = new DSOIdentifier(i, ctx);
                 if (!this.toDelete.contains(id) && !this.toConvert.contains(id))
                 {
                     this.toConvert.addLast(id);
@@ -191,7 +191,7 @@ public class RDFConsumer implements Consumer
         if (event.getEventType() == Event.DELETE)
         {
             DSOIdentifier id = new DSOIdentifier(event.getSubjectType(), 
-                    event.getSubjectID(), event.getDetail());
+                    event.getSubjectID(), event.getDetail(), event.getIdentifiers());
             
             if (this.toConvert.contains(id))
             {
@@ -222,7 +222,7 @@ public class RDFConsumer implements Consumer
                         + "event with the type REMOVE.");
                 return;
             }
-            DSOIdentifier id = new DSOIdentifier(dso);
+            DSOIdentifier id = new DSOIdentifier(dso, ctx);
 
             // If an item gets withdrawn, a MODIFIY event is fired. We have to
             // delete the item from the triple store instead of converting it.
@@ -260,7 +260,7 @@ public class RDFConsumer implements Consumer
                 || event.getEventType() == Event.REMOVE)
         {
             DSOIdentifier id = new DSOIdentifier(Constants.SITE,
-                    Site.SITE_ID, Site.getSiteHandle());
+                    Site.SITE_ID, Site.getSiteHandle(), new String[] {Site.getSiteHandle()});
             if (!this.toConvert.contains(id)) this.toConvert.add(id);
             return;
         }
@@ -393,12 +393,12 @@ public class RDFConsumer implements Consumer
             throws SQLException {
         try
         {
-            RDFUtil.delete(context, id.type, id.id, id.handle);
+            RDFUtil.delete(context, id.type, id.id, id.handle, id.identifiers);
         }
         catch (RDFMissingIdentifierException ex)
         {
             log.warn("Cannot delete " + Constants.typeText[id.type] + " " 
-                    + Integer.toString(id.id) + " (handle " + id.handle + "): " 
+                    + Integer.toString(id.id) + ": " 
                     + ex.getMessage(), ex);
         }
     }
@@ -416,15 +416,17 @@ public class RDFConsumer implements Consumer
         int type;
         int id;
         String handle;
+        String[] identifiers;
         
-        DSOIdentifier(int type, int id, String handle)
+        DSOIdentifier(int type, int id, String handle, String[] identifiers)
         {
             this.type = type;
             this.id = id;
             this.handle = handle;
+            this.identifiers = identifiers;
         }
         
-        DSOIdentifier(DSpaceObject dso)
+        DSOIdentifier(DSpaceObject dso, Context ctx)
         {
             if (dso.getType() != Constants.SITE 
                     && dso.getType() != Constants.COMMUNITY
@@ -437,6 +439,7 @@ public class RDFConsumer implements Consumer
             this.type = dso.getType();
             this.id = dso.getID();
             this.handle = dso.getHandle();
+            this.identifiers = dso.getIdentifiers(ctx);
         }
         
         @Override
