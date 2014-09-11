@@ -198,7 +198,9 @@ public class ContextTest extends AbstractUnitTest
         instance.complete();
         assertThat("testComplete 3", instance.getDBConnection(), nullValue());
         assertThat("testComplete 4", instance.isValid(), equalTo(false));
-        
+
+        // Cleanup our new context
+        cleanupContext(instance);
         // TODO: May also want to test that complete() is calling commit()?
     }
     
@@ -215,6 +217,9 @@ public class ContextTest extends AbstractUnitTest
         // and effectively does nothing
         instance.complete();
         instance.complete();
+
+        // Cleanup our new context
+        cleanupContext(instance);
     }
 
     /**
@@ -245,9 +250,9 @@ public class ContextTest extends AbstractUnitTest
         Context newInstance = new Context();
         EPerson found = EPerson.findByEmail(newInstance, createdEmail);
         assertThat("testCommit 0", found, notNullValue());
-        
-        // Close our new context
-        newInstance.abort();
+
+        // Cleanup our new context
+        cleanupContext(newInstance);
     }
     
     /**
@@ -266,10 +271,9 @@ public class ContextTest extends AbstractUnitTest
         }
         finally
         {
-            // Close our context
-            instance.abort();
+            // Cleanup our context
+            cleanupContext(instance);
         }
-        
     }
     
     /**
@@ -283,9 +287,17 @@ public class ContextTest extends AbstractUnitTest
 
         // Close context (invalidating it)
         instance.abort();
-        
-        // Attempt to commit to it - should throw an exception
-        instance.commit();
+
+        try
+        {
+            // Attempt to commit to it - should throw an exception
+            instance.commit();
+        }
+        finally
+        {
+            // Cleanup our context
+            cleanupContext(instance);
+        }
     }
 
     /**
@@ -321,9 +333,10 @@ public class ContextTest extends AbstractUnitTest
         Context newInstance = new Context();
         EPerson found = EPerson.findByEmail(newInstance, createdEmail);
         assertThat("testAbort 1", found, nullValue());
-        
-        // close our new context
-        newInstance.abort();
+
+        // Cleanup our contexts
+        cleanupContext(instance);
+        cleanupContext(newInstance);
     }
     
     /**
@@ -339,6 +352,9 @@ public class ContextTest extends AbstractUnitTest
         // and effectively does nothing
         instance.abort();
         instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -361,9 +377,9 @@ public class ContextTest extends AbstractUnitTest
         // Create a new read-only context
         Context instance = new Context(Context.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
-        
-        // Close our new context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -396,9 +412,9 @@ public class ContextTest extends AbstractUnitTest
         EPerson fromCache = (EPerson) instance.fromCache(EPerson.class, newEperson.getID());
         assertThat("testFromCache 0", fromCache, notNullValue());
         assertThat("testFromCache 1", fromCache, equalTo(newEperson));
-        
-        // Close our context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -421,9 +437,9 @@ public class ContextTest extends AbstractUnitTest
         String fromCache = (String) instance.fromCache(String.class, cacheMeID);
         assertThat("testCache 0", fromCache, notNullValue());
         assertThat("testCache 1", fromCache, equalTo(cacheMe));
-        
-        // Close our context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -450,9 +466,9 @@ public class ContextTest extends AbstractUnitTest
         // Now, can we remove it?
         instance.removeCached(cacheMe, cacheMeID);
         assertThat("testRemoveCache 3", instance.fromCache(String.class, cacheMeID), nullValue());
-       
-        // Close our context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -479,9 +495,9 @@ public class ContextTest extends AbstractUnitTest
         
         // Ensure cache is empty
         assertThat("testClearCache 1", instance.getCacheSize(), equalTo(0));
-        
-        // Close our context
-        instance.abort();      
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -508,9 +524,9 @@ public class ContextTest extends AbstractUnitTest
         assertThat("testSetSpecialGroup 0", instance.inSpecialGroup(10000), equalTo(true));
         assertThat("testSetSpecialGroup 1", instance.inSpecialGroup(10001), equalTo(true));
         assertThat("testSetSpecialGroup 2", instance.inSpecialGroup(20000), equalTo(false));
-        
-        // Close our context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -551,9 +567,9 @@ public class ContextTest extends AbstractUnitTest
         assertThat("testGetSpecialGroup 0", specialGroups.length, equalTo(2));
         assertThat("testGetSpecialGroup 1", specialGroups[0], equalTo(group));
         assertThat("testGetSpecialGroup 1", specialGroups[1], equalTo(adminGroup));
-        
-        // Close our context
-        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
 
     /**
@@ -568,7 +584,8 @@ public class ContextTest extends AbstractUnitTest
         
         // Finalize is like abort()...should invalidate our context
         assertThat("testSetSpecialGroup 0", instance.isValid(), equalTo(false));
+
+        // Cleanup our context
+        cleanupContext(instance);
     }
-    
-    
 }
