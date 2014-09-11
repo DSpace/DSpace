@@ -224,6 +224,14 @@
     </command>
 
     <command>
+        <name>rdfizer</name>
+        <description>The RDFizer manages the attached triple store if dspace-rdf is enabled</description>
+        <step>
+            <class>org.dspace.rdf.RDFizer</class>
+        </step>
+    </command>
+
+    <command>
         <name>registry-loader</name>
         <description>Load entries into a registry</description>
         <step>
