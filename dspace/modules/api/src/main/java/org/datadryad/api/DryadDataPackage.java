@@ -4,6 +4,7 @@ package org.datadryad.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
@@ -41,6 +42,15 @@ public class DryadDataPackage extends DryadObject {
     private static final String PUBLICATION_NAME_SCHEMA = "prism";
     private static final String PUBLICATION_NAME_ELEMENT = "publicationName";
     private static final String PUBLICATION_NAME_QUALIFIER = null;
+
+    private static final String MANUSCRIPT_NUMBER_SCHEMA = "dc";
+    private static final String MANUSCRIPT_NUMBER_ELEMENT = "identifier";
+    private static final String MANUSCRIPT_NUMBER_QUALIFIER = "manuscriptNumber";
+
+    // TODO: Determine what to use here.
+    private static final String PUBLICATION_DATE_SCHEMA = "internal";
+    private static final String PUBLICATION_DATE_ELEMENT = "date";
+    private static final String PUBLICATION_DATE_QUALIFIER = "publishOn";
 
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -321,4 +331,35 @@ public class DryadDataPackage extends DryadObject {
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
         return new HashSet<DryadObject>(getDataFiles(context));
     }
+
+    //TODO: Do we need a regex?
+    public static DryadDataPackage findByManuscriptId(Context context, String manuscriptId) throws SQLException {
+        DryadDataPackage dataPackage = null;
+        try {
+            ItemIterator dataPackages = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptId);
+            if(dataPackages.hasNext()) {
+                dataPackage = new DryadDataPackage(dataPackages.next());
+            }
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting data package from manuscript number", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting data package from manuscript number", ex);
+        }
+        return dataPackage;
+    }
+
+    public void setPublicationDate(Date publicationDate) throws SQLException {
+        // Tolerates null date to clear!
+        getItem().clearMetadata(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, null);
+        if(publicationDate != null) {
+            String dateString = new DCDate(publicationDate).toString();
+            getItem().addMetadata(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, null, dateString);
+        }
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting publication date", ex);
+        }
+    }
+
 }
