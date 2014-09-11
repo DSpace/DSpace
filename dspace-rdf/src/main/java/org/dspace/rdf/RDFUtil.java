@@ -81,10 +81,11 @@ public class RDFUtil {
      *         identifier assigned to the provided DSO.
      */
     public static String generateIdentifier(Context context, int type, int id,
-            String handle) throws SQLException
+            String handle, String[] identifier)
+            throws SQLException
     {
         return RDFConfiguration.getURIGenerator().generateIdentifier(context, 
-                type, id, handle);
+                type, id, handle, identifier);
     }
     /**
      * Converts the the provided DSpaceObject into RDF and returns the model.
@@ -281,11 +282,11 @@ public class RDFUtil {
      * @throws SQLException
      * @throws RDFMissingIdentifierException In case that no Identifier could be generated.
      */
-    public static void delete(Context ctx, int type, int id, String handle)
+    public static void delete(Context ctx, int type, int id, String handle, String[] identifiers)
             throws SQLException, RDFMissingIdentifierException
     {
         String uri = RDFConfiguration.getURIGenerator().generateIdentifier(ctx,
-                        type, id, handle);
+                        type, id, handle, identifiers);
         if (uri != null)
         {
             RDFConfiguration.getRDFStorage().delete(uri);

@@ -27,10 +27,10 @@ public class LocalURIGenerator implements URIGenerator {
     private static final Logger log = Logger.getLogger(LocalURIGenerator.class);
 
     @Override
-    public String generateIdentifier(Context context, int type, int id, String handle)
+    public String generateIdentifier(Context context, int type, int id, 
+            String handle, String[] identifiers)
             throws SQLException
     {
-        
         String urlPrefix = RDFConfiguration.getDSpaceRDFModuleURI() + "/resource/";
         
         if (type == Constants.SITE)
@@ -62,7 +62,7 @@ public class LocalURIGenerator implements URIGenerator {
             return null;
         }
         
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle());
+        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), dso.getIdentifiers(context));
     }
 
 }
