@@ -162,6 +162,22 @@ public class Event implements Serializable
      * for more complex consumer abilities that are beyond our purview.
      */
     private String detail;
+    
+    /**
+     * Contains all identifiers of the DSpaceObject that was changed (added, 
+     * modified, deleted, ...).
+     * 
+     * All events gets fired when a context that contains events gets commited.
+     * When the delete event is fired, a deleted DSpaceObject is already gone.
+     * This array contains all identifiers of the object, not only the handle
+     * as the detail field does. The field may be an empty array if no
+     * identifiers could be found.
+     * 
+     * FIXME: As the detail field describes it would be even better if all
+     * metadata would be available to a consumer, but the identifiers are the
+     * most important once.
+     */
+    private String[] identifiers;
 
     /** unique key to bind together events from one context's transaction */
     private String transactionID;
@@ -182,6 +198,9 @@ public class Event implements Serializable
     /**
      * Constructor.
      * 
+     * You should consider to use 
+     * {@link Event#Event(int, int, int, java.lang.String, java.lang.String[])}.
+     * 
      * @param eventType
      *            action type, e.g. Event.ADD.
      * @param subjectType
@@ -193,15 +212,38 @@ public class Event implements Serializable
      */
     public Event(int eventType, int subjectType, int subjectID, String detail)
     {
+        this(eventType, subjectType, subjectID, detail, new String[0]);
+    }
+    
+    /**
+     * Constructor.
+     * 
+     * @param eventType
+     *            action type, e.g. Event.ADD.
+     * @param subjectType
+     *            DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID
+     *            database ID of subject instance.
+     * @param detail
+     *            detail information that depends on context.
+     * @param identifiers
+     *            array containing all identifiers of the dso or an empty array
+     */
+    public Event(int eventType, int subjectType, int subjectID, String detail, String[] identifiers)
+    {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
         timeStamp = System.currentTimeMillis();
         this.detail = detail;
+        this.identifiers = identifiers.clone();
     }
-
+    
     /**
      * Constructor.
+     * 
+     * You should consider to use 
+     * {@link Event#Event(int, int, int, int, int, java.lang.String)} instead.
      * 
      * @param eventType
      *            action type, e.g. Event.ADD.
@@ -219,6 +261,31 @@ public class Event implements Serializable
     public Event(int eventType, int subjectType, int subjectID, int objectType,
             int objectID, String detail)
     {
+        this(eventType, subjectType, subjectID, objectType, objectID, detail, 
+                new String[0]);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param eventType
+     *            action type, e.g. Event.ADD.
+     * @param subjectType
+     *            DSpace Object Type of subject e.g. Constants.ITEM.
+     * @param subjectID
+     *            database ID of subject instance.
+     * @param objectType
+     *            DSpace Object Type of object e.g. Constants.BUNDLE.
+     * @param objectID
+     *            database ID of object instance.
+     * @param detail
+     *            detail information that depends on context.
+     * @param identifiers
+     *            array containing all identifiers of the dso or an empty array
+     */
+    public Event(int eventType, int subjectType, int subjectID, int objectType,
+            int objectID, String detail, String[] identifiers)
+    {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
         this.subjectID = subjectID;
@@ -226,6 +293,7 @@ public class Event implements Serializable
         this.objectID = objectID;
         timeStamp = System.currentTimeMillis();
         this.detail = detail;
+        this.identifiers = identifiers.clone();
     }
 
     /**
@@ -505,6 +573,15 @@ public class Event implements Serializable
     public String getDetail()
     {
         return detail;
+    }
+    
+    /**
+     * @return array of identifiers of this event's subject.
+     */
+    public String[] getIdentifiers()
+    {
+        // don't return a reference to our private array, clone it.
+        return identifiers.clone();
     }
 
     /**
