@@ -401,7 +401,7 @@
         </profile>
 
         <!--
-             Builds RDF Data Provider WAR for DSpace
+             Builds RDF API and Data Provider WAR for DSpace
         -->
         <profile>
             <id>dspace-rdf</id>
@@ -1185,6 +1185,14 @@
 
    <developers>
       <developer>
+         <name>Pascal-Nicolas Becker</name>
+         <email>dspace at pascal-becker dot de</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
          <name>Andrea Bollini</name>
          <email>bollini at users.sourceforge.net</email>
          <url>http://www.linkedin.com/in/andreabollini</url>
@@ -1381,14 +1389,6 @@
             <role>developer</role>
          </roles>
          <timezone>+10</timezone>
-      </contributor>
-      <contributor>
-         <name>Pascal-Nicolas Becker</name>
-         <email>dspace at pascal-becker dot de</email>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>+1</timezone>
       </contributor>
    </contributors>
 
