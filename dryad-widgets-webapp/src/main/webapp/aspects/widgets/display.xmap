@@ -142,7 +142,6 @@
                     <map:parameter name="doi"        value="{request-param:doi}"/>
                     <!-- <map:parameter name="object-url" value="http://localhost:{request:serverPort}/mn/object/{request-param:doi}/bitstream"/> -->
                     <map:parameter name="object-url" value="http://datadryad.org/mn/object/{request-param:doi}/bitstream"/>
-
                 </map:generate>
                 <map:serialize/>
             </map:match>
@@ -152,7 +151,6 @@
         <map:pipeline type="noncaching">
             <map:parameter name="expires" value="now"/>
             <map:match pattern="dataFileBitstream">
-
                 <map:generate type="WidgetDisplayBitstreamGenerator">
                     <map:parameter name="referrer"   value="{request-param:referrer}"/>
                     <map:parameter name="doi"        value="{request-param:doi}"/>
