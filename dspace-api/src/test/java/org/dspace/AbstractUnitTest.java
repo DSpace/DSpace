@@ -168,6 +168,10 @@ public class AbstractUnitTest
                 IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
                 indexer.createIndex(ctx);
                 ctx.commit();
+                
+                // Nullify resources, so Junit will clean them up
+                dspace = null;
+                indexer = null;
             }
             ctx.restoreAuthSystemState();
             if(ctx.isValid())
@@ -365,6 +369,11 @@ public class AbstractUnitTest
         //we clear the properties
         testProps.clear();
         testProps = null;
+        
+        //Also clear out the kernel & nullify (so JUnit will clean it up)
+        if (kernelImpl!=null)
+            kernelImpl.destroy();
+        kernelImpl = null;
     }
 
     /**

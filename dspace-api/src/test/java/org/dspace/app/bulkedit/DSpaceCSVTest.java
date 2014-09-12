@@ -56,6 +56,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
 
             // Test the CSV parsing was OK
             DSpaceCSV dcsv = new DSpaceCSV(new File(filename), context);
@@ -69,6 +70,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             value.add("Abstract with\ntwo\nnew lines");    
             assertThat("testDSpaceCSV New lines", line.valueToCSV(value),
                                                   equalTo("\"Abstract with\ntwo\nnew lines\""));
+            line = null;
 
             // Test the CSV parsing with a bad heading element value
             csv[0] = "id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract";
@@ -82,6 +84,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
 
             // Test the CSV parsing was OK
             try
@@ -111,6 +114,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
 
             // Test the CSV parsing was OK
             try
@@ -128,6 +132,11 @@ public class DSpaceCSVTest extends AbstractUnitTest
             // Delete the test file
             File toDelete = new File(filename);
             toDelete.delete();
+            toDelete = null;
+            
+            // Nullify resources so JUnit will clean them up
+            dcsv = null;
+            lines = null;
         }
         catch (Exception ex) {
             log.error("IO Error while creating test CSV file", ex);

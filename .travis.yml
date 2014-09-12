@@ -1,8 +1,8 @@
 language: java
 
 env: 
-  # Give Maven 2GB of memory to work with
-  - MAVEN_OPTS=-Xmx2048M
+  # Give Maven 1GB of memory to work with
+  - MAVEN_OPTS="-Xms256m -Xmx1024m -XX:MaxPermSize=128m"
 
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
@@ -31,8 +31,9 @@ install: "mvn install -P !dspace"
 #  travis_retry => Retry build/test up to 3 times
 #  license:check => Validate all source code license headers
 #  -Dmaven.test.skip=false => Enable DSpace Unit Tests
+#  -Dsurefire.argLine => Ensure Unit Tests get same MAVEN_OPTS settings
 #  -Dmirage2.on=true => Build Mirage2
 #  -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
 #  -B => Maven batch/non-interactive mode (recommended for CI)
 #  -V => Display Maven version info before build
-script: "travis_retry mvn clean package license:check -Dmaven.test.skip=false -Dmirage2.on=true -Dmirage2.deps.included=false -B -V"
+script: 'travis_retry mvn clean package license:check -Dmaven.test.skip=false -Dsurefire.argLine="$MAVEN_OPTS" -Dmirage2.on=true -Dmirage2.deps.included=false -B -V'
