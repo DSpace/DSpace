@@ -829,7 +829,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private String getCanonicalDataPackage(String doi) {
         // no version present
-        if(countDots(doi) <=2) return doi;
+        if(!isVersionedDOI(doi)) return doi;
         return doi.toString().substring(0, doi.toString().lastIndexOf(DOT));
     }
 
@@ -837,7 +837,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     // returns the version number of the package (eg 1)
     private String getDataPackageVersion(String doi) {
         // no version present
-        if(countDots(doi) <=2) return "";
+        if(!isVersionedDOI(doi)) return "";
         return doi.toString().substring(doi.toString().lastIndexOf(DOT) + 1);
     }
 
@@ -848,15 +848,21 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
     }
 
-    private short countDots(String doi){
-        short index=0;
-        int indexDot=0;
-        while( (indexDot=doi.indexOf(DOT))!=-1){
-            doi=doi.substring(indexDot+1);
-            index++;
+    private boolean isVersionedDOI(String doi){
+        // if a DOI has 2 or less dots, it is not a versioned DOI.
+        // eg: doi:10.5061/dryad.xxxxx or doi:10.5061/dryad.xxxxx/4 (two dots)
+        // instead of doi:10.5061/dryad.xxxxx.2 or doi:10.5061/dryad.xxxxx.2/4.2 (3 or 4 dots)
+        short numDots=0;
+        int indexDot = doi.indexOf(DOT);
+        while(indexDot != -1){
+            indexDot = doi.indexOf(DOT, indexDot+1);
+            numDots++;
         }
 
-        return index;
+        if (numDots <= 2) {
+            return false;
+        }
+        return true;
     }
 
 
