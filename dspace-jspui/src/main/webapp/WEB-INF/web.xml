@@ -301,6 +301,11 @@
     <servlet-name>batchmetadataimport</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BatchMetadataImportServlet</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>backuprestore</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BackupRestoreServlet</servlet-class>
+  </servlet>
   
   <servlet>
     <servlet-name>metadata-field-registry</servlet-name>
@@ -641,6 +646,10 @@
   <servlet-mapping>
     <servlet-name>batchmetadataimport</servlet-name>
     <url-pattern>/dspace-admin/batchmetadataimport</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>backuprestore</servlet-name>
+    <url-pattern>/dspace-admin/backuprestore</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>

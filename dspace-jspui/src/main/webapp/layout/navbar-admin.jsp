@@ -73,6 +73,7 @@
                <li><a href="<%= request.getContextPath() %>/dspace-admin/privateitems"><fmt:message key="jsp.layout.navbar-admin.privateitems"/></a></li>
                <li><a href="<%= request.getContextPath() %>/dspace-admin/metadataimport"><fmt:message key="jsp.layout.navbar-admin.metadataimport"/></a></li>
                <li><a href="<%= request.getContextPath() %>/dspace-admin/batchmetadataimport"><fmt:message key="jsp.layout.navbar-admin.batchmetadataimport"/></a></li>               
+               <li><a href="<%= request.getContextPath() %>/dspace-admin/backuprestore"><fmt:message key="jsp.layout.navbar-admin.backuprestore"/></a></li>               
             </ul>
           </li>
                           
