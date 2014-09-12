@@ -12,6 +12,11 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import org.dspace.core.Constants;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierService;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -67,7 +72,41 @@ public class ApproveRejectReviewItem {
             return;
         }
     }
-    // TODO: Should take publication name too.
+
+    public static void reviewItemDOI(Boolean approved, String dataPackageDOI) throws ApproveRejectReviewItemException  {
+        WorkflowItem wfi = null;
+        try {
+            Context c = new Context();
+            c.turnOffAuthorisationSystem();
+            IdentifierService identifierService = getIdentifierService();
+            DSpaceObject object = identifierService.resolve(c, dataPackageDOI);
+            if(object == null) {
+                throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to null item");
+            }
+            if(object.getType() != Constants.ITEM) {
+                throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to a non item DSpace Object");
+            }
+            wfi = WorkflowItem.findByItemId(c, object.getID());
+            reviewItem(c, approved, wfi);
+        } catch (SQLException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IdentifierNotFoundException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IdentifierNotResolvableException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (AuthorizeException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (WorkflowConfigurationException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IOException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (MessagingException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (WorkflowException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        }
+    }
+
     public static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
         try {
@@ -143,12 +182,15 @@ public class ApproveRejectReviewItem {
         c.complete();
     }
 
-    private static SearchService getSearchService()
-    {
+    private static IdentifierService getIdentifierService() {
         DSpace dspace = new DSpace();
-
         org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
+        return manager.getServiceByName(IdentifierService.class.getName(), IdentifierService.class);
+    }
 
+    private static SearchService getSearchService() {
+        DSpace dspace = new DSpace();
+        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
         return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
