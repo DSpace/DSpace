@@ -47,10 +47,9 @@ public class DryadDataPackage extends DryadObject {
     private static final String MANUSCRIPT_NUMBER_ELEMENT = "identifier";
     private static final String MANUSCRIPT_NUMBER_QUALIFIER = "manuscriptNumber";
 
-    // TODO: Determine what to use here.
-    private static final String PUBLICATION_DATE_SCHEMA = "internal";
-    private static final String PUBLICATION_DATE_ELEMENT = "date";
-    private static final String PUBLICATION_DATE_QUALIFIER = "publishOn";
+    private static final String BLACKOUT_UNTIL_SCHEMA = "dc";
+    private static final String BLACKOUT_UNTIL_ELEMENT = "date";
+    private static final String BLACKOUT_UNTIL_QUALIFIER = "blackoutUntil";
 
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -332,11 +331,10 @@ public class DryadDataPackage extends DryadObject {
         return new HashSet<DryadObject>(getDataFiles(context));
     }
 
-    //TODO: Do we need a regex?
-    public static DryadDataPackage findByManuscriptId(Context context, String manuscriptId) throws SQLException {
+    public static DryadDataPackage findByManuscriptNumber(Context context, String manuscriptNumber) throws SQLException {
         DryadDataPackage dataPackage = null;
         try {
-            ItemIterator dataPackages = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptId);
+            ItemIterator dataPackages = Item.findByMetadataField(context, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
             if(dataPackages.hasNext()) {
                 dataPackage = new DryadDataPackage(dataPackages.next());
             }
@@ -348,18 +346,37 @@ public class DryadDataPackage extends DryadObject {
         return dataPackage;
     }
 
-    public void setPublicationDate(Date publicationDate) throws SQLException {
+    public String getManuscriptNumber() throws SQLException {
+        String manuscriptNumber = null;
+        DCValue[] metadata = item.getMetadata(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, Item.ANY);
+        if(metadata.length > 0) {
+            manuscriptNumber = metadata[0].value;
+        }
+        return manuscriptNumber;
+    }
+
+    public void setBlackoutUntilDate(Date blackoutUntilDate) throws SQLException {
         // Tolerates null date to clear!
-        getItem().clearMetadata(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, null);
-        if(publicationDate != null) {
-            String dateString = new DCDate(publicationDate).toString();
-            getItem().addMetadata(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, null, dateString);
+        getItem().clearMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, null);
+        if(blackoutUntilDate != null) {
+            String dateString = new DCDate(blackoutUntilDate).toString();
+            getItem().addMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, null, dateString);
         }
         try {
             getItem().update();
         } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting publication date", ex);
+            log.error("Authorize exception setting blackoutUntil date", ex);
         }
+    }
+
+    public Date getBlackoutUntilDate() throws SQLException {
+        Date blackoutUntilDate = null;
+        DCValue[] metadata = item.getMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, Item.ANY);
+        if(metadata.length > 0) {
+            String dateString = metadata[0].value;
+            blackoutUntilDate = new DCDate(dateString).toDate();
+        }
+        return blackoutUntilDate;
     }
 
 }

@@ -54,18 +54,18 @@ public class ManuscriptReleaseDateHandler implements HandlerInterface<Manuscript
 
     @Override
     public void handleDelete(StoragePath path, Manuscript object) throws HandlerException {
-
+        // TODO: Anything for deletions?
     }
 
     private void processChange(Manuscript manuscript) throws HandlerException {
         try {
             Context context = getContext();
             String manuscriptId = manuscript.manuscriptId;
-            DryadDataPackage dataPackage = DryadDataPackage.findByManuscriptId(context, manuscriptId);
+            DryadDataPackage dataPackage = DryadDataPackage.findByManuscriptNumber(context, manuscriptId);
             if(dataPackage == null) {
                 throw new HandlerException("Data package not found with manuscriptId: " + manuscriptId);
             }
-            dataPackage.setPublicationDate(manuscript.publicationDate);
+            dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
             completeContext(context);
         } catch (SQLException ex) {
             throw new HandlerException("SQLException updating publicationDate", ex);
