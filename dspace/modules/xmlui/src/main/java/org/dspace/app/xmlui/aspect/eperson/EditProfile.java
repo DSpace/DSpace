@@ -21,17 +21,29 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
+import org.apache.oltu.oauth2.client.OAuthClient;
+import org.apache.oltu.oauth2.client.URLConnectionClient;
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
+import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.authority.orcid.Orcid;
+import org.dspace.authority.orcid.model.Bio;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Display a form that allows the user to edit their profile.
@@ -235,6 +247,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        String defaultFirstName="",defaultLastName="",defaultPhone="";
        String defaultLanguage=null;
+       String defaultOrcidId=null;
        boolean defaultTerms=false;
        if (request.getParameter("submit") != null)
        {
@@ -243,6 +256,34 @@ public class EditProfile extends AbstractDSpaceTransformer
            defaultPhone = request.getParameter("phone");
            defaultLanguage = request.getParameter("language");
        }
+       if (request.getParameter("remove-link") != null)
+       {
+           try{
+               //remove orcid information from eperson
+               eperson.setMetadata("orcid","");
+               eperson.setMetadata("access_token","");
+               defaultOrcidId=null;
+               eperson.update();
+               context.commit();
+           }catch (Exception e)
+           {
+               log.error("error when remove orcid id on eperson",e);
+           }
+
+       }
+       if (request.getParameter("link") != null)
+       {
+           try{
+           //redirect to orcid page to get authentication from orcid
+           HttpServletResponse response1 =  (HttpServletResponse)objectModel.get("httpresponse");
+
+           response1.sendRedirect("/oauth-login");
+           }catch (Exception e)
+           {
+               log.error("error when try to link to orcid",e);
+           }
+
+       }
        else if (eperson != null)
        {
             defaultFirstName = eperson.getFirstName();
@@ -250,6 +291,13 @@ public class EditProfile extends AbstractDSpaceTransformer
             defaultPhone = eperson.getPhone();
             defaultLanguage = eperson.getLanguage();
 		    defaultTerms = eperson.getTerms();
+            try{
+                defaultOrcidId = eperson.getMetadata("orcid");
+            }catch (Exception e)
+
+            {
+                log.error("error when getting the orcid id from eperson metadata",e);
+            }
        }
        
        String action = contextPath;
@@ -295,7 +343,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        // Email
        identity.addLabel(T_email_address);
        identity.addItem(email);
-       
+
        // First name
        Text firstName = identity.addItem().addText("first_name");
        firstName.setRequired();
@@ -394,7 +442,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            }
        }
        */
-       
+
        if (allowSetPassword)
        {
            List security = form.addList("security",List.TYPE_FORM);
@@ -432,7 +480,20 @@ public class EditProfile extends AbstractDSpaceTransformer
                passwordConfirm.addError(T_error_unconfirmed_password);
            }
        }
+       List orcid = form.addList("orcid",List.TYPE_FORM);
+       orcid.setHead("Associate Account with ORCID");
+       if(defaultOrcidId!=null&&defaultOrcidId.length()>0){
+           orcid.addItem().addContent("Your account is now associated with the following ORCID ID. You may now authenticate with this DSpace exclusively with your ORCID login. If this ORCID account is incorrect, it may be disconnected by selecting the \"Disconnect from ORCID\" button.\n");
+           orcid.addLabel("Orcid Id");
+           orcid.addItem().addContent(defaultOrcidId);
+           orcid.addItem().addButton("remove-link").setValue("Disconnect from ORCID");
 
+       }
+       else
+       {
+           orcid.addItem().addContent("Select the following button to connect to ORCID and associate this profile with your ORCID account.");
+           orcid.addItem().addButton("link").setValue("Link to Orcid");
+       }
        List tl = form.addList("terms",List.TYPE_FORM);
        tl.setHead(T_terms);
        tl.addItem(T_terms_help);

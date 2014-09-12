@@ -1985,5 +1985,5 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.help.first">First name(s) e.g. "Fred"</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
-
+     <message key="org.dspace.authenticate.OAuthAuthentication.title">Oauth Authentication</message>
 </catalogue>
