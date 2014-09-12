@@ -113,6 +113,8 @@ public class EPersonAdminServlet extends DSpaceServlet
             String oldEmail = e.getEmail();
             String newEmail = request.getParameter("email").trim();
             String netid = request.getParameter("netid");
+	    String password = request.getParameter("password");
+	    String passwordConfirm = request.getParameter("password_confirm");
 
             if (!newEmail.equals(oldEmail))
             {
@@ -156,6 +158,15 @@ public class EPersonAdminServlet extends DSpaceServlet
                             .getParameter("require_certificate") != null)
                             && request.getParameter("require_certificate")
                                     .equals("true"));
+		    //Check it's there and long enough
+		    //Check the two passwords entered match
+		    if((password != null) &&
+		       (password.length() > 6) &&
+		       (password.equals(passwordConfirm))) {
+			//Everything OK so far, Change the password
+			e.setPassword(password);
+
+		    }
 
                     e.update();
 

@@ -117,6 +117,20 @@
                 <input class="form-control" name="firstname" id="tfirstname" size="24" value="<%=firstName == null ? "" : Utils.addEntities(firstName) %>"/>
             </div>
          </div>
+        <div class="row">           
+            <%-- <td>First Name:</td> --%>
+            <label class="col-md-2" for="tpassword"><fmt:message key="jsp.dspace-admin.eperson.general.password"/></label>
+            <div class="col-md-6">
+                <input class="form-control" name="password" id="tpassword" size="24" value=""/>
+            </div>
+         </div>
+        <div class="row">           
+            <%-- <td>First Name:</td> --%>
+            <label class="col-md-2" for="tpassword_confirm"><fmt:message key="jsp.dspace-admin.eperson.general.password"/></label>
+            <div class="col-md-6">
+                <input class="form-control" name="password_confirm" id="tpassword_confirm" size="24" value=""/>
+            </div>
+         </div>
 
         <% if (ldap_enabled) { %>
 		<div class="row">
