@@ -20,6 +20,7 @@ import org.dspace.xoai.services.api.database.EarliestDateResolver;
 import org.dspace.xoai.services.api.database.FieldResolver;
 import org.dspace.xoai.tests.DSpaceTestConfiguration;
 import org.dspace.xoai.tests.helpers.stubs.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,19 @@ public abstract class AbstractDSpaceTest {
 //        solrServer = this.wac.getBean(SolrServer.class);
         resourceResolver = (StubbedResourceResolver) this.wac.getBean(ResourceResolver.class);
         xoaiManagerResolver.configuration();
+    }
+    
+    @After
+    public void teardown() {
+        // Nullify all resources so that JUnit will clean them up
+        xoaiManagerResolver = null;
+        configurationService = null;
+        databaseService = null;
+        earliestDateResolver = null;
+        setRepository = null;
+        resourceResolver = null;
+        mockMvc = null;
+        solrServer = null;
     }
 
     protected MockMvc againstTheDataProvider() {
