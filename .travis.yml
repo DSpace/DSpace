@@ -35,4 +35,6 @@ install: "mvn install -P !dspace"
 #  -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
 #  -B => Maven batch/non-interactive mode (recommended for CI)
 #  -V => Display Maven version info before build
-script: "travis_retry mvn clean package license:check -Dmaven.test.skip=false -Dmirage2.on=true -Dmirage2.deps.included=false -B -V"
+#script: "travis_retry mvn clean package license:check -Dmaven.test.skip=false -Dmirage2.on=true -Dmirage2.deps.included=false -B -V"
+# MIRAGE2 BUILD IS DISABLED: It seems to be causing random "Killed" messages from Travis, which may be Memory related issues.
+script: "travis_retry mvn clean package license:check -Dmaven.test.skip=false -B -V"
