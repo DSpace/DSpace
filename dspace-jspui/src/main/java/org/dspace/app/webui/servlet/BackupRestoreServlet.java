@@ -30,6 +30,8 @@ import org.dspace.content.Collection;
 import org.dspace.core.*;
 import org.dspace.utils.DSpace;
 import org.elasticsearch.common.collect.Lists;
+import org.dspace.core.ConfigurationManager;
+
 
 /**
  * Servlet to batch import metadata via the BTE
@@ -148,27 +150,25 @@ public class BackupRestoreServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	//Get all the possible data loaders from the Spring configuration
-    	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-    	List<String> inputTypes = dls.getFileDataLoaders();
-    	request.setAttribute("input-types", inputTypes);
-    	
-    	//Get all collections
-    	List<Collection> collections = null;
-    	String colIdS = request.getParameter("colId");
-    	if (colIdS!=null){
-    		collections = new ArrayList<Collection>();
-    		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
-    		
-    	}
-    	else {
-    		collections = Arrays.asList(Collection.findAll(context));
-    	}
-    	
-    	request.setAttribute("collections", collections);
+	//Get the location for Backup folder
+	String backupfolder = ConfigurationManager.getProperty("backup.dir");
+
+	List<String> inputTypes = new ArrayList<String>();
+
+
+	File[] files = new File(backupfolder).listFiles();
+	//If this pathname does not denote a directory, then listFiles() returns null. 
+
+	for (File file : files) {
+    		if (file.isDirectory()) {
+        		inputTypes.add(file.getName());
+    		}
+	}
+
+    	request.setAttribute("snapshots", inputTypes);
     	
         // Show the upload screen
-        JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/backuprestore.jsp");
     }
 
 }

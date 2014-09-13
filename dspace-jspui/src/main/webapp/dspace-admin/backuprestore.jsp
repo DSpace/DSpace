@@ -22,22 +22,21 @@
 
 <%
 
-	List<String> inputTypes = (List<String>)request.getAttribute("input-types");
-	List<Collection> collections = (List<Collection>)request.getAttribute("collections");
+	List<String> snapshots = (List<String>)request.getAttribute("snapshots");
 	String hasErrorS = (String)request.getAttribute("has-error");
 	boolean hasError = (hasErrorS==null) ? true : (Boolean.parseBoolean((String)request.getAttribute("has-error")));
 	
     String message = (String)request.getAttribute("message");
 %>
 
-<dspace:layout style="submission" titlekey="jsp.dspace-admin.batchmetadataimport.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.backuprestore.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin" 
                nocache="true">
 
-    <h1><fmt:message key="jsp.dspace-admin.batchmetadataimport.title"/></h1>
+    <h1><fmt:message key="jsp.dspace-admin.backuprestore.title"/></h1>
 
 <%
 	if (hasErrorS == null){
@@ -62,37 +61,20 @@
 
     <form method="post" enctype="multipart/form-data" action="">
 	
-
-		<div class="form-group">
-			<label for="file"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectfile"/></label>
-            <input class="form-control" type="file" size="40" name="file"/>
-        </div>
         <div class="form-group">
-			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
+			<label for="inputType"><fmt:message key="jsp.dspace-admin.backuprestore.selectsnapshot"/></label>
             <select class="form-control" name="inputType">
  <% 
- 		for (String inputType : inputTypes){
+ 		for (String snapshot : snapshots){
 %> 			
- 				<option value="<%= inputType %>"><%= inputType %></option>	
+ 				<option value="<%= snapshot %>"><%= snapshot %></option>	
  <%
  		}
  %>           	
             </select>
         </div>
-        <div class="form-group">
-			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectcollection"/></label>
-            <select class="form-control" name="collection">
- <% 
- 		for (Collection collection : collections){
-%> 			
- 				<option value="<%= collection.getID() %>"><%= collection.getName() %></option>	
- <%
- 		}
- %>           	
-            </select>
-        </div>
-        
-        <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.upload"/>" />
+        <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.backup"/>" />
+        <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.restore"/>" />
 
     </form>
     
