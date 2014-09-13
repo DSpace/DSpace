@@ -36,33 +36,12 @@
                parentlink="/dspace-admin" 
                nocache="true">
 
-    <h1><fmt:message key="jsp.dspace-admin.backuprestore.title"/></h1>
-
-<%
-	if (hasErrorS == null){
-	
-	}
-	else if (hasError && message!=null){
-%>
-	<%= message %>
-<%  
-    }
-	else if (hasError && message==null){
-%>
-		<div class="alert alert-warning"><fmt:message key="jsp.dspace-admin.batchmetadataimport.genericerror"/></div>
-<%  
-	}
-	else {
-%>
-		<div class="alert alert-info"><fmt:message key="jsp.dspace-admin.batchmetadataimport.success"/></div>
-<%  
-	}
-%>
+    <h1><fmt:message key="jsp.dspace-admin.restore.title"/></h1>
 
     <form method="post" enctype="multipart/form-data" action="">
 	
         <div class="form-group">
-			<label for="inputType"><fmt:message key="jsp.dspace-admin.backuprestore.selectsnapshot"/></label>
+			<label for="inputType"><fmt:message key="jsp.dspace-admin.restore.selectsnapshot"/></label>
             <select class="form-control" name="inputType">
  <% 
  		for (String snapshot : snapshots){
@@ -73,7 +52,6 @@
  %>           	
             </select>
         </div>
-        <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.backup"/>" />
         <input class="btn btn-success" type="submit" name="submit" value="<fmt:message key="jsp.dspace-admin.general.restore"/>" />
 
     </form>

@@ -31,7 +31,10 @@ import org.dspace.core.*;
 import org.dspace.utils.DSpace;
 import org.elasticsearch.common.collect.Lists;
 import org.dspace.core.ConfigurationManager;
-
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Servlet to batch import metadata via the BTE
@@ -43,94 +46,6 @@ public class BackupServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(BatchMetadataImportServlet.class);
 
-    /**
-     * Respond to a post request for metadata bulk importing via csv
-     *
-     * @param context a DSpace Context object
-     * @param request the HTTP request
-     * @param response the HTTP response
-     *
-     * @throws ServletException
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-        // First, see if we have a multipart request (uploading a metadata file)
-        String contentType = request.getContentType();     
-        if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
-        {
-        	String message = null;
-        	
-        	// Process the file uploaded
-        	try {
-        		// Wrap multipart request to get the submission info
-        		FileUploadRequest wrapper = new FileUploadRequest(request);
-        		File f = wrapper.getFile("file");
-
-        		int colId = Integer.parseInt(wrapper.getParameter("collection"));
-        		Collection collection = Collection.find(context, colId);
-        		
-        		String inputType = wrapper.getParameter("inputType");
-        		
-        		try {
-					ItemImport.processUploadableImport(f, new Collection[]{collection}, inputType, context);
-					
-					request.setAttribute("has-error", "false");
-					
-				} catch (Exception e) {
-					request.setAttribute("has-error", "true");
-					message = e.getMessage();
-					e.printStackTrace();
-				}
-        	} catch (FileSizeLimitExceededException e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	} catch (Exception e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	}
-        	
-        	//Get all the possible data loaders from the Spring configuration
-        	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-        	List<String> inputTypes =dls.getFileDataLoaders();
-        	
-        	request.setAttribute("input-types", inputTypes);
-        	
-        	//Get all collections
-        	List<Collection> collections = null;
-        	String colIdS = request.getParameter("colId");
-        	if (colIdS!=null){
-        		collections = new ArrayList<Collection>();
-        		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
-        		
-        	}
-        	else {
-        		collections = Arrays.asList(Collection.findAll(context));
-        	}
-        	
-        	request.setAttribute("collections", collections);
-        	
-        	request.setAttribute("message", message);
-        	
-        	// Show the upload screen
-    		JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
-
-        }
-        else
-        {
-        	request.setAttribute("has-error", "true");
-        	
-            // Show the upload screen
-            JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
-        }
-    }
-    
     /**
      * GET request is only ever used to show the upload form
      * 
@@ -152,23 +67,17 @@ public class BackupServlet extends DSpaceServlet
     {
 	//Get the location for Backup folder
 	String backupfolder = ConfigurationManager.getProperty("backup.dir");
+	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+	//get current date time with Date()
+	Date date = new Date();
+	String snapshot = "snapshot_";
+	String inputTypes = snapshot.concat(dateFormat.format(date));	
 
-	List<String> inputTypes = new ArrayList<String>();
-
-
-	File[] files = new File(backupfolder).listFiles();
-	//If this pathname does not denote a directory, then listFiles() returns null. 
-
-	for (File file : files) {
-    		if (file.isDirectory()) {
-        		inputTypes.add(file.getName());
-    		}
-	}
-
-    	request.setAttribute("snapshots", inputTypes);
+    	request.setAttribute("snapshotname", inputTypes);
+    	request.setAttribute("message", backupfolder);
     	
         // Show the upload screen
-        JSPManager.showJSP(request, response, "/dspace-admin/backuprestore.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/backup.jsp");
     }
 
 }
