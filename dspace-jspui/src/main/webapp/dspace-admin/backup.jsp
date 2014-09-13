@@ -22,7 +22,7 @@
 
 <%
 
-	String snapshotname = request.getAttribute("snapshotname");
+	String snapshotname = (String)request.getAttribute("snapshotname");
 	String message = (String)request.getAttribute("message");
 %>
 
