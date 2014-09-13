@@ -38,7 +38,7 @@ import org.dspace.core.ConfigurationManager;
  *
  * @author Stuart Lewis
  */
-public class BackupRestoreServlet extends DSpaceServlet
+public class RestoreServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(BatchMetadataImportServlet.class);
@@ -168,7 +168,7 @@ public class BackupRestoreServlet extends DSpaceServlet
     	request.setAttribute("snapshots", inputTypes);
     	
         // Show the upload screen
-        JSPManager.showJSP(request, response, "/dspace-admin/backuprestore.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/restore.jsp");
     }
 
 }

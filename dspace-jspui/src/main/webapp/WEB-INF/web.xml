@@ -303,8 +303,12 @@
   </servlet>
 
   <servlet>
-    <servlet-name>backuprestore</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BackupRestoreServlet</servlet-class>
+    <servlet-name>backup</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BackupServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>restore</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.RestoreServlet</servlet-class>
   </servlet>
   
   <servlet>
@@ -648,8 +652,12 @@
     <url-pattern>/dspace-admin/batchmetadataimport</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>backuprestore</servlet-name>
-    <url-pattern>/dspace-admin/backuprestore</url-pattern>
+    <servlet-name>backup</servlet-name>
+    <url-pattern>/dspace-admin/backup</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>restore</servlet-name>
+    <url-pattern>/dspace-admin/restore</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
