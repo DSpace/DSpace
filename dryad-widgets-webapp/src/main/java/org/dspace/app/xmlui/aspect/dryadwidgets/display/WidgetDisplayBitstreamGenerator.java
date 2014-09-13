@@ -5,25 +5,24 @@
  */
 package org.dspace.app.xmlui.aspect.dryadwidgets.display;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.avalon.framework.parameters.Parameters;
+
+import java.io.IOException;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.generation.AbstractGenerator;
+
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
 import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.BaseBitstreamHandler;
 import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.DefaultBitstreamHandler;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain;
+import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text_Plain;
+
 
 /**
  * This generator uses a DOI to locate a bitstream object and convert its content
@@ -37,36 +36,16 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
 
     private static final String DOFid = "DataONE-formatId";
     
-    private final static HashMap<String,String> bitstreamHandlerClasses = new HashMap<String, String>();
-    static {
-        bitstreamHandlerClasses.put("text/plain",           "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain");
-        bitstreamHandlerClasses.put("application/x-python", "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain");
-        bitstreamHandlerClasses.put("text/csv",             "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV");
-    }
-
-    private SourceResolver resolver;
-    private Map objectModel;
-    private Parameters parameters;
-    private String source;
-    
+    /*
     @Override 
-    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par) 
             throws ProcessingException, SAXException, IOException
     {
-        super.setup(resolver, objectModel, src, parameters);
-        this.resolver = resolver;
-        this.objectModel = objectModel;
-        this.source = src;
-        this.parameters = parameters;
+        super.setup(resolver, objectModel, src, par);
     }
     @Override
-    public void recycle() {
-        super.recycle();
-        this.resolver = null;
-        this.objectModel = null;
-        this.source = null;
-        this.parameters = null;
-    }
+    public void recycle()
+    */
     
     @Override
     public void generate() throws IOException, SAXException, ProcessingException {
@@ -94,7 +73,7 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
             responseCode = connection.getResponseCode();
             log.debug("DataOne Server sent response code " + Integer.toString(responseCode) + "' for url '" + object_url + "'");
             dataOneFormat = connection.getHeaderField(DOFid);
-            log.debug("DataOne reports format '" + dataOneFormat + "' for doi '" + doi + "'");
+            log.debug("DataOne reports format if '" + dataOneFormat + "' for doi '" + doi + "'");
         } catch (IOException e) {
             throw new IOException("Failed to connect to DataOne service");
         }
@@ -105,41 +84,46 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
             log.error("Unavailable content type for doi: " + doi);
             throw new IOException("Unavailable content type for doi: " + doi);
         }
-        connection.disconnect();
-        connection = null;
-        objUrl = null;
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
         // check for content-specific handler
         BaseBitstreamHandler handler = null;
-        if (bitstreamHandlerClasses.containsKey(dataOneFormat)) {
+        if (dataOneFormat.equals("text/plain")) {
             try {
-                Class cls = Class.forName(bitstreamHandlerClasses.get(dataOneFormat));
-                Constructor ctor = cls.getConstructor(String.class, String.class, ContentHandler.class, LexicalHandler.class, SourceResolver.class, Map.class);
-                handler = (BaseBitstreamHandler) ctor.newInstance(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, this.resolver, this.objectModel);
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-                throw new ProcessingException("Bitstream handler instantiaion error for doi: " + doi);
+                handler = new Text_Plain(bufferedReader, contentHandler, lexicalHandler, dataOneFormat);
+            } catch (SAXException e) {
+                log.error("Failed to instantiate default bitstream handler for format '" + dataOneFormat + "':  " + e.toString());
+                throw new ProcessingException("Bitstream handler error for doi: " + doi);            
             }
         }
         if (handler == null) {
             try {
-                handler = new DefaultBitstreamHandler(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, this.resolver, this.objectModel);
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-                throw new ProcessingException("Bitstream handler instantiaion error for doi: " + doi);
+                handler = new DefaultBitstreamHandler(bufferedReader, contentHandler, lexicalHandler, dataOneFormat);
+            } catch (SAXException e) {
+                log.error("Failed to instantiate default bitstream handler: " + e.toString());
+                throw new ProcessingException("Bitstream handler error for doi: " + doi);
             }
         }
-        log.trace("Using handler '" + handler.getClass().getName() + "' for doi: " + doi);
+        log.debug("Using handler '" + handler.getClass().getName() + "' for doi: " + doi);
         try {
-            handler.start();    // should be BaseBitstreamHandler.start()
-            handler.generate(); // should be subclass of BaseBitstreamHandler
-            handler.end();      // should be BaseBitstreamHandler.end()
+            log.debug("Starting serialization generation for doi: " + doi);
+            handler.generate();
+            log.debug("Starting serialization finalization for doi: " + doi);
+            handler.finalize();
+            log.debug("Serialization result is: " + xmlConsumer.toString());
         } catch (SAXException e) {
             log.error("SAX Exception: Failed to generate bitstream content: " + e.getMessage().toString());
             throw new ProcessingException("Bitstream generator error (SAXException) for doi: " + doi);
+
+        // TODO: work out this cleanup scope
         } catch (IOException e) {
             log.error("IOException: Failed to generate bitstream content: " + e.getMessage().toString());
-            throw new ProcessingException("Bitstream generator error (IOException) for doi: " + doi);            
+            throw new ProcessingException("Bitstream generator error (IOException) for doi: " + doi);
+            
+            // TODO: work out this cleanup scope
+        } finally {
+            connection.disconnect();
+            objUrl = null;
         }
     }    
 }
