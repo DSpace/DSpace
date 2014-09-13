@@ -1,0 +1,47 @@
+
+font-family: @widget-font;
+font-weight: @widget-font-weight;
+
+.fa {
+    font-family: @fa-font;
+}
+
+h1 {
+    font-size:   29px;
+    font-weight: 200;
+    font-style:  normal;
+}
+
+@media(max-width: @sm-max - 1) {
+    h1 {
+        font-size:   20px;
+        font-weight: 200;
+        font-style:  normal;
+    }
+}
+
+b {
+    font-weight: bold;
+}
+
+.dryad-ddw-footer {
+    p {
+        font-weight: normal;
+    }
+}
+
+@media(min-width: @md-max) {
+    .dryad-ddw-control {
+        ul li a i:before {
+            font-size: 24pt;
+        }
+    }
+}
+
+@media(max-width: @md-max) {
+    .dryad-ddw-control {
+        ul li a i:before {
+            font-size: 20pt;
+        }
+    }
+}
