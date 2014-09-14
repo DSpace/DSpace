@@ -215,7 +215,7 @@ set_onclick(zooms, {"action" : "zoom", "data" : zoomc.outerHTML} );
     </xsl:template>
 
     <xsl:template name="data-content">
-        <iframe class="dryad-ddw-data" src="{$bitstream-url}" height="100%" width="100%"></iframe>
+        <iframe class="dryad-ddw-data" src="{$bitstream-url}"></iframe>
     </xsl:template>
 
 </xsl:stylesheet>
