@@ -35,6 +35,7 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.lang.Runtime;
 
 /**
  * Servlet to batch import metadata via the BTE
@@ -67,6 +68,7 @@ public class BackupServlet extends DSpaceServlet
     {
 	//Get the location for Backup folder
 	String backupfolder = ConfigurationManager.getProperty("backup.dir");
+	String dspacedir = ConfigurationManager.getProperty("dspace.dir");
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 	//get current date time with Date()
 	Date date = new Date();
@@ -75,6 +77,8 @@ public class BackupServlet extends DSpaceServlet
 
     	request.setAttribute("snapshotname", inputTypes);
     	request.setAttribute("message", backupfolder);
+	Runtime runTime = Runtime.getRuntime();
+	Process process = runTime.exec("sh " + dspacedir + "/scripts/backup.sh " + inputTypes);	
     	
         // Show the upload screen
         JSPManager.showJSP(request, response, "/dspace-admin/backup.jsp");
