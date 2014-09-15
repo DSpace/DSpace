@@ -9,6 +9,9 @@ import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.Context;
 
+// TODO: Update this as a general purpose handler that synchronizes metadata between
+// manuscript object and dryad data package (if exists)
+
 /**
  * Extracts publication date from manuscript and places in data package metadata
  * (if exists)
@@ -58,6 +61,7 @@ public class ManuscriptReleaseDateHandler implements HandlerInterface<Manuscript
     }
 
     private void processChange(Manuscript manuscript) throws HandlerException {
+        // TODO: Prefer to find by Dryad DOI
         try {
             Context context = getContext();
             String manuscriptId = manuscript.manuscriptId;
