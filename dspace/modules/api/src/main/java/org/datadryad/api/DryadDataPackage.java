@@ -4,8 +4,10 @@ package org.datadryad.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -50,6 +52,18 @@ public class DryadDataPackage extends DryadObject {
     private static final String BLACKOUT_UNTIL_SCHEMA = "dc";
     private static final String BLACKOUT_UNTIL_ELEMENT = "date";
     private static final String BLACKOUT_UNTIL_QUALIFIER = "blackoutUntil";
+
+    // Publication DOI in a data package
+    private static final String RELATION_ISREFERENCEDBY_QUALIFIER = "isreferencedby";
+
+    private static final String TITLE_SCHEMA = "dc";
+    private static final String TITLE_ELEMENT = "title";
+
+    private static final String ABSTRACT_SCHEMA = "dc";
+    private static final String ABSTRACT_ELEMENT = "description";
+
+    private static final String KEYWORD_SCHEMA = "dc";
+    private static final String KEYWORD_ELEMENT = "subject";
 
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -184,12 +198,7 @@ public class DryadDataPackage extends DryadObject {
         if(dataFileIdentifier == null || dataFileIdentifier.length() == 0) {
             throw new IllegalArgumentException("Data file must have an identifier");
         }
-        this.getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, null, dataFileIdentifier);
-        try {
-            this.getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception assigning package haspart file", ex);
-        }
+        addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_HASPART_QUALIFIER, dataFileIdentifier);
     }
 
     public void addDataFile(Context context, DryadDataFile dataFile) throws SQLException {
@@ -246,13 +255,7 @@ public class DryadDataPackage extends DryadObject {
 
 
     public void setPublicationName(String publicationName) throws SQLException {
-        getItem().clearMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null);
-        getItem().addMetadata(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, null, publicationName);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting publication name", ex);
-        }
+        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
     }
 
     /**
@@ -318,12 +321,7 @@ public class DryadDataPackage extends DryadObject {
     public void addSubmittedProvenance(DCDate date, String submitterName,
             String submitterEmail, String provenanceStartId, String bitstreamProvenanceMessage) throws SQLException {
         String metadataValue = makeSubmittedProvenance(date, submitterName, submitterEmail, provenanceStartId, bitstreamProvenanceMessage);
-        getItem().addMetadata(PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception adding submitted provenance", ex);
-        }
+        addSingleMetadataValue(Boolean.FALSE,PROVENANCE_SCHEMA, PROVENANCE_ELEMENT, PROVENANCE_QUALIFIER, PROVENANCE_LANGUAGE, metadataValue);
     }
 
     @Override
@@ -347,36 +345,72 @@ public class DryadDataPackage extends DryadObject {
     }
 
     public String getManuscriptNumber() throws SQLException {
-        String manuscriptNumber = null;
-        DCValue[] metadata = item.getMetadata(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, Item.ANY);
-        if(metadata.length > 0) {
-            manuscriptNumber = metadata[0].value;
-        }
-        return manuscriptNumber;
+        return getSingleMetadataValue(MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER);
+    }
+
+    public void setManuscriptNumber(String manuscriptNumber) throws SQLException {
+        addSingleMetadataValue(Boolean.TRUE, MANUSCRIPT_NUMBER_SCHEMA, MANUSCRIPT_NUMBER_ELEMENT, MANUSCRIPT_NUMBER_QUALIFIER, manuscriptNumber);
     }
 
     public void setBlackoutUntilDate(Date blackoutUntilDate) throws SQLException {
-        // Tolerates null date to clear!
-        getItem().clearMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, null);
-        if(blackoutUntilDate != null) {
-            String dateString = new DCDate(blackoutUntilDate).toString();
-            getItem().addMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, null, dateString);
+        String dateString = null;
+        if(blackoutUntilDate != null)  {
+             dateString = new DCDate(blackoutUntilDate).toString();
         }
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting blackoutUntil date", ex);
-        }
+        addSingleMetadataValue(Boolean.TRUE, BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, dateString);
     }
 
     public Date getBlackoutUntilDate() throws SQLException {
         Date blackoutUntilDate = null;
-        DCValue[] metadata = item.getMetadata(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER, Item.ANY);
-        if(metadata.length > 0) {
-            String dateString = metadata[0].value;
+        String dateString =getSingleMetadataValue(BLACKOUT_UNTIL_SCHEMA, BLACKOUT_UNTIL_ELEMENT, BLACKOUT_UNTIL_QUALIFIER);
+        if(dateString != null) {
             blackoutUntilDate = new DCDate(dateString).toDate();
         }
         return blackoutUntilDate;
     }
 
+    public void setPublicationDOI(String publicationDOI) throws SQLException {
+        // Need to filter just on metadata values that are publication DOIs
+        addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
+    }
+
+    public void clearPublicationDOI() throws SQLException {
+        // Need to filter just on metadata values that are publication DOIs
+        addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, null);
+    }
+
+    /**
+     * Get the publication DOI. Does not account for pubmed IDs, assumes
+     * first dc.relation.isreferencedby is the publication DOI
+     * @return
+     * @throws SQLException
+     */
+    public String getPublicationDOI() throws SQLException {
+        return getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
+    }
+
+    public void setTitle(String title) throws SQLException {
+        // Need to filter just on metadata values that are publication DOIs
+        addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, title);
+    }
+
+    public String getTitle() throws SQLException {
+        return getSingleMetadataValue(TITLE_SCHEMA, TITLE_ELEMENT, null);
+    }
+
+    public void setAbstract(String theAbstract) throws SQLException {
+        addSingleMetadataValue(Boolean.TRUE, ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null, theAbstract);
+    }
+
+    public String getAbstract() throws SQLException {
+        return getSingleMetadataValue(ABSTRACT_SCHEMA, ABSTRACT_ELEMENT, null);
+    }
+
+    public List<String> getKeywords() throws SQLException {
+        return getMultipleMetadataValues(KEYWORD_SCHEMA, KEYWORD_ELEMENT, null);
+    }
+
+    public void setKeywords(List<String> keywords) throws SQLException {
+        addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+    }
 }

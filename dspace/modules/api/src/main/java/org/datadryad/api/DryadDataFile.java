@@ -108,13 +108,7 @@ public class DryadDataFile extends DryadObject {
             throw new IllegalArgumentException("Attempted to assign a file to a package with no identifier");
         }
         // Files may only belong to one package, so clear any existing metadata for ispartof
-        clearIsPartOf();
-        getItem().addMetadata(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, null, dataPackageIdentifier);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting file ispartof package", ex);
-        }
+        addSingleMetadataValue(Boolean.TRUE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISPARTOF_QUALIFIER, dataPackageIdentifier);
         if(this.dataPackage != null) {
             this.dataPackage.clearDataFilesCache();
         }
@@ -181,13 +175,8 @@ public class DryadDataFile extends DryadObject {
     }
 
     public void clearEmbargo() throws SQLException {
-        getItem().clearMetadata(EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, Item.ANY);
-        getItem().clearMetadata(EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY);
-        try {
-            getItem().update();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize exception clearing embargo", ex);
-        }
+        addSingleMetadataValue(Boolean.TRUE, EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, Item.ANY, null);
+        addSingleMetadataValue(Boolean.TRUE, EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, Item.ANY, null);
     }
 
     public void setEmbargo(String embargoType, Date liftDate) throws SQLException {
@@ -197,18 +186,10 @@ public class DryadDataFile extends DryadObject {
         }
         if(liftDate == null) {
             throw new IllegalArgumentException("Unable to set embargo date with null liftDate");
-        }
-
-        else {
-            try {
-                clearEmbargo();
-                String liftDateString = formatDate(liftDate);
-                getItem().addMetadata(EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, null, embargoType);
-                getItem().addMetadata(EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, null, liftDateString);
-                getItem().update();
-            } catch (AuthorizeException ex) {
-                log.error("Authorize exception setting embargo", ex);
-            }
+        } else {
+            String liftDateString = formatDate(liftDate);
+            addSingleMetadataValue(Boolean.TRUE, EMBARGO_TYPE_SCHEMA, EMBARGO_TYPE_ELEMENT, EMBARGO_TYPE_QUALIFIER, embargoType);
+            addSingleMetadataValue(Boolean.TRUE, EMBARGO_DATE_SCHEMA, EMBARGO_DATE_ELEMENT, EMBARGO_DATE_QUALIFIER, liftDateString);
         }
     }
 
