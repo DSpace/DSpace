@@ -21,6 +21,6 @@ public class DefaultBitstreamHandler extends BaseBitstreamHandler {
     }
     public void generate() {
         // do nothing
-        log.debug("In default handler '" + this.getClass().getName() + "' for mime-type: " + format);
+        log.trace("In default handler '" + this.getClass().getName() + "' for mime-type: " + format);
     }
 }
