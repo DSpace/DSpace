@@ -116,4 +116,10 @@ public class Manuscript {
         this.status = STATUS_SUBMITTED;
         this.title = "Title of article 1";
     }
+
+    @JsonIgnore
+    public Boolean isRejected() {
+        return STATUS_REJECTED.equals(this.status) || STATUS_NEEDS_REVISION.equals(this.status);
+    }
+
 }
