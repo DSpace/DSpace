@@ -66,7 +66,7 @@ public abstract class BaseBitstreamHandler {
             </head> */
         contentHandler.startElement(NSURI, headEltName, headEltName, emptyAttr);
         AttributesImpl metaAtts = new AttributesImpl();
-        metaAtts.addAttribute(NSURI, propertyAttName, propertyAttName, "String", dcFormatVal);
+        metaAtts.addAttribute("", propertyAttName, propertyAttName, "String", dcFormatVal);
         contentHandler.startElement(NSURI, metaEltName, metaEltName, metaAtts);
         contentHandler.characters(format.toCharArray(), 0, format.length());
         contentHandler.endElement(NSURI, metaEltName, metaEltName);
