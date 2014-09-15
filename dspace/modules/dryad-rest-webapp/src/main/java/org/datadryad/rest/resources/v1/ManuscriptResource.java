@@ -22,6 +22,8 @@ import org.apache.log4j.Logger;
 import org.datadryad.rest.handler.ManuscriptHandlerGroup;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.responses.ErrorResponse;
+import org.datadryad.rest.responses.ResponseFactory;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
@@ -50,7 +52,8 @@ public class ManuscriptResource {
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
             return Response.ok(manuscriptStorage.getAll(path)).build();
         } catch (StorageException ex) {
-            return Response.serverError().entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -64,13 +67,14 @@ public class ManuscriptResource {
             manuscriptPath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
             Manuscript manuscript = manuscriptStorage.findByPath(manuscriptPath);
             if(manuscript == null) {
-                return Response.status(Status.NOT_FOUND).build();
+                ErrorResponse error = ResponseFactory.makeError("Manuscript with ID " + manuscriptId + " does not exist", "Manuscript not found", uriInfo, Status.NOT_FOUND.getStatusCode());
+                return Response.status(Status.NOT_FOUND).entity(error).build();
             } else {
                 return Response.ok(manuscript).build();
             }
         } catch (StorageException ex) {
-            // what to do here?
-            return Response.serverError().entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to get manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -85,15 +89,17 @@ public class ManuscriptResource {
                 manuscript.organization = organizationStorage.findByPath(organizationPath);
                 manuscriptStorage.create(organizationPath, manuscript);
             } catch (StorageException ex) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+                ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
             }
             // call handlers - must set organization first
             handlers.handleObjectCreated(organizationPath, manuscript);
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(manuscript.manuscriptId).build();
-            return Response.created(uri).build();
+            return Response.created(uri).entity(manuscript).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Manuscript ID not found").build();
+            ErrorResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid manuscript object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -111,13 +117,15 @@ public class ManuscriptResource {
                 manuscript.organization = organizationStorage.findByPath(organizationPath);
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+                ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
             }
             // call handlers - must set organization first.
             handlers.handleObjectUpdated(path, manuscript);
-            return Response.noContent().build();
+            return Response.ok(manuscript).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Manuscript ID not found").build();
+            ErrorResponse error = ResponseFactory.makeError("Please check the structure of your object",  "Invalid manuscript object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -131,9 +139,10 @@ public class ManuscriptResource {
         try {
             manuscriptStorage.deleteByPath(path);
         } catch (StorageException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to delete manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
-        // TODO: handle the deleted object - if we need to
+        // TODO: invoke handlers on deleted object - if we need to
         return Response.noContent().build();
     }
 }

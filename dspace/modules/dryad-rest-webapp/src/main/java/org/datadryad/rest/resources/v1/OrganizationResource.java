@@ -18,10 +18,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.datadryad.rest.responses.ErrorResponse;
 import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractOrganizationStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+import org.datadryad.rest.responses.ResponseFactory;
 
 /**
  *
@@ -34,7 +36,6 @@ public class OrganizationResource {
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganizations() {
@@ -42,7 +43,8 @@ public class OrganizationResource {
             // Returning a list requires POJO turned on
             return Response.ok(organizationStorage.getAll(new StoragePath())).build();
         } catch (StorageException ex) {
-            return Response.serverError().entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list organizations", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -55,32 +57,34 @@ public class OrganizationResource {
         try {
             Organization organization = organizationStorage.findByPath(path);
             if(organization == null) {
-                return Response.status(Status.NOT_FOUND).build();
+                ErrorResponse error = ResponseFactory.makeError("Organization with code " + organizationCode + " does not exist", "Organization not found", uriInfo, Status.NOT_FOUND.getStatusCode());
+                return Response.status(Status.NOT_FOUND).entity(error).build();
             } else {
                 return Response.ok(organization).build();
             }
         } catch (StorageException ex) {
-            // what to do here?
-            return Response.serverError().entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to get organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createOrganization(Organization organization) {
-        System.err.println("Organization received with name: " + organization.organizationName + ", Code: " + organization.organizationCode);
         // Check required fields
         if(organization.isValid()) {
             try {
                 organizationStorage.create(new StoragePath(), organization);
             } catch (StorageException ex) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+                ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
             }
             UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI uri = ub.path(organization.organizationCode).build();
-            return Response.created(uri).build();
+            return Response.created(uri).entity(organization).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Organization Code not found").build();
+            ErrorResponse error = ResponseFactory.makeError("Please check the structure of your object", "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -88,7 +92,6 @@ public class OrganizationResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Organization organization) {
-        System.err.println("Organization received with name: " + organization.organizationName + ", Code: " + organization.organizationCode);
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
         // Check required fields
@@ -96,11 +99,13 @@ public class OrganizationResource {
             try {
                 organizationStorage.update(path, organization);
             } catch (StorageException ex) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+                ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
             }
-            return Response.noContent().build();
+            return Response.ok(organization).build();
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Organization Code not found").build();
+            ErrorResponse error = ResponseFactory.makeError("Please check the structure of your object",  "Invalid organization object", uriInfo, Status.BAD_REQUEST.getStatusCode());
+            return error.toResponse().build();
         }
     }
 
@@ -113,7 +118,8 @@ public class OrganizationResource {
         try {
             organizationStorage.deleteByPath(path);
         } catch (StorageException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+            ErrorResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to delete organization", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            return error.toResponse().build();
         }
         return Response.noContent().build();
     }
