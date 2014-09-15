@@ -16,8 +16,9 @@
         Lookup table for template to call for handling input based on mime-type
     -->
     <ddw:templates>
-        <ddw:template mime-type="text/plain">text-plain</ddw:template>
-        <ddw:template mime-type="application/pdf">application-pdf</ddw:template>
+        <ddw:template mime-type="text/plain"        >text-plain</ddw:template>
+        <ddw:template mime-type="text/csv"          >text-csv</ddw:template>
+        <ddw:template mime-type="application/pdf"   >application-pdf</ddw:template>
     </ddw:templates>
     
     <xsl:template match="/">
@@ -28,8 +29,9 @@
             <xsl:otherwise>
                 <xsl:variable name="template-name" select="document('')/xsl:stylesheet/ddw:templates/ddw:template[@mime-type=$mime-type]"/>
                 <xsl:choose>
-                    <xsl:when test="$template-name = 'text-plain'"><xsl:call-template name="text-plain"/></xsl:when>
-                    <xsl:when test="$template-name = 'application-pdf'"><xsl:call-template name="application-pdf"/></xsl:when>
+                    <xsl:when test="$template-name = 'text-plain'"      ><xsl:call-template name="text-plain"        /></xsl:when>
+                    <xsl:when test="$template-name = 'text-csv'"        ><xsl:call-template name="text-csv"          /></xsl:when>
+                    <xsl:when test="$template-name = 'application-pdf'" ><xsl:call-template name="application-pdf"   /></xsl:when>
                     <xsl:otherwise>
                         <xsl:message terminate="yes">Misconfigured lookup or missing named template.</xsl:message>
                     </xsl:otherwise>
@@ -115,6 +117,40 @@ PDFJS.getDocument(url).then(function(pdf) {
 </pre>
             </body>
         </html>
+    </xsl:template>
+    
+    <xsl:template name="text-csv">
+        <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title></title>
+                <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+                <script type="text/javascript" src="//cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+                <style type="text/css">
+                    .sorting, .sorting_asc, .sorting_desc {
+                        background : none !important;
+                    }
+                </style>
+                <link type="text/css" rel="stylesheet" href="//cdn.datatables.net/1.10.2/css/jquery.dataTables.css"></link>
+            </head>
+            <body>
+                <table id="example" class="compact hover" cellspacing="0" width="100%">
+                    <xsl:call-template name="csv-to-table"/>
+                </table>
+                <script type="text/javascript">
+//<![CDATA[
+$(document).ready(function() {
+    $('#example').dataTable({
+        "sDom": '<"top">t<"bottom"lp><"clear">' // "sDom": '<"top"i>rt<"bottom"flp><"clear">'
+    });
+});
+//]]>
+                </script>
+            </body>
+        </html>
+    </xsl:template>
+    
+    <xsl:template name="csv-to-table">
+        
     </xsl:template>
     
 </xsl:stylesheet>

@@ -6,8 +6,9 @@
 
 package org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -45,15 +46,18 @@ public abstract class BaseBitstreamHandler {
     private final String dcFormatVal = "dc.format";
     private final String bodyEltName = "body";
     
-    protected BufferedReader bufferedReader;
+    protected String url;
+    protected String format;
     protected ContentHandler contentHandler;
     protected LexicalHandler lexicalHandler;
-    protected String format;
-    public BaseBitstreamHandler(BufferedReader bufferedReader, ContentHandler contentHandler, LexicalHandler lexicalHandler, String format) throws SAXException {
-        this.bufferedReader = bufferedReader;
+    protected SourceResolver sourceResolver;
+    
+    public BaseBitstreamHandler(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver) throws SAXException {
+        this.url = url;
+        this.format = format.trim();
         this.contentHandler = contentHandler;
         this.lexicalHandler = lexicalHandler;
-        this.format = format.trim();
+        this.sourceResolver = sourceResolver;
     }
     public void start() throws SAXException {
         final Attributes emptyAttr = new AttributesImpl();
@@ -82,5 +86,5 @@ public abstract class BaseBitstreamHandler {
         contentHandler.endPrefixMapping("");
         contentHandler.endDocument();
     }
-    public abstract void generate() throws SAXException, IOException;
+    public abstract void generate() throws SAXException, IOException, ProcessingException;
 }
