@@ -6,9 +6,9 @@
     exclude-result-prefixes="xhtml ddw"
     version="1.0">
     
-    <xsl:output method="xml" omit-xml-declaration="yes"/>
+    <xsl:output method="html" indent="no"/>
     
-    <xsl:variable name="mime-type" select="//xhtml:meta[@property='dc:format']"/>
+    <xsl:variable name="mime-type" select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.format']"/>
     <xsl:param name="doi"/>
     <xsl:param name="object-url"/> <!-- DataOne-MN url for bitstream -->
     
@@ -46,13 +46,9 @@
         <html>
             <head></head>
             <body>
-<pre>
-This is it: <b><xsl:value-of select="$mime-type"/></b>
-</pre>
-                
-                <div>This content type '<xsl:value-of select="$mime-type"/>' is unsupported. Please visit the
-                    <a href="http://dx.doi.org/{$doi}">Dryad site</a>
-                    to view the data.
+                <div>This content type '<xsl:value-of select="$mime-type"/>' is unsupported. 
+                    Please visit the <a href="http://dx.doi.org/{$doi}">Dryad site</a>
+                    to view the data or download the data from this widget.
                 </div>
             </body>
         </html>
@@ -80,7 +76,7 @@ PDFJS.getDocument(url).then(function(pdf) {
   pdf.getPage(1).then(function(page) {
     var scale = 1.5;
     var viewport = page.getViewport(scale);
-    var canvas = document.getElementById('the-canvas');
+    var canvas = document.getElementById('PDFcanvas');
     var context = canvas.getContext('2d');
     canvas.height = viewport.height;
     canvas.width = viewport.width;
@@ -95,7 +91,7 @@ PDFJS.getDocument(url).then(function(pdf) {
                 </script>
             </head>
             <body>
-                <canvas id="the-canvas" style="border:1px  solid black"></canvas>
+                <canvas id="PDFcanvas" style="border:0; width: 100%"></canvas>
             </body>
         </html>        
     </xsl:template>
