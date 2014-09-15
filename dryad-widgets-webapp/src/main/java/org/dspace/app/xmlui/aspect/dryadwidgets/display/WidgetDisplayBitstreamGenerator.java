@@ -90,27 +90,25 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
         BaseBitstreamHandler handler = null;
         if (dataOneFormat.equals("text/plain")) {
             try {
-                handler = new Text_Plain(bufferedReader, contentHandler, lexicalHandler, dataOneFormat);
+                handler = new Text_Plain(bufferedReader, super.contentHandler, super.lexicalHandler, dataOneFormat);
             } catch (SAXException e) {
-                log.error("Failed to instantiate default bitstream handler for format '" + dataOneFormat + "':  " + e.toString());
+                log.error("Failed to instantiate Text_Plain bitstream handler for format '" + dataOneFormat + "':  " + e.toString());
                 throw new ProcessingException("Bitstream handler error for doi: " + doi);            
             }
         }
         if (handler == null) {
             try {
-                handler = new DefaultBitstreamHandler(bufferedReader, contentHandler, lexicalHandler, dataOneFormat);
+                handler = new DefaultBitstreamHandler(bufferedReader, super.contentHandler, super.lexicalHandler, dataOneFormat);
             } catch (SAXException e) {
-                log.error("Failed to instantiate default bitstream handler: " + e.toString());
+                log.error("Failed to instantiate default bitstream handler: " + e.getMessage());
                 throw new ProcessingException("Bitstream handler error for doi: " + doi);
             }
         }
-        log.debug("Using handler '" + handler.getClass().getName() + "' for doi: " + doi);
+        log.trace("Using handler '" + handler.getClass().getName() + "' for doi: " + doi);
         try {
-            log.debug("Starting serialization generation for doi: " + doi);
-            handler.generate();
-            log.debug("Starting serialization finalization for doi: " + doi);
-            handler.finalize();
-            log.debug("Serialization result is: " + xmlConsumer.toString());
+            handler.start();    // should be BaseBitstreamHandler.start()
+            handler.generate(); // should be subclass of BaseBitstreamHandler
+            handler.end();      // should be BaseBitstreamHandler.end()
         } catch (SAXException e) {
             log.error("SAX Exception: Failed to generate bitstream content: " + e.getMessage().toString());
             throw new ProcessingException("Bitstream generator error (SAXException) for doi: " + doi);
