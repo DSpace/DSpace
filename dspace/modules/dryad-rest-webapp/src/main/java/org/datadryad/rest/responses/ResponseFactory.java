@@ -11,7 +11,7 @@ import javax.ws.rs.core.UriInfo;
 public class ResponseFactory {
     public static ErrorsResponse makeError(String detail, String title, UriInfo uriInfo, Integer statusCode) {
         ErrorObject error = new ErrorObject();
-        error.path = uriInfo.getPath();
+        error.path = uriInfo.getAbsolutePathBuilder().build().toString();
         error.status = String.valueOf(statusCode);
         error.detail = detail;
         error.title = title;
