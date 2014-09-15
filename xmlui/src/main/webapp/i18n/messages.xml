@@ -2382,6 +2382,23 @@
 <message key="xmlui.XMLWorkflow.default.finaleditstep.finaleditaction">Accept/Reject final</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
+
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.claimaction">Step of the revisor assignment</message>
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign revisor</message>
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.singleUserReviewStep">Single user review step</message>

@@ -2319,6 +2319,22 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+
 
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Acciones que puedes realizar en esta tarea:</message>
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Asignar esta tarea a uno mismo.</message>
