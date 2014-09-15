@@ -36,7 +36,6 @@ public class AuthHelper {
     }
 
     Integer getEPersonIdFromToken(String accessToken) {
-        // TODO: switch storage to provider.
         try {
             OAuthToken oAuthToken = tokenStorage.getToken(accessToken);
             if(oAuthToken == null || !oAuthToken.isValid()) {
