@@ -138,6 +138,13 @@
             <artifactId>atmire-authority</artifactId>
         </dependency>
         <dependency>
+            <!-- dspace.cfg choices.plugin specifies HIVESubjectAuthority, which is in xmlui -->
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>xmlui</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
            <groupId>org.dspace.modules</groupId>
            <artifactId>api</artifactId>
             <version>${project.version}</version>
