@@ -212,7 +212,7 @@ public abstract class DryadObject {
 
     protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String language, String value) throws SQLException {
         if(clearFirst) {
-            getItem().clearMetadata(schema, element, qualifier, language);
+            getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
         }
         if(value != null) {
             getItem().addMetadata(schema, element, qualifier, language, value);
@@ -248,7 +248,7 @@ public abstract class DryadObject {
 
     protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, String language, List<String> values) throws SQLException {
         if(clearFirst) {
-            getItem().clearMetadata(schema, element, qualifier, language);
+            getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
         }
         if(values != null) {
             for(String value : values) {
