@@ -413,4 +413,7 @@ public class DryadDataPackage extends DryadObject {
     public void setKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
+    public void addKeywords(List<String> keywords) throws SQLException {
+        addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
+    }
 }
