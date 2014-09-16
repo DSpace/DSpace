@@ -90,7 +90,7 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
         // dspace review-item -a false
         try {
             if(manuscript.dryadDataDOI != null) {
-                ApproveRejectReviewItem.reviewItemDOI(Boolean.TRUE, manuscript.dryadDataDOI);
+                ApproveRejectReviewItem.reviewItemDOI(Boolean.FALSE, manuscript.dryadDataDOI);
             } else {
                 ApproveRejectReviewItem.reviewItem(Boolean.FALSE, manuscript.manuscriptId);
             }
