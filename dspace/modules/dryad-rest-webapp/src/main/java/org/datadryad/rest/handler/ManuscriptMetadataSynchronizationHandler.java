@@ -34,6 +34,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         Context context = null;
         try {
             context = new Context();
+            context.turnOffAuthorisationSystem();
         } catch (SQLException ex) {
             log.error("Unable to instantiate DSpace context", ex);
         }
@@ -82,7 +83,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         DryadDataPackage dataPackage = null;
         try {
             // First look up by DOI
-            if(manuscript.dryadDataDOI != null) {
+            if(doi != null) {
                 DSpaceObject object = getIdentifierService().resolve(context, doi);
                 if(object.getType() == Constants.ITEM) {
                     dataPackage = new DryadDataPackage((Item)object);
@@ -120,8 +121,12 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
             }
             completeContext(context);
         } catch (SQLException ex) {
-            throw new HandlerException("SQLException updating publicationDate", ex);
+            throw new HandlerException("SQLException updating Data Package with metadata", ex);
         }
+    }
+
+    private static String prefixTitle(String title) {
+        return String.format("Data from: %s", title);
     }
 
     /**
@@ -141,9 +146,13 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         List<String> unionKeywords = unionLists(packageKeywords, manuscriptKeywords);
         dataPackage.setKeywords(unionKeywords);
         // set title
-        dataPackage.setTitle(manuscript.title);
+        if(manuscript.title != null) {
+            dataPackage.setTitle(prefixTitle(manuscript.title));
+        }
         // set abstract
-        dataPackage.setAbstract(manuscript.manuscript_abstract);
+        if(manuscript.manuscript_abstract != null) {
+            dataPackage.setAbstract(manuscript.manuscript_abstract);
+        }
         // set publicationDate
         dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
     }
