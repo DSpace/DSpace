@@ -7,6 +7,7 @@
 package org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text;
 
 import java.io.IOException;
+import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
@@ -22,8 +23,10 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Nathan Day
  */
 public class Plain extends BaseBitstreamHandler {
-    public Plain(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver) throws SAXException {
-        super(url, format, contentHandler, lexicalHandler, resolver);
+    public Plain(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver, Map objectModel) 
+        throws SAXException 
+    {
+        super(url, format, contentHandler, lexicalHandler, resolver, objectModel);
     }
     /**
      * Generate a plain text data section, wrapped in <!CDATA[]]>.
@@ -33,21 +36,17 @@ public class Plain extends BaseBitstreamHandler {
     @Override
     public void generate() throws SAXException, IOException, ProcessingException {
         TextGenerator text = new TextGenerator();
+        Parameters params = new Parameters();
         /*
-            Parameters params = new Parameters();
             params.setParameter("encoding", "");
-            params.setParameter("separator", "");
-            params.setParameter("escape", "");
-            params.setParameter("buffer-size", "");
-            params.setParameter("max-records", "");
         */
-        text.setup(sourceResolver, null, url, Parameters.EMPTY_PARAMETERS);
         BitstreamXMLConsumer consumer = new BitstreamXMLConsumer(contentHandler, lexicalHandler);
         try {
+            text.setup(sourceResolver, objectModel, url, params);
             text.setConsumer(consumer);
             text.generate();
         } catch (Exception e) {
-            log.error("Failed to generate CSV data: " + e.getMessage());
+            log.error("Failed to generate Text data: " + e.getMessage());
         } finally {
             if (text != null) {
                 text.dispose();

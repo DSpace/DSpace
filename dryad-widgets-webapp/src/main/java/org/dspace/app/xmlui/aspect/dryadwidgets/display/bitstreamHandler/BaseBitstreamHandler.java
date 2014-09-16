@@ -7,6 +7,7 @@
 package org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler;
 
 import java.io.IOException;
+import java.util.Map;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.xml.sax.Attributes;
@@ -51,13 +52,17 @@ public abstract class BaseBitstreamHandler {
     protected ContentHandler contentHandler;
     protected LexicalHandler lexicalHandler;
     protected SourceResolver sourceResolver;
+    protected Map objectModel;
     
-    public BaseBitstreamHandler(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver) throws SAXException {
+    public BaseBitstreamHandler(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver sourceResolver, Map objectModel) 
+            throws SAXException 
+    {
         this.url = url;
         this.format = format.trim();
         this.contentHandler = contentHandler;
         this.lexicalHandler = lexicalHandler;
         this.sourceResolver = sourceResolver;
+        this.objectModel = objectModel;
     }
     public void start() throws SAXException {
         final Attributes emptyAttr = new AttributesImpl();
