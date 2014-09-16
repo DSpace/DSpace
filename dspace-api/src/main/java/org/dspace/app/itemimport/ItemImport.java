@@ -1226,13 +1226,15 @@ public class ItemImport
     }
 
     /**
-     * Read the collections file inside the item directory. If there is one and it is not empty return a list of
-     * collections in which the item should be inserted. If it does not exist or it is empty return null.
+     * Read the collections file inside the item directory. If there
+     * is one and it is not empty return a list of collections in
+     * which the item should be inserted. If it does not exist or it
+     * is empty return null.
      *
-     * @param c
-     * @param path
-     * @param filename
-     * @return
+     * @param c The context
+     * @param path The path to the data directory for this item
+     * @param filename The collections file filename. Should be "collections"
+     * @return A list of collections in which to insert the item or null
      */
 
     private Collection[] processCollectionFile(Context c, String path, String filename) throws IOException, SQLException
