@@ -80,6 +80,7 @@ public class ManuscriptResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Manuscript manuscript) {
         StoragePath organizationPath = new StoragePath();
         organizationPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
@@ -106,6 +107,7 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId, Manuscript manuscript) {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
@@ -132,6 +134,7 @@ public class ManuscriptResource {
     @Path("/{manuscriptId}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         StoragePath path = new StoragePath();
         path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
