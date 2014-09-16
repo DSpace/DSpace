@@ -137,7 +137,8 @@ function download_url(url) {
     iframe.src = url;
 }
 function handle_message(e) {
-    if (e.origin !== d.location.protocol + '//' + d.location.host) return;
+    // TODO: verify dryad source
+    //if (e.origin !== d.location.protocol + '//' + d.location.host) return;
     if (e.data.hasOwnProperty('action')) {
         if (e.data.action === 'download') {
             if (!e.data.hasOwnProperty('data')) return;
@@ -168,6 +169,20 @@ function load_css(url) {
     link.setAttribute('href', url);
     (d.getElementsByTagName('script')[0]).insertBefore(link, null);
 }
+function verify_load(url, pred, interval, count) {
+    if (!(pred())) {
+        var v;
+        var f = function() {
+            if (pred() || --count == 0) {
+                clearInterval(v);
+            } else {
+                console.log('reattempting load of js');
+                load_js(url);
+            }
+        };
+        v = setInterval(f,interval);
+    }
+}
 function dryadJQLoaded() {
     jQuery(d).ready(function($) {
         var wrapper = document.getElementById(wid);
@@ -180,10 +195,15 @@ function dryadJQLoaded() {
         w.addEventListener('message', handle_message, false);
         load_css(ddwcss);
         load_js(lblib);
+        if (!jQuery.hasOwnProperty('magnificPopup')) {
+            load_js(lblib);
+            verify_load(lblib, function() { return jQuery.hasOwnProperty('magnificPopup') }, 500, 10);
+        }
         wrapper.appendChild(frame);
     });
 }
 })(window,document);
+
 ]]>
     </xsl:template>
     
