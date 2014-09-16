@@ -5,28 +5,25 @@
  */
 package org.dspace.app.xmlui.aspect.dryadwidgets.display;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.generation.AbstractGenerator;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.BaseBitstreamHandler;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.DefaultBitstreamHandler;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV;
-import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 
+import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.BaseBitstreamHandler;
+import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.DefaultBitstreamHandler;
+import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV;
+import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain;
 
 /**
  * This generator uses a DOI to locate a bitstream object and convert its content
@@ -42,20 +39,34 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
     
     private final static HashMap<String,String> bitstreamHandlerClasses = new HashMap<String, String>();
     static {
-        bitstreamHandlerClasses.put("text/plain",   "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain");
-        bitstreamHandlerClasses.put("text/csv",     "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV");
+        bitstreamHandlerClasses.put("text/plain",           "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain");
+        bitstreamHandlerClasses.put("application/x-python", "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.Plain");
+        bitstreamHandlerClasses.put("text/csv",             "org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text.CSV");
     }
 
-    /*
+    private SourceResolver resolver;
+    private Map objectModel;
+    private Parameters parameters;
+    private String source;
+    
     @Override 
-    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par) 
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
             throws ProcessingException, SAXException, IOException
     {
-        super.setup(resolver, objectModel, src, par);
+        super.setup(resolver, objectModel, src, parameters);
+        this.resolver = resolver;
+        this.objectModel = objectModel;
+        this.source = src;
+        this.parameters = parameters;
     }
     @Override
-    public void recycle()
-    */
+    public void recycle() {
+        super.recycle();
+        this.resolver = null;
+        this.objectModel = null;
+        this.source = null;
+        this.parameters = null;
+    }
     
     @Override
     public void generate() throws IOException, SAXException, ProcessingException {
@@ -83,7 +94,7 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
             responseCode = connection.getResponseCode();
             log.debug("DataOne Server sent response code " + Integer.toString(responseCode) + "' for url '" + object_url + "'");
             dataOneFormat = connection.getHeaderField(DOFid);
-            log.debug("DataOne reports format if '" + dataOneFormat + "' for doi '" + doi + "'");
+            log.debug("DataOne reports format '" + dataOneFormat + "' for doi '" + doi + "'");
         } catch (IOException e) {
             throw new IOException("Failed to connect to DataOne service");
         }
@@ -103,8 +114,8 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
         if (bitstreamHandlerClasses.containsKey(dataOneFormat)) {
             try {
                 Class cls = Class.forName(bitstreamHandlerClasses.get(dataOneFormat));
-                Constructor ctor = cls.getConstructor(String.class, String.class, ContentHandler.class, LexicalHandler.class, SourceResolver.class);
-                handler = (BaseBitstreamHandler) ctor.newInstance(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, super.resolver);
+                Constructor ctor = cls.getConstructor(String.class, String.class, ContentHandler.class, LexicalHandler.class, SourceResolver.class, Map.class);
+                handler = (BaseBitstreamHandler) ctor.newInstance(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, this.resolver, this.objectModel);
             } catch (Exception ex) {
                 log.error(ex.getMessage());
                 throw new ProcessingException("Bitstream handler instantiaion error for doi: " + doi);
@@ -112,7 +123,7 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
         }
         if (handler == null) {
             try {
-                handler = new DefaultBitstreamHandler(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, super.resolver);
+                handler = new DefaultBitstreamHandler(object_url, dataOneFormat, super.contentHandler, super.lexicalHandler, this.resolver, this.objectModel);
             } catch (Exception ex) {
                 log.error(ex.getMessage());
                 throw new ProcessingException("Bitstream handler instantiaion error for doi: " + doi);
