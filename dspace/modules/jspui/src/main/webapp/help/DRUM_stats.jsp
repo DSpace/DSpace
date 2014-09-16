@@ -6,13 +6,13 @@
 
 <h1>Metrics</h1>
 
-<p>To help you monitor your impact, DRUM provides information about downloads of your research. You can track the following statistics:<p>
+<p>To help you monitor your impact, DRUM provides information about downloads of your research. You can track the following statistics:</p>
 
 <ul>
 <li>Total downloads of each file</li>
 </ul>
 
-We are investigating other metrics and may implement new features soon.
+<p>We are investigating other metrics and may implement new features soon.</p>
 
 <p><strong>Contact us with questions or comments</strong><br />
 General inquiries: <a href="mailto:drum-help@umd.edu">drum-help@umd.edu</a>, (301) 314-1328<br />
