@@ -37,8 +37,8 @@
         <module>dataone-mn</module>
         <module>journal-submit</module>
         <module>versioning</module>
-        <module>atmire-solr-authority</module>
         <module>payment-system</module>
+
         <!--module>solr-load-tester</module-->
 	</modules>
 
@@ -109,14 +109,6 @@
                    <artifactId>versioning-api</artifactId>
                    <version>${pom.version}</version>
                </dependency>
-
-               <dependency>
-                   <groupId>com.atmire</groupId>
-                   <artifactId>atmire-authority</artifactId>
-                   <version>${pom.version}</version>
-               </dependency>
-
-
 
 
                <dependency>

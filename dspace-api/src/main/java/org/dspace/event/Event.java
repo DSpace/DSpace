@@ -44,7 +44,7 @@ import org.dspace.core.Context;
  * significance varies by the combination of action and subject type.</li>
  * <li> - timestamp -- exact millisecond timestamp at which event was logged.</li>
  * </ul>
- * 
+ *
  * @version $Revision$
  */
 public class Event implements Serializable
@@ -65,7 +65,7 @@ public class Event implements Serializable
     public static final int REMOVE = 1 << 4; // remove content from container
 
     public static final int DELETE = 1 << 5; // destroy object
-    
+
     public static final int INSTALL = 1 << 6; // object exits workspace/flow
 
     /** Index of filter parts in their array: */
@@ -97,8 +97,14 @@ public class Event implements Serializable
 
     private static final int EPERSON = 1 << Constants.EPERSON; // 7
 
+    private static final int SCHEME = 1 << Constants.SCHEME; // 8
+
+    private static final int CONCEPT = 1 << Constants.CONCEPT; //9
+
+    private static final int TERM = 1 << Constants.TERM; // 10
+
     private static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
-            | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
+            | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON | SCHEME | CONCEPT | TERM;
 
     private static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
 
@@ -128,6 +134,15 @@ public class Event implements Serializable
 
         objTypeToMask.put(Constants.EPERSON, EPERSON);
         objMaskToType.put(EPERSON, Constants.EPERSON);
+
+        objTypeToMask.put(Constants.SCHEME, SCHEME);
+        objMaskToType.put(SCHEME, Constants.SCHEME);
+
+        objTypeToMask.put(Constants.CONCEPT, CONCEPT);
+        objMaskToType.put(CONCEPT, Constants.CONCEPT);
+
+        objTypeToMask.put(Constants.TERM, TERM);
+        objMaskToType.put(TERM, Constants.TERM);
     }
 
     /** ---------- Event Fields ------------- * */
@@ -181,7 +196,7 @@ public class Event implements Serializable
 
     /**
      * Constructor.
-     * 
+     *
      * @param eventType
      *            action type, e.g. Event.ADD.
      * @param subjectType
@@ -202,7 +217,7 @@ public class Event implements Serializable
 
     /**
      * Constructor.
-     * 
+     *
      * @param eventType
      *            action type, e.g. Event.ADD.
      * @param subjectType
@@ -217,7 +232,7 @@ public class Event implements Serializable
      *            detail information that depends on context.
      */
     public Event(int eventType, int subjectType, int subjectID, int objectType,
-            int objectID, String detail)
+                 int objectID, String detail)
     {
         this.eventType = eventType;
         this.subjectType = coreTypeToMask(subjectType);
@@ -231,7 +246,7 @@ public class Event implements Serializable
     /**
      * Compare two events. Ignore any difference in the timestamps. Also ignore
      * transactionID since that is not always set initially.
-     * 
+     *
      * @param other
      *            the event to compare this one to
      * @return true if events are "equal", false otherwise.
@@ -256,17 +271,17 @@ public class Event implements Serializable
     public int hashCode()
     {
         return new HashCodeBuilder().append(this.detail)
-                                    .append(eventType)
-                                    .append(subjectType)
-                                    .append(subjectID)
-                                    .append(objectType)
-                                    .append(objectID)
-                                    .toHashCode();
+                .append(eventType)
+                .append(subjectType)
+                .append(subjectID)
+                .append(objectType)
+                .append(objectID)
+                .toHashCode();
     }
 
     /**
      * Set the identifier of the dispatcher that first processed this event.
-     * 
+     *
      * @param id
      *            the unique (hash code) value characteristic of the dispatcher.
      */
@@ -305,7 +320,7 @@ public class Event implements Serializable
 
     /**
      * Get the DSpace object which is the "object" of an event.
-     * 
+     *
      * @return DSpaceObject or null if none can be found or no object was set.
      */
     public DSpaceObject getObject(Context context) throws SQLException
@@ -325,7 +340,7 @@ public class Event implements Serializable
     /**
      * Syntactic sugar to get the DSpace object which is the "subject" of an
      * event.
-     * 
+     *
      * @return DSpaceObject or null if none can be found.
      */
     public DSpaceObject getSubject(Context context) throws SQLException
@@ -402,7 +417,7 @@ public class Event implements Serializable
      * Translate a textual DSpace Object type name into an event subject-type
      * mask. NOTE: This returns a BIT-MASK, not a numeric type value; the mask
      * is only used within the event system.
-     * 
+     *
      * @param s
      *            text name of object type.
      * @return numeric value of object type or 0 for error.
@@ -435,7 +450,7 @@ public class Event implements Serializable
 
     /**
      * Get the text name of event (action) type.
-     * 
+     *
      * @return event-type (i.e. action) this event as a String, e.g. for
      *          logging.
      */
@@ -454,7 +469,7 @@ public class Event implements Serializable
 
     /**
      * Interpret named event type.
-     * 
+     *
      * @param s
      *            name of event type.
      * @return numeric value of event type or 0 for error.
@@ -517,7 +532,7 @@ public class Event implements Serializable
 
     /**
      * Sets value of transactionID element of the event.
-     * 
+     *
      * @param tid
      *            new value of transactionID.
      */
@@ -548,7 +563,7 @@ public class Event implements Serializable
 
     /**
      * Test whether this event would pass through a list of filters.
-     * 
+     *
      * @param filters
      *            list of filter masks; each one is an Array of two ints.
      * @return true if this event would be passed through the given filter
@@ -598,7 +613,7 @@ public class Event implements Serializable
      * Keeps track of which consumers the event has been consumed by. Should be
      * called by a dispatcher when calling consume(Context ctx, String name,
      * Event event) on an event.
-     * 
+     *
      * @param consumerName
      */
     public void setBitSet(String consumerName)
@@ -638,6 +653,6 @@ public class Event implements Serializable
                 + (detail == null ? "[null]" : "\"" + detail + "\"")
                 + ", transactionID="
                 + (transactionID == null ? "[null]" : "\"" + transactionID
-                        + "\"") + ")";
+                + "\"") + ")";
     }
 }

@@ -324,5 +324,4 @@
 			<class>org.dspace.discovery.IndexClient</class>
 		</step>
 	</command>
-
 </commands>

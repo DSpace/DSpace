@@ -9,13 +9,18 @@ package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.*;
 
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.AuthorityValueFinder;
+import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.*;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.handle.HandleManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowManager;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.io.File;
@@ -37,6 +42,8 @@ public class MetadataImport
 
     /** The lines to import */
     List<DSpaceCSVLine> toImport;
+    private AuthorityValueFinder authorityValueFinder = new AuthorityValueFinder();
+
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -302,6 +309,13 @@ public class MetadataImport
             String[] bits = md.split("\\[");
             language = bits[1].substring(0, bits[1].length() - 1);
         }
+
+        AuthorityValue fromAuthority = getAuthorityValueType(md);
+        if (md.indexOf(':') > 0) {
+            md = md.substring(md.indexOf(':') + 1);
+        }
+
+
         String[] bits = md.split("\\.");
         String schema = bits[0];
         String element = bits[1];
@@ -341,6 +355,17 @@ public class MetadataImport
             dcv.qualifier = qualifier;
             dcv.language = language;
             dcv.value = value;
+            if (value == null || value.indexOf(DSpaceCSV.authoritySeparator) < 0)
+                simplyCopyValue(value, dcv);
+            else
+            {
+                String[] parts = value.split(DSpaceCSV.escapedAuthoritySeparator);
+                dcv.value = parts[0];
+                dcv.authority = parts[1];
+                dcv.confidence = (parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED);
+            }
+
+
             if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)))
             {
                 // Remove it
@@ -354,18 +379,19 @@ public class MetadataImport
         }
 
         // Compare from current->csv
-        for (String value : fromCSV)
-        {
-            // Look to see if it should be added
-            DCValue dcv = new DCValue();
-            dcv.schema = schema;
-            dcv.element = element;
-            dcv.qualifier = qualifier;
-            dcv.language = language;
-            dcv.value = value;
-            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues)))
-            {
+        for (int v = 0; v < fromCSV.length; v++) {
+            String value = fromCSV[v];
+            DCValue dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            if (fromAuthority!=null) {
+                value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
+                fromCSV[v] = value;
+            }
+
+            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues))) {
                 changes.registerAdd(dcv);
+            } else {
+                // Keep it
+                changes.registerConstant(dcv);
             }
         }
 
@@ -607,6 +633,14 @@ public class MetadataImport
             String[] bits = md.split("\\[");
             language = bits[1].substring(0, bits[1].length() - 1);
         }
+
+        AuthorityValue fromAuthority = getAuthorityValueType(md);
+        if (md.indexOf(':') > 0) {
+            md = md.substring(md.indexOf(':') + 1);
+        }
+
+
+
         String[] bits = md.split("\\.");
         String schema = bits[0];
         String element = bits[1];
@@ -630,22 +664,72 @@ public class MetadataImport
         // Add all the values
         for (String value : fromCSV)
         {
-            // Look to see if it should be removed
-            DCValue dcv = new DCValue();
-            dcv.schema = schema;
-            dcv.element = element;
-            dcv.qualifier = qualifier;
-            dcv.language = language;
-            dcv.value = value;
+            DCValue dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            if(fromAuthority!=null){
+                value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
+            }
 
             // Add it
             if ((value != null) && (!"".equals(value)))
             {
                 changes.registerAdd(dcv);
             }
+
         }
     }
+    public static AuthorityValue getAuthorityValueType(String md) {
+        AuthorityValue fromAuthority = null;
+        List<AuthorityValue> types = AuthorityValue.getAuthorityTypes().getTypes();
+        for (AuthorityValue type : types) {
+            if (StringUtils.startsWithIgnoreCase(md, type.getAuthorityType())) {
+                fromAuthority = type;
+            }
+        }
+        return fromAuthority;
+    }
 
+    private DCValue getDcValueFromCSV(String language, String schema, String element, String qualifier, String value, AuthorityValue fromAuthority) {
+        // Look to see if it should be removed
+        DCValue dcv = new DCValue();
+        dcv.schema = schema;
+        dcv.element = element;
+        dcv.qualifier = qualifier;
+        dcv.language = language;
+        if (fromAuthority != null) {
+            if (value.indexOf(':') > 0) {
+                value = value.substring(0, value.indexOf(':'));
+            }
+
+            // look up the value and authority in solr
+            List<AuthorityValue> byValue = authorityValueFinder.findByValue(c, schema, element, qualifier, value);
+            AuthorityValue authorityValue = null;
+            if (byValue.isEmpty()) {
+                String toGenerate = fromAuthority.generateString() + value;
+                String field = schema + "_" + element + (StringUtils.hasLength(qualifier) ? "_" + qualifier : "");
+                authorityValue = AuthorityValueGenerator.generate(toGenerate, value, field);
+                dcv.authority = toGenerate;
+            } else {
+                authorityValue = byValue.get(0);
+                dcv.authority = authorityValue.getId();
+            }
+
+            dcv.value = authorityValue.getValue();
+            dcv.confidence = Choices.CF_ACCEPTED;
+        } else if (value == null || !value.contains(DSpaceCSV.authoritySeparator)) {
+            simplyCopyValue(value, dcv);
+        } else {
+            String[] parts = value.split(DSpaceCSV.escapedAuthoritySeparator);
+            dcv.value = parts[0];
+            dcv.authority = parts[1];
+            dcv.confidence = (parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED);
+        }
+        return dcv;
+    }
+    private void simplyCopyValue(String value, DCValue dcv) {
+        dcv.value = value;
+        dcv.authority = null;
+        dcv.confidence = Choices.CF_UNSET;
+    }
     /**
      * Method to find if a String occurs in an array of Strings
      *
