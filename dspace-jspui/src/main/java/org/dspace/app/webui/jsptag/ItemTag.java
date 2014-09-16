@@ -925,15 +925,18 @@ public class ItemTag extends TagSupport
                                 // Work out what the bitstream link should be
                                 // (persistent
                                 // ID if item has Handle)
+                                //String bsLink = "target=\"_blank\" href=\""
+                                //        + request.getContextPath();
                                 String bsLink = "target=\"_blank\" href=\""
-                                        + request.getContextPath();
+                                        + ConfigurationManager.getProperty("dspace.viewer.baseurl");
 
                                 if ((handle != null)
                                         && (bitstreams[k].getSequenceID() > 0))
                                 {
-                                    bsLink = bsLink + "/bitstream/"
-                                            + item.getHandle() + "/"
-                                            + bitstreams[k].getSequenceID() + "/";
+                                    //bsLink = bsLink + "/bitstream/"
+                                    //        + item.getHandle() + "/"
+                                    //        + bitstreams[k].getSequenceID() + "/";
+                                    bsLink = bsLink + "?sequence=" + bitstreams[k].getInternalID() + "&File=";
                                 }
                                 else
                                 {
@@ -941,6 +944,10 @@ public class ItemTag extends TagSupport
                                             + bitstreams[k].getID() + "/";
                                 }
 
+                                //bsLink = bsLink
+                                //        + UIUtil.encodeBitstreamName(bitstreams[k]
+                                //             .getName(),
+                                //            Constants.DEFAULT_ENCODING) + "\">";
                                 bsLink = bsLink
                                         + UIUtil.encodeBitstreamName(bitstreams[k]
                                             .getName(),
