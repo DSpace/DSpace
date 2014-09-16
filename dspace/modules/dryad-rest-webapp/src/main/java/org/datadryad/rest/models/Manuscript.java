@@ -36,7 +36,7 @@ public class Manuscript {
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @XmlElement(name="abstract")
-    public String manuscript_abstract; // how to annotate this as "abstract"
+    public String manuscript_abstract;
     public AuthorsList authors;
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     public String dryadDataDOI;
