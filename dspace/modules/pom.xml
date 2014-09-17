@@ -38,11 +38,7 @@
         <module>journal-submit</module>
         <module>versioning</module>
         <module>payment-system</module>
-<<<<<<< HEAD
         <module>dryad-rest-webapp</module>
-=======
-
->>>>>>> dryad-master
         <!--module>solr-load-tester</module-->
 	</modules>
 
