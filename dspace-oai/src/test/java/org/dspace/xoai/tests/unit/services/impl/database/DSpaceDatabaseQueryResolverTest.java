@@ -25,6 +25,7 @@ import org.dspace.xoai.filter.DateUntilFilter;
 import org.dspace.xoai.services.api.database.DatabaseQuery;
 import org.dspace.xoai.services.impl.database.DSpaceDatabaseQueryResolver;
 import org.dspace.xoai.tests.unit.services.impl.AbstractQueryResolverTest;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,6 +50,11 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
     @Before
     public void autowire () {
         autowire(underTest);
+    }
+    
+    @After
+    public void cleanup() {
+        underTest = null;
     }
 
     @Test

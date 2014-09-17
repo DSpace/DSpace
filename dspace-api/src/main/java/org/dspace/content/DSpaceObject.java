@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,6 +26,9 @@ import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
 
 /**
  * Abstract base class for DSpace objects
@@ -47,6 +51,8 @@ public abstract class DSpaceObject
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     private StringBuffer eventDetails = null;
+    
+    private String[] identifiers = null;
 
     /** The Dublin Core metadata - inner class for lazy loading */
     protected MetadataCache metadataCache = new MetadataCache();
@@ -346,6 +352,65 @@ public abstract class DSpaceObject
      *         one
      */
     public abstract String getName();
+    
+    /**
+     * Tries to lookup all Identifiers of this DSpaceObject.
+     * @return An array containing all found identifiers or an array with a length of 0.
+     */
+    public String[] getIdentifiers(Context context)
+    {
+        if (identifiers == null)
+        {
+            log.debug("This DSO's identifiers cache is empty, looking for identifiers...");
+            identifiers = new String[0];
+
+            IdentifierService identifierService = 
+                    new DSpace().getSingletonService(IdentifierService.class);
+
+            if (identifierService != null)
+            {
+                identifiers = identifierService.lookup(context, this);
+            } else {
+                log.warn("No IdentifierService found, will return an array containing "
+                        + "the Handle only.");
+                if (getHandle() != null)
+                {
+                    identifiers = new String[] { HandleManager.getCanonicalForm(getHandle()) };
+                }
+            }
+        }
+
+        // it the DSO has no identifiers at all including handle, we should return an empty array.
+        // G.e. items during submission (workspace items) have no handle and no other identifier.
+        if (identifiers == null)
+        {
+            identifiers = new String[] {};
+        }
+
+        if (log.isDebugEnabled())
+        {
+            StringBuilder dbgMsg = new StringBuilder();
+            for (String id : identifiers)
+            {
+                if (dbgMsg.capacity() == 0)
+                {
+                    dbgMsg.append("This DSO's Identifiers are: ");
+                } else {
+                    dbgMsg.append(", ");
+                }
+                dbgMsg.append(id);
+            }
+            dbgMsg.append(".");
+            log.debug(dbgMsg.toString());
+        }
+
+        return identifiers;
+    }
+    
+    public void resetIdentifiersCache()
+    {
+        identifiers = null;
+    }
 
     /**
      * Generic find for when the precise type of a DSO is not known, just the

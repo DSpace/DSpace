@@ -169,6 +169,10 @@ public class AbstractUnitTest
                 IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
                 indexer.createIndex(ctx);
                 ctx.commit();
+                
+                // Nullify resources, so Junit will clean them up
+                dspace = null;
+                indexer = null;
             }
             Group.initDefaultGroupNames(ctx);
             ctx.restoreAuthSystemState();
@@ -351,12 +355,9 @@ public class AbstractUnitTest
      */
     @After
     public void destroy()
-    {        
-        if(context != null && context.isValid())
-        {
-            context.abort();
-            context = null;
-        }
+    {
+        // Cleanup our global context object
+        cleanupContext(context);
     }
 
     /**
@@ -370,6 +371,11 @@ public class AbstractUnitTest
         //we clear the properties
         testProps.clear();
         testProps = null;
+        
+        //Also clear out the kernel & nullify (so JUnit will clean it up)
+        if (kernelImpl!=null)
+            kernelImpl.destroy();
+        kernelImpl = null;
     }
 
     /**
@@ -384,8 +390,6 @@ public class AbstractUnitTest
         assertTrue(5 != 0.67) ;
     }
     */
-     
-    
 
     /**
      * This method expects and exception to be thrown. It also has a time
@@ -398,7 +402,22 @@ public class AbstractUnitTest
         throw new Exception("Fail!");
     }
     */
-    
+
+    /**
+     *  Utility method to cleanup a created Context object (to save memory).
+     *  This can also be used by individual tests to cleanup context objects they create.
+     */
+    protected void cleanupContext(Context c)
+    {
+        // If context still valid, abort it
+        if(c!=null && c.isValid())
+           c.abort();
+
+        // Cleanup Context object by setting it to null
+        if(c!=null)
+           c = null;
+    }
+
     /**
       * Create the database tables by running the schema SQL specified
       * in the 'db.schema.path' system property

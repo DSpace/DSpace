@@ -220,12 +220,15 @@ public class Community extends DSpaceObject
         myPolicy.setGroup(anonymousGroup);
         myPolicy.update();
 
-        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, c.getID(), c.handle));
+        context.addEvent(new Event(Event.CREATE, Constants.COMMUNITY, c.getID(), 
+                c.handle, c.getIdentifiers(context)));
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null)
         {
-            context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, Constants.COMMUNITY, c.getID(), c.handle));
+            context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, 
+                    Constants.COMMUNITY, c.getID(), c.handle, 
+                    c.getIdentifiers(context)));
         }
 
         log.info(LogManager.getHeader(context, "create_community",
@@ -552,7 +555,8 @@ public class Community extends DSpaceObject
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, 
+                    getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
@@ -959,7 +963,9 @@ public class Community extends DSpaceObject
                 mappingRow.setColumn("community_id", getID());
                 mappingRow.setColumn("collection_id", c.getID());
 
-                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, 
+                        getID(), Constants.COLLECTION, c.getID(), c.getHandle(),
+                        getIdentifiers(ourContext)));
 
                 DatabaseManager.insert(ourContext, mappingRow);
             }
@@ -1034,7 +1040,9 @@ public class Community extends DSpaceObject
                 mappingRow.setColumn("parent_comm_id", getID());
                 mappingRow.setColumn("child_comm_id", c.getID());
 
-                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, 
+                        getID(), Constants.COMMUNITY, c.getID(), c.getHandle(),
+                        getIdentifiers(ourContext)));
 
                 DatabaseManager.insert(ourContext, mappingRow);
             }
@@ -1072,6 +1080,7 @@ public class Community extends DSpaceObject
             // Capture ID & Handle of Collection we are removing, so we can trigger events later
             int removedId = c.getID();
             String removedHandle = c.getHandle();
+            String[] removedIdentifiers = c.getIdentifiers(ourContext);
 
             // How many parent(s) does this collection have?
             TableRow trow = DatabaseManager.querySingle(ourContext,
@@ -1097,7 +1106,8 @@ public class Community extends DSpaceObject
             log.info(LogManager.getHeader(ourContext, "remove_collection",
                     "community_id=" + getID() + ",collection_id=" + removedId));
         
-            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, removedId, removedHandle));
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), 
+                    Constants.COLLECTION, removedId, removedHandle, removedIdentifiers));
         }
         catch(SQLException|IOException e)
         {
@@ -1131,6 +1141,7 @@ public class Community extends DSpaceObject
             // Capture ID & Handle of Community we are removing, so we can trigger events later
             int removedId = c.getID();
             String removedHandle = c.getHandle();
+            String[] removedIdentifiers = c.getIdentifiers(ourContext);
         
             // How many parent(s) does this subcommunity have?
             TableRow trow = DatabaseManager.querySingle(ourContext,
@@ -1156,7 +1167,7 @@ public class Community extends DSpaceObject
             log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
                     "parent_comm_id=" + getID() + ",child_comm_id=" + removedId));
 
-            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, removedId, removedHandle));
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, removedId, removedHandle, removedIdentifiers));
         }
         catch(SQLException|IOException e)
         {
@@ -1201,7 +1212,7 @@ public class Community extends DSpaceObject
 
             // Since this is a top level Community, simulate a REMOVE event at the Site.
             ourContext.addEvent(new Event(Event.REMOVE, Constants.SITE, Site.SITE_ID,
-                    Constants.COMMUNITY, getID(), getHandle()));
+                    Constants.COMMUNITY, getID(), getHandle(), getIdentifiers(ourContext)));
         } else {
             // This is a subcommunity, so let the parent remove it
             // NOTE: this essentially just logs event and calls "rawDelete()"
@@ -1225,6 +1236,7 @@ public class Community extends DSpaceObject
         // Capture ID & Handle of object we are removing, so we can trigger events later
         int deletedId = getID();
         String deletedHandle = getHandle();
+        String[] deletedIdentifiers = getIdentifiers(ourContext);
 
         // Remove Community object from cache
         ourContext.removeCached(this, getID());
@@ -1278,7 +1290,7 @@ public class Community extends DSpaceObject
         }
 
         // If everything above worked, then trigger any associated events
-        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, deletedId, deletedHandle));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, deletedId, deletedHandle, deletedIdentifiers));
     }
 
     /**
@@ -1445,6 +1457,7 @@ public class Community extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the community HAS been modified
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, 
+                getID(), null, getIdentifiers(ourContext)));
     }
 }

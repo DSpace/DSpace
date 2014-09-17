@@ -13,7 +13,7 @@
 @function twbs-font-path($font-name) {
     @return "../vendor/bootstrap-sass-official/assets/fonts/" + $font-name
 }
-@import "../vendor/bootstrap-sass-official/assets/stylesheets/bootstrap/bootstrap";
+@import "../vendor/bootstrap-sass-official/assets/stylesheets/bootstrap";
 
 @import "classic_mirage_color_scheme/dspace_variables";
 

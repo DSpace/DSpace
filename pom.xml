@@ -97,9 +97,23 @@
                 </configuration>
              </plugin>
              <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
              </plugin>
+             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+             </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+             </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+              </plugin>
              <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -114,7 +128,6 @@
          <!-- Ensure that any *.properties files have UTF-8 chars encoded (e.g. "\u00e9") *before* using them to filter dspace.cfg and other configs -->
          <plugin>
            <artifactId>maven-antrun-plugin</artifactId>
-           <version>1.7</version>
            <executions>
              <execution>
                <id>native2ascii-utf8</id>
@@ -247,13 +260,34 @@
            </properties>
        </profile>
 
+       <!-- Skip Unit Tests by default, but allow override on command line
+           by setting property "-Dmaven.test.skip=false" -->
+       <profile>
+           <id>skiptests</id>
+           <activation>
+               <!-- This profile should be active at all times, unless the user
+                    specifies a different value for "maven.test.skip" -->
+               <property>
+                   <name>!maven.test.skip</name>
+               </property>
+           </activation>
+           <properties>
+               <maven.test.skip>true</maven.test.skip>
+           </properties>
+       </profile>
 
-        <!-- This profile ensures that we ONLY generate the Unit Test Environment
-             if the testEnvironment.xml file is found. That way the Test Environment
-             is NOT built when running a 'mvn package' on a "binary" release. -->
+        <!-- This profile ensures that we ONLY generate the Unit Test Environment,
+             if the testEnvironment.xml file is found AND we are not skipping Unit 
+             Tests (see also skiptests profile). That way the Test Environment is 
+             also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
                 <file>
                     <exists>src/main/assembly/testEnvironment.xml</exists>
                 </file>
@@ -458,10 +492,11 @@
                 <module>dspace-swordv2</module>
             </modules>
         </profile>
-       <!--
-      Builds MIRAGE2 WAR for DSpace
-   -->
-       <profile>
+
+        <!--
+           Builds MIRAGE2 WAR for DSpace
+        -->
+        <profile>
            <id>dspace-xmlui-mirage2</id>
            <activation>
                <file>
@@ -471,7 +506,8 @@
            <modules>
                <module>dspace-xmlui-mirage2</module>
            </modules>
-       </profile>
+        </profile>
+        
         <!--
            Builds XMLUI WAR for DSpace
         -->
@@ -486,8 +522,6 @@
                 <module>dspace-xmlui</module>
             </modules>
         </profile>
-
-
 
         <!--
            Builds LNI WAR & Client for DSpace
@@ -530,24 +564,6 @@
          </modules>
       </profile>
 
-      <!-- Skip Unit Tests by default, but allow override on command line
-           by setting property "-Dmaven.test.skip=false" -->
-      <profile>
-        <id>skiptests</id>
-        <activation>
-            <!-- This profile should be active at all times, unless the user
-                 specifies a different value for "maven.test.skip" -->
-            <property>
-                <name>!maven.test.skip</name>
-            </property>
-        </activation>
-        <properties>
-            <maven.test.skip>true</maven.test.skip>
-        </properties>
-      </profile>
-
-
-    
    </profiles>
 
    <!--
@@ -802,7 +818,7 @@
          <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.3</version>
+            <version>1.9</version>
          </dependency>
          <dependency>
             <groupId>commons-collections</groupId>

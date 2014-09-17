@@ -583,7 +583,8 @@ public class EPerson extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
 
-        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), 
+                null, e.getIdentifiers(context)));
 
         return e;
     }
@@ -616,7 +617,7 @@ public class EPerson extends DSpaceObject
         // Delete the Dublin Core
         removeMetadataFromDatabase();
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail(), getIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -1043,7 +1044,8 @@ public class EPerson extends DSpaceObject
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, 
+                    getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)

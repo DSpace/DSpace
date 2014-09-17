@@ -205,7 +205,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, null, bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -240,7 +241,8 @@ public class Bitstream extends DSpaceObject
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, "REGISTER"));
+        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
+                bitstreamID, "REGISTER", bitstream.getIdentifiers(context)));
 
         return bitstream;
     }
@@ -487,7 +489,7 @@ public class Bitstream extends DSpaceObject
 
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
@@ -517,7 +519,8 @@ public class Bitstream extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_bitstream",
                 "bitstream_id=" + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), String.valueOf(getSequenceID())));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, getID(), 
+                String.valueOf(getSequenceID()), getIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -725,6 +728,6 @@ public class Bitstream extends DSpaceObject
     public void updateLastModified()
     {
         //Also fire a modified event since the bitstream HAS been modified
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
     }
 }

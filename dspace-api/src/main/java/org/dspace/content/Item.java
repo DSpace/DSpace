@@ -177,7 +177,8 @@ public class Item extends DSpaceObject
         i.update();
         context.restoreAuthSystemState();
 
-        context.addEvent(new Event(Event.CREATE, Constants.ITEM, i.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, i.getID(), 
+                null, i.getIdentifiers(context)));
 
         log.info(LogManager.getHeader(context, "create_item", "item_id="
                 + row.getIntColumn("item_id")));
@@ -334,7 +335,7 @@ public class Item extends DSpaceObject
             itemRow.setColumn("last_modified", lastModified);
             DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
             //Also fire a modified event since the item HAS been modified
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null, getIdentifiers(ourContext)));
         } catch (SQLException e) {
             log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
         }
@@ -714,7 +715,9 @@ public class Item extends DSpaceObject
         mappingRow.setColumn("bundle_id", b.getID());
         DatabaseManager.insert(ourContext, mappingRow);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), 
+                Constants.BUNDLE, b.getID(), b.getName(), 
+                getIdentifiers(ourContext)));
     }
 
     /**
@@ -755,7 +758,8 @@ public class Item extends DSpaceObject
                 "AND bundle_id= ? ",
                 getID(), b.getID());
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), 
+                Constants.BUNDLE, b.getID(), b.getName(), getIdentifiers(ourContext)));
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -1020,7 +1024,8 @@ public class Item extends DSpaceObject
                 clearDetails();
             }
 
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+                    null, getIdentifiers(ourContext)));
             modified = false;
         }
     }
@@ -1073,7 +1078,8 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+                "WITHDRAW", getIdentifiers(ourContext)));
 
         // remove all authorization policies, saving the custom ones
         AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
@@ -1131,7 +1137,8 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+                "REINSTATE", getIdentifiers(ourContext)));
 
         // authorization policies
         if (colls.length > 0)
@@ -1164,7 +1171,8 @@ public class Item extends DSpaceObject
         // leaving the database in an inconsistent state
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), 
+                getHandle(), getIdentifiers(ourContext)));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
                 + getID()));
@@ -1573,7 +1581,8 @@ public class Item extends DSpaceObject
             // Note that updating the owning collection above will have the same effect,
             // so we only do this here if the owning collection hasn't changed.
             
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+                    null, getIdentifiers(ourContext)));
         }
     }
     
