@@ -388,9 +388,8 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>format</dc-element>
 					<dc-qualifier>medium</dc-qualifier>
-					<repeatable>true</repeatable>
 					<label>Materiales</label>
-					<input-type>onebox</input-type>
+					<input-type>textarea</input-type>
 					<hint>Material en que está hecho el objeto, técnica usada para fabricarlo. Ejemplo: madera, bronce, plástico</hint>
 					<visibility>workflow</visibility>
 					<type-bind>Objeto Fisico</type-bind>
