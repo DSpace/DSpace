@@ -50,7 +50,7 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
             {
                 DSpaceObject dso = handleResolver.resolve(setSpec.replace("col_", ""));
                 return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.item_id=i.item_id AND collection_id = ?)",
+                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id = ?)",
                         dso.getID());
             }
             catch (Exception ex)
@@ -66,7 +66,7 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
                 List<Integer> list = collectionsService.getAllSubCollections(dso.getID());
                 String subCollections = StringUtils.join(list.iterator(), ",");
                 return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.item_id=i.item_id AND collection_id IN ("
+                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
                                 + subCollections + "))");
             }
             catch (Exception e)

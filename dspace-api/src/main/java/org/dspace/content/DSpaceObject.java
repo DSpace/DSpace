@@ -273,7 +273,7 @@ public abstract class DSpaceObject
         }
 
         if(modifiedMetadata) {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, getType(), getID(), getDetails()));
+            ourContext.addEvent(new Event(Event.MODIFY_METADATA, getType(), getID(), getDetails(), getIdentifiers(ourContext)));
             modifiedMetadata = false;
         }
     }

@@ -155,7 +155,7 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
         for (String v : values)
             this.buildWhere(v, parts, params);
         if (parts.size() > 0) {
-            String query = "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?"
+            String query = "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM + " AND tmp.metadata_field_id=?"
                     + " AND ("
                     + StringUtils.join(parts.iterator(), " OR ")
                     + "))";

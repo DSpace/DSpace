@@ -614,6 +614,7 @@ public class Bundle extends DSpaceObject
         if (modifiedMetadata)
         {
             updateMetadata();
+            clearDetails();
         }
     }
 

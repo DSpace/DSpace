@@ -298,7 +298,7 @@ public class Group extends DSpaceObject
         if (epeople.remove(e))
         {
             epeopleChanged = true;
-            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail(), getIdentifiers(ourContext)));
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.EPERSON, e.getID(), e.getEmail(), getIdentifiers(ourContext)));
         }
     }
 
@@ -314,7 +314,7 @@ public class Group extends DSpaceObject
         if (groups.remove(g))
         {
             groupsChanged = true;
-            myContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName(), getIdentifiers(ourContext)));
+            ourContext.addEvent(new Event(Event.REMOVE, Constants.GROUP, getID(), Constants.GROUP, g.getID(), g.getName(), getIdentifiers(ourContext)));
         }
     }
 
@@ -1029,7 +1029,7 @@ public class Group extends DSpaceObject
     {
         // FIXME: authorizations
 
-        myContext.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName(), getIdentifiers(ourContext)));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName(), getIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());

@@ -73,7 +73,7 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
             List<Object> args = new ArrayList<Object>(fields.size());
             where.append("(");
             for (int i = 0; i < fields.size(); i++) {
-                where.append("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?)");
+                where.append("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM + " AND tmp.metadata_field_id=?)");
                 args.add(fieldResolver.getFieldID(context, fields.get(i)));
 
                 if (i < fields.size() - 1)
