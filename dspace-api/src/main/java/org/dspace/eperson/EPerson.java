@@ -289,7 +289,7 @@ public class EPerson extends DSpaceObject
                 " WHERE e.eperson_id = ? OR " +
                 "LOWER(fn.text_value) LIKE LOWER(?) OR LOWER(ln.text_value) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY  ");
 
-        if("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
+        if(DatabaseManager.isOracle()) {
             queryBuf.append(" dbms_lob.substr(ln.text_value), dbms_lob.substr(fn.text_value) ASC");
         }else{
             queryBuf.append(" ln.text_value, fn.text_value ASC");

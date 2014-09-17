@@ -700,7 +700,7 @@ public class Group extends DSpaceObject
         String query = "select * from epersongroup e " +
                 "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_group_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
                 "where ";
-        if("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
+        if(DatabaseManager.isOracle()) {
             query += " dbms_lob.substr(m.text_value) = ?";
         }else{
             query += " m.text_value = ?";
@@ -852,7 +852,7 @@ public class Group extends DSpaceObject
                 "LEFT JOIN metadatavalue m on (m.resource_id = epersongroup.eperson_group_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
                 "WHERE LOWER(m.text_value) LIKE LOWER(?) OR eperson_group_id = ? ");
 
-        if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+        if(DatabaseManager.isOracle()){
             queryBuf.append(" ORDER BY cast(m.text_value as varchar2(128))");
         }else{
             queryBuf.append(" ORDER BY m.text_value");

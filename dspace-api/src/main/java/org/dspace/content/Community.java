@@ -250,7 +250,7 @@ public class Community extends DSpaceObject
         try {
             String query = "SELECT c.* FROM community c " +
                     "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";
@@ -321,7 +321,7 @@ public class Community extends DSpaceObject
             String query = "SELECT c.* FROM community c  "
                     + "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
                     + "WHERE NOT c.community_id IN (SELECT child_comm_id FROM community2community) ";
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";
@@ -652,7 +652,7 @@ public class Community extends DSpaceObject
             String query = "SELECT c.* FROM community2collection c2c, collection c "
                     + "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
                     + "WHERE c2c.collection_id=c.collection_id AND c2c.community_id=? ";
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";
@@ -724,7 +724,7 @@ public class Community extends DSpaceObject
                     "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
                     "WHERE c2c.child_comm_id=c.community_id " +
                     "AND c2c.parent_comm_id= ? ";
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";

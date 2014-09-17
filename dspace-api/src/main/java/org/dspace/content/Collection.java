@@ -296,7 +296,7 @@ public class Collection extends DSpaceObject
         try {
             String query = "SELECT c.* FROM collection c " +
                     "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";
@@ -364,7 +364,7 @@ public class Collection extends DSpaceObject
             String query = "SELECT c.* FROM collection c " +
                     "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
 
-            if("oracle".equals(ConfigurationManager.getProperty("db.name"))){
+            if(DatabaseManager.isOracle()){
                 query += " ORDER BY cast(m.text_value as varchar2(128))";
             }else{
                 query += " ORDER BY m.text_value";
