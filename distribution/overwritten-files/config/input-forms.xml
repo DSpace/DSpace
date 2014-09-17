@@ -1120,8 +1120,8 @@
 				<stored-value>Contribucion a revista</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Informe técnico</displayed-value>
-				<stored-value>Informe tecnico</stored-value>
+				<displayed-value>Reporte</displayed-value>
+				<stored-value>Reporte</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Artículo</displayed-value>

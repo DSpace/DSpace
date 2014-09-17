@@ -87,7 +87,7 @@
 			<xsl:when test="$subtype='Contribucion a revista'">
 				artículo
 			</xsl:when> -->
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				informe técnico
 			</xsl:when>
 			<xsl:when test="$subtype='Patente'">

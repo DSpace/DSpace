@@ -137,7 +137,7 @@
 			<xsl:when test="$subtype='Contribucion a revista'">
 				info:eu-repo/semantics/contributionToPeriodical
 			</xsl:when>
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				info:eu-repo/semantics/report
 			</xsl:when>
 			<xsl:when test="$subtype='patente'">
@@ -220,7 +220,7 @@
 			<xsl:when test="$subtype='Contribucion a revista'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='patente'">
