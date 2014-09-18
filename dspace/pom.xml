@@ -29,32 +29,6 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
-    
-        <plugins>
-            <!--  Default project assembly. Calls 'assembly.xml', which
-                  generates the DSpace build directory. -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <!-- Don't "attach" the assembly results to this project. As
-                         this assembly builds a directory, setting this to "true"
-                         (default value) will just result in a WARNING message.-->
-                    <attach>false</attach>
-                    <finalName>${project.artifactId}</finalName>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
@@ -63,15 +37,53 @@
         <profile>
             <id>default</id>
             <activation>
-
                 <file><exists>modules/pom.xml</exists></file>
             </activation>
-            <!--
-                Builds Overlay Modules for DSpace
-            -->
+            <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
             </modules>
+        </profile>
+
+        <!--
+            DSpace Assembly profile. By default this is enabled.
+            This profile actually assembles the 'dspace-installer'
+            from the resulting JARs/WARs of all submodules.
+            See 'assembly.xml' for more info.
+            This profile can only be deactivated by passing '-P!assembly'.
+        -->
+        <profile>
+            <id>assembly</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                   <!-- Assemble 'target/dspace-installer' using 'assembly.xml' -->
+                   <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <!-- Don't "attach" the assembly results to this project. As
+                                 this assembly builds a directory, setting this to "true"
+                                (default value) will just result in a WARNING message.-->
+                            <attach>false</attach>
+                            <finalName>${project.artifactId}</finalName>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
 
