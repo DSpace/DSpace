@@ -83,8 +83,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.17</version>
-                <!-- tests whose name starts by Abstract will be ignored -->
                 <configuration>
+                    <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
+                         maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
+                    <argLine>${surefire.argLine}</argLine>
+                    <!-- tests whose name starts by Abstract will be ignored -->
                     <excludes>
                         <exclude>**/Abstract*</exclude>
                     </excludes>
@@ -275,6 +278,22 @@
                <maven.test.skip>true</maven.test.skip>
            </properties>
        </profile>
+
+        <!-- Allow for passing extra memory to Unit tests (via maven-surefire-plugin).
+             By default this gives unit tests 512MB of memory (when tests are enabled), 
+             unless tweaked on commandline (e.g. "-Dsurefire.argLine=-Xmx512m"). Since 
+             m-surefire-p forks a new JVM for testing, it ignores MAVEN_OPTS. -->
+        <profile>
+            <id>surefire-argLine</id>
+            <activation>
+                <property>
+                    <name>!surefire.argLine</name>
+                </property>
+            </activation>
+            <properties>
+                <surefire.argLine>-Xmx512m</surefire.argLine>
+            </properties>
+        </profile>
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment,
              if the testEnvironment.xml file is found AND we are not skipping Unit 
