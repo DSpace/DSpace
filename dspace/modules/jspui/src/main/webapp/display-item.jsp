@@ -140,28 +140,6 @@
 	    	</tbody>
 	    </table>
 	   	
-	   	<!-- 
-	   		Item user export
-	   	 -->
-	   	<div>
-	   	
-		   	<span style="font-weight: bold; padding-left: 6px;">
-		   		<fmt:message key="item.export.label"/>
-		   	</span>
-		   	
-		   	<span>
-				<a style="text-decoration: none;" href="<%= request.getContextPath() + "/item-export-formats?itemId=" + item.getID() + "&format=ENDNOTE" %>">
-					<img alt="<fmt:message key="item.export.type.endnote" />" title="<fmt:message key="item.export.type.endnote" />" src="<%= request.getContextPath() + "/image/endnote.png" %>">
-				</a>
-		   	</span>
-		   	<span>
-				<a style="text-decoration: none;" href="<%= request.getContextPath() + "/item-export-formats?itemId=" + item.getID() + "&format=BIBTEX" %>">
-					<img alt="<fmt:message key="item.export.type.bibtex" />" title="<fmt:message key="item.export.type.bibtex" />" src="<%= request.getContextPath() + "/image/bibtex.png" %>">
-				</a>
-		   	</span>
-		   	
-	   	</div>
-
 	   	<br/>
 
 		<%		
