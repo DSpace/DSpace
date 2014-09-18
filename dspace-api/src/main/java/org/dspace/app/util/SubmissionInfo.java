@@ -77,6 +77,9 @@ public class SubmissionInfo extends HashMap
     /** Reader for submission process configuration file * */
     private static SubmissionConfigReader submissionConfigReader;
     
+    /** Alow presentation of messages for missing fields **/
+    private Map<String, String> missingFieldToMessage;
+    
     /**
      * Default Constructor - PRIVATE
      * <p>
@@ -382,7 +385,15 @@ public class SubmissionInfo extends HashMap
         this.missingFields = missing;
     }
 
-    /**
+    public Map<String, String> getMissingFieldToMessage() {
+		return missingFieldToMessage;
+	}
+
+	public void setMissingFieldToMessage(Map<String, String> missingFieldToMessage) {
+		this.missingFieldToMessage = missingFieldToMessage;
+	}
+
+	/**
      * Return metadata field which user has requested more input boxes be
      * displayed (by pressing "Add More" on one of the "Describe" pages)
      * 
@@ -700,4 +711,3 @@ public class SubmissionInfo extends HashMap
     }
     
 }
-

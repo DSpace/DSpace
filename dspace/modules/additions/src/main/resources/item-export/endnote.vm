@@ -1,0 +1,8 @@
+#set( $newLine = "
+" )
+%0 Thesis
+#if($itemMetadata.get("dc.title"))%T $itemMetadata.get("dc.title")${newLine}#end
+#if($itemMetadata.get("dc.contributor.author"))%A $itemMetadata.get("dc.contributor.author")${newLine}#end
+#if($itemMetadata.get("dc.identifier.uri"))%U $itemMetadata.get("dc.identifier.uri")${newLine}#end
+#if($itemMetadata.get("date.issued"))%D $itemMetadata.get("date.issued")${newLine}#end
+#if($itemMetadata.get("dc.publisher"))%I $itemMetadata.get("dc.publisher")${newLine}#end

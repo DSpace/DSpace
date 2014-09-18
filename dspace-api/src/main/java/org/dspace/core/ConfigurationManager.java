@@ -53,6 +53,9 @@ public class ConfigurationManager
 
     /** module configuration properties */
     private static Map<String, Properties> moduleProps = new HashMap<String, Properties>();
+    
+    /** Map to register original properties wich were overwritten **/
+    private static Map<String, String> overwrittenProperties;
 
     // limit of recursive depth of property variable interpolation in
     // configuration; anything greater than this is very likely to be a loop.
@@ -768,6 +771,46 @@ public class ConfigurationManager
             throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
         }
 
+    }
+    
+    /**
+     * Override DSpace properties defaults, registering the default value in {@link #overwrittenProperties}
+     * @param key Properties key
+     * @param value Properties value to overrite
+     */
+    public static void overwrite(String key, String value)
+    {
+    	if(overwrittenProperties == null)
+    	{
+    		overwrittenProperties = new HashMap<String, String>();
+    	}
+    	
+    	String originalPropertyValue = getProperty(key);
+    	if(originalPropertyValue != null)
+    	{
+    		overwrittenProperties.put(key, originalPropertyValue);
+    		properties.put(key, value);
+    	}
+    }
+    
+    /**
+     * Performs a <i>rollback</i> into changed properties
+     */
+    public static void undoOverrite()
+    {
+    	if(overwrittenProperties != null)
+    	{
+    		for(Map.Entry<String, String> originalProperties : overwrittenProperties.entrySet())
+    		{
+    			properties.put(originalProperties.getKey(), originalProperties.getValue());
+    		}
+    		
+    		overwrittenProperties = null;
+    	}
+    	else
+    	{
+    		log.warn("There's nothing to be overwritten");
+    	}
     }
 
     /**

@@ -1,0 +1,15 @@
+#set( $tab = "	" ) 
+#set( $newLine = "
+" ) 
+@#if($itemMetadata.get("dc.type").equals("Tese"))PHDTHESIS#{else}MASTERSTHESIS#end{ $generatedId,
+#if($itemMetadata.get("dc.contributor.author")) ${tab}author = {$itemMetadata.get("dc.contributor.author")},${newLine}#end
+#if($itemMetadata.get("dc.contributor.advisor")) ${tab}advisor = {$itemMetadata.get("dc.contributor.advisor")},${newLine}#end
+#if($itemMetadata.get("dc.title")) ${tab}title = {$itemMetadata.get("dc.title")},${newLine}#end
+#if($itemMetadata.get("dc.date.issued")) ${tab}year = {$itemMetadata.get("dc.date.issued")},${newLine}#end
+#if($itemMetadata.get("dc.identifier.doi")) ${tab}doi = "$itemMetadata.get("dc.identifier.doi")",${newLine}#end
+#if($itemMetadata.get("dc.identifier.uri")) ${tab}url = "$itemMetadata.get("dc.identifier.uri")",${newLine}#end
+#if($itemMetadata.get("dc.description.resumo")) ${tab}abstract = "$itemMetadata.get("dc.description.resumo")",${newLine}#end
+#if($itemMetadata.get("dc.publisher")) ${tab}publisher = {$itemMetadata.get("dc.publisher")},${newLine}#end
+#if($itemMetadata.get("dc.publisher.program")) ${tab}scholl = {$itemMetadata.get("dc.publisher.program")},${newLine}#end
+#if($itemMetadata.get("dc.publisher.department")) ${tab}note = {$itemMetadata.get("dc.publisher.department")}${newLine}#end
+}

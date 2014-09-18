@@ -1,0 +1,564 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+.banner img {background-color: #FFFFFF;}
+.brand {padding-top: 30px;}
+.brand h4 {color: #999999}
+ol.breadcrumb li {color: white; font-style: italic;}
+ol.breadcrumb li a {color: white; font-weight: bold; font-style: normal;}
+body.undernavigation {overflow-x: hidden; padding-top: 65px;}
+#content {padding-bottom:60px;}
+#designedby {padding: 5px;}
+#footer_feedback {padding-top: 12px;}
+input[type="file"] {display: block;height: auto;}
+div.panel-primary div.panel-heading a {color: white;}
+/* This magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence,
+span.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 5px; background-repeat: no-repeat;
+  padding: 0px 2px; vertical-align: bottom; color: transparent;}
+img.ds-authority-confidence.cf-unset,
+span.ds-authority-confidence.cf-unset
+  { background-image: url(../../../image/authority/bug.png);}
+img.ds-authority-confidence.cf-novalue,
+span.ds-authority-confidence.cf-novalue
+  { background-image: url(../../../image/confidence/0-unauthored.gif);}
+img.ds-authority-confidence.cf-rejected,
+img.ds-authority-confidence.cf-failed,
+span.ds-authority-confidence.cf-rejected,
+span.ds-authority-confidence.cf-failed
+  { background-image: url(../../../image/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-notfound,
+span.ds-authority-confidence.cf-notfound
+  { background-image: url(../../../image/confidence/3-thumb1.gif); }
+img.ds-authority-confidence.cf-ambiguous,
+span.ds-authority-confidence.cf-ambiguous
+  { background-image: url(../../../image/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-uncertain,
+span.ds-authority-confidence.cf-uncertain
+  { background-image: url(../../../image/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-accepted,
+span.ds-authority-confidence.cf-accepted
+  { background-image: url(../../../image/confidence/6-greencheck.gif); }
+
+/* hide authority-value inputs in forms */
+input.ds-authority-value { display:none; }
+
+/** XXX Change to this to get the authority value to show up for debugging:
+ input.ds-authority-value { display:inline; }
+**/
+
+/* for edit-item-form lock button */
+input.ds-authority-lock
+  { vertical-align: bottom; height: 24px; width: 24px; margin-right: 8px;
+    background-repeat: no-repeat; background-color: transparent; }
+input.ds-authority-lock.is-locked
+  { background-image: url(../../../image/lock24.png); }
+input.ds-authority-lock.is-unlocked
+  { background-image: url(../../../image/unlock24.png); }
+
+/* field required in submission */
+.label-required:after { content:" *"; }
+
+
+
+/** 
+	************************************************************************************
+	Modificações para o TEDE
+	************************************************************************************
+
+	Definição de cores:
+	
+		 Cor padrão do topo: #088a29
+		 Cor para itens selecionados e fundo de topo de paineis: #449d44
+		 Fundo claro: #f1ffee
+		 Cor da borda: #7aa97a
+		 Cor da borda clara: #bed7be
+		 Verde escuro: #006633
+		 Cinza claro: #f3f3f3
+**/
+
+/** Linhas de tabelas **/
+
+.banner {
+	padding-bottom: 15px;
+}
+
+/** Topo **/
+.navbar-fixed-top {
+	/* background-color: #088A29; */
+	background-image: none;
+}
+
+/** Rodapé **/
+.navbar-bottom {
+	
+	/* background-color: #fff; */
+	background-image: none;
+	border-radius: 0;
+	/* border-top: 2px solid #006633; */
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding-top: 3px;
+}
+
+.panel-default > .panel-heading {
+    background-image: none;
+   /*  background-color: #dcffd4; */
+}
+
+.panel-footer {
+   /*  background-color: #dcffd4; */
+}
+
+.default-padding-left {
+	padding-left: 10px;
+}
+
+.footer-institution-data {
+	clear: both;
+	font-size: 10px;
+	text-align: left;
+}
+
+
+.navbar-inverse .navbar-nav > .active > a {
+	/* background-color: #006633;	 */
+}
+
+.navbar-inverse .navbar-nav > li > a {
+    /* color: #fff; */
+}
+
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+   /*  background-color: #449d44; */
+}
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    /* background-color: #449d44; */
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+    /* background-color: #449d44; */
+    /* background-image: linear-gradient(to bottom, #7aa97a 0px, #449d44 100%); */
+    background-repeat: repeat-x;
+}
+
+.form-control:focus {
+    /* border-color: #449d44; */
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(120, 169, 122, 0.6);
+    outline: 0 none;
+}
+
+
+.panel-primary > .panel-heading {
+    background-image: none;
+   /*  background-color: #449d44; */
+    background-repeat: repeat-x;
+    border-bottom: none;
+}
+
+.panel-info > .panel-heading  {
+	    background-image: none;
+    /* background-color: #449d44; */
+    background-repeat: repeat-x;
+    border-bottom: none;
+    color: white;
+	
+}
+
+.panel-primary {
+   /*  border-color: #7aa97a; */
+}
+
+
+
+.form-group-lg input  {
+    font-size: 18px;
+    height: 46px;
+    line-height: 1.33;
+    padding: 10px 16px;	
+}
+
+.form-group-lg {
+	width: 100%;
+}
+
+/** Delimita região de hiperlink para mudança de idioma **/
+.langChangeOn {
+	cursor: pointer;
+}
+
+/** Cor do rastro **/
+.breadcrumb {
+    /* background-image: linear-gradient(to bottom, #088a29 0px, #189a3a 100%); */
+}
+
+/** Cor de fundo quantificador de itens **/
+.badge {
+    /* background-color: #006633; */
+}
+
+/** Modifica cor de fundo de caixas de alerta **/
+.alert-info {
+ /*    background-image: none;
+    background-color: #449d44;
+    background-repeat: repeat-x;
+    border-color: #7aa97a;
+	color: #fff;	 */
+}
+
+
+.panel-heading {
+/*     background-image: none;
+    background-color: #449d44;
+    background-repeat: repeat-x;
+    border-color: #7aa97a;
+    color: #fff; */
+}
+
+.panel-info {
+	/* border-color: #7aa97a; */
+}
+
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+/*     background-color: #7aa97a;
+    border-color: #7aa97a; */
+}
+
+/** Modifica cor do link da submissão **/
+.alert-info a, .alert-info a:HOVER, .alert-info a:VISITED, .alert-info a:FOCUS {
+	/* color: #fff; */
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+/*     background-color: #449d44;
+    border-color: #088A29; */
+}
+
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .open .dropdown-toggle.btn-info {
+    background-color: #31B404;
+    border-color: #31B404;
+}
+
+.navbar-inverse .navbar-nav > .dropdown > a .caret, .navbar-inverse .navbar-nav > .dropdown > a .caret:HOVER, .nav a:hover .caret {
+/*     border-bottom-color: #fff;
+    border-top-color: #fff; */
+}
+
+a:hover, a:focus {
+  /*   color: #449d44; */
+}
+
+.ui-widget-content {
+	/* background: #fff; */
+}
+
+/** Ícone do sistema junto a barra de navegação. **/
+.navbar-brand {
+	padding:  8px 15px 0px 15px;
+}
+
+/** Correção visando evitar que navbar estenda quando há ocorrência de usuário logado **/
+.logged-user {
+	padding-top: 5px !important;
+	padding-bottom: 5px !important;
+}
+
+
+
+/** Div container da descrição do repositório **/
+.repo-description {
+	margin-left: 15px;
+	float: left;
+}
+
+
+/** Cor de fundo do "jumbotron" **/
+.jumbotron {
+	/* background-color: #f1ffee; */
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-bottom: 5px;
+    padding: 10px;
+}
+
+.jumbotron h1 {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/** Cor do botão de busca **/
+.navbar-form  button, .search-button
+{
+	background-image: none;
+	/* border: #7aa97a; */
+/* 	background-color: #449d44;
+    border-color: #088a29; */
+}
+
+.addongreen {
+	/* border: #7aa97a;
+	background-color: #449d44;
+    border-color: #088a29; */
+	color: white;	
+}
+
+.addongreen .form-control
+{
+	/* border-color: #7aa97a; */
+}
+
+.top-search-container {
+	padding-top: 40px;
+	padding-bottom: 40px; 
+	/* background-color: #f1ffee; */
+}
+
+/** Modifica cor dos links da busca facetada **/
+.list-group-item a .pull-right, .list-group-item  .pull-left {
+/* 	color: #0174DF; */
+}
+
+/** Modifica estilo dos títulos da busca facetada **/
+h3, .h3 {
+	font-size: 16px;
+	font-weight: bold;	
+}
+
+h4, .h4 {
+	font-size: 14px;
+}
+
+.about-bdtd {
+	padding-top: 10px;
+}
+
+.facetName {
+	font-weight: bold;
+}
+
+
+/*** Nuvem de tags ***/
+.cloudtag-1 {
+	font-size: 14px;	
+}
+
+.cloudtag-2 {
+	font-size: 18px;	
+}
+.cloudtag-3 {
+	font-size: 22px;	
+}
+.cloudtag-4 {
+	font-size: 26px;	
+}
+
+.cloud-tag-label {
+	width: 100%; 
+	text-align: center;
+}
+
+.cloud-tag-label h3 {
+	/* color: #c4c4c4; */
+	font-size: 22px;
+	letter-spacing: 3px;
+}
+ 
+#cloud a
+{
+	color: #8d8f92;
+} 
+ 
+.tag-cloud-container {
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	width: 100%;
+	position: relative;
+	margin: -5px auto 40px;
+	height: 350px;
+	border: 2px solid #f3f3f3;
+}
+
+
+#cloud-text {
+	text-align: center;
+}
+
+#cloud-text span {
+	padding-right: 10px;
+}
+
+.date-lenght, .submit-date-field {
+	width: 16%;
+}
+
+.alert-warning a {
+	
+	/* color: #006633; */
+}
+
+.label-important {
+	/* background-color: #d9534f; */
+}
+
+
+/**
+ * Statistics customization
+ */
+ .statsTable {
+ 	width: 100%;
+ }
+ 
+ .statsTable td,  .statsTable th  {
+ 	padding-left: 10px;
+ }
+ 
+ .stats-title {
+ 	padding-bottom: 25px;
+ } 
+ 
+.stats-item-title {
+	width: 20%;	
+}
+
+.ui-datepicker {
+	z-index: 2000 !important;	
+}
+
+/** Cor da seta (dropdown) dos menus **/
+.nav .caret {
+	/* border-top-color: white;
+	border-bottom-color: white; */
+}
+
+/** Caixas de aviso **/
+.well {
+	/* background-image: linear-gradient(to bottom, #f1ffee 0px, #dae8d7 100%);
+	border-color: #bed7be; */
+}
+
+/** Tag "code" **/
+code {
+    border-radius: 4px;
+/*     background-color: white;
+    border: 2px #dae8d7 solid;
+    color: #006633; */
+    font-size: 90%;
+}
+
+/** Alfabeto da caixa de busca **/
+#browse_navigation .label-default {
+	/* background-color: #7aa97a; */
+}
+
+#browse_navigation a {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.input-border {
+    /* background-color: #fff; */
+    border: 1px solid/*  #ccc */;
+    /* color: #555; */
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    vertical-align: middle;
+}
+.input-border-no-paddings {
+/*     background-color: #fff;
+    border: 1px solid #ccc; */
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+  /*   color: #555; */
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    vertical-align: middle;
+    padding-left: 2px;
+}
+
+/** Aplicabilidade nas tabelas **/
+.table > tbody > tr:nth-child(2n+1) > td {
+	background-color: #f1ffee;
+}
+.table > tbody > tr:nth-child(2n+1) > th {
+	background-color: #f3f3f3;
+}
+
+/** Espaçamento entre labels da submissão e seus textos **/
+#edit_metadata .metadataFieldValue a {
+	padding-left: 10px;
+}
+
+/** Facetas página inicial/busca **/
+.hideFacets {
+	display: none;
+}
+
+.clickable-panel {
+	cursor: pointer;
+}
+
+
+/** Cor do carrossel **/
+#recent-submissions-carousel {
+	/* background-color: #94d984; */
+}
+
+/** Tamanho de h2 **/
+h2, .h2 {
+    font-size: 22px;
+}
+
+.well h2 {
+	margin-top: 0px;
+	margin-bottom: 0px;	
+}
+
+/* Ajuste da largura para o thumbnail */
+table img[src*="/retrieve/"] {
+	width : 100px;
+	height : auto;
+}
+
+.thumbnail-image {
+	width : auto !important;
+	height : auto !important;
+}
+
+/* Ajuste de tamanho dos títulos */
+
+h1, .h1 {
+font-size: 20px;
+}
+
+/* Ajuste de tamanho da descrição do repositório */
+
+.repo-description h1 {
+font-size: 40px;
+}
+
+/** Início: Delimitação de sublinado em links **/
+.langChangeOn, .panel-footer a, .panel-heading a, #loginform a, p a[href*="/mydspace"], .link {
+	text-decoration: underline;
+}
+
+/** Fim: Delimitação de sublinado em links **/
+

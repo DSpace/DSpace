@@ -9,7 +9,6 @@ package org.dspace.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +96,8 @@ public abstract class AbstractProcessingStep
     private Map<Integer, String> errorMessages = null;
 
     private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
+    
+    private static final String ERROR_MESSAGE_ATTRIBUTE = "dspace.submit.error_message";
     
 
     /**
@@ -197,6 +198,43 @@ public abstract class AbstractProcessingStep
         
         //save updated list
         setErrorFields(request, errorFields);
+    }
+    
+    /**
+     * Associate an error message for a given field.<br>
+     * It's usefull when its necessary to add a warn message for a field which is not required
+     * @param request HTTP Request
+     * @param field Field in error
+     * @param message Error message (translated)
+     */
+    @SuppressWarnings("unchecked")
+	protected static final void addErrorMessage(HttpServletRequest request, String field, String message)
+    {
+    	Map<String, String> errorMessageToField = null;
+    	if(request.getAttribute(ERROR_MESSAGE_ATTRIBUTE) == null)
+    	{
+    		errorMessageToField = new HashMap<String, String>();
+			request.setAttribute(ERROR_MESSAGE_ATTRIBUTE, errorMessageToField);
+    	}
+    	else
+    	{
+    		errorMessageToField = (Map<String, String>) request.getAttribute(ERROR_MESSAGE_ATTRIBUTE);
+    	}
+    	
+    	errorMessageToField.put(field, message);
+    	
+    	request.setAttribute(ERROR_MESSAGE_ATTRIBUTE, errorMessageToField);
+    }
+    
+    /**
+     * Get error fields, @see {@link #addErrorMessage(int, String)}
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public static final Map<String, String> getErrorMessages(HttpServletRequest request)
+    {
+    	return (Map<String, String>) request.getAttribute(ERROR_MESSAGE_ATTRIBUTE);
     }
 
     /**

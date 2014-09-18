@@ -9,6 +9,7 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,11 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -32,12 +33,15 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.submit.AbstractProcessingStep;
+
+import com.ibm.icu.util.Calendar;
 
 /**
  * Describe step for DSpace submission process. Handles the gathering of
@@ -217,7 +221,7 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if (inputType.equals("date"))
             {
-                readDate(request, item, schema, element, qualifier);
+                readPickerDate(request, item, schema, element, qualifier);
             }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
@@ -265,6 +269,33 @@ public class DescribeStep extends AbstractProcessingStep
                                 thisVal);
                     }
                 }
+            }
+            else if (inputType.equals("qualdrop_language") ||  inputType.equals("qualdrop_textarea_language"))
+            {
+            	boolean hasQualifier = qualifier != null && !qualifier.isEmpty();
+            	String elementPlusQualifier = element + (hasQualifier ? ("_" + qualifier) : "");
+
+            	List<String> quals = getRepeatedParameter(request, schema + "_"
+            			+ element, schema + "_" + elementPlusQualifier + "_language");
+            	List<String> vals = getRepeatedParameter(request, schema + "_"
+            			+ element, schema + "_" + elementPlusQualifier + "_value");
+            	
+            	for (int z = 0; z < vals.size(); z++)
+            	{
+            		String thisQual = quals.get(z);
+            		if ("".equals(thisQual))
+            		{
+            			thisQual = null;
+            		}
+            		String thisVal = vals.get(z);
+            		if (!buttonPressed.equals("submit_" + schema + "_"
+            				+ elementPlusQualifier + "_remove_" + z)
+            				&& !thisVal.equals(""))
+            		{
+            			item.addMetadata(schema, element, hasQualifier ? qualifier : null, thisQual,
+            					thisVal);
+            		}
+            	}
             }
             else if ((inputType.equals("onebox"))
                     || (inputType.equals("twobox"))
@@ -326,6 +357,19 @@ public class DescribeStep extends AbstractProcessingStep
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));
                 }
+                
+                /** Checks if dc.identifier.citation variables **/
+                else if(inputs[i].getElement() != null && inputs[i].getElement().equals("identifier") && inputs[i].getQualifier() != null 
+                		&& inputs[i].getQualifier().equals("citation") && values.length == 1 && inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
+            	{
+                	String currentMetadataValue = values[0].value;
+            		if(currentMetadataValue.contains(I18nUtil.getMessage("jsp.submit.dc.identifier.citation.variable.pagenumber")) 
+            				|| currentMetadataValue.contains(I18nUtil.getMessage("jsp.submit.dc.identifier.citation.variable.place")))
+            		{ 
+            			addErrorMessage(request, getFieldName(inputs[i]), I18nUtil.getMessage("jsp.submit.dc.identifier.citation.error"));
+            			addErrorField(request, getFieldName(inputs[i]));
+            		}
+            	}
             }
         }
 
@@ -353,7 +397,35 @@ public class DescribeStep extends AbstractProcessingStep
 
     
 
-    /**
+    private void readPickerDate(HttpServletRequest request, Item item,
+			String schema, String element, String qualifier) {
+    	
+    	String metadataField = MetadataField.formKey(schema, element, qualifier);
+    	String dateCandidate = request.getParameter(metadataField);
+    	Date parsedDate = null;
+    	
+        try
+        {
+        	parsedDate = DateUtils.parseDate(dateCandidate, new String[]{"yyyy-MM-dd"});
+        } 
+        catch (Exception e) 
+        {
+        }
+
+        if (parsedDate != null)
+        {
+            // Only put in date if there is one!
+        	java.util.Calendar calendar = java.util.Calendar.getInstance();
+        	calendar.setTime(parsedDate);
+        	DCDate dcDate = new DCDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), -1, -1, -1);
+            item.addMetadata(schema, element, qualifier, null, dcDate.toString());
+        }
+		
+	}
+
+
+
+	/**
      * Retrieves the number of pages that this "step" extends over. This method
      * is used to build the progress bar.
      * <P>
@@ -446,10 +518,10 @@ public class DescribeStep extends AbstractProcessingStep
     public static String getDefaultLanguageQualifier()
     {
        String language = "";
-       language = ConfigurationManager.getProperty("default.language");
+       language = ConfigurationManager.getProperty("defatult.language.iso6392");
        if (StringUtils.isEmpty(language))
        {
-           language = "en";
+           language = "eng";
        }
        return language;
     }
@@ -738,9 +810,10 @@ public class DescribeStep extends AbstractProcessingStep
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database if non-empty
-            String s = vals.get(i);
-            if ((s != null) && !s.equals(""))
+            String currentMetadataValue = vals.get(i);
+            if ((currentMetadataValue != null) && !currentMetadataValue.equals(""))
             {
+            	
                 if (isAuthorityControlled)
                 {
                     String authKey = auths.size() > i ? auths.get(i) : null;
@@ -753,14 +826,14 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                     else
                     {
-                        item.addMetadata(schema, element, qualifier, lang, s,
+                        item.addMetadata(schema, element, qualifier, lang, currentMetadataValue,
                                 authKey, (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
                     }
                 }
                 else
                 {
-                    item.addMetadata(schema, element, qualifier, lang, s);
+                    item.addMetadata(schema, element, qualifier, lang, currentMetadataValue);
                 }
             }
         }

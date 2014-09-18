@@ -1,0 +1,53 @@
+
+.social-pointer{
+	cursor: pointer;
+	float: left;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.esp-socialnetwork{
+	width: 163px;
+} 
+.border-socialnetwork{
+	border-top: 1px solid #bed7be;
+	border-bottom: 1px solid #bed7be;
+}
+.border-socialnetwork td {
+	background-color: #f1ffee;	
+}
+
+.social-label {
+	width: 20%;
+	padding-left: 8px;
+} 
+
+.g-plusone {
+	float: left;
+	padding-left: 5px;
+}
+
+.iconsBar {
+	padding-top: 9px;
+	padding-bottom: 4px;
+}
+
+#google-plus-container {
+	padding-left: 6px;
+}
+
+.social-label span {
+	font-weight: bold;
+}
+
+.ui-widget-overlay{
+    position:fixed !important;
+}
+
+.ui-dialog-titlebar-close {
+display: none !important;
+}
+
+.navbar-bottom {
+	z-index: 0;
+}
