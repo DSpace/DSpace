@@ -32,6 +32,9 @@
                             <includes>
                                 <include>WEB-INF/web.xml</include>
                             </includes>
+                            <excludes>
+                                <exclude>${basedir}/src/main/webapp/static/css/widgets/display/less</exclude>
+                            </excludes>
                         </resource>
                     </webResources>
                 </configuration>

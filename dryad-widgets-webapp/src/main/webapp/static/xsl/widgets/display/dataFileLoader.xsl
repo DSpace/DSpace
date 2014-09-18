@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet
+    xmlns:bibo="http://purl.org/dryad/schema/dryad-bibo/v3.1"
+    xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:ddf="http://purl.org/dryad/schema/terms/v3.1"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
-    xmlns:dcterms="http://purl.org/dc/terms/"
-    xmlns:bibo="http://purl.org/dryad/schema/dryad-bibo/v3.1"
-    xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ex="http://apache.org/cocoon/exception/1.0"
+    xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    exclude-result-prefixes="bibo dcterms ddf dwc ex i18n xsl xsi"
     version="1.0">
     
     <xsl:output method="text"/>
     
-    <xsl:param name="ddwcss"/>          <!-- large_widget.css -->
+<xsl:variable name="ddwcss" select="'http://localhost:9999/static/css/widgets/display/dryad-ddw.css'"/>
+    
+    <!--<xsl:param name="ddwcss"/>          <! - - dryad-ddw.css -->
     <xsl:param name="jqlib"/>           <!-- jquery.min.js -->
     <xsl:param name="lblib"/>           <!-- jquery.magnific-popup.js -->
     <xsl:param name="frame-url"/>       <!-- url for file contents request -->
     <xsl:param name="wrapper-id"/>      <!-- @id of element wrapping JS call -->
-    <xsl:param name="frame-height"/>    <!-- -->
-    <xsl:param name="frame-width"/>     <!-- -->
     <xsl:param name="doi"/>             <!-- data file Dryad DOI value; not URL encoded -->
 
     <xsl:variable name="quote">"</xsl:variable>
@@ -77,9 +78,7 @@ var ddwcss = '<xsl:value-of select="$ddwcss"/>'
 , jqlib    = '<xsl:value-of select="$jqlib"/>'
 , lblib    = '<xsl:value-of select="$lblib"/>'
 , wid      = '<xsl:value-of select="$wrapper-id"/>'
-, bssrc    = '<xsl:value-of select="$frame-url"/>'
-, height   = '<xsl:value-of select="$frame-height"/>'
-, width    = '<xsl:value-of select="$frame-width"/>'<![CDATA[
+, bssrc    = '<xsl:value-of select="$frame-url"/>'<![CDATA[
 , minJQ = ['1.7.2',1,7,2] // jQuery 1.7.2+ required for lightbox library
 , pudel = 150  // lightbox close delay, ms.
 , pucls = 'mfp-zoom-in' // css class for lightbox
@@ -116,12 +115,13 @@ function noConflictHandler() {
 function open_popup(content) {
     if (jQuery === undefined || !jQuery.hasOwnProperty('magnificPopup')) return;
     jQuery.magnificPopup.open({
-        removalDelay: pudel,
-        mainClass: pucls,
-        items: {
+        removalDelay: pudel
+        , mainClass: pucls
+        , items: {
             src: content,
             type: 'inline'
         }
+        , closeBtnInside: false
     });
 }
 // download a URL using a hidden iframe element
@@ -190,8 +190,8 @@ function dryadJQLoaded() {
         var frame = document.createElement('iframe');
         frame.setAttribute('class', frcls);
         frame.setAttribute('src', bssrc);
-        frame.setAttribute('width', width);
-        frame.setAttribute('height', height);
+        frame.setAttribute('height', '100%');
+        frame.setAttribute('width', '100%');
         w.addEventListener('message', handle_message, false);
         load_css(ddwcss);
         load_js(lblib);
