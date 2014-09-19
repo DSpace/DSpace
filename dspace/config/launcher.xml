@@ -406,5 +406,12 @@
         </step>
     </command>
 
+    <command>
+        <name>import-journal</name>
+        <description>Import authority from solr to database</description>
+        <step>
+            <class>org.dspace.app.xmlui.aspect.authority.util.ImportJournal2Authority</class>
+        </step>
+    </command>
 
 </commands>

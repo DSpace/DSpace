@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.AuthorityMetadataValue;
+import org.dspace.content.authority.Concept;
+import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
@@ -13,10 +16,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,47 +37,41 @@ public class DryadJournalSubmissionUtils {
     public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
     public static final String JOURNAL_ID = "journalID";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
-
+    public static final String journalPropFile =  ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
     public enum RecommendedBlackoutAction {
-          BLACKOUT_TRUE
+        BLACKOUT_TRUE
         , BLACKOUT_FALSE
         , JOURNAL_NOT_INTEGRATED
     }
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
     static{
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-        Properties properties = new Properties();
+        Context context = null;
+
         try {
-            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-            String journalTypes = properties.getProperty("journal.order");
-
-            for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim();
-
-                String str = "journal." + journalType + ".";
-                
-                log.debug("reading config for journal " + journalType);
-                log.debug("fullname " + properties.getProperty(str + FULLNAME));
-                log.debug("subscription? " + properties.getProperty(str + SUBSCRIPTION_PAID));
-
+            context = new Context();
+            Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
+            Concept[] concepts = scheme.getConcepts();
+            //todo:add the journal order
+            //String journalTypes = properties.getProperty("journal.order");
+            for(Concept concept:concepts){
+                String key = concept.getPreferredLabel();
+                ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
                 Map<String, String> map = new HashMap<String, String>();
-                map.put(FULLNAME, properties.getProperty(str + FULLNAME));
-                map.put(METADATADIR, properties.getProperty(str + METADATADIR));
-                map.put(INTEGRATED, properties.getProperty(str + INTEGRATED));
-                map.put(PUBLICATION_BLACKOUT, properties.getProperty(str + PUBLICATION_BLACKOUT, "false"));
-                map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
-                map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
-                map.put(JOURNAL_ID, journalType);
-                map.put(SUBSCRIPTION_PAID, properties.getProperty(str + SUBSCRIPTION_PAID));
+                for(AuthorityMetadataValue metadataValue : metadataValues){
 
-                String key = properties.getProperty(str + FULLNAME);
-                if(key!=null&&key.length()>0){
-                journalProperties.put(key, map);
+                    map.put(metadataValue.qualifier,metadataValue.value);
+                    if(key!=null&&key.length()>0){
+                        journalProperties.put(key, map);
+                    }
                 }
             }
-
-        }catch (IOException e) {
+            context.complete();
+        }catch (Exception e) {
+            if(context!=null)
+            {
+                context.abort();
+            }
             log.error("Error while loading journal properties", e);
         }
     }
@@ -91,7 +85,7 @@ public class DryadJournalSubmissionUtils {
     public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
-        if(!isDataPackage(collection)) 
+        if(!isDataPackage(collection))
             dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
         DCValue[] journalFullNames = dataPackage.getMetadata("prism.publicationName");
         String journalFullName=null;
@@ -101,8 +95,8 @@ public class DryadJournalSubmissionUtils {
 
         Map<String, String> values = journalProperties.get(journalFullName);
         // Ignore blackout setting if journal is not (yet) integrated
-	// get journal's blackout setting
-	// journal is blacked out if its blackout setting is true or if it has no setting
+        // get journal's blackout setting
+        // journal is blacked out if its blackout setting is true or if it has no setting
         String isIntegrated = null;
         String isBlackedOut = null;
         if(values!=null && values.size()>0) {
@@ -118,12 +112,12 @@ public class DryadJournalSubmissionUtils {
             return RecommendedBlackoutAction.BLACKOUT_TRUE;
         } else {
             // journal is integrated but blackout setting is false or missing
-           return RecommendedBlackoutAction.BLACKOUT_FALSE;
+            return RecommendedBlackoutAction.BLACKOUT_FALSE;
         }
     }
 
 
-     private static boolean isDataPackage(Collection coll) throws SQLException {
+    private static boolean isDataPackage(Collection coll) throws SQLException {
         return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
     }
 
@@ -143,7 +137,7 @@ public class DryadJournalSubmissionUtils {
     /**
      * Replaces invalid filename characters by percent-escaping.  Based on
      * http://stackoverflow.com/questions/1184176/how-can-i-safely-encode-a-string-in-java-to-use-as-a-filename
-     * 
+     *
      * @param filename A filename to escape
      * @return The filename, with special characters escaped with percent
      */
@@ -155,8 +149,8 @@ public class DryadJournalSubmissionUtils {
         for (int i = 0; i < len; i++) {
             char ch = filename.charAt(i);
             if (ch < ' ' || ch >= 0x7F || ch == fileSep
-                || (ch == '.' && i == 0) // we don't want to collide with "." or ".."!
-                || ch == escape) {
+                    || (ch == '.' && i == 0) // we don't want to collide with "." or ".."!
+                    || ch == escape) {
                 sb.append(escape);
                 if (ch < 0x10) {
                     sb.append('0'); // Leading zero
@@ -168,7 +162,7 @@ public class DryadJournalSubmissionUtils {
         }
         return sb.toString();
     }
-    
+
     /**
      * Replaces escaped characters with their original representations
      * @param escaped a filename that has been escaped by
@@ -186,5 +180,5 @@ public class DryadJournalSubmissionUtils {
         sb.append(escaped);
         return sb.toString();
     }
-    
+
 }

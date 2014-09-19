@@ -405,7 +405,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public boolean hasDiscount(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
             Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-            Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
+            Boolean countryDiscount = getCountryWaiver(context,shoppingcart);
             Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
             if(journalSubscription||countryDiscount||voucherDiscount){
@@ -420,7 +420,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException{
         //this method check all the discount: journal,country,voucher
         Boolean journalSubscription =  getJournalSubscription(context, shoppingcart, journal);
-        Boolean countryDiscount = getCountryWaiver(context,shoppingcart,journal);
+        Boolean countryDiscount = getCountryWaiver(context,shoppingcart);
         Boolean voucherDiscount = voucherValidate(context,shoppingcart);
 
         if(countryDiscount){
@@ -434,7 +434,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return ShoppingCart.NO_WAIVER;
     }
     
-    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart, String journal) throws SQLException{
+    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart) throws SQLException{
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Properties countryArray = manager.getAllCountryProperty();
 

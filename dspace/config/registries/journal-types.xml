@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <dc-schema>
+        <name>journal</name>
+        <namespace>http://purl.org/dspace/models/journal</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>fullname</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>metadataDir</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>parsingScheme</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>integrated</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>allowReviewWorkflow</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>embargoAllowed</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>publicationBlackout</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>subscriptionPaid</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>sponsorName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>notifyOnReview</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>notifyOnArchive</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>notifyWeekly</element>
+    </dc-type>
+    <dc-type>
+        <schema>journal</schema>
+        <element>paymentPlanType</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>customerId</element>
+    </dc-type>
+
+</dspace-dc-types>
