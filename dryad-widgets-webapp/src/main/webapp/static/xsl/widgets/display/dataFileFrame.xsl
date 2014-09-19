@@ -172,8 +172,11 @@
         <div id="dryad-ddw-meta" class="dryad-ddw-hide" style="display:none !important;">
             <div id="dryad-ddw-citation" class="dryad-popup dryad-ddw dryad-ddw-citation">
                 <div class="dryad-ddw-citation">
-                    <img src="{$datapackage-img}" alt="Data in Dryad"/>
-                    <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
+                    <div><img src="{$datapackage-img}" alt="Data in Dryad"/></div>
+                    <!--<i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>-->
+                    <div>
+                    <xsl:text>When using this data, please cite the original publication:</xsl:text>
+                    </div>
                     <p class="shade">
                         <xsl:value-of select="$article-citation"/>
                         <xsl:text> </xsl:text>
@@ -181,7 +184,8 @@
                             <xsl:value-of select="$article-doi-url"/>
                         </a>
                     </p>
-                    <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
+                    <!--<i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>-->
+                    <div><xsl:text>Additionally, please cite the Dryad data package: </xsl:text></div>
                     <p class="shade">
                         <xsl:value-of select="$package-citation"/>
                         <xsl:text> </xsl:text>
@@ -190,7 +194,8 @@
                         </a>
                     </p>
                     <p>
-                        <i18n:text>xmlui.DryadItemSummary.downloadFormats</i18n:text>
+                        <!--<i18n:text>xmlui.DryadItemSummary.downloadFormats</i18n:text>-->
+                        <xsl:text>Download the data package citation in the following formats:</xsl:text>
                     </p>
                     <ul class="dryad-ddw-citation">
                         <li>
@@ -198,7 +203,8 @@
                                 href="http://datadryad.org/resource/doi:10.5061/dryad.87ht85rs/citation/ris"
                                 >RIS</a>
                             <span>
-                                <i18n:text>xmlui.DryadItemSummary.risCompatible</i18n:text>
+                                <!--<i18n:text>xmlui.DryadItemSummary.risCompatible</i18n:text>-->
+                                <xsl:text> (compatible with EndNote, Reference Manager, ProCite, RefWorks)</xsl:text>
                             </span>
                         </li>
                         <li>
@@ -206,7 +212,8 @@
                                 href="http://datadryad.org/resource/doi:10.5061/dryad.87ht85rs/citation/bib"
                                 >BibTex</a>
                             <span>
-                                <i18n:text>xmlui.DryadItemSummary.bibtexCompatible</i18n:text>
+                                <!--<i18n:text>xmlui.DryadItemSummary.bibtexCompatible</i18n:text>-->
+                                <xsl:text> (compatible with BibDesk, LaTeX)</xsl:text>
                             </span>
                         </li>
                     </ul>
