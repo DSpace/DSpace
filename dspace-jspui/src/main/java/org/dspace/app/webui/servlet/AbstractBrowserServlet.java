@@ -25,11 +25,13 @@ import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.utils.DSpace;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.configuration.TagCloudConfiguration;
 
 /**
  * Servlet for browsing through indices, as they are defined in
@@ -325,6 +327,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             {
                 if (bi.isMetadataIndex() && !scope.isSecondLevel())
                 {
+                	if (bi.isTagCloudEnabled()){
+                		TagCloudConfiguration tagCloudConfiguration = new DSpace().getServiceManager().getServiceByName("browseTagCloudConfiguration", TagCloudConfiguration.class);
+                		if (tagCloudConfiguration == null){
+                			tagCloudConfiguration = new TagCloudConfiguration();
+                		}
+                		request.setAttribute("tagCloudConfig", tagCloudConfiguration);
+                	}
+                	
                     showSinglePage(context, request, response);
                 }
                 else
