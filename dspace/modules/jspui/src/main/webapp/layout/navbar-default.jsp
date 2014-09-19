@@ -60,9 +60,9 @@
             navbarEmail = navbarEmail.substring(0, 17) + "...";
         }
     }
-    
+
     // get the browse indices
-    
+
 	BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
     BrowseInfo binfo = (BrowseInfo) request.getAttribute("browse.info");
     String browseCurrent = "";
@@ -78,37 +78,6 @@
         }
     }
 %>
-
-<%-- Search Box --%>
-<form method="get" action="<%= request.getContextPath() %>/simple-search">
-
-  <table width="100%" class="searchBox">
-    <tr>
-      <td>
-        <table width="100%" border="0" cellspacing="0" >
-          <tr>
-            <td class="searchBoxLabel"><label for="tequery"><fmt:message key="jsp.layout.navbar-default.search"/></label></td>
-          </tr>
-          <tr>
-            <td class="searchBoxLabelSmall" valign="middle" nowrap="nowrap">
-              <%-- <input type="text" name="query" id="tequery" size="10"/><input type=image border="0" src="<%= request.getContextPath() %>/image/search-go.gif" name="submit" alt="Go" value="Go"/> --%>
-              <input type="text" name="query" id="tequery" size="10"/><input type="image" border="0" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" src="<%= request.getContextPath() %>/image/search-go.gif"/>
-              
-<%
-			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
-			{
-%>        
-              <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
-<%
-            }
-%>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</form>
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
 <table class="navigationBarTable" width="100%" border="0" cellspacing="2" cellpadding="2">
@@ -155,37 +124,23 @@
       			<a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a>
     		</td>
   		</tr>
-	<%	
+	<%
 	}
 %>
 
 <%-- End of dynamic browse indices --%>
 
-  <tr>
-    <td colspan="2">&nbsp;</td>
-  </tr>
-
-  <tr>
-    <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-default.sign"/></td>
-  </tr>
-
-  <%
+   <%
     // Logged in
     if (user != null) {
   %>
-  <tr class="navigationBarItem">
-      	<td nowrap colspan="2" class="loggedIn">
-          Logged&nbsp;in&nbsp;as<br/> 
-          <%= navbarEmail %>
-      	</td>
-      </tr>
+    <tr>
+      <td colspan="2">&nbsp;</td>
+    </tr>
 
-      <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
-    </td>
-      	<td nowrap class="navigationBarItem"><A HREF="<%= request.getContextPath() %>/logout">Logout</A></td>
-      </tr>
+    <tr>
+      <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-default.sign"/></td>
+    </tr>
 
       <tr class="navigationBarItem">
       	<td>
@@ -204,7 +159,7 @@
       	  <a href="<%= request.getContextPath() %>/subscribe">Subscriptions</a>
     </td>
   </tr>
-      
+
       <tr class="navigationBarItem">
       	<td>
       	  <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/profile" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
@@ -215,41 +170,13 @@
       </tr>
 
   <%
-    // Not logged in
-    } else {
-  %> 
-  <tr class="navigationBarItem">
-    <td>
-      	  <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13">
-    </td>
-      	<td nowrap class="navigationBarItem">
-      	  <a href="<%= request.getContextPath() %>/mydspace">Login</a> for
-    </td>
-  </tr>
-
-      <tr class="navigationBarItem">
-      	<td>&nbsp;</td>
-      	<td nowrap class="navigationBarItem">Submissions</td>
-      </tr>
-
-      <tr class="navigationBarItem">
-      	<td>&nbsp;</td>
-      	<td nowrap class="navigationBarItem">Subscriptions</td>
-      </tr>
-
-      <tr class="navigationBarItem">
-      	<td>&nbsp;</td>
-      	<td nowrap class="navigationBarItem">Profile</td>
-      </tr>
-
-  <%
     }
-  %> 
+  %>
 
 <%
   if (isAdmin)
   {
-%>  
+%>
   <tr class="navigationBarItem">
     <td>
       <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>

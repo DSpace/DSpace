@@ -19,12 +19,21 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.util.Util" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
+    // Get the DSpace Context
+    Context context = UIUtil.obtainContext((HttpServletRequest)request);
+
+    // Is anyone logged in?
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+
     String title = (String) request.getAttribute("dspace.layout.title");
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
     boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
@@ -52,8 +61,8 @@
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
-	    
-	    
+
+
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
 <%
@@ -66,7 +75,7 @@
 <%
         }
     }
-    
+
     if (osLink)
     {
 %>
@@ -80,8 +89,8 @@
 <%
         }
 %>
-        
-    
+
+
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
@@ -93,7 +102,7 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
-    
+
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -107,25 +116,52 @@
     <body>
 
         <%-- DSpace top-of-page banner --%>
-        <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="pageBanner" width="100%" border="0" cellpadding="0" cellspacing="0">
+        <div class="pageBanner">
 
-            <%-- UM logo --%>
-            <tr>
-                <td valign="bottom" width="160">
-                    <a href="http://www.lib.umd.edu/"><img src="<%= request.getContextPath() %>/image/logo-top.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="84" height="49" border="0"/></a></td>
-                    <td class="tagLine">
-                    <a class="tagLineText" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
-                </td>
-                <td nowrap="nowrap" valign="middle">
-                    &nbsp;
-                </td>
-            </tr>
-            <tr class="colorbar"> 
-                <td valign="top" colspan="1"><img src="<%= request.getContextPath() %>/image/logo-bottom.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="83" height="20" border="0"></td>
-		<td colspan="2">Digital Repository at the University of Maryland</td>
-            </tr>
-        </table>
+          <span id="pageBanner-ul-logo">
+            <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
+          </span>
+
+		  <span id="pageBanner-drum-logo">
+		    <span>DRUM</span>
+		    <span>Digital Repository at the University of Maryland</span>
+          </span>
+
+          <span id="pageBanner-login">
+  <%
+    // Logged in
+    if (user != null) {
+  %>
+          <span class="loggedIn"><%= user.getEmail() %></span>
+      	  <A HREF="<%= request.getContextPath() %>/logout">Logout</A>
+
+  <%
+    // Not logged in
+    } else {
+  %>
+      	  <a href="<%= request.getContextPath() %>/mydspace">Login</a>
+
+  <%
+    }
+  %>
+
+          <span id-"pageBanner-search-box">
+            <%-- Search Box --%>
+            <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
+
+              <input type="text" name="query" id="tequery" size="10"/>
+              <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" src="<%= request.getContextPath() %>/image/search-go.gif"/>
+<%
+			  if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+			  {
+%>
+                <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
+<%
+              }
+%>
+            </form>
+          </span>
+        </div>
 
         <%-- Localization --%>
 <%--  <c:if test="${param.locale != null}">--%>
