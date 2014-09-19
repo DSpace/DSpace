@@ -100,14 +100,17 @@
 
                     <!-- <map:parameter name="download-url"      value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{request-param:doi}/bitstream"/> -->
                     <map:parameter name="download-url"      value="http://datadryad.org/mn/object/{request-param:doi}/bitstream"/>
+                    
+                    <!-- <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{request-param:doi}"/> -->
+                    <map:parameter name="datapackage-url"   value="http://datadryad.org/resource/{request-param:doi}"/>
 
                     <map:parameter name="ddwcss"            value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
-                    <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/dataPackageForPub?referrer={request-param:referrer}&amp;pubId={url-encode:{request-param:doi}}"/>
                     <map:parameter name="datapackage-img"   value="{request:scheme}://{request:serverName}:{request:serverPort}/static/img/bannerForPub.png"/>
                     <map:parameter name="link1"             value="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"/>
                     <map:parameter name="link2"             value="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300italic,300,400italic,400,600italic,600,700italic,700,900italic,900"/>
                     <map:parameter name="referrer"          value="{request-param:referrer}"/>
                     <map:parameter name="request-origin"    value="{request-param:origin}"/>
+                    
                 </map:transform>
                 <map:transform type="i18n">
                     <map:parameter name="locale" value="{locale}"/>

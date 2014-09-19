@@ -15,7 +15,7 @@
 
     <!--
         <map:parameter name="bitstream-url"     value="{request:scheme}://{request:serverName}:{request:serverPort}/api/v1/widgets/display/dataFileBitstream?referrer={request-param:referrer}&amp;doi={url-encode:{request-param:doi}}"/>
-        <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/dataPackageForPub?referrer={request-param:referrer}&amp;pubId={url-encode:{request-param:doi}}"/>
+        <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{request-param:doi}"/>
         <map:parameter name="datapackage-img"   value="{request:scheme}://{request:serverName}:{request:serverPort}/static/img/bannerForPub.png"/>
         <map:parameter name="ddwcss"            value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
         <map:parameter name="link1"             value="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"/>
