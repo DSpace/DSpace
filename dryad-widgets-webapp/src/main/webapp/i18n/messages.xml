@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+  <!--
+  messages.xml
+
+  Version: $Revision: 4648 $
+
+  Date: $Date: 2009-12-23 17:24:52 +0100 (wo, 23 dec 2009) $
+
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+<catalogue xml:lang="en" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+
+	<!--
+		The format used by all keys is as follows
+
+		xmlui.<Aspect>.<Java Class>.<name>
+
+		There are a few exceptions to this nameing format,
+		1) Some general keys are in the xmlui.general namespace
+		   because they are used very frequently.
+		2) Some general keys which are specific to a particular aspect
+		   may be found at xmlui.<Aspect> without specifiying a
+		   particular java class.
+		-->
+	<message key="xmlui.DryadItemSummary.downloadFormats">Download the data package citation in the following formats:</message>
+	<message key="xmlui.DryadItemSummary.risCompatible">(compatible with EndNote, Reference Manager, ProCite, RefWorks)</message>
+	<message key="xmlui.DryadItemSummary.bibtexCompatible">(compatible with BibDesk, LaTeX)</message>
+	<message key="xmlui.DryadItemSummary.pleaseCite">Additionally, please cite the Dryad data package: </message>
+	<message key="xmlui.DryadItemSummary.whenUsing">When using this data, please cite the original publication:</message>
+
+</catalogue>
