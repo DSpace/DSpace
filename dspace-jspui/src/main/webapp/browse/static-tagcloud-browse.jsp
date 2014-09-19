@@ -20,13 +20,15 @@
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.discovery.configuration.TagCloudConfiguration"%>
 
 <%
 		BrowseInfo bi2 = (BrowseInfo) request.getAttribute("browse.info");
 		BrowseIndex bix2 = bi2.getBrowseIndex();
+		TagCloudConfiguration tagCloudConfiguration = (TagCloudConfiguration) request.getAttribute("tagCloudConfig");
 		
 		String type2 = "1";
-		String index = "subject";
+		String index = bix2.getName();
 		String scope2 = "";
 		DSpaceObject dso = bi2.getBrowseContainer();
 		if (dso!=null){
@@ -45,7 +47,7 @@
 	    }
     %>
     			<div>
-    				<dspace:tagcloud index='<%= index %>' scope='<%= scope2 %>' data='<%= data %>' type='<%= type2 %>'/><br/><br/>
+    				<dspace:tagcloud parameters='<%= tagCloudConfiguration %>' index='<%= index %>' scope='<%= scope2 %>' data='<%= data %>' type='<%= type2 %>'/><br/><br/>
     			</div>
     <%		
 	    	

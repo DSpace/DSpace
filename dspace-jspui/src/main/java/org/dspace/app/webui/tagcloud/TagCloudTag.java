@@ -71,16 +71,11 @@ public class TagCloudTag extends SimpleTagSupport{
 				cloud.setMaxTagsToDisplay(1000000);
 			else
 				cloud.setMaxTagsToDisplay(parameters.getTotalTags());
-
-
-			//cloud.setNormThreshold(0.4);
-
 			
 			for (String subject : data.keySet()){
 				if (data.get(subject).intValue() > Integer.parseInt(parameters.getCuttingLevel())){
 					for (int i=0; i<data.get(subject).intValue(); i++){
-						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+(type.equals("0")?("/simple-search?filterquery="+URLEncoder.encode(subject,"UTF-8")+"&filtername="+index+"&filtertype=equals"):("/browse?type="+index+"&value="+subject)));   // creates a tag
-						//tag2.setScore(subjects.get(subject).doubleValue());
+						Tag tag2 = new Tag(subject, ((HttpServletRequest) pageContext.getRequest()).getContextPath()+(scope!=null?scope:"")+(type.equals("0")?("/simple-search?filterquery="+URLEncoder.encode(subject,"UTF-8")+"&filtername="+index+"&filtertype=equals"):("/browse?type="+index+"&value="+subject)));
 						cloud.addTag(tag2); 
 					}
 				}
@@ -94,10 +89,6 @@ public class TagCloudTag extends SimpleTagSupport{
 				tagList = cloud.tags(new Tag.NameComparatorAsc());
 			else if (parameters.getOrdering().equals("Tag.NameComparatorDesc"))
 				tagList = cloud.tags(new Tag.NameComparatorDesc());
-			//else if (parameters.ordering.equals("Tag.GreekNameComparatorAsc"))
-			//	tagList = cloud.tags(new GreekComparatorTagAsc());			
-			//else if (parameters.ordering.equals("Tag.GreekNameComparatorDesc"))
-			//	tagList = cloud.tags(new GreekComparatorTagDesc());
 			else if (parameters.getOrdering().equals("Tag.ScoreComparatorAsc"))
 				tagList = cloud.tags(new Tag.ScoreComparatorAsc());
 			else if (parameters.getOrdering().equals("Tag.ScoreComparatorDesc"))
@@ -158,32 +149,7 @@ public class TagCloudTag extends SimpleTagSupport{
 			}
 			out.println("</div>");
 
-			/*out.println("<br/>");
-			out.println("<br/>");
-			out.println("<br/>");
-			out.println("<br/>");
-
-			out.println("<div>");
-			for (Tag tag : cloud.tags()) { 
-				String classS;
-				if (tag.getNormScore()>0.3f)
-					classS = "tagcloud2_0";
-				else if (tag.getNormScore()>0.2f)
-					classS = "tagcloud2_1";
-				else if (tag.getNormScore()>0.1f)
-					classS = "tagcloud2_2";
-				else 
-					classS = "tagcloud2_3";
-
-				String title = "Score = "+tag.getScore()+", Normalized score = "+tag.getNormScore()+", Weight = "+tag.getWeight()+", Category = "+classS.replace("tagcloud2_", "");
-
-				out.println("<a class=\""+classS+"\" title = \""+title+"\"href=\"" + tag.getLink() +"\" style=\"font-size: "+ tag.getWeight() +"px;\">"+ tag.getName() +"</a>"); 
-
-			}
-			out.println("</div>");*/
-
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
