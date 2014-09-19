@@ -13,9 +13,7 @@
     
     <xsl:output method="text"/>
     
-<xsl:variable name="ddwcss" select="'http://localhost:9999/static/css/widgets/display/dryad-ddw.css'"/>
-    
-    <!--<xsl:param name="ddwcss"/>          <! - - dryad-ddw.css -->
+    <xsl:param name="ddwcss"/>          <!-- dryad-ddw.css -->
     <xsl:param name="jqlib"/>           <!-- jquery.min.js -->
     <xsl:param name="lblib"/>           <!-- jquery.magnific-popup.js -->
     <xsl:param name="frame-url"/>       <!-- url for file contents request -->
