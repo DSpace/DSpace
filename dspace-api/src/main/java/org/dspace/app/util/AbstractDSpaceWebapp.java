@@ -14,11 +14,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -109,7 +109,7 @@ abstract public class AbstractDSpaceWebapp
         TableRowIterator tri;
 
         Context context = null;
-        HttpMethod request = null;
+        HttpHead method = null;
         try {
             context = new Context();
             tri = DatabaseManager.queryTable(context, "Webapp",
@@ -123,10 +123,10 @@ abstract public class AbstractDSpaceWebapp
                 app.started = row.getDateColumn("Started");
                 app.uiQ = row.getBooleanColumn("isUI");
 
-                HttpClient client = new HttpClient();
-                request = new HeadMethod(app.url);
-                int status = client.executeMethod(request);
-                request.getResponseBody();
+                method = new HttpHead(app.url);
+                HttpClient client = new DefaultHttpClient();
+                HttpResponse response = client.execute(method);
+                int status = response.getStatusLine().getStatusCode();
                 if (status != HttpStatus.SC_OK)
                 {
                     DatabaseManager.delete(context, row);
@@ -138,14 +138,12 @@ abstract public class AbstractDSpaceWebapp
             }
         } catch (SQLException e) {
             log.error("Unable to list running applications", e);
-        } catch (HttpException e) {
-            log.error("Failure checking for a running webapp", e);
         } catch (IOException e) {
             log.error("Failure checking for a running webapp", e);
         } finally {
-            if (null != request)
+            if (null != method)
             {
-                request.releaseConnection();
+                method.releaseConnection();
             }
             if (null != context)
             {

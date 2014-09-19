@@ -13,13 +13,20 @@ import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -48,13 +55,6 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Static holder for a HttpSolrClient connection pool to issue
@@ -1322,9 +1322,9 @@ public class SolrLogger
                 String solrRequestUrl = solr.getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
 
-                GetMethod get = new GetMethod(solrRequestUrl);
-                new HttpClient().executeMethod(get);
-                InputStream csvInputstream = get.getResponseBodyAsStream();
+                HttpGet get = new HttpGet(solrRequestUrl);
+                HttpResponse response = new DefaultHttpClient().execute(get);
+                InputStream csvInputstream = response.getEntity().getContent();
                 //Write the csv ouput to a file !
                 File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYear() + "." + i + ".csv");
                 FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
@@ -1398,10 +1398,10 @@ public class SolrLogger
                 String solrRequestUrl = solr.getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, params);
 
-                GetMethod get = new GetMethod(solrRequestUrl);
-                new HttpClient().executeMethod(get);
+                HttpGet get = new HttpGet(solrRequestUrl);
+                HttpResponse response = new DefaultHttpClient().execute(get);
 
-                InputStream  csvOutput = get.getResponseBodyAsStream();
+                InputStream  csvOutput = response.getEntity().getContent();
                 Reader csvReader = new InputStreamReader(csvOutput);
                 List<String[]> rows = new CSVReader(csvReader).readAll();
                 String[][] csvParsed = rows.toArray(new String[rows.size()][]);
