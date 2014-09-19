@@ -26,30 +26,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes SQL queries.
- * 
+ *
  * @author Peter Breton
  * @author Jim Downing
  * @version $Revision$
  */
 public class DatabaseManager
 {
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(DatabaseManager.class);
+    /** logging category */
+    private static final Logger log = LoggerFactory.getLogger(DatabaseManager.class);
 
     /** True if initialization has been done */
     private static boolean initialized = false;
@@ -59,35 +58,24 @@ public class DatabaseManager
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
 
-    static
-    {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            isOracle = true;
-            isPostgres = false;
-        }
-        else
-        {
-            isOracle = false;
-            isPostgres = true;
-        }
-    }
-
     /** DataSource (retrieved from jndi */
     private static DataSource dataSource = null;
+
+    /** Name of the DBMS, as returned by its driver. */
+    private static String dbms;
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
 
-    /** 
-     * This regular expression is used to perform sanity checks 
-     * on database names (i.e. tables and columns). 
-     * 
+    /**
+     * This regular expression is used to perform sanity checks
+     * on database names (i.e. tables and columns).
+     *
      * FIXME: Regular expressions can be slow to solve this in the future we should
      * probably create a system where we don't pass in column and table names to these low
-     * level database methods. This approach is highly exploitable for injection 
+     * level database methods. This approach is highly exploitable for injection
      * type attacks because we are unable to determine where the input came from. Instead
-     * we could pass in static integer constants which are then mapped to their sql name. 
+     * we could pass in static integer constants which are then mapped to their sql name.
      */
     private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9.]+$");
 
@@ -106,12 +94,19 @@ public class DatabaseManager
 
     public static boolean isOracle()
     {
+        try
+        {
+            initialize();
+        } catch (SQLException ex)
+        {
+            log.error("Failed to initialize the database:  ", ex);
+        }
         return isOracle;
     }
-    
+
     /**
      * Set the constraint check to deferred (commit time)
-     * 
+     *
      * @param context
      *            The context object
      * @param constraintName
@@ -145,7 +140,7 @@ public class DatabaseManager
 
     /**
      * Set the constraint check to immediate (every query)
-     * 
+     *
      * @param context
      *            The context object
      * @param constraintName
@@ -176,12 +171,12 @@ public class DatabaseManager
             }
         }
     }
-    
+
     /**
      * Return an iterator with the results of the query. The table parameter
      * indicates the type of result. If table is null, the column names are read
      * from the ResultSetMetaData.
-     * 
+     *
      * @param context
      *            The context object
      * @param table
@@ -189,8 +184,8 @@ public class DatabaseManager
      * @param query
      *            The SQL query
      * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference  
+     * 			  A set of SQL parameters to be included in query. The order of
+     * 			  the parameters must correspond to the order of their reference
      * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
@@ -211,7 +206,7 @@ public class DatabaseManager
             }
             log.debug(sb.toString());
         }
-        
+
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
         try
         {
@@ -238,24 +233,24 @@ public class DatabaseManager
             throw sqle;
         }
     }
-    
+
     /**
      * Return an iterator with the results of the query.
-     * 
+     *
      * @param context
      *            The context object
      * @param query
      *            The SQL query
      * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference 
+     * 			  A set of SQL parameters to be included in query. The order of
+     * 			  the parameters must correspond to the order of their reference
      * 			  within the query.
      * @return A TableRowIterator with the results of the query
      * @exception SQLException
      *                If a database error occurs
      */
     public static TableRowIterator query(Context context, String query,
-            Object... parameters) throws SQLException    
+            Object... parameters) throws SQLException
     {
         if (log.isDebugEnabled())
         {
@@ -301,14 +296,14 @@ public class DatabaseManager
     /**
      * Return the single row result to this query, or null if no result. If more
      * than one row results, only the first is returned.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param query
      *            The SQL query
      * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference 
+     * 			  A set of SQL parameters to be included in query. The order of
+     * 			  the parameters must correspond to the order of their reference
      * 			  within the query.
 
      * @return A TableRow object, or null if no result
@@ -335,11 +330,11 @@ public class DatabaseManager
 
         return (retRow);
     }
-    
+
     /**
      * Return the single row result to this query, or null if no result. If more
      * than one row results, only the first is returned.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -347,8 +342,8 @@ public class DatabaseManager
      * @param query
      *            The SQL query
      * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference 
+     * 			  A set of SQL parameters to be included in query. The order of
+     * 			  the parameters must correspond to the order of their reference
      * 			  within the query.
      * @return A TableRow object, or null if no result
      * @exception SQLException
@@ -373,18 +368,18 @@ public class DatabaseManager
         }
         return (retRow);
     }
-    
+
     /**
      * Execute an update, insert or delete query. Returns the number of rows
      * affected by the query.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param query
      *            The SQL query to execute
      * @param parameters
-     * 			  A set of SQL parameters to be included in query. The order of 
-     * 			  the parameters must correspond to the order of their reference 
+     * 			  A set of SQL parameters to be included in query. The order of
+     * 			  the parameters must correspond to the order of their reference
      * 			  within the query.
      * @return The number of rows affected by the query.
      * @exception SQLException
@@ -409,10 +404,10 @@ public class DatabaseManager
         }
 
         try
-        {        	
+        {
         	statement = context.getDBConnection().prepareStatement(query);
         	loadParameters(statement, parameters);
-        	
+
         	return statement.executeUpdate();
         }
         finally
@@ -432,7 +427,7 @@ public class DatabaseManager
 
     /**
      * Create a new row in the given table, and assigns a unique id.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -451,7 +446,7 @@ public class DatabaseManager
     /**
      * Find a table row by its primary key. Returns the row, or null if no row
      * with that primary key value exists.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -476,7 +471,7 @@ public class DatabaseManager
      * Find a table row by a unique value. Returns the row, or null if no row
      * with that primary key value exists. If multiple rows with the value
      * exist, one is returned.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -512,7 +507,7 @@ public class DatabaseManager
     /**
      * Delete a table row via its primary key. Returns the number of rows
      * deleted.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -535,7 +530,7 @@ public class DatabaseManager
     /**
      * Delete all table rows with the given value. Returns the number of rows
      * deleted.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param table
@@ -569,7 +564,7 @@ public class DatabaseManager
 
     /**
      * Obtain an RDBMS connection.
-     * 
+     *
      * @return A new database connection.
      * @exception SQLException
      *                If a database error occurs, or a connection cannot be
@@ -604,7 +599,7 @@ public class DatabaseManager
 
     /**
      * Release resources associated with this connection.
-     * 
+     *
      * @param c
      *            The connection to release
      */
@@ -626,7 +621,7 @@ public class DatabaseManager
     /**
      * Create a table row object that can be passed into the insert method, not
      * commonly used unless the table has a referential integrity constraint.
-     * 
+     *
      * @param table
      *            The RDBMS table in which to create the new row
      * @return The newly created row
@@ -639,7 +634,7 @@ public class DatabaseManager
 
     /**
      * Insert a table row into the RDBMS.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param row
@@ -665,7 +660,7 @@ public class DatabaseManager
     /**
      * Update changes to the RDBMS. Note that if the update fails, the values in
      * the row will NOT be reverted.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param row
@@ -714,7 +709,7 @@ public class DatabaseManager
 
     /**
      * Delete row from the RDBMS.
-     * 
+     *
      * @param context
      *            Current DSpace context
      * @param row
@@ -742,7 +737,7 @@ public class DatabaseManager
 
     /**
      * Return metadata about a table.
-     * 
+     *
      * @param table
      *            The name of the table
      * @return An array of ColumnInfo objects
@@ -758,7 +753,7 @@ public class DatabaseManager
 
     /**
      * Return info about column in table.
-     * 
+     *
      * @param table
      *            The name of the table
      * @param column
@@ -777,7 +772,7 @@ public class DatabaseManager
 
     /**
      * Return the names of all the columns of the given table.
-     * 
+     *
      * @param table
      *            The name of the table
      * @return The names of all the columns of the given table, as a List. Each
@@ -800,7 +795,7 @@ public class DatabaseManager
 
     /**
      * Return the names of all the columns of the ResultSet.
-     * 
+     *
      * @param meta
      *            The ResultSetMetaData
      * @return The names of all the columns of the given table, as a List. Each
@@ -823,7 +818,7 @@ public class DatabaseManager
 
     /**
      * Return the canonical name for a table.
-     * 
+     *
      * @param table
      *            The name of the table.
      * @return The canonical name of the table.
@@ -846,7 +841,7 @@ public class DatabaseManager
 
     /**
      * Load SQL into the RDBMS.
-     * 
+     *
      * @param sql
      *            The SQL to load.
      * throws SQLException
@@ -865,7 +860,7 @@ public class DatabaseManager
 
     /**
      * Load SQL from a reader into the RDBMS.
-     * 
+     *
      * @param r
      *            The Reader from which to read the SQL.
      * @throws SQLException
@@ -989,18 +984,12 @@ public class DatabaseManager
                     // If the messages are bogus, give them a low priority
                     if (isDrop || isNoResults)
                     {
-                        if (log.isDebugEnabled())
-                        {
-                            log.debug(msg, sqle);
-                        }
+                        log.debug(msg, sqle);
                     }
                     // Otherwise, we need to know!
                     else
                     {
-                        if (log.isEnabledFor(Level.WARN))
-                        {
-                            log.warn(msg, sqle);
-                        }
+                        log.warn(msg, sqle);
                     }
                 }
 
@@ -1029,7 +1018,7 @@ public class DatabaseManager
 
     /**
      * Convert the current row in a ResultSet into a TableRow object.
-     * 
+     *
      * @param results
      *            A ResultSet to process
      * @param table
@@ -1178,7 +1167,7 @@ public class DatabaseManager
      * Return the name of the primary key column. We assume there's only one
      * primary key per table; if there are more, only the first one will be
      * returned.
-     * 
+     *
      * @param row
      *            The TableRow to return the primary key for.
      * @return The name of the primary key column, or null if the row has no
@@ -1195,7 +1184,7 @@ public class DatabaseManager
      * Return the name of the primary key column in the given table. We assume
      * there's only one primary key per table; if there are more, only the first
      * one will be returned.
-     * 
+     *
      * @param table
      *            The name of the RDBMS table
      * @return The name of the primary key column, or null if the table has no
@@ -1215,7 +1204,7 @@ public class DatabaseManager
      * Return column information for the primary key column, or null if the
      * table has no primary key. We assume there's only one primary key per
      * table; if there are more, only the first one will be returned.
-     * 
+     *
      * @param table
      *            The name of the RDBMS table
      * @return A ColumnInfo object, or null if the table has no primary key.
@@ -1240,7 +1229,7 @@ public class DatabaseManager
     /**
      * Execute SQL as a PreparedStatement on Connection. Bind parameters in
      * columns to the values in the table row before executing.
-     * 
+     *
      * @param connection
      *            The SQL connection
      * @param sql
@@ -1315,7 +1304,7 @@ public class DatabaseManager
 
     /**
      * Return metadata about a table.
-     * 
+     *
      * @param table
      *            The name of the table
      * @return An map of info.
@@ -1340,7 +1329,7 @@ public class DatabaseManager
 
     /**
      * Read metadata about a table from the database.
-     * 
+     *
      * @param table
      *            The RDBMS table.
      * @return A map of information about the columns. The key is the name of
@@ -1354,7 +1343,7 @@ public class DatabaseManager
         Connection connection = null;
         ResultSet pkcolumns = null;
         ResultSet columns = null;
-        
+
         try
         {
             String schema = ConfigurationManager.getProperty("db.schema");
@@ -1362,8 +1351,8 @@ public class DatabaseManager
                 schema = null;
             }
             String catalog = null;
-            
-            int dotIndex = table.indexOf('.'); 
+
+            int dotIndex = table.indexOf('.');
             if (dotIndex > 0)
             {
                 catalog = table.substring(0, dotIndex);
@@ -1371,7 +1360,7 @@ public class DatabaseManager
                 log.warn("catalog: " + catalog);
                 log.warn("table: " + table);
             }
-            
+
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
@@ -1380,9 +1369,9 @@ public class DatabaseManager
             int max = metadata.getMaxTableNameLength();
             String tname = ((max > 0) && (table.length() >= max)) ? table
                     .substring(0, max - 1) : table;
-            
+
             pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
-            
+
             Set<String> pks = new HashSet<String>();
 
             while (pkcolumns.next())
@@ -1487,6 +1476,33 @@ public class DatabaseManager
                 dataSource = DataSourceInit.getDatasource();
             }
 
+            // What brand of DBMS do we have?
+            Connection connection = dataSource.getConnection();
+            DatabaseMetaData meta = connection.getMetaData();
+            dbms = meta.getDatabaseProductName();
+            String dbms_lc = dbms.toLowerCase(Locale.ROOT);
+            if (dbms_lc.contains("postgresql"))
+            {
+                isPostgres = true;
+                log.info("DBMS is PostgreSQL");
+            }
+            else if (dbms_lc.contains("oracle"))
+            {
+                isOracle = true;
+                log.info("DBMS is Oracle Database");
+            }
+            else if (dbms_lc.contains("h2")) // Used in testing
+            {
+                isOracle = true;
+                log.info("DBMS is H2");
+            }
+            else
+            {
+                log.error("DBMS {} is unsupported", dbms);
+            }
+            log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
+            connection.close();
+
             initialized = true;
         }
         catch (SQLException se)
@@ -1503,8 +1519,23 @@ public class DatabaseManager
         }
     }
 
-	/**
-	 * Iterate over the given parameters and add them to the given prepared statement. 
+    /**
+     * What is the name of our DBMS?
+     *
+     * @return name returned by the DBMS driver.
+     */
+    public static String getDbName()
+    {
+        try {
+            initialize();
+        } catch (SQLException ex) {
+            log.error("Failed to initialize the database:  ", ex);
+        }
+        return dbms;
+    }
+
+    /**
+	 * Iterate over the given parameters and add them to the given prepared statement.
 	 * Only a select number of datatypes are supported by the JDBC driver.
 	 *
 	 * @param statement
@@ -1712,7 +1743,7 @@ public class DatabaseManager
                 {
                     params.add(col);
                 }
-            }            
+            }
         }
 
         PreparedStatement statement = null;

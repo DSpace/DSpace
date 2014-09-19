@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -60,13 +59,13 @@ public class EPerson extends DSpaceObject
     public static final int LANGUAGE = 5;
     
     /** log4j logger */
-    private static Logger log = Logger.getLogger(EPerson.class);
+    private static final Logger log = Logger.getLogger(EPerson.class);
 
     /** Our context */
-    private Context myContext;
+    private final Context myContext;
 
     /** The row in the table representing this eperson */
-    private TableRow myRow;
+    private final TableRow myRow;
 
     /** Flag set when data is modified, for events */
     private boolean modified;
@@ -295,7 +294,7 @@ public class EPerson extends DSpaceObject
         queryBuf.append("LOWER(firstname) LIKE LOWER(?) OR LOWER(lastname) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY lastname, firstname ASC ");
 
         // Add offset and limit restrictions - Oracle requires special code
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
@@ -431,7 +430,7 @@ public class EPerson extends DSpaceObject
 		        new Object[] {int_param,dbquery,dbquery,dbquery});
 				
 		// use getIntColumn for Oracle count data
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             count = Long.valueOf(row.getIntColumn("epcount"));
         }

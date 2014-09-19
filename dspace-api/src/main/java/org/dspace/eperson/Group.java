@@ -46,7 +46,7 @@ public class Group extends DSpaceObject
     public static final int NAME = 1; // sort by NAME (default)
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Group.class);
+    private static final Logger log = Logger.getLogger(Group.class);
 
     /** ID of Anonymous Group */
     public static final int ANONYMOUS_ID = 0;
@@ -55,10 +55,10 @@ public class Group extends DSpaceObject
     public static final int ADMIN_ID = 1;
 
     /** Our context */
-    private Context myContext;
+    private final Context myContext;
 
     /** The row in the table representing this object */
-    private TableRow myRow;
+    private final TableRow myRow;
 
     /** lists of epeople and groups in the group */
     private List<EPerson> epeople = new ArrayList<EPerson>();
@@ -852,7 +852,7 @@ public class Group extends DSpaceObject
 		queryBuf.append("SELECT * FROM epersongroup WHERE LOWER(name) LIKE LOWER(?) OR eperson_group_id = ? ORDER BY name ASC ");
 		
         // Add offset and limit restrictions - Oracle requires special code
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
@@ -985,7 +985,7 @@ public class Group extends DSpaceObject
 		
 		// use getIntColumn for Oracle count data
 		Long count;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             count = Long.valueOf(row.getIntColumn("gcount"));
         }
