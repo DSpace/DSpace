@@ -74,7 +74,8 @@ CREATE TABLE Scheme
   modified DATE,
   status VARCHAR(256),
   lang VARCHAR(24),
-  topconcept BOOL
+  topconcept BOOL,
+  CONSTRAINT SchemeIndentifier UNIQUE(identifier)
 );
 
 
@@ -106,7 +107,8 @@ CREATE TABLE Concept
   status VARCHAR(256),
   lang VARCHAR(24),
   source VARCHAR(256),
-  topconcept BOOL
+  topconcept BOOL,
+  CONSTRAINT ConceptIndentifier UNIQUE(identifier)
 );
 
 
@@ -138,7 +140,8 @@ CREATE TABLE Term
   source VARCHAR(256),
   status VARCHAR(256),
   literalForm TEXT,
-  lang VARCHAR(24)
+  lang VARCHAR(24),
+  CONSTRAINT TermIndentifier UNIQUE(identifier)
 
 );
 

@@ -40,11 +40,20 @@
             <action id="finalPaymentAction"/>
             <alternativeOutcome>
                 <step status="1">reAuthorizationPaymentStep</step>
+                <step status="2">reAuthorizationCreditStep</step>
             </alternativeOutcome>
         </step>
         
         <step id="reAuthorizationPaymentStep" nextStep="completePaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
+        </step>
+
+        <step id="reAuthorizationCreditStep" nextStep="completePaymentStep" userSelectionMethod="assignOriginalSubmitterAction">
+            <action id="reAuthorizationCreditAction"/>
+            <alternativeOutcome>
+                <step status="1">reAuthorizationCreditStep</step>
+            </alternativeOutcome>
+
         </step>
         
         <!-- Blackout selected.  Use the same payment auth actions but different steps for blackout -->
@@ -52,11 +61,18 @@
             <action id="finalPaymentAction"/>
             <alternativeOutcome>
                 <step status="1">pendingPublicationReAuthorizationPaymentStep</step>
+                <step status="2">pendingPublicationReAuthorizationCreditStep</step>
             </alternativeOutcome>
         </step>
 
         <step id="pendingPublicationReAuthorizationPaymentStep" nextStep="registerPendingPublicationStep" userSelectionMethod="assignOriginalSubmitterAction">
             <action id="reAuthorizationPaymentAction"/>
+        </step>
+        <step id="pendingPublicationReAuthorizationCreditStep" nextStep="registerPendingPublicationStep" userSelectionMethod="assignOriginalSubmitterAction">
+            <action id="reAuthorizationCreditAction"/>
+            <alternativeOutcome>
+            <step status="1">pendingPublicationReAuthorizationCreditStep</step>
+            </alternativeOutcome>
         </step>
 
         <!-- Register an identifier and then send to pendingPublicationStep -->

@@ -24,6 +24,8 @@ import java.sql.SQLException;
  */
 public class AuthorityMetadataValue {
 
+    public static final String ANY = "*";
+
     /** The reference to the metadata field */
     public int fieldId = 0;
 
