@@ -114,6 +114,10 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Search type</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Search for</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_thesisSemester">Thesis Semester</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_discipline">Discipline</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_theisDegreeLevel">Thesis Degree Level</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contentType">Content Type</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
