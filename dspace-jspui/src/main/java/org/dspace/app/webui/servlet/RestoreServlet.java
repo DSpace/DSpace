@@ -63,8 +63,11 @@ public class RestoreServlet extends DSpaceServlet
         String contentType = request.getContentType();     
         if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
         {
-        	//request.setAttribute("message", message);
-        	
+                String message = null;
+		String inputType = request.getParameter("inputType");
+        		
+        	request.setAttribute("snapshotname", inputType);
+      	
         	// Show the upload screen
     		JSPManager.showJSP(request, response, "/dspace-admin/restore-msg.jsp");
 
