@@ -63,71 +63,20 @@ public class RestoreServlet extends DSpaceServlet
         String contentType = request.getContentType();     
         if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
         {
-        	String message = null;
-        	
-        	// Process the file uploaded
-        	try {
-        		// Wrap multipart request to get the submission info
-        		FileUploadRequest wrapper = new FileUploadRequest(request);
-        		File f = wrapper.getFile("file");
-
-        		int colId = Integer.parseInt(wrapper.getParameter("collection"));
-        		Collection collection = Collection.find(context, colId);
+                String message = null;
+		String inputType = request.getParameter("inputType");
         		
-        		String inputType = wrapper.getParameter("inputType");
-        		
-        		try {
-					ItemImport.processUploadableImport(f, new Collection[]{collection}, inputType, context);
-					
-					request.setAttribute("has-error", "false");
-					
-				} catch (Exception e) {
-					request.setAttribute("has-error", "true");
-					message = e.getMessage();
-					e.printStackTrace();
-				}
-        	} catch (FileSizeLimitExceededException e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	} catch (Exception e) {
-        		request.setAttribute("has-error", "true");
-        		message = e.getMessage();
-        		e.printStackTrace();
-        	}
-        	
-        	//Get all the possible data loaders from the Spring configuration
-        	BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-        	List<String> inputTypes =dls.getFileDataLoaders();
-        	
-        	request.setAttribute("input-types", inputTypes);
-        	
-        	//Get all collections
-        	List<Collection> collections = null;
-        	String colIdS = request.getParameter("colId");
-        	if (colIdS!=null){
-        		collections = new ArrayList<Collection>();
-        		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
-        		
-        	}
-        	else {
-        		collections = Arrays.asList(Collection.findAll(context));
-        	}
-        	
-        	request.setAttribute("collections", collections);
-        	
-        	request.setAttribute("message", message);
-        	
+        	request.setAttribute("snapshotname", inputType);
+      	
         	// Show the upload screen
-    		JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
+    		JSPManager.showJSP(request, response, "/dspace-admin/restore-msg.jsp");
 
         }
         else
         {
-        	request.setAttribute("has-error", "true");
-        	
+	    request.setAttribute("has-error", "true");
             // Show the upload screen
-            JSPManager.showJSP(request, response, "/dspace-admin/batchmetadataimport.jsp");
+            JSPManager.showJSP(request, response, "/dspace-admin/restore.jsp");
         }
     }
     
