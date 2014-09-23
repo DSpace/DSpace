@@ -333,6 +333,12 @@
                   <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                 </xsl:call-template>
               </xsl:when>
+                <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                    <xsl:call-template name="addLookupButtonAuthor">
+                        <xsl:with-param name="isName" select="'true'"/>
+                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                    </xsl:call-template>
+                </xsl:when>
             </xsl:choose>
             <xsl:if test="dri:params/@authorityControlled">
               <xsl:variable name="confValue" select="dri:field/dri:value[@type='authority'][1]/@confidence"/>
@@ -367,6 +373,11 @@
                       <xsl:text>display:none;</xsl:text>
                     </xsl:attribute>
             </xsl:if>
+                   <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
+                       <xsl:attribute name="style">
+                           <xsl:text>display:none;</xsl:text>
+                       </xsl:attribute>
+                   </xsl:if>
                </input>
             </xsl:if>
             <!-- insert choice mechansim and/or Add button here -->
@@ -383,6 +394,12 @@
                   <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                 </xsl:call-template>
               </xsl:when>
+                <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                    <xsl:call-template name="addLookupButtonAuthor">
+                        <xsl:with-param name="isName" select="'true'"/>
+                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                    </xsl:call-template>
+                </xsl:when>
             </xsl:choose>
             <!-- place to store authority value -->
             <xsl:if test="dri:params/@authorityControlled">
@@ -446,6 +463,11 @@
                   <xsl:text>display:none;</xsl:text>
                 </xsl:attribute>
         </xsl:if>
+                <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
+                    <xsl:attribute name="style">
+                        <xsl:text>display:none;</xsl:text>
+                    </xsl:attribute>
+                </xsl:if>
            </input>
         </xsl:if>
         <br/>
@@ -560,6 +582,11 @@
                   <xsl:text>display:none;</xsl:text>
                 </xsl:attribute>
         </xsl:if>
+               <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
+                   <xsl:attribute name="style">
+                       <xsl:text>display:none;</xsl:text>
+                   </xsl:attribute>
+               </xsl:if>
            </input>
         </xsl:if>
 
@@ -593,6 +620,12 @@
               <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
             </xsl:call-template>
           </xsl:when>
+            <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                <xsl:call-template name="addLookupButtonAuthor">
+                    <xsl:with-param name="isName" select="'true'"/>
+                    <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                </xsl:call-template>
+            </xsl:when>
         </xsl:choose>
         <br/>
         <xsl:if test="dri:instance or dri:field/dri:instance">
@@ -965,6 +998,12 @@
                     <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                   </xsl:call-template>
                 </xsl:when>
+                  <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                      <xsl:call-template name="addLookupButtonAuthor">
+                          <xsl:with-param name="isName" select="'false'"/>
+                          <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                      </xsl:call-template>
+                  </xsl:when>
               </xsl:choose>
               <!-- Dryad Metadata propagation -->
               <!-- Admin page -->
@@ -1087,6 +1126,12 @@
                               <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                             </xsl:call-template>
                           </xsl:when>
+                            <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
+                                <xsl:call-template name="addLookupButtonAuthor">
+                                    <xsl:with-param name="isName" select="'false'"/>
+                                    <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                                </xsl:call-template>
+                            </xsl:when>
                         </xsl:choose>
                     </xsl:otherwise>
         </xsl:choose>

@@ -10,14 +10,10 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.sql.Timestamp;
+import java.util.*;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -27,6 +23,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -227,8 +226,18 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
-    public static ItemIterator findAllWithdrawn(Context context) throws SQLException{
-        String myQuery = "SELECT * FROM item WHERE withdrawn='1'";
+    /**
+     * Get all "final" items in the archive, both archived ("in archive" flag) or
+     * withdrawn items are included. The order of the list is indeterminate.
+     *
+     * @param context
+     *            DSpace context object
+     * @return an iterator over the items in the archive.
+     * @throws SQLException
+     */
+    public static ItemIterator findAllUnfiltered(Context context) throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE in_archive='1' or withdrawn='1'";
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
@@ -267,6 +276,11 @@ public class Item extends DSpaceObject
     {
         return itemRow.getIntColumn("item_id");
     }
+
+
+
+
+
 
     /**
      * @see org.dspace.content.DSpaceObject#getHandle()
@@ -324,6 +338,22 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * Method that updates the last modified date of the item
+     */
+    public void updateLastModified()
+    {
+        try {
+            Date lastModified = new Timestamp(new Date().getTime());
+            itemRow.setColumn("last_modified", lastModified);
+            DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
+            //Also fire a modified event since the item HAS been modified
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+        } catch (SQLException e) {
+            log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+        }
+    }
+
+    /**
      * Set the "is_archived" flag. This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
      *
@@ -360,7 +390,10 @@ public class Item extends DSpaceObject
 
         // get the collection ID
         int cid = itemRow.getIntColumn("owning_collection");
-
+        if(cid==-1)
+        {
+            return null;
+        }
         myCollection = Collection.find(ourContext, cid);
 
         return myCollection;
@@ -533,6 +566,108 @@ public class Item extends DSpaceObject
         }
 
         return values;
+    }
+
+    public List<DCValue> getMetadata(String mdString, String authority) {
+        String[] elements = getElements(mdString);
+        return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
+    }
+
+    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+        DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<DCValue> dcValues = Arrays.asList(metadata);
+        if (!authority.equals(Item.ANY)) {
+            Iterator<DCValue> iterator = dcValues.iterator();
+            while (iterator.hasNext()) {
+                DCValue dcValue = iterator.next();
+                if (!authority.equals(dcValue.authority)) {
+                    iterator.remove();
+                }
+            }
+        }
+        return dcValues;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * Values in the returned array can be empty or null.
+     */
+    public static String[] getElements(String fieldName) {
+        String[] tokens = StringUtils.split(fieldName, ".");
+
+        int add = 4 - tokens.length;
+        if (add > 0) {
+            tokens = (String[]) ArrayUtils.addAll(tokens, new String[add]);
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
+     */
+    public static String[] getElementsFilled(String fieldName) {
+        String[] elements = getElements(fieldName);
+        for (int i = 0; i < elements.length; i++) {
+            if (StringUtils.isBlank(elements[i])) {
+                elements[i] = Item.ANY;
+            }
+        }
+        return elements;
+    }
+
+    public void replaceMetadataValue(DCValue oldValue, DCValue newValue) {
+        // check both dcvalues are for the same field
+        if (oldValue.hasSameFieldAs(newValue)) {
+
+            String schema = oldValue.schema;
+            String element = oldValue.element;
+            String qualifier = oldValue.qualifier;
+
+            // Save all metadata for this field
+            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            clearMetadata(schema, element, qualifier, Item.ANY);
+
+            for (DCValue dcvalue : dcvalues) {
+                if (dcvalue.equals(oldValue)) {
+                    addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
+                } else {
+                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
+                }
+            }
+        }
+    }
+
+    public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
+        String[] elements = getElementsFilled(mdString);
+        String schema = elements[0], element = elements[1], qualifier = elements[2];
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
+                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        TableRowIterator rows = null;
+        if (Item.ANY.equals(authority)) {
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        } else {
+            query += " AND metadatavalue.authority = ?";
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), authority);
+        }
+        return new ItemIterator(context, rows);
     }
 
     /**
@@ -719,7 +854,10 @@ public class Item extends DSpaceObject
             if(!dublinCore.contains(dcv)){
                 dublinCore.add(dcv);
                 addDetails(fieldName);
-                dublinCoreChanged = true;
+                if (values.length > 0)
+                {
+                    dublinCoreChanged = true;
+                }
             }
         }
 
@@ -1938,6 +2076,7 @@ public class Item extends DSpaceObject
         // leaving the database in an inconsistent state
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
 
         VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
         VersionHistory history = versioningService.findVersionHistory(ourContext, this.getID());
@@ -2822,4 +2961,12 @@ public class Item extends DSpaceObject
    public void touch() {
         modified = true;
    }
+
+    public static ItemIterator findAllWithdrawn(Context context) throws SQLException{
+        String myQuery = "SELECT * FROM item WHERE withdrawn='1'";
+
+        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
+
+        return new ItemIterator(context, rows);
+    }
 }

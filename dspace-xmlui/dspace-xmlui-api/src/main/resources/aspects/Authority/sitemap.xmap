@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 5466 $
+
+  Date: $Date: 2010-10-19 19:09:33 +0200 (di, 19 okt 2010) $
+
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+
+        <map:transformers>
+
+            <map:transformer name="ManageConceptMain" src="org.dspace.app.xmlui.aspect.authority.concept.ManageConceptMain"/>
+            <map:transformer name="AddConceptForm" src="org.dspace.app.xmlui.aspect.authority.concept.AddConceptForm"/>
+            <map:transformer name="EditConceptForm" src="org.dspace.app.xmlui.aspect.authority.concept.EditConceptForm"/>
+            <map:transformer name="DeleteConceptConfirm" src="org.dspace.app.xmlui.aspect.authority.concept.DeleteConceptConfirm"/>
+
+
+            <map:transformer name="ManageTermMain" src="org.dspace.app.xmlui.aspect.authority.term.ManageTermMain"/>
+            <map:transformer name="AddTermForm" src="org.dspace.app.xmlui.aspect.authority.term.AddTermForm"/>
+            <map:transformer name="EditTermForm" src="org.dspace.app.xmlui.aspect.authority.term.EditTermForm"/>
+            <map:transformer name="DeleteTermConfirm" src="org.dspace.app.xmlui.aspect.authority.term.DeleteTermConfirm"/>
+
+
+            <map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.authority.Navigation"/>
+
+
+            <map:transformer name="ManageSchemeMain" src="org.dspace.app.xmlui.aspect.authority.scheme.ManageSchemeMain"/>
+            <map:transformer name="EditSchemeForm" src="org.dspace.app.xmlui.aspect.authority.scheme.EditSchemeForm"/>
+            <map:transformer name="AddSchemeForm" src="org.dspace.app.xmlui.aspect.authority.scheme.AddSchemeForm"/>
+            <map:transformer name="DeleteSchemeConfirm" src="org.dspace.app.xmlui.aspect.authority.scheme.DeleteSchemeConfirm"/>
+
+            <map:transformer name="SchemeViewer" src="org.dspace.app.xmlui.aspect.authority.scheme.SchemeViewer"/>
+            <map:transformer name="ConceptViewer" src="org.dspace.app.xmlui.aspect.authority.concept.ConceptViewer"/>
+            <map:transformer name="TermViewer" src="org.dspace.app.xmlui.aspect.authority.term.TermViewer"/>
+
+            <map:transformer name="EditConceptMetadataValueForm" src="org.dspace.app.xmlui.aspect.authority.concept.EditConceptMetadataValueForm"/>
+            <map:transformer name="EditSchemeMetadataValueForm" src="org.dspace.app.xmlui.aspect.authority.scheme.EditSchemeMetadataValueForm"/>
+            <map:transformer name="EditTermMetadataValueForm" src="org.dspace.app.xmlui.aspect.authority.term.EditTermMetadataValueForm"/>
+
+
+            <map:transformer name="AddConcept2ConceptRelationForm" src="org.dspace.app.xmlui.aspect.authority.concept.AddConcept2ConceptRelationForm"/>
+
+
+        </map:transformers>
+        <map:matchers default="wildcard">
+            <map:matcher name="requestParameterWild"
+                         src="org.apache.cocoon.matching.WildcardRequestParameterMatcher"/>
+        </map:matchers>
+        <map:actions>
+            <map:action name="ControlPanelAction" src="org.dspace.app.xmlui.aspect.administrative.ControlPanelAction"/>
+            <map:action name="CurrentActivityAction"
+                        src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction"/>
+            <map:action name="ClearCacheAction" src="org.apache.cocoon.acting.ClearCacheAction"/>
+        </map:actions>
+
+        <map:selectors>
+            <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+        </map:selectors>
+    </map:components>
+
+    <map:flow language="javascript">
+        <map:script src="authority.js"/>
+    </map:flow>
+
+    <map:pipelines>
+        <map:pipeline>
+
+            <map:select type="AuthenticatedSelector">
+                <map:when test="eperson">
+                    <!--
+                    This is the general entry / resume point for the
+                    management of all metadata fields and schemas.
+                    -->
+
+                    <map:match pattern="admin/scheme">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+
+                        <!-- editing a scheme -->
+                        <map:match type="request" pattern="schemeID">
+
+                            <map:match type="request" pattern="edit">
+                                <map:call function="startEditScheme"/>
+                            </map:match>
+                            <map:match type="request" pattern="editMetadata">
+                                <map:call function="startEditSchemeMetadata"/>
+                            </map:match>
+
+                            <map:match type="request" pattern="search">
+                                <map:call function="startManageConcept"/>
+                            </map:match>
+                        </map:match>
+
+                        <!-- manage all your schemes -->
+                        <map:call function="startManageScheme"/>
+                    </map:match>
+
+
+
+                    <map:match pattern="admin/concept">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+
+                        <!-- editing a concept -->
+                        <map:match type="request" pattern="conceptID">
+                            <map:match type="request" pattern="edit">
+                                <map:call function="startEditConcept"/>
+                            </map:match>
+                            <map:match type="request" pattern="editMetadata">
+                                <map:call function="startEditConceptMetadata"/>
+                            </map:match>
+                            <map:match type="request" pattern="addConcept">
+                                <map:call function="startAddConceptRelation"/>
+                            </map:match>
+                            <!-- Continue creating a new concept, unscoped -->
+                            <map:match type="request" pattern="search">
+                                <map:call function="doManageTerm">
+                                    <map:parameter name="concept" value="{1}"/>
+                                </map:call>
+                            </map:match>
+                        </map:match>
+
+                        <!-- manage all your concepts -->
+                        <map:call function="startManageConcept"/>
+                    </map:match>
+
+
+
+
+                    <map:match pattern="admin/term">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+
+                        <!-- editing a term -->
+                        <map:match type="request" pattern="termID">
+                            <map:match type="request" pattern="edit">
+                                <map:call function="startEditTerm"/>
+                            </map:match>
+                            <map:match type="request" pattern="editMetadata">
+                                <map:call function="startEditTermMetadata"/>
+                            </map:match>
+                        </map:match>
+
+                        <!-- manage all your concepts -->
+                        <map:call function="startManageTerm"/>
+                    </map:match>
+
+                </map:when>
+
+                <map:otherwise>
+                    <map:match pattern="admin/authority">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+                </map:otherwise>
+            </map:select>
+
+
+            <map:generate/>
+
+
+
+            <!-- Continue creating a new scheme, unscoped -->
+            <map:match pattern="scheme/*">
+                <map:transform type="SchemeViewer">
+                    <map:parameter name="scheme" value="{1}"/>
+                </map:transform>
+            </map:match>
+
+            <!-- Continue creating a new scheme, unscoped -->
+            <map:match pattern="concept/*">
+                <map:transform type="ConceptViewer">
+                    <map:parameter name="concept" value="{1}"/>
+                </map:transform>
+            </map:match>
+
+            <!-- Continue creating a new scheme, unscoped -->
+            <map:match pattern="term/*">
+                <map:transform type="TermViewer">
+                    <map:parameter name="term" value="{1}"/>
+                </map:transform>
+            </map:match>
+
+
+            <map:select type="AuthenticatedSelector">
+                <map:when test="eperson">
+
+                    <!-- Flow pages
+
+                    These pages may only be reached through a flow script. While typically all
+                    the user sees in their url bar is a short url like /admin/epeople or
+                    /admin/groups, in reality there is another url being used. The flow scripts
+                    always operate on these simple urls, but once the particular state is determined
+                    an distinguishing part is appended to the url for the particular state. Below are
+                    all those url.
+                    -->
+                    <map:match type="WildcardParameterMatcher" pattern="true">
+                        <map:parameter name="parameter-name" value="flow"/>
+                        <map:parameter name="flow" value="{flow-attribute:flow}"/>
+                        <map:match pattern="admin/**">
+                            <map:match type="WildcardParameterMatcher" pattern="true">
+                                <map:parameter name="parameter-name" value="notice"/>
+                                <map:parameter name="notice" value="{flow-attribute:notice}"/>
+                                <map:transform type="notice">
+                                    <map:parameter name="outcome" value="{flow-attribute:outcome}"/>
+                                    <map:parameter name="header" value="{flow-attribute:header}"/>
+                                    <map:parameter name="message" value="{flow-attribute:message}"/>
+                                    <map:parameter name="characters" value="{flow-attribute:characters}"/>
+                                </map:transform>
+                            </map:match>
+                        </map:match>
+
+                        <!-- manage scheme -->
+                        <map:match pattern="admin/not-authorized">
+                            <map:transform type="NotAuthorized"/>
+                        </map:match>
+
+
+                        <map:match pattern="admin/scheme/main">
+                            <map:transform type="ManageSchemeMain">
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/scheme/add">
+                            <map:transform type="AddSchemeForm">
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+
+                        <map:match pattern="admin/scheme/edit">
+                            <map:transform type="EditSchemeForm">
+                                <map:parameter name="scheme" value="{flow-attribute:schemeId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/scheme/delete">
+                            <map:transform type="DeleteSchemeConfirm">
+                                <map:parameter name="schemeIds" value="{flow-attribute:schemeIds}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <!-- manage concept -->
+                        <map:match pattern="admin/scheme/*/concept/main">
+                            <map:transform type="ManageConceptMain">
+                                <map:parameter name="scheme" value="{1}"/>
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/scheme/*/concept/add">
+                            <map:transform type="AddConceptForm">
+                                <map:parameter name="scheme" value="{1}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/scheme/*/concept/delete">
+                            <map:transform type="DeleteConceptConfirm">
+                                <map:parameter name="scheme" value="{1}"/>
+                                <map:parameter name="concepts" value="{flow-attribute:ids}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+
+                        <map:match pattern="admin/concept/main">
+                            <map:transform type="ManageConceptMain">
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="scheme" value="{flow-attribute:schemeId}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/concept/add">
+                            <map:transform type="AddConceptForm">
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+
+                        <map:match pattern="admin/concept/edit">
+                            <map:transform type="EditConceptForm">
+                                <map:parameter name="concept" value="{flow-attribute:conceptId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+
+                        <map:match pattern="admin/concept/editMetadata">
+                            <map:transform type="EditConceptMetadataValueForm">
+                                <map:parameter name="conceptID" value="{flow-attribute:conceptId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/concept/addRelation">
+                            <map:transform type="AddConcept2ConceptRelationForm">
+                                <map:parameter name="conceptID" value="{flow-attribute:conceptId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/scheme/editMetadata">
+                            <map:transform type="EditSchemeMetadataValueForm">
+                                <map:parameter name="schemeID" value="{flow-attribute:schemeId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/term/editMetadata">
+                            <map:transform type="EditTermMetadataValueForm">
+                                <map:parameter name="termID" value="{flow-attribute:termId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/concept/delete">
+                            <map:transform type="DeleteConceptConfirm">
+                                <map:parameter name="conceptIds" value="{flow-attribute:conceptIds}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="schemeId" value="{flow-attribute:schemeId}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <!-- manage concept -->
+                        <map:match pattern="admin/concept/*/term/main">
+                            <map:transform type="ManageTermMain">
+                                <map:parameter name="concept" value="{1}"/>
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/concept/*/term/add">
+                            <map:transform type="AddTermForm">
+                                <map:parameter name="concept" value="{1}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+                        <map:match pattern="admin/concept/*/term/delete">
+                            <map:transform type="DeleteTermConfirm">
+                                <map:parameter name="concept" value="{1}"/>
+                                <map:parameter name="termIds" value="{flow-attribute:ids}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/term/main">
+                            <map:transform type="ManageTermMain">
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="conceptId" value="{flow-attribute:conceptId}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/term/add">
+                            <map:transform type="AddTermForm">
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+
+                        <map:match pattern="admin/term/edit">
+                            <map:transform type="EditTermForm">
+                                <map:parameter name="term" value="{flow-attribute:termId}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <map:match pattern="admin/term/delete">
+                            <map:transform type="DeleteTermConfirm">
+                                <map:parameter name="termIds" value="{flow-attribute:termIds}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                <map:parameter name="conceptId" value="{flow-attribute:conceptId}"/>
+                            </map:transform>
+                        </map:match>
+
+                    </map:match>
+                </map:when>
+                <map:otherwise>
+                    <map:match pattern="admin/authority">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+
+                </map:otherwise>
+            </map:select>
+
+            <!--
+                    Add the basic navigation content to every page.
+                    -->
+            <map:transform type="Navigation"/>
+
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+
+        </map:pipeline>
+
+    </map:pipelines>
+</map:sitemap>
