@@ -72,6 +72,8 @@
                     <xsl:call-template name="cc-license">
                         <xsl:with-param name="metadataURL" select="./dri:referenceSet/dri:reference/@url"/>
                     </xsl:call-template>
+                    <xsl:call-template name="requestCorrection">
+                    </xsl:call-template>
                 </xsl:if>
         <xsl:apply-templates select="@pagination">
             <xsl:with-param name="position">bottom</xsl:with-param>
@@ -675,4 +677,19 @@
         </xsl:if>
     </xsl:template>
 
+	<xsl:template name="requestCorrection">
+		<xsl:if test="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier'][@qualifier='email']">
+			<p class="InformarError">
+				<a>
+					<xsl:attribute name="href">
+						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+						<xsl:value-of select="substring-before(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'],'handle/')"/>
+						<xsl:text>/solicitarCorreccion/</xsl:text>
+						<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'],'handle/')"/>
+					</xsl:attribute>
+					<i18n:text>xmlui.ArtifactBrowser.SolicitarCorreccionForm.link</i18n:text>
+				</a>
+			</p>
+		</xsl:if>
+  	</xsl:template>
 </xsl:stylesheet>

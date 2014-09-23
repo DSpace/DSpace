@@ -31,6 +31,8 @@ and searching the repository.
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
+			<map:transformer name="SolicitarCorreccionForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.SolicitarCorreccionForm" />
+			<map:transformer name="SolicitarCorreccionSent" 	src="org.dspace.app.xmlui.aspect.artifactbrowser.SolicitarCorreccionSent" />
         </map:transformers>
 
 
@@ -44,6 +46,7 @@ and searching the repository.
                         <map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction"/>
                         <map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction"/>
                         <map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction"/>
+                        <map:action name="SendSolicitarCorreccionAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendSolicitarCorreccionAction" />
                 </map:actions>
 
 
@@ -212,7 +215,31 @@ and searching the repository.
                                 <map:transform type="Contact"/>
                                 <map:serialize type="xml"/>
                         </map:match>
-
+						<map:match pattern="solicitarCorreccion/**">
+							<map:select type="AuthenticatedSelector"> 
+								    <map:when test="eperson"> 
+								     	<map:act type="SendSolicitarCorreccionAction">
+											<map:parameter name="handle" value="{1}" />
+											<map:transform type="SolicitarCorreccionForm">
+												<map:parameter name="handle" value="{handle}" />
+												<map:parameter name="comments" value="{comments}" />
+												<map:parameter name="email" value="{email}" />
+												<map:parameter name="page" value="{page}" />
+											</map:transform>
+						
+											<map:serialize type="xml" />
+										</map:act>
+										<map:transform type="SolicitarCorreccionSent" />
+										<map:serialize type="xml" />
+								    </map:when> 
+								    <map:otherwise> 
+								     <map:transform type="RestrictedItem"/> 
+										<map:serialize type="xml"/> 
+								    </map:otherwise> 
+								  </map:select>
+								<map:transform type="SolicitarCorreccionSent" />
+								<map:serialize type="xml" />
+							</map:match>
 
                         <!-- Not a URL we care about, so just pass it on. -->
                         <map:serialize type="xml"/>

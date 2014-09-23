@@ -1369,7 +1369,11 @@ table.discovery-filters th.new-filter-header
     padding-top: 5px;
 }
 
-
 .searchTime{
     color: #999999;
+}
+
+.InformarError{
+	margin-top:4em;
+	margin-left:20em;
 }

@@ -2276,4 +2276,22 @@
     <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_help">A more recent version of this item is in the Workflow.</message>
 
     <!-- End Versioning -->
+    
+    <!-- Request correction -->
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.link">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.title">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.trail">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.head">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.para1">Thanks for reporting the error in the item: {0}. We will review it as soon as possible</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.email">Your email</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.email_help">This address will be used to track your suggestion.</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.comments">Error description</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionForm.submit">Send</message>
+	
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionSent.title">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionSent.trail">Request correction</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionSent.head">Correction request sent</message>
+	<message key="xmlui.ArtifactBrowser.SolicitarCorreccionSent.para1">Your request has been received</message>
+	<!-- End Correction Request -->
+
 </catalogue>
