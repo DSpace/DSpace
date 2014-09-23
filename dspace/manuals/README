@@ -1,0 +1,5 @@
+1. Create the following folders
+/dspace/backup
+/dspace/scripts
+2. copy dspace-src/dspace/scripts/* to /dspace/scripts
+

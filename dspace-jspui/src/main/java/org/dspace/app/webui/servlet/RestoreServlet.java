@@ -64,7 +64,8 @@ public class RestoreServlet extends DSpaceServlet
         if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
         {
                 String message = null;
-		String inputType = request.getParameter("inputType");
+		//String inputType = request.getParameter("inputType");
+		String inputType = "Hello World";
         		
         	request.setAttribute("snapshotname", inputType);
       	
