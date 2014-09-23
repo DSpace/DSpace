@@ -116,8 +116,8 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_thesisSemester">Thesis Semester</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_discipline">Discipline</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_theisDegreeLevel">Thesis Degree Level</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_discipline">Thesis Discipline</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_thesisDegreeLevel">Thesis Degree Level</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contentType">Content Type</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
@@ -137,6 +137,11 @@
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_other">Other Contributor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
+   <message key="xmlui.Discovery.AbstractdSearch.type_thesisSemester">Thesis Semester</message>
+   <message key="xmlui.Discovery.AbstractSearch.type_advisor">Advisor</message>
+   <message key="xmlui.Discovery.AbstractSearch.type_discipline">Thesis Discipline</message>
+   <message key="xmlui.Discovery.AbstractSearch.type_thesisDegreeLevel">Thesis Degree Level</message>
+
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
@@ -144,7 +149,7 @@
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
 
 
-	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
+  	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with">Or enter first few letters:</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help">Browse for items that begin with these letters</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select">Jump to a point in the index:</message>
@@ -268,6 +273,11 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Full Text Search</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.contentType">Content Type</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.discipline">Thesis Discipline</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.thesisSemester">Thesis Semester</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.thesisDegreeLevel">Thesis Degree Level</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.advisor">Advisor</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>

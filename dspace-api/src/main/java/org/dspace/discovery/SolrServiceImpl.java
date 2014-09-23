@@ -1487,45 +1487,71 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         SimpleDateFormat[] dfArr;
 
-        // Choose the likely date formats based on string length
-        switch (t.length())
-        {
+		// inspect for seasons
+
+
+		String spring = "(\\d{4}) (?i:.*SPRING.*)";
+		String summer = "(\\d{4}) (?i:.*SUMMER.*)";
+		String fall = "(\\d{4}) (?i:.*FALL.*)";
+		String winter = "(\\d{4}) (?i:.*WINTER.*)";
+
+
+		if (t.matches(spring)){
+			// munge for April	 
+			t = t.replaceAll(spring,"$1 Apr 01");
+		} 
+		if (t.matches(summer)){
+			// munge for July	 
+			t = t.replaceAll(summer,"$1 Jul 01");
+		}
+		if (t.matches(fall)){
+			// munge for September	 
+			t = t.replaceAll(fall,"$1 Sep 01");
+		}		
+		if (t.matches(winter)){
+			// munge for December	 
+			t = t.replaceAll(winter,"$1 Dec 01");
+		}
+
+		// Choose the likely date formats based on string length
+		switch (t.length())
+		{
 			// case from 1 to 3 go through adding anyone a single 0. Case 4 define
 			// for all the SimpleDateFormat
-        	case 1:
-        		t = "0" + t;
-        	case 2:
-        		t = "0" + t;
-        	case 3:
-        		t = "0" + t;
-            case 4:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy")};
-                break;
-            case 6:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyyMM")};
-                break;
-            case 7:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy-MM")};
-                break;
-            case 8:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyyMMdd"),
-                        new SimpleDateFormat("yyyy MMM")};
-                break;
-            case 10:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy-MM-dd")};
-                break;
-            case 11:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy MMM dd")};
-                break;
-            case 20:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mm:ss'Z'")};
-                break;
-            default:
-                dfArr = new SimpleDateFormat[]{new SimpleDateFormat(
-                        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")};
-                break;
-        }
+			case 1:
+				t = "0" + t;
+			case 2:
+				t = "0" + t;
+			case 3:
+				t = "0" + t;
+			case 4:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy")};
+				break;
+			case 6:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyyMM")};
+				break;
+			case 7:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy-MM")};
+				break;
+			case 8:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyyMMdd"),
+						new SimpleDateFormat("yyyy MMM")};
+				break;
+			case 10:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy-MM-dd")};
+				break;
+			case 11:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy MMM dd")};
+				break;
+			case 20:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ss'Z'")};
+				break;
+			default:
+				dfArr = new SimpleDateFormat[]{new SimpleDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")};
+				break;
+		}
 
         for (SimpleDateFormat df : dfArr)
         {
