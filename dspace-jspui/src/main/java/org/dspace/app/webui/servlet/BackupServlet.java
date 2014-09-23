@@ -46,6 +46,30 @@ public class BackupServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(BatchMetadataImportServlet.class);
+    private static boolean isFileLocked(String filename) {
+    	boolean isLocked=false;
+    	RandomAccessFile fos=null;
+    	try {
+        	File file = new File(filename);
+        	if(file.exists()) {
+            	fos=new RandomAccessFile(file,"rw");
+        }
+    	} catch (FileNotFoundException e) {
+        	isLocked=true;
+    	}catch (Exception e) {
+        	// handle exception
+    	}finally {
+        	try {
+            	if(fos!=null) {
+                	fos.close();
+            	}
+        	}catch(Exception e) {
+            		//handle exception
+        	}
+    	}
+    	return isLocked;
+    }
+
 
     /**
      * GET request is only ever used to show the upload form
@@ -69,16 +93,24 @@ public class BackupServlet extends DSpaceServlet
 	//Get the location for Backup folder
 	String backupfolder = ConfigurationManager.getProperty("backup.dir");
 	String dspacedir = ConfigurationManager.getProperty("dspace.dir");
-	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-	//get current date time with Date()
-	Date date = new Date();
-	String snapshot = "snapshot_";
-	String inputTypes = snapshot.concat(dateFormat.format(date));	
+	String lockfile = ConfigurationManager.getProperty("backuprestore.lockfile");
+	if(!isFileLocked(lockfile)){
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		//get current date time with Date()
+		Date date = new Date();
+		String snapshot = "snapshot_";
+		String inputTypes = snapshot.concat(dateFormat.format(date));	
 
-    	request.setAttribute("snapshotname", inputTypes);
-    	request.setAttribute("message", backupfolder);
-	Runtime runTime = Runtime.getRuntime();
-	Process process = runTime.exec("sh " + dspacedir + "/scripts/backup.sh " + inputTypes);	
+    		request.setAttribute("snapshotname", inputTypes);
+    		request.setAttribute("message", backupfolder);
+	    	request.setAttribute("has-error", "false");
+		Runtime runTime = Runtime.getRuntime();
+		Process process = runTime.exec("sh " + dspacedir + "/scripts/backup.sh " + inputTypes);	
+	} else {
+    		request.setAttribute("snapshotname", null);
+        	request.setAttribute("message", "A backup or restore task is still ongoing..wait for its completion.");
+	    	request.setAttribute("has-error", "true");
+	}
     	
         // Show the upload screen
         JSPManager.showJSP(request, response, "/dspace-admin/backup.jsp");

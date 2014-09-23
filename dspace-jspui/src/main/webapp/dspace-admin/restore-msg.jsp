@@ -24,6 +24,8 @@
 
 	String snapshotname = (String)request.getAttribute("snapshotname");
 	String message = (String)request.getAttribute("message");
+	String hasErrorS = (String)request.getAttribute("has-error");
+	boolean hasError = (hasErrorS==null) ? true : (Boolean.parseBoolean((String)request.getAttribute("has-error")));
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.restore.title"
@@ -34,8 +36,26 @@
                nocache="true">
 
     <h1><fmt:message key="jsp.dspace-admin.restore.title"/></h1>
-
-
-    <label value="<%= snapshotname %>">Restoring with Snapshot Name: <%= snapshotname %></label>	
+<%
+	if (hasErrorS == null){
+	
+	}
+	else if (hasError && message!=null){
+%>
+	<%= message %>
+<%  
+    }
+	else if (hasError && message==null){
+%>
+		<div class="alert alert-warning"><fmt:message key="jsp.dspace-admin.batchmetadataimport.genericerror"/></div>
+<%  
+	}
+	else {
+%>
+		<div class="alert alert-info"><fmt:message key="jsp.dspace-admin.batchmetadataimport.success"/></div>
+    		<label value="<%= snapshotname %>">Restoring with Snapshot Name: <%= snapshotname %></label>	
+<%  
+	}
+%>
     
 </dspace:layout>

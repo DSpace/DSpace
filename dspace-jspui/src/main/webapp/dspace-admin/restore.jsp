@@ -38,7 +38,7 @@
 
     <h1><fmt:message key="jsp.dspace-admin.restore.title"/></h1>
 
-    <form method="post" enctype="multipart/form-data" action="">
+    <form method="post" action="">
 	
         <div class="form-group">
 			<label for="inputType"><fmt:message key="jsp.dspace-admin.restore.selectsnapshot"/></label>

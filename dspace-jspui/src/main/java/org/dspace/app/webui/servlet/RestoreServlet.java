@@ -31,6 +31,9 @@ import org.dspace.core.*;
 import org.dspace.utils.DSpace;
 import org.elasticsearch.common.collect.Lists;
 import org.dspace.core.ConfigurationManager;
+import java.lang.Runtime;
+import java.io.RandomAccessFile;
+import java.io.File;
 
 
 /**
@@ -42,6 +45,30 @@ public class RestoreServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(BatchMetadataImportServlet.class);
+    private static boolean isFileLocked(String filename) {
+    	boolean isLocked=false;
+    	RandomAccessFile fos=null;
+    	try {
+        	File file = new File(filename);
+        	if(file.exists()) {
+            	fos=new RandomAccessFile(file,"rw");
+        }
+    	} catch (FileNotFoundException e) {
+        	isLocked=true;
+    	}catch (Exception e) {
+        	// handle exception
+    	}finally {
+        	try {
+            	if(fos!=null) {
+                	fos.close();
+            	}
+        	}catch(Exception e) {
+            		//handle exception
+        	}
+    	}
+    	return isLocked;
+    }
+
 
     /**
      * Respond to a post request for metadata bulk importing via csv
@@ -61,13 +88,25 @@ public class RestoreServlet extends DSpaceServlet
     {
         // First, see if we have a multipart request (uploading a metadata file)
         String contentType = request.getContentType();     
-        if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
+	//Get the location for Backup folder
+	String backupfolder = ConfigurationManager.getProperty("backup.dir");
+	String dspacedir = ConfigurationManager.getProperty("dspace.dir");
+	String lockfile = ConfigurationManager.getProperty("backuprestore.lockfile");
+        if (contentType != null)
         {
                 String message = null;
-		//String inputType = request.getParameter("inputType");
-		String inputType = "Hello World";
-        		
-        	request.setAttribute("snapshotname", inputType);
+		String inputType = (String)request.getParameter("inputType");
+		//String inputType = "Hello World";
+        	if(isFileLocked(lockfile) != true){		
+        		request.setAttribute("snapshotname", inputType);
+	    		request.setAttribute("has-error", "false");
+			Runtime runTime = Runtime.getRuntime();
+			Process process = runTime.exec("sh " + dspacedir + "/scripts/restore.sh " + backupfolder + "/" + inputType);	
+		} else {
+        		request.setAttribute("snapshotname", null);
+        		request.setAttribute("message", "A backup or restore task is still ongoing..wait for its completion.");
+	    		request.setAttribute("has-error", "true");
+		}
       	
         	// Show the upload screen
     		JSPManager.showJSP(request, response, "/dspace-admin/restore-msg.jsp");
@@ -76,6 +115,7 @@ public class RestoreServlet extends DSpaceServlet
         else
         {
 	    request.setAttribute("has-error", "true");
+	    request.setAttribute("message", "Some Unknown exception has occured.");
             // Show the upload screen
             JSPManager.showJSP(request, response, "/dspace-admin/restore.jsp");
         }
@@ -116,6 +156,7 @@ public class RestoreServlet extends DSpaceServlet
 	}
 
     	request.setAttribute("snapshots", inputTypes);
+	request.setAttribute("has-error", "false");
     	
         // Show the upload screen
         JSPManager.showJSP(request, response, "/dspace-admin/restore.jsp");
