@@ -33,10 +33,7 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.util.*;
 
 /**
  * Class representing a collection.
@@ -1507,6 +1504,69 @@ public class Collection extends DSpaceObject
         return myCollections;
     }
 
+    public static Collection[] findAuthorizedOptimized(Context context, int actionID) throws java.sql.SQLException
+    {
+        List<Collection> myResults = new ArrayList<Collection>();
+
+        if(AuthorizeManager.isAdmin(context))
+        {
+            return findAll(context);
+        }
+
+        //Check eperson->policy
+        Collection[] directToCollection = findDirectMapped(context, actionID);
+        for (int i = 0; i< directToCollection.length; i++)
+        {
+            if(!myResults.contains(directToCollection[i]))
+            {
+                myResults.add(directToCollection[i]);
+            }
+        }
+
+        //Check eperson->groups->policy
+        Collection[] groupToCollection = findGroupMapped(context, actionID);
+
+        for (int i = 0; i< groupToCollection.length; i++)
+        {
+            if(!myResults.contains(groupToCollection[i]))
+            {
+                myResults.add(groupToCollection[i]);
+            }
+        }
+
+        //Check eperson->groups->groups->policy->collection
+        //i.e. Malcolm Litchfield is a member of OSU_Press_Embargo,
+        // which is a member of: COLLECTION_24_ADMIN, COLLECTION_24_SUBMIT
+        Collection[] group2GroupToCollection = findGroup2GroupMapped(context, actionID);
+
+        for (int i = 0; i< group2GroupToCollection.length; i++)
+        {
+            if(!myResults.contains(group2GroupToCollection[i]))
+            {
+                myResults.add(group2GroupToCollection[i]);
+            }
+        }
+
+        //TODO Check eperson->groups->groups->policy->community
+
+
+        //TODO Check eperson->groups->policy->community
+        // i.e. Typical Community Admin -- name.# > COMMUNITY_10_ADMIN > Ohio State University Press
+
+        //Check eperson->comm-admin
+
+
+        // Return the collections, sorted alphabetically
+        Collections.sort(myResults, new CollectionComparator());
+
+        Collection[] myCollections = new Collection[myResults.size()];
+        myCollections = (Collection[]) myResults.toArray(myCollections);
+
+        return myCollections;
+
+
+    }
+
 	/**
      * counts items in this collection
      *
@@ -1608,5 +1668,117 @@ public class Collection extends DSpaceObject
         //Also fire a modified event since the collection HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, 
                 getID(), null, getIdentifiers(ourContext)));
+    }
+
+    //TODO replace hard-coded action_id's with constants...
+    public static Collection[] findDirectMapped(Context context, int actionID) throws java.sql.SQLException
+    {
+        //eperson_id -> resourcepolicy.eperson_id
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT * FROM collection, resourcepolicy, eperson " +
+                        "WHERE resourcepolicy.resource_id = collection.collection_id AND " +
+                        "eperson.eperson_id = resourcepolicy.eperson_id AND "+
+                        "resourcepolicy.resource_type_id = 3 AND "+
+                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
+                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
+        return produceCollectionsFromQuery(context, tri);
+    }
+
+    public static Collection[] findGroupMapped(Context context, int actionID) throws java.sql.SQLException
+    {
+        //eperson_id -> resourcepolicy.eperson_id
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT * FROM collection, resourcepolicy, eperson, epersongroup2eperson " +
+                        "WHERE resourcepolicy.resource_id = collection.collection_id AND "+
+                        "eperson.eperson_id = epersongroup2eperson.eperson_id AND "+
+                        "epersongroup2eperson.eperson_group_id = resourcepolicy.epersongroup_id AND "+
+                        "resourcepolicy.resource_type_id = 3 AND "+
+                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
+                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
+        return produceCollectionsFromQuery(context, tri);
+    }
+
+    public static Collection[] findGroup2GroupMapped(Context context, int actionID) throws SQLException {
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT \n" +
+                        "  * \n" +
+                        "FROM \n" +
+                        "  public.eperson, \n" +
+                        "  public.epersongroup2eperson, \n" +
+                        "  public.epersongroup, \n" +
+                        "  public.group2group, \n" +
+                        "  public.resourcepolicy rp_parent, \n" +
+                        "  public.collection\n" +
+                        "WHERE \n" +
+                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
+                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
+                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
+                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
+                        "  collection.collection_id = rp_parent.resource_id AND\n" +
+                        "  eperson.eperson_id = ? AND \n" +
+                        "  (rp_parent.action_id = 3 OR \n" +
+                        "  rp_parent.action_id = 11  \n" +
+                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
+        return produceCollectionsFromQuery(context, tri);
+    }
+
+    public static Collection[] findGroup2CommunityMapped(Context context) throws SQLException {
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT \n" +
+                        "  * \n" +
+                        "FROM \n" +
+                        "  public.eperson, \n" +
+                        "  public.epersongroup2eperson, \n" +
+                        "  public.epersongroup, \n" +
+                        "  public.community, \n" +
+                        "  public.resourcepolicy\n" +
+                        "WHERE \n" +
+                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
+                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
+                        "  resourcepolicy.epersongroup_id = epersongroup.eperson_group_id AND\n" +
+                        "  resourcepolicy.resource_id = community.community_id AND\n" +
+                        " ( resourcepolicy.action_id = 3 OR \n" +
+                        "  resourcepolicy.action_id = 11) AND \n" +
+                        "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser().getID());
+
+        return produceCollectionsFromCommunityQuery(context, tri);
+    }
+
+    public static class CollectionComparator implements Comparator<Collection> {
+        @Override
+        public int compare(Collection collection1, Collection collection2) {
+            return collection1.getName().compareTo(collection2.getName());
+        }
+    }
+
+    public static Collection[] produceCollectionsFromQuery(Context context, TableRowIterator tri) throws SQLException {
+        List<Collection> collections = new ArrayList<Collection>();
+
+        while(tri.hasNext()) {
+            TableRow row = tri.next();
+            Collection collection = Collection.find(context, row.getIntColumn("collection_id"));
+            collections.add(collection);
+        }
+
+        return collections.toArray(new Collection[0]);
+    }
+
+    public static Collection[] produceCollectionsFromCommunityQuery(Context context, TableRowIterator tri) throws SQLException {
+        List<Collection> collections = new ArrayList<Collection>();
+
+        while(tri.hasNext()) {
+            TableRow commRow = tri.next();
+            Community community = Community.find(context, commRow.getIntColumn("community_id"));
+
+            Collection[] comCollections = community.getCollections();
+            for(Collection collection : comCollections) {
+                collections.add(collection);
+            }
+
+            //ugh, handle that communities has subcommunities...
+            //TODO  community.getAllCollections();
+
+        }
+        return collections.toArray(new Collection[0]);
     }
 }
