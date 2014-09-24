@@ -507,11 +507,7 @@ public class Bitstream extends DSpaceObject
      */
     void delete() throws SQLException
     {
-        boolean oracle = false;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            oracle = true;
-        }
+        boolean oracle = DatabaseManager.isOracle();
 
         // changed to a check on remove
         // Check authorisation

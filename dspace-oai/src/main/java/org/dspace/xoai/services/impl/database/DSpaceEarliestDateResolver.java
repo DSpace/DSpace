@@ -13,7 +13,6 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.database.EarliestDateResolver;
 import org.dspace.xoai.services.api.database.FieldResolver;
 import org.dspace.xoai.util.DateUtils;
@@ -23,22 +22,15 @@ import java.sql.SQLException;
 import java.util.Date;
 
 public class DSpaceEarliestDateResolver implements EarliestDateResolver {
-    private static Logger log = LogManager.getLogger(DSpaceEarliestDateResolver.class);
+    private static final Logger log = LogManager.getLogger(DSpaceEarliestDateResolver.class);
 
     @Autowired
     private FieldResolver fieldResolver;
 
-    @Autowired
-    private ConfigurationService configurationService;
-
     @Override
     public Date getEarliestDate(Context context) throws InvalidMetadataFieldException, SQLException {
         String query = "SELECT MIN(text_value) as value FROM metadatavalue WHERE metadata_field_id = ?";
-        String db = configurationService.getProperty("db.name");
-        boolean postgres = true;
-        // Assuming Postgres as default
-        if ("oracle".equals(db))
-            postgres = false;
+        boolean postgres = ! DatabaseManager.isOracle();
 
         if (!postgres) {
             query = "SELECT MIN(TO_CHAR(text_value)) as value FROM metadatavalue WHERE metadata_field_id = ?";

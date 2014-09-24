@@ -1143,11 +1143,7 @@ public class LogAnalyser
     public static Integer getNumItems(Context context, String type)
         throws SQLException
     {
-        boolean oracle = false;
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-        {
-            oracle = true;
-        }
+        boolean oracle = DatabaseManager.isOracle();
 
         // FIXME: this method is clearly not optimised
         

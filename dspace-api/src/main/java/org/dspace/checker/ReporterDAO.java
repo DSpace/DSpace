@@ -180,7 +180,7 @@ public class ReporterDAO extends DAOSupport
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
 
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
             }

@@ -59,11 +59,10 @@ public class EPerson extends DSpaceObject
     public static final int LANGUAGE = 5;
     
     /** log4j logger */
-    private static Logger log = Logger.getLogger(EPerson.class);
-
+    private static final Logger log = Logger.getLogger(EPerson.class);
 
     /** The row in the table representing this eperson */
-    private TableRow myRow;
+    private final TableRow myRow;
 
     /** Flag set when data is modified, for events */
     private boolean modified;
@@ -296,7 +295,7 @@ public class EPerson extends DSpaceObject
         }
 
         // Add offset and limit restrictions - Oracle requires special code
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
@@ -454,7 +453,7 @@ public class EPerson extends DSpaceObject
                 });
 				
 		// use getIntColumn for Oracle count data
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             count = Long.valueOf(row.getIntColumn("epcount"));
         }

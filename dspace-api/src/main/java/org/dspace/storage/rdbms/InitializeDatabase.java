@@ -11,9 +11,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.dspace.utils.DSpace;
 
 /**
  * Command-line executed class for initializing the DSpace database. This should
@@ -25,7 +25,7 @@ import org.dspace.utils.DSpace;
 public class InitializeDatabase
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(InitializeDatabase.class);
+    private static final Logger log = Logger.getLogger(InitializeDatabase.class);
 
     public static void main(String[] argv)
     {
@@ -61,13 +61,13 @@ public class InitializeDatabase
 
     /**
      * Attempt to get the named script, with the following rules:
-     * etc/<db.name>/<name>
+     * etc/<DBMS name>/<name>
      * etc/<name>
      * <name>
      */
     private static FileReader getScript(String name) throws FileNotFoundException, IOException
     {
-        String dbName = new DSpace().getConfigurationService().getProperty("db.name") ;
+        String dbName = DatabaseManager.getDbName().toLowerCase(Locale.ROOT);
 
         File myFile = null;
         

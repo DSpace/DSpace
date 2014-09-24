@@ -7,14 +7,16 @@
  */
 package org.dspace.ctask.general;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * MicrosoftTranslator translates metadata fields using Microsoft Translation API v2
@@ -35,7 +37,7 @@ public class MicrosoftTranslator extends AbstractTranslator
     private static final String baseUrl = "http://api.microsofttranslator.com/V2/Http.svc/Translate";
     private static String apiKey = "";
 
-    private static Logger log = Logger.getLogger(MicrosoftTranslator.class);
+    private static final Logger log = Logger.getLogger(MicrosoftTranslator.class);
 
 
     @Override
@@ -55,13 +57,13 @@ public class MicrosoftTranslator extends AbstractTranslator
         String url = baseUrl + "?appId=" + apiKey;
         url += "&to=" + to + "&from=" + from + "&text=" + text;
 
-        HttpClient client = new HttpClient();
-        HttpMethod hm = new GetMethod(url);
-        int code = client.executeMethod(hm);
-        log.debug("Response code from API call is " + code);
+        HttpClient client = new DefaultHttpClient();
+        HttpGet hm = new HttpGet(url);
+        HttpResponse httpResponse = client.execute(hm);
+        log.debug("Response code from API call is " + httpResponse);
 
-        if(code == 200) {
-            String response = hm.getResponseBodyAsString();
+        if(httpResponse.getStatusLine().getStatusCode() == 200) {
+            String response = IOUtils.toString(httpResponse.getEntity().getContent(), StandardCharsets.ISO_8859_1);
             response = response.replaceAll("<string xmlns=\"http://schemas.microsoft.com/2003/10/Serialization/\">","");
             response = response.replaceAll("</string>","");
             translatedText = response;

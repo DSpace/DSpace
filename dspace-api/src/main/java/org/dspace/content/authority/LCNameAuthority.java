@@ -8,6 +8,8 @@
 package org.dspace.content.authority;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
 import javax.xml.parsers.SAXParserFactory;
@@ -25,11 +27,12 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.DCPersonName;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.util.EncodingUtil;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.HttpException;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  * Sample personal name authority based on Library of Congress Name Authority
@@ -56,7 +59,7 @@ import org.apache.commons.httpclient.HttpException;
  */
 public class LCNameAuthority implements ChoiceAuthority
 {
-    private static Logger log = Logger.getLogger(LCNameAuthority.class);
+    private static final Logger log = Logger.getLogger(LCNameAuthority.class);
 
     // get these from configuration
     private static String url = null;
@@ -83,6 +86,7 @@ public class LCNameAuthority implements ChoiceAuthority
     }
 
     // punt!  this is a poor implementation..
+    @Override
     public Choices getBestMatch(String field, String text, int collection, String locale)
     {
         return getMatches(field, text, collection, 0, 2, locale);
@@ -92,6 +96,7 @@ public class LCNameAuthority implements ChoiceAuthority
      * Match a proposed value against name authority records
      * Value is assumed to be in "Lastname, Firstname" format.
      */
+    @Override
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
         Choices result = queryPerson(text, start, limit);
@@ -105,6 +110,7 @@ public class LCNameAuthority implements ChoiceAuthority
 
     // punt; supposed to get the canonical display form of a metadata authority key
     // XXX FIXME implement this with a query on the authority key, cache results
+    @Override
     public String getLabel(String field, String key, String locale)
     {
         return key;
@@ -135,24 +141,30 @@ public class LCNameAuthority implements ChoiceAuthority
             limit = 50;
         }
 
-        NameValuePair args[] = new NameValuePair[6];
-        args[0] = new NameValuePair("operation", "searchRetrieve");
-        args[1] = new NameValuePair("version", "1.1");
-        args[2] = new NameValuePair("recordSchema", "info:srw/schema/1/marcxml-v1.1");
-        args[3] = new NameValuePair("query", query.toString());
-        args[4] = new NameValuePair("maximumRecords", String.valueOf(limit));
-        args[5] = new NameValuePair("startRecord", String.valueOf(start+1));
-        HttpClient hc = new HttpClient();
-        String srUrl = url + "?" + EncodingUtil.formUrlEncode(args, "UTF8");
-        GetMethod get = new GetMethod(srUrl);
+        URI sruUri;
+        try {
+            URIBuilder builder = new URIBuilder(url);
+            builder.addParameter("operation", "searchRetrieve");
+            builder.addParameter("version", "1.1");
+            builder.addParameter("recordSchema", "info:srw/schema/1/marcxml-v1.1");
+            builder.addParameter("query", query.toString());
+            builder.addParameter("maximumRecords", String.valueOf(limit));
+            builder.addParameter("startRecord", String.valueOf(start+1));
+            sruUri = builder.build();
+        } catch (URISyntaxException e) {
+            log.error("SRU query failed: ", e);
+            return new Choices(true);
+        }
+        HttpGet get = new HttpGet(sruUri);
 
-        log.debug("Trying SRU query, URL="+srUrl);
+        log.debug("Trying SRU query, URL=" + sruUri);
 
         // 2. web request
         try
         {
-            int status = hc.executeMethod(get);
-            if (status == 200)
+            HttpClient hc = new DefaultHttpClient();
+            HttpResponse response = hc.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200)
             {
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 SAXParser sp = spf.newSAXParser();
@@ -164,7 +176,8 @@ public class LCNameAuthority implements ChoiceAuthority
                 xr.setFeature("http://xml.org/sax/features/namespaces", true);
                 xr.setContentHandler(handler);
                 xr.setErrorHandler(handler);
-                xr.parse(new InputSource(get.getResponseBodyAsStream()));
+                HttpEntity responseBody = response.getEntity();
+                xr.parse(new InputSource(responseBody.getContent()));
 
                 // this probably just means more results available..
                 if (handler.hits != handler.result.size())
@@ -195,11 +208,6 @@ public class LCNameAuthority implements ChoiceAuthority
                 return new Choices(handler.result.toArray(new Choice[handler.result.size()]),
                                    start, handler.hits, confidence, more);
             }
-        }
-        catch (HttpException e)
-        {
-            log.error("SRU query failed: ", e);
-            return new Choices(true);
         }
         catch (IOException e)
         {
@@ -246,6 +254,7 @@ public class LCNameAuthority implements ChoiceAuthority
         // BEWARE:  subclass's startElement method should call super()
         // to null out 'value'.  (Don't you miss the method combination
         // options of a real object system like CLOS?)
+        @Override
         public void characters(char[] ch, int start, int length)
             throws SAXException
         {
@@ -263,6 +272,7 @@ public class LCNameAuthority implements ChoiceAuthority
             }
         }
 
+        @Override
         public void endElement(String namespaceURI, String localName,
                                  String qName)
             throws SAXException
@@ -327,6 +337,7 @@ public class LCNameAuthority implements ChoiceAuthority
         }
 
         // subclass overriding this MUST call it with super()
+        @Override
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
             throws SAXException
@@ -353,12 +364,14 @@ public class LCNameAuthority implements ChoiceAuthority
             }
         }
 
+        @Override
         public void error(SAXParseException exception)
             throws SAXException
         {
             throw new SAXException(exception);
         }
 
+        @Override
         public void fatalError(SAXParseException exception)
             throws SAXException
         {

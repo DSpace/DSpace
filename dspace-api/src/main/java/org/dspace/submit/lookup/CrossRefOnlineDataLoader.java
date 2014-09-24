@@ -18,7 +18,7 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpException;
+import org.apache.http.HttpException;
 import org.dspace.core.Context;
 import org.jdom.JDOMException;
 import org.xml.sax.SAXException;

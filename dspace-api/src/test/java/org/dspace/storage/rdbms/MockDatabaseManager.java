@@ -14,7 +14,6 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 
-import mockit.Deencapsulation;
 import mockit.Mock;
 import mockit.MockUp;
 
@@ -35,16 +34,14 @@ public final class MockDatabaseManager
 {
     // Set our logger to specify the Mock class, so we know which logs are from the "real" vs "mock" class
     private static final Logger log = Logger.getLogger(MockDatabaseManager.class);
-    
-    // Get the values of private static variables 'isOracle' and 'isPostgres' from 
-    // DatabaseManager itself (by using Deencapsulation)
-    private static final boolean isOracle = Deencapsulation.getField(DatabaseManager.class, "isOracle");
-    private static final boolean isPostgres = Deencapsulation.getField(DatabaseManager.class, "isPostgres");
-    
+
+    /** Is our DBMS Oracle-like? */
+    private static final boolean isOracle = DatabaseManager.isOracle();
+
     /**
-     * Override/Mock the default "setConstraintDeferred()" method in order to 
+     * Override/Mock the default "setConstraintDeferred()" method in order to
      * add some custom H2-specific code (look for the comments with "H2" in them).
-     * 
+     *
      * Set the constraint check to deferred (commit time)
      *
      * @param context
@@ -58,13 +55,13 @@ public final class MockDatabaseManager
             String constraintName) throws SQLException
     {
         log.debug("Mocked setContraintDeferred() method for H2 database");
-        
+
         Statement statement = null;
         try
         {
             statement = context.getDBConnection().createStatement();
             //statement.execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
-            // H2 does NOT support "SET CONSTRAINTS" syntax. 
+            // H2 does NOT support "SET CONSTRAINTS" syntax.
             // Instead it requires the following SQL
             statement.execute("SET REFERENTIAL_INTEGRITY FALSE");
             statement.close();
@@ -84,11 +81,11 @@ public final class MockDatabaseManager
             }
         }
     }
-    
+
     /**
-     * Override/Mock the default "setConstraintImmediate()" method in order to 
+     * Override/Mock the default "setConstraintImmediate()" method in order to
      * add some custom H2-specific code (look for the comments with "H2" in them).
-     * 
+     *
      * Set the constraint check to immediate (every query)
      *
      * @param context
@@ -102,13 +99,13 @@ public final class MockDatabaseManager
             String constraintName) throws SQLException
     {
         log.debug("Mocked setContraintImmediate() method for H2 database");
-        
+
         Statement statement = null;
         try
         {
             statement = context.getDBConnection().createStatement();
             //statement.execute("SET CONSTRAINTS " + constraintName + " IMMEDIATE");
-            // H2 does NOT support "SET CONSTRAINTS" syntax. 
+            // H2 does NOT support "SET CONSTRAINTS" syntax.
             // Instead it requires the following SQL
             statement.execute("SET REFERENTIAL_INTEGRITY TRUE");
             statement.close();
@@ -127,11 +124,11 @@ public final class MockDatabaseManager
             }
         }
     }
-     
+
     /**
-     * Override/Mock the default "process()" method in order to add some custom 
+     * Override/Mock the default "process()" method in order to add some custom
      * H2-specific code (look for the comments with "H2" in them below).
-     * 
+     *
      * Convert the current row in a ResultSet into a TableRow object.
      *
      * @param results
@@ -149,7 +146,7 @@ public final class MockDatabaseManager
     {
         // Added for H2 debugging
         log.debug("Mocked process() method for H2 database");
-        
+
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
@@ -239,7 +236,7 @@ public final class MockDatabaseManager
                     {
                         log.error("Unable to parse text from database", e);
                     }*/
-                    
+
                     // H2 assumes that "getBytes()" should return hexidecimal.
                     // So, the above commented out code will throw a JdbcSQLException:
                     // "Hexadecimal string contains non-hex character"
