@@ -17,6 +17,7 @@ import com.lyncode.xoai.dataprovider.filter.conditions.CustomCondition;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.StringValue;
+import org.dspace.core.Constants;
 import org.dspace.xoai.filter.DSpaceMetadataExistsFilter;
 import org.dspace.xoai.filter.DSpaceSetSpecFilter;
 import org.dspace.xoai.filter.DateFromFilter;
@@ -116,7 +117,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM + " AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((Integer) result.getParameters().get(0)), is(1));
         assertThat((Integer) result.getParameters().get(1), is(START));
         assertThat((Integer) result.getParameters().get(2), is(LENGTH));
@@ -140,7 +141,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
-        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?) OR EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
+        assertThat(result.getQuery(), is("SELECT i.* FROM item i  WHERE i.in_archive=true AND ((EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM + " AND tmp.metadata_field_id=?) OR EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM + " AND tmp.metadata_field_id=?))) ORDER BY i.item_id OFFSET ? LIMIT ?"));
         assertThat(((Integer) result.getParameters().get(0)), is(1));
         assertThat(((Integer) result.getParameters().get(1)), is(2));
         assertThat((Integer) result.getParameters().get(2), is(START));

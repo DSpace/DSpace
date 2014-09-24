@@ -180,7 +180,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			return null;
 		}
 
-		DCValue[] dcvs = item.getMetadata(field);
+		DCValue[] dcvs = item.getMetadataByMetadataString(field);
 		if (dcvs == null)
 		{
 			return null;

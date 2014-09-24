@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
@@ -154,7 +155,7 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
         for (String v : values)
             this.buildWhere(v, parts, params);
         if (parts.size() > 0) {
-            String query = "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?"
+            String query = "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?"
                     + " AND ("
                     + StringUtils.join(parts.iterator(), " OR ")
                     + "))";

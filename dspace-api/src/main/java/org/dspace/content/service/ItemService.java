@@ -53,7 +53,7 @@ public class ItemService
     }
 
     public static String getFirstMetadataValue(Item item, String metadataKey) {
-        DCValue[] dcValue = item.getMetadata(metadataKey);
+        DCValue[] dcValue = item.getMetadataByMetadataString(metadataKey);
         if(dcValue.length > 0) {
             return dcValue[0].value;
         } else {
