@@ -236,7 +236,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
             resultSb.append(itemId);
             // Only proceed if item has a value for service template parameter
-            DCValue[] dcVals = item.getMetadata(lookupField);
+            DCValue[] dcVals = item.getMetadataByMetadataString(lookupField);
             if (dcVals.length > 0 && dcVals[0].value.length() > 0) {
             	String value = transform(dcVals[0].value, lookupTransform);
             	status = callService(value, item, resultSb);

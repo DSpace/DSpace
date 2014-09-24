@@ -181,9 +181,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 // Fetch the document type (dc.type)
                 String documentType = "";
-                if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+                if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
                 {
-                    documentType = item.getMetadata("dc.type")[0].value;
+                    documentType = item.getMetadataByMetadataString("dc.type")[0].value;
                 }
                 
                 // Iterate over all inputs and add it to the form.
