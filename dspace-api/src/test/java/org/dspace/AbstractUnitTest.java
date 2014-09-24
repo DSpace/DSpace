@@ -36,6 +36,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -148,6 +149,8 @@ public class AbstractUnitTest
 
                 RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
                 MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
+                MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
+                MetadataImporter.loadRegistry(base + "bitstream-formats.xml", true);
                 MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
                 ctx.commit();
 
@@ -173,6 +176,7 @@ public class AbstractUnitTest
                 dspace = null;
                 indexer = null;
             }
+            Group.initDefaultGroupNames(ctx);
             ctx.restoreAuthSystemState();
             if(ctx.isValid())
             {
