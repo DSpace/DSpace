@@ -629,7 +629,7 @@ public class EZIDIdentifierProvider
 
         for (Entry<String, String> datum : crosswalk.entrySet())
         {
-            DCValue[] values = item.getMetadata(datum.getValue());
+            DCValue[] values = item.getMetadataByMetadataString(datum.getValue());
             if (null != values)
             {
                 for (DCValue value : values)

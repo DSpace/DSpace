@@ -146,13 +146,9 @@ CREATE TABLE Bitstream
 (
    bitstream_id            INTEGER PRIMARY KEY,
    bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
-   name                    VARCHAR(256),
    size_bytes              BIGINT,
    checksum                VARCHAR(64),
    checksum_algorithm      VARCHAR(32),
-   description             TEXT,
-   user_format_description TEXT,
-   source                  VARCHAR(256),
    internal_id             VARCHAR(256),
    deleted                 BOOL,
    store_number            INTEGER,
@@ -171,31 +167,25 @@ CREATE TABLE EPerson
   password            VARCHAR(128),
   salt                VARCHAR(32),
   digest_algorithm    VARCHAR(16),
-  firstname           VARCHAR(64),
-  lastname            VARCHAR(64),
   can_log_in          BOOL,
   require_certificate BOOL,
   self_registered     BOOL,
   last_active         TIMESTAMP,
-  sub_frequency       INTEGER,
-  phone               VARCHAR(32),
-  netid               VARCHAR(64),
-  language            VARCHAR(64)
+  sub_frequency       INTEGER
 );
 
 -- index by email
 CREATE INDEX eperson_email_idx ON EPerson(email);
 
 -- index by netid
-CREATE INDEX eperson_netid_idx ON EPerson(netid);
+--CREATE INDEX eperson_netid_idx ON EPerson(netid);
 
 -------------------------------------------------------
 -- EPersonGroup table
 -------------------------------------------------------
 CREATE TABLE EPersonGroup
 (
-  eperson_group_id INTEGER PRIMARY KEY,
-  name             VARCHAR(256) UNIQUE
+  eperson_group_id INTEGER PRIMARY KEY
 );
 
 ------------------------------------------------------
@@ -312,7 +302,8 @@ CREATE TABLE MetadataFieldRegistry
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
-  item_id            INTEGER REFERENCES Item(item_id),
+  resource_id        INTEGER NOT NULL,
+  resource_type_id   INTEGER NOT NULL,
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
@@ -323,18 +314,16 @@ CREATE TABLE MetadataValue
 
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
-  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.resource_id,
     MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value,
     MetadataValue.text_lang, MetadataValue.place
   FROM MetadataValue, MetadataFieldRegistry
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
-  AND MetadataFieldRegistry.metadata_schema_id = 1;
+  AND MetadataFieldRegistry.metadata_schema_id = 1 AND MetadataValue.resource_type_id = 2;
 
 -- An index for item_id - almost all access is based on
 -- instantiating the item object, which grabs all values
 -- related to that item
-CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
-CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
 CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
   
@@ -344,12 +333,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -362,15 +346,8 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
-  provenance_description  TEXT,
-  license           TEXT,
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
@@ -645,8 +622,9 @@ CREATE TABLE community_item_count (
 --  and administrators
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0, 'Anonymous');
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
+INSERT INTO epersongroup VALUES(0);
+INSERT INTO epersongroup VALUES(getnextid('epersongroup'));
+
 
 
 -------------------------------------------------------

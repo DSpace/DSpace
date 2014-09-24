@@ -13,8 +13,6 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.View;
@@ -28,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -159,9 +155,9 @@ public class RisView implements View {
     {
         ArrayList<String> authors = new ArrayList<String>();
 
-        authors.addAll(getAuthors(aItem.getMetadata("dc.contributor.author")));
-        authors.addAll(getAuthors(aItem.getMetadata("dc.creator")));
-        authors.addAll(getAuthors(aItem.getMetadata("dc.contributor")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.contributor.author")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.creator")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.contributor")));
 
         return authors.toArray(new String[authors.size()]);
     }
@@ -170,7 +166,7 @@ public class RisView implements View {
     {
         ArrayList<String> keywordList = new ArrayList<String>();
 
-        for (DCValue keyword : aItem.getMetadata("dc.subject"))
+        for (DCValue keyword : aItem.getMetadataByMetadataString("dc.subject"))
         {
             if (keyword.value.length() < 255)
             {
@@ -178,7 +174,7 @@ public class RisView implements View {
             }
         }
 
-        for (DCValue keyword : aItem.getMetadata("dwc.ScientificName"))
+        for (DCValue keyword : aItem.getMetadataByMetadataString("dwc.ScientificName"))
         {
             if (keyword.value.length() < 255)
             {
@@ -193,7 +189,7 @@ public class RisView implements View {
     {
         StringTokenizer tokenizer;
 
-        for (DCValue date : item.getMetadata("dc.date.issued"))
+        for (DCValue date : item.getMetadataByMetadataString("dc.date.issued"))
         {
             tokenizer = new StringTokenizer(date.value, "-/ T");
             String[] dateParts = new String[tokenizer.countTokens()];
@@ -211,7 +207,7 @@ public class RisView implements View {
 
     private String getMetadataValue(Item item, String metadatafield)
     {
-        for (DCValue value : item.getMetadata(metadatafield))
+        for (DCValue value : item.getMetadataByMetadataString(metadatafield))
         {
             return value.value;
         }

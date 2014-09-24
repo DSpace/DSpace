@@ -26,7 +26,6 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.TableRow;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
@@ -189,9 +188,9 @@ public class CSVOutputter extends AbstractReader implements Recyclable
                 entryValues[2] = bitstream.getBundles()[0].getName();
                 entryValues[3] = item.getName();
                 entryValues[4] = "http://hdl.handle.net/" + item.getHandle();
-                entryValues[5] = wrapInDelimitedString(item.getMetadata("dc.creator"));
-                entryValues[6] = wrapInDelimitedString(item.getMetadata("dc.publisher"));
-                entryValues[7] = wrapInDelimitedString(item.getMetadata("dc.date.issued"));
+                entryValues[5] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.creator"));
+                entryValues[6] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.publisher"));
+                entryValues[7] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.date.issued"));
                 entryValues[8] = facetEntry.getCount() + "";
                 writer.writeNext(entryValues);
             } else {
