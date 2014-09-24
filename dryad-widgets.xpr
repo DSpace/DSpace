@@ -6,6 +6,7 @@
     </meta>
     <projectTree name="dryad-widgets.xpr">
         <folder path="dryad-widgets-webapp/"/>
+        <folder path="dryad-widgets-webapp/src/main/properties/"/>
         <file name="pom.xml"/>
     </projectTree>
 </project>

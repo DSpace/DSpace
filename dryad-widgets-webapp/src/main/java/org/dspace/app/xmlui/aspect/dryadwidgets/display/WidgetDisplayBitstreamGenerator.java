@@ -6,11 +6,16 @@
 package org.dspace.app.xmlui.aspect.dryadwidgets.display;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
@@ -77,12 +82,10 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
             throw new IllegalArgumentException("Empty or null doi provided to WidgetDisplayBitstreamGenerator");
         }
         log.debug("In WidgetDisplayBitstreamGenerator for referrer '" + referrer + "' and doi: " + doi);
-
         URL objUrl = new URL(object_url);
         HttpURLConnection connection;
         String dataOneFormat;
-        int responseCode;
-        
+        Integer responseCode;
         // Do an initial HTTP HEAD request from Data-One service to determine
         // - if requested resource exists
         // - if the requested resource has a handlable content type
@@ -99,12 +102,13 @@ public class WidgetDisplayBitstreamGenerator extends AbstractGenerator {
             throw new IOException("Failed to connect to DataOne service");
         }
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            log.error("Resource not found for doi: " + doi);
-            throw new ResourceNotFoundException("Resource not found for doi: " + doi);
+            log.error("Response code '" + responseCode + "' for doi '" + doi + "' at url: " + object_url);
+            throw new ResourceNotFoundException("Response code '" + responseCode + "' for doi '" + doi + "' at url: " + object_url);
         } else if (dataOneFormat == null || dataOneFormat.equals("")) {
             log.error("Unavailable content type for doi: " + doi);
-            throw new IOException("Unavailable content type for doi: " + doi);
+            throw new IOException("Unavailable content type for doi '" + doi + "' at url: " + object_url);
         }
+
         connection.disconnect();
         connection = null;
         objUrl = null;
