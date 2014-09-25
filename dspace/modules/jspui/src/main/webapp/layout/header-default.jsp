@@ -116,51 +116,58 @@
     <body>
 
         <%-- DSpace top-of-page banner --%>
-        <div class="pageBanner">
+        <div class="row pageBanner">
 
-          <span id="pageBanner-ul-logo">
+      	  <div class="col-md-2" id="pageBanner-ul-logo">
             <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
-          </span>
+     	  </div>
 
-		  <span id="pageBanner-drum-logo">
-		    <span>DRUM</span>
-		    <span>Digital Repository at the University of Maryland</span>
-          </span>
+     	  <div class="col-md-3 col-md-offset-1">
+            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="319" height="55" border="0"/></a>
+          </div>
 
-          <span id="pageBanner-login">
+          <div class="pull-right" id="pageBanner-login">
+
+	        <div class="loginStatus">
   <%
-    // Logged in
-    if (user != null) {
+              // Logged in
+              if (user != null) {
   %>
-          <span class="loggedIn"><%= user.getEmail() %></span>
-      	  <A HREF="<%= request.getContextPath() %>/logout">Logout</A>
+	            <span class="loggedIn"><%= user.getEmail() %></span>
+	      	    <a href="<%= request.getContextPath() %>/logout">
+	      	      <button class="btn btn-primary">Logout</button>
+	      	    </a>
+  <%
+              } else {
+                // Not logged in
+
+  %>
+	      	    <a href="<%= request.getContextPath() %>/mydspace">
+	      	      <button class="btn btn-primary">Login</button>
+	      	    </a>
 
   <%
-    // Not logged in
-    } else {
-  %>
-      	  <a href="<%= request.getContextPath() %>/mydspace">Login</a>
-
-  <%
-    }
-  %>
-
-          <span id-"pageBanner-search-box">
-            <%-- Search Box --%>
-            <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
-
-              <input type="text" name="query" id="tequery" size="10"/>
-              <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" src="<%= request.getContextPath() %>/image/search-go.gif"/>
-<%
-			  if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
-			  {
-%>
-                <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
-<%
               }
+  %>
+            </div>
+
+            <div class="pull-right">
+              <%-- Search Box --%>
+              <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
+
+                <input type="text" name="query" id="tequery" size="20" placeholder="Search DRUM ..."/>
+                <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" />
+<%
+			    if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+			    {
 %>
-            </form>
-          </span>
+                  <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
+<%
+                }
+%>
+              </form>
+            </div>
+          </div>
         </div>
 
         <%-- Localization --%>
@@ -172,7 +179,7 @@
         <%-- Page contents --%>
 
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="centralPane" width="99%" border="0" cellpadding="3" cellspacing="1">
+        <table class="centralPane" width="100%" border="0" cellpadding="3" cellspacing="1">
 
             <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
             <tr valign="top">

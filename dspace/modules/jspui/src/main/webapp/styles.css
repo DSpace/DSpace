@@ -45,7 +45,7 @@ p {  margin-left: 10px;
      margin-right: 10px;
      font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 12px }
-     
+
 /* This class is here so that a "DIV" by default acts as a "P".
    This is necessary since the "dspace:popup" tag must have a "DIV"
    (or block element) surrounding it in order to be valid XHTML 1.0 */
@@ -84,6 +84,10 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
               color: #000000;
               padding: 0;
               vertical-align: middle }
+
+.pageBanner-drum-logo {
+	display:block;
+}
 
 .tagLine { vertical-align: bottom;
            padding: 0;
@@ -148,7 +152,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      border: 0;
 		 font-family: "verdana", "Arial", "Helvetica", sans-serif; }
 
-.navigationBar { 
+.navigationBar {
   font-family: "verdana", "Arial", "Helvetica", sans-serif;
   font-size: 10px;
                  font-style: normal;
@@ -156,7 +160,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  color: #252645;
                  text-decoration: none;
   width: 13em;
-  background: white 
+  background: white
 }
 
 .navigationBarSublabel { font-family: "verdana", "Arial", "Helvetica", sans-serif;
@@ -212,7 +216,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 	    width: 30%
  }
 
-.communityLink { 
+.communityLink {
      		font-family: "verdana", "Arial", "Helvetica", sans-serif;
      		font-size: 12px;
                  font-weight: bold;
@@ -230,7 +234,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                         font-weight: normal;
                         list-style-type: none }
 
-.collectionListItem { 
+.collectionListItem {
      		font-family: "verdana", "Arial", "Helvetica", sans-serif;
      		font-size: 12px;
                 font-weight: normal;
@@ -322,7 +326,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
 		   font-size: 12px;
            text-align: center }
-           
+
 
 .submitFormWarn {  margin-left: 10px;
            margin-right: 10px;
@@ -332,7 +336,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
            color: #ff6600;
            text-align: center }
 
-.submitFormWarnMark {  
+.submitFormWarnMark {
   color: #ff6600;
 }
 
@@ -527,7 +531,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
         background: #ffffff;
         margin-left:10px;}
 
-.warn { 
+.warn {
   margin-left: 10px;
   margin-right: 10px;
   padding: 10px;
@@ -568,13 +572,13 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .help td.leftAlign{font-size:10pt;}
 .help td.rightAlign{text-align:right;
                     font-size:10pt;}
-                    
+
 
 /* The following rules are used by the controlled-vocabulary add-on */
 ul.controlledvocabulary  {
                 list-style-type:none; }
 
-        
+
 .controlledvocabulary ul  li ul {
              list-style-type:none;
                 display:none; }
@@ -597,7 +601,7 @@ img.controlledvocabulary {
 .controlledVocabularyLink {
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt; }
-           
+
 .browse_buttons
 {
         float: right;
@@ -734,8 +738,8 @@ input.ds-authority-lock.is-locked
 input.ds-authority-lock.is-unlocked
   { background-image: url(./image/unlock24.png); }
 
-  
-  
+
+
 /* Bootstrap Overrides */
 .alert-info, .panel-info>.panel-heading, .panel-success>.panel-heading {
 	background-image: -webkit-gradient(linear,left 0,left 100%,from(#fff0c1),to(#ffe9c2));
@@ -769,13 +773,19 @@ input.ds-authority-lock.is-unlocked
 }
 
 .btn-primary {
-	background-image: -webkit-gradient(linear,left 0,left 100%,from(#ffcc33),to(#fdb73f));
-	background-image: -webkit-linear-gradient(top,#ffcc33,0%,#fdb73f,100%);
-	background-image: -moz-linear-gradient(top,#ffcc33 0,#fdb73f 100%);
-	background-image: linear-gradient(to bottom,#ffcc33 0,#fdb73f 100%);
+	background-image: -webkit-gradient(linear,left 0,left 100%,from(#cf0000),to(#d43f3a));
+	background-image: -webkit-linear-gradient(top,#cf0000,0%,#d43f3a,100%);
+	background-image: -moz-linear-gradient(top,#cf0000 0,#d43f3a 100%);
+	background-image: linear-gradient(to bottom,#cf0000 0,#d43f3a 100%);
 	background-repeat: repeat-x;
 	border-color: #a68011;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffcc33',endColorstr='#fffdb73f',GradientType=0);
+	color: #ffffff;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    padding: 1px 5px;
+
 }
 
 h1, h2, h3, h4, h5 {
