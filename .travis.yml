@@ -1,10 +1,4 @@
 language: java
 jdk: openjdk6
-#before_script:
-#  - "export DISPLAY=:99.0"
-#  - "sh -e /etc/init.d/xvfb start"
-#  - sleep 3 # give xvfb some time
-#  - echo    # start a Web server
-#  - sleep 3 # give Web server some time
-script: mvn --quiet package -DskipTests=false 
+script: ./test/build_test.sh 
 
