@@ -114,6 +114,13 @@ public class HandleServlet extends DSpaceServlet
                     // The path is just the Handle
                     handle = path;
                 }
+                /**
+                 * damanzano: Esto se realiza con el fin de que las solicitudes que se hagan las las urls /handle/item/###
+                 * se redireccionen a /handle/myhandleid/###
+                 * 
+                 * myhandleid se extrae del archivo de configuración
+                 */                
+                handle=handle.replace("item", ConfigurationManager.getProperty("handle.prefix"));
             }
             catch (NumberFormatException nfe)
             {
