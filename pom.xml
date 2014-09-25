@@ -9,6 +9,10 @@
     <description>Dryad UI widgets</description>
     <version>1.7.3-SNAPSHOT</version>
     
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <!--
     <parent>
         <groupId>org.dspace</groupId>

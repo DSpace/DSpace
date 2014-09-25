@@ -8,6 +8,10 @@
     <name>Dryad UI widgets :: WEBAPP</name>
     <description>Dryad UI widgets WEBAPP</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <parent>
         <groupId>org.dspace.modules</groupId>
         <artifactId>dryad-widgets</artifactId>
@@ -44,6 +48,45 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>it/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.17</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>it/**</include>
+                    </includes>
+                    <excludes>
+                        <exclude>org/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            
         </plugins>
     </build>
     
@@ -89,6 +132,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -96,6 +140,7 @@
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
             <scope>test</scope>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -105,6 +150,7 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
@@ -112,6 +158,15 @@
             <scope>test</scope>
             <type>jar</type>
         </dependency>
+        
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.12.0</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        
     </dependencies>
 
 </project>
