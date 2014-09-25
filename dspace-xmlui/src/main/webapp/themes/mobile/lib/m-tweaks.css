@@ -345,3 +345,13 @@ font-size: 18px;
 margin-bottom: 1px;
 }
 
+/* Hide a tag from visibility. Used in exception2dri.xslt to hide error stack by default. */
+.hidden {
+    display:none;
+    visibility:hidden;
+}
+
+/* Preserve whitespace. Used in exception2dri.xslt to display error messages in themes. */
+.pre {
+    white-space:pre;
+}
