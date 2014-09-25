@@ -118,4 +118,14 @@ table#aspect_administrative_ControlPanel_table_users a{
     }
 }
 
-
+/*
+ * Themed error page (exception2dri.xsl) styles
+ * -------
+ */
+span.bold {
+    font-weight: bold;
+}
+/* Preserve whitespace. Used to display error stack in a readable way. */
+p.pre {
+    white-space:pre;
+}

@@ -36,7 +36,6 @@ Created by Tim Donohue
       <body>
         <div id="exception">
           <head><xsl:value-of select="$pageTitle"/></head>
-          <p></p>
           <p>
             <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
           </p>
@@ -44,12 +43,9 @@ Created by Tim Donohue
             <i18n:text>xmlui.error.contact_msg</i18n:text>
           </p>
           <p>
-            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/contact</xsl:attribute><i18n:text>xmlui.error.contact</i18n:text></xref> 
-          </p>
-          <p></p>
-          <!-- Create a link which lets users optionally display the error stacktrace (using JQuery) -->
-          <p>
-            <xref target="javascript:jQuery('#errorstack').show().css('visibility','visible');"><i18n:text>xmlui.error.show_stack</i18n:text></xref>
+            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/contact</xsl:attribute><i18n:text>xmlui.error.contact</i18n:text></xref> ||  
+            <!-- Create a link which lets users optionally display the error stacktrace (using JQuery) -->
+            <xref target="javascript:jQuery('#errorstack').toggleClass('hidden');"><i18n:text>xmlui.error.show_stack</i18n:text></xref>
           </p>
           <!-- Include the Java stacktrace on the page, but hide it from view by default. -->
           <p id="errorstack" rend="pre hidden">
@@ -76,7 +72,7 @@ Created by Tim Donohue
 
   <!-- Display Java error stack -->
   <xsl:template match="ex:stacktrace">
-       <hi rend="bold">Java <xsl:value-of select="translate(local-name(), '-', ' ')"/>:</hi>
+       <hi rend="bold">Java <xsl:value-of select="translate(local-name(), '-', ' ')"/>: </hi>
        <hi>
          <xsl:value-of select="translate(.,'&#13;','')"/>
        </hi>
