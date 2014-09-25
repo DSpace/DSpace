@@ -64,6 +64,9 @@ public class DatabaseManager
     /** Name of the DBMS, as returned by its driver. */
     private static String dbms;
 
+    /** Name of the DBMS, as used in DSpace:  "postgres", "oracle", or "h2". */
+    private static String dbms_keyword;
+
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
 
@@ -1484,16 +1487,19 @@ public class DatabaseManager
             if (dbms_lc.contains("postgresql"))
             {
                 isPostgres = true;
+                dbms_keyword = "postgres";
                 log.info("DBMS is PostgreSQL");
             }
             else if (dbms_lc.contains("oracle"))
             {
                 isOracle = true;
+                dbms_keyword = "oracle";
                 log.info("DBMS is Oracle Database");
             }
             else if (dbms_lc.contains("h2")) // Used in testing
             {
                 isOracle = true;
+                dbms_keyword = "h2";
                 log.info("DBMS is H2");
             }
             else
@@ -1534,6 +1540,20 @@ public class DatabaseManager
         return dbms;
     }
 
+    /**
+     * What is the string that we use to name the DBMS brand?
+     *
+     * @return a normalized "keyword" for the DBMS brand:  postgres, oracle, h2.
+     */
+    public static String getDbKeyword()
+    {
+        try {
+            initialize();
+        } catch (SQLException ex) {
+            log.error("Failed to initialize the database:  ", ex);
+        }
+        return dbms_keyword;
+    }
     /**
 	 * Iterate over the given parameters and add them to the given prepared statement.
 	 * Only a select number of datatypes are supported by the JDBC driver.
