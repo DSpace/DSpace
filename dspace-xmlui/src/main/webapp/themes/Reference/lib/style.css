@@ -1262,6 +1262,10 @@ form.discover-sort-box select{
     visibility:hidden;
 }
 
+.pre {
+    white-space:pre;
+}
+
 .icon-button{
     padding:4px;
     cursor: pointer;

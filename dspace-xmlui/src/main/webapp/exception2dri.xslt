@@ -41,12 +41,19 @@ Created by Tim Donohue
             <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>
           </p>
           <p>
-            <!-- TODO: This should be moved to an I18N message key -->
-            Please contact your <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/contact</xsl:attribute>site administrators</xref> if you have any questions about this error message. 
+            <i18n:text>xmlui.error.contact_msg</i18n:text>
           </p>
-          <!-- Include the full stacktrace in the page, but hide it from view. -->
-          <p rend="hidden">
-            <xsl:apply-templates select="ex:full-stacktrace"/>
+          <p>
+            <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/contact</xsl:attribute><i18n:text>xmlui.error.contact</i18n:text></xref> 
+          </p>
+          <p></p>
+          <!-- Create a link which lets users optionally display the error stacktrace (using JQuery) -->
+          <p>
+            <xref target="javascript:jQuery('#errorstack').show().css('visibility','visible');"><i18n:text>xmlui.error.show_stack</i18n:text></xref>
+          </p>
+          <!-- Include the Java stacktrace on the page, but hide it from view by default. -->
+          <p id="errorstack" rend="pre hidden">
+            <xsl:apply-templates select="ex:stacktrace"/>
           </p>
         </div>
       </body>
@@ -67,10 +74,12 @@ Created by Tim Donohue
     </document>
   </xsl:template>
 
-  <xsl:template match="ex:full-stacktrace">
-       <hi>Java <xsl:value-of select="translate(local-name(), '-', ' ')"/></hi>
-       <br/>
-       <xsl:value-of select="translate(.,'&#13;','')"/>
+  <!-- Display Java error stack -->
+  <xsl:template match="ex:stacktrace">
+       <hi rend="bold">Java <xsl:value-of select="translate(local-name(), '-', ' ')"/>:</hi>
+       <hi>
+         <xsl:value-of select="translate(.,'&#13;','')"/>
+       </hi>
   </xsl:template>
-  
+ 
 </xsl:stylesheet>
