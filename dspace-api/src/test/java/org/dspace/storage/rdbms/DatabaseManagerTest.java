@@ -56,7 +56,7 @@ public class DatabaseManagerTest
         System.out.println("isOracle");
         boolean expResult = true;
         boolean result = DatabaseManager.isOracle();
-        assertEquals(expResult, result);
+        assertEquals("isOracle is true for Oracle-like DBMSs", expResult, result);
     }
 
     /**
@@ -630,7 +630,20 @@ public class DatabaseManagerTest
         System.out.println("getDbName");
         String expResult = "H2";
         String result = DatabaseManager.getDbName();
-        assertEquals(expResult, result);
+        assertEquals("Database name names the configured database driver",
+                expResult, result);
+    }
+
+    /**
+     * Test of getDbKeyword method, of class DatabaseManager.
+     */
+    @Test
+    public void testGetDbKeyword()
+    {
+        System.out.println("getDbKeyword");
+        String expResult = "h2";
+        String result = DatabaseManager.getDbKeyword();
+        assertEquals("Database 'keyword' names the configured DBMS", expResult, result);
     }
 
     /**
