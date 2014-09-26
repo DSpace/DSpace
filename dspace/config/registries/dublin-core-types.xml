@@ -584,4 +584,18 @@
     <scope_note>Nature or genre of content.</scope_note>
   </dc-type>
 
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>provenance</element>
+        <!-- unqualified -->
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <qualifier>license</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>

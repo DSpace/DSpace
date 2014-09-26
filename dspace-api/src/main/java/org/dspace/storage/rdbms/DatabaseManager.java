@@ -117,16 +117,17 @@ public class DatabaseManager
      * @throws SQLException
      */
     public static void setConstraintDeferred(Context context,
-            String constraintName) throws SQLException
-    {
+            String constraintName) throws SQLException {
         Statement statement = null;
         try
         {
             statement = context.getDBConnection().createStatement();
             statement.execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
             statement.close();
-        }
-        finally
+        } catch (SQLException e) {
+            log.error("SQL setConstraintDeferred Error - ", e);
+            throw e;
+        } finally
         {
             if (statement != null)
             {
@@ -136,6 +137,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL setConstraintDeferred close Error - ",sqle);
+                    throw sqle;
                 }
             }
         }
@@ -151,16 +154,17 @@ public class DatabaseManager
      * @throws SQLException
      */
     public static void setConstraintImmediate(Context context,
-            String constraintName) throws SQLException
-    {
+            String constraintName) throws SQLException {
         Statement statement = null;
         try
         {
             statement = context.getDBConnection().createStatement();
             statement.execute("SET CONSTRAINTS " + constraintName + " IMMEDIATE");
             statement.close();
-        }
-        finally
+        } catch (SQLException e) {
+            log.error("SQL setConstraintImmediate Error - ", e);
+            throw e;
+        } finally
         {
             if (statement != null)
             {
@@ -170,6 +174,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL setConstraintImmediate Error - ",sqle);
+                    throw sqle;
                 }
             }
         }
@@ -194,8 +200,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException
-    {
+    public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException {
         if (log.isDebugEnabled())
         {
             StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
@@ -210,9 +215,11 @@ public class DatabaseManager
             log.debug(sb.toString());
         }
 
-        PreparedStatement statement = context.getDBConnection().prepareStatement(query);
+        PreparedStatement statement = null;
         try
         {
+            statement = context.getDBConnection().prepareStatement(query);
+
             loadParameters(statement, parameters);
 
             TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
@@ -230,9 +237,11 @@ public class DatabaseManager
                 }
                 catch (SQLException s)
                 {
+                    log.error("SQL QueryTable close Error - ",s);
+                    throw s;
                 }
             }
-
+            log.error("SQL QueryTable Error - ",sqle);
             throw sqle;
         }
     }
@@ -289,9 +298,11 @@ public class DatabaseManager
                 }
                 catch (SQLException s)
                 {
+                    log.error("SQL query exec close Error - ",s);
+                    throw s;
                 }
             }
-
+            log.error("SQL query exec Error - ",sqle);
             throw sqle;
         }
     }
@@ -314,16 +325,17 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static TableRow querySingle(Context context, String query,
-            Object... parameters) throws SQLException
-    {
+            Object... parameters) throws SQLException {
         TableRow retRow = null;
         TableRowIterator iterator = null;
         try
         {
             iterator = query(context, query, parameters);
             retRow = (!iterator.hasNext()) ? null : iterator.next();
-        }
-        finally
+        } catch (SQLException e) {
+            log.error("SQL query single Error - ", e);
+            throw e;
+        } finally
         {
             if (iterator != null)
             {
@@ -353,16 +365,23 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static TableRow querySingleTable(Context context, String table,
-            String query, Object... parameters) throws SQLException
-    {
+            String query, Object... parameters) throws SQLException {
         TableRow retRow = null;
-        TableRowIterator iterator = queryTable(context, canonicalize(table), query, parameters);
+        TableRowIterator iterator = null;
+        try {
+            iterator = queryTable(context, canonicalize(table), query, parameters);
+        } catch (SQLException e) {
+            log.error("SQL query singleTable Error - ", e);
+            throw e;
+        }
 
         try
         {
             retRow = (!iterator.hasNext()) ? null : iterator.next();
-        }
-        finally
+        } catch (SQLException e) {
+            log.error("SQL query singleTable Error - ", e);
+            throw e;
+        } finally
         {
             if (iterator != null)
             {
@@ -388,8 +407,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static int updateQuery(Context context, String query, Object... parameters) throws SQLException
-    {
+    public static int updateQuery(Context context, String query, Object... parameters) throws SQLException {
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
@@ -412,8 +430,10 @@ public class DatabaseManager
         	loadParameters(statement, parameters);
 
         	return statement.executeUpdate();
-        }
-        finally
+        } catch (SQLException e) {
+            log.error("SQL query updateQuery Error - ", e);
+            throw e;
+        } finally
         {
             if (statement != null)
             {
@@ -423,6 +443,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL updateQuery Error - ",sqle);
+                    throw sqle;
                 }
             }
         }
@@ -437,13 +459,17 @@ public class DatabaseManager
      *            The RDBMS table in which to create the new row
      * @return The newly created row
      */
-    public static TableRow create(Context context, String table)
-            throws SQLException
-    {
-        TableRow row = new TableRow(canonicalize(table), getColumnNames(table));
-        insert(context, row);
+    public static TableRow create(Context context, String table) throws SQLException
 
-        return row;
+    {
+        try {
+            TableRow row = new TableRow(canonicalize(table), getColumnNames(table));
+            insert(context, row);
+            return row;
+        } catch (SQLException e) {
+            log.error("SQL create Error - ",e);
+            throw e;
+        }
     }
 
     /**
@@ -461,13 +487,18 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRow find(Context context, String table, int id)
-            throws SQLException
+    public static TableRow find(Context context, String table, int id) throws SQLException
+
     {
         String ctable = canonicalize(table);
 
-        return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
-                Integer.valueOf(id));
+        try {
+            return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
+                    Integer.valueOf(id));
+        } catch (SQLException e) {
+            log.error("SQL find Error - ", e);
+            throw e;
+        }
     }
 
     /**
@@ -489,22 +520,25 @@ public class DatabaseManager
      *                If a database error occurs
      */
     public static TableRow findByUnique(Context context, String table,
-            String column, Object value) throws SQLException
-    {
+        String column, Object value) throws SQLException {
         String ctable = canonicalize(table);
 
-        if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        {
-            throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
-        }
+        try {
+            if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+            {
+                    throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
+            }
 
-        if ( ! DB_SAFE_NAME.matcher(column).matches())
-        {
-            throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+            if ( ! DB_SAFE_NAME.matcher(column).matches())
+            {
+                throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+            }
+            StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
+            return querySingleTable(context, ctable, sql.toString(), value);
+        } catch (SQLException e) {
+            log.error("SQL findByUnique Error - ", e);
+            throw e;
         }
-
-        StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
-        return querySingleTable(context, ctable, sql.toString(), value);
     }
 
     /**
@@ -521,13 +555,16 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static int delete(Context context, String table, int id)
-            throws SQLException
+    public static int delete(Context context, String table, int id) throws SQLException
     {
-        String ctable = canonicalize(table);
-
-        return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
-                Integer.valueOf(id));
+        try {
+            String ctable = canonicalize(table);
+            return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
+                    Integer.valueOf(id));
+        } catch (SQLException e) {
+            log.error("SQL delete Error - ", e);
+            throw e;
+        }
     }
 
     /**
@@ -549,20 +586,25 @@ public class DatabaseManager
     public static int deleteByValue(Context context, String table,
             String column, Object value) throws SQLException
     {
-        String ctable = canonicalize(table);
+        try {
+            String ctable = canonicalize(table);
 
-        if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        {
-            throw new SQLException("Unable to execute delete query because table name (" + ctable + ") contains non alphanumeric characters.");
+            if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+            {
+                throw new SQLException("Unable to execute delete query because table name (" + ctable + ") contains non alphanumeric characters.");
+            }
+
+            if ( ! DB_SAFE_NAME.matcher(column).matches())
+            {
+                throw new SQLException("Unable to execute delete query because column name (" + column + ") contains non alphanumeric characters.");
+            }
+
+            StringBuilder sql = new StringBuilder("delete from ").append(ctable).append(" where ").append(column).append(" = ? ");
+            return updateQuery(context, sql.toString(), value);
+        } catch (SQLException e) {
+            log.error("SQL deleteByValue Error - ", e);
+            throw e;
         }
-
-        if ( ! DB_SAFE_NAME.matcher(column).matches())
-        {
-            throw new SQLException("Unable to execute delete query because column name (" + column + ") contains non alphanumeric characters.");
-        }
-
-        StringBuilder sql = new StringBuilder("delete from ").append(ctable).append(" where ").append(column).append(" = ? ");
-        return updateQuery(context, sql.toString(), value);
     }
 
     /**
@@ -575,15 +617,20 @@ public class DatabaseManager
      */
     public static Connection getConnection() throws SQLException
     {
-        initialize();
+        try{
+            initialize();
 
-        if (dataSource != null) {
-        	Connection conn = dataSource.getConnection();
+            if (dataSource != null) {
+                Connection conn = dataSource.getConnection();
 
-        	return conn;
+                return conn;
+            }
+
+            return null;
+        } catch (SQLException e) {
+            log.error("SQL connection Error - ", e);
+            throw e;
         }
-
-        return null;
     }
 
     public static DataSource getDataSource()
@@ -594,6 +641,7 @@ public class DatabaseManager
         }
         catch (SQLException e)
         {
+            log.error("SQL getDataSource Error - ",e);
             throw new IllegalStateException(e.getMessage(), e);
         }
 
@@ -858,6 +906,7 @@ public class DatabaseManager
         }
         catch (IOException ioe)
         {
+            log.error("IOE loadSQL Error - ",ioe);
         }
     }
 
@@ -1270,6 +1319,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL execute Error - ",sqle);
+                    throw sqle;
                 }
             }
         }
@@ -1300,6 +1351,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL executeUpdate Error - ",sqle);
+                    throw sqle;
                 }
             }
         }
@@ -1792,6 +1845,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL doInsertPostgresrs close Error - ",sqle);
+                    throw sqle;
                 }
             }
 
@@ -1803,6 +1858,8 @@ public class DatabaseManager
                 }
                 catch (SQLException sqle)
                 {
+                    log.error("SQL doInsertPostgres statement close Error - ",sqle);
+                    throw sqle;
                 }
             }
         }

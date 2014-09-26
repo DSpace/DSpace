@@ -89,7 +89,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
             String handle = item.getHandle();
             log.debug("Translating metadata for " + handle);
 
-            DCValue[] authLangs = item.getMetadata(authLangField);
+            DCValue[] authLangs = item.getMetadataByMetadataString(authLangField);
             if(authLangs.length > 0)
             {
                 /* Assume the first... multiple
