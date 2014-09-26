@@ -10,10 +10,17 @@ package org.dspace.content;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.hadoop.security.authorize.ServiceAuthorizationManager;
 import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.elasticsearch.common.collect.Lists;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -1819,6 +1826,76 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         found = Collection.findAuthorized(context, null, Constants.READ);
         assertThat("testFindAuthorized 9",found,notNullValue());
         assertTrue("testFindAuthorized 10",found.length >= 1);
+    }
+
+    /**
+     * Test of findAuthorizedOptimized method, of class Collection.
+     * We create some collections and some users with varying auth, and ensure we can access them all properly.
+     */
+    @Test
+    public void testFindAuthorizedOptimized() throws Exception
+    {
+        context.turnOffAuthorisationSystem();
+        Community com = Community.create(null, context);
+        Collection collectionA = Collection.create(context);
+        Collection collectionB = Collection.create(context);
+        Collection collectionC = Collection.create(context);
+
+        com.addCollection(collectionA);
+        com.addCollection(collectionB);
+        com.addCollection(collectionC);
+
+        EPerson epersonA = EPerson.create(context);
+        EPerson epersonB = EPerson.create(context);
+        EPerson epersonC = EPerson.create(context);
+        EPerson epersonD = EPerson.create(context);
+
+        //personA can submit to collectionA and collectionC
+        AuthorizeManager.addPolicy(context, collectionA, Constants.ADD, epersonA);
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonA);
+
+        //personB can submit to collectionB and collectionC
+        AuthorizeManager.addPolicy(context, collectionB, Constants.ADD, epersonB);
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonB);
+
+        //personC can only submit to collectionC
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonC);
+
+        //personD no submission powers
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(epersonA);
+        Collection[] personACollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized A", personACollections.length == 2);
+        List<Collection> aList = Arrays.asList(personACollections);
+        assertTrue("testFindAuthorizeOptimized A.A", aList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized A.A", aList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized A.A", aList.contains(collectionC));
+
+        context.setCurrentUser(epersonB);
+        Collection[] personBCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized B", personBCollections.length == 2);
+        List<Collection> bList = Arrays.asList(personBCollections);
+        assertFalse("testFindAuthorizeOptimized B.A", bList.contains(collectionA));
+        assertTrue("testFindAuthorizeOptimized B.B", bList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized B.C", bList.contains(collectionC));
+
+        context.setCurrentUser(epersonC);
+        Collection[] personCCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized C", personCCollections.length == 1);
+        List<Collection> cList = Arrays.asList(personCCollections);
+        assertFalse("testFindAuthorizeOptimized C.A", cList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized C.B", cList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized C.C", cList.contains(collectionC));
+
+        context.setCurrentUser(epersonD);
+        Collection[] personDCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized D", personDCollections.length == 0);
+        List<Collection> dList = Arrays.asList(personDCollections);
+        assertFalse("testFindAuthorizeOptimized D.A", dList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized D.B", dList.contains(collectionB));
+        assertFalse("testFindAuthorizeOptimized D.C", dList.contains(collectionC));
     }
 
     /**

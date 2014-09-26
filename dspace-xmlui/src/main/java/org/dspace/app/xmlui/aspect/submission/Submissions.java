@@ -172,7 +172,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
     	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
     	{
-            Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+            Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
 
             if (collections.length > 0)
             {
