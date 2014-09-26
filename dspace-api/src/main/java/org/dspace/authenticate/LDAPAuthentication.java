@@ -250,17 +250,24 @@ public class LDAPAuthentication
                 log.info(LogManager.getHeader(context,
                                 "autoregister", "netid=" + netid));
 
-                // If there is no email and the email domain is set, add it to the netid
                 String email = ldap.ldapEmail;
 
-                if ((StringUtils.isEmpty(email)) &&
-                        (StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
+                // Check if we were able to determine an email address from LDAP
+                if (StringUtils.isEmpty(email))
                 {
-                    email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
-                }
-                else
-                {
-                    email = netid;
+                    // If no email, check if we have a "netid_email_domain". If so, append it to the netid to create email
+                    if (StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain")))
+                    {
+                        email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
+                    }
+                    else
+                    {
+                        // We don't have a valid email address. We'll default it to 'netid' but log a warning
+                        log.warn(LogManager.getHeader(context, "autoregister",
+                                "Unable to locate email address for account '" + netid + "', so it has been set to '" + netid + "'. " +
+                                "Please check the LDAP 'email_field' OR consider configuring 'netid_email_domain'."));
+                        email = netid;
+                    }
                 }
 
                 if (StringUtils.isNotEmpty(email))
