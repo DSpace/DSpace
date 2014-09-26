@@ -82,7 +82,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         } 
         else
         {
-            collections = Collection.findAuthorized(context, null, Constants.ADD);
+            collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
         }
         
         // Basic form with a drop down list of all the collections

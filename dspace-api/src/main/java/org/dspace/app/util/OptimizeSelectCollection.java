@@ -22,6 +22,7 @@ public class OptimizeSelectCollection {
     private static Context context;
 
     private static ArrayList<EPerson> brokenPeople;
+    private static Long timeSavedMS = 0L;
 
     public static void main(String[] argv) throws Exception
     {
@@ -31,17 +32,21 @@ public class OptimizeSelectCollection {
 
         context = new Context();
         brokenPeople = new ArrayList<EPerson>();
+        int peopleChecked = 0;
+        timeSavedMS = 0L;
 
         if(argv != null && argv.length > 0) {
             for(String email : argv) {
                 EPerson person = EPerson.findByEmail(context, email);
                 checkSelectCollectionForUser(person);
+                peopleChecked++;
             }
         } else {
             //default case, run as specific user, or run all...
             EPerson[] people = EPerson.findAll(context, EPerson.EMAIL);
             for(EPerson person : people) {
                 checkSelectCollectionForUser(person);
+                peopleChecked++;
             }
         }
 
@@ -50,6 +55,8 @@ public class OptimizeSelectCollection {
             for(EPerson person : brokenPeople) {
                 System.out.println("-- " + person.getEmail());
             }
+        } else {
+            System.out.println("All Good: " + peopleChecked + " people have been checked, with same submission powers. TimeSaved(ms): " + timeSavedMS);
         }
 
     }
@@ -63,7 +70,7 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorized");
         Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
         stopWatch.stop();
-
+        Long defaultMS = stopWatch.getLastTaskTimeMillis();
 
         stopWatch.start("ListingCollections");
         System.out.println("Legacy Find Authorized");
@@ -73,6 +80,9 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorizedOptimized");
         Collection[] collectionsOptimized = Collection.findAuthorizedOptimized(context, Constants.ADD);
         stopWatch.stop();
+        Long optimizedMS = stopWatch.getLastTaskTimeMillis();
+        timeSavedMS += defaultMS - optimizedMS;
+
 
         stopWatch.start("ListingCollectionsWithOptimizedCollections");
         System.out.println("Find Authorized Optimized");
