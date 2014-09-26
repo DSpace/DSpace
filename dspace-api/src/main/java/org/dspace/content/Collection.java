@@ -1554,6 +1554,14 @@ public class Collection extends DSpaceObject
         // i.e. Typical Community Admin -- name.# > COMMUNITY_10_ADMIN > Ohio State University Press
 
         //Check eperson->comm-admin
+        Collection[] group2commCollections = findGroup2CommunityMapped(context);
+        for (int i = 0; i< group2commCollections.length; i++)
+        {
+            if(!myResults.contains(group2commCollections[i]))
+            {
+                myResults.add(group2commCollections[i]);
+            }
+        }
 
 
         // Return the collections, sorted alphabetically
