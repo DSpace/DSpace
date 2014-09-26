@@ -297,10 +297,10 @@
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
-        <!-- Enable or disable multilanguage support in discovery facets (depending on the session current locale)
-        	 If missing, "false" is meant by default -->
-        <property name="localeEnabled" value="true"/>
-        <property name="inputFormEnabled" value="true"/>
+        <!-- Enable or disable multilanguage support in discovery facets (depending on the session current locale).If missing, "false" is meant by default -->
+        <!-- <property name="localeEnabled" value="true"/> -->
+        <!-- Enable or disable multilanguage support for indexing in browse stored and displayed value for value-pairns inut form fields -->
+        <!-- <property name="inputFormEnabled" value="false"/> -->
     </bean>
 
     <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
