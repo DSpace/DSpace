@@ -106,7 +106,7 @@ public class SendItemRequestAction extends AbstractAction
         if (titleDC == null || titleDC.length == 0) {
             titleDC = item.getDC("title", Item.ANY, Item.ANY); // dc.title with qualifier term
         }
-        if (titleDC != null || titleDC.length > 0) {
+        if (titleDC != null && titleDC.length > 0) {
             title = titleDC[0].value;
         }
         
