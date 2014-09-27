@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,12 +85,14 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
         field2.create(context);
 
         MetadataValue value1 = new MetadataValue(field1);
-        value1.setItemId(it.getID());
+        value1.setResourceId(it.getID());
+        value1.setResourceTypeId(Constants.ITEM);
         value1.setValue("value1");
         value1.create(context);
 
         MetadataValue value2 = new MetadataValue(field2);
-        value2.setItemId(it.getID());
+        value2.setResourceId(it.getID());
+        value2.setResourceTypeId(Constants.ITEM);
         value2.setValue("value2");
         value2.create(context);
         

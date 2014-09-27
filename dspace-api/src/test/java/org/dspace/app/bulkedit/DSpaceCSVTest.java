@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
-import org.dspace.core.Context;
 
 import org.junit.*;
 import static org.junit.Assert.* ;
@@ -30,34 +29,6 @@ public class DSpaceCSVTest extends AbstractUnitTest
 {
     /** log4j category */
     private static final Logger log = Logger.getLogger(DSpaceCSVTest.class);
-
-    /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @Before
-    @Override
-    public void init()
-    {
-        super.init();
-    }
-
-    /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy()
-    {
-        super.destroy();
-    }
 
     /**
      * Test the reading and parsing of CSV files
@@ -85,9 +56,10 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
+
             // Test the CSV parsing was OK
-            Context c = new Context();
-            DSpaceCSV dcsv = new DSpaceCSV(new File(filename), c);
+            DSpaceCSV dcsv = new DSpaceCSV(new File(filename), context);
             String[] lines = dcsv.getCSVLinesAsStringArray();
             assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
 
@@ -98,6 +70,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             value.add("Abstract with\ntwo\nnew lines");    
             assertThat("testDSpaceCSV New lines", line.valueToCSV(value),
                                                   equalTo("\"Abstract with\ntwo\nnew lines\""));
+            line = null;
 
             // Test the CSV parsing with a bad heading element value
             csv[0] = "id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract";
@@ -111,16 +84,19 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
+
             // Test the CSV parsing was OK
             try
             {
-                dcsv = new DSpaceCSV(new File(filename), c);
+                dcsv = new DSpaceCSV(new File(filename), context);
                 lines = dcsv.getCSVLinesAsStringArray();
 
                 fail("An exception should have been thrown due to bad CSV");
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                    assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata element in row 4: dc.contributor.foobar"));
+                assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata element in row 4: dc.contributor.foobar"));
             }
             lines = dcsv.getCSVLinesAsStringArray();
             assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
@@ -138,14 +114,17 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             out.flush();
             out.close();
+            out = null;
+
             // Test the CSV parsing was OK
             try
             {
-                dcsv = new DSpaceCSV(new File(filename), c);
+                dcsv = new DSpaceCSV(new File(filename), context);
                 lines = dcsv.getCSVLinesAsStringArray();
 
                 fail("An exception should have been thrown due to bad CSV");
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata schema in row 3: dcdc.title"));
             }
@@ -153,6 +132,11 @@ public class DSpaceCSVTest extends AbstractUnitTest
             // Delete the test file
             File toDelete = new File(filename);
             toDelete.delete();
+            toDelete = null;
+            
+            // Nullify resources so JUnit will clean them up
+            dcsv = null;
+            lines = null;
         }
         catch (Exception ex) {
             log.error("IO Error while creating test CSV file", ex);

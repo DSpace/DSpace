@@ -64,3 +64,5 @@ input.ds-authority-lock.is-unlocked
 
 /* field required in submission */
 .label-required:after { content:" *"; }
+.browse_range { text-align: center; }
+.prev-next-links { text-align: center; }

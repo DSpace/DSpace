@@ -14,6 +14,11 @@
 This stylsheet to handle exception display is a modified version of the
 base apache cocoon stylesheet, this is still under the Apache license.
 
+In DSpace, this stylesheet is ONLY used when major exceptions occur. DSpace will
+first attempt to use 'exception2dri.xsl' in order to display the error within your
+DSpace theme. However, if that fails (or the Theme is not configured properly), then
+DSpace will fallback to using this stylesheet to generate an un-themed exception display.
+
 The original author is unknown.
 Scott Phillips adapted it for Manakin's need.
 

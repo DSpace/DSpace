@@ -1,2 +1,45 @@
 language: java
-script: "mvn clean package license:check -Dmaven.test.skip=false"
+
+env: 
+  # Give Maven 1GB of memory to work with
+  - MAVEN_OPTS=-Xmx1024M
+
+# Install prerequisites for building Mirage2 more rapidly
+before_install:
+  # Install latest Node.js 0.10.x & print version info
+  - nvm install 0.10
+  - node --version
+  # Install Bower
+  - npm install -g bower
+  # Install Grunt & print version info
+  - npm install -g grunt && npm install -g grunt-cli
+  - grunt --version
+  # Print ruby version info (should be installed)
+  - ruby -v
+  # Install Sass & print version info
+  - gem install sass
+  - sass -v
+  # Install Compass & print version info
+  - gem install compass
+  - compass version
+
+# Skip install stage, as we'll do it below
+install: "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"
+
+# Two stage Build and Test
+# 1. Install & Unit Test APIs
+# 2. Assemble DSpace
+script:
+  # 1. [Install & Unit Test] Check source code licenses and run source code Unit Tests
+  #    (This explicitly skips building the 'dspace' assembly module, since we only want to do that ONCE.)
+  #        license:check => Validate all source code license headers
+  #        -Dmaven.test.skip=false => Enable DSpace Unit Tests
+  #        -P !dspace => SKIP full DSpace assembly (will do below)
+  #        -B => Maven batch/non-interactive mode (recommended for CI)
+  #        -V => Display Maven version info before build
+  - "mvn clean install license:check -Dmaven.test.skip=false -P !dspace -B -V"
+  # 2. [Assemble DSpace] Ensure assembly process works (from [src]/dspace/), including Mirage 2
+  #        -Dmirage2.on=true => Build Mirage2
+  #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
+  #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
+  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V"

@@ -30,11 +30,11 @@
     <!-- provider to mint and register DOIs with DSpace.
          To mint DOIs you need a registration agency. The DOIIdentifierProvider
          maintains the doi database table and handling of DSpaceObject. It uses
-         a DOIConnector that handle all API calls to your DOI registration
-         agency. Please configure a DOIConnector as well!-->
+         a DOIConnector that handles all API calls to your DOI registration
+         agency. Please configure a DOIConnector as well! -->
 
-    <!-- To mint DOIs with DSpace get an agreement with a DOI registration
-         agency,  take a look into dspace.cfg, and remove this comment
+    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI registration
+         agency,  take a look into dspace.cfg, and uncomment this.
     <bean id="org.dspace.identifier.DOIIdentifierProvider"
         class="org.dspace.identifier.DOIIdentifierProvider"
         scope="singleton">
@@ -47,13 +47,13 @@
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
-         tells you to use DataCites API directly you can use the
+         tells you to use the DataCite API directly, you can use the
          DataCiteConnector. If your registration agency is not part of DataCite
-         or provides their own API you have to implement a DOIConnector.
-         EZID f.e. is part of DataCite but provides their own APIs. The following
+         or provides their own API, you have to implement a DOIConnector.
+         e.g. EZID is part of DataCite but provides their own APIs. The following
          DataCiteConnector won't work if EZID is your registration agency.
     -->
-    <!-- Remove this comment to use DataCite API directly as DOIConnector.
+    <!-- Uncomment this to use the DataCite API directly as DOIConnector.
     <bean id="org.dspace.identifier.doi.DOIConnector"
         class="org.dspace.identifier.doi.DataCiteConnector"
         scope="singleton">

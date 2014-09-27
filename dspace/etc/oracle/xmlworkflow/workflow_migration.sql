@@ -121,7 +121,7 @@ DELETE FROM resourcepolicy
 WHERE resource_type_id = 0 AND resource_id IN
   (SELECT bundle2bitstream.bitstream_id FROM
     ((workflowitem INNER JOIN item2bundle ON workflowitem.item_id = item2bundle.item_id)
-      INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id);
+      INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id));
 -- Create policies for claimtasks
 --     public static final int BITSTREAM = 0;
 --     public static final int BUNDLE = 1;
@@ -137,7 +137,7 @@ WHERE resource_type_id = 0 AND resource_id IN
 -- Create a temporarty table with action ID's
 CREATE TABLE temptable(
   action_id INTEGER PRIMARY KEY
-)
+);
 INSERT ALL
   INTO temptable (action_id) VALUES (0)
   INTO temptable (action_id) VALUES (1)
@@ -266,11 +266,11 @@ FROM (((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item
 );
 
 -- TODO: not tested yet
-INSERT INTO cwf_in_progress_user (in_progress_user_id, workflowitem_id, step_id, user_id, finished)
+INSERT INTO cwf_in_progress_user (in_progress_user_id, workflowitem_id, user_id, finished)
 SELECT
   cwf_in_progress_user_seq.nextval AS in_progress_user_id,
-  cwf_workflowitem.item_id AS workflowitem_id,
-  cwf_claimtask.owner_id AS user_id
+  cwf_workflowitem.workflowitem_id AS workflowitem_id,
+  cwf_claimtask.owner_id AS user_id,
   0 as finished
 FROM
   (cwf_claimtask INNER JOIN cwf_workflowitem ON cwf_workflowitem.workflowitem_id = cwf_claimtask.workflowitem_id);

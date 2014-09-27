@@ -149,6 +149,9 @@
 				}
 			});
 	});
+	function validateFilters() {
+		return document.getElementById("filterquery").value.length > 0;
+	}
 </script>		
 </c:set>
 
@@ -285,11 +288,11 @@
 			}
 		%>
 		</select>
-		<input type="text" id="filterquery" name="filterquery" size="45"/>
-        <input type="hidden" value="<%= rpp %>" name="rpp" />
-        <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-        <input type="hidden" value="<%= order %>" name="order" />
-		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" />
+		<input type="text" id="filterquery" name="filterquery" size="45" required="required" />
+		<input type="hidden" value="<%= rpp %>" name="rpp" />
+		<input type="hidden" value="<%= sortedBy %>" name="sort_by" />
+		<input type="hidden" value="<%= order %>" name="order" />
+		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" onclick="return validateFilters()" />
 		</form>
 		</div>        
 <% } %>

@@ -1,5 +1,5 @@
 --
--- database_schema_18-3.sql
+-- database_schema_3-4.sql
 --
 -- Version: $Revision$
 --
@@ -13,8 +13,8 @@
 --
 
 --
--- SQL commands to upgrade the database schema of a live DSpace 1.8 or 1.8.x
--- to the DSpace 3 database schema
+-- SQL commands to upgrade the database schema of a live DSpace 3 or 3.x
+-- to the DSpace 4 database schema
 --
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
 -- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.

@@ -176,6 +176,9 @@
     <!-- Items inside option lists are excluded from the "orphan roundup" mechanism -->
     <xsl:template match="dri:options//dri:item" mode="nested" priority="3">
         <li>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-simple-list-item</xsl:with-param>
+            </xsl:call-template>
             <xsl:apply-templates />
         </li>
     </xsl:template>

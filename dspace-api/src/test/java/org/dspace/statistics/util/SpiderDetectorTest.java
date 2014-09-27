@@ -23,12 +23,6 @@ public class SpiderDetectorTest
 {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
-    @BeforeClass
-    static public void beforeClass()
-    {
-        new MockSolrLogger();
-    }
-
     /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetector#readPatterns(java.io.File)}.
      */
@@ -83,6 +77,8 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+        
+        req = null;
     }
 
     /**

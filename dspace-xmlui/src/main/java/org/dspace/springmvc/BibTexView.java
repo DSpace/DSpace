@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -133,7 +131,7 @@ public class BibTexView implements View {
 
     private String getMetadataValue(Item item, String metadatafield)
     {
-        for (DCValue value : item.getMetadata(metadatafield))
+        for (DCValue value : item.getMetadataByMetadataString(metadatafield))
         {
             return value.value;
         }
@@ -145,16 +143,16 @@ public class BibTexView implements View {
     {
         ArrayList<String> authors = new ArrayList<String>();
 
-        authors.addAll(getAuthors(aItem.getMetadata("dc.contributor.author")));
-        authors.addAll(getAuthors(aItem.getMetadata("dc.creator")));
-        authors.addAll(getAuthors(aItem.getMetadata("dc.contributor")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.contributor.author")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.creator")));
+        authors.addAll(getAuthors(aItem.getMetadataByMetadataString("dc.contributor")));
 
         return authors.toArray(new String[authors.size()]);
     }
 
     private String getYear(Item aItem)
     {
-        for (DCValue date : aItem.getMetadata("dc.date.issued"))
+        for (DCValue date : aItem.getMetadataByMetadataString("dc.date.issued"))
         {
             return date.value.substring(0, 4);
         }

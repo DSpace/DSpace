@@ -38,7 +38,7 @@ public abstract class AbstractVersionProvider {
                 continue;
             }
 
-            itemNew.addMetadata(aMd.schema, aMd.element, aMd.qualifier, aMd.language, aMd.value);
+            itemNew.addMetadata(aMd.schema, aMd.element, aMd.qualifier, aMd.language, aMd.value, aMd.authority, aMd.confidence);
         }
     }
 
