@@ -758,7 +758,7 @@ public class RDFizer {
     
     protected static void usage(Options options)
     {
-        String cliSyntax = "[dspace-bin]/bin/dspace rdf-converter [OPTIONS...]";
+        String cliSyntax = "[dspace-bin]/bin/dspace rdfizer [OPTIONS...]";
         String header = "";
         String footer = "\nYou cannot use the options --convert-all, --identifiers " +
                 "or --stdout together with --delete or --delete-all.\n" +
