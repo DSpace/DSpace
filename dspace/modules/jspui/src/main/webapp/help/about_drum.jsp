@@ -53,7 +53,7 @@
 
 <p>You can use DRUM to share your work with researchers around the world. All content in DRUM is indexed in Google and Google Scholar for high visibility, and you receive a permanent DOI for each submission. Colleagues and other researchers can use the DOI to cite your work.</p>
 
-<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. Review our short <a href="http://drumstage.lib.umd.edu/help/about_submitting.jsp">guide to submitting your research</a>.</p>.</p>
+<p>By depositing your work in DRUM, you make it easy for researchers, students, policymakers, and journalists to reference, replicate, and re-use your work. Review our short <a href="<%= request.getContextPath() %>/help/about_submitting.jsp">guide to submitting your research</a>.</p>.</p>
 
 <h2>Preserve your work for the long term</h2>
 
