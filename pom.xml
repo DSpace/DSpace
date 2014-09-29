@@ -58,7 +58,7 @@
     </build>
 
     <modules>
-        <module>dryad-widgets-api</module>
+        <module>dryad-widgets-webapp</module>
     </modules>
 
 </project>
