@@ -8,6 +8,7 @@
         <folder path="dryad-widgets-api/"/>
         <folder path="dryad-widgets-webapp/"/>
         <folder path="dryad-widgets-webapp/src/main/properties/"/>
+        <file name=".travis.yml"/>
         <file name="pom.xml"/>
     </projectTree>
 </project>

@@ -1,4 +1,4 @@
 language: java
 jdk: openjdk6
-script: ./test/build_test.sh 
-
+before_install: echo "Overriding default install"
+script: ./test/build_test.sh
