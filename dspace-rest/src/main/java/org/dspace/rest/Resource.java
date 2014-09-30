@@ -83,6 +83,10 @@ public class Resource
             context.abort();
             throw new ContextException("Could not create context, SQLException. Message: " + e, e);
         }
+        finally
+        {
+			context.abort();
+		}
     }
 
     /**
@@ -142,6 +146,10 @@ public class Resource
         {
             processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
     }
 

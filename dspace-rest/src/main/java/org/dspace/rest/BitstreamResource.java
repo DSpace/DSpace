@@ -108,6 +108,8 @@ public class BitstreamResource extends Resource{
             processException("Someting went wrong while reading bitstream(id=" + bitstreamId + ") from database! Message: " + e,context);
         } catch (ContextException e) {
 			processException("Someting went wrong while reading bitstream(id=" + bitstreamId + "), ContextException. Message: " + e.getMessage(), context);
+		} finally {
+			context.abort();
 		}
     	
     	return bitstream;
@@ -154,6 +156,8 @@ public class BitstreamResource extends Resource{
 			processException("Someting went wrong while reading policies of bitstream(id=" + bitstreamId + "), SQLException! Message: " + e, context);
 		} catch (ContextException e) {
 			processException("Someting went wrong while reading policies of bitstream(id=" + bitstreamId + "), ContextException. Message: " + e.getMessage(), context);
+		}  finally {
+			context.abort();
 		}
 
 		return policies.toArray(new ResourcePolicy[0]);
@@ -219,6 +223,8 @@ public class BitstreamResource extends Resource{
         	processException("Something get wrong while reading bitstreams from database!. Message: " + e, context);
         } catch (ContextException e) {
 			processException("Something get wrong while reading bitstreams, ContextException. Message: " + e.getMessage(), context);
+		}  finally {
+			context.abort();
 		}
     	
     	return bitstreams.toArray(new Bitstream[0]);
@@ -279,6 +285,8 @@ public class BitstreamResource extends Resource{
         	processException("Could not retrieve file of bitstream(id=" + bitstreamId + "), AuthorizeException! Message: " + e, context);
         } catch (ContextException e) {
 			processException("Could not retrieve file of bitstream(id=" + bitstreamId + "), ContextException! Message: " + e.getMessage(), context);
+		}  finally {
+			context.abort();
 		}
     	
     	return null;
@@ -341,6 +349,8 @@ public class BitstreamResource extends Resource{
 			processException("Someting went wrong while adding policy to bitstream(id=" + bitstreamId + "), ContextException. Message: " + e.getMessage(), context);
 		} catch (AuthorizeException e) {
 			processException("Someting went wrong while adding policy to bitstream(id=" + bitstreamId + "), AuthorizeException! Message: " + e, context);
+		}  finally {
+			context.abort();
 		}
 		return Response.status(Status.OK).build();
 	}
@@ -444,6 +454,8 @@ public class BitstreamResource extends Resource{
         	processException("Could not update bitstream(id=" + bitstreamId + ") metadata, AuthorizeException. Message: " + e, context);
         } catch (ContextException e) {
 			processException("Could not update bitstream(id=" + bitstreamId + ") metadata, ContextException. Message: " + e.getMessage(), context);
+		} finally {
+			context.abort();
 		}
         
     	log.info("Bitstream metadata(id=" + bitstreamId + ") were successfully updated.");
@@ -517,6 +529,8 @@ public class BitstreamResource extends Resource{
         	processException("Could not update bitstream(id=" + bitstreamId + ") data, IOException. Message: " + e, context);
 		} catch (ContextException e) {
 			processException("Could not update bitstream(id=" + bitstreamId + ") data, ContextException. Message: " + e.getMessage(), context);
+		} finally {
+			context.abort();
 		}
 		
 		log.info("Bitstream(id=" + bitstreamId + ") data was successfully updated.");
@@ -577,6 +591,8 @@ public class BitstreamResource extends Resource{
 			processException("Could not delete bitstream(id=" + bitstreamId + "), IOException. Message: " + e, context);
         } catch (ContextException e) {
 			processException("Could not delete bitstream(id=" + bitstreamId + "), ContextException. Message:" + e.getMessage(), context);
+		} finally {
+			context.abort();
 		}
     	
         log.info("Bitstream(id=" + bitstreamId + ") was successfully deleted.");
@@ -632,6 +648,8 @@ public class BitstreamResource extends Resource{
 			processException("Someting went wrong while deleting READ policy(id=" + policyId + ") to bitstream(id=" + bitstreamId + "), ContextException. Message: " + e.getMessage(), context);
 		} catch (AuthorizeException e) {
 			processException("Someting went wrong while deleting READ policy(id=" + policyId + ") to bitstream(id=" + bitstreamId + "), AuthorizeException! Message: " + e, context);
+		} finally {
+			context.abort();
 		}
 		return Response.status(Status.OK).build();
 	}
@@ -684,6 +702,8 @@ public class BitstreamResource extends Resource{
 			
 		} catch (SQLException e) {
 			processException("Something get wrong while finding bitstream. SQLException, Message:" + e, context);
+		} finally {
+			context.abort();
 		}
     	return bitstream;
     }
