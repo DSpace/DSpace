@@ -18,24 +18,25 @@ public class BtnCiteLightbox extends TestCase {
 
   @Before
   public void setUp() throws Exception {
+    baseUrl = System.getProperty("seleniumTestURL");
     driver = new FirefoxDriver();
-    // baseUrl = "http://localhost:1234/dryad-widgets-webapp/src/test/java/it";
-    baseUrl = System.getProperty("selenium_test_url"); 
     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
   }
 
   @Test
   public void testBtnCiteLightbox() throws Exception {
+    String btn_selector = "i.fa.fa-quote-left:nth-of-type(1)";
+    String close_selector = "button.mfp-close";
     driver.get(baseUrl + "/test.html");
-System.out.println("1");
-    assertTrue(isElementPresent(By.cssSelector("#ddw-body > div.dryad-ddw-control > ul > li:nth-child(4) > a > i")));
-System.out.println("2");
-    driver.findElement(By.cssSelector("#ddw-body > div.dryad-ddw-control > ul > li:nth-child(4) > a > i")).click();
-System.out.println("3");
-    // ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
-    driver.findElement(By.cssSelector("button.mfp-close")).click();
-System.out.println("4");
-    // ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
+    
+    // into widget frame
+    driver.switchTo().frame(0);
+    assertTrue(isElementPresent(By.cssSelector(btn_selector)));
+    driver.findElement(By.cssSelector(btn_selector)).click();
+    
+    // out of frame
+    driver.switchTo().defaultContent(); 
+    driver.findElement(By.cssSelector(close_selector)).click();
   }
 
   @After

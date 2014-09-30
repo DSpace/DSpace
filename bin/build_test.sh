@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-set -x  # verbose bash
+#set -x  # verbose bash
 set -e  # return fail on a failed command, for travis-ci
 
 ITPORT=2341
@@ -31,7 +31,7 @@ trap on_exit EXIT
 # build and run junit tests
 cd "$BASE_DIR"
 $MVN clean package -DskipTests=true
-#$MVN test
+$MVN test
 
 # start virtual frame buffer if in Travis-CI env 
 if [ "$travis" ]; then

@@ -18,19 +18,25 @@ public class BtnZoomLightbox extends TestCase {
 
   @Before
   public void setUp() throws Exception {
+    baseUrl = System.getProperty("seleniumTestURL");
     driver = new FirefoxDriver();
-    baseUrl = "http://localhost:1234/";
     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
   }
 
   @Test
-  public void testBtnZoomLightbox() throws Exception {
+  public void testBtnZoomLightbox() throws Exception {    
+    String btn_selector = "i.fa.fa-expand:nth-of-type(1)";
+    String close_selector = "button.mfp-close";
     driver.get(baseUrl + "/test.html");
-    assertTrue(isElementPresent(By.cssSelector("i.fa.fa-expand")));
-    driver.findElement(By.cssSelector("i.fa.fa-expand")).click();
-    // ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
-    driver.findElement(By.cssSelector("button.mfp-close")).click();
-    // ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.]
+    
+    // into widget frame
+    driver.switchTo().frame(0);
+    assertTrue(isElementPresent(By.cssSelector(btn_selector)));
+    driver.findElement(By.cssSelector(btn_selector)).click();
+    
+    // out of frame
+    driver.switchTo().defaultContent(); 
+    driver.findElement(By.cssSelector(close_selector)).click();
   }
 
   @After

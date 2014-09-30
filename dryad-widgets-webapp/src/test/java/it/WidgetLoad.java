@@ -18,14 +18,15 @@ public class WidgetLoad extends TestCase {
 
   @Before
   public void setUp() throws Exception {
+    baseUrl = System.getProperty("seleniumTestURL");   
     driver = new FirefoxDriver();
-    baseUrl = "http://localhost:1234/dryad-widgets-webapp/src/test/java/it";
     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
   }
 
   @Test
   public void testWidgetLoad() throws Exception {
     driver.get(baseUrl + "/test.html");
+    driver.switchTo().frame(0);
     assertTrue(isElementPresent(By.cssSelector("img[alt=\"Data in Dryad\"]")));
   }
 

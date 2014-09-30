@@ -18,14 +18,15 @@ public class ButtonsPresent extends TestCase {
 
   @Before
   public void setUp() throws Exception {
+    baseUrl = System.getProperty("seleniumTestURL");
     driver = new FirefoxDriver();
-    baseUrl = "http://localhost:1234/";
     driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
   }
 
   @Test
   public void testButtonsPresent() throws Exception {
     driver.get(baseUrl + "/test.html");
+    driver.switchTo().frame(0);
     assertTrue(isElementPresent(By.cssSelector("i.fa.fa-expand")));
     assertTrue(isElementPresent(By.cssSelector("i.fa.fa-share-alt")));
     assertTrue(isElementPresent(By.cssSelector("i.fa.fa-download")));
