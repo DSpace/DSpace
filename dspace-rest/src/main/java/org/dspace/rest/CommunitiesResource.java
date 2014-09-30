@@ -35,7 +35,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
-import org.dspace.rest.common.Edge;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
