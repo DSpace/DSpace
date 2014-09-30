@@ -115,6 +115,10 @@ public class CollectionsResource extends Resource
             processException("Could not read collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.trace("Collection(id=" + collectionId + ") has been successfully read.");
         return collection;
@@ -200,6 +204,10 @@ public class CollectionsResource extends Resource
         {
             processException("Something went wrong while reading collections, ContextError. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.trace("All collections were successfully read.");
         return collections.toArray(new org.dspace.rest.common.Collection[0]);
@@ -284,6 +292,10 @@ public class CollectionsResource extends Resource
         {
             processException("Could not read collection items, ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.trace("All items in collection(id=" + collectionId + ") were successfully read.");
         return null;
@@ -386,6 +398,10 @@ public class CollectionsResource extends Resource
                     "Could not add item into collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Item successfully created in collection(id=" + collectionId + "). Item handle=" + returnItem.getHandle());
         return returnItem;
@@ -457,6 +473,10 @@ public class CollectionsResource extends Resource
         {
             processException("Could not update collection(id=" + collectionId + "), AuthorizeException. Message: " + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Collection(id=" + collectionId + ") successfully updated.");
         return Response.ok().build();
@@ -523,6 +543,10 @@ public class CollectionsResource extends Resource
         {
             processException("Could not delete collection(id=" + collectionId + "), IOException. Message: " + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Collection(id=" + collectionId + ") was successfully deleted.");
         return Response.ok().build();
@@ -625,6 +649,10 @@ public class CollectionsResource extends Resource
             processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
                     + "), IOException. Message: " + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Item(id=" + itemId + ") in collection(id=" + collectionId + ") was successfully deleted.");
         return Response.ok().build();
@@ -670,6 +698,10 @@ public class CollectionsResource extends Resource
 			processException("Something went wrong while searching for collection(name=" + name + ") from database. Message: " + e, context);
 		} catch (ContextException e) {
 			processException("Something went wrong while searching for collection(name=" + name + "), ContextError. Message: " + e.getMessage(), context);
+		}
+		finally
+        {
+			context.abort();
 		}
 
 		if (collection == null) {
@@ -730,6 +762,10 @@ public class CollectionsResource extends Resource
         {
             processException("Something get wrong while finding collection(id=" + id + "). SQLException, Message: " + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
         return collection;
     }
 }

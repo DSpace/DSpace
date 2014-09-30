@@ -119,6 +119,10 @@ public class ItemsResource extends Resource
         {
             processException("Could not read item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return item;
     }
@@ -196,6 +200,10 @@ public class ItemsResource extends Resource
         {
             processException("Something went wrong while reading items, ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -251,6 +259,10 @@ public class ItemsResource extends Resource
         {
             processException("Could not read item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
         return null;
     }
 
@@ -320,6 +332,10 @@ public class ItemsResource extends Resource
             processException("Could not read item(id=" + itemId + ") bitstreams, ContextException. Message: " + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -393,6 +409,10 @@ public class ItemsResource extends Resource
             processException("Could not write metadata to item(id=" + itemId + "), ContextException. Message: " + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Metadata to item(id=" + itemId + ") were successfully added.");
         return Response.status(Status.OK).build();
@@ -536,6 +556,10 @@ public class ItemsResource extends Resource
 		} catch (ContextException e) {
 			processException("Could not create bitstream in item(id=" + itemId + "), ContextException Message: " + e.getMessage(), context);
 		}
+		finally
+        {
+			context.abort();
+		}
 
 		log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
 		return bitstream;
@@ -618,6 +642,10 @@ public class ItemsResource extends Resource
             processException(
                     "Could not update metadata in item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Metadata of item(id=" + itemId + ") were successfully updated.");
         return Response.status(Status.OK).build();
@@ -683,6 +711,10 @@ public class ItemsResource extends Resource
         {
             processException("Could not delete item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Item(id=" + itemId + ") was successfully deleted.");
         return Response.status(Status.OK).build();
@@ -758,6 +790,10 @@ public class ItemsResource extends Resource
         {
             processException("Could not delete item(id=" + itemId + "), ContextException. Message:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Item(id=" + itemId + ") metadata were successfully deleted.");
         return Response.status(Status.OK).build();
@@ -850,6 +886,10 @@ public class ItemsResource extends Resource
             processException("Could not delete bitstream(id=" + bitstreamId + "), ContextException. Message:" + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Bitstream(id=" + bitstreamId + ") from item(id=" + itemId + ") was successfuly deleted .");
         return Response.status(Status.OK).build();
@@ -959,6 +999,10 @@ public class ItemsResource extends Resource
         {
             processException("Context error:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         if (items.size() == 0)
         {
@@ -1021,6 +1065,10 @@ public class ItemsResource extends Resource
         {
             processException("Something get wrong while finding item(id=" + id + "). SQLException, Message: " + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
         return item;
     }
 }

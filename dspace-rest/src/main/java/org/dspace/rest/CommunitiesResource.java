@@ -106,6 +106,10 @@ public class CommunitiesResource extends Resource
             processException("Could not read community(id=" + communityId + "), ContextException. Message:" + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.trace("Community(id=" + communityId + ") was successfully read.");
         return community;
@@ -184,6 +188,10 @@ public class CommunitiesResource extends Resource
         {
             processException("Could not read communities, ContextException. Message:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -264,6 +272,10 @@ public class CommunitiesResource extends Resource
         {
             processException("Could not read top communities, ContextException. Message:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -348,6 +360,10 @@ public class CommunitiesResource extends Resource
                     "Could not read community(id=" + communityId + ") collections, ContextException. Message:" + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -433,6 +449,10 @@ public class CommunitiesResource extends Resource
                     "Could not read community(id=" + communityId + ") subcommunities, ContextException. Message:"
                             + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return null;
     }
@@ -506,6 +526,10 @@ public class CommunitiesResource extends Resource
         {
             processException("Could not create new top community, AuthorizeException. Message: " + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Community at top level has been successfully created. Handle:" + retCommunity.getHandle());
         return retCommunity;
@@ -583,6 +607,10 @@ public class CommunitiesResource extends Resource
                     "Could not add collection into community(id=" + communityId + "), ContextException. Message:"
                             + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Collection was successfully added into community(id=" + communityId + "). Collection handle=" + retCollection.getHandle());
         return retCollection;
@@ -658,6 +686,10 @@ public class CommunitiesResource extends Resource
             processException("Could not add subcommunity into community(id=" + communityId + "), ContextException. Message:" + e,
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Subcommunity was successfully added in community(id=" + communityId + ").");
         return retCommunity;
@@ -726,6 +758,10 @@ public class CommunitiesResource extends Resource
         {
             processException("Could not update community(id=" + communityId + "), AuthorizeException. Message:" + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Community(id=" + communityId + ") has been successfully updated.");
         return Response.ok().build();
@@ -787,6 +823,10 @@ public class CommunitiesResource extends Resource
             processException("Could not delete community(id=" + communityId + "), ContextException. Message:" + e.getMessage(),
                     context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -888,6 +928,10 @@ public class CommunitiesResource extends Resource
             processException("Could not delete collection(id=" + collectionId + ") in community(id=" + communityId
                     + "), ContextExcpetion. Message:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Collection(id=" + collectionId + ") in community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -989,6 +1033,10 @@ public class CommunitiesResource extends Resource
             processException("Could not delete subcommunity(id=" + subcommunityId + ") in community(id=" + parentCommunityId
                     + "), ContextExcpetion. Message:" + e.getMessage(), context);
         }
+        finally
+        {
+			context.abort();
+		}
 
         log.info("Subcommunity(id=" + subcommunityId + ") from community(id=" + parentCommunityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -1044,6 +1092,10 @@ public class CommunitiesResource extends Resource
         {
             processException("Something get wrong while finding community(id=" + id + "). SQLException, Message:" + e, context);
         }
+        finally
+        {
+			context.abort();
+		}
         return community;
     }
 }

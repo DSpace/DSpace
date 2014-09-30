@@ -93,6 +93,10 @@ public class TokenHolder
             log.error("Could not find user, AuthorizeException. Message:" + e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
+        finally
+        {
+			context.abort();
+		}
 
         return token;
     }
