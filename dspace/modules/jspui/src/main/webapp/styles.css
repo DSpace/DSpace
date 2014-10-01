@@ -11,7 +11,7 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        font-size: 10px;
        font-style: normal;
        color: #000000;
-       background: #bbbbbb;
+       background: #fff;
        margin: 0;
        padding: 0;
        margin-left:0px;
@@ -19,6 +19,21 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        margin-top:0px;
        margin-bottom:0px }
 
+.container-drum {
+	padding: 10px 5px;
+}
+
+#lib-logo {
+	padding: 0 20px 0 0;
+}
+
+#pageBanner-right{
+	text-align:right;
+}
+
+#pageBanner-right p {
+	margin: 5px 0 10px 0;
+}
 
 H1 { margin-left: 10px;
      margin-right: 10px;
@@ -742,24 +757,24 @@ input.ds-authority-lock.is-unlocked
 
 /* Bootstrap Overrides */
 .alert-info, .panel-info>.panel-heading, .panel-success>.panel-heading {
-	background-image: -webkit-gradient(linear,left 0,left 100%,from(#fff0c1),to(#ffe9c2));
-	background-image: -webkit-linear-gradient(top,#fff0c1,0%,#ffe9c2,100%);
-	background-image: -moz-linear-gradient(top,#fff0c1 0,#ffe9c2 100%);
-	background-image: linear-gradient(to bottom,#fff0c1 0,#ffe9c2 100%);
+	background-image: -webkit-gradient(linear,left 0,left 100%,from(#cf0000),to(#d43f3a));
+	background-image: -webkit-linear-gradient(top,#cf0000,0%,#d43f3a,100%);
+	background-image: -moz-linear-gradient(top,#cf0000 0,#d43f3a 100%);
+	background-image: linear-gradient(to bottom,#cf0000 0,#d43f3a 100%);
 	background-repeat: repeat-x;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffff0c1',endColorstr='#ffffe9c2',GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cf0000',endColorstr='#d43f3a',GradientType=0);
 	margin-left: 0;
 	margin-right: 0;
 }
 
 .alert-info, .panel-info>.panel-heading, .panel-success>.panel-heading {
-	color: #a68011;
-	background-color: #fff0c1;
+	color: #fff;
+	background-color: #cf0000;
 	border-color: #a68011;
 }
 
 .alert-info, .panel-success, .panel-info {
-	border-color: #a68011;
+	border-color: #cf0000;
 }
 
 .panel-default>.panel-heading {
@@ -768,8 +783,8 @@ input.ds-authority-lock.is-unlocked
 }
 
 .pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
-	background-color: #ffcc33;
-	border-color: #a68011;
+	background-color: #cf0000;
+	border-color: #cf0000;
 }
 
 .btn-primary {
@@ -779,7 +794,7 @@ input.ds-authority-lock.is-unlocked
 	background-image: linear-gradient(to bottom,#cf0000 0,#d43f3a 100%);
 	background-repeat: repeat-x;
 	border-color: #a68011;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffcc33',endColorstr='#fffdb73f',GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cf0000',endColorstr='#d43f3a',GradientType=0);
 	color: #ffffff;
     font-size: 12px;
     line-height: 1.5;

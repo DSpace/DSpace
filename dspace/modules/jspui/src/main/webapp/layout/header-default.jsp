@@ -114,33 +114,48 @@
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body>
-
+     <div class="container-drum">
         <%-- DSpace top-of-page banner --%>
         <div class="row pageBanner">
 
-      	  <div class="col-md-2" id="pageBanner-ul-logo">
+      	  <div class="col-md-2 col-sm-4" id="lib-logo">
             <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
      	  </div>
 
-     	  <div class="col-md-3 col-md-offset-1">
-            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="319" height="55" border="0"/></a>
+     	  <div class="col-md-4 col-sm-8" id="drum-logo">
+            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"
+            width="123" height="40" border="0"/></a>
+          <br/> Digital Repository at the University of Maryland
           </div>
 
-          <div class="pull-right" id="pageBanner-login">
+          <div class="pull-right" id="pageBanner-right">
+            <%-- Search Box --%>
+            <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
 
-	        <div class="loginStatus">
+              <input type="text" name="query" id="tequery" size="20" placeholder="Search DRUM ..."/>
+              <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" />
+<%
+			  if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
+			  {
+%>
+                <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
+<%
+              }
+%>
+            </form>
+
+	        <p>
   <%
               // Logged in
               if (user != null) {
   %>
-	            <span class="loggedIn"><%= user.getEmail() %></span>
+	           <%= user.getEmail() %>
 	      	    <a href="<%= request.getContextPath() %>/logout">
 	      	      <button class="btn btn-primary">Logout</button>
 	      	    </a>
   <%
               } else {
                 // Not logged in
-
   %>
 	      	    <a href="<%= request.getContextPath() %>/mydspace">
 	      	      <button class="btn btn-primary">Login</button>
@@ -149,24 +164,7 @@
   <%
               }
   %>
-            </div>
-
-            <div class="pull-right">
-              <%-- Search Box --%>
-              <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
-
-                <input type="text" name="query" id="tequery" size="20" placeholder="Search DRUM ..."/>
-                <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" />
-<%
-			    if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
-			    {
-%>
-                  <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
-<%
-                }
-%>
-              </form>
-            </div>
+            </p>
           </div>
         </div>
 
@@ -211,3 +209,5 @@
 <%
     }
 %>
+
+</div>
