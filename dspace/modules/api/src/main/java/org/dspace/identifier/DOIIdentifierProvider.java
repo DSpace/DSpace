@@ -871,16 +871,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
      * output doi.toString()=  2rdfer334/1
      */
     private DOI getCanonicalDataFile(DOI doi, Item item) {
-
-        log.warn("getCanonicalDataFile() doi in input: " + doi);
-
-
         // doi:10.5061/dryad.9054.1 (based on the input example)
         String idDP = doi.toString().substring(0, doi.toString().lastIndexOf(SLASH));
 
         // idDF=1.1
         String idDF = doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
-
 
         String canonicalDP = idDP.substring(0, idDP.lastIndexOf(DOT));
         String canonicalDF = idDF;
