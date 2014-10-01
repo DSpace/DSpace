@@ -45,6 +45,7 @@ fi
 # run selenium/integration tests
 echo "Starting SimpleHTTPServer"
 python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &
+sleep 10
 if [ "$?" -eq "0"  ]; then
     echo Running integration tests
     $MVN failsafe:integration-test failsafe:verify -DseleniumTestURL="http://localhost:$ITPORT/dryad-widgets-webapp/src/test/java/it"
