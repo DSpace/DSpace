@@ -11,10 +11,10 @@ BASE_DIR="$TEST_DIR/.."
 # non-dspace, standalone pom.xml file for local 
 # builds and travis-ci
 POM="$BASE_DIR/pom.standalone.xml"
-MVN_BASE="mvn -f $POM"
-#MVN="$MVN_BASE"
+MVN_BASE="mvn -f $POM --batch-mode"
+MVN="$MVN_BASE"
 #MVN="$MVN_BASE -e"
-MVN="$MVN_BASE --quiet"
+#MVN="$MVN_BASE --quiet"
 
 # run always on exit, wherever failure
 function on_exit {
