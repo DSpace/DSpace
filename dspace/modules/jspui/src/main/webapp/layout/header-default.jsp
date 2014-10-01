@@ -31,9 +31,6 @@
     // Get the DSpace Context
     Context context = UIUtil.obtainContext((HttpServletRequest)request);
 
-    // Is anyone logged in?
-    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
-
     String title = (String) request.getAttribute("dspace.layout.title");
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
     boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
@@ -118,54 +115,28 @@
         <%-- DSpace top-of-page banner --%>
         <div class="row pageBanner">
 
-      	  <div class="col-md-2 col-sm-4" id="lib-logo">
-            <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
+          <%-- University Libraries logo --%>
+	      <div class="col-lg-2 col-md-3 col-sm-4 col-xs-4" id="lib-logo">
+            <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" class="img-responsive" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
      	  </div>
 
-     	  <div class="col-md-4 col-sm-8" id="drum-logo">
-            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" alt="<fmt:message key="jsp.layout.header-default.alt"/>"
-            width="123" height="40" border="0"/></a>
-          <br/> Digital Repository at the University of Maryland
+          <%-- DRUM logo --%>
+     	  <div class="col-lg-4 col-md-4 col-sm-3 col-xs-6" id="drum-logo">
+            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" class="img-responsive" alt="<fmt:message key="jsp.layout.header-default.alt"/>"
+            height="55" width="271" border="0"/></a>
           </div>
 
-          <div class="pull-right" id="pageBanner-right">
-            <%-- Search Box --%>
-            <form method="get" action="<%= request.getContextPath() %>/simple-search" style="display: inline;">
+          <%-- Search box and Login/Logout --%>
+          <div id="pageBanner-right">
+            <%-- Display this div when not 'xs' --%>
+            <div class="pull-right hidden-xs">
+              <dspace:include page="/components/page-banner-right.jsp"></dspace:include>
+            </div>
 
-              <input type="text" name="query" id="tequery" size="20" placeholder="Search DRUM ..."/>
-              <input type="submit" class="btn btn-primary" id="main-query-submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" />
-<%
-			  if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
-			  {
-%>
-                <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
-<%
-              }
-%>
-            </form>
-
-	        <p>
-  <%
-              // Logged in
-              if (user != null) {
-  %>
-	           <%= user.getEmail() %>
-	      	    <a href="<%= request.getContextPath() %>/logout">
-	      	      <button class="btn btn-primary">Logout</button>
-	      	    </a>
-  <%
-              } else {
-                // Not logged in
-  %>
-	      	    <a href="<%= request.getContextPath() %>/mydspace">
-	      	      <button class="btn btn-primary">Login</button>
-	      	    </a>
-
-  <%
-              }
-  %>
-            </p>
-          </div>
+            <%-- Display this div when 'xs' --%>
+            <div class="visible-xs">
+              <dspace:include page="/components/page-banner-right.jsp"></dspace:include>
+            </div>
         </div>
 
         <%-- Localization --%>

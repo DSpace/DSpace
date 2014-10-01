@@ -19,21 +19,41 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        margin-top:0px;
        margin-bottom:0px }
 
+.pageBanner {
+	width: 100%;
+    border: 0;
+    margin: 0;
+    background: #ffffff;
+    color: #000000;
+    padding: 0;
+    vertical-align: middle }
+
+.pageBanner p{
+	margin: 5px 0 10px 0;
+}
+
 .container-drum {
 	padding: 10px 5px;
 }
 
 #lib-logo {
-	padding: 0 20px 0 0;
+	padding: 0;
 }
 
-#pageBanner-right{
+#drum-logo {
+	padding: 5px 0;
+}
+
+#pageBanner-right div {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+#pageBanner-right div.hidden-xs {
 	text-align:right;
 }
 
-#pageBanner-right p {
-	margin: 5px 0 10px 0;
-}
+
 
 H1 { margin-left: 10px;
      margin-right: 10px;
@@ -91,14 +111,6 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 color: #336699;
                 cursor: pointer;
                 font-size: 10pt }
-
-.pageBanner { width: 100%;
-              border: 0;
-              margin: 0;
-              background: #ffffff;
-              color: #000000;
-              padding: 0;
-              vertical-align: middle }
 
 .pageBanner-drum-logo {
 	display:block;
@@ -352,7 +364,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
            text-align: center }
 
 .submitFormWarnMark {
-  color: #ff6600;
+  color: #cf0000;
 }
 
 .uploadHelp { margin-left: 20px;
