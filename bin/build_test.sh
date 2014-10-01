@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-#set -x  # verbose bash
+set -x  # verbose bash
 set -e  # return fail on a failed command, for travis-ci
 
 ITPORT=2341
