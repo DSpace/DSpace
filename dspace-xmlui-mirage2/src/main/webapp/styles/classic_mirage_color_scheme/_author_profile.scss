@@ -1,0 +1,121 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+.author-pic.icon {
+    color: #333333;
+}
+
+.author-details-wrapper h3{
+    margin-top: 0px;
+}
+
+.author-details-wrapper {
+    overflow-y: hidden;
+    margin-top: 10px;
+}
+
+.simple-item-view-authors {
+    color: $gray-dark;
+}
+
+@media (max-width: $screen-xs) {
+
+    .ds-author-picture.small{
+        background: #EEE;
+    }
+
+    .author-pic.img-responsive{
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 90px;
+    }
+
+    .author-pic.small.icon {
+        display: none;
+    }
+
+    .ds-author-picture {
+        width: 28%;
+    }
+    .ds-author-picture img.author-pic{
+        width: 100%;
+    }
+
+}
+
+div.author-pic.icon i{
+    font-size: 158px;
+}
+
+div.author-pic.icon.small i {
+    font-size: 96px;
+}
+
+.author-profile dl {
+    margin-bottom: 10px;
+    margin-top: 0px;
+}
+
+.ds-static-div.author-page-wrapper > h2 {
+    display: none;
+}
+
+.ds-static-div.author-page-wrapper .discover-search-box h2 {
+    display: none;
+}
+
+#AuthorProfile-updateDate {
+    color:$blockquote-small-color;
+    font-style: italic;
+}
+
+#aspect_authorprofile_AuthorPage_div_search {
+    margin-top: 20px;
+}
+
+.ds-author-picture {
+    margin-bottom: 5px;
+    margin-right: 10px;
+    float: left;
+}
+
+.ds-author-top-wrapper h3{
+    margin-top: 0;
+}
+
+#aspect_authorprofile_AuthorPage_div_author-profile-wrapper > h2 {
+    display: none;
+}
+
+.ds-button-field.btn.btn-default.show-stats-filter.show-stats-filter {
+    height: 28px;
+}
+
+#aspect_authorprofile_AuthorPage_div_search  .pagination-masked button{
+    margin-left: 5px;
+}
+
+#aspect_authorprofile_AuthorPage_div_search .row.discovery-facets.vertical-slider {
+    margin-bottom: 10px;
+}
+
+.author-details-button-wrapper button{
+    float: left;
+    clear: left;
+    margin-top: 10px;
+    height: 28px;
+}
+
+.author-page-wrapper blockquote{
+    margin-bottom: 10px;
+}
+
+#aspect_authorprofile_AuthorPage_div_author-profile-wrapper .discovery-facets {
+    margin-top: 15px;
+}
+
+

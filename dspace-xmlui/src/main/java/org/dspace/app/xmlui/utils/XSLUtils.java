@@ -7,6 +7,11 @@
  */
 package org.dspace.app.xmlui.utils;
 
+import org.dspace.content.DCDate;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+
 /**
  * Utilities that are needed in XSL transformations.
  *
@@ -52,5 +57,11 @@ public class XSLUtils {
 
         return string.substring(0, targetLength) + " ...";
 
+    }
+
+    public static String dcDateFormat(String dcDate, String format)
+    {
+        Format formatter = new SimpleDateFormat("MMMM d, yyyy");
+        return formatter.format(new DCDate(dcDate).toDate());
     }
 }

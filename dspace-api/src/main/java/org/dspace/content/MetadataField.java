@@ -674,4 +674,13 @@ public class MetadataField
         hash = 47 * hash + this.schemaID;
         return hash;
     }
+
+    @Override
+    public String toString() {
+        if(qualifier != null){
+            return schemaID + "." + element + "." + qualifier;
+        }else{
+            return schemaID + "." + element;
+        }
+    }
 }

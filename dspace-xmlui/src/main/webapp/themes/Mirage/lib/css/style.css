@@ -1457,3 +1457,274 @@ table.discovery-filters th.new-filter-header
     border: 1px solid #cccccc;
     margin-right: 3px;
 }
+
+label.error
+{
+    clear: both;
+    display: block;
+    color: #c22121;
+    font-size: 0.9em;
+    margin-top: 3px;
+}
+
+img.author-profile-img{
+    float: left;
+    margin-right: 10px;
+}
+
+li.nomargin{
+    margin: 0;
+}
+
+fieldset#aspect_authorprofile_administrative_EditAuthorProfileForm_list_author-profile{
+    margin-bottom: 20px;
+}
+
+.ds-hidden-field[name='regex']{
+    display: none;
+}
+
+.ds-author-picture{
+    float: left;
+}
+
+.ds-author-links ul {
+    margin-left: 0px;
+
+}
+.ds-author-wrapper {
+    padding-top: 10px;
+}
+
+#AuthorProfile-updateDate {
+    padding-top: 10px;
+}
+
+#aspect_authorprofile_AuthorPage_div_author-profile {
+    padding-bottom: 10px;
+}
+
+.profile-title {
+    font-size: 100%;
+    font-weight: bold;
+    line-height: 161.6%;
+
+}
+
+.ds-author-names {
+    font-family: 'Arial', serif;
+    border-bottom: 1px solid #D8E8EB;
+    margin-bottom: 15px;
+}
+
+.ds-author-picture {
+    padding-right: 5px;
+    padding-bottom: 1px;
+    width: 104px;
+}
+
+.details.placeholder {
+    float: right;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+}
+
+#aspect_authorprofile_AuthorPage_div_author-profile-wrapper {
+    position: relative;
+}
+
+.author-fullname {
+    font-weight: bold;
+    font-size: 179%;
+}
+
+.ds-author-bottom-wrapper li{
+    list-style: none;
+    margin-left: 0px;
+}
+.ds-author-bottom-wrapper ul{
+    margin-left: 0px;
+}
+
+.ds-author-bottom-wrapper{
+    clear: both;
+}
+
+
+.ds-author-bottom-wrapper.ds-static-div {
+    clear: both;
+}
+
+.ds-author-biography{
+    float: right;
+    width: 600px;
+    text-align: left;
+}
+
+div#aspect_authorprofile_AuthorPage_div_author-profile-wrapper h1 {
+    border-bottom: 1px solid #D8E8EB;
+    padding-bottom: 2px;
+}
+
+
+.ds-author-include-set>ul>li{
+    list-style: none;
+    margin-bottom: 3px;
+    font-size: 100%;
+}
+
+.ds-author-include-set>ul>li>ul>li{
+    list-style: none;
+    margin-bottom: 3px;
+    font-size: 100%;
+}
+
+.ds-author-include-set>ul>li:first-of-type{
+    color: #8E000F;
+    font-size: 120%;
+    margin-bottom: 10px;
+
+}
+
+.ds-author-include-set ul li a, .ds-author-include-set ul li a:link,  .ds-author-include-set ul li a:active, .ds-author-include-set ul li a:visited, .details{
+    color: black;
+    text-decoration: underline;
+
+}
+
+#aspect_authorprofile_AuthorPage_div_author-profile h3 {
+    padding-top: 10px;
+}
+
+.ds-author-departments,
+.ds-author-specialization,
+.ds-author-namevariants,
+.ds-author-degrees{
+    padding-bottom: 4px;
+}
+.details.placeholder:hover{
+    cursor: pointer;
+}
+
+.simple-author-view-other {
+    margin-bottom: 10px;
+}
+
+.ds-author-bottom-wrapper h2 {
+    font-size: 100%;
+    font-family: sans-serif;
+    font-weight: bold;
+    line-height: 161.6%;
+}
+
+.profile-title {
+    line-height: 161%;
+}
+
+.ds-author-links {
+    margin-bottom: 10px;
+}
+span.pd{
+    padding-right: 4px;
+}
+
+li.department{
+    margin-bottom: 7px;
+}.biography{
+     padding-top: 10px;
+     margin-left: 3px;
+ }
+
+.author-details-hidden{
+    display: none;
+}
+
+.rightpane{
+    float: right;
+    height: 100%;
+    vertical-align: baseline;
+    display: block;
+    margin-left: 10px;
+}
+
+.rightpane .details{
+    display: block;
+}
+
+.rightpane .details:hover{
+    cursor: pointer;
+}
+
+
+.rightpane .placeholder{
+    visibility: hidden;
+}
+
+#aspect_authorprofile_BrowseByAuthorProfile_table_browse-by-author-results a{
+    float:left;
+}
+a.author-profile, .author-page-icon{
+    background-image: url(../../images/author_profile.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    background-size: 16px 16px;
+    float: left;
+    margin-right: 3px;
+    text-decoration: none;
+}
+#aspect_statistics_MostPopular_div_tableContainer a.author-profile, .author-page-icon{
+    margin-right: 3px;
+}
+
+a.author-profile-current, .author-page-icon-current{
+    background-image: url(../../images/grey-author-icon.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    background-size: 16px 16px;
+    float: left;
+
+    margin-left: 3px;
+    text-decoration: none;
+}
+
+.author-item, .nav_author li a, .disc_author, #aspect_authorprofile_administrative_EditAuthorProfileForm_p_author-link-para a{
+    float:left;
+}
+
+
+#aspect_authorprofile_BrowseByAuthorProfile_cell_ a.author-profile{
+    float:right;
+
+}
+
+#aspect_authorprofile_BrowseByAuthorProfile_div_browse-by-author-wrapper div.top{
+    margin-bottom: 5px;
+}
+#aspect_authorprofile_BrowseByAuthorProfile_table_browse-by-author-results td {
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0px;
+}
+
+.ie7 #aspect_authorprofile_BrowseByAuthorProfile_table_browse-by-author-results td,.ie8 #aspect_authorprofile_BrowseByAuthorProfile_table_browse-by-author-results td,.ie9 #aspect_artifactbrowser_BrowseByAuthorProfile_table_browse-by-author-results td {
+    padding: 5px;
+
+}
+
+.biography > ol {
+    list-style-type: decimal;
+    margin-left: 30px;
+}
+
+
+#aspect_authorprofile_administrative_EditAuthorProfileForm_list_author-profile .field-help{
+    margin-bottom: 0.2em;
+}
+

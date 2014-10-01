@@ -289,6 +289,9 @@
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communitySummaryList-DIM"/>
             </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryList-DIM"/>
+            </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
             </xsl:otherwise>
@@ -311,6 +314,9 @@
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communityDetailList-DIM"/>
             </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryList-DIM"/>
+            </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
             </xsl:otherwise>
@@ -332,6 +338,9 @@
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communitySummaryView-DIM"/>
             </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryView-DIM"/>
+            </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
             </xsl:otherwise>
@@ -352,6 +361,9 @@
             </xsl:when>
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communityDetailView-DIM"/>
+            </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryView-DIM"/>
             </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>

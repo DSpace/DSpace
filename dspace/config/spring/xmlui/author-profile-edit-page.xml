@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd" default-autowire-candidates="authorProfile*">
+
+    <bean class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInputConfiguration"
+          scope="singleton" lazy-init="true">
+    </bean>
+
+
+    <bean id="authorProfileLastNameInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileLastNameInput"/>
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="name"/>
+                    <property name="qualifier" value="last"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="true"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileFirstNameInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileFirstNameInput"/>
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="name"/>
+                    <property name="qualifier" value="first"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="true"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <!--<bean id="authorProfileOrchidId"-->
+          <!--class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">-->
+        <!--<constructor-arg value="authorProfileOrchidId"/>-->
+        <!--<property name="metadataFields">-->
+            <!--<list>-->
+                <!--<bean class="org.dspace.content.MetadataFieldDescriptor">-->
+                    <!--<property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>-->
+                    <!--<property name="element" value="OrchidId"/>-->
+                <!--</bean>-->
+            <!--</list>-->
+        <!--</property>-->
+        <!--<property name="inputType" ref="authorProfileOneBoxField"/>-->
+        <!--<property name="required" value="false"/>-->
+        <!--<property name="repeatable" value="false"/>-->
+    <!--</bean>-->
+
+    <bean id="authorProfileAuthorInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileAuthorInput"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="author"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="true"/>
+        <property name="repeatable" value="true"/>
+        <property name="defaultValue" value="Last name, First name"/>
+        <property name="validators">
+            <list>
+                <bean class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.DuplicateAuthorNameVariant">
+
+                </bean>
+            </list>
+        </property>
+        <property name="inputCleaners">
+            <list><ref bean="spacesCleaner" /></list>
+        </property>
+    </bean>
+
+    <bean id="authorProfileNameVariantInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileNameVariantInput"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="name"/>
+                    <property name="qualifier" value="variant"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="true"/>
+    </bean>
+
+
+    <bean id="authorProfileNameSynonymInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileNameSynonymInput"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="name"/>
+                    <property name="qualifier" value="synonym"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+        <property name="displayer">
+            <bean class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.SynonymDisplayer"/>
+        </property>
+    </bean>
+
+
+
+
+    <bean id="authorProfileSpecialization"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileSpecialization"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="specialization"/>
+
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="true"/>
+    </bean>
+
+    <bean id="authorProfileDegree"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileDegree"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="degree"/>
+
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="true"/>
+    </bean>
+
+    <bean id="authorProfileDepartment"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileDepartment"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="department"/>
+                    <property name="qualifier" value="name"/>
+                </bean>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="department"/>
+                    <property name="qualifier" value="url"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileMultiMetadataField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="true"/>
+    </bean>
+
+   <bean id="authorProfileTelephone"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileTelephone"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="telephone"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileEmail"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileEmail"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="email"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="true"/>
+        <property name="repeatable" value="false"/>
+        <property name="validators">
+            <list>
+                <bean class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.RegexValidator">
+                    <property name="validationRegex" value="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="authorProfileEmailPrivate"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileHidden"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="email"/>
+                    <property name="qualifier" value="private"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileCheckboxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileSite"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileSite"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="site"/>
+                    <property name="qualifier" value="name"/>
+                </bean>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="site"/>
+                    <property name="qualifier" value="url"/>
+                </bean>
+
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileMultiMetadataField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="true"/>
+    </bean>
+
+    <bean id="authorProfileTitleInput"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileTitleInput"/>
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="biography"/>
+                    <property name="qualifier" value="title"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileOneBoxField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileBiography"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileBiography"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="biography"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileTextAreaField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileExternalHostWork"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileExternalHostWork"/>
+
+        <property name="metadataFields">
+            <list>
+                <bean class="org.dspace.content.MetadataFieldDescriptor">
+                    <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                    <property name="element" value="external"/>
+                    <property name="qualifier" value="hostWork"/>
+                </bean>
+            </list>
+        </property>
+        <property name="inputType" ref="authorProfileTextAreaField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfileSingleImage"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfileSingleImage"/>
+
+        <property name="inputType" ref="authorProfileImageField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+    <bean id="authorProfilePublic"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.AuthorProfileInput">
+        <constructor-arg value="authorProfilePublic"/>
+
+        <property name="inputType" ref="authorProfileAuthorizationField"/>
+        <property name="required" value="false"/>
+        <property name="repeatable" value="false"/>
+    </bean>
+
+
+    <!--Input type beans-->
+
+    <bean id="authorProfileOneBoxField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfileOneBoxField"
+          scope="singleton"/>
+    <bean id="authorProfileTextAreaField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfileTextAreaField"
+          scope="singleton"/>
+
+    <bean id="authorProfileMultiMetadataField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfileMultiMetadataField"
+          scope="singleton">
+        <description>Add a property named separator to authorProfileMultiMetadataField to override the default separator
+            '|||'
+        </description>
+    </bean>
+
+    <bean id="authorProfileImageField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfileImageField"
+          scope="singleton"/>
+    <bean id="authorProfileCheckboxField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfileCheckboxField"
+          scope="singleton"/>
+    <bean id="authorProfileAuthorizationField"
+          class="org.dspace.app.xmlui.aspect.authorprofile.administrative.fields.AuthorProfilePublicAuthorizationField"
+          scope="singleton"/>
+
+    <bean id="spacesCleaner" class="org.dspace.app.xmlui.aspect.authorprofile.administrative.configuration.SpacesInputCleaner" scope="singleton">
+        <constructor-arg name="metadataFields">
+
+                <list>
+                    <bean class="org.dspace.content.MetadataFieldDescriptor">
+                        <property name="schema" value="#{T(org.dspace.content.AuthorProfile).AUTHOR_PROFILE_SCHEMA}"/>
+                        <property name="element" value="author"/>
+                    </bean>
+                </list>
+
+        </constructor-arg>
+
+
+    </bean>
+
+</beans>

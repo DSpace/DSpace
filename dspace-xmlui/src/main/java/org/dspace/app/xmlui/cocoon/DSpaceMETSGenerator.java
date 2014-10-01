@@ -15,16 +15,10 @@ import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.generation.AbstractGenerator;
-import org.dspace.app.xmlui.objectmanager.AbstractAdapter;
-import org.dspace.app.xmlui.objectmanager.ContainerAdapter;
-import org.dspace.app.xmlui.objectmanager.ItemAdapter;
-import org.dspace.app.xmlui.objectmanager.RepositoryAdapter;
+import org.dspace.app.xmlui.objectmanager.*;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -194,6 +188,12 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                          {
                              adapter = new ContainerAdapter(context, community, contextPath);
                          }
+         			} else if("author".equals(type)){
+                         AuthorProfile authorProfile = AuthorProfile.find(context,id);
+                         if(authorProfile!=null){
+                             adapter= new AuthorProfileAdapter(context,authorProfile,contextPath);
+                         }
+
          			}
 			}
          	}

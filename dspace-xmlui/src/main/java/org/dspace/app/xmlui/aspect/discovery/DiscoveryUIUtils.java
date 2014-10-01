@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.discovery;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverFilterQuery;
 import org.dspace.discovery.SearchService;
 import org.dspace.utils.DSpace;
 
@@ -59,8 +60,18 @@ public class DiscoveryUIUtils {
      * @return an array containing the filter queries
      */
     public static String[] getFilterQueries(Request request, Context context) {
+        List<String> result = new ArrayList<>();
+        Collection<DiscoverFilterQuery> discoveryQueries = getFilterDiscoveryQueries(request, context);
+
+        for(DiscoverFilterQuery filterQuery : discoveryQueries){
+            result.add(filterQuery.getFilterQuery());
+        }
+        return result.toArray(new String[result.size()]);
+    }
+
+    public static Collection<DiscoverFilterQuery> getFilterDiscoveryQueries(Request request, Context context) {
         try {
-            List<String> allFilterQueries = new ArrayList<String>();
+            List<DiscoverFilterQuery> allFilterQueries = new ArrayList<>();
             List<String> filterTypes = getRepeatableParameters(request, "filtertype");
             List<String> filterOperators = getRepeatableParameters(request, "filter_relational_operator");
             List<String> filterValues = getRepeatableParameters(request, "filter");
@@ -71,16 +82,16 @@ public class DiscoveryUIUtils {
                 String filterValue = filterValues.get(i);
 
                 if(StringUtils.isNotBlank(filterValue)){
-                    allFilterQueries.add(searchService.toFilterQuery(context, (filterType.equals("*") ? "" : filterType), filterOperator, filterValue).getFilterQuery());
+                    allFilterQueries.add(searchService.toFilterQuery(context, (filterType.equals("*") ? "" : filterType), filterOperator, filterValue));
                 }
             }
 
-            return allFilterQueries.toArray(new String[allFilterQueries.size()]);
+            return allFilterQueries;
         }
         catch (RuntimeException re) {
             throw re;
         } catch (Exception e) {
-            return new String[0];
+            return Collections.emptyList();
         }
     }
 

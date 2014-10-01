@@ -97,6 +97,8 @@ public class Event implements Serializable
 
     private static final int EPERSON = 1 << Constants.EPERSON; // 7
 
+    private static final int AUTHOR_PROFILE = 1 << Constants.AUTHOR_PROFILE; // 8
+
     private static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
             | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
 
@@ -128,6 +130,9 @@ public class Event implements Serializable
 
         objTypeToMask.put(Constants.EPERSON, EPERSON);
         objMaskToType.put(EPERSON, Constants.EPERSON);
+
+        objTypeToMask.put(Constants.AUTHOR_PROFILE, AUTHOR_PROFILE);
+        objMaskToType.put(AUTHOR_PROFILE, Constants.AUTHOR_PROFILE);
     }
 
     /** ---------- Event Fields ------------- * */

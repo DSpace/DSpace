@@ -31,6 +31,7 @@
     <script src="scripts/search-controls.js">&#160;</script>
     <script src="scripts/sidebar.js">&#160;</script>
     <script src="scripts/community-list.js">&#160;</script>
+    <script src="scripts/author-page.js">&#160;</script>
     <script src="scripts/browse.js">&#160;</script>
     <script src="scripts/choice-support.js">&#160;</script>
     <script src="scripts/vocabulary-support.js">&#160;</script>

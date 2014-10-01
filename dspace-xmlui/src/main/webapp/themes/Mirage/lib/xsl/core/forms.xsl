@@ -85,7 +85,16 @@
 
     <!-- NON-instance composite fields (i.e. not repeatable) -->
     <xsl:template match="dri:field[@type='composite']" mode="formComposite">
-        <div class="ds-form-content">
+        <div>
+            <xsl:attribute name="class">
+                <xsl:text>ds-form-content </xsl:text>
+                <xsl:if test="@rend">
+                    <xsl:value-of select="@rend" />
+                </xsl:if>
+
+            </xsl:attribute>
+
+
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
             <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>

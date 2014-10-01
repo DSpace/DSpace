@@ -13,10 +13,10 @@
     });
 
     function initializeGear(){
-        var gearControlsDivs = $('div#aspect_discovery_SimpleSearch_div_search-controls-gear');
+        var gearControlsDivs = $('div.controls-gear-wrapper');
         jQuery.each(gearControlsDivs, function(index, value) {
             var gearControlsDiv = $(value);
-            var gearControls = gearControlsDiv.find('ul#aspect_discovery_SimpleSearch_list_sort-options');
+            var gearControls = gearControlsDiv.find('ul.gear-selection');
             var gearButton = $('<button class="discovery-controls-gear ds-button-field"><div class="gear-icon">&nbsp;</div></button>');
 
             gearButton.click(function(){
@@ -49,7 +49,7 @@
                 //Retrieve the params we are to fill in in our main form
                 var params = $link.attr('href').split('&');
 
-                var mainForm = $('form#aspect_discovery_SimpleSearch_div_main-form');
+                var mainForm = $('form.discovery-main-form');
                 //Split them & fill in in the main form, when done submit the main form !
                 for(var i = 0; i < params.length; i++){
                     var param = params[i].split('=')[0];
@@ -82,7 +82,7 @@
     function initializeFilters(){
         //Initialize the show filters link
         $('a[href="display-filters"]').click(function(){
-            var filtersForm = $('form#aspect_discovery_SimpleSearch_div_search-filters');
+            var filtersForm = $('form.discover-filters-box');
             filtersForm.show();
             filtersForm.css('visibility', 'visible');
             $(this).hide();

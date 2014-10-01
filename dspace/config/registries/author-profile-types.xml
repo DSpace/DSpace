@@ -1,0 +1,118 @@
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>DSpace Submission Author Profile Registry</title>
+    <contributor.author>Kevin Van de Velde</contributor.author>
+    <contributor.author>Roeland Dillen</contributor.author>
+    <contributor.author>Ben Bosman</contributor.author>
+    <contributor.author>Mark Diggory</contributor.author>
+  </dspace-header>
+
+  <dc-schema>
+      <name>authorProfile</name>
+      <namespace>http://www.dspace.org/author-profiles</namespace>
+  </dc-schema>
+
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>name</element>
+    <qualifier>last</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>name</element>
+    <qualifier>first</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>author</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>name</element>
+    <qualifier>variant</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>name</element>
+    <qualifier>synonym</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>specialization</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>degree</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>department</element>
+    <qualifier>name</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>department</element>
+    <qualifier>url</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>telephone</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>email</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>email</element>
+    <qualifier>private</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>site</element>
+    <qualifier>name</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>site</element>
+    <qualifier>url</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>biography</element>
+    <qualifier>title</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>biography</element>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>external</element>
+    <qualifier>hostWork</qualifier>
+  </dc-type>
+
+  <dc-type>
+	<schema>authorProfile</schema>
+    <element>updateDate</element>
+  </dc-type>
+
+</dspace-dc-types>

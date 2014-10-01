@@ -40,11 +40,14 @@ public class Constants
     /** Type of individual eperson objects */
     public static final int EPERSON = 7;
 
+    /** Type for the author profiles */
+    public static final int AUTHOR_PROFILE = 8;
+
     /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
-            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON" };
+            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "AUTHOR_PROFILE" };
 
     /**
      * Special Bundle and Bitstream Names:

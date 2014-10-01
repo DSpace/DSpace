@@ -98,6 +98,22 @@
        </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="linebreakIntoBr">
+       <xsl:param name="text" select="."/>
+       <xsl:choose>
+         <xsl:when test="contains($text, '&#xa;')">
+           <xsl:value-of select="substring-before($text, '&#xa;')"/>
+           <br />
+           <xsl:call-template name="linebreakIntoBr">
+             <xsl:with-param name="text" select="substring-after($text,'&#xa;')"/>
+           </xsl:call-template>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:value-of select="$text"/>
+         </xsl:otherwise>
+       </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="i18n:translate">
         <xsl:copy-of select="."/>
     </xsl:template>

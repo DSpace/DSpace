@@ -15,10 +15,7 @@ import java.util.Map;
 import org.dspace.app.xmlui.wing.ObjectManager;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
 
@@ -44,7 +41,7 @@ public class DSpaceObjectManager implements ObjectManager
     {
     	// Check that the object is of a type we can manage.
     	return (object instanceof BrowseItem) || (object instanceof Item) || (object instanceof Collection)
-			    || (object instanceof Community);
+			    || (object instanceof Community) || (object instanceof AuthorProfile);
     }
 	
 	
@@ -79,6 +76,9 @@ public class DSpaceObjectManager implements ObjectManager
 		    	else if (object instanceof Community)
 		    	{
 		    		return "/metadata/internal/community/" + dso.getID() + "/mets.xml";
+		    	}else if (object instanceof AuthorProfile)
+		    	{
+		    		return "/metadata/internal/author/" + dso.getID() + "/mets.xml";
 		    	}
 			}
 		}
@@ -103,6 +103,9 @@ public class DSpaceObjectManager implements ObjectManager
     	else if (object instanceof Community)
     	{
     		return "DSpace Community";
+    	}else if (object instanceof AuthorProfile)
+    	{
+    		return "AuthorProfile";
     	}
 			
 		return null;

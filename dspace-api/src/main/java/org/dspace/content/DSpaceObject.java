@@ -435,6 +435,7 @@ public abstract class DSpaceObject
             case Constants.GROUP     : return Group.find(context, id);
             case Constants.EPERSON   : return EPerson.find(context, id);
             case Constants.SITE      : return Site.find(context, id);
+            case Constants.AUTHOR_PROFILE      : return AuthorProfile.find(context, id);
         }
         return null;
     }
@@ -663,7 +664,7 @@ public abstract class DSpaceObject
     /**
      * Retrieve first metadata field value
      */
-    protected String getMetadataFirstValue(String schema, String element, String qualifier, String language){
+    public String getMetadataFirstValue(String schema, String element, String qualifier, String language){
         DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
         if(dcvalues.length>0){
             return dcvalues[0].value;
