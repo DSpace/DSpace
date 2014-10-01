@@ -70,7 +70,6 @@ public class BtnDownload extends TestCase {
     ExpectedCondition<Boolean> fileExistsCondition = new ExpectedCondition<Boolean>() {
         @Override
         public Boolean apply(WebDriver f) {
-System.out.println("HERE: " + dlFile.getPath());
             return dlFile.exists();
         }
     };
