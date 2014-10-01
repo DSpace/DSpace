@@ -12,14 +12,14 @@ BASE_DIR="$TEST_DIR/.."
 # builds and travis-ci
 POM="$BASE_DIR/pom.standalone.xml"
 MVN_BASE="mvn -f $POM"
-MVN="$MVN_BASE"
+#MVN="$MVN_BASE"
 #MVN="$MVN_BASE -e"
-#MVN="$MVN_BASE --quiet"
+MVN="$MVN_BASE --quiet"
 
 # run always on exit, wherever failure
 function on_exit {
     # Travis-CI clenup
-    if [ "$travis" ]; then
+    if [ "$TRAVIS" ]; then
         echo "Stopping xvfb"
         sh -e /etc/init.d/xvfb stop
     fi
@@ -34,7 +34,7 @@ $MVN clean package -DskipTests=true
 $MVN test
 
 # start virtual frame buffer if in Travis-CI env 
-if [ "$travis" ]; then
+if [ "$TRAVIS" ]; then
     echo "Starting xvfb"
     export DISPLAY=:99.0
     sh -e /etc/init.d/xvfb start
