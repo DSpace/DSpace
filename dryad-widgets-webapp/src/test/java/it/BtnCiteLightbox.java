@@ -1,26 +1,21 @@
+
 package it;
 
-import java.util.regex.Pattern;
-import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import org.junit.*;
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.By;
 
-public class BtnCiteLightbox extends TestCase {
-  private WebDriver driver;
-  private String baseUrl;
-  private boolean acceptNextAlert = true;
-  private StringBuffer verificationErrors = new StringBuffer();
+public class BtnCiteLightbox extends WidgetSeleniumTest {
 
   @Before
   public void setUp() throws Exception {
-    baseUrl = System.getProperty("seleniumTestURL");
-    driver = new FirefoxDriver();
-    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+      super.setUp();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    super.tearDown();
   }
 
   @Test
@@ -28,6 +23,10 @@ public class BtnCiteLightbox extends TestCase {
     String btn_selector = "i.fa.fa-quote-left:nth-of-type(1)";
     String close_selector = "button.mfp-close";
     driver.get(baseUrl + "/test.html");
+    
+    // wait until the widget's frame has loaded 
+    waitOnWidgetLoaded();
+    assertTrue(isElementPresent(By.cssSelector("iframe.dryad-ddw")));
     
     // into widget frame
     driver.switchTo().frame(0);
@@ -37,47 +36,5 @@ public class BtnCiteLightbox extends TestCase {
     // out of frame
     driver.switchTo().defaultContent(); 
     driver.findElement(By.cssSelector(close_selector)).click();
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    driver.quit();
-    String verificationErrorString = verificationErrors.toString();
-    if (!"".equals(verificationErrorString)) {
-      fail(verificationErrorString);
-    }
-  }
-
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
-  }
-
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
-
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
   }
 }

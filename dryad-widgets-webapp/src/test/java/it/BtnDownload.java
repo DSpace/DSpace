@@ -14,18 +14,13 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class BtnDownload extends TestCase {
-  private WebDriver driver;
-  private String baseUrl;
+public class BtnDownload extends WidgetSeleniumTest {
   private File downloadDir;
   private String downloadDirName = "selenium_downloads";
   private long dlWaitTimeout = 5;
-  private boolean acceptNextAlert = true;
-  private StringBuffer verificationErrors = new StringBuffer();
 
   @Before
   public void setUp() throws Exception {
-    baseUrl = System.getProperty("seleniumTestURL");
     downloadDir = new File(System.getProperty("user.dir") + "/" + downloadDirName);
     if (!downloadDir.exists()) {
         downloadDir.mkdir();
@@ -41,17 +36,13 @@ public class BtnDownload extends TestCase {
   }
   @After
   public void tearDown() throws Exception {
-    driver.quit();
     if (downloadDir.exists()) {
         for (File f : downloadDir.listFiles()) {
             f.delete();
         }
         downloadDir.delete();
     }
-    String verificationErrorString = verificationErrors.toString();
-    if (!"".equals(verificationErrorString)) {
-      fail(verificationErrorString);
-    }
+    super.tearDown();
   }
 
   @Test
@@ -78,38 +69,5 @@ public class BtnDownload extends TestCase {
     wait.until(fileExistsCondition);
     assertTrue("Downloaded file exists: " + new File(downloadDir + "/" + "invert.data-may19.csv").getAbsolutePath(), dlFile.exists());
     dlFile.delete();
-  }
-
-  private boolean isElementPresent(By by) {
-    try {
-      driver.findElement(by);
-      return true;
-    } catch (NoSuchElementException e) {
-      return false;
-    }
-  }
-
-  private boolean isAlertPresent() {
-    try {
-      driver.switchTo().alert();
-      return true;
-    } catch (NoAlertPresentException e) {
-      return false;
-    }
-  }
-
-  private String closeAlertAndGetItsText() {
-    try {
-      Alert alert = driver.switchTo().alert();
-      String alertText = alert.getText();
-      if (acceptNextAlert) {
-        alert.accept();
-      } else {
-        alert.dismiss();
-      }
-      return alertText;
-    } finally {
-      acceptNextAlert = true;
-    }
   }
 }
