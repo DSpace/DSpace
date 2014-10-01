@@ -20,13 +20,17 @@ public class WidgetSeleniumTest extends TestCase {
   protected boolean acceptNextAlert = true;
   protected StringBuffer verificationErrors = new StringBuffer();
   
-  protected long widgetLoadedSecondsTimeout = 5000;
+  protected long driverTimeoutSeconds = 10;
+  protected long widgetLoadedSecondsTimeout = 5;
+  protected long widgetPopupWaitSecondsTimeout = 1;
 
   @Before
   public void setUp() throws Exception {
     baseUrl = System.getProperty("seleniumTestURL");
-    driver = new FirefoxDriver();
-    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+    if (driver == null) {
+        driver = new FirefoxDriver();
+    }
+    driver.manage().timeouts().implicitlyWait(driverTimeoutSeconds, TimeUnit.SECONDS);
   }
 
   @After
@@ -82,9 +86,10 @@ public class WidgetSeleniumTest extends TestCase {
     }
   }
   
-  protected void waitOnWidgetLoaded() {
+  protected void waitOnWidgetLoaded() throws Exception {
     // wait until "iframe.dryad-ddw" is present
     By.ByCssSelector by = new By.ByCssSelector("iframe.dryad-ddw");
     waitUntilElementPresent(by,widgetLoadedSecondsTimeout);
+    assertTrue(isElementPresent(By.cssSelector("iframe.dryad-ddw")));
   }  
 }

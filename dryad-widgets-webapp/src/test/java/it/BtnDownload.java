@@ -1,17 +1,12 @@
 package it;
 
 import java.io.File;
-import java.util.regex.Pattern;
 import java.util.concurrent.TimeUnit;
-import junit.framework.TestCase;
 import org.junit.*;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class BtnDownload extends WidgetSeleniumTest {
@@ -32,7 +27,7 @@ public class BtnDownload extends WidgetSeleniumTest {
     fp.setPreference("browser.helperApps.neverAsk.saveToDisk","text/csv");
     fp.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
     driver = new FirefoxDriver(fp);
-    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+    super.setUp();
   }
   @After
   public void tearDown() throws Exception {
@@ -57,7 +52,6 @@ public class BtnDownload extends WidgetSeleniumTest {
 
     final File dlFile = new File(downloadDir + "/" + "invert.data-may19.csv");
     dlFile.deleteOnExit();
-    
     ExpectedCondition<Boolean> fileExistsCondition = new ExpectedCondition<Boolean>() {
         @Override
         public Boolean apply(WebDriver f) {
