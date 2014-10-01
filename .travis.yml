@@ -1,5 +1,5 @@
 language: java
 jdk: openjdk6
-before_install: echo "Overriding default before_install"
+before_install: ./test/bin/travis-install-maven.sh
 install: echo "Overriding default travis install"
 script: ./bin/build_test.sh
