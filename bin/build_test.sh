@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-set -x  # verbose bash
+#set -x  # verbose bash
 set -e  # return fail on a failed command, for travis-ci
 
 ITPORT=2341
@@ -45,7 +45,7 @@ fi
 # run selenium/integration tests
 echo "Starting SimpleHTTPServer"
 python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &
-sleep 10
+sleep 5 
 if [ "$?" -eq "0"  ]; then
     echo Running integration tests
     $MVN failsafe:integration-test failsafe:verify -DseleniumTestURL="http://localhost:$ITPORT/dryad-widgets-webapp/src/test/java/it"
