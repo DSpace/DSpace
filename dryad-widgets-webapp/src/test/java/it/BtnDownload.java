@@ -44,7 +44,8 @@ public class BtnDownload extends WidgetSeleniumTest {
   public void testBtnDownload() throws Exception {
     String btn_selector = "i.fa.fa-download:nth-of-type(1)";
     driver.get(baseUrl + "/test.html");
-    
+    waitOnWidgetLoaded();
+
     // into widget frame
     driver.switchTo().frame(0);
     assertTrue(isElementPresent(By.cssSelector(btn_selector)));

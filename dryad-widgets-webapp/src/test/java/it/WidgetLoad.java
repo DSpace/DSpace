@@ -19,8 +19,9 @@ public class WidgetLoad extends WidgetSeleniumTest {
   @Test
   public void testWidgetLoad() throws Exception {
     driver.get(baseUrl + "/test.html");
-    driver.switchTo().frame(0);
+    waitOnWidgetLoaded();
     
+    driver.switchTo().frame(0);
     assertTrue(isElementPresent(By.cssSelector("img[alt=\"Data in Dryad\"]")));
   }
 }

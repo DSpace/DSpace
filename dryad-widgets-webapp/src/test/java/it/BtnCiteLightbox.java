@@ -24,8 +24,6 @@ public class BtnCiteLightbox extends WidgetSeleniumTest {
     String close_selector = "button.mfp-close";
     String citation_popup_selector = "#dryad-ddw-citation";
     driver.get(baseUrl + "/test.html");
-
-    // wait until the widget's frame has loaded 
     waitOnWidgetLoaded();
 
     // click quote button in widget frame

@@ -23,6 +23,7 @@ public class BtnShareLightbox extends WidgetSeleniumTest {
     String btn_selector = "i.fa.fa-share-alt:nth-of-type(1)";
     String close_selector = "button.mfp-close";
     driver.get(baseUrl + "/test.html");
+    waitOnWidgetLoaded();
     
     // into widget frame
     driver.switchTo().frame(0);

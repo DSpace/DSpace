@@ -92,4 +92,11 @@ public class WidgetSeleniumTest extends TestCase {
     waitUntilElementPresent(by,widgetLoadedSecondsTimeout);
     assertTrue(isElementPresent(By.cssSelector("iframe.dryad-ddw")));
   }  
+  
+  protected void executeJavascript(String js) {
+	if (driver instanceof JavascriptExecutor) {
+		//String ret = (String) ((JavascriptExecutor) driver).executeScript(js);
+	}      
+  }
+
 }

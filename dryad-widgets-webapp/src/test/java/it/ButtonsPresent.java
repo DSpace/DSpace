@@ -19,6 +19,8 @@ public class ButtonsPresent extends WidgetSeleniumTest {
   @Test
   public void testButtonsPresent() throws Exception {
     driver.get(baseUrl + "/test.html");
+    waitOnWidgetLoaded();
+
     driver.switchTo().frame(0);
     assertTrue(isElementPresent(By.cssSelector("i.fa.fa-expand")));
     assertTrue(isElementPresent(By.cssSelector("i.fa.fa-share-alt")));
