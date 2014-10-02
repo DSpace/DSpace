@@ -107,7 +107,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         // 1. iterate over the metadata values
 
         String metadataField = metadataFields.get(currentFieldIndex);
-        DCValue[] values = currentItem.getMetadata(metadataField);
+        DCValue[] values = currentItem.getMetadataByMetadataString(metadataField);
         if (currentMetadataIndex < values.length) {
             prepareNextValue(metadataField, values[currentMetadataIndex]);
 
