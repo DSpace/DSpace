@@ -8,7 +8,7 @@
 package org.dspace.discovery;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -25,8 +25,8 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
         if(dso instanceof Item){
-            DCValue[] dcValues = ((Item) dso).getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue dcValue : dcValues) {
+            Metadatum[] dcValues = ((Item) dso).getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (Metadatum dcValue : dcValues) {
                 document.addField("a_spell", dcValue.value);
 
             }

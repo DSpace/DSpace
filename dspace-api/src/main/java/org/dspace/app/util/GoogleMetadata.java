@@ -268,7 +268,7 @@ public class GoogleMetadata
             }
         }
 
-        DCValue v = resolveMetadataField(config);
+        Metadatum v = resolveMetadataField(config);
 
         if (null != v && (null != v.value) && !v.value.trim().equals(""))
         {
@@ -289,10 +289,10 @@ public class GoogleMetadata
      * @param configFilter
      * @return The first configured match of metadata field for the item.
      */
-    private DCValue resolveMetadataField(String configFilter)
+    private Metadatum resolveMetadataField(String configFilter)
     {
 
-        ArrayList<DCValue> fields = resolveMetadata(configFilter, SINGLE);
+        ArrayList<Metadatum> fields = resolveMetadata(configFilter, SINGLE);
         if (null != fields && fields.size() > 0)
         {
             return fields.get(0);
@@ -308,10 +308,10 @@ public class GoogleMetadata
      * @return Aggregate of all matching metadata fields configured in the first
      *         option field-set to return any number of filter matches.
      */
-    private ArrayList<DCValue> resolveMetadataFields(String configFilter)
+    private ArrayList<Metadatum> resolveMetadataFields(String configFilter)
     {
 
-        ArrayList<DCValue> fields = resolveMetadata(configFilter, MULTI);
+        ArrayList<Metadatum> fields = resolveMetadata(configFilter, MULTI);
         if (null != fields && fields.size() > 0)
         {
             return fields;
@@ -326,7 +326,7 @@ public class GoogleMetadata
      * @param configValue
      * @return Array of configuration -> item-field matches
      */
-    private ArrayList<DCValue> resolveMetadata(String configFilter,
+    private ArrayList<Metadatum> resolveMetadata(String configFilter,
             int returnType)
     {
 
@@ -367,8 +367,8 @@ public class GoogleMetadata
 
             int optionMatches = 0;
             String[] components;
-            DCValue[] values;
-            ArrayList<DCValue> resolvedFields = new ArrayList<DCValue>();
+            Metadatum[] values;
+            ArrayList<Metadatum> resolvedFields = new ArrayList<Metadatum>();
 
             for (String field : optionFields)
             {
@@ -379,7 +379,7 @@ public class GoogleMetadata
 
                 if (values.length > 0)
                 {
-                    for (DCValue v : values)
+                    for (Metadatum v : values)
                     {
 
                         resolvedFields.add(v);
@@ -392,7 +392,7 @@ public class GoogleMetadata
                                 {
                                     log
                                             .debug("Resolved Field Value For This Item:");
-                                    for (DCValue r : resolvedFields)
+                                    for (Metadatum r : resolvedFields)
                                     {
                                         log.debug("{" + r.value + "}");
                                     }
@@ -411,7 +411,7 @@ public class GoogleMetadata
                 if (log.isDebugEnabled())
                 {
                     log.debug("Resolved Field Values For This Item:");
-                    for (DCValue v : resolvedFields)
+                    for (Metadatum v : resolvedFields)
                     {
                         log.debug("{" + v.value + "}");
                     }
@@ -599,11 +599,11 @@ public class GoogleMetadata
                 }
             }
 
-            DCValue[] allMD = item.getMetadata(components[0], components[1],
+            Metadatum[] allMD = item.getMetadata(components[0], components[1],
                     components[2], Item.ANY);
 
             ArrayList<String> expandedDC = new ArrayList<String>();
-            for (DCValue v : allMD)
+            for (Metadatum v : allMD)
             {
 
                 // De-dup multiple occurrences of field names in item
@@ -628,13 +628,13 @@ public class GoogleMetadata
     }
 
     /**
-     * Construct metadata field name out of DCValue components
+     * Construct metadata field name out of Metadatum components
      * 
      * @param v
-     *            The DCValue to construct a name for.
+     *            The Metadatum to construct a name for.
      * @return The complete metadata field name.
      */
-    private String buildFieldName(DCValue v)
+    private String buildFieldName(Metadatum v)
     {
 
         StringBuilder name = new StringBuilder();
@@ -1098,7 +1098,7 @@ public class GoogleMetadata
     {
 
         String authorConfig = configuredFields.get(FIELD);
-        ArrayList<DCValue> fields = resolveMetadataFields(authorConfig);
+        ArrayList<Metadatum> fields = resolveMetadataFields(authorConfig);
 
         if (null != fields && !fields.isEmpty())
         {
@@ -1106,7 +1106,7 @@ public class GoogleMetadata
             StringBuilder fieldMetadata = new StringBuilder();
             int count = 0;
 
-            for (DCValue field : fields)
+            for (Metadatum field : fields)
             {
                 fieldMetadata.append(field.value);
                 if (count < fields.size() - 1)
@@ -1234,10 +1234,10 @@ public class GoogleMetadata
         }
 
         // Check resolved/present metadata fields against configured values
-        ArrayList<DCValue> presentMD = resolveMetadataFields(sb.toString());
+        ArrayList<Metadatum> presentMD = resolveMetadataFields(sb.toString());
         if (null != presentMD && presentMD.size() != 0)
         {
-            for (DCValue v : presentMD)
+            for (Metadatum v : presentMD)
             {
                 String fieldName = buildFieldName(v);
                 if (mdPairs.containsKey(fieldName))

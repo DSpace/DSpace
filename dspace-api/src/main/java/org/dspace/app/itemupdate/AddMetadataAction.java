@@ -10,7 +10,7 @@ package org.dspace.app.itemupdate;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -47,11 +47,11 @@ public class AddMetadataAction extends UpdateMetadataAction {
 				{
 					// match against metadata for this field/value in repository
 					// qualifier must be strictly matched, possibly null					
-					DCValue[] ardcv = null;
+					Metadatum[] ardcv = null;
 					ardcv = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
 					
 					boolean found = false;
-					for (DCValue dcv : ardcv)
+					for (Metadatum dcv : ardcv)
 					{
 						if (dcv.value.equals(dtom.value))
 						{
@@ -102,7 +102,7 @@ public class AddMetadataAction extends UpdateMetadataAction {
 								//ItemUpdate.pr("Undo metadata: " + dtom);
 								
 								// add all as a replace record to be preceded by delete
-								for (DCValue dcval : ardcv)
+								for (Metadatum dcval : ardcv)
 								{							
 									itarch.addUndoMetadataField(DtoMetadata.create(dcval.schema, dcval.element, 
 											dcval.qualifier, dcval.language, dcval.value));

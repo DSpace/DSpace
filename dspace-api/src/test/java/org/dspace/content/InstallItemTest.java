@@ -132,9 +132,9 @@ public class InstallItemTest extends AbstractUnitTest
         assertThat("testRestoreItem 0", result, equalTo(is.getItem()));
 
         //Make sure that restore did NOT insert a new provenance message with today's date
-        DCValue[] provMsgValues = result.getMetadata("dc", "description", "provenance", Item.ANY);
+        Metadatum[] provMsgValues = result.getMetadata("dc", "description", "provenance", Item.ANY);
         int i = 1;
-        for(DCValue val : provMsgValues)
+        for(Metadatum val : provMsgValues)
         {
             assertFalse("testRestoreItem " + i, val.value.startsWith(provDescriptionBegins));
             i++;
@@ -202,7 +202,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure the string "today" was replaced with today's date
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
 
         assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
         assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));
@@ -224,7 +224,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure dc.date.issued is NOT set
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
         assertThat("testInstallItem_nullIssuedDate 0", issuedDates.length, equalTo(0));
     }
 
@@ -254,7 +254,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure the string "today" was replaced with today's date
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
 
         assertThat("testRestoreItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
         assertThat("testRestoreItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));

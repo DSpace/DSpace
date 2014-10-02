@@ -336,7 +336,7 @@ public class MetadataImport
                         Item item = wsItem.getItem();
 
                         // Add the metadata to the item
-                        for (DCValue dcv : whatHasChanged.getAdds())
+                        for (Metadatum dcv : whatHasChanged.getAdds())
                         {
                             item.addMetadata(dcv.schema,
                                              dcv.element,
@@ -473,11 +473,11 @@ public class MetadataImport
                                        ",looking_for_element=" + element +
                                        ",looking_for_qualifier=" + qualifier +
                                        ",looking_for_language=" + language));
-        DCValue[] current = item.getMetadata(schema, element, qualifier, language);
+        Metadatum[] current = item.getMetadata(schema, element, qualifier, language);
         
         String[] dcvalues = new String[current.length];
         int i = 0;
-        for (DCValue dcv : current)
+        for (Metadatum dcv : current)
         {
             if (dcv.authority == null || !isAuthorityControlledField(md))
             {
@@ -497,7 +497,7 @@ public class MetadataImport
         // Compare from current->csv
         for (int v = 0; v < fromCSV.length; v++) {
             String value = fromCSV[v];
-            DCValue dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            Metadatum dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
             if (fromAuthority!=null) {
                 value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
                 fromCSV[v] = value;
@@ -515,7 +515,7 @@ public class MetadataImport
         for (String value : dcvalues)
         {
             // Look to see if it should be removed
-            DCValue dcv = new DCValue();
+            Metadatum dcv = new Metadatum();
             dcv.schema = schema;
             dcv.element = element;
             dcv.qualifier = qualifier;
@@ -548,11 +548,11 @@ public class MetadataImport
             ((changes.getAdds().size() > 0) || (changes.getRemoves().size() > 0)))
         {
             // Get the complete list of what values should now be in that element
-            List<DCValue> list = changes.getComplete();
+            List<Metadatum> list = changes.getComplete();
             List<String> values = new ArrayList<String>();
             List<String> authorities = new ArrayList<String>();
             List<Integer> confidences = new ArrayList<Integer>();
-            for (DCValue value : list)
+            for (Metadatum value : list)
             {
                 if ((qualifier == null) && (language == null))
                 {
@@ -825,7 +825,7 @@ public class MetadataImport
         // Add all the values
         for (String value : fromCSV)
         {
-            DCValue dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            Metadatum dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
             if(fromAuthority!=null){
                 value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
             }
@@ -849,9 +849,9 @@ public class MetadataImport
         return fromAuthority;
     }
 
-    private DCValue getDcValueFromCSV(String language, String schema, String element, String qualifier, String value, AuthorityValue fromAuthority) {
+    private Metadatum getDcValueFromCSV(String language, String schema, String element, String qualifier, String value, AuthorityValue fromAuthority) {
         // Look to see if it should be removed
-        DCValue dcv = new DCValue();
+        Metadatum dcv = new Metadatum();
         dcv.schema = schema;
         dcv.element = element;
         dcv.qualifier = qualifier;
@@ -887,7 +887,7 @@ public class MetadataImport
         return dcv;
     }
 
-    private void simplyCopyValue(String value, DCValue dcv) {
+    private void simplyCopyValue(String value, Metadatum dcv) {
         dcv.value = value;
         dcv.authority = null;
         dcv.confidence = Choices.CF_UNSET;
@@ -960,8 +960,8 @@ public class MetadataImport
         for (BulkEditChange change : changes)
         {
             // Get the changes
-            List<DCValue> adds = change.getAdds();
-            List<DCValue> removes = change.getRemoves();
+            List<Metadatum> adds = change.getAdds();
+            List<Metadatum> removes = change.getRemoves();
             List<Collection> newCollections = change.getNewMappedCollections();
             List<Collection> oldCollections = change.getOldMappedCollections();
             if ((adds.size() > 0) || (removes.size() > 0) ||
@@ -1099,7 +1099,7 @@ public class MetadataImport
             }
 
             // Show additions
-            for (DCValue dcv : adds)
+            for (Metadatum dcv : adds)
             {
                 String md = dcv.schema + "." + dcv.element;
                 if (dcv.qualifier != null)
@@ -1128,7 +1128,7 @@ public class MetadataImport
             }
 
             // Show removals
-            for (DCValue dcv : removes)
+            for (Metadatum dcv : removes)
             {
                 String md = dcv.schema + "." + dcv.element;
                 if (dcv.qualifier != null)

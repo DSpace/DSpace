@@ -13,20 +13,20 @@ import static org.junit.Assert.*;
 import org.junit.*;
 
 /**
- * DCValue is a deprecated class with no methods (just a Data Object). This
+ * Metadatum is a deprecated class with no methods (just a Data Object). This
  * class does no real testing, is just here for the sake of coberture completeness
  * and in case the class is refactored and requires some extra testing.
  * @author pvillega
  */
-public class DCValueTest extends AbstractUnitTest
+public class MetadatumTest extends AbstractUnitTest
 {
     /** log4j category */
-    private final static Logger log = Logger.getLogger(DCValueTest.class);
+    private final static Logger log = Logger.getLogger(MetadatumTest.class);
 
     /**
      * Object to use in the tests
      */
-    private DCValue dcval;
+    private Metadatum dcval;
 
 
     /**
@@ -41,7 +41,7 @@ public class DCValueTest extends AbstractUnitTest
     public void init()
     {
         super.init();
-        dcval =  new DCValue();
+        dcval =  new Metadatum();
     }
 
     /**

@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -326,10 +326,10 @@ public class DSpaceAIPIngester
         throws PackageValidationException, AuthorizeException, IOException, SQLException
     {
         // Get all metadata fields/values currently added to this Item
-        DCValue allMD[] = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum allMD[] = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // For each field, we'll check if it exists. If not, we'll create it.
-        for(DCValue md : allMD)
+        for(Metadatum md : allMD)
         {
             MetadataSchema mdSchema = null;
             MetadataField mdField = null;

@@ -27,7 +27,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.xml.sax.SAXException;
 
 import org.dspace.app.bulkedit.BulkEditChange;
@@ -106,8 +106,8 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                     for (BulkEditChange change : changes)
                     {
                         // Get the changes
-                        List<DCValue> adds = change.getAdds();
-                        List<DCValue> removes = change.getRemoves();
+                        List<Metadatum> adds = change.getAdds();
+                        List<Metadatum> removes = change.getRemoves();
                         List<Collection> newCollections = change.getNewMappedCollections();
                         List<Collection> oldCollections = change.getOldMappedCollections();
 
@@ -207,7 +207,7 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                         }
 
                         // Show additions
-                        for (DCValue dcv : adds)
+                        for (Metadatum dcv : adds)
                         {
                             Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
                             String md = dcv.schema + "." + dcv.element;
@@ -227,7 +227,7 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                         }
 
                         // Show removals
-                        for (DCValue dcv : removes)
+                        for (Metadatum dcv : removes)
                         {
                             Row mdrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
                             String md = dcv.schema + "." + dcv.element;

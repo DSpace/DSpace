@@ -20,7 +20,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.xml.sax.SAXException;
 
@@ -93,11 +93,11 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
+		Metadatum[] titles = item.getDC("title", "alternative", Item.ANY);
 		
-		DCValue[] dateIssued = item.getDC("date", "issued", Item.ANY);
-        DCValue[] citation = item.getDC("identifier", "citation", Item.ANY);
-        DCValue[] publisher = item.getDC("publisher", null, Item.ANY);
+		Metadatum[] dateIssued = item.getDC("date", "issued", Item.ANY);
+        Metadatum[] citation = item.getDC("identifier", "citation", Item.ANY);
+        Metadatum[] publisher = item.getDC("publisher", null, Item.ANY);
     	
     	
         // Generate a from asking the user two questions: multiple 

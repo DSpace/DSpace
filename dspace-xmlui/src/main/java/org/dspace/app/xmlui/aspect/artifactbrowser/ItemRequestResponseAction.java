@@ -21,7 +21,7 @@ import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -69,7 +69,7 @@ public class ItemRequestResponseAction extends AbstractAction
         RequestItem requestItem = RequestItem.findByToken(context, token);
         String title;
         Item item = Item.find(context, requestItem.getItemID());
-        DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
         if (titleDC != null || titleDC.length > 0) 
         	title=titleDC[0].value; 
         else

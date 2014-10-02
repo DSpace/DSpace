@@ -38,7 +38,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.app.util.GoogleMetadata;
@@ -433,7 +433,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
      */
     public static String getItemTitle(Item item)
     {
-        DCValue[] titles = item.getDC("title", Item.ANY, Item.ANY);
+        Metadatum[] titles = item.getDC("title", Item.ANY, Item.ANY);
 
         String title;
         if (titles != null && titles.length > 0)

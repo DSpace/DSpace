@@ -454,11 +454,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 itemName.append(item.getHandle()).append(":").append(metadataKey.toString());
 
 
-                DCValue[] itemMetadata = item.getMetadata(schema, metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
+                Metadatum[] itemMetadata = item.getMetadata(schema, metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
                 if(!ArrayUtils.isEmpty(itemMetadata))
                 {
                     org.dspace.app.xmlui.wing.element.List metadataFieldList = itemList.addList(itemName.toString());
-                    for (DCValue metadataValue : itemMetadata)
+                    for (Metadatum metadataValue : itemMetadata)
                     {
                         String value = metadataValue.value;
                         addMetadataField(highlightedResults, metadataKey.toString(), metadataFieldList, value);

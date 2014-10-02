@@ -22,7 +22,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -199,10 +199,10 @@ public class CSVOutputter extends AbstractReader implements Recyclable
         }
     }
     
-    public String wrapInDelimitedString(DCValue[] metadataEntries) {
+    public String wrapInDelimitedString(Metadatum[] metadataEntries) {
         StringBuilder metadataString = new StringBuilder();
 
-        for(DCValue metadataEntry : metadataEntries) {
+        for(Metadatum metadataEntry : metadataEntries) {
             if(metadataString.length() > 0) {
                 // Delimit entries with the || double pipe character sequence.
                 metadataString.append("\\|\\|");

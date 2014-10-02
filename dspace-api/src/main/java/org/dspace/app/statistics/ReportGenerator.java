@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -801,8 +801,8 @@ public class ReportGenerator
         // build the referece
         // FIXME: here we have blurred the line between content and presentation
         // and it should probably be un-blurred
-        DCValue[] title = item.getDC("title", null, Item.ANY);
-        DCValue[] author = item.getDC("contributor", "author", Item.ANY);
+        Metadatum[] title = item.getDC("title", null, Item.ANY);
+        Metadatum[] author = item.getDC("contributor", "author", Item.ANY);
         
         StringBuffer authors = new StringBuffer();
         if (author.length > 0)

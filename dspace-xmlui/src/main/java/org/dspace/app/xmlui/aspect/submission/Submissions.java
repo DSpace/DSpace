@@ -29,7 +29,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -223,7 +223,7 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             for (WorkspaceItem workspaceItem : unfinishedItems) 
             {
-                DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+                Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
                 EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 
                 int workspaceItemID = workspaceItem.getID();
@@ -267,7 +267,7 @@ public class Submissions extends AbstractDSpaceTransformer
         for (WorkspaceItem workspaceItem : supervisedItems) 
         {
 
-            DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+            Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
             EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 
             int workspaceItemID = workspaceItem.getID();
@@ -394,9 +394,9 @@ public class Submissions extends AbstractDSpaceTransformer
             Item published = (Item) i.next();
             String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
             String itemUrl = contextPath+"/handle/"+published.getHandle();
-            DCValue[] titles = published.getMetadata("dc", "title", null, Item.ANY);
+            Metadatum[] titles = published.getMetadata("dc", "title", null, Item.ANY);
             String collectionName = published.getOwningCollection().getMetadata("name");
-            DCValue[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
+            Metadatum[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
 
             Row row = table.addRow();
 
