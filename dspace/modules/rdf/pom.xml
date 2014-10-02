@@ -79,12 +79,6 @@
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-rdf</artifactId>
-            <type>jar</type>
-            <classifier>classes</classifier>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>

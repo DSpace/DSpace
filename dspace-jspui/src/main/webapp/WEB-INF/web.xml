@@ -72,7 +72,7 @@
   
   <filter>
       <filter-name>rdf-content-negotiation</filter-name>
-      <filter-class>org.dspace.rdf.providing.negotiation.NegotiationFilter</filter-class>
+      <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
   </filter>
 
   <!-- Filter mappings -->

@@ -16,11 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Site;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.rdf.RDFUtil;
-import org.dspace.rdf.providing.negotiation.Negotiator;
+import org.dspace.rdf.negotiation.Negotiator;
 import org.dspace.utils.DSpace;
 
 /**
