@@ -47,9 +47,13 @@ public class InitializeDatabase
 
         try
         {
-            String dbSchema = ConfigurationManager.getProperty("db.schema");
-            if (!DatabaseManager.isOracle() && StringUtils.isBlank(dbSchema) != true)
+            if (!DatabaseManager.isOracle())
             {
+                String dbSchema = ConfigurationManager.getProperty("db.schema");
+                if (StringUtils.isBlank(dbSchema) == true) {
+                    dbSchema = "public";
+                }
+
                 Connection connection = DatabaseManager.getConnection();
                 connection.setAutoCommit(true);
                 Statement statement = connection.createStatement();
