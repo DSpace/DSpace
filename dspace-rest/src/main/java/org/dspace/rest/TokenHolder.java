@@ -95,8 +95,8 @@ public class TokenHolder
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return token;
     }

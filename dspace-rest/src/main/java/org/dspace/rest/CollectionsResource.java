@@ -117,8 +117,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.trace("Collection(id=" + collectionId + ") has been successfully read.");
         return collection;
@@ -175,10 +175,9 @@ public class CollectionsResource extends Resource
                 offset = 0;
             }
 
-            // dspaceCollections =
-            // org.dspace.content.Collection.findAll(context, limit, offset); //
-            // Message:java.sql.SQLSyntaxErrorException: ORA-00933: SQL command
-            // not properly ended
+            // TODO Repair it in DSpace api
+            // dspaceCollections = org.dspace.content.Collection.findAll(context, limit, offset);
+            // Message:java.sql.SQLSyntaxErrorException: ORA-00933: SQL command not properly ended
             dspaceCollections = org.dspace.content.Collection.findAll(context);
 
             for (int i = offset; i < limit + offset; i++)
@@ -206,8 +205,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.trace("All collections were successfully read.");
         return collections.toArray(new org.dspace.rest.common.Collection[0]);
@@ -294,8 +293,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.trace("All items in collection(id=" + collectionId + ") were successfully read.");
         return null;
@@ -312,10 +311,10 @@ public class CollectionsResource extends Resource
      *            If you want to access to collection under logged user into
      *            context. In headers must be set header "rest-dspace-token"
      *            with passed token from login method.
-     * @return Return status code with item. Return status
-     *         (OK)200 if item was created. NOT_FOUND(404) if id of collection
-     *         does not exists. UNAUTHORIZED(401) if user have not permission to
-     *         write items in collection.
+     * @return Return status code with item. Return status (OK)200 if item was
+     *         created. NOT_FOUND(404) if id of collection does not exists.
+     *         UNAUTHORIZED(401) if user have not permission to write items in
+     *         collection.
      * @throws WebApplicationException
      *             It is thrown when was problem with database reading or
      *             writing (SQLException) or problem with creating
@@ -369,9 +368,9 @@ public class CollectionsResource extends Resource
 
             log.trace("Installing item to collection(id=" + collectionId + ").");
             dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
-            
+
             returnItem = new Item(dspaceItem, "", context);
-            
+
             context.complete();
 
         }
@@ -400,8 +399,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Item successfully created in collection(id=" + collectionId + "). Item handle=" + returnItem.getHandle());
         return returnItem;
@@ -449,8 +448,7 @@ public class CollectionsResource extends Resource
 
             dspaceCollection.setMetadata("name", collection.getName());
             dspaceCollection.setLicense(collection.getLicense());
-            // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this
-            // option.
+            // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
             dspaceCollection.setMetadata(org.dspace.content.Collection.COPYRIGHT_TEXT, collection.getCopyrightText());
             dspaceCollection.setMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
             dspaceCollection.setMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
@@ -475,8 +473,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Collection(id=" + collectionId + ") successfully updated.");
         return Response.ok().build();
@@ -545,8 +543,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Collection(id=" + collectionId + ") was successfully deleted.");
         return Response.ok().build();
@@ -651,66 +649,83 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Item(id=" + itemId + ") in collection(id=" + collectionId + ") was successfully deleted.");
         return Response.ok().build();
     }
-    
+
     /**
      * Search for first collection with passed name.
-     * @param name Name of collection.
+     * 
+     * @param name
+     *            Name of collection.
      * @param headers
      *            If you want to access to collection under logged user into
      *            context. In headers must be set header "rest-dspace-token"
      *            with passed token from login method.
-     * @return It returns null if collection was not found. Otherwise returns first founded collection.
+     * @return It returns null if collection was not found. Otherwise returns
+     *         first founded collection.
      * @throws WebApplicationException
      */
-	@POST
-	@Path("/find-collection")
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Collection findCollectionByName(String name, @Context HttpHeaders headers) throws WebApplicationException {
-		log.info("Searching for first collection with name=" + name + ".");
-		org.dspace.core.Context context = null;
-		Collection collection = null;
+    @POST
+    @Path("/find-collection")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Collection findCollectionByName(String name, @Context HttpHeaders headers) throws WebApplicationException
+    {
+        log.info("Searching for first collection with name=" + name + ".");
+        org.dspace.core.Context context = null;
+        Collection collection = null;
 
-		try {
-			context = createContext(getUser(headers));
-			org.dspace.content.Collection[] dspaceCollections;
-
-			dspaceCollections = org.dspace.content.Collection.findAll(context);
-
-			for (org.dspace.content.Collection dspaceCollection : dspaceCollections) {
-				if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ)) {
-					if (dspaceCollection.getName().equals(name)) {
-						collection = new Collection(dspaceCollection, "", context, 100, 0);
-						break;
-					}
-				}
-			}
-
-			context.complete();
-
-		} catch (SQLException e) {
-			processException("Something went wrong while searching for collection(name=" + name + ") from database. Message: " + e, context);
-		} catch (ContextException e) {
-			processException("Something went wrong while searching for collection(name=" + name + "), ContextError. Message: " + e.getMessage(), context);
-		}
-		finally
+        try
         {
-			context.abort();
-		}
+            context = createContext(getUser(headers));
+            org.dspace.content.Collection[] dspaceCollections;
 
-		if (collection == null) {
-			log.info("Collection was not found.");
-		} else {
-			log.info("Collection was found with id(" + collection.getId() + ").");
-		}
-		return collection;
-	}
+            dspaceCollections = org.dspace.content.Collection.findAll(context);
+
+            for (org.dspace.content.Collection dspaceCollection : dspaceCollections)
+            {
+                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
+                {
+                    if (dspaceCollection.getName().equals(name))
+                    {
+                        collection = new Collection(dspaceCollection, "", context, 100, 0);
+                        break;
+                    }
+                }
+            }
+
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Something went wrong while searching for collection(name=" + name + ") from database. Message: "
+                    + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Something went wrong while searching for collection(name=" + name + "), ContextError. Message: "
+                    + e.getMessage(), context);
+        }
+        finally
+        {
+            context.abort();
+        }
+
+        if (collection == null)
+        {
+            log.info("Collection was not found.");
+        }
+        else
+        {
+            log.info("Collection was found with id(" + collection.getId() + ").");
+        }
+        return collection;
+    }
 
     /**
      * Find collection from DSpace database. It is encapsulation of method
@@ -764,8 +779,8 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
         return collection;
     }
 }

@@ -45,6 +45,8 @@ import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 
 /**
@@ -53,8 +55,7 @@ import org.dspace.usage.UsageEvent;
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  * 
  */
-// Every DSpace class used without namespace is from package
-// org.dspace.rest.common.*. Otherwise namespace is defined.
+// Every DSpace class used without namespace is from package org.dspace.rest.common.*. Otherwise namespace is defined.
 @SuppressWarnings("deprecation")
 @Path("/items")
 public class ItemsResource extends Resource
@@ -121,8 +122,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return item;
     }
@@ -202,8 +203,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -261,8 +262,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
         return null;
     }
 
@@ -334,8 +335,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -383,10 +384,8 @@ public class ItemsResource extends Resource
 
             for (MetadataEntry entry : metadata)
             {
-                String data[] = mySplit(entry.getKey()); // Done by my split,
-                                                         // because of java
-                                                         // split was not
-                                                         // function.
+                // TODO Test with Java split
+                String data[] = mySplit(entry.getKey()); // Done by my split, because of java split was not function.
                 if ((data.length >= 2) && (data.length <= 3))
                 {
                     dspaceItem.addMetadata(data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
@@ -411,8 +410,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Metadata to item(id=" + itemId + ") were successfully added.");
         return Response.status(Status.OK).build();
@@ -429,9 +428,9 @@ public class ItemsResource extends Resource
      *            If you want to access to item under logged user into context.
      *            In headers must be set header "rest-dspace-token" with passed
      *            token from login method.
-     * @return Returns bitstream with status code OK(200). If id of item
-     *         is invalid , it returns status code NOT_FOUND(404). If user is
-     *         not allowed to write to item, UNAUTHORIZED(401).
+     * @return Returns bitstream with status code OK(200). If id of item is
+     *         invalid , it returns status code NOT_FOUND(404). If user is not
+     *         allowed to write to item, UNAUTHORIZED(401).
      * @throws WebApplicationException
      *             It is thrown by these exceptions: SQLException, when was
      *             problem with reading/writing from/to database.
@@ -442,127 +441,151 @@ public class ItemsResource extends Resource
      *             DSpace.
      */
     // TODO Add option to add bitsream by URI.(for very big files)
-	@POST
-	@Path("/{item_id}/bitstreams")
-	public Bitstream addItemBitstream(
-			@PathParam("item_id") Integer itemId, InputStream inputStream,
-			@QueryParam("name") String name, @QueryParam("description") String description,
-			@QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
-			@QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-			@QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-					throws WebApplicationException {
+    @POST
+    @Path("/{item_id}/bitstreams")
+    public Bitstream addItemBitstream(@PathParam("item_id") Integer itemId, InputStream inputStream,
+            @QueryParam("name") String name, @QueryParam("description") String description,
+            @QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
+            @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
 
-		log.info("Adding bitstream to item(id=" + itemId + ").");
-		org.dspace.core.Context context = null;
-		Bitstream bitstream = null;
+        log.info("Adding bitstream to item(id=" + itemId + ").");
+        org.dspace.core.Context context = null;
+        Bitstream bitstream = null;
 
-		try {
-			context = createContext(getUser(headers));
-			org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
-
-			writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
-
-			// Is better to add bitstream to ORIGINAL bundle or to item own?
-			log.trace("Creating bitstream in item.");
-			org.dspace.content.Bundle bundle = null;
-			org.dspace.content.Bitstream dspaceBitstream = null;
-			if ((dspaceItem.getBundles().length == 0) || (dspaceItem.getBundles() == null)) {
-				log.trace("Creating bundle in item.");
-				dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
-				//bundle = dspaceItem.getBundles()[0];
-				//bundle.setName(dspaceItem.getID() + "-bundle");
-				//bundle.update();
-			} else {
-				log.trace("Getting bundle from item.");
-				bundle = dspaceItem.getBundles()[0];
-				dspaceBitstream = bundle.createBitstream(inputStream);
-			}
-			
-			dspaceBitstream.setSource("DSpace Rest api");
-			
-			// Set bitstream name and description
-			if (name != null) {
-				if (BitstreamResource.getMimeType(name) == null) {
-					dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
-				} else {
-					dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, BitstreamResource.getMimeType(name)));
-				}
-				dspaceBitstream.setName(name);
-			}
-			if (description != null) {
-				dspaceBitstream.setDescription(description);
-			}
-			
-			dspaceBitstream.update();
-			
-			// Create policy for bitstream
-			if (groupId != null) {
-				Bundle[] bundles = dspaceBitstream.getBundles();
-				for (Bundle dspaceBundle : bundles) {
-					List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = dspaceBundle.getBitstreamPolicies();
-					
-					// Remove default bitstream policies
-					List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize.ResourcePolicy>();
-					for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
-						if (policy.getResourceID() == dspaceBitstream.getID()) {
-							policiesToRemove.add(policy);
-						}
-					}
-					for (org.dspace.authorize.ResourcePolicy policy : policiesToRemove) {
-						bitstreamsPolicies.remove(policy);
-					}
-					
-					org.dspace.authorize.ResourcePolicy dspacePolicy = org.dspace.authorize.ResourcePolicy.create(context);
-					dspacePolicy.setAction(org.dspace.core.Constants.READ);
-					dspacePolicy.setGroup(Group.find(context, groupId));
-					dspacePolicy.setResourceID(dspaceBitstream.getID());
-					dspacePolicy.setResource(dspaceBitstream);
-					dspacePolicy.setResourceType(org.dspace.core.Constants.BITSTREAM);
-					if ((year != null) || (month != null) || (day != null)) {
-						Date date = new Date();
-						if (year != null) {
-							date.setYear(year-1900);
-						}
-						if (month != null) {
-							date.setMonth(month-1);
-						}
-						if (day != null) {
-							date.setDate(day);
-						}
-						date.setHours(0);
-						date.setMinutes(0);
-						date.setSeconds(0);
-						dspacePolicy.setStartDate(date);
-					}
-					dspacePolicy.update();
-					bitstreamsPolicies.add(dspacePolicy);
-
-					dspaceBundle.replaceAllBitstreamPolicies(bitstreamsPolicies);
-					dspaceBundle.update();
-				}
-			}
-
-			dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
-			bitstream = new Bitstream(dspaceBitstream, "");
-
-			context.complete();
-
-		} catch (SQLException e) {
-			processException("Could not create bitstream in item(id=" + itemId + "), SQLException. Message: " + e, context);
-		} catch (AuthorizeException e) {
-			processException("Could not create bitstream in item(id=" + itemId + "), AuthorizeException. Message: " + e, context);
-		} catch (IOException e) {
-			processException("Could not create bitstream in item(id=" + itemId + "), IOException Message: " + e, context);
-		} catch (ContextException e) {
-			processException("Could not create bitstream in item(id=" + itemId + "), ContextException Message: " + e.getMessage(), context);
-		}
-		finally
+        try
         {
-			context.abort();
-		}
+            context = createContext(getUser(headers));
+            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-		log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
-		return bitstream;
+            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+
+            // Is better to add bitstream to ORIGINAL bundle or to item own?
+            log.trace("Creating bitstream in item.");
+            org.dspace.content.Bundle bundle = null;
+            org.dspace.content.Bitstream dspaceBitstream = null;
+            if ((dspaceItem.getBundles().length == 0) || (dspaceItem.getBundles() == null))
+            {
+                log.trace("Creating bundle in item.");
+                dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
+            }
+            else
+            {
+                log.trace("Getting bundle from item.");
+                bundle = dspaceItem.getBundles()[0];
+                dspaceBitstream = bundle.createBitstream(inputStream);
+            }
+
+            dspaceBitstream.setSource("DSpace Rest api");
+
+            // Set bitstream name and description
+            if (name != null)
+            {
+                if (BitstreamResource.getMimeType(name) == null)
+                {
+                    dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
+                }
+                else
+                {
+                    dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, BitstreamResource.getMimeType(name)));
+                }
+                dspaceBitstream.setName(name);
+            }
+            if (description != null)
+            {
+                dspaceBitstream.setDescription(description);
+            }
+
+            dspaceBitstream.update();
+
+            // Create policy for bitstream
+            if (groupId != null)
+            {
+                Bundle[] bundles = dspaceBitstream.getBundles();
+                for (Bundle dspaceBundle : bundles)
+                {
+                    List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = dspaceBundle.getBitstreamPolicies();
+
+                    // Remove default bitstream policies
+                    List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize.ResourcePolicy>();
+                    for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies)
+                    {
+                        if (policy.getResourceID() == dspaceBitstream.getID())
+                        {
+                            policiesToRemove.add(policy);
+                        }
+                    }
+                    for (org.dspace.authorize.ResourcePolicy policy : policiesToRemove)
+                    {
+                        bitstreamsPolicies.remove(policy);
+                    }
+
+                    org.dspace.authorize.ResourcePolicy dspacePolicy = org.dspace.authorize.ResourcePolicy.create(context);
+                    dspacePolicy.setAction(org.dspace.core.Constants.READ);
+                    dspacePolicy.setGroup(Group.find(context, groupId));
+                    dspacePolicy.setResourceID(dspaceBitstream.getID());
+                    dspacePolicy.setResource(dspaceBitstream);
+                    dspacePolicy.setResourceType(org.dspace.core.Constants.BITSTREAM);
+                    if ((year != null) || (month != null) || (day != null))
+                    {
+                        Date date = new Date();
+                        if (year != null)
+                        {
+                            date.setYear(year - 1900);
+                        }
+                        if (month != null)
+                        {
+                            date.setMonth(month - 1);
+                        }
+                        if (day != null)
+                        {
+                            date.setDate(day);
+                        }
+                        date.setHours(0);
+                        date.setMinutes(0);
+                        date.setSeconds(0);
+                        dspacePolicy.setStartDate(date);
+                    }
+                    dspacePolicy.update();
+                    bitstreamsPolicies.add(dspacePolicy);
+
+                    dspaceBundle.replaceAllBitstreamPolicies(bitstreamsPolicies);
+                    dspaceBundle.update();
+                }
+            }
+
+            dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
+            bitstream = new Bitstream(dspaceBitstream, "");
+
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Could not create bitstream in item(id=" + itemId + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not create bitstream in item(id=" + itemId + "), AuthorizeException. Message: " + e, context);
+        }
+        catch (IOException e)
+        {
+            processException("Could not create bitstream in item(id=" + itemId + "), IOException Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException(
+                    "Could not create bitstream in item(id=" + itemId + "), ContextException Message: " + e.getMessage(), context);
+        }
+        finally
+        {
+            context.abort();
+        }
+
+        log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
+        return bitstream;
     }
 
     /**
@@ -644,8 +667,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Metadata of item(id=" + itemId + ") were successfully updated.");
         return Response.status(Status.OK).build();
@@ -713,8 +736,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Item(id=" + itemId + ") was successfully deleted.");
         return Response.status(Status.OK).build();
@@ -757,8 +780,7 @@ public class ItemsResource extends Resource
             writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
 
             log.trace("Deleting metadata.");
-            // TODO Rewrite without deprecated object.
-            // Leave there only generated metadata.
+            // TODO Rewrite without deprecated object. Leave there only generated metadata.
             DCValue[] value = dspaceItem.getMetadata("dc", "date", "accessioned", org.dspace.content.Item.ANY);
             DCValue[] value2 = dspaceItem.getMetadata("dc", "date", "available", org.dspace.content.Item.ANY);
             DCValue[] value3 = dspaceItem.getMetadata("dc", "identifier", "uri", org.dspace.content.Item.ANY);
@@ -792,8 +814,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Item(id=" + itemId + ") metadata were successfully deleted.");
         return Response.status(Status.OK).build();
@@ -888,8 +910,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Bitstream(id=" + bitstreamId + ") from item(id=" + itemId + ") was successfuly deleted .");
         return Response.status(Status.OK).build();
@@ -930,7 +952,6 @@ public class ItemsResource extends Resource
         org.dspace.core.Context context = null;
 
         List<Item> items = new ArrayList<Item>();
-        ItemIterator itemIterator = null;
         String[] metadata = mySplit(metadataEntry.getKey());
 
         try
@@ -940,17 +961,21 @@ public class ItemsResource extends Resource
             // TODO Repair, it ends by error:
             // "java.sql.SQLSyntaxErrorException: ORA-00932: inconsistent datatypes: expected - got CLOB"
             /*
-             * if (metadata.length == 3) { itemIterator =
-             * org.dspace.content.Item.findByMetadataField(context, metadata[0],
-             * metadata[1], metadata[2], value); } else if (metadata.length ==
-             * 2) { itemIterator =
-             * org.dspace.content.Item.findByMetadataField(context, metadata[0],
-             * metadata[1], null, value); } else { context.abort();
-             * log.error("Finding failed, bad metadata key."); throw new
-             * WebApplicationException(Response.Status.NOT_FOUND); }
+             * if (metadata.length == 3){
+             *     itemIterator =  org.dspace.content.Item.findByMetadataField(context, metadata[0],
+             *     metadata[1], metadata[2], value);
+             * } else if (metadata.length == 2){
+             *     itemIterator = org.dspace.content.Item.findByMetadataField(context, metadata[0],
+             *     metadata[1], null, value);
+             * } else {
+             *     context.abort();
+             *     log.error("Finding failed, bad metadata key.");
+             *     throw new WebApplicationException(Response.Status.NOT_FOUND);
+             * }
              * 
-             * if (itemIterator.hasNext()) { item = new
-             * Item(itemIterator.next(), "", context); }
+             * if (itemIterator.hasNext()) {
+             * item = new Item(itemIterator.next(), "", context);
+             * }
              */
 
             // Must used own style.
@@ -961,25 +986,37 @@ public class ItemsResource extends Resource
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
 
-            org.dspace.content.Item dspaceItem = null;
-            itemIterator = org.dspace.content.Item.findAll(context);
-            org.dspace.content.DCValue[] dspaceValue = null;
-            while (itemIterator.hasNext())
+            String sql = "SELECT ITEM_ID, TEXT_VALUE, TEXT_LANG, SHORT_ID, ELEMENT, QUALIFIER " +
+                    "FROM METADATAVALUE " +
+                    "JOIN METADATAFIELDREGISTRY ON METADATAVALUE.METADATA_FIELD_ID = METADATAFIELDREGISTRY.METADATA_FIELD_ID " +
+                    "JOIN METADATASCHEMAREGISTRY ON METADATAFIELDREGISTRY.METADATA_SCHEMA_ID = METADATASCHEMAREGISTRY.METADATA_SCHEMA_ID " +
+                    "WHERE " +
+                    "SHORT_ID='" + metadata[0] + "'  AND " +
+                    "ELEMENT='" + metadata[1] + "' AND ";
+            if (metadata.length > 3)
             {
-                dspaceItem = itemIterator.next();
+                sql += "QUALIFIER='" + metadata[2] + "' AND ";
+            }
+            sql += "dbms_lob.substr(TEXT_VALUE, 40)='" + metadataEntry.getValue() + "' AND ";
+            if (metadataEntry.getLanguage() != null)
+            {
+                sql += "TEXT_LANG='" + metadataEntry.getLanguage() + "'";
+            }
+            else
+            {
+                sql += "TEXT_LANG is null";
+            }
 
-                dspaceValue = dspaceItem.getMetadata(metadata[0], metadata[1], metadata[2], org.dspace.content.Item.ANY);
-
-                for (DCValue dcvalue : dspaceValue)
-                {
-                    if (dcvalue.value.equals(metadataEntry.getValue()))
-                    {
-                        items.add(new Item(dspaceItem, expnad, context));
-                        writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
-                                headers, request);
-                        break;
-                    }
-                }
+            TableRowIterator iterator = org.dspace.storage.rdbms.DatabaseManager.query(context, sql);
+            while (iterator.hasNext())
+            {
+                TableRow row = iterator.next();
+                org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("ITEM_ID"),
+                        org.dspace.core.Constants.READ);
+                Item item = new Item(dspaceItem, "", context);
+                writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+                        request);
+                items.add(item);
             }
 
             context.complete();
@@ -988,21 +1025,15 @@ public class ItemsResource extends Resource
         catch (SQLException e)
         {
             processException("Something get wrong while finding item. SQLException, Message: " + e, context);
-        }/*
-          * catch (AuthorizeException e) { processException(
-          * "Something get wrong while finding item. AuthorizeException, Message:"
-          * + e, context); } catch (IOException e) { processException(
-          * "Something get wrong while finding item. IOEception Message:" + e,
-          * context); }
-          */
+        }
         catch (ContextException e)
         {
             processException("Context error:" + e.getMessage(), context);
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         if (items.size() == 0)
         {
@@ -1067,8 +1098,8 @@ public class ItemsResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
         return item;
     }
 }

@@ -10,7 +10,6 @@ package org.dspace.rest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -36,8 +35,6 @@ import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 
 /**
@@ -108,8 +105,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.trace("Community(id=" + communityId + ") was successfully read.");
         return community;
@@ -190,8 +187,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -274,8 +271,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -362,8 +359,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -451,8 +448,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         return null;
     }
@@ -509,7 +506,7 @@ public class CommunitiesResource extends Resource
             dspaceCommunity.setMetadata(org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
             dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
             dspaceCommunity.update();
-            
+
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
 
@@ -528,8 +525,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Community at top level has been successfully created. Handle:" + retCommunity.getHandle());
         return retCommunity;
@@ -587,7 +584,7 @@ public class CommunitiesResource extends Resource
             dspaceCollection.update();
             dspaceCommunity.update();
 
-            retCollection = new Collection(dspaceCollection, "", context, 100, 0);       
+            retCollection = new Collection(dspaceCollection, "", context, 100, 0);
             context.complete();
 
         }
@@ -609,10 +606,11 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
-        log.info("Collection was successfully added into community(id=" + communityId + "). Collection handle=" + retCollection.getHandle());
+        log.info("Collection was successfully added into community(id=" + communityId + "). Collection handle="
+                + retCollection.getHandle());
         return retCollection;
     }
 
@@ -688,8 +686,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Subcommunity was successfully added in community(id=" + communityId + ").");
         return retCommunity;
@@ -760,8 +758,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Community(id=" + communityId + ") has been successfully updated.");
         return Response.ok().build();
@@ -825,8 +823,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -930,8 +928,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Collection(id=" + collectionId + ") in community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -1035,13 +1033,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
 
         log.info("Subcommunity(id=" + subcommunityId + ") from community(id=" + parentCommunityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
     }
-    
+
     /**
      * Find community from DSpace database. It is encapsulation of method
      * org.dspace.content.Community.find with checking if item exist and if user
@@ -1094,8 +1092,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-			context.abort();
-		}
+            context.abort();
+        }
         return community;
     }
 }
