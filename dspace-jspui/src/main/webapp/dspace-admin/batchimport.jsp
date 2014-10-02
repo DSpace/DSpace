@@ -8,7 +8,7 @@
 
 --%>
 <%--
-  - Form to upload a csv metadata file
+  - Form to upload a metadata files
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -31,7 +31,6 @@
     String message = (String)request.getAttribute("message");
     
     int type = (Integer)request.getAttribute("type");
-    System.out.println("ss: " + type);
     
 %>
 
@@ -44,6 +43,11 @@
 
     <h1><fmt:message key="jsp.dspace-admin.batchimport.title"/></h1>
 
+	<% if (uploadId != null) { %>
+		<div style="color:red">-- <fmt:message key="jsp.dspace-admin.batchimport.resume.info"/> --</div>
+		<br/>
+	<% } %>
+			
 <%
 	if (hasErrorS == null){
 	
@@ -70,7 +74,7 @@
 		<input type="hidden" name=type value="<%= type %>"/>
 		
 		<% if (uploadId != null) { %>
-		<input type="hidden" name=uploadid value="<%= uploadId %>"/>
+		<input type="hidden" name=uploadId value="<%= uploadId %>"/>
 		<% } %>
 		
 		<div class="form-group">
@@ -80,6 +84,7 @@
         
         <div class="form-group">
 			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectowningcollection"/></label>
+			<br/><i for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectowningcollection.info"/></i>
             <select class="form-control" name="collection">
 				<option value="-1"><fmt:message key="jsp.dspace-admin.batchmetadataimport.select"/></option>
  <% 

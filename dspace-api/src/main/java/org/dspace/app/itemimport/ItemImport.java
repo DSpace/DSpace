@@ -2429,7 +2429,7 @@ public class ItemImport
 					
 					//Clear these files, since it is a resume
 					(new File(dataZipPath)).delete();
-					(new File(dataZipDir)).delete();
+					FileDeleteStrategy.FORCE.delete(new File(dataZipDir));
 					
 					OutputStream os = new FileOutputStream(dataZipPath);
 
