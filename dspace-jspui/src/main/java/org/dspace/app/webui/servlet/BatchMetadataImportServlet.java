@@ -149,14 +149,21 @@ public class BatchMetadataImportServlet extends DSpaceServlet
 
     		String message = null;
 
-    		String uploadId = request.getParameter("uploadid");
+    		String uploadId = request.getParameter("uploadId");
     		if (uploadId != null){
-    			request.setAttribute("uploadid", uploadId);
+    			request.setAttribute("uploadId", uploadId);
     		}
 
     		String zipurl = request.getParameter("zipurl");
     		if (StringUtils.isEmpty(zipurl)) {
     			request.setAttribute("has-error", "true");
+    			Locale locale = request.getLocale();
+		        ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
+				try {
+					message = msgs.getString("jsp.layout.navbar-admin.batchimport.fileurlempty");
+				} catch (Exception e) {
+					message = "???jsp.layout.navbar-admin.batchimport.fileurlempty???";
+				}
     		}
     		else {
 
