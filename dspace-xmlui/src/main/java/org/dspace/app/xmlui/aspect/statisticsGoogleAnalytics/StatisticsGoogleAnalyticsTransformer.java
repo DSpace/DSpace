@@ -137,8 +137,7 @@ public class StatisticsGoogleAnalyticsTransformer extends AbstractDSpaceTransfor
         Table pageViews = results.addTable("pageViews", rows.size(), 2);
         pageViews.setHead(T_page_views);
 
-        for (int i = rows.size(); --i >= 0;) {
-            java.util.List<String> row = rows.get(i);
+        for (java.util.List<String> row : rows) {
             Row tableRow = pageViews.addRow();
             tableRow.addCellContent(row.get(0) + " / " + row.get(1));
             tableRow.addCellContent(row.get(2));
@@ -152,8 +151,7 @@ public class StatisticsGoogleAnalyticsTransformer extends AbstractDSpaceTransfor
         Table bitstreamViews = results.addTable("downloads", rows.size(), 2);
         bitstreamViews.setHead(T_downloads);
 
-        for (int i = rows.size(); --i >= 0;) {
-            java.util.List<String> row = rows.get(i);
+        for (java.util.List<String> row : rows) {
             Row tableRow = bitstreamViews.addRow();
             tableRow.addCellContent(row.get(0) + " / " + row.get(1));
             tableRow.addCellContent(row.get(2));

@@ -27,7 +27,7 @@ public class GoogleQueryManager {
                 endDate,
                 "ga:pageviews") // Metrics.
                 .setDimensions("ga:year,ga:month")
-                .setSort("ga:year,ga:month")
+                .setSort("-ga:year,-ga:month")
                 .setFilters("ga:pagePath=~/handle/" + handle + "$")
                 .execute();
     }
@@ -39,7 +39,7 @@ public class GoogleQueryManager {
                 endDate,
                 "ga:totalEvents") // Metrics.
                 .setDimensions("ga:year,ga:month")
-                .setSort("ga:year,ga:month")
+                .setSort("-ga:year,-ga:month")
                 .setFilters("ga:eventCategory==bitstream;ga:eventAction==download;ga:pagePath=~" + handle + "/")
                 .execute();
     }
