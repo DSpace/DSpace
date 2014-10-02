@@ -124,14 +124,6 @@
             <type>jar</type>
             <classifier>classes</classifier>
     	</dependency>
-        <!-- Add dspace-rdf to [dspace]/lib/ as well as it is needed to convert
-             new and changed items to rdf.-->
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-rdf</artifactId>
-            <type>jar</type>
-            <classifier>classes</classifier>
-        </dependency>
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

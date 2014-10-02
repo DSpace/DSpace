@@ -33,6 +33,7 @@
         <java.version>1.7</java.version>
         <lucene.version>4.4.0</lucene.version>
         <solr.version>4.4.0</solr.version>
+        <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
@@ -680,13 +681,6 @@
              <groupId>org.dspace</groupId>
              <artifactId>dspace-rdf</artifactId>
              <version>5.0-SNAPSHOT</version>
-             <type>jar</type>
-             <classifier>classes</classifier>
-         </dependency>
-         <dependency>
-             <groupId>org.dspace</groupId>
-             <artifactId>dspace-rdf</artifactId>
-             <version>5.0-SNAPSHOT</version>
              <type>war</type>
          </dependency>
          <dependency>
@@ -804,6 +798,12 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
          </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>${jena.version}</version>
+        </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>

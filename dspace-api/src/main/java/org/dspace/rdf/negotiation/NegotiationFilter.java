@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.rdf.providing.negotiation;
+package org.dspace.rdf.negotiation;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -18,7 +18,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.StringUtils;
+
 import org.apache.log4j.Logger;
 
 import org.dspace.rdf.RDFConfiguration;
