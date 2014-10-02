@@ -75,6 +75,7 @@ public class RestIndex {
                   		"<li>GET /collections/{collectionId} - Return collection with id.</li>" +
                   		"<li>GET /collections/{collectionId}/items - Return all items of collection.</li>" +
                   		"<li>POST /collections/{collectionId}/items - Create posted item in collection.</li>" +
+                  		"<li>POST /collections/find-collection - Find collection by passed name.</li>" +
                   		"<li>PUT /collections/{collectionId} </li> - Update collection. You muset post collection." +
                   		"<li>DELETE /collections/{collectionId} - Delete collection from DSpace.</li>" +
                   		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete item in collection. </li>" +
@@ -97,10 +98,13 @@ public class RestIndex {
                   	"<ul>" +
                   		"<li>GET /bitstreams - Return all bitstreams in DSpace.</li>" +
                   		"<li>GET /bitstreams/{bitstream id} - Return bitstream.</li>" +
+                  		"<li>GET /bitstreams/{bitstream id}/policy - Return bitstream policies.</li>" +
                   		"<li>POST /bitstreams/{bitstream id}/retrieve - Return data of bitstream.</li>" +
+                  		"<li>POST /bitstreams/{bitstream id}/policy - Add policy to item.</li>" +
                   		"<li>PUT /bitstreams/{bitstream id}/data - Update data of bitstream.</li>" +
                   		"<li>PUT /bitstreams/{bitstream id} - Update metadata of bitstream.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete bitstream from DSpace.</li>" +
+                  		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete bitstream policy.</li>" +
                   	"</ul>" +
                 "</body></html> ";
     }
