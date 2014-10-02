@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.rdf.providing.negotiation;
+package org.dspace.rdf.negotiation;
 
 import java.util.ArrayList;
 import java.util.List;
