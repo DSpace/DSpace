@@ -20,9 +20,9 @@ public class WidgetSeleniumTest extends TestCase {
   protected boolean acceptNextAlert = true;
   protected StringBuffer verificationErrors = new StringBuffer();
   
-  protected long driverTimeoutSeconds = 30;
-  protected long widgetLoadedSecondsTimeout = 30;
-  protected long widgetPopupWaitSecondsTimeout = 10;
+  protected long driverTimeoutSeconds = 5;
+  protected long widgetLoadedSecondsTimeout = 5;
+  protected long widgetPopupWaitSecondsTimeout = 5;
 
   @Before
   public void setUp() throws Exception {

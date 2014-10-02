@@ -7,6 +7,11 @@ set -e  # return fail on a failed command, for travis-ci
 ITPORT=2341
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$TEST_DIR/.."
+XVFBPID="$BASE_DIR/xvfb.pid"
+SERVER="99"
+SCREEN="0"
+XVFBARGS=":$SERVER -screen $SCREEN 1024x768x24 -ac +extension GLX +render -noreset"
+XVFB="/usr/bin/Xvfb"
 
 # non-dspace, standalone pom.xml file for local 
 # builds and travis-ci
@@ -20,8 +25,11 @@ MVN="$MVN_BASE"
 function on_exit {
     # Travis-CI clenup
     if [ "$TRAVIS" ]; then
-        echo "Stopping xvfb"
+        echo "Stopping Travis xvfb"
         sh -e /etc/init.d/xvfb stop
+    elif [ "$LOGNAME" == "vagrant" ]; then
+        echo "Stopping Vagrant Xvfb"
+        start-stop-daemon --stop --quiet --pidfile $PIDFILE
     fi
     echo Killing SimpleHTTPServer
     pkill -f SimpleHTTPServer
@@ -34,11 +42,18 @@ $MVN clean package -DskipTests=true
 $MVN test
 
 # start virtual frame buffer if in Travis-CI env 
-if [ "$TRAVIS" ]; then
-    echo "Starting xvfb"
-    export DISPLAY=:99.0
-    sh -e /etc/init.d/xvfb start
+if [ "$TRAVIS" ] || [ "$LOGNAME" == "vagrant" ]; then
+    export DISPLAY=":${SERVER}.${SCREEN}"
+    echo "Starting xvfb with display $DISPLAY"
+    if [ "$TRAVIS" ]; then
+        echo Starting Travis-CI xvfb
+        sh -e /etc/init.d/xvfb start
+    elif [ "$LOGNAME" == "vagrant" ]; then
+        echo Starting Vagrant Xvfb
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $XVFB -- $XVFBARGS
+    fi
     # TODO: ping framebuffer for start instead of sleeping
+    echo "Sleeping for xvfb server start"
     sleep 3
 fi 
 
