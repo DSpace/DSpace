@@ -37,8 +37,8 @@
     <script src="scripts/access-form-util.js">&#160;</script>
     <script src="scripts/forms.js">&#160;</script>
     <script src="scripts/vendor-extensions.js">&#160;</script>
-    <script src="scripts/templates.js">&#160;</script>
     <script src="scripts/google-stats-dates.js">&#160;</script>
+    <script src="scripts/templates.js">&#160;</script>
     <!-- endbuild -->
 
     <!--the build comments below need to be inline to fix the 'undefined'
