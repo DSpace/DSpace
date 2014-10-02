@@ -24,9 +24,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -35,7 +32,6 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -44,12 +40,6 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
 
 /**
  * Class representing an item in DSpace.
@@ -253,6 +243,32 @@ public class Item extends DSpaceObject
 
         return new ItemIterator(context, rows);
     }
+
+    public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
+        String[] elements = getElementsFilled(mdString);
+        String schema = elements[0], element = elements[1], qualifier = elements[2];
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
+                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        TableRowIterator rows = null;
+        if (Item.ANY.equals(authority)) {
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        } else {
+            query += " AND metadatavalue.authority = ?";
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), authority);
+        }
+        return new ItemIterator(context, rows);
+    }
+
 
     /**
      * Get the internal ID of this item. In general, this shouldn't be exposed

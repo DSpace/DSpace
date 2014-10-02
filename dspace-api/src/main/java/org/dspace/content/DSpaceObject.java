@@ -9,6 +9,8 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.*;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
 import org.apache.commons.lang.StringUtils;
@@ -716,6 +718,86 @@ public abstract class DSpaceObject
         }
         return null;
     }
+
+    public List<DCValue> getMetadata(String mdString, String authority) {
+        String[] elements = getElements(mdString);
+        return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
+    }
+
+    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+        DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<DCValue> dcValues = Arrays.asList(metadata);
+        if (!authority.equals(Item.ANY)) {
+            Iterator<DCValue> iterator = dcValues.iterator();
+            while (iterator.hasNext()) {
+                DCValue dcValue = iterator.next();
+                if (!authority.equals(dcValue.authority)) {
+                    iterator.remove();
+                }
+            }
+        }
+        return dcValues;
+    }
+
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * Values in the returned array can be empty or null.
+     */
+    public static String[] getElements(String fieldName) {
+        String[] tokens = StringUtils.split(fieldName, ".");
+
+        int add = 4 - tokens.length;
+        if (add > 0) {
+            tokens = (String[]) ArrayUtils.addAll(tokens, new String[add]);
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
+     */
+    public static String[] getElementsFilled(String fieldName) {
+        String[] elements = getElements(fieldName);
+        for (int i = 0; i < elements.length; i++) {
+            if (StringUtils.isBlank(elements[i])) {
+                elements[i] = Item.ANY;
+            }
+        }
+        return elements;
+    }
+
+    public void replaceMetadataValue(DCValue oldValue, DCValue newValue)
+    {
+        // check both dcvalues are for the same field
+        if (oldValue.hasSameFieldAs(newValue)) {
+
+            String schema = oldValue.schema;
+            String element = oldValue.element;
+            String qualifier = oldValue.qualifier;
+
+            // Save all metadata for this field
+            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            clearMetadata(schema, element, qualifier, Item.ANY);
+            for (DCValue dcvalue : dcvalues) {
+                if (dcvalue.equals(oldValue)) {
+                    addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
+                } else {
+                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
+                }
+            }
+        }
+    }
+
+
 
     /**
      * Add Dublin Core metadata fields. These are appended to existing values.
