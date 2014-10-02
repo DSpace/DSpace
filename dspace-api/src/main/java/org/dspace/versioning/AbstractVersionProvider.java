@@ -27,8 +27,8 @@ public abstract class AbstractVersionProvider {
     private Set<String> ignoredMetadataFields;
 
     protected void copyMetadata(Item itemNew, Item nativeItem){
-        DCValue[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue aMd : md) {
+        Metadatum[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum aMd : md) {
             String unqualifiedMetadataField = aMd.schema + "." + aMd.element;
             String qualifiedMetadataField = unqualifiedMetadataField + (aMd.qualifier == null ? "" : "." + aMd.qualifier);
             if(getIgnoredMetadataFields().contains(qualifiedMetadataField) ||

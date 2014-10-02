@@ -272,7 +272,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testGetDC 0",dc,notNullValue());
         assertTrue("testGetDC 1",dc.length == 0);
     }
@@ -287,7 +287,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testGetMetadata_4args 0",dc,notNullValue());
         assertTrue("testGetMetadata_4args 1",dc.length == 0);
     }
@@ -299,7 +299,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     public void testGetMetadata_String()
     {
         String mdString = "dc.contributor.author";
-        DCValue[] dc = it.getMetadataByMetadataString(mdString);
+        Metadatum[] dc = it.getMetadataByMetadataString(mdString);
         assertThat("testGetMetadata_String 0",dc,notNullValue());
         assertTrue("testGetMetadata_String 1",dc.length == 0);
 
@@ -327,7 +327,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         it.addMetadata("test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
-        DCValue[] values = it.getMetadata("dc", "type", null, null);
+        Metadatum[] values = it.getMetadata("dc", "type", null, null);
         assertTrue("Return results", values.length == 1);
     }
 
@@ -343,7 +343,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addDC(element, qualifier, lang, values);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testAddDC_4args_1 0",dc,notNullValue());
         assertTrue("testAddDC_4args_1 1",dc.length == 2);
         assertThat("testAddDC_4args_1 2",dc[0].element,equalTo(element));
@@ -368,7 +368,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String value = "value";
         it.addDC(element, qualifier, lang, value);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testAddDC_4args_2 0",dc,notNullValue());
         assertTrue("testAddDC_4args_2 1",dc.length == 1);
         assertThat("testAddDC_4args_2 2",dc[0].element,equalTo(element));
@@ -390,7 +390,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addMetadata(schema, element, qualifier, lang, values);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_5args_1 1",dc.length == 2);
         assertThat("testAddMetadata_5args_1 2",dc[0].schema,equalTo(schema));
@@ -423,7 +423,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int[] confidences = {0,0};
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_1 1",dc.length == 2);
         assertThat("testAddMetadata_7args_1 2",dc[0].schema,equalTo(schema));
@@ -459,7 +459,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int[] confidences = {0,0};
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_1 1",dc.length == 2);
         assertThat("testAddMetadata_7args_1 2",dc[0].schema,equalTo(schema));
@@ -491,7 +491,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addMetadata(schema, element, qualifier, lang, values);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_5args_2 1",dc.length == 2);
         assertThat("testAddMetadata_5args_2 2",dc[0].schema,equalTo(schema));
@@ -524,7 +524,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int confidences = 0;
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_2 1",dc.length == 1);
         assertThat("testAddMetadata_7args_2 2",dc[0].schema,equalTo(schema));
@@ -553,7 +553,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int confidences = 0;
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_2 1",dc.length == 1);
         assertThat("testAddMetadata_7args_2 2",dc[0].schema,equalTo(schema));
@@ -579,7 +579,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
 
         it.clearDC(element, qualifier, lang);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testClearDC 0",dc,notNullValue());
         assertTrue("testClearDC 1",dc.length == 0);
     }
@@ -599,7 +599,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
 
         it.clearMetadata(schema, element, qualifier, lang);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testClearMetadata 0",dc,notNullValue());
         assertTrue("testClearMetadata 1",dc.length == 0);
     }

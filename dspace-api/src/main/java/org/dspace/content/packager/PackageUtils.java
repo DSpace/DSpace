@@ -26,7 +26,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -129,7 +129,7 @@ public class PackageUtils
     public static void checkItemMetadata(Item item)
         throws PackageValidationException
     {
-        DCValue t[] = item.getDC( "title", null, Item.ANY);
+        Metadatum t[] = item.getDC( "title", null, Item.ANY);
         if (t == null || t.length == 0)
         {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");

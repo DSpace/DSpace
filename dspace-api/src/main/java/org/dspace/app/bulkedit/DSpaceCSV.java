@@ -423,8 +423,8 @@ public class DSpaceCSV implements Serializable
         }
 
         // Populate it
-        DCValue md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue value : md)
+        Metadatum md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum value : md)
         {
             // Get the key (schema.element)
             String key = value.schema + "." + value.element;
@@ -652,10 +652,10 @@ public class DSpaceCSV implements Serializable
      *
      * The list can be configured via the key ignore-on-export in bulkedit.cfg
      *
-     * @param md The DCValue to examine
+     * @param md The Metadatum to examine
      * @return Whether or not it is OK to export this element
      */
-    private final boolean okToExport(DCValue md)
+    private final boolean okToExport(Metadatum md)
     {
         // Now compare with the list to ignore
         String key = md.schema + "." + md.element;

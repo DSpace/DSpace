@@ -9,7 +9,7 @@ package org.dspace.app.util;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
@@ -360,7 +360,7 @@ public class Util {
      * @param item
      *            The Dspace Item
      * @param values
-     *            A DCValue[] array of the specific "stored-value(s)"
+     *            A Metadatum[] array of the specific "stored-value(s)"
      * @param schema
      *            A String with the schema name of the metadata field
      * @param element
@@ -371,7 +371,7 @@ public class Util {
      */
 
     public static List<String> getControlledVocabulariesDisplayValueLocalized(
-            Item item, DCValue[] values, String schema, String element,
+            Item item, Metadatum[] values, String schema, String element,
             String qualifier, Locale locale) throws SQLException,
             DCInputsReaderException
     {
@@ -398,7 +398,7 @@ public class Util {
 
         DCInputSet inputSet = inputsReader.getInputs(col_handle);
 
-        // Replace the values of DCValue[] with the correct ones in case of
+        // Replace the values of Metadatum[] with the correct ones in case of
         // controlled vocabularies
         String currentField = schema + "." + element
                 + (qualifier == null ? "" : "." + qualifier);

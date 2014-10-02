@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -128,7 +128,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     for (int mdIdx = 0; mdIdx < bi.getMetadataCount(); mdIdx++)
                     {
                         String[] md = bi.getMdBits(mdIdx);
-                        DCValue[] values = item.getMetadata(md[0], md[1],
+                        Metadatum[] values = item.getMetadata(md[0], md[1],
                                 md[2], Item.ANY);
 
                         // if we have values to index on, then do so
@@ -330,7 +330,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         {
             for (SortOption so : SortOption.getSortOptions())
             {
-                DCValue[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
+                Metadatum[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
                 if (dcvalue != null && dcvalue.length > 0)
                 {
                     String nValue = OrderFormat

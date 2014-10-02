@@ -10,44 +10,45 @@ package org.dspace.content;
 import org.dspace.content.authority.Choices;
 
 /**
- * Simple data structure-like class representing a Dublin Core value. It has an
- * element, qualifier, value and language.
+ * Simple data structure-like class representing a flat metadata value. It has a
+ * schema, element, qualifier, value, language and authority.
  *
  * @author Robert Tansley
  * @author Martin Hald
  * @version $Revision$
  */
-@Deprecated
-public class DCValue
+public class Metadatum
 {
-    /** The DC element */
+    /** The element name. */
     public String element;
 
-    /** The DC qualifier, or <code>null</code> if unqualified */
+    /** The name's qualifier, or <code>null</code> if unqualified. */
     public String qualifier;
 
-    /** The value of the field */
+    /** The value of the field. */
     public String value;
 
-    /** The language of the field, may be <code>null</code> */
+    /** The language of the field, may be <code>null</code>. */
     public String language;
 
-    /** The schema name of the metadata element */
+    /** The schema name of the metadata element. */
     public String schema;
 
-    /** Authority control key */
+    /** Authority control key. */
     public String authority = null;
 
-    /** Authority control confidence  */
+    /** Authority control confidence. */
     public int confidence = Choices.CF_UNSET;
 
     /**
-     * Get the field in dot notation. i.e. schema.element.qualifier, as in dc.date.issued
-     * @return
+     * Get the name of the field in dot notation:  schema.element.qualifier,
+     * as in {@code dc.date.issued}.
+     *
+     * @return stringified name of this field.
      */
 
-    public DCValue copy() {
-        DCValue copy = new DCValue();
+    public Metadatum copy() {
+        Metadatum copy = new Metadatum();
         copy.value = this.value;
         copy.authority = this.authority;
         copy.confidence = this.confidence;
@@ -79,7 +80,7 @@ public class DCValue
         return vals;
     }
 
-    public boolean hasSameFieldAs(DCValue dcValue) {
+    public boolean hasSameFieldAs(Metadatum dcValue) {
         if (dcValue == this) {
             return true;
         }
@@ -104,7 +105,7 @@ public class DCValue
             return false;
         }
 
-        DCValue dcValue = (DCValue) o;
+        Metadatum dcValue = (Metadatum) o;
 
         if (confidence != dcValue.confidence) {
             return false;

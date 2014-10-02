@@ -37,8 +37,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.Metadatum;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
@@ -771,10 +771,10 @@ public class ItemsResource extends Resource
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
-            DCValue[] value = dspaceItem.getMetadata("dc", "date", "accessioned", org.dspace.content.Item.ANY);
-            DCValue[] value2 = dspaceItem.getMetadata("dc", "date", "available", org.dspace.content.Item.ANY);
-            DCValue[] value3 = dspaceItem.getMetadata("dc", "identifier", "uri", org.dspace.content.Item.ANY);
-            DCValue[] value4 = dspaceItem.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
+            Metadatum[] value = dspaceItem.getMetadata("dc", "date", "accessioned", org.dspace.content.Item.ANY);
+            Metadatum[] value2 = dspaceItem.getMetadata("dc", "date", "available", org.dspace.content.Item.ANY);
+            Metadatum[] value3 = dspaceItem.getMetadata("dc", "identifier", "uri", org.dspace.content.Item.ANY);
+            Metadatum[] value4 = dspaceItem.getMetadata("dc", "description", "provenance", org.dspace.content.Item.ANY);
 
             dspaceItem.clearMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
                     org.dspace.content.Item.ANY);

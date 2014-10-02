@@ -20,7 +20,7 @@ import org.dspace.browse.CrossLinks;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.service.ItemService;
@@ -422,7 +422,7 @@ public class ItemListTag extends TagSupport
                     String qualifier = tokens[2];
 
                     // first get hold of the relevant metadata for this column
-                    DCValue[] metadataArray;
+                    Metadatum[] metadataArray;
                     if (qualifier.equals("*"))
                     {
                         metadataArray = items[i].getMetadata(schema, element, Item.ANY, Item.ANY);
@@ -439,7 +439,7 @@ public class ItemListTag extends TagSupport
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                        metadataArray = new DCValue[0];
+                        metadataArray = new Metadatum[0];
                     }
 
                     // now prepare the content of the table division

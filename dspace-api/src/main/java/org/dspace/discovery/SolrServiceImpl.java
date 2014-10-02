@@ -65,7 +65,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -971,8 +971,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-            DCValue[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue meta : mydc)
+            Metadatum[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (Metadatum meta : mydc)
             {
                 String field = meta.schema + "." + meta.element;
                 String unqualifiedField = field;
@@ -1325,7 +1325,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
 
-            DCValue[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
+            Metadatum[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
 
             if(values != null && values.length > 0 && values[0] != null && values[0].value != null)
             {
