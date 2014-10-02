@@ -25,13 +25,14 @@ public class BtnShareLightbox extends WidgetSeleniumTest {
     driver.get(baseUrl + "/test.html");
     waitOnWidgetLoaded();
     
-    // into widget frame
-    driver.switchTo().frame(0);
-    assertTrue(isElementPresent(By.cssSelector(btn_selector)));
-    driver.findElement(By.cssSelector(btn_selector)).click();
+    // click button in widget frame
+    Boolean buttonWasClicked = clickFirstDisplayedInFrame(0, By.cssSelector(btn_selector));
+    assertTrue(buttonWasClicked);
     
-    // out of frame
-    driver.switchTo().defaultContent(); 
-    driver.findElement(By.cssSelector(close_selector)).click();
+    // close lightbox
+    assertTrue(isElementPresent(By.cssSelector(lightbox_close_selector)));
+    driver.findElement(By.cssSelector(lightbox_close_selector)).click();
+    waitUntilElementAbsent(By.cssSelector(lightbox_close_selector),widgetLoadedSecondsTimeout);
+    assertFalse(isElementPresent(By.cssSelector(lightbox_close_selector)));
   }
 }

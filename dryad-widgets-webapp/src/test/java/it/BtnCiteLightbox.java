@@ -1,10 +1,12 @@
 
 package it;
 
+import java.util.List;
 import junit.framework.TestCase;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 public class BtnCiteLightbox extends WidgetSeleniumTest {
 
@@ -20,26 +22,23 @@ public class BtnCiteLightbox extends WidgetSeleniumTest {
 
   @Test
   public void testBtnCiteLightbox() throws Exception {
-    String btn_selector = "i.fa.fa-quote-left:nth-of-type(1)";
-    String close_selector = "button.mfp-close";
+    String btn_selector = "a.dryad-ddw-cite";
     String citation_popup_selector = "#dryad-ddw-citation";
     driver.get(baseUrl + "/test.html");
     waitOnWidgetLoaded();
 
-    // click quote button in widget frame
-    driver.switchTo().frame(0);
-    assertTrue(isElementPresent(By.cssSelector(btn_selector)));
-    driver.findElement(By.cssSelector(btn_selector)).click();
+    // click button in widget frame
+    Boolean buttonWasClicked = clickFirstDisplayedInFrame(0, By.cssSelector(btn_selector));
+    assertTrue(buttonWasClicked);
 
     // confirm quote content visible outer page
-    driver.switchTo().defaultContent();
-    By popupBy = new By.ByCssSelector(citation_popup_selector);
-    waitUntilElementPresent(popupBy,widgetPopupWaitSecondsTimeout);
-    assertTrue(isElementPresent(popupBy));
+    waitUntilElementPresent(By.cssSelector(lightbox_container_selector), widgetPopupWaitSecondsTimeout);
+    assertTrue(isElementPresent(By.cssSelector(citation_popup_selector)));
 
     // out of frame
-    driver.switchTo().defaultContent();
-    assertTrue(isElementPresent(By.cssSelector(close_selector)));
-    driver.findElement(By.cssSelector(close_selector)).click();
+    assertTrue(isElementPresent(By.cssSelector(lightbox_close_selector)));
+    driver.findElement(By.cssSelector(lightbox_close_selector)).click();
+    waitUntilElementAbsent(By.cssSelector(lightbox_close_selector),widgetLoadedSecondsTimeout);
+    assertFalse(isElementPresent(By.cssSelector(lightbox_close_selector)));
   }
 }

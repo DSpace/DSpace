@@ -1,6 +1,7 @@
 package it;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.*;
 import org.openqa.selenium.*;
@@ -42,14 +43,14 @@ public class BtnDownload extends WidgetSeleniumTest {
 
   @Test
   public void testBtnDownload() throws Exception {
-    String btn_selector = "i.fa.fa-download:nth-of-type(1)";
+    String btn_selector = "a.dryad-ddw-download";
     driver.get(baseUrl + "/test.html");
     waitOnWidgetLoaded();
 
     // into widget frame
-    driver.switchTo().frame(0);
-    assertTrue(isElementPresent(By.cssSelector(btn_selector)));
-    driver.findElement(By.cssSelector(btn_selector)).click();
+    // click button in widget frame
+    Boolean buttonWasClicked = clickFirstDisplayedInFrame(0, By.cssSelector(btn_selector));
+    assertTrue(buttonWasClicked);
 
     final File dlFile = new File(downloadDir + "/" + "invert.data-may19.csv");
     dlFile.deleteOnExit();

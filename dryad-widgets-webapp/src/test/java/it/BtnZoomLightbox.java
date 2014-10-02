@@ -19,25 +19,27 @@ public class BtnZoomLightbox extends WidgetSeleniumTest {
   }
 
   @Test
-  public void testBtnZoomLightbox() throws Exception {    
+  public void testBtnZoomLightbox() throws Exception {
     String btn_selector = "a.dryad-ddw-zoom";
-    String close_selector = "button.mfp-close";
+    String zoom_header_selector = "#ddw-header";
+    String zoom_data_selector = "iframe.dryad-ddw-data";
     driver.get(baseUrl + "/test.html");
     waitOnWidgetLoaded();
-    
-    // into widget frame
-    driver.switchTo().frame(0);
-    List<WebElement> es = driver.findElements(By.cssSelector(btn_selector));
-    assertTrue(es.size() > 0);
-    for (WebElement e : es) {
-       if (e.isDisplayed()) { 
-            e.click();
-            break;
-        }
-    }
-    
+
+    // click button in widget frame
+    Boolean buttonWasClicked = clickFirstDisplayedInFrame(0, By.cssSelector(btn_selector));
+    assertTrue(buttonWasClicked);
+
+    // confirm popup is open outside of iframe, and that the widget and
+    // content are present
+    waitUntilElementPresent(By.cssSelector(lightbox_container_selector), widgetPopupWaitSecondsTimeout);
+    assertTrue(isElementPresent(By.cssSelector(zoom_header_selector)));
+    assertTrue(isElementPresent(By.cssSelector(zoom_data_selector)));
+
     // out of frame
-    driver.switchTo().defaultContent(); 
-    driver.findElement(By.cssSelector(close_selector)).click();
+    assertTrue(isElementPresent(By.cssSelector(lightbox_close_selector)));
+    driver.findElement(By.cssSelector(lightbox_close_selector)).click();
+    waitUntilElementAbsent(By.cssSelector(lightbox_close_selector),widgetLoadedSecondsTimeout);
+    assertFalse(isElementPresent(By.cssSelector(lightbox_close_selector)));
   }
 }
