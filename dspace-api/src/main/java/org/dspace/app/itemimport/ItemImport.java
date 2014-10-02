@@ -35,6 +35,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileDeleteStrategy;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -666,7 +667,7 @@ public class ItemImport
     		outputFolder = importDir + File.separator + generateRandomFilename(true);
     	}
     	else { //This indicates a UI import, working dir is preconfigured
-    		outputFolder = workingDir + File.separator + ".bte_output_dspace";
+    		outputFolder = workingDir;
     	}
 
         BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
@@ -718,12 +719,8 @@ public class ItemImport
         		e.printStackTrace();
         		throw e;
         	}
-
         	ItemImport myloader = new ItemImport();
         	myloader.addItems(c, mycollections, outputFolder, mapFile, template);
-
-        	//remove files from output generator
-        	deleteDirectory(new File(outputFolder));
         }
     }
 
@@ -2079,12 +2076,13 @@ public class ItemImport
      * @param context The context
      * @throws Exception
      */
-    public static void processUploadableImport(File file, Collection[] collections,
+    public static void processUploadableImport(File file, Collection owningCollection, String[] collections,
     		String bteInputType, Context context) throws Exception
     {
         final EPerson eperson = context.getCurrentUser();
         final File myFile = file;
-        final Collection[] mycollections = collections;
+        final String[] otherCollections2 = collections;
+        final Collection theOwningCollection = owningCollection;
         final String myBteInputType = bteInputType;
 
         // if the file exists
@@ -2095,6 +2093,9 @@ public class ItemImport
                 public void run()
                 {
                     Context context = null;
+                    
+                    String importDir = null;
+                    
                     ItemIterator iitems = null;
                     try
                     {
@@ -2103,31 +2104,57 @@ public class ItemImport
                         context.setCurrentUser(eperson);
                         context.setIgnoreAuthorization(true);
 
-                        File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
-                        if (!importDir.exists()){
-                        	boolean success = importDir.mkdir();
-                        	if (!success) {
-                        		log.info("Cannot create batch import directory!");
-                        		throw new Exception();
-                        	}
-                        }
-                        //Generate a random filename for the subdirectory of the specific import in case
-                        //more that one batch imports take place at the same time
-                        String subDirName = generateRandomFilename(false);
-                        String workingDir = importDir.getAbsolutePath() + File.separator + subDirName;
+                        List<Collection> collectionList = new ArrayList<Collection>();
+    	    			if (otherCollections2 != null){
+    	    				for (String colID : otherCollections2){
+    	    					int colId = Integer.parseInt(colID);
+    	    					if (colId != theOwningCollection.getID()){
+    	    						Collection col = Collection.find(context, colId);
+    	    						if (col != null){
+    	    							collectionList.add(col);
+    	    						}
+    	    					}
+    	    				}
+    	    			}
+    	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
+    	    			
+    	    			importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (new GregorianCalendar()).getTimeInMillis();
+    	    			File importDirFile = new File(importDir);
+    	    			if (!importDirFile.exists()){
+    						boolean success = importDirFile.mkdirs();
+    						if (!success) {
+    							log.info("Cannot create batch import directory!");
+    							throw new Exception("Cannot create batch import directory!");
+    						}
+    					}
+    	    			
+    	    			String dataPath = importDirFile + File.separator + myFile.getName();
+    	    			FileUtils.copyFile(myFile, new File(dataPath));
 
+    					String dataDir = importDir + File.separator + "data" + File.separator;
+    					
                         //Create the import working directory
-                        boolean success = (new File(workingDir)).mkdir();
+                        boolean success = (new File(dataDir)).mkdir();
                     	if (!success) {
                     		log.info("Cannot create batch import working directory!");
                     		throw new Exception();
                     	}
 
                         //Create random mapfile;
-                        String mapfile = workingDir + File.separator+ "mapfile";
+                        String mapfile = importDirFile + File.separator+ "mapfile";
 
+                        Collection[] finalCollections = null;
+    					if (theOwningCollection != null){
+    						finalCollections = new Collection[otherCollections.length + 1];
+    						finalCollections[0] = theOwningCollection;
+    						for (int i=0; i<otherCollections.length; i++){
+    							finalCollections[i+1] = otherCollections[i];
+    						}
+    					}
+    					
                         ItemImport myloader = new ItemImport();
-                        myloader.addBTEItems(context, mycollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, workingDir);
+                        myloader.isResume = false;
+                        myloader.addBTEItems(context, finalCollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, dataDir);
 
                         // email message letting user know the file is ready for
                         // download
@@ -2180,6 +2207,149 @@ public class ItemImport
         }
     }
 
+    /**
+     * Given an uploaded file, this method calls the method to instantiate a BTE instance to
+     * transform the input data and batch import them to DSpace
+     * @param file The input file to read data from
+     * @param collections The collections the created items will be inserted to
+     * @param bteInputType The input type of the data (bibtex, csv, etc.)
+     * @param context The context
+     * @throws Exception
+     */
+    public static void processResumableImport(File file, Collection owningCollection, String[] collections, String resumeDir, 
+    		String bteInputType, Context context) throws Exception
+    {
+        final EPerson eperson = context.getCurrentUser();
+        final File myFile = file;
+        final String[] otherCollections2 = collections;
+        final Collection theOwningCollection = owningCollection;
+        final String myBteInputType = bteInputType;
+        final String resumePath = resumeDir;
+
+        // if the file exists
+        if (file.exists())
+        {
+            Thread go = new Thread()
+            {
+                public void run()
+                {
+                    Context context = null;
+                    ItemIterator iitems = null;
+                    try
+                    {
+                        // create a new dspace context
+                        context = new Context();
+                        context.setCurrentUser(eperson);
+                        context.setIgnoreAuthorization(true);
+
+                        String importDir = null;
+                        
+                        List<Collection> collectionList = new ArrayList<Collection>();
+    	    			if (otherCollections2 != null){
+    	    				for (String colID : otherCollections2){
+    	    					int colId = Integer.parseInt(colID);
+    	    					if (colId != theOwningCollection.getID()){
+    	    						Collection col = Collection.find(context, colId);
+    	    						if (col != null){
+    	    							collectionList.add(col);
+    	    						}
+    	    					}
+    	    				}
+    	    			}
+    	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
+    	    			
+    	    			importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + resumePath;
+    	    			File importDirFile = new File(importDir);
+    	    			if (!importDirFile.exists()){
+    						boolean success = importDirFile.mkdirs();
+    						if (!success) {
+    							log.info("Cannot create batch import directory!");
+    							throw new Exception("Cannot create batch import directory!");
+    						}
+    					}
+    	    			
+    	    			String dataPath = importDirFile + File.separator + myFile.getName();
+    	    			String dataDir = importDirFile + File.separator + "data" + File.separator;
+    					
+    					//Clear these files, since it is a resume
+    					(new File(dataPath)).delete();
+    					FileDeleteStrategy.FORCE.delete(new File(dataDir));
+    					FileUtils.copyFile(myFile, new File(dataPath));
+
+                        //Create the import working directory
+                        boolean success = (new File(dataDir)).mkdir();
+                    	if (!success) {
+                    		log.info("Cannot create batch import working directory!");
+                    		throw new Exception();
+                    	}
+
+                        //Create random mapfile;
+                        String mapfile = importDirFile + File.separator+ "mapfile";
+
+                        Collection[] finalCollections = null;
+    					if (theOwningCollection != null){
+    						finalCollections = new Collection[otherCollections.length + 1];
+    						finalCollections[0] = theOwningCollection;
+    						for (int i=0; i<otherCollections.length; i++){
+    							finalCollections[i+1] = otherCollections[i];
+    						}
+    					}
+    					
+                        ItemImport myloader = new ItemImport();
+                        myloader.isResume = true;
+                        myloader.addBTEItems(context, finalCollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, dataDir);
+
+                        // email message letting user know the file is ready for
+                        // download
+                        emailSuccessMessage(context, eperson, mapfile);
+
+                        // return to enforcing auths
+                        context.setIgnoreAuthorization(false);
+                    }
+                    catch (Exception e1)
+                    {
+                        try
+                        {
+                            emailErrorMessage(eperson, e1.getMessage());
+                        }
+                        catch (Exception e)
+                        {
+                            // wont throw here
+                        }
+                        throw new IllegalStateException(e1);
+                    }
+                    finally
+                    {
+                        if (iitems != null)
+                        {
+                            iitems.close();
+                        }
+
+                        // close the mapfile writer
+                        if (mapOut != null)
+                        {
+                            mapOut.close();
+                        }
+
+                        // Make sure the database connection gets closed in all conditions.
+                    	try {
+							context.complete();
+						} catch (SQLException sqle) {
+							context.abort();
+						}
+                    }
+                }
+
+            };
+
+            go.isDaemon();
+            go.start();
+        }
+        else {
+        	log.error("Unable to find the uploadable file");
+        }
+    }
+    
 	/**
 	 * Given an uploaded file, this method calls the method to instantiate a BTE instance to
 	 * transform the input data and batch import them to DSpace
@@ -2676,7 +2846,7 @@ public class ItemImport
 
     }
     
-    public void deleteButchUpload(Context c, String uploadId) throws Exception
+    public void deleteBatchUpload(Context c, String uploadId) throws Exception
     {
     	String uploadDir = null;
     	String mapFilePath = null;
@@ -2685,9 +2855,9 @@ public class ItemImport
 		mapFilePath = uploadDir + File.separator + "mapfile";
 	
 		this.deleteItems(c, mapFilePath);
-		FileDeleteStrategy.FORCE.delete(new File(uploadDir));
-		
 		// complete all transactions
         c.commit();
+        
+		FileDeleteStrategy.FORCE.delete(new File(uploadDir));
     }
 }

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
+import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.app.itemimport.BatchUpload;
 import org.dspace.app.itemimport.ItemImport;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -45,6 +46,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -739,7 +741,7 @@ public class MyDSpaceServlet extends DSpaceServlet
     	else if (buttonPressed.equals("submit_delete")){
     		ItemImport itemImport = new ItemImport();
     		try {
-				itemImport.deleteButchUpload(context, uploadId);
+				itemImport.deleteBatchUpload(context, uploadId);
 				showMainPage(context, request, response);
 				
 			} catch (Exception e) {
@@ -750,12 +752,16 @@ public class MyDSpaceServlet extends DSpaceServlet
     	else if (buttonPressed.equals("submit_resume")){
     		// Set attributes
             request.setAttribute("uploadId", uploadId);
-            request.setAttribute("type", 0);
         	
         	//Get all collections
     		List<Collection> collections = Arrays.asList(Collection.findAll(context));
     		request.setAttribute("collections", collections);
 
+    		//Get all the possible data loaders from the Spring configuration
+    		BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
+    		List<String> inputTypes = dls.getFileDataLoaders();
+    		request.setAttribute("input-types", inputTypes);
+    		
             // Forward to main mydspace page
             JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
     	}
