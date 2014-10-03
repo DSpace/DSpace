@@ -11,7 +11,7 @@ package org.dspace.identifier;
 import java.sql.SQLException;
 import java.util.UUID;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -101,7 +101,7 @@ public class DSpaceProvider
     public String lookup(Context context, DSpaceObject object)
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
-        DCValue[] identifiers = object.getMetadata(DSPACE_SCHEMA,
+        Metadatum[] identifiers = object.getMetadata(DSPACE_SCHEMA,
                 METADATA_ELEMENT, METADATA_QUALIFIER, Item.ANY);
         return identifiers[0].value;
     }
