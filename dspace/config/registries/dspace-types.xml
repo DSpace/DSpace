@@ -11,8 +11,9 @@
     </dc-schema>
 
     <dc-type>
-        <schema>identifier</schema>
-        <element>dspace</element>
+        <schema>dspace</schema>
+        <element>identifier</element>
+        <qualifier>dspace</qualifier>
         <scope_note>DSpace internal persistent identifier</scope_note>
     </dc-type>
 </dspace-dc-types>
