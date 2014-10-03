@@ -35,6 +35,10 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.MigrationInfoService;
+import org.flywaydb.core.internal.info.MigrationInfoDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1560,8 +1564,12 @@ public class DatabaseManager
                 log.error("DBMS {} is unsupported", dbms);
             }
             log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
-            connection.close();
+            
+            // Ensure database scheme is up-to-date
+            // If not, upgrade/migrate database
+            initializeDatabase(connection);
 
+            connection.close();
             initialized = true;
         }
         catch (SQLException se)
@@ -1577,7 +1585,86 @@ public class DatabaseManager
             throw new SQLException(e.toString(), e);
         }
     }
+    
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * 
+     * @param connection
+     *      Database connection
+     */
+    private static synchronized void initializeDatabase(Connection connection) 
+            throws IOException, SQLException
+    {
+        // Get the name of the Schema that the DSpace Database is using
+        String schema = ConfigurationManager.getProperty("db.schema");
+        if(StringUtils.isBlank(schema)){
+            schema = null;
+        }
+        
+        // Initialize Flyway DB API (http://flywaydb.org/), used to perform DB migrations
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(dataSource);
+        flyway.setEncoding("UTF-8");
+    
+        // Set location where Flyway will load DB scripts from (based on DB Type)
+        // e.g. [dspace.dir]/etc/[dbtype]/
+        String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
+                            System.getProperty("file.separator") + "etc" +
+                            System.getProperty("file.separator") + dbms_keyword;
+        
+        //If XMLWorkflow is enabled, then we also need to reference those scripts
+        // TODO: IT IS NOT RECOMMENDED BY FLYWAY TO HAVE OPTIONAL DB SCRIPTS LIKE THIS
+        // THIS IS A HACK. WE NEED TO FULLY INTEGRATE XMLWORKFLOW! (SEE DS-2059)
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+        {
+            // Also load the XML Workflow scripts from their location:
+            // [dspace.dir]/etc/xmlworkflow/[dbtype]/
+            String xmlWorkflowScripts = ConfigurationManager.getProperty("dspace.dir") +
+                            System.getProperty("file.separator") + "etc" +
+                            System.getProperty("file.separator") + "xmlworkflow" +
+                            System.getProperty("file.separator") + dbms_keyword;
+            log.info("Loading Flyway DB scripts from " + scriptPath + " AND " + xmlWorkflowScripts);
+            flyway.setLocations("filesystem:" + scriptPath, "filesystem:" + xmlWorkflowScripts);
+        }
+        else
+        {
+            log.info("Loading Flyway DB scripts from " + scriptPath);
+            flyway.setLocations("filesystem:" + scriptPath);
+        }
+        
+        // Check if the necessary Flyway table ("schema_version") exists in this database
+        DatabaseMetaData meta = connection.getMetaData();
+        ResultSet tables = meta.getTables(null, schema, flyway.getTable(), null);
+        
+        // If Flyway table does NOT exist, then this is the first time running Flyway
+        if (!tables.next()) 
+        {
+            // What version of DSpace database schema do we have?
+            String schemaVersion = "4.0";
+            
+            log.info("Initializing Flyway 'schema_version' table to DSpace database schema version " + schemaVersion);
+            
+            // Initialize the Flyway database table & set current DSpace version number
+            // (NOTE: Flyway will also create the db.schema, if it doesn't exist)
+            flyway.setInitVersion(schemaVersion);
+            flyway.init();
+        }
+        
+        // Determine pending Database migrations
+        MigrationInfo[] pending = flyway.info().pending();
 
+        // Log info about pending migrations
+        if (pending!=null && pending.length>0)  
+            log.info("Pending DSpace database migrations:", MigrationInfoDumper.dumpToAsciiTable(flyway.info().pending()));
+        else
+            log.info("DSpace database schema is up to date.");
+
+        // Ensure database is on the latest version of the DSpace schema
+        flyway.migrate();
+    }
+    
     /**
      * What is the name of our DBMS?
      *
