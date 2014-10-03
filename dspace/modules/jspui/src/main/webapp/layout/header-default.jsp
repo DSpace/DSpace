@@ -19,12 +19,18 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.util.Util" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
 <%
+    // Get the DSpace Context
+    Context context = UIUtil.obtainContext((HttpServletRequest)request);
+
     String title = (String) request.getAttribute("dspace.layout.title");
     String navbar = (String) request.getAttribute("dspace.layout.navbar");
     boolean locbar = ((Boolean) request.getAttribute("dspace.layout.locbar")).booleanValue();
@@ -52,8 +58,8 @@
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
-	    
-	    
+
+
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
 <%
@@ -66,7 +72,7 @@
 <%
         }
     }
-    
+
     if (osLink)
     {
 %>
@@ -80,8 +86,8 @@
 <%
         }
 %>
-        
-    
+
+
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
@@ -93,7 +99,7 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
-    
+
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -105,27 +111,33 @@
     <%-- HACK: leftmargin, topmargin: for non-CSS compliant Microsoft IE browser --%>
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body>
-
+     <div class="container-drum">
         <%-- DSpace top-of-page banner --%>
-        <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="pageBanner" width="100%" border="0" cellpadding="0" cellspacing="0">
+        <div class="row pageBanner">
 
-            <%-- UM logo --%>
-            <tr>
-                <td valign="bottom" width="160">
-                    <a href="http://www.lib.umd.edu/"><img src="<%= request.getContextPath() %>/image/logo-top.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="84" height="49" border="0"/></a></td>
-                    <td class="tagLine">
-                    <a class="tagLineText" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
-                </td>
-                <td nowrap="nowrap" valign="middle">
-                    &nbsp;
-                </td>
-            </tr>
-            <tr class="colorbar"> 
-                <td valign="top" colspan="1"><img src="<%= request.getContextPath() %>/image/logo-bottom.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="83" height="20" border="0"></td>
-		<td colspan="2">Digital Repository at the University of Maryland</td>
-            </tr>
-        </table>
+          <%-- University Libraries logo --%>
+	      <div class="col-lg-2 col-md-3 col-sm-4 col-xs-4" id="lib-logo">
+            <a href="http://www.lib.umd.edu"><img src="http://www.lib.umd.edu/images/wrapper/liblogo.png" class="img-responsive" alt="<fmt:message key="jsp.layout.header-default.alt"/>"/></a>
+     	  </div>
+
+          <%-- DRUM logo --%>
+     	  <div class="col-lg-4 col-md-4 col-sm-3 col-xs-6" id="drum-logo">
+            <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum-logo.png" class="img-responsive" alt="<fmt:message key="jsp.layout.header-default.alt"/>"
+            height="55" width="271" border="0"/></a>
+          </div>
+
+          <%-- Search box and Login/Logout --%>
+          <div id="pageBanner-right">
+            <%-- Display this div when not 'xs' --%>
+            <div class="pull-right hidden-xs">
+              <dspace:include page="/components/page-banner-right.jsp"></dspace:include>
+            </div>
+
+            <%-- Display this div when 'xs' --%>
+            <div class="visible-xs">
+              <dspace:include page="/components/page-banner-right.jsp"></dspace:include>
+            </div>
+        </div>
 
         <%-- Localization --%>
 <%--  <c:if test="${param.locale != null}">--%>
@@ -136,7 +148,7 @@
         <%-- Page contents --%>
 
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="centralPane" width="99%" border="0" cellpadding="3" cellspacing="1">
+        <table class="centralPane" width="100%" border="0" cellpadding="3" cellspacing="1">
 
             <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
             <tr valign="top">
@@ -168,3 +180,5 @@
 <%
     }
 %>
+
+</div>
