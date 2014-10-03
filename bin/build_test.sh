@@ -2,14 +2,14 @@
 #
 
 #set -x  # verbose bash
-set -e  # return fail on a failed command, for travis-ci
+set -euo pipefail # return fail on a failed command, for travis-ci
 
 ITPORT=2341
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$TEST_DIR/.."
-XVFBPID="$BASE_DIR/xvfb.pid"
 SERVER="99"
 SCREEN="0"
+XVFBPID="$BASE_DIR/xvfb.pid"
 XVFBARGS=":$SERVER -screen $SCREEN 1024x768x24 -ac +extension GLX +render -noreset"
 XVFB="/usr/bin/Xvfb"
 
@@ -29,7 +29,7 @@ function on_exit {
         sh -e /etc/init.d/xvfb stop
     elif [ "$LOGNAME" == "vagrant" ]; then
         echo "Stopping Vagrant Xvfb"
-        start-stop-daemon --stop --quiet --pidfile $PIDFILE
+        start-stop-daemon --stop --quiet --pidfile $XVFBPID
     fi
     echo Killing SimpleHTTPServer
     pkill -f SimpleHTTPServer
@@ -50,7 +50,7 @@ if [ "$TRAVIS" ] || [ "$LOGNAME" == "vagrant" ]; then
         sh -e /etc/init.d/xvfb start
     elif [ "$LOGNAME" == "vagrant" ]; then
         echo Starting Vagrant Xvfb
-        start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $XVFB -- $XVFBARGS
+        start-stop-daemon --start --quiet --pidfile $XVFBPID --make-pidfile --background --exec $XVFB -- $XVFBARGS
     fi
     # TODO: ping framebuffer for start instead of sleeping
     echo "Sleeping for xvfb server start"
