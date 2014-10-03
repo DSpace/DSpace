@@ -291,14 +291,33 @@ public class CitationDocument {
     private File makeCitedDocument(Bitstream bitstream, CitationMeta cMeta)
             throws IOException, SQLException, AuthorizeException, COSVisitorException {
         //Read the source bitstream
-        //PdfReader source = new PdfReader(bitstream.retrieve());
-        log.info("0");
         PDDocument document = new PDDocument();
-
-
         PDDocument sourceDocument = new PDDocument();
         sourceDocument = sourceDocument.load(bitstream.retrieve());
-        log.info("1");
+        log.info("loaded pdf");
+        PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+
+        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+        //Is the citation-page the first page or last-page?
+        if(isCitationFirstPage()) {
+            //citation as cover page
+            document.addPage(coverPage);
+            for(PDPage sourcePage : sourcePageList) {
+                document.addPage(sourcePage);
+            }
+        } else {
+            //citation as tail page
+            for(PDPage sourcePage : sourcePageList) {
+                document.addPage(sourcePage);
+            }
+            document.addPage(coverPage);
+        }
+        log.info("added pages");
+        sourcePageList.clear();
+
+        generateCoverPage(document, coverPage, cMeta);
+        log.info("3");
+
         String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
         File tempDir = new File(tempDirString);
         if(!tempDir.exists()) {
@@ -312,294 +331,120 @@ public class CitationDocument {
             log.info(tempDir + " exists");
         }
 
-        log.info("2");
-        PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
-        log.info("3");
-        document.addPage(coverPage);
-        log.info("3.1");
-        PDFont font = PDType1Font.HELVETICA_BOLD;
-        PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
-        log.info("4");
-        contentStream.beginText();
-        contentStream.setFont(font, 12);
-        contentStream.moveTextPositionByAmount(100, 700);
-        contentStream.drawString("Hello World");
-        contentStream.endText();
-        contentStream.close();
-
-
-        log.info("5");
-        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
-        log.info("6");
-        for(PDPage sourcePage : sourcePageList) {
-            log.info("7.page");
-            document.addPage(sourcePage);
-        }
-        sourcePageList.clear();
-
-        log.info("8");
         document.save(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
-        log.info("9");
         document.close();
-        log.info("10");
         sourceDocument.close();
         return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
-
-
-        /*
-        Document citedDoc = new Document(PageSize.LETTER);
-
-        File coverTemp = File.createTempFile(bitstream.getName(), ".cover.pdf");
-
-        //Need a writer instance to make changed to the document.
-        PdfWriter writer = PdfWriter.getInstance(citedDoc, new FileOutputStream(coverTemp));
-
-        //Call helper function to add content to the coverpage.
-        this.generateCoverPage(citedDoc, writer, cMeta);
-
-        //Create reader from finished cover page.
-        PdfReader cover = new PdfReader(new FileInputStream(coverTemp));
-
-        //Get page labels from source document
-        String[] labels = PdfPageLabels.getPageLabels(source);
-
-        //Concatenate the finished cover page with the source document.
-        File citedTemp = File.createTempFile(bitstream.getName(), ".cited.pdf");
-        OutputStream citedOut = new FileOutputStream(citedTemp);
-        PdfConcatenate concat = new PdfConcatenate(citedOut);
-        concat.open();
-
-        //Is the citation-page the first page or last-page?
-        if(isCitationFirstPage()) {
-            //citation as cover page
-            concat.addPages(cover);
-            concat.addPages(source);
-        } else {
-            //citation as tail page
-            concat.addPages(source);
-            concat.addPages(cover);
-        }
-
-        //Put all of our labels in from the orignal document.
-        if (labels != null) {
-            PdfPageLabels citedPageLabels = new PdfPageLabels();
-            log.debug("Printing arbitrary page labels.");
-
-            for (int i = 0; i < labels.length; i++) {
-                citedPageLabels.addPageLabel(i + 1, PdfPageLabels.EMPTY, labels[i]);
-                log.debug("Label for page: " + (i + 1) + " -> " + labels[i]);
-            }
-            citedPageLabels.addPageLabel(labels.length + 1, PdfPageLabels.EMPTY, "Citation Page");
-            concat.getWriter().setPageLabels(citedPageLabels);
-        }
-
-        //Close it up
-        concat.close();
-
-        //Close the cover-page
-        writer.close();
-        coverTemp.delete();
-
-        citedTemp.deleteOnExit();
-        return citedTemp;*/
     }
 
-    /**
-     * Takes a DSpace {@link Bitstream} and uses its associated METADATA to
-     * create a cover page.
-     *
-     * @param cDoc The cover page document to add cited information to.
-     * @param writer
-     * @param cMeta
-     *            METADATA retrieved from the parent collection.
-     * @throws IOException
-     * @throws DocumentException
-     */
-    /*private void generateCoverPage(Document cDoc, PdfWriter writer, CitationMeta cMeta) throws DocumentException {
-        cDoc.open();
-        writer.setCompressionLevel(0);
-
-        Item item = cMeta.getItem();
-
-        //Set up some fonts
-        Font helv26 =           FontFactory.getFont(FontFactory.HELVETICA,          26f,    BaseColor.BLACK);
-        Font helv16 =           FontFactory.getFont(FontFactory.HELVETICA,          16f,    BaseColor.BLACK);
-        Font helv12 =           FontFactory.getFont(FontFactory.HELVETICA,          12f,    BaseColor.BLACK);
-        Font helv12_italic =    FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE,  12f,    BaseColor.BLACK);
-        Font helv11_bold =      FontFactory.getFont(FontFactory.HELVETICA_BOLD,     11f,    BaseColor.BLACK);
-        Font helv9 =            FontFactory.getFont(FontFactory.HELVETICA,          9f,     BaseColor.BLACK);
-
-        // 1 - Header:
-        //  University Name
-        //  Repository Name                                                        repository.url
-        Paragraph university = new Paragraph("The Ohio State University", helv11_bold);
-        cDoc.add(university);
-
-        PdfPTable repositoryTable = new PdfPTable(2);
-        repositoryTable.setWidthPercentage(100);
-
-        Chunk repositoryName =  new Chunk("Knowledge Bank", helv11_bold);
-        PdfPCell nameCell = new PdfPCell();
-        nameCell.setBorderWidth(0);
-        nameCell.addElement(repositoryName);
-
-        Chunk repositoryURL =   new Chunk("kb.osu.edu", helv11_bold);
-        repositoryURL.setAnchor("http://kb.osu.edu");
-
-        PdfPCell urlCell = new PdfPCell();
-        urlCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        urlCell.setBorderWidth(0);
-        urlCell.addElement(repositoryURL);
-
-        repositoryTable.addCell(nameCell);
-        repositoryTable.addCell(urlCell);
-
-        repositoryTable.setSpacingAfter(5);
-
-        cDoc.add(repositoryTable);
-
-        // Line Separator
-        LineSeparator lineSeparator = new LineSeparator();
-        cDoc.add(lineSeparator);
-
-        // 2 - Bread Crumbs
-        // Community Name                                                          Collection Name
-        PdfPTable breadcrumbTable = new PdfPTable(2);
-        breadcrumbTable.setWidthPercentage(100);
-
-        Chunk communityName =  new Chunk(getOwningCommunity(item), helv9);
-        PdfPCell commCell = new PdfPCell();
-        commCell.setBorderWidth(0);
-        commCell.addElement(communityName);
-
-        Chunk collectionName =   new Chunk(getOwningCollection(item), helv9);
-        PdfPCell collCell = new PdfPCell();
-        collCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        collCell.setBorderWidth(0);
-        collCell.addElement(collectionName);
-
-        breadcrumbTable.addCell(commCell);
-        breadcrumbTable.addCell(collCell);
-
-        breadcrumbTable.setSpacingBefore(5);
-        breadcrumbTable.setSpacingAfter(5);
-
-        cDoc.add(breadcrumbTable);
-
-        // Line Separator
-        cDoc.add(lineSeparator);
-
-        // 3 - Metadata
-        // date.issued
-        // dc.title
-        // dc.creator; dc.creator
-        Paragraph dateIssued = new Paragraph(item.getMetadata("dc.date.issued"), helv12);
-        dateIssued.setSpacingBefore(20);
-        cDoc.add(dateIssued);
-
-        Paragraph title = new Paragraph(item.getName(), helv26);
-        title.setSpacingBefore(15);
-        cDoc.add(title);
-
-        Paragraph creators = new Paragraph(getAllMetadataSeperated(item, "dc.creator"), helv16);
-        creators.setSpacingBefore(30);
-        creators.setSpacingAfter(20);
-        cDoc.add(creators);
-
-        // Line Separator
-        cDoc.add(lineSeparator);
-
-        // 4 - Citation
-        // dc.identifier.citation
-        // dc.identifier.uri
-        Paragraph citation      = new Paragraph(item.getMetadata("dc.identifier.citation"), helv12);
-
-        Chunk identifierChunk = new Chunk(item.getMetadata("dc.identifier.uri"), helv12);
-        identifierChunk.setAnchor(item.getMetadata("dc.identifier.uri"));
-
-        Paragraph identifier    = new Paragraph();
-        identifier.add(identifierChunk);
-
-
-        cDoc.add(citation);
-        cDoc.add(identifier);
-
-        // 5 - License
-        // Downloaded from the Knowledge Bank, The Ohio State University's institutional repository
-        Paragraph license = new Paragraph("Downloaded from the Knowledge Bank, The Ohio State University's institutional repository", helv12_italic);
-        license.setSpacingBefore(10);
-        cDoc.add(license);
-
-        cDoc.close();
-    }*/
-
-    /**
-     * Attempts to add a Logo to the document from the given resource. Returns
-     * true on success and false on failure.
-     *
-     * @param doc The document to add the logo to. (Added to the top right
-     * corner of the first page.
-     * @param writer The writer associated with the given Document.
-     * @param res The resource/path to the logo file. This file can be any of
-     * the following formats:
-     *  GIF, PNG, JPEG, PDF
-     *
-     * @return Succesfully added logo to document.
-     */
-    /*private boolean addLogoToDocument(Document doc, PdfWriter writer, String res) {
-        boolean ret = false;
+    private void generateCoverPage(PDDocument document, PDPage coverPage, CitationMeta citationMeta) throws IOException {
+        PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
-            //First we try to get the logo as if it is a Java Resource
-            URL logoURL = this.getClass().getResource(res);
-            log.debug(res + " -> " + logoURL.toString());
-            if (logoURL == null) {
-                logoURL = new URL(res);
+            Item item = citationMeta.getItem();
+            int ypos = 700;
+            log.info("1");
+
+            PDFont fontHelvetica = PDType1Font.HELVETICA;
+            PDFont fontHelveticaBold = PDType1Font.HELVETICA_BOLD;
+            PDFont fontHelveticaOblique = PDType1Font.HELVETICA_OBLIQUE;
+
+
+            log.info("2");
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaBold, 11);
+            contentStream.moveTextPositionByAmount(100, ypos);
+            contentStream.drawString("Ohio State");
+            contentStream.endText();
+            log.info("3");
+            ypos -=50;
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaBold, 11);
+            contentStream.moveTextPositionByAmount(100, ypos);
+            contentStream.drawString("Knowledge Bank");
+            contentStream.endText();
+            log.info("4");
+            ypos -=50;
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaBold, 11);
+            contentStream.moveTextPositionByAmount(100, ypos);
+            contentStream.drawString("kb.osu.edu");
+            contentStream.endText();
+            log.info("5");
+            ypos -=50;
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaBold, 11);
+            contentStream.moveTextPositionByAmount(100, ypos);
+            contentStream.drawString(getOwningCommunity(item));
+            contentStream.endText();
+            log.info("6");
+            ypos -=50;
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaBold, 11);
+            contentStream.moveTextPositionByAmount(100, ypos);
+            contentStream.drawString(getOwningCollection(item));
+            contentStream.endText();
+            log.info("7");
+            ypos -=50;
+
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.date.issued"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 11);
+                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.drawString(item.getMetadata("dc.date.issued"));
+                contentStream.endText();
+                log.info("8");
+                ypos -=50;
             }
 
-            if (logoURL != null) {
-                String mtype = URLConnection.guessContentTypeFromStream(logoURL.openStream());
-                if (mtype == null) {
-                    mtype = URLConnection.guessContentTypeFromName(res);
-                }
-                log.debug("Determined MIMETYPE of logo: " + mtype);
-                if (PDF_MIMES.contains(mtype)) {
-                    //Handle pdf logos.
-                    PdfReader reader = new PdfReader(logoURL);
-                    PdfImportedPage logoPage = writer.getImportedPage(reader, 1);
-                    Image logo = Image.getInstance(logoPage);
-                    float x = doc.getPageSize().getWidth() - doc.rightMargin() - logo.getScaledWidth();
-                    float y = doc.getPageSize().getHeight() - doc.topMargin() - logo.getScaledHeight();
-                    logo.setAbsolutePosition(x, y);
-                    doc.add(logo);
-                    ret = true;
-                } else if (RASTER_MIMES.contains(mtype)) {
-                    //Use iText's Image class
-                    Image logo = Image.getInstance(logoURL);
-
-                    //Determine the position of the logo (upper-right corner) and
-                    //place it there.
-                    float x = doc.getPageSize().getWidth() - doc.rightMargin() - logo.getScaledWidth();
-                    float y = doc.getPageSize().getHeight() - doc.topMargin() - logo.getScaledHeight();
-                    logo.setAbsolutePosition(x, y);
-                    writer.getDirectContent().addImage(logo);
-                    ret = true;
-                } else if (SVG_MIMES.contains(mtype)) {
-                    //Handle SVG Logos
-                    log.error("SVG Logos are not supported yet.");
-                } else {
-                    //Cannot use other mimetypes
-                    log.debug("Logo MIMETYPE is not supported.");
-                }
-            } else {
-                log.debug("Could not create URL to Logo resource: " + res);
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.title"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 11);
+                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.drawString(item.getMetadata("dc.title"));
+                contentStream.endText();
+                log.info("9");
+                ypos -=50;
             }
-        } catch (Exception e) {
-            log.error("Could not add logo (" + res + ") to cited document: "
-                    + e.getMessage());
-            ret = false;
+
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.contributor.*"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 11);
+                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.drawString(item.getMetadata("dc.contributor.*"));
+                contentStream.endText();
+                log.info("10");
+                ypos -=50;
+            }
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.citation"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 11);
+                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.drawString(item.getMetadata("dc.identifier.citation"));
+                contentStream.endText();
+                log.info("11");
+                ypos -=50;
+            }
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.uri"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 11);
+                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.drawString(item.getMetadata("dc.identifier.uri"));
+                contentStream.endText();
+                log.info("12");
+                ypos -=50;
+            }
+
+        } finally {
+            contentStream.close();
         }
-        return ret;
-    }*/
+
+        log.info("13");
+    }
 
     public String getOwningCommunity(Item item) {
         try {
