@@ -698,7 +698,7 @@ public abstract class DSpaceObject
         DCValue[] dcvalues = getMetadataByMetadataString(value);
 
         if(dcvalues.length>0) {
-            return dcvalues[0].toString();
+            return dcvalues[0].value;
         }
         return null;
     }
