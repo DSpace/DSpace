@@ -7,11 +7,14 @@
  */
 package org.dspace.disseminate;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.draw.LineSeparator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -281,16 +284,69 @@ public class CitationDocument {
      * @param bitstream The source bitstream being cited. This must be a PDF.
      * @param cMeta The citation information used to generate the coverpage.
      * @return The temporary File that is the finished, cited document.
-     * @throws com.itextpdf.text.DocumentException
      * @throws java.io.FileNotFoundException
      * @throws SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
     private File makeCitedDocument(Bitstream bitstream, CitationMeta cMeta)
-            throws DocumentException, IOException, SQLException, AuthorizeException {
+            throws IOException, SQLException, AuthorizeException, COSVisitorException {
         //Read the source bitstream
-        PdfReader source = new PdfReader(bitstream.retrieve());
+        //PdfReader source = new PdfReader(bitstream.retrieve());
+        log.info("0");
+        PDDocument document = new PDDocument();
 
+
+        PDDocument sourceDocument = new PDDocument();
+        sourceDocument = sourceDocument.load(bitstream.retrieve());
+        log.info("1");
+        String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
+        File tempDir = new File(tempDirString);
+        if(!tempDir.exists()) {
+            boolean success = tempDir.mkdir();
+            if(success) {
+                log.info("Created temp dir");
+            } else {
+                log.info("Not created temp dir");
+            }
+        } else {
+            log.info(tempDir + " exists");
+        }
+
+        log.info("2");
+        PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+        log.info("3");
+        document.addPage(coverPage);
+        log.info("3.1");
+        PDFont font = PDType1Font.HELVETICA_BOLD;
+        PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
+        log.info("4");
+        contentStream.beginText();
+        contentStream.setFont(font, 12);
+        contentStream.moveTextPositionByAmount(100, 700);
+        contentStream.drawString("Hello World");
+        contentStream.endText();
+        contentStream.close();
+
+
+        log.info("5");
+        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+        log.info("6");
+        for(PDPage sourcePage : sourcePageList) {
+            log.info("7.page");
+            document.addPage(sourcePage);
+        }
+        sourcePageList.clear();
+
+        log.info("8");
+        document.save(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
+        log.info("9");
+        document.close();
+        log.info("10");
+        sourceDocument.close();
+        return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
+
+
+        /*
         Document citedDoc = new Document(PageSize.LETTER);
 
         File coverTemp = File.createTempFile(bitstream.getName(), ".cover.pdf");
@@ -345,7 +401,7 @@ public class CitationDocument {
         coverTemp.delete();
 
         citedTemp.deleteOnExit();
-        return citedTemp;
+        return citedTemp;*/
     }
 
     /**
@@ -359,7 +415,7 @@ public class CitationDocument {
      * @throws IOException
      * @throws DocumentException
      */
-    private void generateCoverPage(Document cDoc, PdfWriter writer, CitationMeta cMeta) throws DocumentException {
+    /*private void generateCoverPage(Document cDoc, PdfWriter writer, CitationMeta cMeta) throws DocumentException {
         cDoc.open();
         writer.setCompressionLevel(0);
 
@@ -475,7 +531,7 @@ public class CitationDocument {
         cDoc.add(license);
 
         cDoc.close();
-    }
+    }*/
 
     /**
      * Attempts to add a Logo to the document from the given resource. Returns
@@ -490,7 +546,7 @@ public class CitationDocument {
      *
      * @return Succesfully added logo to document.
      */
-    private boolean addLogoToDocument(Document doc, PdfWriter writer, String res) {
+    /*private boolean addLogoToDocument(Document doc, PdfWriter writer, String res) {
         boolean ret = false;
         try {
             //First we try to get the logo as if it is a Java Resource
@@ -543,7 +599,7 @@ public class CitationDocument {
             ret = false;
         }
         return ret;
-    }
+    }*/
 
     public String getOwningCommunity(Item item) {
         try {
