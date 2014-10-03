@@ -29,8 +29,8 @@ public class DSpaceProvider
         extends IdentifierProvider
 {
     private static final String DSPACE_SCHEMA = "dspace";
-    private static final String METADATA_ELEMENT = "identifier";
-    private static final String METADATA_QUALIFIER = "dspace";
+    private static final String ELEMENT = "identifier";
+    private static final String QUALIFIER = "dspace";
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
@@ -39,9 +39,9 @@ public class DSpaceProvider
     }
 
     @Override
-    public boolean supports(String identifier)
+    public boolean supports(String type)
     {
-        throw new UnsupportedOperationException("Not supported yet."); // TODO
+        return QUALIFIER.equalsIgnoreCase(type);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class DSpaceProvider
             throws IdentifierException
     {
         String id = mint(context, dso);
-        dso.addMetadata(DSPACE_SCHEMA, METADATA_ELEMENT, METADATA_QUALIFIER, null, id);
+        dso.addMetadata(DSPACE_SCHEMA, ELEMENT, QUALIFIER, null, id);
         try {
             dso.update();
         }
@@ -75,7 +75,7 @@ public class DSpaceProvider
         try {
             MetadataSchema dspace = MetadataSchema.find(context, DSPACE_SCHEMA);
             MetadataField identifier_dspace = MetadataField.findByElement(context,
-                    dspace.getSchemaID(), METADATA_ELEMENT, METADATA_QUALIFIER);
+                    dspace.getSchemaID(), ELEMENT, QUALIFIER);
             row = DatabaseManager.querySingleTable(context, "MetadataValue",
                     "SELECT resource_id, resource_type_id FROM Metadatavalue" +
                     " WHERE text_value = ? AND metadata_field_id = ?",
@@ -102,15 +102,18 @@ public class DSpaceProvider
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
         Metadatum[] identifiers = object.getMetadata(DSPACE_SCHEMA,
-                METADATA_ELEMENT, METADATA_QUALIFIER, Item.ANY);
-        return identifiers[0].value;
+                ELEMENT, QUALIFIER, Item.ANY);
+        if (identifiers.length > 0)
+            return identifiers[0].value;
+        else
+            throw new IdentifierNotFoundException();
     }
 
     @Override
     public void delete(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        throw new UnsupportedOperationException("Not supported.");
+        dso.clearMetadata(DSPACE_SCHEMA, ELEMENT, QUALIFIER, Item.ANY);
     }
 
     @Override
