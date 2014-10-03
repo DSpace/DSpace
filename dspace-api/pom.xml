@@ -594,6 +594,13 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
+        
+        <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>3.0</version>
+        </dependency>
 
         <!-- Google Analytics -->
         <dependency>

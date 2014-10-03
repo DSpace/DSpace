@@ -31,24 +31,28 @@ public class InitializeDatabase
     {
       
         // Usage checks
-        if (argv.length != 1)
+        /*if (argv.length != 1)
         {
             log.warn("Schema file not specified");
             System.exit(1);
-        }
+        }*/
 
         log.info("Initializing Database");
 
         try
         {
-            if("clean-database.sql".equals(argv[0]))
+            // This is just to ensure DatabaseManager.initialize() gets called!
+            String dbKeyword = DatabaseManager.getDbKeyword();
+
+            log.info("Done initializing " + dbKeyword + " Database");
+            /*if("clean-database.sql".equals(argv[0]))
             {
                DatabaseManager.loadSql(getScript(argv[0]));
             }
             else
             {
                DatabaseManager.loadSql(getScript(argv[0]));
-            }
+            }*/
             
             System.exit(0);
         }
