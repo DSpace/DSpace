@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -423,8 +424,7 @@ public class DSpaceCSV implements Serializable
             }
 
             // Add the language if there is one (schema.element.qualifier[langauge])
-            //if ((value.language != null) && (!"".equals(value.language)))
-            if (value.language != null)
+            if (StringUtils.isNotBlank(value.language))
             {
                 key = key + "[" + value.language + "]";
             }
