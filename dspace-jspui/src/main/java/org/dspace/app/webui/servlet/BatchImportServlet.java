@@ -186,18 +186,18 @@ public class BatchImportServlet extends DSpaceServlet
     				//Decide if it is a new upload or a resume one!
     				if (uploadId != null){ //resume upload
     					if (f==null){
-    						ItemImport.processResumableImport(zipurl, owningCollection, reqCollections, uploadId, context);
+    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, uploadId, context);
     					}
     					else {
-    						ItemImport.processResumableImport(f, owningCollection, reqCollections, uploadId, inputType, context);
+    						ItemImport.processUIImport(f, owningCollection, reqCollections, uploadId, inputType, context);
     					}
     				}
     				else { //New upload
     					if (f==null){
-    						ItemImport.processUploadableImport(zipurl, owningCollection, reqCollections, context);
+    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, null, context);
     					}
     					else {
-    						ItemImport.processUploadableImport(f, owningCollection, reqCollections, inputType, context);
+    						ItemImport.processUIImport(f, owningCollection, reqCollections, null, inputType, context);
     					}
     				}
     				
