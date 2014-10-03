@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+    <dspace-header>
+        <title>DSpace private types</title>
+        <contributor.author>Mark H. Wood</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>dspace</name>
+        <namespace>http://dspace.org/dspace</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>identifier</schema>
+        <element>dspace</element>
+        <scope_note>DSpace internal persistent identifier</scope_note>
+    </dc-type>
+</dspace-dc-types>
