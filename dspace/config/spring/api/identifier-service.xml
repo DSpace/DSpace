@@ -21,7 +21,12 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for using the versioned handle identifier instead of the default one. -->
+    <!-- Provider for DSpace's own identifiers.  DO NOT DISABLE THIS. -->
+    <bean id='org.dspace.identifier.DSpaceProvider'
+          class='org.dspace.identifier.DSpaceProvider'
+          scope='singleton'/>
+
+    <!-- provider for using the versioned handle identifier instead of the default one. -->
     <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
           <!--scope="singleton">-->
         <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
