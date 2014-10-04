@@ -339,11 +339,18 @@ public class CitationDocument {
     }
 
     private void generateCoverPage(PDDocument document, PDPage coverPage, CitationMeta citationMeta) throws IOException, COSVisitorException {
+        String[] header1 = {"The Ohio State University", ""};
+        String[] header2 = {"Knowledge Bank", "http://kb.osu.edu"};
+        String[] fields1 = {"dc.date.issued", "dc.date.created"};
+        String[] fields2 = {"dc.title", "dc.creator", "dc.contributor.author", "dc.publisher"};
+        String[] fields3 = {"dc.identifier.citation", "dc.identifier.uri"};
+        String footer = "Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository";
+
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
             Item item = citationMeta.getItem();
             int ypos = 700;
-            int xpos = 75;
+            int xpos = 50;
             int ygap = 20;
             log.info("1");
 
@@ -353,18 +360,18 @@ public class CitationDocument {
 
             log.info("2");
 
-            String[][] content = {{"The Ohio State University", ""}};
+            String[][] content = {header1};
             drawTable(coverPage, contentStream, ypos, xpos, content);
-            ypos -=ygap;
+            ypos -=(ygap);
 
-            String[][] content2 = {{"Knowledge Bank", "kb.osu.edu"}};
+            String[][] content2 = {header2};
             drawTable(coverPage, contentStream, ypos, xpos, content2);
             ypos -=ygap;
 
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.fillRect(xpos, ypos, 500, 1);
             contentStream.closeAndStroke();
-            ypos -=(ygap/2);
+            //ypos -=(ygap/2);
 
             String[][] content3 = {{getOwningCommunity(item), getOwningCollection(item)}};
             drawTable(coverPage, contentStream, ypos, xpos, content3);
@@ -373,79 +380,72 @@ public class CitationDocument {
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.fillRect(xpos, ypos, 500, 1);
             contentStream.closeAndStroke();
-            ypos -=ygap;
+            ypos -=(ygap*2);
 
             log.info("Drew table");
 
-            ypos -=200;
+            for(String field : fields1) {
+                PDFont font = fontHelvetica;
+                int fontSize = 12;
 
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.date.issued"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.date.issued"));
-                contentStream.endText();
-                log.info("8");
-                ypos -=ygap;
+                if(field.contains("title")) {
+                    font = fontHelveticaBold;
+                    fontSize = 26;
+                } else if(field.contains("identifier")) {
+                    fontSize = 11;
+                }
+
+                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
+                    ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
+                }
             }
 
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.fillRect(xpos, ypos, 500, 1);
             contentStream.closeAndStroke();
-            ypos -=(2*ygap);
+            ypos -=(ygap*2);
 
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.title"))) {
-                ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata("dc.title.*"), xpos, ypos, fontHelveticaBold, 26);
-            }
+            for(String field : fields2) {
+                PDFont font = fontHelvetica;
+                int fontSize = 12;
+                if(field.contains("title")) {
+                    font = fontHelveticaBold;
+                    fontSize = 26;
+                } else if(field.contains("identifier")) {
+                    fontSize = 11;
+                }
 
-
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.creator.*"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 16);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.creator.*"));
-                contentStream.endText();
-                log.info("10.creator");
-                ypos -=ygap;
-            }
-
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.contributor.*"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 16);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.contributor.*"));
-                contentStream.endText();
-                log.info("10.contributor");
-                ypos -=ygap;
+                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
+                    ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
+                }
             }
 
             contentStream.setNonStrokingColor(Color.BLACK);
             contentStream.fillRect(xpos, ypos, 500, 1);
-            ypos -=ygap;
+            contentStream.closeAndStroke();
+            ypos -=(ygap*2);
 
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.citation"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.identifier.citation"));
-                contentStream.endText();
-                log.info("11");
-                ypos -=ygap;
+            for(String field : fields3) {
+                PDFont font = fontHelvetica;
+                int fontSize = 12;
+                if(field.contains("title")) {
+                    font = fontHelveticaBold;
+                    fontSize = 26;
+                } else if(field.contains("identifier")) {
+                    fontSize = 11;
+                }
+
+                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
+                    ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
+                }
             }
-            if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.uri"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.identifier.uri"));
-                contentStream.endText();
-                log.info("12");
-                ypos -=ygap;
-            }
+
+
 
             contentStream.beginText();
             contentStream.setFont(fontHelveticaOblique, 11);
             contentStream.moveTextPositionByAmount(xpos, ypos);
-            contentStream.drawString("Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository");
+            contentStream.drawString(footer);
             contentStream.endText();
             log.info("13");
             ypos -=ygap;
