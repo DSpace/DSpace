@@ -395,13 +395,7 @@ public class CitationDocument {
             ypos -=(2*ygap);
 
             if(StringUtils.isNotEmpty(item.getMetadata("dc.title"))) {
-                contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 26);
-                contentStream.moveTextPositionByAmount(xpos, ypos);
-                contentStream.drawString(item.getMetadata("dc.title"));
-                contentStream.endText();
-                log.info("9");
-                ypos -=(4*ygap);
+                ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata("dc.title.*"), xpos, ypos, fontHelveticaBold, 26);
             }
 
 
@@ -461,6 +455,64 @@ public class CitationDocument {
         }
 
         log.info("14");
+    }
+
+    public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
+                                    int startX, int startY, PDFont pdfFont, float fontSize) throws IOException {
+        //PDFont pdfFont = PDType1Font.HELVETICA;
+        //float fontSize = 25;
+        float leading = 1.5f * fontSize;
+
+
+        PDRectangle mediabox = page.findMediaBox();
+        float margin = 72;
+        float width = mediabox.getWidth() - 2*margin;
+        //float startX = mediabox.getLowerLeftX() + margin;
+        //float startY = mediabox.getUpperRightY() - margin;
+
+        //String text = "I am trying to create a PDF file with a lot of text contents in the document. I am using PDFBox";
+        List<String> lines = new ArrayList<String>();
+        int lastSpace = -1;
+        while (text.length() > 0)
+        {
+            int spaceIndex = text.indexOf(' ', lastSpace + 1);
+            if (spaceIndex < 0)
+            {
+                lines.add(text);
+                text = "";
+            }
+            else
+            {
+                String subString = text.substring(0, spaceIndex);
+                float size = fontSize * pdfFont.getStringWidth(subString) / 1000;
+                if (size > width)
+                {
+                    if (lastSpace < 0) // So we have a word longer than the line... draw it anyways
+                        lastSpace = spaceIndex;
+                    subString = text.substring(0, lastSpace);
+                    lines.add(subString);
+                    text = text.substring(lastSpace).trim();
+                    lastSpace = -1;
+                }
+                else
+                {
+                    lastSpace = spaceIndex;
+                }
+            }
+        }
+
+        contentStream.beginText();
+        contentStream.setFont(pdfFont, fontSize);
+        contentStream.moveTextPositionByAmount(startX, startY);
+        int currentY = startY;
+        for (String line: lines)
+        {
+            contentStream.drawString(line);
+            currentY -= leading;
+            contentStream.moveTextPositionByAmount(0, -leading);
+        }
+        contentStream.endText();
+        return currentY;
     }
 
     public String getOwningCommunity(Item item) {
