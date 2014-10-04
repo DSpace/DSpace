@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -23,11 +24,11 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
+import java.awt.*;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 
 /**
  * The Citation Document produces a dissemination package (DIP) that is different that the archival package (AIP).
@@ -337,113 +338,129 @@ public class CitationDocument {
         return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
     }
 
-    private void generateCoverPage(PDDocument document, PDPage coverPage, CitationMeta citationMeta) throws IOException {
+    private void generateCoverPage(PDDocument document, PDPage coverPage, CitationMeta citationMeta) throws IOException, COSVisitorException {
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
             Item item = citationMeta.getItem();
             int ypos = 700;
+            int xpos = 75;
+            int ygap = 20;
             log.info("1");
 
             PDFont fontHelvetica = PDType1Font.HELVETICA;
             PDFont fontHelveticaBold = PDType1Font.HELVETICA_BOLD;
             PDFont fontHelveticaOblique = PDType1Font.HELVETICA_OBLIQUE;
 
-
             log.info("2");
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaBold, 11);
-            contentStream.moveTextPositionByAmount(100, ypos);
-            contentStream.drawString("Ohio State");
-            contentStream.endText();
-            log.info("3");
-            ypos -=50;
+            String[][] content = {{"The Ohio State University", ""}};
+            drawTable(coverPage, contentStream, ypos, xpos, content);
+            ypos -=ygap;
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaBold, 11);
-            contentStream.moveTextPositionByAmount(100, ypos);
-            contentStream.drawString("Knowledge Bank");
-            contentStream.endText();
-            log.info("4");
-            ypos -=50;
+            String[][] content2 = {{"Knowledge Bank", "kb.osu.edu"}};
+            drawTable(coverPage, contentStream, ypos, xpos, content2);
+            ypos -=ygap;
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaBold, 11);
-            contentStream.moveTextPositionByAmount(100, ypos);
-            contentStream.drawString("kb.osu.edu");
-            contentStream.endText();
-            log.info("5");
-            ypos -=50;
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.fillRect(xpos, ypos, 500, 1);
+            contentStream.closeAndStroke();
+            ypos -=(ygap/2);
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaBold, 11);
-            contentStream.moveTextPositionByAmount(100, ypos);
-            contentStream.drawString(getOwningCommunity(item));
-            contentStream.endText();
-            log.info("6");
-            ypos -=50;
+            String[][] content3 = {{getOwningCommunity(item), getOwningCollection(item)}};
+            drawTable(coverPage, contentStream, ypos, xpos, content3);
+            ypos -=ygap;
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaBold, 11);
-            contentStream.moveTextPositionByAmount(100, ypos);
-            contentStream.drawString(getOwningCollection(item));
-            contentStream.endText();
-            log.info("7");
-            ypos -=50;
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.fillRect(xpos, ypos, 500, 1);
+            contentStream.closeAndStroke();
+            ypos -=ygap;
+
+            log.info("Drew table");
+
+            ypos -=200;
 
             if(StringUtils.isNotEmpty(item.getMetadata("dc.date.issued"))) {
                 contentStream.beginText();
                 contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
                 contentStream.drawString(item.getMetadata("dc.date.issued"));
                 contentStream.endText();
                 log.info("8");
-                ypos -=50;
+                ypos -=ygap;
             }
+
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.fillRect(xpos, ypos, 500, 1);
+            contentStream.closeAndStroke();
+            ypos -=(2*ygap);
 
             if(StringUtils.isNotEmpty(item.getMetadata("dc.title"))) {
                 contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.setFont(fontHelveticaBold, 26);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
                 contentStream.drawString(item.getMetadata("dc.title"));
                 contentStream.endText();
                 log.info("9");
-                ypos -=50;
+                ypos -=(4*ygap);
+            }
+
+
+            if(StringUtils.isNotEmpty(item.getMetadata("dc.creator.*"))) {
+                contentStream.beginText();
+                contentStream.setFont(fontHelveticaBold, 16);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
+                contentStream.drawString(item.getMetadata("dc.creator.*"));
+                contentStream.endText();
+                log.info("10.creator");
+                ypos -=ygap;
             }
 
             if(StringUtils.isNotEmpty(item.getMetadata("dc.contributor.*"))) {
                 contentStream.beginText();
-                contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.setFont(fontHelveticaBold, 16);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
                 contentStream.drawString(item.getMetadata("dc.contributor.*"));
                 contentStream.endText();
-                log.info("10");
-                ypos -=50;
+                log.info("10.contributor");
+                ypos -=ygap;
             }
+
+            contentStream.setNonStrokingColor(Color.BLACK);
+            contentStream.fillRect(xpos, ypos, 500, 1);
+            ypos -=ygap;
+
             if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.citation"))) {
                 contentStream.beginText();
                 contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
                 contentStream.drawString(item.getMetadata("dc.identifier.citation"));
                 contentStream.endText();
                 log.info("11");
-                ypos -=50;
+                ypos -=ygap;
             }
             if(StringUtils.isNotEmpty(item.getMetadata("dc.identifier.uri"))) {
                 contentStream.beginText();
                 contentStream.setFont(fontHelveticaBold, 11);
-                contentStream.moveTextPositionByAmount(100, ypos);
+                contentStream.moveTextPositionByAmount(xpos, ypos);
                 contentStream.drawString(item.getMetadata("dc.identifier.uri"));
                 contentStream.endText();
                 log.info("12");
-                ypos -=50;
+                ypos -=ygap;
             }
+
+            contentStream.beginText();
+            contentStream.setFont(fontHelveticaOblique, 11);
+            contentStream.moveTextPositionByAmount(xpos, ypos);
+            contentStream.drawString("Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository");
+            contentStream.endText();
+            log.info("13");
+            ypos -=ygap;
 
         } finally {
             contentStream.close();
         }
 
-        log.info("13");
+        log.info("14");
     }
 
     public String getOwningCommunity(Item item) {
@@ -480,6 +497,58 @@ public class CitationDocument {
         }
 
         return StringUtils.join(valueArray.toArray(), "; ");
+    }
+
+    /**
+     * @param page
+     * @param contentStream
+     * @param y the y-coordinate of the first row
+     * @param margin the padding on left and right of table
+     * @param content a 2d array containing the table data
+     * @throws IOException
+     */
+    public static void drawTable(PDPage page, PDPageContentStream contentStream,
+                                 float y, float margin,
+                                 String[][] content) throws IOException {
+        final int rows = content.length;
+        final int cols = content[0].length;
+        final float rowHeight = 20f;
+        final float tableWidth = page.findMediaBox().getWidth()-(2*margin);
+        final float tableHeight = rowHeight * rows;
+        final float colWidth = tableWidth/(float)cols;
+        final float cellMargin=5f;
+
+        //draw the rows
+        //float nexty = y ;
+        //for (int i = 0; i <= rows; i++) {
+        //    contentStream.drawLine(margin,nexty,margin+tableWidth,nexty);
+        //    nexty-= rowHeight;
+        //}
+
+        //draw the columns
+        //float nextx = margin;
+        //for (int i = 0; i <= cols; i++) {
+        //    contentStream.drawLine(nextx,y,nextx,y-tableHeight);
+        //    nextx += colWidth;
+        //}
+
+        //now add the text
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD,12);
+
+        float textx = margin+cellMargin;
+        float texty = y-15;
+        for(int i = 0; i < content.length; i++){
+            for(int j = 0 ; j < content[i].length; j++){
+                String text = content[i][j];
+                contentStream.beginText();
+                contentStream.moveTextPositionByAmount(textx,texty);
+                contentStream.drawString(text);
+                contentStream.endText();
+                textx += colWidth;
+            }
+            texty-=rowHeight;
+            textx = margin+cellMargin;
+        }
     }
 
     /**
