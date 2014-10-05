@@ -280,23 +280,14 @@ public class Item extends DSpaceObject
      */
     public static ItemIterator findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException
     {
-        String querySorted =    "SELECT \n" +
-                "  item.item_id, \n" +
-                "  item.submitter_id, \n" +
-                "  item.in_archive, \n" +
-                "  item.withdrawn, \n" +
-                "  item.owning_collection, \n" +
-                "  item.last_modified, \n" +
-                "  metadatavalue.text_value\n" +
-                "FROM \n" +
-                "  public.item, \n" +
-                "  public.metadatafieldregistry, \n" +
-                "  public.metadatavalue\n" +
-                "WHERE \n" +
-                "  metadatafieldregistry.metadata_field_id = metadatavalue.metadata_field_id AND\n" +
-                "  metadatavalue.item_id = item.item_id AND\n" +
-                "  metadatafieldregistry.element = 'date' AND \n" +
-                "  metadatafieldregistry.qualifier = 'accessioned' AND \n" +
+        String querySorted =    "SELECT item.item_id, item.submitter_id, item.in_archive, item.withdrawn, " +
+                "item.owning_collection, item.last_modified, metadatavalue.text_value " +
+                "FROM item, metadatafieldregistry, metadatavalue " +
+                "WHERE metadatafieldregistry.metadata_field_id = metadatavalue.metadata_field_id AND " +
+                "  metadatavalue.resource_id = item.item_id AND " +
+                "  metadatavalue.resource_type_id = ? AND " +
+                "  metadatafieldregistry.element = 'date' AND " +
+                "  metadatafieldregistry.qualifier = 'accessioned' AND " +
                 "  item.submitter_id = ? AND \n" +
                 "  item.in_archive = true\n" +
                 "ORDER BY\n" +
@@ -306,10 +297,10 @@ public class Item extends DSpaceObject
 
         if(limit != null && limit > 0) {
             querySorted += " limit ? ;";
-            rows = DatabaseManager.query(context, querySorted, eperson.getID(), limit);
+            rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID(), limit);
         } else {
             querySorted += ";";
-            rows = DatabaseManager.query(context, querySorted, eperson.getID());
+            rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID());
         }
 
         return new ItemIterator(context, rows);
