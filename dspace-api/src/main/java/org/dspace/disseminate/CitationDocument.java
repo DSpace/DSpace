@@ -151,10 +151,33 @@ public class CitationDocument {
 
         }
 
-        header1 = new String[]{"The Ohio State University", ""};
-        header2 = new String[]{"Knowledge Bank", "http://kb.osu.edu"};
-        fields = new String[]{"dc.date.issued", "dc.date.created", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
-        footer = "Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository";
+        String header1Config = ConfigurationManager.getProperty("disseminate-citation", "header1");
+        if(StringUtils.isNotBlank(header1Config)) {
+            header1 = header1Config.split(",");
+        } else {
+            header1 = new String[]{"DSpace Institution", ""};
+        }
+
+        String header2Config = ConfigurationManager.getProperty("disseminate-citation", "header2");
+        if(StringUtils.isNotBlank(header2Config)) {
+            header2 = header2Config.split(",");
+        } else {
+            header2 = new String[]{"DSpace Repository", "http://dspace.org"};
+        }
+
+        String fieldsConfig = ConfigurationManager.getProperty("disseminate-citation", "fields");
+        if(StringUtils.isNotBlank(fieldsConfig)) {
+            fields = fieldsConfig.split(",");
+        } else {
+            fields = new String[]{"dc.date.issued", "dc.date.created", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
+        }
+
+        String footerConfig = ConfigurationManager.getProperty("disseminate-citation", "footer");
+        if(StringUtils.isNotBlank(footerConfig)) {
+            footer = footerConfig;
+        } else {
+            footer = "Downloaded from DSpace Repository, DSpace Institution's institutional repository";
+        }
 
         String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
         tempDir = new File(tempDirString);
@@ -171,8 +194,7 @@ public class CitationDocument {
     }
 
 
-    public CitationDocument() {
-    }
+    public CitationDocument() {}
 
     /**
      * Boolean to determine is citation-functionality is enabled globally for entire site.
