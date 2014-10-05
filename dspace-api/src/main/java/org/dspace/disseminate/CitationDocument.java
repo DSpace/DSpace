@@ -81,6 +81,13 @@ public class CitationDocument {
      */
     private static ArrayList<String> citationEnabledCollectionsList;
 
+    private static File tempDir;
+
+    private static String[] header1;
+    private static String[] header2;
+    private static String[] fields;
+    private static String footer;
+
 
     static {
         // Add valid format MIME types to set. This could be put in the Schema
@@ -142,6 +149,24 @@ public class CitationDocument {
                 log.error(e.getMessage());
             }
 
+        }
+
+        header1 = new String[]{"The Ohio State University", ""};
+        header2 = new String[]{"Knowledge Bank", "http://kb.osu.edu"};
+        fields = new String[]{"dc.date.issued", "dc.date.created", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
+        footer = "Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository";
+
+        String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
+        tempDir = new File(tempDirString);
+        if(!tempDir.exists()) {
+            boolean success = tempDir.mkdir();
+            if(success) {
+                log.info("Created temp dir");
+            } else {
+                log.info("Not created temp dir");
+            }
+        } else {
+            log.info(tempDir + " exists");
         }
     }
 
@@ -247,27 +272,6 @@ public class CitationDocument {
         return VALID_TYPES.contains(bitstream.getFormat().getMIMEType());
     }
 
-    public File makeCitedDocument(Bitstream bitstream) {
-        try {
-
-            Item item = (Item) bitstream.getParentObject();
-            CitationMeta cm = new CitationMeta(item);
-            if(cm == null) {
-                log.error("CitationMeta was null");
-            }
-
-            File citedDocumentFile = makeCitedDocument(bitstream, cm);
-            if(citedDocumentFile == null) {
-                log.error("Got a null citedDocumentFile in makeCitedDocument for bitstream");
-            }
-            return citedDocumentFile;
-        } catch (Exception e) {
-            log.error("makeCitedDocument from Bitstream fail!" + e.getMessage());
-            return null;
-        }
-
-    }
-
     /**
      * Creates a
      * cited document from the given bitstream of the given item. This
@@ -283,195 +287,126 @@ public class CitationDocument {
      * </p>
      *
      * @param bitstream The source bitstream being cited. This must be a PDF.
-     * @param cMeta The citation information used to generate the coverpage.
      * @return The temporary File that is the finished, cited document.
      * @throws java.io.FileNotFoundException
      * @throws SQLException
      * @throws org.dspace.authorize.AuthorizeException
      */
-    private File makeCitedDocument(Bitstream bitstream, CitationMeta cMeta)
+    public File makeCitedDocument(Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException, COSVisitorException {
-        //Read the source bitstream
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
-        sourceDocument = sourceDocument.load(bitstream.retrieve());
-        log.info("loaded pdf");
-        PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+        try {
+            Item item = (Item) bitstream.getParentObject();
+            sourceDocument = sourceDocument.load(bitstream.retrieve());
+            log.info("loaded pdf");
+            PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
+            generateCoverPage(document, coverPage, item);
+            addCoverPageToDocument(document, sourceDocument, coverPage);
 
-        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
-        //Is the citation-page the first page or last-page?
-        if(isCitationFirstPage()) {
-            //citation as cover page
-            document.addPage(coverPage);
-            for(PDPage sourcePage : sourcePageList) {
-                document.addPage(sourcePage);
-            }
-        } else {
-            //citation as tail page
-            for(PDPage sourcePage : sourcePageList) {
-                document.addPage(sourcePage);
-            }
-            document.addPage(coverPage);
+            document.save(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
+            return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
+        } finally {
+            sourceDocument.close();
+            document.close();
         }
-        log.info("added pages");
-        sourcePageList.clear();
-
-        generateCoverPage(document, coverPage, cMeta);
-        log.info("3");
-
-        String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
-        File tempDir = new File(tempDirString);
-        if(!tempDir.exists()) {
-            boolean success = tempDir.mkdir();
-            if(success) {
-                log.info("Created temp dir");
-            } else {
-                log.info("Not created temp dir");
-            }
-        } else {
-            log.info(tempDir + " exists");
-        }
-
-        document.save(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
-        document.close();
-        sourceDocument.close();
-        return new File(tempDir.getAbsolutePath() + "/bitstream.cover.pdf");
     }
 
-    private void generateCoverPage(PDDocument document, PDPage coverPage, CitationMeta citationMeta) throws IOException, COSVisitorException {
-        String[] header1 = {"The Ohio State University", ""};
-        String[] header2 = {"Knowledge Bank", "http://kb.osu.edu"};
-        String[] fields1 = {"dc.date.issued", "dc.date.created"};
-        String[] fields2 = {"dc.title", "dc.creator", "dc.contributor.author", "dc.publisher"};
-        String[] fields3 = {"dc.identifier.citation", "dc.identifier.uri"};
-        String footer = "Downloaded from the Knowledge Bank, The Ohio State University's intitutional repository";
-
+    private void generateCoverPage(PDDocument document, PDPage coverPage, Item item) throws IOException, COSVisitorException {
         PDPageContentStream contentStream = new PDPageContentStream(document, coverPage);
         try {
-            Item item = citationMeta.getItem();
-            int ypos = 700;
-            int xpos = 50;
+            int ypos = 760;
+            int xpos = 30;
+            int xwidth = 550;
             int ygap = 20;
-            log.info("1");
 
             PDFont fontHelvetica = PDType1Font.HELVETICA;
             PDFont fontHelveticaBold = PDType1Font.HELVETICA_BOLD;
             PDFont fontHelveticaOblique = PDType1Font.HELVETICA_OBLIQUE;
-
-            log.info("2");
+            contentStream.setNonStrokingColor(Color.BLACK);
 
             String[][] content = {header1};
-            drawTable(coverPage, contentStream, ypos, xpos, content);
+            drawTable(coverPage, contentStream, ypos, xpos, content, fontHelveticaBold, 11, false);
             ypos -=(ygap);
 
             String[][] content2 = {header2};
-            drawTable(coverPage, contentStream, ypos, xpos, content2);
+            drawTable(coverPage, contentStream, ypos, xpos, content2, fontHelveticaBold, 11, false);
             ypos -=ygap;
 
-            contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.fillRect(xpos, ypos, 500, 1);
+            contentStream.fillRect(xpos, ypos, xwidth, 1);
             contentStream.closeAndStroke();
-            //ypos -=(ygap/2);
 
             String[][] content3 = {{getOwningCommunity(item), getOwningCollection(item)}};
-            drawTable(coverPage, contentStream, ypos, xpos, content3);
+            drawTable(coverPage, contentStream, ypos, xpos, content3, fontHelvetica, 9, false);
             ypos -=ygap;
 
-            contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.fillRect(xpos, ypos, 500, 1);
+            contentStream.fillRect(xpos, ypos, xwidth, 1);
             contentStream.closeAndStroke();
             ypos -=(ygap*2);
 
-            log.info("Drew table");
-
-            for(String field : fields1) {
+            for(String field : fields) {
                 PDFont font = fontHelvetica;
-                int fontSize = 12;
-
+                int fontSize = 11;
                 if(field.contains("title")) {
-                    font = fontHelveticaBold;
                     fontSize = 26;
-                } else if(field.contains("identifier")) {
-                    fontSize = 11;
+                    ypos -= ygap;
+                } else if(field.contains("creator") || field.contains("contributor")) {
+                    fontSize = 16;
                 }
 
-                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
+                if(field.equals("_line_")) {
+                    contentStream.fillRect(xpos, ypos, xwidth, 1);
+                    contentStream.closeAndStroke();
+                    ypos -=(ygap);
+
+                } else if(StringUtils.isNotEmpty(item.getMetadata(field))) {
                     ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
                 }
-            }
 
-            contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.fillRect(xpos, ypos, 500, 1);
-            contentStream.closeAndStroke();
-            ypos -=(ygap*2);
-
-            for(String field : fields2) {
-                PDFont font = fontHelvetica;
-                int fontSize = 12;
                 if(field.contains("title")) {
-                    font = fontHelveticaBold;
-                    fontSize = 26;
-                } else if(field.contains("identifier")) {
-                    fontSize = 11;
-                }
-
-                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
-                    ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
+                    ypos -=ygap;
                 }
             }
-
-            contentStream.setNonStrokingColor(Color.BLACK);
-            contentStream.fillRect(xpos, ypos, 500, 1);
-            contentStream.closeAndStroke();
-            ypos -=(ygap*2);
-
-            for(String field : fields3) {
-                PDFont font = fontHelvetica;
-                int fontSize = 12;
-                if(field.contains("title")) {
-                    font = fontHelveticaBold;
-                    fontSize = 26;
-                } else if(field.contains("identifier")) {
-                    fontSize = 11;
-                }
-
-                if(StringUtils.isNotEmpty(item.getMetadata(field))) {
-                    ypos = drawStringWordWrap(coverPage, contentStream, item.getMetadata(field), xpos, ypos, font, fontSize);
-                }
-            }
-
-
 
             contentStream.beginText();
             contentStream.setFont(fontHelveticaOblique, 11);
             contentStream.moveTextPositionByAmount(xpos, ypos);
             contentStream.drawString(footer);
             contentStream.endText();
-            log.info("13");
-            ypos -=ygap;
-
         } finally {
             contentStream.close();
         }
+    }
 
-        log.info("14");
+    private void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
+        List<PDPage> sourcePageList = sourceDocument.getDocumentCatalog().getAllPages();
+
+        if (isCitationFirstPage()) {
+            //citation as cover page
+            document.addPage(coverPage);
+            for (PDPage sourcePage : sourcePageList) {
+                document.addPage(sourcePage);
+            }
+        } else {
+            //citation as tail page
+            for (PDPage sourcePage : sourcePageList) {
+                document.addPage(sourcePage);
+            }
+            document.addPage(coverPage);
+        }
+        log.info("added pages");
+        sourcePageList.clear();
     }
 
     public int drawStringWordWrap(PDPage page, PDPageContentStream contentStream, String text,
                                     int startX, int startY, PDFont pdfFont, float fontSize) throws IOException {
-        //PDFont pdfFont = PDType1Font.HELVETICA;
-        //float fontSize = 25;
         float leading = 1.5f * fontSize;
-
 
         PDRectangle mediabox = page.findMediaBox();
         float margin = 72;
         float width = mediabox.getWidth() - 2*margin;
-        //float startX = mediabox.getLowerLeftX() + margin;
-        //float startY = mediabox.getUpperRightY() - margin;
 
-        //String text = "I am trying to create a PDF file with a lot of text contents in the document. I am using PDFBox";
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         int lastSpace = -1;
         while (text.length() > 0)
         {
@@ -539,13 +474,15 @@ public class CitationDocument {
         }
     }
 
-    public String getAllMetadataSeperated(Item item, String metadataKey) {
+    public String getAllMetadataSeparated(Item item, String metadataKey) {
         DCValue[] dcValues = item.getMetadataByMetadataString(metadataKey);
 
         ArrayList<String> valueArray = new ArrayList<String>();
 
         for(DCValue dcValue : dcValues) {
-            valueArray.add(dcValue.value);
+            if(StringUtils.isNotBlank(dcValue.value)) {
+                valueArray.add(dcValue.value);
+            }
         }
 
         return StringUtils.join(valueArray.toArray(), "; ");
@@ -561,7 +498,7 @@ public class CitationDocument {
      */
     public static void drawTable(PDPage page, PDPageContentStream contentStream,
                                  float y, float margin,
-                                 String[][] content) throws IOException {
+                                 String[][] content, PDFont font, int fontSize, boolean cellBorders) throws IOException {
         final int rows = content.length;
         final int cols = content[0].length;
         final float rowHeight = 20f;
@@ -570,22 +507,24 @@ public class CitationDocument {
         final float colWidth = tableWidth/(float)cols;
         final float cellMargin=5f;
 
-        //draw the rows
-        //float nexty = y ;
-        //for (int i = 0; i <= rows; i++) {
-        //    contentStream.drawLine(margin,nexty,margin+tableWidth,nexty);
-        //    nexty-= rowHeight;
-        //}
+        if(cellBorders) {
+            //draw the rows
+            float nexty = y ;
+            for (int i = 0; i <= rows; i++) {
+                contentStream.drawLine(margin,nexty,margin+tableWidth,nexty);
+                nexty-= rowHeight;
+            }
 
-        //draw the columns
-        //float nextx = margin;
-        //for (int i = 0; i <= cols; i++) {
-        //    contentStream.drawLine(nextx,y,nextx,y-tableHeight);
-        //    nextx += colWidth;
-        //}
+            //draw the columns
+            float nextx = margin;
+            for (int i = 0; i <= cols; i++) {
+                contentStream.drawLine(nextx,y,nextx,y-tableHeight);
+                nextx += colWidth;
+            }
+        }
 
         //now add the text
-        contentStream.setFont(PDType1Font.HELVETICA_BOLD,12);
+        contentStream.setFont(font, fontSize);
 
         float textx = margin+cellMargin;
         float texty = y-15;
@@ -602,86 +541,4 @@ public class CitationDocument {
             textx = margin+cellMargin;
         }
     }
-
-    /**
-     * This wraps the item used in its constructor to make it easier to access
-     * METADATA.
-     */
-    private class CitationMeta {
-        private Collection parent;
-        private Map<String, String> metaData;
-        private Item myItem;
-
-        /**
-         * Constructs CitationMeta object from an Item. It uses item specific
-         * METADATA as well as METADATA from the owning collection.
-         *
-         * @param item An Item to get METADATA from.
-         * @throws java.sql.SQLException
-         */
-        public CitationMeta(Item item) throws SQLException {
-            this.myItem = item;
-            this.metaData = new HashMap<String, String>();
-            //Get all METADATA from our this.myItem
-            DCValue[] dcvs = this.myItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            //Put METADATA in a Map for easy access.
-            for (DCValue dsv : dcvs) {
-                String[] dsvParts = {dsv.schema, dsv.element, dsv.qualifier, dsv.language, dsv.authority};
-                StringBuilder keyBuilder = new StringBuilder();
-                for (String part : dsvParts) {
-                    if (part != null && part != "") {
-                        keyBuilder.append(part + '.');
-                    }
-                }
-                //Remove the trailing '.'
-                keyBuilder.deleteCharAt(keyBuilder.length() - 1);
-                this.metaData.put(keyBuilder.toString(), dsv.value);
-            }
-
-
-            //Get METADATA from the owning Collection
-            this.parent = this.myItem.getOwningCollection();
-        }
-
-        /**
-         * Returns a map of the METADATA for the item associated with this
-         * instance of CitationMeta.
-         *
-         * @return a Map of the METADATA for the associated item.
-         */
-        public Map<String, String> getMetaData() {
-            return this.metaData;
-        }
-
-        public Item getItem() {
-            return this.myItem;
-        }
-
-        public Collection getCollection() {
-            return this.parent;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @see Object#toString()
-         * @return A string with the format:
-         *  CitationPage.CitationMeta {
-         *      CONTENT
-         *  }
-         *  Where CONTENT is the METADATA derived by this class.
-         */
-        @Override
-        public String toString() {
-            StringBuilder ret = new StringBuilder(CitationMeta.class.getName());
-            ret.append(" {<br />\n\t");
-            ret.append(this.parent.getName());
-            ret.append("\n\t");
-            ret.append(this.myItem.getName());
-            ret.append("\n\t");
-            ret.append(this.metaData);
-            ret.append("\n}\n");
-            return ret.toString();
-        }
-    }
-
 }
