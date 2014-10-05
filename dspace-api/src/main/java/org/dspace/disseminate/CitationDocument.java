@@ -35,7 +35,7 @@ import java.util.List;
  * In this case we append the descriptive metadata to the end (configurable) of the document. i.e. last page of PDF.
  * So instead of getting the original PDF, you get a cPDF (with citation information added).
  *
- * @author Peter Dietz (dietz.72@osu.edu)
+ * @author Peter Dietz (peter@longsight.com)
  */
 public class CitationDocument {
     /**
@@ -151,6 +151,7 @@ public class CitationDocument {
 
         }
 
+        // Configurable text/fields, we'll set sane defaults
         String header1Config = ConfigurationManager.getProperty("disseminate-citation", "header1");
         if(StringUtils.isNotBlank(header1Config)) {
             header1 = header1Config.split(",");
@@ -169,7 +170,7 @@ public class CitationDocument {
         if(StringUtils.isNotBlank(fieldsConfig)) {
             fields = fieldsConfig.split(",");
         } else {
-            fields = new String[]{"dc.date.issued", "dc.date.created", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
+            fields = new String[]{"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
         }
 
         String footerConfig = ConfigurationManager.getProperty("disseminate-citation", "footer");
@@ -179,17 +180,16 @@ public class CitationDocument {
             footer = "Downloaded from DSpace Repository, DSpace Institution's institutional repository";
         }
 
+        //Ensure a temp directory is available
         String tempDirString = ConfigurationManager.getProperty("dspace.dir") + "/temp";
         tempDir = new File(tempDirString);
         if(!tempDir.exists()) {
             boolean success = tempDir.mkdir();
             if(success) {
-                log.info("Created temp dir");
+                log.info("Created temp directory at: " + tempDirString);
             } else {
-                log.info("Not created temp dir");
+                log.info("Unable to create temp directory at: " + tempDirString);
             }
-        } else {
-            log.info(tempDir + " exists");
         }
     }
 
@@ -210,12 +210,7 @@ public class CitationDocument {
         return citationEnabledGlobally;
     }
 
-
-
-
     private static boolean isCitationEnabledThroughCollection(Bitstream bitstream) throws SQLException {
-        //TODO Should we re-check configs, and set the collections list?
-
         //Reject quickly if no-enabled collections
         if(citationEnabledCollectionsList.size() == 0) {
             return false;
@@ -237,9 +232,6 @@ public class CitationDocument {
         // If previous logic didn't return true, then we're false
         return false;
     }
-
-
-
 
     /**
      * Repository policy can specify to have a custom citation cover/tail page to the document, which embeds metadata.
@@ -268,7 +260,6 @@ public class CitationDocument {
             if(!adminUser && canGenerateCitationVersion(bitstream)) {
                 return true;
             }
-
         }
 
         // If previous logic didn't return true, then we're false.
@@ -321,7 +312,6 @@ public class CitationDocument {
         try {
             Item item = (Item) bitstream.getParentObject();
             sourceDocument = sourceDocument.load(bitstream.retrieve());
-            log.info("loaded pdf");
             PDPage coverPage = new PDPage(PDPage.PAGE_SIZE_LETTER);
             generateCoverPage(document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
@@ -367,6 +357,7 @@ public class CitationDocument {
             ypos -=(ygap*2);
 
             for(String field : fields) {
+                field = field.trim();
                 PDFont font = fontHelvetica;
                 int fontSize = 11;
                 if(field.contains("title")) {
@@ -416,7 +407,6 @@ public class CitationDocument {
             }
             document.addPage(coverPage);
         }
-        log.info("added pages");
         sourcePageList.clear();
     }
 
