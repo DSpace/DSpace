@@ -4,16 +4,17 @@
 --
 -- http://www.dspace.org/license/
 
--- SQL commands to upgrade the Postgres database schema from DSpace 4.x to 5.x
--- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
-BEGIN;
+-- ===============================================================
+-- WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+--
+-- DO NOT MANUALLY RUN THIS DATABASE MIGRATION. IT WILL BE EXECUTED
+-- AUTOMATICALLY (IF NEEDED) BY "FLYWAY" WHEN YOU STARTUP DSPACE.
+-- http://flywaydb.org/
+-- ===============================================================
 
 ------------------------------------------------------
--- DS-1945 RequestItem Helpdesk, store request message
+-- DS-1582 Metadata on all DSpace Objects
 ------------------------------------------------------
-ALTER TABLE requestitem ADD request_message TEXT;
-
-
 alter table metadatavalue rename item_id to resource_id;
 alter table metadatavalue alter column resource_id set not null;
 alter table metadatavalue add column resource_type_id integer;

@@ -4,15 +4,17 @@
 --
 -- http://www.dspace.org/license/
 
--- SQL commands to upgrade the ORACLE database schema from DSpace 4.x to 5.x
--- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- ===============================================================
+-- WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+--
+-- DO NOT MANUALLY RUN THIS DATABASE MIGRATION. IT WILL BE EXECUTED
+-- AUTOMATICALLY (IF NEEDED) BY "FLYWAY" WHEN YOU STARTUP DSPACE.
+-- http://flywaydb.org/
+-- ===============================================================
 
 ------------------------------------------------------
--- DS-1945 RequestItem Helpdesk, store request message
+-- DS-1582 Metadata on all DSpace Objects
 ------------------------------------------------------
-ALTER TABLE requestitem ADD request_message VARCHAR2(2000);
-
-
 DECLARE
 statement VARCHAR2(2000);
 constr_name VARCHAR2(300);
