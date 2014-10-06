@@ -158,59 +158,63 @@ public final class ImportJournal2Authority {
                                         Map<String,String> val = journalProperties.get(authorityValue.getValue());
                                         if(val!=null){
                                             journalProperties.remove(authorityValue.getValue());
+                                            if(val.get("journalID")!=null&&val.get("journalID").length()>0)
+                                            {
+                                                aConcept.addMetadata("journal","journalID",null,"",val.get("journalID"),authorityValue.getId(),0);
+                                            }
                                             if(val.get("fullname")!=null&&val.get("fullname").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","fullname","","",val.get("fullname"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","fullname",null,"",val.get("fullname"),authorityValue.getId(),0);
                                                 fullName =  val.get("fullname");
                                             }
 
                                             if(val.get("metadataDir")!=null&&val.get("metadataDir").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","metadataDir","","",val.get("metadataDir"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","metadataDir",null,"",val.get("metadataDir"),authorityValue.getId(),0);
                                             }
                                             if(val.get("parsingScheme")!=null&&val.get("parsingScheme").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","parsingScheme","","",val.get("parsingScheme"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","parsingScheme",null,"",val.get("parsingScheme"),authorityValue.getId(),0);
                                             }
                                             if(val.get("integrated")!=null&&val.get("integrated").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","integrated","","",val.get("integrated"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","integrated",null,"",val.get("integrated"),authorityValue.getId(),0);
                                             }
                                             if(val.get("embargoAllowed")!=null&&val.get("embargoAllowed").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","embargoAllowed","","",val.get("embargoAllowed"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","embargoAllowed",null,"",val.get("embargoAllowed"),authorityValue.getId(),0);
                                             }
                                             if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","allowReviewWorkflow","","",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
                                             }
                                             if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","allowReviewWorkflow","","",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
                                             }
                                             if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","publicationBlackout","","",val.get("publicationBlackout"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),authorityValue.getId(),0);
                                             }
                                             if(val.get("subscriptionPaid")!=null&&val.get("subscriptionPaid").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","subscriptionPaid","","",val.get("subscriptionPaid"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),authorityValue.getId(),0);
                                             }
                                             if(val.get("sponsorName")!=null&&val.get("sponsorName").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","sponsorName","","",val.get("sponsorName"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","sponsorName",null,"",val.get("sponsorName"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyOnReview")!=null&&val.get("notifyOnReview").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyOnReview","","",val.get("notifyOnReview"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","notifyOnReview",null,"",val.get("notifyOnReview"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyOnArchive")!=null&&val.get("notifyOnArchive").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyOnArchive","","",val.get("notifyOnArchive"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),authorityValue.getId(),0);
                                             }
                                             if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                                             {
-                                                aConcept.addMetadata("journal","notifyWeekly","","",val.get("notifyWeekly"),authorityValue.getId(),0);
+                                                aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),authorityValue.getId(),0);
                                             }
                                         }
                                     }
@@ -240,58 +244,63 @@ public final class ImportJournal2Authority {
                     aConcept.setLang("en");
                     aConcept.setTopConcept(true);
                     aConcept.setSource("LOCAL-DryadJournal");
+
+                    if(val.get("journalID")!=null&&val.get("journalID").length()>0)
+                    {
+                        aConcept.addMetadata("journal","journalID",null,"",val.get("journalID"),aConcept.getIdentifier(),0);
+                    }
                     if(val.get("fullname")!=null&&val.get("fullname").length()>0)
                     {
-                        aConcept.addMetadata("journal","fullname","","",val.get("fullname"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","fullname",null,"",val.get("fullname"),aConcept.getIdentifier(),0);
                     }
 
                     if(val.get("metadataDir")!=null&&val.get("metadataDir").length()>0)
                     {
-                        aConcept.addMetadata("journal","metadataDir","","",val.get("metadataDir"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","metadataDir",null,"",val.get("metadataDir"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("parsingScheme")!=null&&val.get("parsingScheme").length()>0)
                     {
-                        aConcept.addMetadata("journal","parsingScheme","","",val.get("parsingScheme"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","parsingScheme",null,"",val.get("parsingScheme"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("integrated")!=null&&val.get("integrated").length()>0)
                     {
-                        aConcept.addMetadata("journal","integrated","","",val.get("integrated"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","integrated",null,"",val.get("integrated"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("embargoAllowed")!=null&&val.get("embargoAllowed").length()>0)
                     {
-                        aConcept.addMetadata("journal","embargoAllowed","","",val.get("embargoAllowed"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","embargoAllowed",null,"",val.get("embargoAllowed"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                     {
-                        aConcept.addMetadata("journal","allowReviewWorkflow","","",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
                     {
-                        aConcept.addMetadata("journal","allowReviewWorkflow","","",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                     {
-                        aConcept.addMetadata("journal","publicationBlackout","","",val.get("publicationBlackout"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("subscriptionPaid")!=null&&val.get("subscriptionPaid").length()>0)
                     {
-                        aConcept.addMetadata("journal","subscriptionPaid","","",val.get("subscriptionPaid"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","subscriptionPaid",null,"",val.get("subscriptionPaid"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("sponsorName")!=null&&val.get("sponsorName").length()>0)
                     {
-                        aConcept.addMetadata("journal","sponsorName","","",val.get("sponsorName"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","sponsorName",null,"",val.get("sponsorName"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyOnReview")!=null&&val.get("notifyOnReview").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyOnReview","","",val.get("notifyOnReview"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","notifyOnReview",null,"",val.get("notifyOnReview"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyOnArchive")!=null&&val.get("notifyOnArchive").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyOnArchive","","",val.get("notifyOnArchive"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","notifyOnArchive",null,"",val.get("notifyOnArchive"),aConcept.getIdentifier(),0);
                     }
                     if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                     {
-                        aConcept.addMetadata("journal","notifyWeekly","","",val.get("notifyWeekly"),aConcept.getIdentifier(),0);
+                        aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),aConcept.getIdentifier(),0);
                     }
                     aConcept.update();
 

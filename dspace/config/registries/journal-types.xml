@@ -7,6 +7,11 @@
         <namespace>http://purl.org/dspace/models/journal</namespace>
     </dc-schema>
 
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>journalID</element>
+    </dc-type>
     <dc-type>
         <schema>journal</schema>
         <element>fullname</element>
