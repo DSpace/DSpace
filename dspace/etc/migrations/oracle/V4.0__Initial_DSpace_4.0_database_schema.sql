@@ -473,7 +473,7 @@ CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
 CREATE TABLE WorkflowItem
 (
   workflow_id    INTEGER PRIMARY KEY,
-  item_id        INTEGER REFERENCES Item(item_id) UNIQUE,
+  item_id        INTEGER UNIQUE REFERENCES Item(item_id),
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),

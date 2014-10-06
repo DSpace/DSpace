@@ -126,8 +126,6 @@ public class AbstractUnitTest
             
             // Applies/initializes our mock database by invoking its constructor:
             new MockDatabaseManager();
-            // Now, initialize our Database itself by populating it
-            initializeDB();
             
             // Also initialize these mock classes for general use
             new MockIndexEventConsumer();
@@ -418,89 +416,5 @@ public class AbstractUnitTest
         // Cleanup Context object by setting it to null
         if(c!=null)
            c = null;
-    }
-
-    /**
-      * Create the database tables by running the schema SQL specified
-      * in the 'db.schema.path' system property
-      */
-     private static void initializeDB() throws SQLException
-     {
-        if(!dbInitialized)
-        {    
-            String schemaPath = "";
-            Connection dbConnection = null;
-            try
-            {
-                //preload the contents of the database
-                String s = new String();
-                StringBuilder sb = new StringBuilder();
-
-                schemaPath = System.getProperty("db.schema.path");
-                if (schemaPath == null)
-                    throw new IllegalArgumentException(
-                           "System property db.schema.path must be defined");
-
-                log.debug("Preloading Unit Test database from " + schemaPath);
-
-                FileReader fr = new FileReader(new File(schemaPath));
-                BufferedReader br = new BufferedReader(fr);
-
-                while((s = br.readLine()) != null)
-                {
-                    //we skip white lines and comments
-                    if(!"".equals(s.trim()) && !s.trim().startsWith("--"))
-                    {
-                        sb.append(s);
-                    }
-                }
-                br.close();
-
-                //we use ";" as a delimiter for each request. This assumes no triggers
-                //nor other calls besides CREATE TABLE, CREATE SEQUENCE and INSERT
-                //exist in the file
-                String[] stmts = sb.toString().split(";");
-
-                // Get a new database connection. This also initializes underlying DatabaseManager object
-                dbConnection = DatabaseManager.getConnection();
-                Statement st = dbConnection.createStatement();
-
-                for(int i = 0; i<stmts.length; i++)
-                {
-                    // we ensure that there is no spaces before or after the request string
-                    // in order to not execute empty statements
-                    if(!stmts[i].trim().equals(""))
-                    {
-                        st.executeUpdate(stmts[i]);
-                        log.debug("Loading into database: "+stmts[i]);
-                    }
-                }
-
-                // Commit all DB changes & mark DB as initialized
-                dbConnection.commit();
-                dbInitialized = true;
-            }
-            catch (IOException e)
-            {
-                // Re-throw as a SQL exception... but note that it's a problem with the Schema file
-                throw new SQLException("Unable to create test database from file '" + schemaPath + "'", e);
-            }
-            finally
-            { 
-                if (dbConnection!=null)
-                {   
-                    try
-                    {
-                        // close out our open DB connection
-                        dbConnection.close();
-                    }
-                    catch(SQLException se)
-                    {    
-                        //ignore if we cannot close
-                    }
-                    dbConnection = null;
-                }
-            }
-        }
     }
 }

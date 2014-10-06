@@ -1614,15 +1614,20 @@ public class DatabaseManager
         flyway.setDataSource(dataSource);
         flyway.setEncoding("UTF-8");
     
+        // Migration scripts are based on DBMS Keyword. But, for H2 we use the Oracle scripts
+        String scriptFolder = dbms_keyword;
+        if(dbms_keyword.equals("h2"))
+           scriptFolder = "oracle";
+        
         // Set location where Flyway will load DB scripts from (based on DB Type)
         // e.g. [dspace.dir]/etc/[dbtype]/
         String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
                             System.getProperty("file.separator") + "etc" +
-                            System.getProperty("file.separator") + dbms_keyword;
-        
+                            System.getProperty("file.separator") + "migrations" +
+                            System.getProperty("file.separator") + scriptFolder;
         
         log.info("Loading Flyway DB scripts from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
-        flyway.setLocations("filesystem:" + scriptPath + ",classpath:org.dspace.storage.rdbms.migration");
+        flyway.setLocations("filesystem:" + scriptPath, "classpath:org.dspace.storage.rdbms.migration");
         
         // Get our Database migration status, so we know what to tell Flyway to do
         int status = getDbMigrationStatus(schema, connection, flyway);
@@ -1719,6 +1724,7 @@ public class DatabaseManager
         // IF we get here, we have 4.0 or above compatible database and Flyway is already installed
         return STATUS_FLYWAY;
     }
+    
     /**
      * What is the name of our DBMS?
      *
