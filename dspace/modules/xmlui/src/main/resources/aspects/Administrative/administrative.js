@@ -1440,7 +1440,7 @@ function doEditItemEmbargo(itemID)
 			// Our embargo has been updated.
 			result = FlowItemUtils.processEditEmbargo(getDSContext(),itemID,cocoon.request);
 		}
-        else if (cocoon.request.get("submit_lift_emabrgo"))
+        else if (cocoon.request.get("submit_lift_embargo"))
 		{
 			// Our embargo has been updated.
 			result = FlowItemUtils.processLiftEmbargo(getDSContext(),itemID,cocoon.request);

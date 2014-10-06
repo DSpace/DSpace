@@ -389,6 +389,7 @@
             <class>com.atmire.authority.IndexClient</class>
         </step>
     </command>
+
     <command>
         <name>journal-stats</name>
         <description>Generate statistics by journal</description>
@@ -396,4 +397,14 @@
             <class>org.datadryad.journalstatistics.main.RunStatistics</class>
         </step>
     </command>
+
+    <command>
+        <name>index-authority</name>
+        <description>Indexes all metadata fields that use solr authority</description>
+        <step>
+            <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
+        </step>
+    </command>
+
+
 </commands>

@@ -69,6 +69,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
 	fieldToXMLTagTable.put("journal embargo period", "Journal_Embargo_Period");
 	fieldToXMLTagTable.put("ms dryad id","Manuscript");
 	fieldToXMLTagTable.put("ms reference number","Manuscript");
+        fieldToXMLTagTable.put("publication doi","Publication_DOI");
 	fieldToXMLTagTable.put("ms title","Article_Title");
 	fieldToXMLTagTable.put("ms authors","Authors");
 	fieldToXMLTagTable.put("contact author","Corresponding_Author");

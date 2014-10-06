@@ -21,6 +21,10 @@
                 exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
+    <!-- Note on importing Mirage.xsl dleehr 2014-09-25 -->
+    <!-- Customizations to dri2xhtml tend to reference templates that are only in Mirage. If Mirage isn't imported, then the payment system breaks every time a template is referenced in dri2xhtml that isn't available to Paypal.xsl. Most recently it was addLookupButtonAuthor. -->
+    <!-- There's a selenium test to ensure Paypal.xsl responds, but selenium tests are not working at the moment, so I'm importing Mirage.xsl to prevent this from breaking so easily at the next change. -->
+    <xsl:import href="../Mirage/Mirage.xsl"/>
     <xsl:output indent="yes"/>
     <xsl:template match="dri:document">
         <xsl:apply-templates select="//dri:body"/>

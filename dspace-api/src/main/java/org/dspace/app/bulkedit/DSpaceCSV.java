@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.dspace.authority.AuthorityValue;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -51,6 +52,12 @@ public class DSpaceCSV implements Serializable
     /** The field separator (defaults to comma) */
     protected static String fieldSeparator;
 
+    /** The authority separator (defaults to double colon '::') */
+    protected static String authoritySeparator;
+
+    /** The authority separator in an escaped form for using in regexes */
+    protected static String escapedAuthoritySeparator;
+
     /** The field separator in an escaped form for using in regexs */
     protected static String escapedFieldSeparator;
 
@@ -74,6 +81,33 @@ public class DSpaceCSV implements Serializable
         // Store the exportAll setting
         this.exportAll = exportAll;
     }
+    /**
+     * Set the authority separator for value with authority data.
+     *
+     * Is set in dspace.cfg as bulkedit.authorityseparator
+     *
+     * If not set, defaults to double colon '::'
+     */
+    private void setAuthoritySeparator()
+    {
+        // Get the value separator
+        authoritySeparator = ConfigurationManager.getProperty("bulkedit", "authorityseparator");
+        if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim())))
+        {
+            authoritySeparator = authoritySeparator.trim();
+        }
+        else
+        {
+            authoritySeparator = "::";
+        }
+
+        // Now store the escaped version
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Matcher match = spchars.matcher(authoritySeparator);
+        escapedAuthoritySeparator = match.replaceAll("\\\\$1");
+    }
+
+
 
     /**
      * Create a new instance, reading the lines in from file
@@ -113,6 +147,17 @@ public class DSpaceCSV implements Serializable
                 }
                 else if (!"id".equals(element))
                 {
+
+                    String authorityPrefix = "";
+                    AuthorityValue authorityValueType = MetadataImport.getAuthorityValueType(element);
+                    if (authorityValueType != null) {
+                        String authorityType = authorityValueType.getAuthorityType();
+                        authorityPrefix = element.substring(0, authorityType.length() + 1);
+                        element = element.substring(authorityPrefix.length());
+                    }
+
+
+
                     // Verify that the heading is valid in the metadata registry
                     String[] clean = element.split("\\[");
                     String[] parts = clean[0].split("\\.");
@@ -139,7 +184,7 @@ public class DSpaceCSV implements Serializable
                     }
 
                     // Store the heading
-                    headings.add(element);
+                    headings.add(authorityPrefix + element);
                 }
             }
 
@@ -208,6 +253,8 @@ public class DSpaceCSV implements Serializable
         // Set the field separator
         setFieldSeparator();
 
+
+        setAuthoritySeparator();
         // Create the headings
         headings = new ArrayList<String>();
 

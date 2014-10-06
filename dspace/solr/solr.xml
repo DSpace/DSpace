@@ -22,19 +22,19 @@
   persistent: Save changes made via the API to this file
   sharedLib: path to a lib directory that will be shared across all cores
 -->
-<solr persistent="true">
+<solr persistent="false">
 
   <!--
   adminPath: RequestHandler path to manage cores.  
     If 'null' (or absent), cores will not be manageable via REST
   -->
   <cores adminPath="/admin/cores">
-    <core name="search" instanceDir="search" />
-    <core name="statistics" instanceDir="statistics" />
-    <core name="dryad" instanceDir="dryad/" dataDir="data"/>
-    <core name="authority" instanceDir="authority" />
-    <core name="dataoneMNlog" instanceDir="dataoneMNlog" />
-    <core name="responselogging" instanceDir="responselogging" />
-  </cores>
+      <core name="search" instanceDir="search" />
+      <core name="statistics" instanceDir="statistics" />
+      <core name="dryad" instanceDir="dryad/" dataDir="data"/>
+      <core name="authority" instanceDir="authority" />
+      <core name="dataoneMNlog" instanceDir="dataoneMNlog" />
+      <core name="responselogging" instanceDir="responselogging" />
+</cores>
   
 </solr>
