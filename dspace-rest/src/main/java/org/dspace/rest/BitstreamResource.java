@@ -37,7 +37,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.ResourcePolicy;
@@ -101,7 +100,7 @@ public class BitstreamResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
-            writeStats(Constants.BITSTREAM, dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             bitstream = new Bitstream(dspaceBitstream, expand);
@@ -241,7 +240,7 @@ public class BitstreamResource extends Resource
                     { // To eliminate bitstreams which cause exception, because of
                       // reading under administrator permissions
                         bitstreams.add(new Bitstream(dspaceBitstreams[i], expand));
-                        writeStats(Constants.BITSTREAM, dspaceBitstreams[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                        writeStats(dspaceBitstreams[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                                 xforwarderfor, headers, request);
                     }
                 }
@@ -306,7 +305,7 @@ public class BitstreamResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
-            writeStats(Constants.BITSTREAM, dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
@@ -464,7 +463,7 @@ public class BitstreamResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.BITSTREAM, dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             log.trace("Updating bitstream metadata.");
@@ -595,7 +594,7 @@ public class BitstreamResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.BITSTREAM, dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             log.trace("Creating new bitstream.");
@@ -679,7 +678,7 @@ public class BitstreamResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.DELETE);
 
-            writeStats(Constants.BITSTREAM, dspaceBitstream, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceBitstream, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             log.trace("Deleting bitstream from all bundles.");

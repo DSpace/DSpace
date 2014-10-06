@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
-import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -99,7 +98,7 @@ public class CollectionsResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             collection = new Collection(dspaceCollection, expand, context, limit, offset);
@@ -187,7 +186,7 @@ public class CollectionsResource extends Resource
                     Collection collection = new org.dspace.rest.common.Collection(dspaceCollections[i], null, context, limit,
                             offset);
                     collections.add(collection);
-                    writeStats(Constants.COLLECTION, dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                 }
             }
@@ -260,7 +259,7 @@ public class CollectionsResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             List<Item> items = new ArrayList<Item>();
@@ -273,7 +272,7 @@ public class CollectionsResource extends Resource
                     if (AuthorizeManager.authorizeActionBoolean(context, dspaceItem, org.dspace.core.Constants.READ))
                     {
                         items.add(new Item(dspaceItem, expand, context));
-                        writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
                                 headers, request);
                     }
                 }
@@ -343,7 +342,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             log.trace("Creating item in collection(id=" + collectionId + ").");
@@ -443,7 +442,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             dspaceCollection.setMetadata("name", collection.getName());
@@ -515,7 +514,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             org.dspace.content.Community community = (org.dspace.content.Community) dspaceCollection.getParentObject();
@@ -618,9 +617,9 @@ public class CollectionsResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(Constants.COLLECTION, dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
-            writeStats(Constants.ITEM, item, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(item, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request);
 
             dspaceCollection.removeItem(item);
 
