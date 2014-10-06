@@ -37,7 +37,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.MigrationInfoService;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1614,25 +1613,9 @@ public class DatabaseManager
                             System.getProperty("file.separator") + "etc" +
                             System.getProperty("file.separator") + dbms_keyword;
         
-        //If XMLWorkflow is enabled, then we also need to reference those scripts
-        // TODO: IT IS NOT RECOMMENDED BY FLYWAY TO HAVE OPTIONAL DB SCRIPTS LIKE THIS
-        // THIS IS A HACK. WE NEED TO FULLY INTEGRATE XMLWORKFLOW! (SEE DS-2059)
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
-        {
-            // Also load the XML Workflow scripts from their location:
-            // [dspace.dir]/etc/xmlworkflow/[dbtype]/
-            String xmlWorkflowScripts = ConfigurationManager.getProperty("dspace.dir") +
-                            System.getProperty("file.separator") + "etc" +
-                            System.getProperty("file.separator") + "xmlworkflow" +
-                            System.getProperty("file.separator") + dbms_keyword;
-            log.info("Loading Flyway DB scripts from " + scriptPath + " AND " + xmlWorkflowScripts);
-            flyway.setLocations("filesystem:" + scriptPath, "filesystem:" + xmlWorkflowScripts);
-        }
-        else
-        {
-            log.info("Loading Flyway DB scripts from " + scriptPath);
-            flyway.setLocations("filesystem:" + scriptPath);
-        }
+        
+        log.info("Loading Flyway DB scripts from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
+        flyway.setLocations("filesystem:" + scriptPath + ",classpath:org.dspace.storage.rdbms.migration");
         
         // Check if the necessary Flyway table ("schema_version") exists in this database
         DatabaseMetaData meta = connection.getMetaData();
@@ -1641,23 +1624,35 @@ public class DatabaseManager
         // If Flyway table does NOT exist, then this is the first time running Flyway
         if (!tables.next()) 
         {
-            // What version of DSpace database schema do we have?
-            String schemaVersion = "4.0";
+            // Check to see if this looks like a DSpace 4.0 Schema. 
+            // If so, there should be a "Webapp" database table.
+            ResultSet tables_4_0 = meta.getTables(null, schema, "Webapp", null);
+            if(!tables_4_0.next())
+            {
+                throw new SQLException("CANNOT AUTOUPGRADE DSPACE DATABASE, AS IT DOES NOT LOOK TO BE A VALID DSPACE 4.0 DATABASE. " +
+                        "Please manually upgrade your database to DSpace 4.0 compatibility.");
+            }
             
-            log.info("Initializing Flyway 'schema_version' table to DSpace database schema version " + schemaVersion);
-            
+            // As long as we got here, this is likely a valid DSpace 4.0 Database!
             // Initialize the Flyway database table & set current DSpace version number
             // (NOTE: Flyway will also create the db.schema, if it doesn't exist)
-            flyway.setInitVersion(schemaVersion);
+            flyway.setInitVersion("4.0");
+            flyway.setInitDescription("Initial DSpace 4.0 database schema");
             flyway.init();
         }
         
         // Determine pending Database migrations
         MigrationInfo[] pending = flyway.info().pending();
-
+        
         // Log info about pending migrations
-        if (pending!=null && pending.length>0)  
-            log.info("Pending DSpace database migrations:", MigrationInfoDumper.dumpToAsciiTable(flyway.info().pending()));
+        if (pending!=null && pending.length>0) 
+        {   
+            log.info("Pending DSpace database schema migrations:");
+            for (MigrationInfo info : pending)
+            {
+                log.info("\t" + info.getVersion() + " " + info.getDescription() + " " + info.getType() + " " + info.getState());
+            }
+        }
         else
             log.info("DSpace database schema is up to date.");
 
