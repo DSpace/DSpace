@@ -37,14 +37,15 @@ import org.apache.http.protocol.HttpRequestHandler;
  * @author Nathan Day
  */
 public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
-    
+
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WidgetDisplayBitstreamGeneratorTest.class);
-    
+
     LocalTestServer testServer;
     private final String resourceInputDir = "/input/";
     private final String resourceOutputDir = "/xml/";
     private final String outputFileSuffix = ".xml";
-    
+    private final String dataOneFormat = "DataONE-formatId";
+
     public WidgetDisplayBitstreamGeneratorTest(String testName) {
         super(testName);
     }
@@ -130,7 +131,6 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
             if (generateSuccess) {
                 tempFile.deleteOnExit();
             } else {
-System.out.println("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
                 log.error("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
             }
             assertTrue(generateSuccess);
@@ -151,7 +151,7 @@ System.out.println("Temp file for resource '" + inputPath + "' remains at '" + t
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) {
                 response.setStatusCode(HttpStatus.SC_OK);
-                response.setHeader("DataONE-formatId", r.mimetype);
+                response.setHeader(dataOneFormat, r.mimetype);
                 response.setEntity(body);
             }
         };
