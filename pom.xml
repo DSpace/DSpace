@@ -562,12 +562,12 @@
         <!--
            Builds LNI WAR & Client for DSpace
         -->
+       <!-- Note:- The LNI module is not built by default and is considered deprecated.
+            To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <file>
-                    <exists>dspace-lni/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>dspace-lni</module>
