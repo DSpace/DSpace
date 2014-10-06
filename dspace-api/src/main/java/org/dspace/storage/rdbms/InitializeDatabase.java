@@ -16,10 +16,13 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.storage.rdbms.DatabaseManager;
 import java.util.*;
 import org.apache.commons.lang.StringUtils;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * Command-line executed class for initializing the DSpace database. This should
@@ -47,17 +50,23 @@ public class InitializeDatabase
 
         try
         {
-            if (!DatabaseManager.isOracle())
+            String dbSchema = ConfigurationManager.getProperty("db.schema");
+            if (!DatabaseManager.isOracle() && StringUtils.isBlank(dbSchema) != true)
             {
-                String dbSchema = ConfigurationManager.getProperty("db.schema");
-                if (StringUtils.isBlank(dbSchema) == true) {
-                    dbSchema = "public";
-                }
-
                 Connection connection = DatabaseManager.getConnection();
                 connection.setAutoCommit(true);
-                Statement statement = connection.createStatement();
-                statement.execute("CREATE SCHEMA IF NOT EXISTS ".concat(dbSchema));
+
+                PreparedStatement statement = connection.prepareStatement("select schema_name from information_schema.schemata where schema_name = ?");
+                DatabaseManager.loadParameters(statement, new Object[] { dbSchema });
+
+                ResultSet rs = null;
+                rs = statement.executeQuery();
+                if (!rs.next())
+                {
+                    Statement statement2 = connection.createStatement();
+                    statement2.execute("CREATE SCHEMA ".concat(dbSchema));
+                    statement2.close();
+                }
                 statement.close();
                 connection.close();
             }
