@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 #
 
+# do a check for whether we're in a travis-ci build before setting -o
+# as part of bash strict mode
+if [ "$TRAVIS" == ""  ]; then
+    TRAVIS="";
+fi
+
 #set -x  # verbose bash
 set -euo pipefail # return fail on a failed command, for travis-ci
 
