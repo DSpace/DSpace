@@ -11,6 +11,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  *
@@ -36,6 +37,7 @@ public class Manuscript {
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @XmlElement(name="abstract")
+    @JsonProperty("abstract")
     public String manuscript_abstract;
     public AuthorsList authors;
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
