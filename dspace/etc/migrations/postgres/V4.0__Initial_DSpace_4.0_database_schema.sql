@@ -1,47 +1,11 @@
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
 --
--- database_schema.sql
---
--- Version: $Revision$
---
--- Date:    $Date$
---
--- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
---
--- Redistribution and use in source and binary forms, with or without
--- modification, are permitted provided that the following conditions are
--- met:
---
--- - Redistributions of source code must retain the above copyright
--- notice, this list of conditions and the following disclaimer.
---
--- - Redistributions in binary form must reproduce the above copyright
--- notice, this list of conditions and the following disclaimer in the
--- documentation and/or other materials provided with the distribution.
---
--- - Neither the name of the DSpace Foundation nor the names of its
--- contributors may be used to endorse or promote products derived from
--- this software without specific prior written permission.
---
--- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
--- ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
--- LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
--- A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
--- HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
--- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
--- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
--- OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
--- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
--- TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
--- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
--- DAMAGE.
---
---
---
---
---   DSpace SQL schema
---
---   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov,
---              Richard Jones
+-- http://www.dspace.org/license/
+
+------------------------------------------------------------------
+--   DSpace v4.0 PostgreSQL schema
 --
 --   This file is used as-is to initialize a database. Therefore,
 --   table and view definitions must be ordered correctly.
@@ -56,6 +20,15 @@
 --   an SQL function 'getnextid', which takes a table name as an
 --   argument, will return a safe new ID to use to create a new
 --   row in that table.
+
+-- ===============================================================
+-- WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+--
+-- DO NOT MANUALLY RUN THIS DATABASE MIGRATION. IT WILL BE EXECUTED
+-- AUTOMATICALLY (IF NEEDED) BY "FLYWAY" WHEN YOU STARTUP DSPACE.
+-- http://flywaydb.org/
+-- ===============================================================
+
 
 -------------------------------------------------------
 -- Function for obtaining new IDs.
@@ -146,9 +119,13 @@ CREATE TABLE Bitstream
 (
    bitstream_id            INTEGER PRIMARY KEY,
    bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
+   name                    VARCHAR(256),
    size_bytes              BIGINT,
    checksum                VARCHAR(64),
    checksum_algorithm      VARCHAR(32),
+   description             TEXT,
+   user_format_description TEXT,
+   source                  VARCHAR(256),
    internal_id             VARCHAR(256),
    deleted                 BOOL,
    store_number            INTEGER,
@@ -167,12 +144,16 @@ CREATE TABLE EPerson
   password            VARCHAR(128),
   salt                VARCHAR(32),
   digest_algorithm    VARCHAR(16),
+  firstname           VARCHAR(64),
+  lastname            VARCHAR(64),
   can_log_in          BOOL,
   require_certificate BOOL,
   self_registered     BOOL,
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  netid               VARCHAR(64)
+  phone               VARCHAR(32),
+  netid               VARCHAR(64),
+  language            VARCHAR(64)
 );
 
 -- index by email
@@ -186,7 +167,8 @@ CREATE INDEX eperson_netid_idx ON EPerson(netid);
 -------------------------------------------------------
 CREATE TABLE EPersonGroup
 (
-  eperson_group_id INTEGER PRIMARY KEY
+  eperson_group_id INTEGER PRIMARY KEY,
+  name             VARCHAR(256) UNIQUE
 );
 
 ------------------------------------------------------
@@ -243,8 +225,7 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  -- name: ORIGINAL | THUMBNAIL | TEXT
-  name               VARCHAR(16),
+  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
@@ -303,8 +284,7 @@ CREATE TABLE MetadataFieldRegistry
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
-  resource_id        INTEGER NOT NULL,
-  resource_type_id   INTEGER NOT NULL,
+  item_id            INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
@@ -315,16 +295,18 @@ CREATE TABLE MetadataValue
 
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
-  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.resource_id,
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
     MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value,
     MetadataValue.text_lang, MetadataValue.place
   FROM MetadataValue, MetadataFieldRegistry
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
-  AND MetadataFieldRegistry.metadata_schema_id = 1 AND MetadataValue.resource_type_id = 2;
+  AND MetadataFieldRegistry.metadata_schema_id = 1;
 
 -- An index for item_id - almost all access is based on
 -- instantiating the item object, which grabs all values
 -- related to that item
+CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
+CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
 CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
   
@@ -334,7 +316,12 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
+  name              VARCHAR(128),
+  short_description VARCHAR(512),
+  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
+  copyright_text    TEXT,
+  side_bar_text     TEXT,
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -347,8 +334,15 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
+  name              VARCHAR(128),
+  short_description VARCHAR(512),
+  introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
+  provenance_description  TEXT,
+  license           TEXT,
+  copyright_text    TEXT,
+  side_bar_text     TEXT,
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
@@ -509,10 +503,11 @@ CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
 CREATE TABLE WorkflowItem
 (
   workflow_id    INTEGER PRIMARY KEY,
-  item_id        INTEGER UNIQUE REFERENCES Item(item_id),
+  item_id        INTEGER REFERENCES Item(item_id) UNIQUE,
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
+
   -- Answers to questions on first page of submit UI
   multiple_titles       BOOL,
   published_before      BOOL,
@@ -599,9 +594,9 @@ CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
 -- Community2Item view
 ------------------------------------------------------
 CREATE VIEW Community2Item as
- SELECT Community2Collection.community_id, Collection2Item.item_id
- FROM Community2Collection, Collection2Item
- WHERE Collection2Item.collection_id   = Community2Collection.collection_id
+SELECT Community2Collection.community_id, Collection2Item.item_id
+FROM Community2Collection, Collection2Item
+WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
 
 -------------------------------------------------------------------------
@@ -623,9 +618,8 @@ CREATE TABLE community_item_count (
 --  and administrators
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0);
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'));
-
+INSERT INTO epersongroup VALUES(0, 'Anonymous');
+INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
 
 
 -------------------------------------------------------
@@ -684,61 +678,61 @@ CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 -- possible
 
 insert into checksum_results
- values
+values
 (
     'INVALID_HISTORY',
     'Install of the cheksum checking code do not consider this history as valid'
 );
 
 insert into checksum_results
- values
+values
 (
     'BITSTREAM_NOT_FOUND',
     'The bitstream could not be found'
 );
 
 insert into checksum_results
- values
+values
 (
     'CHECKSUM_MATCH',
     'Current checksum matched previous checksum'
 );
 
 insert into checksum_results
- values
+values
 (
     'CHECKSUM_NO_MATCH',
     'Current checksum does not match previous checksum'
 );
 
 insert into checksum_results
- values
+values
 (
     'CHECKSUM_PREV_NOT_FOUND',
     'Previous checksum was not found: no comparison possible'
 );
 
 insert into checksum_results
- values
+values
 (
     'BITSTREAM_INFO_NOT_FOUND',
     'Bitstream info not found'
 );
 
 insert into checksum_results
- values
+values
 (
     'CHECKSUM_ALGORITHM_INVALID',
     'Invalid checksum algorithm'
 );
 insert into checksum_results
- values
+values
 (
     'BITSTREAM_NOT_PROCESSED',
     'Bitstream marked to_be_processed=false'
 );
 insert into checksum_results
- values
+values
 (
     'BITSTREAM_MARKED_DELETED',
     'Bitstream marked deleted in bitstream table'
@@ -815,7 +809,6 @@ CREATE TABLE requestitem
   allfiles bool,
   request_email varchar(64),
   request_name varchar(64),
-  request_message TEXT,
   request_date timestamp,
   accept_request bool,
   decision_date timestamp,
