@@ -1733,6 +1733,24 @@
                          alt="Deutsche Entomologische Zeitschrift cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Ecological Applications"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.esajournals.org/loi/ecap')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecoApp.png"
+                         alt="Ecological Applications cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Ecological Monographs"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2577,6 +2595,24 @@
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ProceedingsB.png"
                          alt="Proceedings of the Royal Society B cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Royal Society Open Science"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://royalsocietypublishing.org/royal-society-open-science')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/rsos.png"
+                         alt="Royal Society Open Science cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Scientific Data"'>
