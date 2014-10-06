@@ -206,8 +206,14 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
     }
     @Override
     public String loginPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
-        return response.encodeRedirectURL(request.getContextPath()
+        if(ConfigurationManager.getBooleanProperty("authentication-oauth","choice-page")){
+            return response.encodeRedirectURL(request.getContextPath()
                 + "/oauth-login");
+        }
+        else
+        {
+            return null;
+        }
     }
 
     @Override
