@@ -31,7 +31,6 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
@@ -87,7 +86,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             community = new Community(dspaceCommunity, expand, context);
@@ -165,7 +164,7 @@ public class CommunitiesResource extends Resource
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
-                    writeStats(Constants.COMMUNITY, dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                     communities.add(community);
                 }
@@ -249,7 +248,7 @@ public class CommunitiesResource extends Resource
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
-                    writeStats(Constants.COMMUNITY, dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                     communities.add(community);
                 }
@@ -319,7 +318,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -336,7 +335,7 @@ public class CommunitiesResource extends Resource
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
                 {
                     collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
-                    writeStats(Constants.COLLECTION, dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                 }
             }
@@ -407,7 +406,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -424,7 +423,7 @@ public class CommunitiesResource extends Resource
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     communities.add(new Community(dspaceCommunities[i], expand, context));
-                    writeStats(Constants.COMMUNITY, dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                 }
             }
@@ -497,7 +496,7 @@ public class CommunitiesResource extends Resource
             }
 
             org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(null, context);
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             dspaceCommunity.setMetadata("name", community.getName());
@@ -569,7 +568,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             org.dspace.content.Collection dspaceCollection = dspaceCommunity.createCollection();
@@ -653,7 +652,7 @@ public class CommunitiesResource extends Resource
             org.dspace.content.Community dspaceParentCommunity = findCommunity(context, communityId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.COMMUNITY, dspaceParentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceParentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(dspaceParentCommunity, context);
@@ -730,7 +729,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
-            writeStats(Constants.COMMUNITY, dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
 
             // dspaceCommunity.setLogo(arg0); // TODO Add this option.
@@ -797,7 +796,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.DELETE);
-            writeStats(Constants.COMMUNITY, community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             community.delete();
@@ -896,9 +895,9 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(Constants.COMMUNITY, community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers,
                     request);
-            writeStats(Constants.COLLECTION, collection, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(collection, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             community.removeCollection(collection);
@@ -1002,9 +1001,9 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(Constants.COMMUNITY, parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
                     headers, request);
-            writeStats(Constants.COMMUNITY, subcommunity, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(subcommunity, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             parentCommunity.removeSubcommunity(subcommunity);

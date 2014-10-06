@@ -39,7 +39,6 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
@@ -105,7 +104,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
 
             item = new Item(dspaceItem, expand, context);
             context.complete();
@@ -181,7 +180,7 @@ public class ItemsResource extends Resource
                     if (AuthorizeManager.authorizeActionBoolean(context, dspaceItem, org.dspace.core.Constants.READ))
                     {
                         items.add(new Item(dspaceItem, expand, context));
-                        writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
                                 headers, request);
                     }
                 }
@@ -243,7 +242,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
 
             List<MetadataEntry> metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
@@ -304,7 +303,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
 
             List<Bitstream> bitstreams;
             List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
@@ -380,7 +379,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
 
             for (MetadataEntry entry : metadata)
             {
@@ -460,7 +459,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
 
             // Is better to add bitstream to ORIGINAL bundle or to item own?
             log.trace("Creating bitstream in item.");
@@ -626,7 +625,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
 
             log.trace("Deleting original metadata from item.");
             for (MetadataEntry entry : metadata)
@@ -708,7 +707,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request);
 
             log.trace("Deleting item.");
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context,
@@ -777,7 +776,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
@@ -872,8 +871,8 @@ public class ItemsResource extends Resource
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
-            writeStats(Constants.ITEM, item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
-            writeStats(Constants.BITSTREAM, bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers,
                     request);
 
             log.trace("Deleting bitstream...");
@@ -1014,7 +1013,7 @@ public class ItemsResource extends Resource
                 org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("ITEM_ID"),
                         org.dspace.core.Constants.READ);
                 Item item = new Item(dspaceItem, "", context);
-                writeStats(Constants.ITEM, dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
                         request);
                 items.add(item);
             }
