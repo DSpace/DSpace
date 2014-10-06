@@ -83,17 +83,11 @@ public class Resource
             context.abort();
             throw new ContextException("Could not create context, SQLException. Message: " + e, e);
         }
-        finally
-        {
-            context.abort();
-        }
     }
 
     /**
      * It write statistic about using REST api.
-     * 
-     * @param user
-     *            User, which is used by actual context.
+     *
      * @param typeOfObject
      *            Type of which object is performed. From class
      *            org.dspace.core.Constants. For example: bitstream, item and so

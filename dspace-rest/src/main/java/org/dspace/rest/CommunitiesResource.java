@@ -155,7 +155,7 @@ public class CommunitiesResource extends Resource
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
-                log.warn("Pagging was badly set, using default values.");
+                log.warn("Paging was badly set, using default values.");
                 limit = 100;
                 offset = 0;
             }
