@@ -215,7 +215,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         // Fetch original row
         String msid = manuscript.manuscriptId;
         String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-        TableRow existingRow = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+        TableRow existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
 
         // deactivate the existing row
         existingRow.setColumn(COLUMN_ACTIVE, ACTIVE_FALSE);
