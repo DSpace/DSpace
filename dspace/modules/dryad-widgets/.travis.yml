@@ -1,0 +1,8 @@
+language: java
+jdk: openjdk6
+before_install: 
+- ./bin/travis-install-maven.sh
+- export PATH="$TRAVIS_BUILD_DIR/apache-maven-2.2.1/bin:$PATH"
+install: echo "Overriding default travis install"
+script: ./bin/build_test.sh 
+

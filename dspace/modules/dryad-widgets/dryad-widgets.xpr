@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="14.1">
+    <meta>
+        <filters directoryPatterns="" filePatterns="" positiveFilePatterns="" showHiddenFiles="false"/>
+        <options/>
+    </meta>
+    <projectTree name="dryad-widgets.xpr">
+        <folder path="dryad-widgets-api/"/>
+        <folder path="dryad-widgets-webapp/"/>
+        <folder path="dryad-widgets-webapp/src/main/properties/"/>
+        <file name=".travis.yml"/>
+        <file name="pom.xml"/>
+    </projectTree>
+</project>
