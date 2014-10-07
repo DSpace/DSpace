@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.dspace.workflow.ClaimedTask;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -57,12 +58,14 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private String doi;
     private WorkflowItem wfItem;
     private boolean authorized;
+    private boolean currentlyInReview;
     List<Item> dataFiles = new ArrayList<Item>();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
         authorized = false;
+        currentlyInReview = false;
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
@@ -77,6 +80,21 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             authorized = token.equals(reviewerKey);
             if (authorized)
                 request.getSession().setAttribute("reviewerToken", token);
+        }
+
+        // Check if the item is actually in review
+        // taskowner has step_id=reviewStep, action_id=reviewAction, owner_id=submitter's eperson ID
+        try {
+            List<ClaimedTask> tasks = ClaimedTask.findByWorkflowId(context, wfItem.getID());
+            // find a task with reviewStep
+            for(ClaimedTask task : tasks) {
+                if(task.getStepID().equals("reviewStep")) {
+                    currentlyInReview = true;
+                }
+            }
+        } catch (SQLException ex) {
+            log.error("Exception checking for claimed task with reviewStep", ex);
+            return;
         }
     }
 
@@ -114,6 +132,9 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         if (!authorized) {
             throw new AuthorizeException("You are not authorized to review the submission");
+        }
+        if (!currentlyInReview) {
+            throw new AuthorizeException("The submission is not currently in review");
         }
         Request request = ObjectModelHelper.getRequest(objectModel);
 
