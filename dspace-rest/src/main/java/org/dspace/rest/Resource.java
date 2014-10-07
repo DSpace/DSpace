@@ -17,6 +17,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.exceptions.ContextException;
@@ -50,7 +51,7 @@ public class Resource
      * authorization to read form database. And Exception, if there was some
      * problem with creating context.
      * 
-     * @param user
+     * @param person
      *            User which will be logged in context.
      * @return New created context with logged user if user was not null.
      *         Otherwise, without logged user.
@@ -83,21 +84,10 @@ public class Resource
             context.abort();
             throw new ContextException("Could not create context, SQLException. Message: " + e, e);
         }
-        finally
-        {
-            context.abort();
-        }
     }
 
     /**
      * It write statistic about using REST api.
-     * 
-     * @param user
-     *            User, which is used by actual context.
-     * @param typeOfObject
-     *            Type of which object is performed. From class
-     *            org.dspace.core.Constants. For example: bitstream, item and so
-     *            on.
      * @param dspaceObject
      *            Object of DSpace which is performed.
      * @param action
@@ -108,8 +98,8 @@ public class Resource
      * @param headers
      * @param request
      */
-    protected void writeStats(int typeOfObject, org.dspace.content.DSpaceObject dspaceObject, UsageEvent.Action action,
-            String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request)
+    protected void writeStats(DSpaceObject dspaceObject, UsageEvent.Action action,
+                              String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request)
     {
 
         if (!writeStatistics)
@@ -146,11 +136,6 @@ public class Resource
         {
             processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), context);
         }
-        finally
-        {
-            context.abort();
-        }
-
     }
 
     /**
