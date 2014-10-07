@@ -289,7 +289,7 @@ public class BitstreamResource extends Resource
      *             data. Or was problem with database reading. Or was problem
      *             with creating context. Or problem with authorization.
      */
-    @POST
+    @GET
     @Path("/{bitstream_id}/retrieve")
     public javax.ws.rs.core.Response getBitstreamData(@PathParam("bitstream_id") Integer bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
