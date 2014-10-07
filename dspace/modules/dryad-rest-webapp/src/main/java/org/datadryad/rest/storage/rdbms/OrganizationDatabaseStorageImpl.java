@@ -101,16 +101,16 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    private Organization getOrganizationByCode(String code) throws SQLException {
+    private static Organization getOrganizationByCode(Context context, String code) throws SQLException {
         String query = "SELECT * FROM ORGANIZATION WHERE code = ?";
-        TableRow row = DatabaseManager.querySingleTable(getContext(), ORGANIZATION_TABLE, query, code);
+        TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
         return organizationFromTableRow(row);
     }
 
-    private List<Organization> getOrganizations() throws SQLException {
+    private static List<Organization> getOrganizations(Context context) throws SQLException {
         List<Organization> organizations = new ArrayList<Organization>();
         String query = "SELECT * FROM organization";
-        TableRowIterator rows = DatabaseManager.queryTable(getContext(), ORGANIZATION_TABLE, query);
+        TableRowIterator rows = DatabaseManager.queryTable(context, ORGANIZATION_TABLE, query);
         while(rows.hasNext()) {
             TableRow row = rows.next();
             organizations.add(organizationFromTableRow(row));
@@ -118,18 +118,15 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         return organizations;
     }
 
-    private void insertOrganization(Organization organization) throws SQLException {
-        Context context = getContext();
+    private static void insertOrganization(Context context, Organization organization) throws SQLException {
         TableRow row = tableRowFromOrganization(organization);
         if(row != null) {
             DatabaseManager.insert(context, row);
-            completeContext(context);
         }
     }
 
-    private void updateOrganization(Organization organization) throws SQLException {
-        Context context = getContext();
-        Organization originalOrganization = getOrganizationByCode(organization.organizationCode);
+    private static void updateOrganization(Context context, Organization organization) throws SQLException {
+        Organization originalOrganization = getOrganizationByCode(context, organization.organizationCode);
         TableRow row = tableRowFromOrganization(organization);
         row.setColumn(COLUMN_ID, originalOrganization.organizationId);
         if(row != null) {
@@ -138,22 +135,22 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    private void deleteOrganization(Organization organization) throws SQLException {
-        Context context = getContext();
+    private static void deleteOrganization(Context context, Organization organization) throws SQLException {
         if(organization.organizationId == null) {
             throw new SQLException("NULL Column ID");
         }
         TableRow row = tableRowFromOrganization(organization);
         row.setColumn(COLUMN_ID, organization.organizationId);
         DatabaseManager.delete(context, row);
-        completeContext(context);
     }
 
     @Override
     public Boolean objectExists(StoragePath path, Organization organization) throws StorageException {
         try {
+            Context context = getContext();
             String code = organization.organizationCode;
-            Organization databaseOrganization = getOrganizationByCode(code);
+            Organization databaseOrganization = getOrganizationByCode(context, code);
+            completeContext(context);
             return databaseOrganization != null;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding organization", ex);
@@ -163,7 +160,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
         try {
-            organizations.addAll(getOrganizations());
+            Context context = getContext();
+            organizations.addAll(getOrganizations(context));
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception reading organizations", ex);
         }
@@ -172,7 +171,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected void createObject(StoragePath path, Organization organization) throws StorageException {
         try {
-            insertOrganization(organization);
+            Context context = getContext();
+            insertOrganization(context, organization);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving organization", ex);
         }
@@ -182,7 +183,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     protected Organization readObject(StoragePath path) throws StorageException {
         String organizationCode = path.getValuePath().get(0);
         try {
-            Organization organization = getOrganizationByCode(organizationCode);
+            Context context = getContext();
+            Organization organization = getOrganizationByCode(context, organizationCode);
+            completeContext(context);
             return organization;
         } catch (SQLException ex) {
             throw new StorageException("Exception reading organization", ex);
@@ -194,11 +197,13 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         String organizationCode = path.getValuePath().get(0);
 
         try {
-            Organization organization = getOrganizationByCode(organizationCode);
+            Context context = getContext();
+            Organization organization = getOrganizationByCode(context, organizationCode);
             if(organization == null) {
                 throw new StorageException("Organization does not exist");
             }
-            deleteOrganization(organization);
+            deleteOrganization(context, organization);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception deleting organization", ex);
         }
@@ -207,7 +212,9 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected void updateObject(StoragePath path, Organization organization) throws StorageException {
         try {
-            updateOrganization(organization);
+            Context context = getContext();
+            updateOrganization(context, organization);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving organization", ex);
         }
