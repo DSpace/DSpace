@@ -124,11 +124,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private Integer getOrganizationInternalId(String organizationCode) throws SQLException {
+    private static Integer getOrganizationInternalId(Context context, String organizationCode) throws SQLException {
         // Look up organization id from code
         String table = "organization";
         String query = "SELECT * FROM organization where code like ?";
-        TableRow row = DatabaseManager.querySingleTable(getContext(), table, query, organizationCode);
+        TableRow row = DatabaseManager.querySingleTable(context, table, query, organizationCode);
         if(row != null) {
             return row.getIntColumn("organization_id");
         } else {
@@ -136,9 +136,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private Integer getManuscriptInternalId(String msid, Integer organizationId) throws SQLException {
+    private static Integer getManuscriptInternalId(Context context, String msid, Integer organizationId) throws SQLException {
         String query = "SELECT * FROM manuscript where msid like ? and organization_id = ? and active = ?";
-        TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+        TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
         if(row != null) {
             return row.getIntColumn("manuscript_id");
         } else {
@@ -168,26 +168,26 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         newRow.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
     }
 
-    private Manuscript getManuscriptById(String msid, String organizationCode) throws SQLException, IOException {
-        Integer organizationId = getOrganizationInternalId(organizationCode);
+    private static Manuscript getManuscriptById(Context context, String msid, String organizationCode) throws SQLException, IOException {
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
         if(organizationId == NOT_FOUND) {
             return null;
         } else {
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-            TableRow row = DatabaseManager.querySingleTable(getContext(), MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+            TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
             Manuscript manuscript = manuscriptFromTableRow(row);
             return manuscript;
         }
     }
 
-    private List<Manuscript> getManuscripts(String organizationCode) throws SQLException, IOException {
+    private static List<Manuscript> getManuscripts(Context context, String organizationCode) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Integer organizationId = getOrganizationInternalId(organizationCode);
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
         if(organizationId == NOT_FOUND) {
             return manuscripts;
         } else {
             String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ?";
-            TableRowIterator rows = DatabaseManager.queryTable(getContext(), MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 manuscripts.add(manuscriptFromTableRow(row));
@@ -196,9 +196,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private void insertManuscript(Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Context context = getContext();
-        Integer organizationId = getOrganizationInternalId(organizationCode);
+    private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_VERSION, 1);
         row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
@@ -208,10 +207,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private void updateManuscript(Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Context context = getContext();
-        Integer organizationId = getOrganizationInternalId(organizationCode);
-
+    private static void updateManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
         // Fetch original row
         String msid = manuscript.manuscriptId;
         String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
@@ -229,18 +226,16 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private void deleteManuscript(Manuscript manuscript, String organizationCode) throws SQLException, IOException {
-        Context context = getContext();
+    private static void deleteManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
         if(manuscript.manuscriptId == null) {
             throw new SQLException("NULL ID");
         }
-        Integer organizationId = getOrganizationInternalId(organizationCode);
-        Integer manuscriptId = getManuscriptInternalId(manuscript.manuscriptId, organizationId);
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
+        Integer manuscriptId = getManuscriptInternalId(context, manuscript.manuscriptId, organizationId);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
         row.setColumn(COLUMN_ID, manuscriptId);
         row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
         DatabaseManager.delete(context, row);
-        completeContext(context);
     }
 
     @Override
@@ -248,7 +243,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String msid = manuscript.manuscriptId;
         String organizationCode = getOrganizationCode(path);
         try {
-            Manuscript databaseManuscript = getManuscriptById(msid, organizationCode);
+            Context context = getContext();
+            Manuscript databaseManuscript = getManuscriptById(context, msid, organizationCode);
+            completeContext(context);
             return databaseManuscript != null;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscript", ex);
@@ -261,7 +258,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         try {
-            manuscripts.addAll(getManuscripts(organizationCode));
+            Context context = getContext();
+            manuscripts.addAll(getManuscripts(context, organizationCode));
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscripts", ex);
         } catch (IOException ex) {
@@ -273,7 +272,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         try {
-            insertManuscript(manuscript, organizationCode);
+            Context context = getContext();
+            insertManuscript(context, manuscript, organizationCode);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving manuscript", ex);
         } catch (IOException ex) {
@@ -286,7 +287,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String organizationCode = getOrganizationCode(path);
         String manuscriptId = getManuscriptId(path);
         try {
-            return getManuscriptById(manuscriptId, organizationCode);
+            Context context = getContext();
+            Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
+            completeContext(context);
+            return manuscript;
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscript", ex);
         } catch (IOException ex) {
@@ -299,11 +303,13 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String organizationCode = getOrganizationCode(path);
         String manuscriptId = getManuscriptId(path);
         try {
-            Manuscript manuscript = getManuscriptById(manuscriptId, organizationCode);
+            Context context = getContext();
+            Manuscript manuscript = getManuscriptById(context, manuscriptId, organizationCode);
             if(manuscript == null) {
                 throw new StorageException("Manuscript does not exist");
             }
-            deleteManuscript(manuscript, organizationCode);
+            deleteManuscript(context, manuscript, organizationCode);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception deleting manuscript", ex);
         } catch (IOException ex) {
@@ -320,7 +326,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
 
         try {
-            updateManuscript(manuscript, organizationCode);
+            Context context = getContext();
+            updateManuscript(context, manuscript, organizationCode);
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving manuscript", ex);
         } catch (IOException ex) {
