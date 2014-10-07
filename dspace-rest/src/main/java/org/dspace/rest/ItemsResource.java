@@ -1095,10 +1095,6 @@ public class ItemsResource extends Resource
         {
             processException("Something get wrong while finding item(id=" + id + "). SQLException, Message: " + e, context);
         }
-        finally
-        {
-            context.abort();
-        }
         return item;
     }
 }

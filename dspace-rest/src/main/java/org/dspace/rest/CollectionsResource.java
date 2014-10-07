@@ -776,10 +776,6 @@ public class CollectionsResource extends Resource
         {
             processException("Something get wrong while finding collection(id=" + id + "). SQLException, Message: " + e, context);
         }
-        finally
-        {
-            context.abort();
-        }
         return collection;
     }
 }

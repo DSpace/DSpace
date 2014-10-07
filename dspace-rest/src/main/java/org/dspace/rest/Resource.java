@@ -136,11 +136,6 @@ public class Resource
         {
             processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), context);
         }
-        finally
-        {
-            context.abort();
-        }
-
     }
 
     /**

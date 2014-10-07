@@ -850,10 +850,6 @@ public class BitstreamResource extends Resource
         {
             processException("Something get wrong while finding bitstream. SQLException, Message:" + e, context);
         }
-        finally
-        {
-            context.abort();
-        }
         return bitstream;
     }
 }
