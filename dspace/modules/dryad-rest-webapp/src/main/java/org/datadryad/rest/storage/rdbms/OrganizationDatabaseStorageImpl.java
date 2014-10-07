@@ -131,7 +131,6 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         row.setColumn(COLUMN_ID, originalOrganization.organizationId);
         if(row != null) {
             DatabaseManager.update(context, row);
-            completeContext(context);
         }
     }
 

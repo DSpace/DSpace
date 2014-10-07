@@ -203,7 +203,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         row.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
         if(row != null) {
             DatabaseManager.insert(context, row);
-            completeContext(context);
         }
     }
 
@@ -222,7 +221,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             updateTableRow(existingRow, newRow);
             DatabaseManager.update(context, existingRow); // Deactivates old version
             DatabaseManager.insert(context, newRow);
-            completeContext(context);
         }
     }
 
