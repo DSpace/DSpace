@@ -1089,10 +1089,6 @@ public class CommunitiesResource extends Resource
         {
             processException("Something get wrong while finding community(id=" + id + "). SQLException, Message:" + e, context);
         }
-        finally
-        {
-            context.abort();
-        }
         return community;
     }
 }
