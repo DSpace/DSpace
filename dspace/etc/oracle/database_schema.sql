@@ -134,7 +134,8 @@ CREATE TABLE EPerson
   require_certificate NUMBER(1),
   self_registered     NUMBER(1),
   last_active         TIMESTAMP,
-  sub_frequency       INTEGER
+  sub_frequency       INTEGER,
+  netid               VARCHAR2(64) UNIQUE
 );
 
 -------------------------------------------------------
