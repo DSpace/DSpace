@@ -498,8 +498,7 @@ public class EPerson extends DSpaceObject
             t = "language";
             break;
         case NETID:
-            s = "m_text_value";
-            t = "netid";
+            s = "e.netid";
             break;
 
         default:
@@ -510,7 +509,7 @@ public class EPerson extends DSpaceObject
         // NOTE: The use of 's' in the order by clause can not cause an SQL
         // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY ?",s);
-        if(t!="") {
+        if(!t.equals("")) {
             rows = DatabaseManager.query(context,
                     "SELECT * FROM eperson e " +
                             "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
@@ -719,7 +718,7 @@ public class EPerson extends DSpaceObject
      */
     public String getNetid()
     {
-        return getMetadataFirstValue("eperson", "netid", null, Item.ANY);
+        return myRow.getStringColumn("netid");
     }
 
     /**
@@ -729,7 +728,7 @@ public class EPerson extends DSpaceObject
      *            the new netid
      */
     public void setNetid(String s) {
-        setMetadataSingleValue("eperson", "netid", null, null, s);
+        myRow.setColumn("netid", s);
         modified = true;
     }
 

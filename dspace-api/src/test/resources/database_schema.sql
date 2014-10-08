@@ -175,7 +175,8 @@ CREATE TABLE EPerson
   require_certificate BOOL,
   self_registered     BOOL,
   last_active         TIMESTAMP,
-  sub_frequency       INTEGER
+  sub_frequency       INTEGER,
+  netid               VARCHAR(64)
 );
 
 -- index by email
