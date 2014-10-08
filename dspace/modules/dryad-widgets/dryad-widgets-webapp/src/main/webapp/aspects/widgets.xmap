@@ -75,7 +75,7 @@
                 <!-- <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}"/> -->
                 <map:generate type="file" src="http://datadryad.org/mn/object/{1}"/>
 
-                <map:transform type="xslt" src="../../static/xsl/widgets/display/dataFileLoader.xsl">
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileLoader.xsl">
 
                     <!-- cocoon-mapped values: url's for resources -->
                     <map:parameter name="ddwcss"        value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
@@ -94,7 +94,7 @@
                 <map:select type="exception">
                     <map:when test="400">
                         <map:generate type="exception"/>
-                        <map:transform src="../../static/xsl/widgets/display/dataFileLoader.xsl"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
                         <map:transform type="i18n">
                             <map:parameter name="locale" value="{locale}"/>
                         </map:transform>
@@ -144,7 +144,7 @@
                     -->
                 </map:aggregate>
                 <!-- -->
-                <map:transform type="xslt" src="../../static/xsl/widgets/display/dataFileFrame.xsl">
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileFrame.xsl">
                     <map:parameter name="bitstream-url"     value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/v1/display/{url-encode:{1}}/bitstream?referrer={request-param:referrer}"/>
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
@@ -173,7 +173,7 @@
                 <map:select type="exception">
                     <map:when test="400">
                         <map:generate type="exception"/>
-                        <map:transform src="../../static/xsl/widgets/display/dataFileFrameException.xsl"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileFrameException.xsl"/>
                         <map:transform type="i18n">
                                 <map:parameter name="locale" value="{locale}"/>
                         </map:transform>
@@ -212,7 +212,7 @@
 
                 </map:generate>
 
-                <map:transform type="xslt" src="../../static/xsl/widgets/display/dataFileBitstream.xsl">
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileBitstream.xsl">
                     <map:parameter name="doi" value="{1}"/>
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
@@ -229,7 +229,7 @@
                 <map:select type="exception">
                     <map:when test="400">
                         <map:generate type="exception"/>
-                        <map:transform src="../../static/html/widgets/display/bitstreamException.xsl"/>
+                        <map:transform src="../static/html/widgets/display/bitstreamException.xsl"/>
                         <map:serialize type="html" status-code="200"/>
                     </map:when>
                 </map:select>
