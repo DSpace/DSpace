@@ -276,19 +276,6 @@ alter table epersongroup drop column name;
 -- eperson
 -- ---------
 
-
-
-INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
-SELECT
-metadatavalue_seq.nextval as metadata_value_id,
-eperson_id AS resource_id,
-7 AS resource_type_id,
-(select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'email' and qualifier is null) AS metadata_field_id,
-email AS text_value,
-null AS text_lang,
-0 AS place
-FROM eperson where not email is null;
-
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
 metadatavalue_seq.nextval as metadata_value_id,
