@@ -171,14 +171,15 @@ CREATE TABLE EPerson
   require_certificate BOOL,
   self_registered     BOOL,
   last_active         TIMESTAMP,
-  sub_frequency       INTEGER
+  sub_frequency       INTEGER,
+  netid               VARCHAR(64)
 );
 
 -- index by email
 CREATE INDEX eperson_email_idx ON EPerson(email);
 
 -- index by netid
---CREATE INDEX eperson_netid_idx ON EPerson(netid);
+CREATE INDEX eperson_netid_idx ON EPerson(netid);
 
 -------------------------------------------------------
 -- EPersonGroup table

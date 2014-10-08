@@ -34,12 +34,6 @@
 
     <dc-type>
         <schema>eperson</schema>
-        <element>netid</element>
-        <scope_note>Metadata field used for the net id</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>eperson</schema>
         <element>language</element>
         <scope_note>Metadata field used for the language</scope_note>
     </dc-type>
