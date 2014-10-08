@@ -15,12 +15,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.core.ConfigurationManager;
-import java.util.*;
-import org.apache.commons.lang.StringUtils;
-import java.sql.Connection;
-import java.sql.Statement;
-
 /**
  * Command-line executed class for initializing the DSpace database. This should
  * be invoked with a single argument, the filename of the database schema file.
@@ -47,21 +41,6 @@ public class InitializeDatabase
 
         try
         {
-            if (!DatabaseManager.isOracle())
-            {
-                String dbSchema = ConfigurationManager.getProperty("db.schema");
-                if (StringUtils.isBlank(dbSchema) == true) {
-                    dbSchema = "public";
-                }
-
-                Connection connection = DatabaseManager.getConnection();
-                connection.setAutoCommit(true);
-                Statement statement = connection.createStatement();
-                statement.execute("CREATE SCHEMA IF NOT EXISTS ".concat(dbSchema));
-                statement.close();
-                connection.close();
-            }
-
             if("clean-database.sql".equals(argv[0]))
             {
                DatabaseManager.loadSql(getScript(argv[0]));
