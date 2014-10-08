@@ -38,6 +38,7 @@
         <module>journal-submit</module>
         <module>versioning</module>
         <module>payment-system</module>
+        <module>dryad-widgets</module>
 
         <!--module>solr-load-tester</module-->
 	</modules>
