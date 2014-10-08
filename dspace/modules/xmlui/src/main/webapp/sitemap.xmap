@@ -387,9 +387,13 @@
                         </map:match>
 
                         <!-- Dryad widgets -->
+                        <map:match pattern="widgets/v1/**">
+                            <map:mount check-reload="no" src="aspects/widgets.xmap" uri-prefix="widgets/v1/"/>
+                        </map:match>
                         <map:match pattern="widgets/**">
                             <map:mount check-reload="no" src="aspects/widgets.xmap" uri-prefix="widgets/"/>
                         </map:match>
+
                 </map:pipeline>
                 
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
