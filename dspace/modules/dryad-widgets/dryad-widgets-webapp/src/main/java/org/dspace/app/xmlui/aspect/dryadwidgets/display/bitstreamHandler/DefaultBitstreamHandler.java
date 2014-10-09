@@ -6,8 +6,6 @@
 
 package org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler;
 
-import java.util.Map;
-import org.apache.cocoon.environment.SourceResolver;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
@@ -17,10 +15,8 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Nathan Day
  */
 public class DefaultBitstreamHandler extends BaseBitstreamHandler {
-    public DefaultBitstreamHandler(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver, Map objectModel) 
-            throws SAXException 
-    {
-        super(url, format, contentHandler, lexicalHandler, resolver, objectModel);
+    public DefaultBitstreamHandler(ContentHandler contentHandler, LexicalHandler lexicalHandler) {
+        super(contentHandler, lexicalHandler);
     }
     public void generate() {
         // do nothing

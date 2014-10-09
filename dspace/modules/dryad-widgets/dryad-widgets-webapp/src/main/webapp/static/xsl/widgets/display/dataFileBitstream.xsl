@@ -16,6 +16,9 @@
     <xsl:preserve-space elements="script"/>
     
     <xsl:variable name="mime-type" select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.format']"/>
+    <xsl:variable name="extent"    select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.extent']"/>
+    <xsl:variable name="source"    select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.source']"/>
+    
     <xsl:param name="doi"/>
     <xsl:param name="object-url"/> <!-- DataOne-MN url for bitstream -->
     
@@ -27,6 +30,8 @@
         <ddw:template mime-type="text/csv"            >text-csv</ddw:template>
         <ddw:template mime-type="application/pdf"     >application-pdf</ddw:template>
         <ddw:template mime-type="application/x-python">code</ddw:template>
+        <ddw:template mime-type="image/png"           >image-native</ddw:template>
+        <ddw:template mime-type="image/jpeg"          >image-native</ddw:template>
     </ddw:templates>
     
     <xsl:template match="/">
@@ -41,6 +46,7 @@
                     <xsl:when test="$template-name = 'text-csv'"        ><xsl:call-template name="text-csv"          /></xsl:when>
                     <xsl:when test="$template-name = 'application-pdf'" ><xsl:call-template name="application-pdf"   /></xsl:when>
                     <xsl:when test="$template-name = 'code'"            ><xsl:call-template name="code"              /></xsl:when>
+                    <xsl:when test="$template-name = 'image-native'"    ><xsl:call-template name="image-native"      /></xsl:when>
                     <xsl:otherwise>
                         <xsl:message terminate="yes">Misconfigured lookup or missing named template.</xsl:message>
                     </xsl:otherwise>
@@ -177,6 +183,17 @@ $(document).ready(function() {
 });
 ]]>
                 </script>
+            </body>
+        </html>
+    </xsl:template>
+    
+    <xsl:template name="image-native">
+        <html>
+            <head>
+                
+            </head>
+            <body>
+                <img src="{$source}" alt="Image for {$doi}"/>
             </body>
         </html>
     </xsl:template>

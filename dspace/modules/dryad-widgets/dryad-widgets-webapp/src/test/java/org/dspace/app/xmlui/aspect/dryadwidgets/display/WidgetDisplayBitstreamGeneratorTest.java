@@ -5,14 +5,22 @@
  */
 package org.dspace.app.xmlui.aspect.dryadwidgets.display;
 
+import com.google.common.io.Files;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 import junit.framework.TestCase;
@@ -113,7 +121,7 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
             Parameters parameters = new Parameters();
             parameters.setParameter("referrer","");
             parameters.setParameter("doi",r.doi);
-            parameters.setParameter("object-url", url);
+            parameters.setParameter("bitstream", url);
             WidgetDisplayBitstreamGenerator instance = new WidgetDisplayBitstreamGenerator();
             instance.setup(sourceResolver, objectModel, url, parameters);
 
@@ -124,14 +132,18 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
             instance.setConsumer(consumer);
             instance.generate();
             tempFS.close();
-            
+
+            // doctor the output a bit, since the local test server's port changes
+            removeMatchingString(tempFile.getAbsolutePath(), "http://" + testServer.getServiceHostName() + ":" + testServer.getServicePort());
+           
             // check files are equal
-            boolean generateSuccess = FileUtils.contentEquals(new File(outputPath), tempFile);
+            boolean generateSuccess = FileUtils.contentEquals(new File(outputPath), new File(tempFile.getAbsolutePath()));
             // do tmp file cleanup if we had a successful run
             if (generateSuccess) {
                 tempFile.deleteOnExit();
             } else {
                 log.error("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
+System.out.println("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
             }
             assertTrue(generateSuccess);
 
@@ -141,6 +153,30 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
         }
     }
 
+    // remove a 
+    private void removeMatchingString(String path, String str) throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String temp = path + ".tmp";
+        FileWriter fw = new FileWriter(temp);
+        String line = null;
+        Pattern p = Pattern.compile(Pattern.quote(str));
+        Matcher m;
+        Boolean matched = false;
+        while ((line = br.readLine()) != null) {
+            if (!matched) {
+                m = p.matcher(line);
+                if (m.find()) {
+                    line = m.replaceFirst("");
+                    matched = true;
+                }
+            }
+            fw.write(line + "\n");
+        }
+        br.close();
+        fw.close();
+        Files.move(new File(temp), new File(path));
+    }
+    
     private HttpRequestHandler makeRequestHandler(final GeneratorTestResource r, final String resourcePath) {
         final URL url = this.getClass().getResource(resourcePath);
         final FileEntity body = new FileEntity(new File(url.getFile()), r.mimetype);

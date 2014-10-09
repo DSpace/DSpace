@@ -26,11 +26,11 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Nathan Day
  */
 public class CSV extends BaseBitstreamHandler {
-    public CSV(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver, Map objectModel) 
-            throws SAXException 
-    {
-        super(url, format, contentHandler, lexicalHandler, resolver, objectModel);
+
+    public CSV(ContentHandler contentHandler, LexicalHandler lexicalHandler) {
+        super(contentHandler, lexicalHandler);
     }
+
     /**
      * Generate a plain text data section, wrapped in <!CDATA[]]>.
      * @throws SAXException
@@ -47,12 +47,11 @@ public class CSV extends BaseBitstreamHandler {
             params.setParameter("separator", "");
             params.setParameter("escape", "");
             params.setParameter("buffer-size", "");
+            params.setParameter("max-records", "");
         */
-// TODO: configure cutoff through properties file
-        params.setParameter("max-records", "100");
         BitstreamXMLConsumer consumer = new BitstreamXMLConsumer(contentHandler, lexicalHandler);
         try {
-            csv.setup(sourceResolver, objectModel, url, params);
+            csv.setup(resolver, objectModel, source, parameters);
             csv.setConsumer(consumer);
             csv.generate();
         } catch (IOException e) {

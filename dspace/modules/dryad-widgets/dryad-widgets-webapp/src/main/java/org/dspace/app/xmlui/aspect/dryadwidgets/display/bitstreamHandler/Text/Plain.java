@@ -23,11 +23,11 @@ import org.xml.sax.ext.LexicalHandler;
  * @author Nathan Day
  */
 public class Plain extends BaseBitstreamHandler {
-    public Plain(String url, String format, ContentHandler contentHandler, LexicalHandler lexicalHandler, SourceResolver resolver, Map objectModel) 
-        throws SAXException 
-    {
-        super(url, format, contentHandler, lexicalHandler, resolver, objectModel);
+
+    public Plain(ContentHandler contentHandler, LexicalHandler lexicalHandler) {
+        super(contentHandler, lexicalHandler);
     }
+    
     /**
      * Generate a plain text data section, wrapped in <!CDATA[]]>.
      * @throws SAXException
@@ -42,7 +42,7 @@ public class Plain extends BaseBitstreamHandler {
         */
         BitstreamXMLConsumer consumer = new BitstreamXMLConsumer(contentHandler, lexicalHandler);
         try {
-            text.setup(sourceResolver, objectModel, url, params);
+            text.setup(resolver, objectModel, source, params);
             text.setConsumer(consumer);
             text.generate();
         } catch (Exception e) {
