@@ -71,16 +71,21 @@ public class ReportWriter
      */
     protected OutputStreamWriter outputStreamWriter;
 
+    /**
+    * verbosity level
+    */
+    protected int verbosityLevel;
 
     /**
      * Main Constructor.
      * @param osw
      *      destination for report output; should not be null
      */
-    public ReportWriter(OutputStreamWriter osw)
+    public ReportWriter(OutputStreamWriter osw, int vLevel)
     {
         assert( osw != null);
         outputStreamWriter = osw;
+        verbosityLevel = vLevel;
     }
 
     /**

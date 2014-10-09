@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.mail.MessagingException;
@@ -24,7 +25,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Email;
+import org.dspace.core.Context;
 
 /**
  * <p>
@@ -165,6 +166,8 @@ public class DailyReportEmailer
         options.addOption("T", "TSV", false, "Generate tsv formatted output");
         options.addOption("A", "ASCII", false, "Generate ASCII text output  (default)");
 
+        options.addOption("V", "verbose", false, "Chatty data output");
+
 
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
@@ -261,15 +264,18 @@ public class DailyReportEmailer
 
             // create a new simple reporter that uses writer for output
             ReportWriter rw = null;
+            int verbose = line.hasOption('V') ? 1 : 0;
             if (line.hasOption('T')) {
-                rw = new TSVReportWriter(writer);
+                rw = new TSVReportWriter(writer, verbose);
             }
             else
             {
-                // default
-                rw = new ReportWriter(writer);
+                // default ASCII text writer
+                rw = new ReportWriter(writer, verbose);
             }
-            SimpleReporter reporter = new SimpleReporter(rw);
+            Context ctxt = new Context();
+
+            SimpleReporter reporter = new SimpleReporter(rw, ctxt);
 
             // generate report/s
             Boolean all = (line.hasOption("a")) ||
@@ -320,6 +326,10 @@ public class DailyReportEmailer
             log.fatal(e);
         }
         catch (IOException e)
+        {
+            log.fatal(e);
+        }
+        catch (SQLException e)
         {
             log.fatal(e);
         }

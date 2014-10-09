@@ -9,8 +9,9 @@ import java.util.List;
  * @author Monika Mevenkamp
  */
 public class TSVReportWriter extends ReportWriter {
-    public TSVReportWriter(OutputStreamWriter writer) {
-        super(writer);
+
+    public TSVReportWriter(OutputStreamWriter writer, int vLevel) {
+        super(writer, vLevel);
     }
 
     /**
