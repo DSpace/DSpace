@@ -180,6 +180,15 @@ PDFJS.getDocument(url).then(function(pdf) {
                             <xsl:with-param name="colmax" select="$colmax"/>
                         </xsl:call-template>
                     </tbody>
+                    <!-- 
+                        TODO: coordinate this using properties/config with the
+                              text/csv generator
+                    -->
+                    <xsl:if test="//csv:record[position()=last()]/@number &gt;= 100">
+                        <tfoot>
+                            <p>Please download the file to see data from additional rows.</p>
+                        </tfoot>
+                    </xsl:if>
                 </table>
                 <script type="text/javascript">
 <![CDATA[
