@@ -143,7 +143,6 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
                 tempFile.deleteOnExit();
             } else {
                 log.error("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
-System.out.println("Temp file for resource '" + inputPath + "' remains at '" + tempFile.getAbsolutePath() + "'");
             }
             assertTrue(generateSuccess);
 
