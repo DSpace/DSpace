@@ -87,15 +87,32 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 				throw new IllegalArgumentException("File listed in contents is missing: " + ce.filename);
 			}
 		}
-						
+		int bitstream_bundles_updated = 0;
+		
 		//now okay to add
 		for (ContentsEntry ce : contents)
 		{        				
-			addBitstream(context, itarch, item, dir, ce, suppressUndo, isTest);
+			String targetBundleName = addBitstream(context, itarch, item, dir, ce, suppressUndo, isTest);
+			if (!targetBundleName.equals("")
+			    && !targetBundleName.equals("THUMBNAIL")
+			    && !targetBundleName.equals("TEXT"))
+			{
+				bitstream_bundles_updated++;
+			}
 		}
+
+	        if (alterProvenance && bitstream_bundles_updated > 0)
+	        {
+	        	DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
+	        
+	        	String append = ". Added " + Integer.toString(bitstream_bundles_updated)
+	        	                + " bitstream(s) on " + DCDate.getCurrent() + " : "
+	        	                + InstallItem.getBitstreamProvenanceMessage(item);
+	        	MetadataUtilities.appendMetadata(item, dtom, false, append);
+	        }
 	}
 		
-	private void addBitstream(Context context, ItemArchive itarch, Item item, File dir, 
+	private String addBitstream(Context context, ItemArchive itarch, Item item, File dir, 
 			                  ContentsEntry ce, boolean suppressUndo, boolean isTest)
 	throws IOException, IllegalArgumentException, SQLException, AuthorizeException, ParseException
 	{
@@ -180,24 +197,16 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 				}
 	        }
 	        
-	        if (alterProvenance && !targetBundle.getName().equals("THUMBNAIL") 
-	        		&& !targetBundle.getName().equals("TEXT"))
-	        {
-	        	DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
-	        	
-	        	String append = "Bitstream added on " + DCDate.getCurrent() + " : " 
-	        	                + InstallItem.getBitstreamProvenanceMessage(item);
-	        	MetadataUtilities.appendMetadata(item, dtom, false, append);
-	        }
-	        
-	        //update after all changes are applied, even metadata ones
+	        //update after all changes are applied
 	        bs.update();
         
 	        if (!suppressUndo)
 	        {
 	        	itarch.addUndoDeleteContents(bs.getID());
 	        }
+		return targetBundle.getName();
         }
+	return "";
     }
 
 }
