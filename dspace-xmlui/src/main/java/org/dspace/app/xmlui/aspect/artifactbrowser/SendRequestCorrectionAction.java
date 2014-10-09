@@ -29,7 +29,7 @@ import org.dspace.eperson.EPerson;
  * @author Adán Román Ruiz at arvo.es
  */
 
-public class SendSolicitarCorreccionAction extends AbstractAction
+public class SendRequestCorrectionAction extends AbstractAction
 {
 
     /**
@@ -80,12 +80,12 @@ public class SendSolicitarCorreccionAction extends AbstractAction
         }
 
         // All data is there, send the email
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "solicitarCorreccion"));
-        email.addRecipient(ConfigurationManager.getProperty("solicitarCorreccion.recipient"));
+        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "requestCorrection"));
+        email.addRecipient(ConfigurationManager.getProperty("requestCorrection.recipient"));
 
         email.addArgument(new Date()); // Date
         email.addArgument(eperson);    // Logged in as
-        email.addArgument(page.replace("/solicitarCorreccion/", "/handle/"));       // Referring page
+        email.addArgument(page.replace("/requestCorrection/", "/handle/"));       // Referring page
         email.addArgument(agent);      // User agent
         email.addArgument(session);    // Session ID
         email.addArgument(comments);   // The feedback itself

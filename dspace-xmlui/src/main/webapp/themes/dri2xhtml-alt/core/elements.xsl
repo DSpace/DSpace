@@ -684,10 +684,10 @@
 					<xsl:attribute name="href">
 						<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
 						<xsl:value-of select="substring-before(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'],'handle/')"/>
-						<xsl:text>/solicitarCorreccion/</xsl:text>
+						<xsl:text>/requestCorrection/</xsl:text>
 						<xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'],'handle/')"/>
 					</xsl:attribute>
-					<i18n:text>xmlui.ArtifactBrowser.SolicitarCorreccionForm.link</i18n:text>
+					<i18n:text>xmlui.ArtifactBrowser.RequestCorrectionForm.link</i18n:text>
 				</a>
 			</p>
 		</xsl:if>

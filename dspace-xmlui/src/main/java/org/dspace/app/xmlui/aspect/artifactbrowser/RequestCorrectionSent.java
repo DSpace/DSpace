@@ -30,23 +30,23 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Adán Román Ruiz at arvo.es
  */
-public class SolicitarCorreccionSent extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class RequestCorrectionSent extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** language strings */
     public static final Message T_title =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionSent.title");
+        message("xmlui.ArtifactBrowser.RequestCorrectionSent.title");
     
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
     public static final Message T_trail = 
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionSent.trail");
+        message("xmlui.ArtifactBrowser.RequestCorrectionSent.trail");
     
     public static final Message T_head =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionSent.head");
+        message("xmlui.ArtifactBrowser.RequestCorrectionSent.head");
     
     public static final Message T_para1 = 
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionSent.para1");
+        message("xmlui.ArtifactBrowser.RequestCorrectionSent.para1");
     
     
     /**
@@ -80,7 +80,7 @@ public class SolicitarCorreccionSent extends AbstractDSpaceTransformer implement
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        Division feedback = body.addDivision("solicitarCorreccion-sent","primary");
+        Division feedback = body.addDivision("requestCorrection-sent","primary");
      
         feedback.setHead(T_head);
         

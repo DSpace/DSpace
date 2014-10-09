@@ -33,35 +33,35 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Adán Román Ruiz at arvo.es
  */
-public class SolicitarCorreccionForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class RequestCorrectionForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** Language Strings */
     private static final Message T_title =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.title");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.title");
     
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
     private static final Message T_trail =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.trail");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.trail");
     
     private static final Message T_head = 
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.head");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.head");
     
     private static final Message T_para1 =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.para1");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.para1");
     
     private static final Message T_email =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.email");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.email");
 
     private static final Message T_email_help =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.email_help");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.email_help");
     
     private static final Message T_comments = 
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.comments");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.comments");
     
     private static final Message T_submit =
-        message("xmlui.ArtifactBrowser.SolicitarCorreccionForm.submit");
+        message("xmlui.ArtifactBrowser.RequestCorrectionForm.submit");
     
     /**
      * Generate the unique caching key.
@@ -99,8 +99,8 @@ public class SolicitarCorreccionForm extends AbstractDSpaceTransformer implement
             UIException, SQLException, IOException, AuthorizeException
     {
         // Build the item viewer division.
-        Division feedback = body.addInteractiveDivision("solicitarCorreccion-form",
-                contextPath+"/solicitarCorreccion/"+parameters.getParameter("handle","unknown"),Division.METHOD_POST,"primary");
+        Division feedback = body.addInteractiveDivision("RequestCorrection-form",
+                contextPath+"/requestCorrection/"+parameters.getParameter("handle","unknown"),Division.METHOD_POST,"primary");
         
         feedback.setHead(T_head);
         

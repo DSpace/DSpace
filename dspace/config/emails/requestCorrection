@@ -1,0 +1,27 @@
+# E-mail sent with the information filled out in a solicitar correcicon form.
+#
+# Parameters: {0} current date
+#             {1} email address that the user provided
+#             {2} logged in as
+#             {3} page that the user was on when they selected feedback
+#             {4} User-Agent HTTP Header
+#             {5} Session Id
+#             {6} The user's comments
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Request for correction
+
+Date: {0}
+
+registered as: {1}
+
+Refered page: {2}
+
+Error detected:
+   
+{5}
+
+
+
+
