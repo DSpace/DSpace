@@ -20,7 +20,7 @@
     <xsl:variable name="source"    select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.source']"/>
     
     <xsl:param name="doi"/>
-    <xsl:param name="object-url"/> <!-- DataOne-MN url for bitstream -->
+    <xsl:param name="bitstream"/> <!-- DataOne-MN url for bitstream -->
     
     <!-- 
         Lookup table for template to call for handling input based on mime-type
@@ -88,7 +88,7 @@
                 <script src="http://mozilla.github.io/pdf.js/build/pdf.js"></script>
                 <script><![CDATA[
 'use strict';]]>
-var url = '<xsl:value-of select="$object-url"/>';<![CDATA[
+var url = '<xsl:value-of select="$bitstream"/>';<![CDATA[
 PDFJS.getDocument(url).then(function(pdf) {
   pdf.getPage(1).then(function(page) {
     var scale = 1.5;
