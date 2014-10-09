@@ -168,7 +168,6 @@ public class DailyReportEmailer
                 .addOption("n", "Not Processed", false,
                         "Send E-mail report for all bitstreams set to longer be processed for today");
 
-        options.addOption("p", "prune", false, "Prune configuration file");
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
                 .hasArgs(1)
