@@ -47,8 +47,10 @@ public class CSV extends BaseBitstreamHandler {
             params.setParameter("separator", "");
             params.setParameter("escape", "");
             params.setParameter("buffer-size", "");
-            params.setParameter("max-records", "");
         */
+        // cap it at 100 records for performance in pipeline
+        // TODO: parameterize this
+        params.setParameter("max-records", "100");
         BitstreamXMLConsumer consumer = new BitstreamXMLConsumer(contentHandler, lexicalHandler);
         try {
             csv.setup(resolver, objectModel, source, parameters);
