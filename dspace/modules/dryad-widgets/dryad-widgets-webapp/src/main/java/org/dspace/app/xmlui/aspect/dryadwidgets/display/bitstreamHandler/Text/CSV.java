@@ -41,7 +41,7 @@ public class CSV extends BaseBitstreamHandler {
     public void generate() throws SAXException, IOException, ProcessingException {
         // TODO: CSVGenerator/FileGenerator from cocoon throw errors
         CSVGenerator2 csv = new CSVGenerator2();
-        Parameters params = new Parameters();
+        Parameters params2 = new Parameters();
         /*
             params.setParameter("encoding", "");
             params.setParameter("separator", "");
@@ -50,10 +50,10 @@ public class CSV extends BaseBitstreamHandler {
         */
         // cap it at 100 records for performance in pipeline
         // TODO: parameterize this
-        params.setParameter("max-records", "100");
+        params2.setParameter("max-records", "100");
         BitstreamXMLConsumer consumer = new BitstreamXMLConsumer(contentHandler, lexicalHandler);
         try {
-            csv.setup(resolver, objectModel, source, parameters);
+            csv.setup(resolver, objectModel, source, params2);
             csv.setConsumer(consumer);
             csv.generate();
         } catch (IOException e) {
