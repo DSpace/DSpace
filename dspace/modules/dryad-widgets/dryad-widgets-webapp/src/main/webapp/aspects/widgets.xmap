@@ -237,8 +237,8 @@
                     <map:parameter name="doi" value="{1}"/>
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!--<map:parameter name="object-url" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}/bitstream"/>-->
-                    <map:parameter name="object-url" value="http://datadryad.org/mn/object/{1}/bitstream"/>
+                    <!--<map:parameter name="bitstream" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}/bitstream"/>-->
+                    <map:parameter name="bitstream" value="http://datadryad.org/mn/object/{1}/bitstream"/>
                 </map:transform>
                 <map:transform type="i18n">
                     <map:parameter name="locale" value="{locale}"/>
