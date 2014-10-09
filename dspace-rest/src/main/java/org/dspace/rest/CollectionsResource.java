@@ -116,7 +116,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.trace("Collection(id=" + collectionId + ") has been successfully read.");
@@ -204,7 +208,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.trace("All collections were successfully read.");
@@ -292,7 +300,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.trace("All items in collection(id=" + collectionId + ") were successfully read.");
@@ -398,7 +410,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Item successfully created in collection(id=" + collectionId + "). Item handle=" + returnItem.getHandle());
@@ -472,7 +488,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Collection(id=" + collectionId + ") successfully updated.");
@@ -542,7 +562,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Collection(id=" + collectionId + ") was successfully deleted.");
@@ -648,7 +672,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Item(id=" + itemId + ") in collection(id=" + collectionId + ") was successfully deleted.");
@@ -712,7 +740,11 @@ public class CollectionsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         if (collection == null)

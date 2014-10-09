@@ -104,8 +104,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.trace("Community(id=" + communityId + ") was successfully read.");
         return community;
@@ -186,8 +191,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         return null;
     }
@@ -270,8 +280,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         return null;
     }
@@ -358,8 +373,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         return null;
     }
@@ -447,8 +467,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         return null;
     }
@@ -524,8 +549,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Community at top level has been successfully created. Handle:" + retCommunity.getHandle());
         return retCommunity;
@@ -605,8 +635,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Collection was successfully added into community(id=" + communityId + "). Collection handle="
                 + retCollection.getHandle());
@@ -685,8 +720,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Subcommunity was successfully added in community(id=" + communityId + ").");
         return retCommunity;
@@ -757,8 +797,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Community(id=" + communityId + ") has been successfully updated.");
         return Response.ok().build();
@@ -822,8 +867,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -927,8 +977,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Collection(id=" + collectionId + ") in community(id=" + communityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();
@@ -1032,8 +1087,13 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+
 
         log.info("Subcommunity(id=" + subcommunityId + ") from community(id=" + parentCommunityId + ") was successfully deleted.");
         return Response.status(Response.Status.OK).build();

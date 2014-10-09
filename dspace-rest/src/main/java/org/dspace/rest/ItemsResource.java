@@ -121,7 +121,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return item;
@@ -202,7 +206,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return null;
@@ -261,7 +269,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
         return null;
     }
@@ -334,7 +346,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return null;
@@ -409,7 +425,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Metadata to item(id=" + itemId + ") were successfully added.");
@@ -580,7 +600,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
@@ -666,7 +690,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Metadata of item(id=" + itemId + ") were successfully updated.");
@@ -735,7 +763,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Item(id=" + itemId + ") was successfully deleted.");
@@ -813,7 +845,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Item(id=" + itemId + ") metadata were successfully deleted.");
@@ -909,7 +945,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Bitstream(id=" + bitstreamId + ") from item(id=" + itemId + ") was successfuly deleted .");
@@ -1031,7 +1071,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         if (items.size() == 0)
