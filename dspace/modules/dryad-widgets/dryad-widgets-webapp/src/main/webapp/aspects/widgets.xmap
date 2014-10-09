@@ -89,7 +89,7 @@
             <!-- return javascript file used to inject data display widget 
                  {1} : doi
             -->
-            <map:match pattern="display/*/loader.js">
+            <map:match pattern="v1/display/**/loader.js">
                 <!-- request a data file from the DataOne-MN service running on the local machine -->
 
                 <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
@@ -128,7 +128,7 @@
         <map:pipeline type="caching">
             <!-- {1} : doi
             -->
-            <map:match pattern="display/debug/{1}/frame">
+            <map:match pattern="v1/display/debug/**/frame">
                 <map:aggregate element="parts">
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
@@ -149,7 +149,7 @@
 
         <!-- data-file content handler -->
         <map:pipeline type="caching">
-            <map:match pattern="display/*/frame">
+            <map:match pattern="v1/display/**/frame">
                 <map:aggregate element="parts">
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
@@ -206,7 +206,7 @@
         </map:pipeline>
 
         <map:pipeline type="caching">
-            <map:match pattern="display/debug/*/bitstream">
+            <map:match pattern="v1/display/debug/**/bitstream">
                 <map:generate type="WidgetDisplayBitstreamGenerator">
                     <map:parameter name="referrer"   value="{request-param:referrer}"/>
                     <map:parameter name="doi"        value="{1}"/>
@@ -221,7 +221,7 @@
 
         <!-- data-file content handler -->
         <map:pipeline type="caching">
-            <map:match pattern="display/{1}/bitstream">
+            <map:match pattern="v1/display/**/bitstream">
 
                 <map:generate type="WidgetDisplayBitstreamGenerator">
                     <map:parameter name="referrer"   value="{request-param:referrer}"/>
