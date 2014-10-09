@@ -147,6 +147,7 @@ public class DailyReportEmailer
         Options options = new Options();
 
         options.addOption("h", "help", false, "Help");
+
         options.addOption("d", "Deleted", false,
                         "Send E-mail report for all bitstreams set as deleted");
         options.addOption("m", "Missing", false,
@@ -154,12 +155,16 @@ public class DailyReportEmailer
         options.addOption("c", "Changed", false,
                 "Send E-mail report for all bitstreams where checksum has been changed");
         options.addOption("a", "All", false, "Send all E-mail reports");
-        options.addOption("e", "Eternity", false, "Include all checksum info not just the ones from today");
-
         options.addOption("u", "Unchecked", false,
                 "Send the Unchecked bitstream report");
         options.addOption("n", "Not Processed", false,
                 "Send E-mail report for all bitstreams set to longer be processed for today");
+
+        options.addOption("e", "Eternity", false, "Include all checksum info not just the ones from today");
+
+        options.addOption("T", "TSV", false, "Generate tsv formatted output");
+        options.addOption("A", "ASCII", false, "Generate ASCII text output  (default)");
+
 
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
@@ -215,20 +220,20 @@ public class DailyReportEmailer
             tomorrow = calendar.getTime();
         }
 
+        String toAdr = null;
+        if (line.hasOption("t")) {
+            toAdr = line.getOptionValue("t");
+        } else {
+            toAdr = ConfigurationManager.getProperty("mail.admin");
+        }
+        log.info(String.format("DailyReportEmailer toAdr = '%s'", toAdr));
+
         File report = null;
         FileWriter fileWriter = null;
         OutputStreamWriter writer = null;
+
         try
         {
-            String toAdr =  null;
-            
-            if (line.hasOption("t")) {
-                toAdr = line.getOptionValue("t");
-            } else {
-                toAdr = ConfigurationManager.getProperty("mail.admin");
-            }
-            log.info(String.format("DailyReportEmailer toAdr = '%s'", toAdr));
-
             if (toAdr.equals("-")) {// use stdout
                 writer = new OutputStreamWriter(System.out);
                 toAdr = null;   // indicate that we do not want to send email
@@ -255,8 +260,22 @@ public class DailyReportEmailer
             }
 
             // create a new simple reporter that uses writer for output
-            SimpleReporter reporter = new SimpleReporter(new ReportWriter(writer));
-            Boolean all = (line.hasOption("a")) || (line.getOptions().length == 0);
+            ReportWriter rw = null;
+            if (line.hasOption('T')) {
+                rw = new TSVReportWriter(writer);
+            }
+            else
+            {
+                // default
+                rw = new ReportWriter(writer);
+            }
+            SimpleReporter reporter = new SimpleReporter(rw);
+
+            // generate report/s
+            Boolean all = (line.hasOption("a")) ||
+                    (!line.hasOption('d')  &&  !line.hasOption('m')  &&  !line.hasOption('c')  &&  !line.hasOption('n')  &&
+                            !line.hasOption('u'));
+
             // the number of bitstreams in report
             int numBitstreams = 0;
 
@@ -286,7 +305,6 @@ public class DailyReportEmailer
                 writer.write("\n\n");
             }
             writer.flush();
-            writer.close();
             if (toAdr != null)
             {
                 emailer.sendReport(report, numBitstreams, toAdr);
@@ -294,7 +312,7 @@ public class DailyReportEmailer
             else
             {
                 writer.write("Summary:  - " + numBitstreams
-                        + " Bitstreams found with POSSIBLE issues");
+                        + " Bitstreams found with POSSIBLE issues\n");
             }
         }
         catch (MessagingException e)
@@ -307,8 +325,9 @@ public class DailyReportEmailer
         }
         finally
         {
-            if (writer != null)
+            if (writer != null && toAdr != null)
             {
+                // this is not stdout so close temp file
                 try
                 {
                     writer.close();

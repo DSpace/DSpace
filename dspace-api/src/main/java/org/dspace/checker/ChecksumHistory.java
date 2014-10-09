@@ -37,8 +37,11 @@ public class ChecksumHistory
     /** The checksum calculated. */
     private String checksumCalculated;
 
-    /** The string result. */
-    private String result;
+    /** The string resultLong. */
+    private String resultLong;
+
+    /** The string resultCode matching resultLong. */
+    private String resultCode;
 
     public ChecksumHistory()
     {
@@ -68,18 +71,19 @@ public class ChecksumHistory
      *            expected checksum
      * @param checksumCalc
      *            calculated checksum
-     * @param inResult
+     * @param resultLong
      *            result information
      */
     public ChecksumHistory(int bitstrmId, Date startDate, Date endDate,
-            String checksumExpted, String checksumCalc, String inResult)
+            String checksumExpted, String checksumCalc, String resultLong, String resultCode)
     {
         this.bitstreamId = bitstrmId;
         this.processStartDate = (startDate == null ? null : new Date(startDate.getTime()));
         this.processEndDate = (endDate == null ? null : new Date(endDate.getTime()));
         this.checksumExpected = checksumExpted;
         this.checksumCalculated = checksumCalc;
-        this.result = inResult;
+        this.resultLong = resultLong;
+        this.resultCode = resultCode;
     }
 
     /**
@@ -95,18 +99,7 @@ public class ChecksumHistory
      */
     public String getChecksumCalculated()
     {
-        return checksumCalculated;
-    }
-
-    /**
-     * Set the checksum calculated.
-     * 
-     * @param checksumCalculated
-     *            The checksumCalculated to set.
-     */
-    public void setChecksumCalculated(String checksumCalculated)
-    {
-        this.checksumCalculated = checksumCalculated;
+        return checksumCalculated == null ? "" : checksumCalculated ;
     }
 
     /**
@@ -116,18 +109,7 @@ public class ChecksumHistory
      */
     public String getChecksumExpected()
     {
-        return checksumExpected;
-    }
-
-    /**
-     * Set the expected checksum.
-     * 
-     * @param checksumExpected
-     *            The checksumExpected to set.
-     */
-    public void setChecksumExpected(String checksumExpected)
-    {
-        this.checksumExpected = checksumExpected;
+        return checksumExpected == null ? "" : checksumExpected;
     }
 
     /**
@@ -141,17 +123,6 @@ public class ChecksumHistory
     }
 
     /**
-     * Set the process end date. This is the date and time the processing ended.
-     * 
-     * @param processEndDate
-     *            The processEndDate to set.
-     */
-    public void setProcessEndDate(Date processEndDate)
-    {
-        this.processEndDate = (processEndDate == null ? null : new Date(processEndDate.getTime()));
-    }
-
-    /**
      * Get the process start date. This is the date and time the processing
      * started.
      * 
@@ -162,34 +133,22 @@ public class ChecksumHistory
         return processStartDate == null ? null : new Date(processStartDate.getTime());
     }
 
+
     /**
-     * Set the process start date. This is the date and time the processing
-     * started.
-     * 
-     * @param processStartDate
-     *            The processStartDate to set.
+     * @return result code
      */
-    public void setProcessStartDate(Date processStartDate)
+    public String getResultCode()
     {
-        this.processStartDate = (processStartDate == null ? null : new Date(processStartDate.getTime()));
+        return resultCode == null ? "" : resultCode;
     }
 
     /**
      * Return the processing result.
+     * @return  the result (long format)
      */
-    public String getResult()
+    public String getResultLong()
     {
-        return result;
+        return resultLong == null ? "" : resultLong;
     }
 
-    /**
-     * Set the checksum processing result.
-     * 
-     * @param result
-     *            The result to set.
-     */
-    public void setResult(String result)
-    {
-        this.result = result;
-    }
 }

@@ -158,11 +158,13 @@ public class ReporterDAO extends DAOSupport
             conn = DatabaseManager.getConnection();
 
             prepStmt = conn.prepareStatement(DATE_RANGE_BITSTREAMS);
+            if (log.isDebugEnabled())
+                log.debug("Running query \"" + DATE_RANGE_BITSTREAMS + "\"");
             prepStmt.setString(1, resultCode);
             prepStmt.setDate(2, new java.sql.Date(startDate.getTime()));
             prepStmt.setDate(3, new java.sql.Date(endDate.getTime()));
 
-            history = getChecksumHistory(prepStmt);
+            history = getChecksumHistory(prepStmt,resultCode);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         } finally {
@@ -187,8 +189,10 @@ public class ReporterDAO extends DAOSupport
         try {
             conn = DatabaseManager.getConnection();
             prepStmt = conn.prepareStatement(NO_DATE_RANGE_BITSTREAMS);
-            prepStmt.setString(1, resultCode);
-            history = getChecksumHistory(prepStmt);
+            if (log.isDebugEnabled())
+                log.debug("Running query \"" + NO_DATE_RANGE_BITSTREAMS + "\"");
+        prepStmt.setString(1, resultCode);
+            history = getChecksumHistory(prepStmt, resultCode);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         } finally {
@@ -215,23 +219,20 @@ public class ReporterDAO extends DAOSupport
         try {
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
-
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
-                if (startDate == null)
-                    prepStmt = conn.prepareStatement(NOT_PROCESSED_BITSTREAMS_ORACLE);
-                else
-                    prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+            String sqlStmt = null;
+            if (DatabaseManager.isOracle()) {
+                sqlStmt = (startDate == null) ? NOT_PROCESSED_BITSTREAMS_ORACLE : DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE;
             } else {
-                if (startDate == null)
-                    prepStmt = conn.prepareStatement(NOT_PROCESSED_BITSTREAMS);
-                else
-                    prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
+                sqlStmt = (startDate == null) ? NOT_PROCESSED_BITSTREAMS : DATE_RANGE_NOT_PROCESSED_BITSTREAMS;
             }
+            prepStmt = conn.prepareStatement(sqlStmt);
+            if (log.isDebugEnabled())
+                log.debug("Running query \"" + sqlStmt + "\"");
             if (startDate != null) {
                 prepStmt.setDate(1, new java.sql.Date(startDate.getTime()));
                 prepStmt.setDate(2, new java.sql.Date(endDate.getTime()));
             }
-            history = getChecksumHistory(prepStmt);
+            history = getChecksumHistory(prepStmt, null);
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
         } finally {
@@ -260,7 +261,8 @@ public class ReporterDAO extends DAOSupport
             conn = DatabaseManager.getConnection();
 
             prepStmt = conn.prepareStatement(FIND_UNKNOWN_BITSTREAMS);
-
+            if (log.isDebugEnabled())
+                log.debug("Running query \"" + FIND_UNKNOWN_BITSTREAMS + "\"");
             rs = prepStmt.executeQuery();
 
             // add the bitstream history objects
@@ -293,7 +295,7 @@ public class ReporterDAO extends DAOSupport
     }
 
 
-    private List<ChecksumHistory> getChecksumHistory(PreparedStatement prepStmt) throws SQLException {
+    private List<ChecksumHistory> getChecksumHistory(PreparedStatement prepStmt, String resultCode) throws SQLException {
         assert (prepStmt != null);
 
         List<ChecksumHistory> history = new LinkedList<ChecksumHistory>();
@@ -308,7 +310,8 @@ public class ReporterDAO extends DAOSupport
                         .getTimestamp("last_process_end_date"), rs
                         .getString("expected_checksum"), rs
                         .getString("current_checksum"), rs
-                        .getString("result_description")));
+                        .getString("result_description"),
+                        resultCode));
             }
 
         } catch (SQLException e) {
