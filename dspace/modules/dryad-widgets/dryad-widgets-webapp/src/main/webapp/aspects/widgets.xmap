@@ -89,6 +89,36 @@
             <!-- return javascript file used to inject data display widget 
                  {1} : doi
             -->
+            <map:match pattern="v1/display/debug/**/loader.js">
+                <!-- request a data file from the DataOne-MN service running on the local machine -->
+
+                <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
+                <!-- <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}"/> -->
+                <map:generate type="file" src="http://datadryad.org/mn/object/{1}"/>
+
+                <map:serialize type="xml"/>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="404">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                        <map:serialize type="text" mime-type="application/javascript" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+        </map:pipeline>
+
+        <map:pipeline type="caching">
+            <!-- do not cache this file request, as it is a dynamic JS resource -->
+            <map:parameter name="expires" value="now"/>
+
+            <!-- return javascript file used to inject data display widget 
+                 {1} : doi
+            -->
             <map:match pattern="v1/display/**/loader.js">
                 <!-- request a data file from the DataOne-MN service running on the local machine -->
 
@@ -113,7 +143,7 @@
             </map:match>
             <map:handle-errors>
                 <map:select type="exception">
-                    <map:when test="400">
+                    <map:when test="404">
                         <map:generate type="exception"/>
                         <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
                         <map:transform type="i18n">
