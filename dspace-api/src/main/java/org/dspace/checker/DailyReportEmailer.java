@@ -92,7 +92,9 @@ public class DailyReportEmailer
         // create the first part of the email
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart
-                .setText("This is the checksum checker report see attachment for details");
+                .setText("This is the checksum checker report see attachment for details \n"
+                        + numberOfBitstreams
+                        + " Bitstreams found with POSSIBLE issues");
         multipart.addBodyPart(messageBodyPart);
 
         // add the file
@@ -145,26 +147,19 @@ public class DailyReportEmailer
         Options options = new Options();
 
         options.addOption("h", "help", false, "Help");
-        options
-                .addOption("d", "Deleted", false,
-                        "Send E-mail report for all bitstreams set as deleted for today");
-        options
-                .addOption("m", "Missing", false,
-                        "Send E-mail report for all bitstreams not found in assetstore for today");
-        options
-                .addOption(
-                        "c",
-                        "Changed",
-                        false,
-                        "Send E-mail report for all bitstreams where checksum has been changed for today");
+        options.addOption("d", "Deleted", false,
+                        "Send E-mail report for all bitstreams set as deleted");
+        options.addOption("m", "Missing", false,
+                "Send E-mail report for all bitstreams not found in assetstore");
+        options.addOption("c", "Changed", false,
+                "Send E-mail report for all bitstreams where checksum has been changed");
         options.addOption("a", "All", false, "Send all E-mail reports");
+        options.addOption("e", "Eternity", false, "Include all checksum info not just the ones from today");
 
         options.addOption("u", "Unchecked", false,
                 "Send the Unchecked bitstream report");
-
-        options
-                .addOption("n", "Not Processed", false,
-                        "Send E-mail report for all bitstreams set to longer be processed for today");
+        options.addOption("n", "Not Processed", false,
+                "Send E-mail report for all bitstreams set to longer be processed for today");
 
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
@@ -209,14 +204,16 @@ public class DailyReportEmailer
 
         DailyReportEmailer emailer = new DailyReportEmailer();
 
-        // get dates for yesterday and tomorrow
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.add(GregorianCalendar.DAY_OF_YEAR, -1);
+        Date yesterday = null, tomorrow = null;
 
-        Date yesterday = calendar.getTime();
-        calendar.add(GregorianCalendar.DAY_OF_YEAR, 2);
-
-        Date tomorrow = calendar.getTime();
+        if (!line.hasOption('e')) {
+            // get dates for yesterday and tomorrow
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.add(GregorianCalendar.DAY_OF_YEAR, -1);
+            yesterday = calendar.getTime();
+            calendar.add(GregorianCalendar.DAY_OF_YEAR, 2);
+            tomorrow = calendar.getTime();
+        }
 
         File report = null;
         FileWriter fileWriter = null;
@@ -268,7 +265,7 @@ public class DailyReportEmailer
                 numBitstreams += reporter.deletedBitstreamReport(yesterday, tomorrow);
                 writer.write("\n\n");
             }
-            if (all || line.hasOption('d'))
+            if (all || line.hasOption('m'))
             {
                 numBitstreams += reporter.bitstreamNotFoundReport(yesterday, tomorrow);
                 writer.write("\n\n");

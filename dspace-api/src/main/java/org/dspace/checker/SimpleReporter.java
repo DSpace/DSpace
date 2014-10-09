@@ -29,17 +29,22 @@ public class SimpleReporter {
     }
 
     /**
-     * Generate deleted bitstream report for specified date range
+     * Generate deleted bitstream report for specified date range or iff ont dates are given lokk for all matching records
      *
-     * @param startDate the start date for the range
-     * @param endDate   the end date for the range
+     * @param startDate the start date for the range, or null
+     * @param endDate   the end date for the range, or null
      * @throws IOException if io error occurs
      */
     public int deletedBitstreamReport(Date startDate, Date endDate)
             throws IOException {
+        List<ChecksumHistory> history = null;
+        if (startDate != null) {
+            assert (endDate != null);
+            history = reporter.getChecksumHistoryReportForDateRange(startDate, endDate, ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
+        } else {
+            history = reporter.getChecksumHistoryReport(ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
+        }
 
-        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
-                endDate, ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
         writer.writeHeader(ReportWriter.msg("deleted-bitstream-intro") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
@@ -47,15 +52,23 @@ public class SimpleReporter {
     }
 
     /**
-     * Generate changed bitstream report for specified date range
+     * Generate changed bitstream report for specified date range or iff ont dates are given lokk for all matching records
      *
-     * @param startDate the start date for the range
-     * @param endDate   the end date for the range
+     * @param startDate the start date for the range, or null
+     * @param endDate   the end date for the range, or null
      * @throws IOException if io error occurs
      */
     public int changedChecksumReport(Date startDate, Date endDate) throws IOException {
-        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
-                endDate, ChecksumCheckResults.CHECKSUM_NO_MATCH);
+        List<ChecksumHistory> history = null;
+
+        if (startDate != null) {
+            assert (endDate != null);
+            history = reporter.getChecksumHistoryReportForDateRange(startDate,
+                    endDate, ChecksumCheckResults.CHECKSUM_NO_MATCH);
+        } else {
+            history = reporter.getChecksumHistoryReport(ChecksumCheckResults.CHECKSUM_NO_MATCH);
+        }
+
         writer.writeHeader(ReportWriter.msg("checksum-did-not-match") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
@@ -65,13 +78,20 @@ public class SimpleReporter {
     /**
      * Generate not-found bitstream report for specified date range
      *
-     * @param startDate the start date for the range.
-     * @param endDate   the end date for the range.
+     * @param startDate the start date for the range, or null
+     * @param endDate   the end date for the range, or null
      * @throws IOException if io error occurs
      */
     public int bitstreamNotFoundReport(Date startDate, Date endDate) throws IOException {
-        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
-                endDate, ChecksumCheckResults.BITSTREAM_NOT_FOUND);
+        List<ChecksumHistory> history = null;
+
+        if (startDate != null) {
+            assert (endDate != null);
+            history = reporter.getChecksumHistoryReportForDateRange(startDate,
+                    endDate, ChecksumCheckResults.BITSTREAM_NOT_FOUND);
+        } else {
+            history = reporter.getChecksumHistoryReport(ChecksumCheckResults.BITSTREAM_NOT_FOUND);
+        }
         writer.writeHeader(ReportWriter.msg("bitstream-not-found-report") + " " + ReportWriter.dateRange(startDate, endDate));
         writer.writeBodyChecksumHistory(history);
         writer.writeFooter();
@@ -88,6 +108,7 @@ public class SimpleReporter {
      */
     public int notToBeProcessedReport(Date startDate, Date endDate)
             throws IOException {
+
         // get all the bitstreams marked deleted for today
         List<ChecksumHistory> history = reporter.getNotProcessedBitstreamsReport(startDate,
                 endDate);

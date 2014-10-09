@@ -514,7 +514,8 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
         finally
         {
-            cleanup(ps, conn, rs);
+            cleanup(ps, rs);
+            cleanup(conn);
         }
 
         return ids;
@@ -555,7 +556,8 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
         finally
         {
-            cleanup(ps, conn, rs);
+            cleanup(ps, rs);
+            cleanup(conn);
         }
 
         return ids;
@@ -597,7 +599,8 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
         finally
         {
-            cleanup(ps, conn, rs);
+            cleanup(ps, rs);
+            cleanup(conn);
         }
 
         return ids;

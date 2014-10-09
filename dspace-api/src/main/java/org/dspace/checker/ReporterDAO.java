@@ -30,6 +30,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
  */
 public class ReporterDAO extends DAOSupport
 {
+    private static Logger log = Logger.getLogger(ReporterDAO.class);
+
     /**
      * Select the most recent bitstream information for a given date range with
      * the specified status. This select is from the checksum history and
@@ -45,10 +47,22 @@ public class ReporterDAO extends DAOSupport
             + "order by bitstream_id";
 
     /**
-     * 
+     * Select the most recent bitstream information without date restriction with
+     * the specified status. This select is from the checksum history and
+     * checksum results tables.
+     */
+    public static final String NO_DATE_RANGE_BITSTREAMS = "select bitstream_id, last_process_start_date, last_process_end_date, "
+            + "expected_checksum, current_checksum, result_description "
+            + "from most_recent_checksum, checksum_results "
+            + "where most_recent_checksum.result = checksum_results.result_code "
+            + "and most_recent_checksum.result= ? "
+            + "order by bitstream_id";
+
+    /**
+     *
      * Find all bitstreams that were set to not be processed for the specified
      * date range.
-     * 
+     *
      */
     public static final String DATE_RANGE_NOT_PROCESSED_BITSTREAMS = "select most_recent_checksum.bitstream_id, "
             + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
@@ -62,15 +76,38 @@ public class ReporterDAO extends DAOSupport
             + "order by most_recent_checksum.bitstream_id";
 
     public static final String DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE = "select most_recent_checksum.bitstream_id, "
-        + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
-        + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
-        + "result_description "
-        + "from checksum_results, most_recent_checksum "
-        + "where most_recent_checksum.to_be_processed = 0 "
-        + "and most_recent_checksum.result = checksum_results.result_code "
-        + "and most_recent_checksum.last_process_start_date >= ? "
-        + "and most_recent_checksum.last_process_start_date < ? "
-        + "order by most_recent_checksum.bitstream_id";
+            + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
+            + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
+            + "result_description "
+            + "from checksum_results, most_recent_checksum "
+            + "where most_recent_checksum.to_be_processed = 0 "
+            + "and most_recent_checksum.result = checksum_results.result_code "
+            + "and most_recent_checksum.last_process_start_date >= ? "
+            + "and most_recent_checksum.last_process_start_date < ? "
+            + "order by most_recent_checksum.bitstream_id";
+
+    /**
+     *
+     * Find all bitstreams that were set to not be processed
+     *
+     */
+    public static final String NOT_PROCESSED_BITSTREAMS = "select most_recent_checksum.bitstream_id, "
+            + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
+            + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
+            + "result_description "
+            + "from checksum_results, most_recent_checksum "
+            + "where most_recent_checksum.to_be_processed = false "
+            + "and most_recent_checksum.result = checksum_results.result_code "
+            + "order by most_recent_checksum.bitstream_id";
+
+    public static final String NOT_PROCESSED_BITSTREAMS_ORACLE = "select most_recent_checksum.bitstream_id, "
+            + "most_recent_checksum.last_process_start_date, most_recent_checksum.last_process_end_date, "
+            + "most_recent_checksum.expected_checksum, most_recent_checksum.current_checksum, "
+            + "result_description "
+            + "from checksum_results, most_recent_checksum "
+            + "where most_recent_checksum.to_be_processed = 0 "
+            + "and most_recent_checksum.result = checksum_results.result_code "
+            + "order by most_recent_checksum.bitstream_id";
     
     /**
      * Find all bitstreams that the checksum checker is unaware of
@@ -98,125 +135,110 @@ public class ReporterDAO extends DAOSupport
     }
 
     /**
-     * Select the most recent bitstream for a given date range with the
+     * Select the most recent checksum for a given date range with the
      * specified status.
-     * 
+     *
      * @param startDate
      *            the start date range
      * @param endDate
      *            the end date range.
      * @param resultCode
      *            the result code
-     * 
-     * @return a list of BitstreamHistoryInfo objects
+     *
+     * @return a list of ChecksumHistory objects
      */
-    public List<ChecksumHistory> getBitstreamResultTypeReport(Date startDate, Date endDate,
-            String resultCode)
-    {
-        List<ChecksumHistory> bitstreamHistory = new LinkedList<ChecksumHistory>();
-
+    public List<ChecksumHistory> getChecksumHistoryReportForDateRange(Date startDate, Date endDate,
+                                                                      String resultCode) {
+        List<ChecksumHistory> history = null;
         Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
-
-        try
-        {
+        try {
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
 
             prepStmt = conn.prepareStatement(DATE_RANGE_BITSTREAMS);
-
             prepStmt.setString(1, resultCode);
             prepStmt.setDate(2, new java.sql.Date(startDate.getTime()));
             prepStmt.setDate(3, new java.sql.Date(endDate.getTime()));
 
-            rs = prepStmt.executeQuery();
-
-            // add the bitstream history objects
-            while (rs.next())
-            {
-                bitstreamHistory.add(new ChecksumHistory(rs
-                        .getInt("bitstream_id"), rs
-                        .getTimestamp("last_process_start_date"), rs
-                        .getTimestamp("last_process_end_date"), rs
-                        .getString("expected_checksum"), rs
-                        .getString("current_checksum"), rs
-                        .getString("result_description")));
-            }
+            history = getChecksumHistory(prepStmt);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            cleanup(conn);
         }
-        catch (SQLException e)
-        {
-            LOG.warn("Bitstream history could not be found for specified type "
-                    + e.getMessage(), e);
-        }
-        finally
-        {
-            cleanup(prepStmt, conn, rs);
-        }
-
-        return bitstreamHistory;
+        return history;
     }
 
     /**
-     * Find all bitstreams that were set to not be processed for the specified
-     * date range.
-     * 
-     * @param startDate
-     *            the start of the date range
-     * @param endDate
-     *            the end of the date range
-     * @return a list of BitstreamHistoryInfo objects
+     * Select the most recent checksum with the specified status.
+     *
+     * @param resultCode
+     *            the result code
+     *
+     * @return a list of ChecksumHistory objects
      */
-    public List<ChecksumHistory> getNotProcessedBitstreamsReport(Date startDate, Date endDate)
-    {
-        List<ChecksumHistory> bitstreamHistory = new LinkedList<ChecksumHistory>();
+    public List<ChecksumHistory> getChecksumHistoryReport(String resultCode) {
+        List<ChecksumHistory> history = null;
+        Connection conn = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        try {
+            conn = DatabaseManager.getConnection();
+            prepStmt = conn.prepareStatement(NO_DATE_RANGE_BITSTREAMS);
+            prepStmt.setString(1, resultCode);
+            history = getChecksumHistory(prepStmt);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            cleanup(conn);
+        }
+        return history;
+    }
+
+    /**
+     * Find all bitstreams that were set to not be processed; if startDate and endDate are given look only for
+     * matches within the specified date range.
+     *
+     * @param startDate the start of the date range, or null
+     * @param endDate   the end of the date range, or null
+     * @return a list of ChecksumHistory objects or null iff SQLException
+     */
+    public List<ChecksumHistory> getNotProcessedBitstreamsReport(Date startDate, Date endDate) {
+        List<ChecksumHistory> history = null;
 
         Connection conn = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
-
-        try
-        {
+        assert (startDate == null || endDate != null);
+        try {
             // create the connection and execute the statement
             conn = DatabaseManager.getConnection();
 
-            if (DatabaseManager.isOracle())
-            {
-                prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
+                if (startDate == null)
+                    prepStmt = conn.prepareStatement(NOT_PROCESSED_BITSTREAMS_ORACLE);
+                else
+                    prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+            } else {
+                if (startDate == null)
+                    prepStmt = conn.prepareStatement(NOT_PROCESSED_BITSTREAMS);
+                else
+                    prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
             }
-           	else
-            {
-                prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
+            if (startDate != null) {
+                prepStmt.setDate(1, new java.sql.Date(startDate.getTime()));
+                prepStmt.setDate(2, new java.sql.Date(endDate.getTime()));
             }
-
-            prepStmt.setDate(1, new java.sql.Date(startDate.getTime()));
-            prepStmt.setDate(2, new java.sql.Date(endDate.getTime()));
-
-            rs = prepStmt.executeQuery();
-
-            // add the bitstream history objects
-            while (rs.next())
-            {
-                bitstreamHistory.add(new ChecksumHistory(rs
-                        .getInt("bitstream_id"), rs
-                        .getTimestamp("last_process_start_date"), rs
-                        .getTimestamp("last_process_end_date"), rs
-                        .getString("expected_checksum"), rs
-                        .getString("current_checksum"), rs
-                        .getString("result_description")));
-            }
-        }
-        catch (SQLException e)
-        {
-            LOG.warn("Bitstream history could not be found for specified type "
-                    + e.getMessage(), e);
-        }
-        finally
-        {
-            cleanup(prepStmt, conn, rs);
+            history = getChecksumHistory(prepStmt);
+        } catch (SQLException e) {
+            LOG.error(e.getMessage(), e);
+        } finally {
+            cleanup(conn);
         }
 
-        return bitstreamHistory;
+        return history;
     }
 
     /**
@@ -263,9 +285,39 @@ public class ReporterDAO extends DAOSupport
         }
         finally
         {
-            cleanup(prepStmt, conn, rs);
+            cleanup(prepStmt,rs);
+            cleanup(conn);
         }
 
         return unknownBitstreams;
     }
+
+
+    private List<ChecksumHistory> getChecksumHistory(PreparedStatement prepStmt) throws SQLException {
+        assert (prepStmt != null);
+
+        List<ChecksumHistory> history = new LinkedList<ChecksumHistory>();
+        ResultSet rs = null;
+
+        try {
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                history.add(new ChecksumHistory(rs
+                        .getInt("bitstream_id"), rs
+                        .getTimestamp("last_process_start_date"), rs
+                        .getTimestamp("last_process_end_date"), rs
+                        .getString("expected_checksum"), rs
+                        .getString("current_checksum"), rs
+                        .getString("result_description")));
+            }
+
+        } catch (SQLException e) {
+            LOG.warn("Bitstream history could not be found for specified type "
+                    + e.getMessage(), e);
+        } finally {
+            cleanup(prepStmt, rs);
+            return history;
+        }
+    }
+
 }
