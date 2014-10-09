@@ -120,7 +120,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return bitstream;
@@ -181,7 +185,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return policies.toArray(new ResourcePolicy[0]);
@@ -261,9 +269,13 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
-
+        
         return bitstreams.toArray(new Bitstream[0]);
     }
 
@@ -339,7 +351,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return null;
@@ -419,7 +435,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
         return Response.status(Status.OK).build();
     }
@@ -547,7 +567,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Bitstream metadata(id=" + bitstreamId + ") were successfully updated.");
@@ -634,7 +658,11 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         log.info("Bitstream(id=" + bitstreamId + ") data was successfully updated.");
@@ -709,9 +737,13 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
-
+        
         log.info("Bitstream(id=" + bitstreamId + ") was successfully deleted.");
         return Response.ok().build();
     }
@@ -783,8 +815,13 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
+        
         return Response.status(Status.OK).build();
     }
 

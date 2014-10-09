@@ -95,7 +95,11 @@ public class TokenHolder
         }
         finally
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+        	{
+        		log.error("Something get wrong. Aborting context in finally statement.");
+        		context.abort();
+        	}
         }
 
         return token;

@@ -77,11 +77,14 @@ public class Resource
             }
 
             return context;
-
         }
         catch (SQLException e)
         {
-            context.abort();
+        	if((context != null) && (context.isValid()))
+            {
+            	log.error("Something get wrong. Aborting context in finally statement.");
+            	context.abort();
+            }
             throw new ContextException("Could not create context, SQLException. Message: " + e, e);
         }
     }
@@ -129,12 +132,12 @@ public class Resource
         }
         catch (SQLException e)
         {
-            processException("Could not write usageEvent, SQLException. Message: " + e, context);
+            processException("Could not write usageEvent, SQLException. Message: " + e, null); // Write statistic should not abort context.
 
         }
         catch (ContextException e)
         {
-            processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), context);
+            processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), null); // Write statistic should not abort context.
         }
     }
 

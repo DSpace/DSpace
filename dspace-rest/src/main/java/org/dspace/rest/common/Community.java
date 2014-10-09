@@ -39,8 +39,8 @@ public class Community extends DSpaceObject{
     private Integer countItems;
 
     // Renamed because of xml annotation exception with this attribute and getSubCommunities.
-    @XmlElement(name = "subcommunities2", required = true)
-    private List<Community> subCommunities2 = new ArrayList<Community>();
+    @XmlElement(name = "subcommunities", required = true)
+    private List<Community> subcommunities = new ArrayList<Community>();
 
     private List<Collection> collections = new ArrayList<Collection>();
 
@@ -88,10 +88,10 @@ public class Community extends DSpaceObject{
 
         if(expandFields.contains("subCommunities") || expandFields.contains("all")) {
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
-            subCommunities2 = new ArrayList<Community>();
+            subcommunities = new ArrayList<Community>();
             for(org.dspace.content.Community subCommunity : communityArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
-                    subCommunities2.add(new Community(subCommunity, null, context));
+                	subcommunities.add(new Community(subCommunity, null, context));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
                 }
@@ -173,12 +173,12 @@ public class Community extends DSpaceObject{
         return logo;
     }
 
-	public List<Community> getSubCommunities() {
-		return subCommunities2;
+	public List<Community> getSubcommunities() {
+		return subcommunities;
 	}
-
-	public void setSubCommunities(List<Community> subCommunities) {
-		this.subCommunities2 = subCommunities;
+	
+	public void setSubcommunities(List<Community> subcommunities) {
+		this.subcommunities = subcommunities;
 	}
     
 }
