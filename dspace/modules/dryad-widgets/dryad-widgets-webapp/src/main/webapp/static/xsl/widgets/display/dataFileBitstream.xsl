@@ -20,7 +20,7 @@
     <xsl:variable name="source"    select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.source']"/>
     
     <xsl:param name="doi"/>
-    <xsl:param name="bitstream"/> <!-- DataOne-MN url for bitstream -->
+    <xsl:param name="object-url"/> <!-- DataOne-MN url for bitstream -->
     
     <!-- 
         Lookup table for template to call for handling input based on mime-type
@@ -88,7 +88,7 @@
                 <script src="http://mozilla.github.io/pdf.js/build/pdf.js"></script>
                 <script><![CDATA[
 'use strict';]]>
-var url = '<xsl:value-of select="$bitstream"/>';<![CDATA[
+var url = '<xsl:value-of select="$object-url"/>';<![CDATA[
 PDFJS.getDocument(url).then(function(pdf) {
   pdf.getPage(1).then(function(page) {
     var scale = 1.5;
@@ -147,6 +147,11 @@ PDFJS.getDocument(url).then(function(pdf) {
                 <xsl:variable name="colmax" select="math:max(//csv:record/csv:field/@number)"/>
                 <!-- <table id="example" class="compact hover" cellspacing="0" width="100%"></table> -->
                 <table id="table" class="display" cellspacing="0" width="100%">
+                    <!-- 
+                        TODO: determine whether table heads can be inferred, either
+                        here or in the Text/CSV converter. 
+                    -->
+                    <!--
                     <thead>
                         <tr>
                             <xsl:call-template name="csv-col2table">
@@ -167,9 +172,11 @@ PDFJS.getDocument(url).then(function(pdf) {
                             </xsl:call-template>
                         </tr>
                     </tfoot>
+                    -->
                     <tbody>
                         <xsl:call-template name="csv-row2table">
-                            <xsl:with-param name="row" select="//csv:record[@number='2']"/>
+                            <!--<xsl:with-param name="row" select="//csv:record[@number='2']"/>-->
+                            <xsl:with-param name="row" select="//csv:record[@number='1']"/>
                             <xsl:with-param name="colmax" select="$colmax"/>
                         </xsl:call-template>
                     </tbody>
