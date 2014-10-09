@@ -184,19 +184,19 @@ public class DailyReportEmailer
 
             myhelp.printHelp("Checksum Reporter\n", options);
             System.out
-                    .println("\nSend Deleted bitstream email report: DailyReportEmailer -d");
+                    .println("Send Deleted bitstream email report: DailyReportEmailer -d");
             System.out
-                    .println("\nSend Missing bitstreams email report: DailyReportEmailer -m");
+                    .println("Send Missing bitstreams email report: DailyReportEmailer -m");
             System.out
-                    .println("\nSend Checksum Changed email report: DailyReportEmailer -c");
+                    .println("Send Checksum Changed email report: DailyReportEmailer -c");
 
             System.out
-                    .println("\nSend bitstream not to be processed email report: DailyReportEmailer -n");
+                    .println("Send bitstream not to be processed email report: DailyReportEmailer -n");
 
             System.out
-                    .println("\nSend Un-checked bitstream report: DailyReportEmailer -u");
+                    .println("Send Un-checked bitstream report: DailyReportEmailer -u");
 
-            System.out.println("\nSend All email reports: DailyReportEmailer");
+            System.out.println("Send All email reports: DailyReportEmailer");
             System.exit(0);
         }
 
