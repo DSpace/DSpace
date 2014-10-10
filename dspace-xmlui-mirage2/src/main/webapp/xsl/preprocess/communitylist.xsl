@@ -154,9 +154,17 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <xsl:variable name="handle_without_slashes">
+            <xsl:call-template name="string-replace-all">
+                <xsl:with-param name="text" select="$handle"/>
+                <xsl:with-param name="replace" select="'/'"/>
+                <xsl:with-param name="by" select="'_'"/>
+            </xsl:call-template>
+        </xsl:variable>
+
         <xsl:call-template name="string-replace-all">
-            <xsl:with-param name="text" select="$handle"/>
-            <xsl:with-param name="replace" select="'/'"/>
+            <xsl:with-param name="text" select="$handle_without_slashes"/>
+            <xsl:with-param name="replace" select="'.'"/>
             <xsl:with-param name="by" select="'_'"/>
         </xsl:call-template>
     </xsl:template>
