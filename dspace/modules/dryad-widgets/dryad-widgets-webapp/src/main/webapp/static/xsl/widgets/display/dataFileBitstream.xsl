@@ -68,10 +68,10 @@
                 <link type="text/css" rel="stylesheet" href="{$ddwcss}"></link>
             </head>
             <body>
-                <div class="dryad-ddw">
+                <div class="dryad-ddw-unhandled">
                     <p class="dryad-ddw-unhandled">
                         The content for this data is unsupported for viewing.
-                        Please use the download link orq    q
+                        Please use the download link or
                         visit the <a href="http://dx.doi.org/{$doi}" target="_blank">Dryad site</a>
                         to view the data or download the data from this widget.
                     </p>
