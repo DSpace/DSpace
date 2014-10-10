@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><xhtml xmlns="http://www.w3.org/1999/xhtml"><head><meta property="dc.format">text/csv</meta><meta property="dc.source">/input/invert.data-may19.csv</meta><meta property="dc.extent">9099685</meta></head><body>
+<?xml version="1.0" encoding="UTF-8"?><xhtml xmlns="http://www.w3.org/1999/xhtml"><head><meta property="dc.format">text/csv</meta><meta property="dc.source">/input/invert.data-may19.csv</meta><meta property="dc.extent">50964</meta></head><body>
 <csv:document xmlns:csv="http://apache.org/cocoon/csv/1.0">
     <csv:record number="1">
         <csv:field number="1">Kingdom</csv:field>
