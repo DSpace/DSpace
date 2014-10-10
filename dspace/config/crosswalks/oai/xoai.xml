@@ -22,6 +22,7 @@
 			<Format refid="dim" />
 			<Format refid="ore" />
 			<Format refid="rdf" />
+			<Format refid="qdc" />
 			<Format refid="etdms" />
 			<Format refid="mods" />
 			<Format refid="marc" />
@@ -145,7 +146,7 @@
 			<Prefix>qdc</Prefix>
 			<XSLT>metadataFormats/qdc.xsl</XSLT>
 			<Namespace>http://purl.org/dc/terms/</Namespace>
-			<SchemaLocation>http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd</SchemaLocation>
+			<SchemaLocation>http://dublincore.org/schemas/xmls/qdc/dcterms.xsd</SchemaLocation>
 		</Format>
 		<Format id="marc">
 			<Prefix>marc</Prefix>
