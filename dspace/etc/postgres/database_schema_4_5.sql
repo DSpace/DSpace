@@ -276,18 +276,6 @@ null AS text_lang,
 0 AS place
 FROM eperson where not phone is null;
 
-
-INSERT INTO metadatavalue (resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
-SELECT
-eperson_id AS resource_id,
-7 AS resource_type_id,
-(select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'netid' and qualifier is null) AS metadata_field_id,
-netid AS text_value,
-null AS text_lang,
-0 AS place
-FROM eperson where not netid is null;
-
-
 INSERT INTO metadatavalue (resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
 eperson_id AS resource_id,
@@ -299,7 +287,7 @@ null AS text_lang,
 FROM eperson where not language is null;
 
 
-alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column netid, drop column language;
+alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column language;
 
 -- ---------
 -- dcvalue view
