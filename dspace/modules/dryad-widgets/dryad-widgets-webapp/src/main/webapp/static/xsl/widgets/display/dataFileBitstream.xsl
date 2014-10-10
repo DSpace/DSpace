@@ -22,7 +22,8 @@
     <xsl:variable name="source"    select="/xhtml:xhtml/xhtml:head/xhtml:meta[@property='dc.source']"/>
 
     <xsl:param name="doi"/>
-    <xsl:param name="bitstream"/> <!-- DataOne-MN url for bitstream -->
+    <xsl:param name="bitstream"/>   <!-- DataOne-MN url for bitstream -->
+    <xsl:param name="ddwcss"/>      <!-- url of the widget css stylesheet -->
 
     <!--
         Lookup table for template to call for handling input based on mime-type
@@ -63,11 +64,17 @@
     <!-- template called for unsupported mime-types -->
     <xsl:template name="unsupported">
         <html>
-            <head></head>
+            <head>
+                <link type="text/css" rel="stylesheet" href="{$ddwcss}"></link>
+            </head>
             <body>
-                <div>This content type '<xsl:value-of select="$mime-type"/>' is unsupported.
-                    Please visit the <a href="http://dx.doi.org/{$doi}">Dryad site</a>
-                    to view the data or download the data from this widget.
+                <div class="dryad-ddw">
+                    <p>
+                        This content for this data is unsupported for viewing.
+                        Please use the download link or
+                        visit the <a href="http://dx.doi.org/{$doi}">Dryad site</a>
+                        to view the data or download the data from this widget.
+                    </p>
                 </div>
             </body>
         </html>

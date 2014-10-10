@@ -7,10 +7,8 @@
 package org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.Text;
 
 import java.io.IOException;
-import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.generation.TextGenerator;
 import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.BaseBitstreamHandler;
 import org.dspace.app.xmlui.aspect.dryadwidgets.display.bitstreamHandler.BitstreamXMLConsumer;
@@ -34,7 +32,7 @@ public class Plain extends BaseBitstreamHandler {
      * @throws IOException
      */
     @Override
-    public void generate() throws SAXException, IOException, ProcessingException {
+    public void generate() throws SAXException, IOException {
         TextGenerator text = new TextGenerator();
         Parameters params = new Parameters();
         /*

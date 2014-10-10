@@ -234,7 +234,8 @@
                 </map:generate>
 
                 <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileBitstream.xsl">
-                    <map:parameter name="doi" value="{1}"/>
+                    <map:parameter name="doi"    value="{1}"/>
+                    <map:parameter name="ddwcss" value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
 
                     <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
                     <!--<map:parameter name="bitstream" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}/bitstream"/>-->
