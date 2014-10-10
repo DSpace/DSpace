@@ -62,8 +62,9 @@
                               text/csv generator
                     -->
                     <xsl:if test="//csv:record[position()=last()]/@number &gt;= 100">
+                        <xsl:variable name="all-cols" select="math:max(//csv:record/@number)"/>
                         <tfoot>
-                            <p>Please download the file to see data from additional rows.</p>
+                            <tr><td colspan="{$all-cols}">Please download the file to see data additional rows.</td></tr>
                         </tfoot>
                     </xsl:if>
                 </table>
