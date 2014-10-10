@@ -7,11 +7,14 @@
  */
 package org.dspace.app.sherpa;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpStatus;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 import org.dspace.core.ConfigurationManager;
 
 public class SHERPAService
@@ -21,27 +24,21 @@ public class SHERPAService
         String endpoint = ConfigurationManager.getProperty("sherpa.romeo.url");
         String apiKey = ConfigurationManager.getProperty("sherpa.romeo.apikey");
         
-        GetMethod method = null;
+        HttpGet method = null;
         try
         {
-            HttpClient client = new HttpClient();
-            method = new GetMethod(endpoint);
-
-            NameValuePair id = new NameValuePair("issn", query);
-            NameValuePair versions = new NameValuePair("versions", "all");
-            NameValuePair[] params = null;
+            URIBuilder uriBuilder = new URIBuilder(endpoint);
+            uriBuilder.addParameter("issn", query);
+            uriBuilder.addParameter("versions", "all");
             if (StringUtils.isNotBlank(apiKey))
-            {
-                NameValuePair ak = new NameValuePair("ak", apiKey);
-                params = new NameValuePair[] { id, versions, ak };
-            }
-            else
-            {
-                params = new NameValuePair[] { id, versions };
-            }
-            method.setQueryString(params);
+                uriBuilder.addParameter("ak", apiKey);
+
+            method = new HttpGet(uriBuilder.build());
+
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse response = client.execute(method);
+            int statusCode = response.getStatusLine().getStatusCode();
 
             if (statusCode != HttpStatus.SC_OK)
             {
@@ -49,7 +46,11 @@ public class SHERPAService
                         + statusCode);
             }
 
-            return new SHERPAResponse(method.getResponseBodyAsStream());
+            HttpEntity responseBody = response.getEntity();
+            if (null != responseBody)
+                return new SHERPAResponse(responseBody.getContent());
+            else
+                return new SHERPAResponse("SHERPA/RoMEO returned no response");
         }
         catch (Exception e)
         {

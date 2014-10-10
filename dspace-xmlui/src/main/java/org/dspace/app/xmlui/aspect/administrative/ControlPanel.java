@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
@@ -42,10 +41,11 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -510,7 +510,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.name")));
 
         dspace.addLabel(T_DB_NAME);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.name")));
+        dspace.addItem(notnull(DatabaseManager.getDbName()));
 
         dspace.addLabel(T_DB_URL);
         dspace.addItem(notnull(ConfigurationManager.getProperty("db.url")));

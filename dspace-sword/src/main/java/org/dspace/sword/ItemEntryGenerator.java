@@ -47,7 +47,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addCategories()
 	{
-		DCValue[] dcv = item.getMetadata("dc.subject.*");
+		DCValue[] dcv = item.getMetadataByMetadataString("dc.subject.*");
 		if (dcv != null)
 		{
 			for (int i = 0; i < dcv.length; i++)
@@ -233,7 +233,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addPublishDate()
 	{
-		DCValue[] dcv = item.getMetadata("dc.date.issued");
+		DCValue[] dcv = item.getMetadataByMetadataString("dc.date.issued");
 		if (dcv != null && dcv.length == 1)
         {
             entry.setPublished(dcv[0].value);
@@ -298,7 +298,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addSummary()
 	{
-		DCValue[] dcv = item.getMetadata("dc.description.abstract");
+		DCValue[] dcv = item.getMetadataByMetadataString("dc.description.abstract");
 		if (dcv != null)
 		{
 			for (int i = 0; i < dcv.length; i++)
@@ -317,7 +317,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addTitle()
 	{
-		DCValue[] dcv = item.getMetadata("dc.title");
+		DCValue[] dcv = item.getMetadataByMetadataString("dc.title");
 		if (dcv != null)
 		{
 			for (int i = 0; i < dcv.length; i++)
@@ -337,7 +337,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	protected void addLastUpdatedDate()
 	{
 		String config = ConfigurationManager.getProperty("sword-server", "updated.field");
-		DCValue[] dcv = item.getMetadata(config);
+		DCValue[] dcv = item.getMetadataByMetadataString(config);
 		if (dcv != null && dcv.length == 1)
         {
             DCDate dcd = new DCDate(dcv[0].value);

@@ -40,7 +40,7 @@
     String title = "Unknown Item";
     if (item != null)
     {
-        DCValue[] dcvs = item.getMetadata("dc.title");
+        DCValue[] dcvs = item.getMetadataByMetadataString("dc.title");
         if (dcvs != null && dcvs.length > 0)
         {
             title = dcvs[0].value;

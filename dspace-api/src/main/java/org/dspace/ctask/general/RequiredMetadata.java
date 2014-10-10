@@ -81,7 +81,7 @@ public class RequiredMetadata extends AbstractCurationTask
                 sb.append("Item: ").append(handle);
                 for (String req : getReqList(item.getOwningCollection().getHandle()))
                 {
-                    DCValue[] vals = item.getMetadata(req);
+                    DCValue[] vals = item.getMetadataByMetadataString(req);
                     if (vals.length == 0)
                     {
                         sb.append(" missing required field: ").append(req);
