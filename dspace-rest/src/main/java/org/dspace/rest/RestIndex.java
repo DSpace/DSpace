@@ -7,6 +7,8 @@
  */
 package org.dspace.rest;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -20,7 +22,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.eperson.EPerson;
+import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
+import org.dspace.rest.exceptions.ContextException;
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -31,6 +38,8 @@ import org.dspace.rest.common.User;
  */
 @Path("/")
 public class RestIndex {
+    private static Logger log = Logger.getLogger(RestIndex.class);
+
     @javax.ws.rs.core.Context public static ServletContext servletContext;
 
     /**
@@ -137,9 +146,12 @@ public class RestIndex {
         String token = TokenHolder.login(user);
         if (token == null)
         {
+            log.info("REST Login Attempt failed for user: " + user.getEmail());
             return Response.status(Response.Status.FORBIDDEN).build();
+        } else {
+            log.info("REST Login Success for user: " + user.getEmail());
+            return Response.ok(token, "text/plain").build();
         }
-        return Response.ok(token, "text/plain").build();
     }
 
     /**
@@ -160,16 +172,65 @@ public class RestIndex {
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
         boolean logout = false;
-
+        EPerson ePerson = null;
         if (list != null)
         {
             token = list.get(0);
+            ePerson = TokenHolder.getEPerson(token);
             logout = TokenHolder.logout(token);
         }
         if ((token == null) || (!logout))
         {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
+        if(ePerson != null) {
+            log.info("REST Logout: " + ePerson.getEmail());
+        }
         return Response.ok().build();
     }
+
+    /**
+     * ? status: OK
+     * authenticated: TRUE | FALSE
+     * epersonEMAIL: user@dspace.org
+     * epersonNAME: Joe User
+     * @param headers
+     * @return
+     */
+    @GET
+    @Path("/status")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Status status(@Context HttpHeaders headers) throws UnsupportedEncodingException {
+        org.dspace.core.Context context = null;
+
+        try {
+            context = Resource.createContext(Resource.getUser(headers));
+            EPerson ePerson = context.getCurrentUser();
+
+            if(ePerson != null) {
+                //DB EPerson needed since token won't have full info, need context
+                EPerson dbEPerson = EPerson.findByEmail(context, ePerson.getEmail());
+                String token = Resource.getToken(headers);
+                Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
+                return status;
+            }
+
+        } catch (ContextException e)
+        {
+            Resource.processException("Status context error: " + e.getMessage(), context);
+        } catch (SQLException e) {
+            Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);
+        } catch (AuthorizeException e) {
+            Resource.processException("Status eperson authorize exception: " + e.getMessage(), context);
+        } finally {
+            context.abort();
+        }
+
+        //fallback status, unauth
+        Status status = new Status();
+        return status;
+    }
+
+
 }
