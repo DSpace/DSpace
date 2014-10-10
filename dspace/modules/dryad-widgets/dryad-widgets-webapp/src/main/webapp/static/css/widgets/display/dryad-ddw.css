@@ -506,6 +506,21 @@
   margin: 0;
   background-color: #FFFFFF;
 }
+.dryad-ddw div.dryad-unsupported {
+  position: relative;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+.dryad-ddw div.dryad-unsupported p.dryad-unsupported {
+  position: absolute;
+  top: 50%;
+  margin-left: 10%;
+  margin-right: 10%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
 iframe.dryad-ddw,
 iframe.dryad-ddw-data {
   max-width: 100%;

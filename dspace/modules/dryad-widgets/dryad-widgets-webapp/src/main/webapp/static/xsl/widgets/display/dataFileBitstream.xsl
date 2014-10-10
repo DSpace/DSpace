@@ -69,10 +69,10 @@
             </head>
             <body>
                 <div class="dryad-ddw">
-                    <p>
-                        This content for this data is unsupported for viewing.
-                        Please use the download link or
-                        visit the <a href="http://dx.doi.org/{$doi}">Dryad site</a>
+                    <p class="dryad-ddw-unhandled">
+                        The content for this data is unsupported for viewing.
+                        Please use the download link orq    q
+                        visit the <a href="http://dx.doi.org/{$doi}" target="_blank">Dryad site</a>
                         to view the data or download the data from this widget.
                     </p>
                 </div>
