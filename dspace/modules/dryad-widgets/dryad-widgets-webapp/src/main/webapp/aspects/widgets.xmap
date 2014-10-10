@@ -143,7 +143,7 @@
             </map:match>
             <map:handle-errors>
                 <map:select type="exception">
-                    <map:when test="404">
+                    <map:when test="not-found">
                         <map:generate type="exception"/>
                         <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
                         <map:transform type="i18n">
