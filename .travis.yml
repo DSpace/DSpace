@@ -29,7 +29,7 @@ before_script:
 - "sh -e /etc/init.d/xvfb start"
 - "python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &"
 script: 
-- "mvn package install -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test"
+- "mvn package install -Dlicense.skip=true -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test"
 - "mvn -DskipTests=false -f dspace/modules/dryad-widgets/pom.xml failsafe:integration-test failsafe:verify -DseleniumTestURL=\"http://localhost:$ITPORT/dspace/modules/dryad-widgets/dryad-widgets-webapp/src/test/java/it\""
 after_script:
 - pkill -f SimpleHTTPServer
