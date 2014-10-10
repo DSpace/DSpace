@@ -21,14 +21,16 @@ install:
 - ./test/bin/travis-install-missing-poms.sh
 - ./test/bin/travis-install-dryad-dir.sh
 before_script:
-- export ITPORT=2341
-- export SERVER=99
-- export SCREEN=0
-- export ITPORT=2341
-- export DISPLAY=":${SERVER}.${SCREEN}"
-- sh -e /etc/init.d/xvfb start
-- python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &
-script: mvn package -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test surefire:test failsafe:integration-test failsafe:verify -DseleniumTestURL="http://localhost:$ITPORT/dspace/modules/dryad-widgets/dryad-widgets-webapp/src/test/java/it"
+- "export ITPORT=2341"
+- "export SERVER=99"
+- "export SCREEN=0"
+- "export ITPORT=2341"
+- "export DISPLAY=:${SERVER}.${SCREEN}"
+- "sh -e /etc/init.d/xvfb start"
+- "python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &"
+script: 
+- "mvn package -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test"
+- "mvn failsafe:integration-test failsafe:verify -DseleniumTestURL=\"http://localhost:$ITPORT/dspace/modules/dryad-widgets/dryad-widgets-webapp/src/test/java/it\""
 after_script:
 - pkill -f SimpleHTTPServer
 - sh -e /etc/init.d/xvfb stop
@@ -36,3 +38,4 @@ after_failure: find . -type f -path "*/surefire-reports/*" -name "*.txt" -print 
 notifications:
   slack:
     secure: EqYW7e3FhVxoZzVS4FR52ajePoDbyeOsYcXA9b2BjUWDNc5WNFxRDwNfkxmD09BOAI1g7fKH+Fj5VrtnsUwh7kYosNBj9anjl9CleJ8xGQR35avoaXMJQ3BcULIBfSsUUEwaT+M8uHnM1PNC9DW1uq5w+Hd/9wASwJR5g5BU49I=
+
