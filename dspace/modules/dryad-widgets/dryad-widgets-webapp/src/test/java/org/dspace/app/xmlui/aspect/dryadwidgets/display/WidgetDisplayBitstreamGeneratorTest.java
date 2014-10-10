@@ -137,7 +137,17 @@ public class WidgetDisplayBitstreamGeneratorTest extends TestCase {
             removeMatchingString(tempFile.getAbsolutePath(), "http://" + testServer.getServiceHostName() + ":" + testServer.getServicePort());
            
             // check files are equal
+System.out.println("Before generateSuccess");
+System.out.println("PATH 1: " + (new File(outputPath)).getAbsolutePath());
+System.out.println("PATH 2: " + (new File(tempFile.getAbsolutePath())).getAbsolutePath());
+
             boolean generateSuccess = FileUtils.contentEquals(new File(outputPath), new File(tempFile.getAbsolutePath()));
+
+System.out.println("After generateSuccess");
+System.out.println("PATH 1: " + (new File(outputPath)).getAbsolutePath());
+System.out.println("PATH 2: " + (new File(tempFile.getAbsolutePath())).getAbsolutePath());
+
+
             // do tmp file cleanup if we had a successful run
             if (generateSuccess) {
                 tempFile.deleteOnExit();
