@@ -54,6 +54,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -72,7 +73,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+import org.dspace.content.DCDate;
+import org.dspace.content.DCValue;
+import org.dspace.event.Event;
+import org.dspace.embargo.EmbargoManager;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -2140,4 +2144,113 @@ public class ItemImport
             log.warn("error during item export error notification", e);
         }
     }
+
+
+    /**
+     * Replace Item maintaining the item_id - It uses deprecated Class DCValue
+     * 
+     * @param c Context
+     * @param mycollections Collections where the item belongs
+     * @param myitem The Item to be replaced
+     * @param path
+     * @param itemname 
+     * @throws AuthorizeException 
+     * @throws SQLException
+     * @throws IOException 
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     */
+    @Deprecated
+    private void replaceItem(Context c, Collection[] mycollections, Item myitem, String path, String itemname) throws AuthorizeException, SQLException, IOException, SAXException, ParserConfigurationException, TransformerException
+    {
+     System.out.println("Replacing item with directory " + itemname);
+   
+     // before cleanup the metadata, save the fields that would normally be generatesd by InstallItem.populateMetadata()
+     List<DCValue> saved = new ArrayList<DCValue>();
+     saved.addAll(Arrays.asList(myitem.getMetadata("dc","date","available",Item.ANY)));
+     saved.addAll(Arrays.asList(myitem.getMetadata("dc","date","accessioned",Item.ANY)));
+     saved.addAll(Arrays.asList(myitem.getMetadata("dc","date","issued",Item.ANY)));
+     saved.addAll(Arrays.asList(myitem.getMetadata("dc","description","provenance",Item.ANY)));
+
+     if (! isTest) {
+         myitem.cleanItem();
+     } else { 
+         myitem = null;
+     }
+   
+     // load replacement metadata
+     loadMetadata(c, myitem, path + File.separatorChar + itemname + File.separatorChar);
+
+     // restore each saved metadata value
+     if (!isTest) { 
+         for (DCValue val : saved) {
+              // disable special treatment of provenance
+              if (val.schema.equals("dc") && val.element.equals("description") && val.qualifier.equals("provenance")) {
+             // for provenance, always restore it unless the exact same value is already present from replacement
+                    boolean alreadyPresent = false;
+                    for (DCValue existing : myitem.getMetadata("dc","description","provenance",Item.ANY)) {
+                         if (existing.value.equals(val.value)) {
+                             alreadyPresent = true;
+                             break;
+                         }
+                   }
+                   if (!alreadyPresent) {
+                       myitem.addMetadata(val.schema, val.element, val.qualifier, val.language, val.value);
+                   }
+             } else if (myitem.getMetadata(val.schema, val.element, val.qualifier, Item.ANY).length == 0) {
+                          // for non-provenance, only restore if replacement didn't have any values for this element
+                          myitem.addMetadata(val.schema, val.element, val.qualifier, val.language, val.value);
+                       }  
+         }
+         // make a new provenance item and add it
+         String now = DCDate.getCurrent().toString();
+         EPerson e = c.getCurrentUser();
+         String prov = "Item contents replaced by "+e.getFullName()+" ("+e.getEmail()+") on "+now+"\n";
+         myitem.addMetadata("dc", "description", "provenance", "en", prov);
+     }
+     
+     // add replacement bitstreams
+     List<String> options = processContentsFile(c, myitem, path + File.separatorChar + itemname, "contents");
+
+     // set permissions if specified in contents file
+     if (options.size() > 0) {
+        System.out.println("Processing options");
+        processOptions(c, myitem, options);
+     }
+
+     if (!isTest) {
+         myitem.update();
+
+         c.addEvent(new Event(Event.MODIFY+Event.MODIFY_METADATA, Constants.ITEM, myitem.getID(), myitem.getHandle()));
+         //set embargo lift date and take away read access if indicated.
+         DCDate liftDate = EmbargoManager.getEmbargoTermsAsDate(c, myitem);
+         if (liftDate != null)
+         {
+             EmbargoManager.setEmbargo(c, myitem );
+         }
+     }
+
+    // Clean all item_id references
+    mycollections[0].removeItemFromAllCollections(myitem);
+
+    // RR: now add to multiple collections if requested
+    if (mycollections.length > 0)
+    {
+        for (int i = 0; i < mycollections.length; i++)
+            {
+                if (!isTest)
+                {
+                    mycollections[i].addItem(myitem);
+                }
+        }
+    }
+
+
+     c.commit();
+
+     return;
+                   
+    }
+
 }
