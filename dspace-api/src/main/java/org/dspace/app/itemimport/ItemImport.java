@@ -17,6 +17,7 @@ import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipFile;
@@ -35,6 +36,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemexport.ItemExportException;
@@ -1385,6 +1387,7 @@ public class ItemImport
                         boolean bundleExists = false;
                         boolean permissionsExist = false;
                         boolean descriptionExists = false;
+                        boolean embargoExists = false;
 
                         // look for a bundle name
                         String bundleMarker = "\tbundle:";
@@ -1428,6 +1431,20 @@ public class ItemImport
                             descriptionExists = true;
                         }
 
+                        // look for embargo
+                        String embargoMarker = "\tembargo:";
+                        int eMarkerIndex = line.indexOf(embargoMarker);
+                        int eEndIndex = 0;
+                        if (eMarkerIndex > 0)
+                        {
+                            eEndIndex = line.indexOf("\t", eMarkerIndex + 1);
+                            if (eEndIndex == -1)
+                            {
+                                eEndIndex = line.length();
+                            }
+                            embargoExists = true;
+                        }
+
                         // is this the primary bitstream?
                         String primaryBitstreamMarker = "\tprimary:true";
                         boolean primary = false;
@@ -1454,7 +1471,8 @@ public class ItemImport
                             System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                         }
 
-                        if (permissionsExist || descriptionExists)
+                        if (permissionsExist || descriptionExists
+                                || embargoExists)
                         {
                             String extraInfo = bitstreamName;
 
@@ -1468,6 +1486,13 @@ public class ItemImport
                             {
                                 extraInfo = extraInfo
                                         + line.substring(dMarkerIndex, dEndIndex);
+                            }
+
+                            if (embargoExists)
+                            {
+                                extraInfo = extraInfo
+                                        + line.substring(eMarkerIndex,
+                                                eEndIndex);
                             }
 
                             options.add(extraInfo);
@@ -1653,23 +1678,21 @@ public class ItemImport
      * 
      * Process the Options to apply to the Item. The options are tab delimited
      * 
-     * Options:
-     *      48217870-MIT.pdf        permissions: -r 'MIT Users'     description: Full printable version (MIT only)
-     *      permissions:[r|w]-['group name']
-     *      description: 'the description of the file'
-     *      
-     *      where:
-     *          [r|w] (meaning: read|write)
-     *          ['MIT Users'] (the group name)
-     *          
+     * Options: 48217870-MIT.pdf permissions: -r 'MIT Users' description: Full
+     * printable version (MIT only) permissions:[r|w]-['group name']
+     * description: 'the description of the file'
+     * 
+     * where: [r|w] (meaning: read|write) ['MIT Users'] (the group name)
+     * 
      * @param c
      * @param myItem
      * @param options
      * @throws SQLException
      * @throws AuthorizeException
+     * @throws ParseException
      */
     private void processOptions(Context c, Item myItem, List<String> options)
-            throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException, ParseException
     {
         for (String line : options)
         {
@@ -1677,6 +1700,7 @@ public class ItemImport
 
             boolean permissionsExist = false;
             boolean descriptionExists = false;
+            boolean embargoExists = false;
 
             String permissionsMarker = "\tpermissions:";
             int pMarkerIndex = line.indexOf(permissionsMarker);
@@ -1702,6 +1726,19 @@ public class ItemImport
                     dEndIndex = line.length();
                 }
                 descriptionExists = true;
+            }
+
+            String embargoMarker = "\tembargo:";
+            int eMarkerIndex = line.indexOf(embargoMarker);
+            int eEndIndex = 0;
+            if (eMarkerIndex > 0)
+            {
+                eEndIndex = line.indexOf("\t", eMarkerIndex + 1);
+                if (eEndIndex == -1)
+                {
+                    eEndIndex = line.length();
+                }
+                embargoExists = true;
             }
 
             int bsEndIndex = line.indexOf("\t");
@@ -1762,6 +1799,14 @@ public class ItemImport
                         .trim();
             }
 
+            String thisEmbargoDate = "";
+            if (embargoExists)
+            {
+                thisEmbargoDate = line.substring(
+                        eMarkerIndex + embargoMarker.length(), eEndIndex)
+                        .trim();
+            }
+
             Bitstream bs = null;
             boolean notfound = true;
             if (!isTest)
@@ -1813,6 +1858,13 @@ public class ItemImport
                     bs.setDescription(thisDescription);
                     bs.update();
                 }
+
+                if (embargoExists)
+                {
+                    System.out.println("\tSetting embargo for " + bitstreamName
+                            + " until " + thisEmbargoDate);
+                    setEmbargo(c, thisEmbargoDate, null, bs);
+                }
             }
         }
     }
@@ -1856,6 +1908,88 @@ public class ItemImport
             }
         }
 
+    }
+
+    /**
+     * Sets the embargo date on a bitstream
+     * 
+     * @param c
+     * @param embargoDate
+     * @param grpName
+     *            group name specified if embargo applies to a specific group
+     * @param bs
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws ParseException
+     */
+    private void setEmbargo(Context c, String date, String groupName,
+            DSpaceObject dspaceobj) throws SQLException, AuthorizeException,
+            ParseException
+
+    {
+        Date embargoDate = DateUtils.parseDate(date, new String[] {
+                "yyyy-MM-dd", "yyyy-MM", "yyyy" });
+        if (embargoDate != null)
+        {
+            if (!isTest)
+            {
+                AuthorizeManager.authorizeAction(c, dspaceobj, Constants.READ);
+
+                Group policyGroup;
+                if (groupName != null)
+                {
+                    policyGroup = Group.findByName(c, groupName);
+                    if (policyGroup == null)
+                    {
+                        throw new Error("Group name " + groupName
+                                + " does not exist");
+                    }
+                }
+                else
+                {
+                    policyGroup = Group.find(c, 0);
+                }
+
+                String reason = "";
+                if (dspaceobj instanceof Item)
+                {
+                    reason += "Item";
+                }
+                else if (dspaceobj instanceof Bundle)
+                {
+                    reason += "Bundle";
+                }
+                else if (dspaceobj instanceof Bitstream)
+                {
+                    reason += "Bitstream";
+                }
+                reason += " is embargoed until " + embargoDate.toString();
+
+                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null,
+                        c, "Embargo Policy", policyGroup.getID(), null,
+                        embargoDate, Constants.READ, reason, dspaceobj);
+                rp.update();
+            }
+            else
+            {
+                String reason = "";
+                if (dspaceobj instanceof Item)
+                {
+                    reason += "Item";
+                }
+                else if (dspaceobj instanceof Bundle)
+                {
+                    reason += "Bundle";
+                }
+                else if (dspaceobj instanceof Bitstream)
+                {
+                    reason += "Bitstream";
+                }
+                reason += " would be embargoed until " + embargoDate.toString();
+
+                System.out.println(reason);
+            }
+        }
     }
 
     // XML utility methods
