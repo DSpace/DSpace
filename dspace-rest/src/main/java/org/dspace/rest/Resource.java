@@ -80,10 +80,9 @@ public class Resource
         }
         catch (SQLException e)
         {
-        	if((context != null) && (context.isValid()))
+            if ((context != null) && (context.isValid()))
             {
-            	log.error("Something get wrong. Aborting context in finally statement.");
-            	context.abort();
+                context.abort();
             }
             throw new ContextException("Could not create context, SQLException. Message: " + e, e);
         }
@@ -128,16 +127,26 @@ public class Resource
 
             log.debug("fired event");
             context.complete();
-
         }
         catch (SQLException e)
         {
-            processException("Could not write usageEvent, SQLException. Message: " + e, null); // Write statistic should not abort context.
-
+            if ((context != null) && (context.isValid()))
+            {
+                context.abort();
+            }
+            log.error("Could not write usageEvent, SQLException. Message: " + e);
         }
         catch (ContextException e)
         {
-            processException("Could not write usageEvent, ContextException. Message: " + e.getMessage(), null); // Write statistic should not abort context.
+            log.error("Could not write usageEvent, ContextException. Message: " + e.getMessage());
+        }
+        finally
+        {
+            if ((context != null) && (context.isValid()))
+            {
+                context.abort();
+                log.error("Something get wrong. Aborting context in finally statement.");
+            }
         }
     }
 
@@ -160,6 +169,25 @@ public class Resource
         }
         log.error(message);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Process finally statement. It will print message to logger error stream
+     * and abort DSpace context, if was not properly ended.
+     *
+     * @param context
+     *            Context which must be aborted.
+     * @throws WebApplicationException
+     *             This exception is throw for user of REST api.
+     */
+    protected void processFinally(org.dspace.core.Context context) throws WebApplicationException
+    {
+        if ((context != null) && (context.isValid()))
+        {
+            context.abort();
+            log.error("Something get wrong. Aborting context in finally statement.");
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**

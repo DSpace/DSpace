@@ -95,11 +95,12 @@ public class TokenHolder
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            if ((context != null) && (context.isValid()))
+            {
+                context.abort();
+                log.error("Something get wrong. Aborting context in finally statement.");
+                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
         }
 
         return token;
