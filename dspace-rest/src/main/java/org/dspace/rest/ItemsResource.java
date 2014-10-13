@@ -121,11 +121,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         return item;
@@ -161,13 +157,14 @@ public class ItemsResource extends Resource
 
         log.info("Reading items.(offset=" + offset + ",limit=" + limit + ").");
         org.dspace.core.Context context = null;
+        List<Item> items = null;
 
         try
         {
             context = createContext(getUser(headers));
 
             ItemIterator dspaceItems = org.dspace.content.Item.findAllUnfiltered(context);
-            List<Item> items = new ArrayList<Item>();
+            items = new ArrayList<Item>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -189,12 +186,7 @@ public class ItemsResource extends Resource
                     }
                 }
             }
-
             context.complete();
-            log.trace("Items were successfully read.");
-
-            return items.toArray(new Item[0]);
-
         }
         catch (SQLException e)
         {
@@ -206,14 +198,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-        return null;
+        log.trace("Items were successfully read.");
+        return items.toArray(new Item[0]);
     }
 
     /**
@@ -244,6 +233,7 @@ public class ItemsResource extends Resource
 
         log.info("Reading item(id=" + itemId + ") metadata.");
         org.dspace.core.Context context = null;
+        List<MetadataEntry> metadata = null;
 
         try
         {
@@ -252,12 +242,8 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
 
-            List<MetadataEntry> metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
+            metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
-            log.trace("Item(id=" + itemId + ") metadata were successfully read.");
-
-            return metadata.toArray(new MetadataEntry[0]);
-
         }
         catch (SQLException e)
         {
@@ -269,13 +255,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
-        return null;
+
+        log.trace("Item(id=" + itemId + ") metadata were successfully read.");
+        return metadata.toArray(new MetadataEntry[0]);
     }
 
     /**
@@ -309,7 +293,7 @@ public class ItemsResource extends Resource
 
         log.info("Reading item(id=" + itemId + ") bitstreams.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
-
+        List<Bitstream> bitstreams = null;
         try
         {
             context = createContext(getUser(headers));
@@ -317,7 +301,6 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
 
-            List<Bitstream> bitstreams;
             List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
 
             if ((offset + limit) > (itemBitstreams.size() - offset))
@@ -328,12 +311,7 @@ public class ItemsResource extends Resource
             {
                 bitstreams = itemBitstreams.subList(offset, offset + limit);
             }
-
             context.complete();
-            log.trace("Item(id=" + itemId + ") bitstreams were successfully read.");
-
-            return bitstreams.toArray(new Bitstream[0]);
-
         }
         catch (SQLException e)
         {
@@ -346,14 +324,11 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-        return null;
+        log.trace("Item(id=" + itemId + ") bitstreams were successfully read.");
+        return bitstreams.toArray(new Bitstream[0]);
     }
 
     /**
@@ -425,11 +400,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Metadata to item(id=" + itemId + ") were successfully added.");
@@ -600,11 +571,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
@@ -690,11 +657,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Metadata of item(id=" + itemId + ") were successfully updated.");
@@ -763,11 +726,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Item(id=" + itemId + ") was successfully deleted.");
@@ -845,11 +804,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Item(id=" + itemId + ") metadata were successfully deleted.");
@@ -945,11 +900,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Bitstream(id=" + bitstreamId + ") from item(id=" + itemId + ") was successfuly deleted .");
@@ -1071,11 +1022,7 @@ public class ItemsResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         if (items.size() == 0)

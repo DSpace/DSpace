@@ -104,11 +104,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -149,13 +145,14 @@ public class CommunitiesResource extends Resource
 
         log.info("Reading all communities.(offset=" + offset + " ,limit=" + limit + ").");
         org.dspace.core.Context context = null;
+        ArrayList<Community> communities = null;
 
         try
         {
             context = createContext(getUser(headers));
 
             org.dspace.content.Community[] dspaceCommunities = org.dspace.content.Community.findAll(context);
-            ArrayList<Community> communities = new ArrayList<Community>();
+            communities = new ArrayList<Community>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -176,10 +173,6 @@ public class CommunitiesResource extends Resource
             }
 
             context.complete();
-
-            log.trace("All communities successfully read.");
-            return communities.toArray(new Community[0]);
-
         }
         catch (SQLException e)
         {
@@ -191,15 +184,11 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-
-        return null;
+        log.trace("All communities successfully read.");
+        return communities.toArray(new Community[0]);
     }
 
     /**
@@ -238,13 +227,14 @@ public class CommunitiesResource extends Resource
 
         log.info("Reading all top communities.(offset=" + offset + " ,limit=" + limit + ").");
         org.dspace.core.Context context = null;
+        ArrayList<Community> communities = null;
 
         try
         {
             context = createContext(getUser(headers));
 
             org.dspace.content.Community[] dspaceCommunities = org.dspace.content.Community.findAllTop(context);
-            ArrayList<Community> communities = new ArrayList<Community>();
+            communities = new ArrayList<Community>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -265,10 +255,6 @@ public class CommunitiesResource extends Resource
             }
 
             context.complete();
-
-            log.trace("All top communities successfully read.");
-            return communities.toArray(new Community[0]);
-
         }
         catch (SQLException e)
         {
@@ -280,15 +266,11 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-
-        return null;
+        log.trace("All top communities successfully read.");
+        return communities.toArray(new Community[0]);
     }
 
     /**
@@ -327,6 +309,7 @@ public class CommunitiesResource extends Resource
 
         log.info("Reading community(id=" + communityId + ") collections.");
         org.dspace.core.Context context = null;
+        ArrayList<Collection> collections = null;
 
         try
         {
@@ -343,7 +326,7 @@ public class CommunitiesResource extends Resource
                 offset = 0;
             }
 
-            ArrayList<Collection> collections = new ArrayList<Collection>();
+            collections = new ArrayList<Collection>();
             org.dspace.content.Collection[] dspaceCollections = dspaceCommunity.getCollections();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCollections.length); i++)
             {
@@ -356,10 +339,6 @@ public class CommunitiesResource extends Resource
             }
 
             context.complete();
-
-            log.trace("Community(id=" + communityId + ") collections were successfully read.");
-            return collections.toArray(new Collection[0]);
-
         }
         catch (SQLException e)
         {
@@ -373,15 +352,11 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-
-        return null;
+        log.trace("Community(id=" + communityId + ") collections were successfully read.");
+        return collections.toArray(new Collection[0]);
     }
 
     /**
@@ -420,6 +395,7 @@ public class CommunitiesResource extends Resource
 
         log.info("Reading community(id=" + communityId + ") subcommunities.");
         org.dspace.core.Context context = null;
+        ArrayList<Community> communities = null;
 
         try
         {
@@ -436,7 +412,7 @@ public class CommunitiesResource extends Resource
                 offset = 0;
             }
 
-            ArrayList<Community> communities = new ArrayList<Community>();
+            communities = new ArrayList<Community>();
             org.dspace.content.Community[] dspaceCommunities = dspaceCommunity.getSubcommunities();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCommunities.length); i++)
             {
@@ -449,10 +425,6 @@ public class CommunitiesResource extends Resource
             }
 
             context.complete();
-
-            log.trace("Community(id=" + communityId + ") subcommunities were successfully read.");
-            return communities.toArray(new Community[0]);
-
         }
         catch (SQLException e)
         {
@@ -467,15 +439,11 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-
-        return null;
+        log.trace("Community(id=" + communityId + ") subcommunities were successfully read.");
+        return communities.toArray(new Community[0]);
     }
 
     /**
@@ -549,11 +517,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -635,11 +599,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -720,11 +680,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -797,13 +753,8 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
-
 
         log.info("Community(id=" + communityId + ") has been successfully updated.");
         return Response.ok().build();
@@ -867,11 +818,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -977,11 +924,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 
@@ -1087,11 +1030,7 @@ public class CommunitiesResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
 

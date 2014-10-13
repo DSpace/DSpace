@@ -120,11 +120,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         return bitstream;
@@ -185,11 +181,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         return policies.toArray(new ResourcePolicy[0]);
@@ -269,11 +261,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
         
         return bitstreams.toArray(new Bitstream[0]);
@@ -311,6 +299,7 @@ public class BitstreamResource extends Resource
 
         log.info("Reading data of bitstream(id=" + bitstreamId + ").");
         org.dspace.core.Context context = null;
+        InputStream inputStream = null;
 
         try
         {
@@ -321,13 +310,10 @@ public class BitstreamResource extends Resource
                     request);
 
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
-            InputStream inputStream = dspaceBitstream.retrieve();
+            inputStream = dspaceBitstream.retrieve();
             String type = dspaceBitstream.getFormat().getMIMEType();
 
             context.complete();
-
-            return Response.ok(inputStream).type(type).build();
-
         }
         catch (IOException e)
         {
@@ -351,14 +337,10 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
-        return null;
+        return Response.ok(inputStream).type(type).build();
     }
 
     /**
@@ -435,11 +417,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
         return Response.status(Status.OK).build();
     }
@@ -567,11 +545,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Bitstream metadata(id=" + bitstreamId + ") were successfully updated.");
@@ -658,11 +632,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
 
         log.info("Bitstream(id=" + bitstreamId + ") data was successfully updated.");
@@ -737,11 +707,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
         
         log.info("Bitstream(id=" + bitstreamId + ") was successfully deleted.");
@@ -815,11 +781,7 @@ public class BitstreamResource extends Resource
         }
         finally
         {
-        	if((context != null) && (context.isValid()))
-        	{
-        		log.error("Something get wrong. Aborting context in finally statement.");
-        		context.abort();
-        	}
+            processFinally(context);
         }
         
         return Response.status(Status.OK).build();
