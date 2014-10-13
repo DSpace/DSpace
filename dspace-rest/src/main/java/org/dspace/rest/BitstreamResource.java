@@ -300,6 +300,7 @@ public class BitstreamResource extends Resource
         log.info("Reading data of bitstream(id=" + bitstreamId + ").");
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
+        String type = null;
 
         try
         {
@@ -311,7 +312,7 @@ public class BitstreamResource extends Resource
 
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = dspaceBitstream.retrieve();
-            String type = dspaceBitstream.getFormat().getMIMEType();
+            type = dspaceBitstream.getFormat().getMIMEType();
 
             context.complete();
         }
