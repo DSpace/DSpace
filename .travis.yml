@@ -30,6 +30,7 @@ before_script:
 - "python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &"
 script: 
 - "mvn install -Dlicense.skip=true -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test"
+- "./test/bin/travis-install-built-poms.sh"
 - "mvn -DskipTests=false -f dspace/modules/dryad-widgets/pom.xml failsafe:integration-test failsafe:verify -DseleniumTestURL=\"http://localhost:$ITPORT/dspace/modules/dryad-widgets/dryad-widgets-webapp/src/test/java/it\""
 after_script:
 - pkill -f SimpleHTTPServer
