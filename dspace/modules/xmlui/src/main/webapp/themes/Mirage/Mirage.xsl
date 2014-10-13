@@ -111,7 +111,8 @@
             #aspect_statistics_StatisticsTransformer_div_stats,
             #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
                 height: 300px;
-                overflow: visible;
+                overflow-x: visible;
+                overflow-y: scroll;
             }
 
         #aspect_statistics_StatisticsTransformer_div_stats table {
