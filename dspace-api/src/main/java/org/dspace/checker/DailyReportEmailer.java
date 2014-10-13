@@ -10,6 +10,7 @@ package org.dspace.checker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.mail.MessagingException;
@@ -20,6 +21,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
@@ -52,30 +54,67 @@ public class DailyReportEmailer
     /**
      * Send the report through email.
      * 
+     *
      * @param attachment
      *            the file containing the report
      * @param numberOfBitstreams
      *            the number of bitstreams reported
-     * 
+     * @param toAdr
+     *            where to send the email
      * @throws IOException
      *             if IO exception occurs
      * @throws javax.mail.MessagingException
      *             if message cannot be sent.
      */
-    public void sendReport(File attachment, int numberOfBitstreams) 
-            throws IOException, javax.mail.MessagingException 
-    { 
-        if(numberOfBitstreams > 0)
-        {
-            String hostname = ConfigurationManager.getProperty("dspace.hostname");
-            Email email = new Email();
-            email.setSubject("Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues on " + hostname);
-            email.setContent("report is attached ...");
-            email.addAttachment(attachment, "checksum_checker_report.txt");
-            email.addRecipient(ConfigurationManager.getProperty("mail.admin"));
-            email.send();
+    public void sendReport(File attachment, int numberOfBitstreams, String toAdr)
+            throws IOException, javax.mail.MessagingException
+    {
+        InternetAddress to = null;
+        try {
+            to = new InternetAddress(toAdr);
+        } catch (javax.mail.internet.AddressException e) {
+            log.error("Could not parse email address " + toAdr);
+            return;
         }
-    } 
+        // Get the mail configuration properties
+        String server = ConfigurationManager.getProperty("mail.server");
+
+        // Set up properties for mail session
+        Properties props = System.getProperties();
+        props.put("mail.smtp.host", server);
+
+        // Get session
+        Session session = Session.getDefaultInstance(props, null);
+
+        MimeMessage msg = new MimeMessage(session);
+        Multipart multipart = new MimeMultipart();
+
+        // create the first part of the email
+        BodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart
+                .setText("This is the checksum checker report see attachment for details \n"
+                        + numberOfBitstreams
+                        + " Bitstreams found with POSSIBLE issues");
+        multipart.addBodyPart(messageBodyPart);
+
+        // add the file
+        messageBodyPart = new MimeBodyPart();
+
+        DataSource source = new FileDataSource(attachment);
+        messageBodyPart.setDataHandler(new DataHandler(source));
+        messageBodyPart.setFileName("checksum_checker_report.txt");
+        multipart.addBodyPart(messageBodyPart);
+        msg.setContent(multipart);
+        msg.setFrom(new InternetAddress(ConfigurationManager
+                .getProperty("mail.from.address")));
+        msg.addRecipient(Message.RecipientType.TO, to);
+
+        msg.setSentDate(new Date());
+        msg.setSubject("Checksum checker Report - " + numberOfBitstreams
+                + " Bitstreams found with POSSIBLE issues");
+        Transport.send(msg);
+
+    }
 
     /**
      * Allows users to have email sent to them. The default is to send all
@@ -129,6 +168,13 @@ public class DailyReportEmailer
                 .addOption("n", "Not Processed", false,
                         "Send E-mail report for all bitstreams set to longer be processed for today");
 
+        options.addOption("p", "prune", false, "Prune configuration file");
+        OptionBuilder emailadr = OptionBuilder
+                .withArgName("emailadr")
+                .hasArgs(1)
+                .withDescription(
+                        "Send report to given email instead of default mail.admin; if adr is '-' print report to stdout");
+        options.addOption(emailadr.create("t"));
         try
         {
             line = parser.parse(options, args);
@@ -177,29 +223,45 @@ public class DailyReportEmailer
         Date tomorrow = calendar.getTime();
 
         File report = null;
-        FileWriter writer = null;
-
+        FileWriter fileWriter = null;
+        OutputStreamWriter writer = null;
         try
         {
+            String toAdr =  null;
+            
+            if (line.hasOption("t")) {
+                toAdr = line.getOptionValue("t");
+            } else {
+                toAdr = ConfigurationManager.getProperty("mail.admin");
+            }
+            log.info(String.format("DailyReportEmailer toAdr = '%s'", toAdr));
             // the number of bitstreams in report
             int numBitstreams = 0;
 
-            // create a temporary file in the log directory
-            String dirLocation = ConfigurationManager.getProperty("log.dir");
-            File directory = new File(dirLocation);
-
-            if (directory.exists() && directory.isDirectory())
-            {
-                report = File.createTempFile("checker_report", ".txt",
-                        directory);
+            if (toAdr.equals("-")) {// use stdout
+                writer = new OutputStreamWriter(System.out);
+                toAdr = null;   // indicate that we do not want to send email
             }
             else
             {
-                throw new IllegalStateException("directory :" + dirLocation
-                        + " does not exist");
-            }
+                // create a temporary file in the log directory
+                String dirLocation = ConfigurationManager.getProperty("log.dir");
+                File directory = new File(dirLocation);
 
-            writer = new FileWriter(report);
+                if (directory.exists() && directory.isDirectory())
+                {
+                    report = File.createTempFile("checker_report", ".txt",
+                            directory);
+                }
+                else
+                {
+                    throw new IllegalStateException("directory :" + dirLocation
+                            + " does not exist");
+                }
+
+                fileWriter = new FileWriter(report);
+                writer = fileWriter;
+            }
 
             if ((line.hasOption("a")) || (line.getOptions().length == 0))
             {
@@ -226,7 +288,8 @@ public class DailyReportEmailer
                         .write("\n--------------------------------- End Report ---------------------------\n\n");
                 writer.flush();
                 writer.close();
-                emailer.sendReport(report, numBitstreams);
+                if (toAdr != null)
+                    emailer.sendReport(report, numBitstreams, toAdr);
             }
             else
             {
@@ -238,7 +301,8 @@ public class DailyReportEmailer
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
-                    emailer.sendReport(report, numBitstreams);
+                    if (toAdr != null)
+                        emailer.sendReport(report, numBitstreams, toAdr);
                 }
 
                 if (line.hasOption("m"))
@@ -249,7 +313,8 @@ public class DailyReportEmailer
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
-                    emailer.sendReport(report, numBitstreams);
+                    if (toAdr != null)
+                        emailer.sendReport(report, numBitstreams, toAdr);
                 }
 
                 if (line.hasOption("c"))
@@ -260,7 +325,8 @@ public class DailyReportEmailer
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
-                    emailer.sendReport(report, numBitstreams);
+                    if (toAdr != null)
+                        emailer.sendReport(report, numBitstreams, toAdr);
                 }
 
                 if (line.hasOption("n"))
@@ -271,7 +337,8 @@ public class DailyReportEmailer
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
-                    emailer.sendReport(report, numBitstreams);
+                    if (toAdr != null)
+                        emailer.sendReport(report, numBitstreams, toAdr);
                 }
 
                 if (line.hasOption("u"))
@@ -282,7 +349,8 @@ public class DailyReportEmailer
                             .getUncheckedBitstreamsReport(writer);
                     writer.flush();
                     writer.close();
-                    emailer.sendReport(report, numBitstreams);
+                    if (toAdr != null)
+                        emailer.sendReport(report, numBitstreams, toAdr);
                 }
             }
         }
