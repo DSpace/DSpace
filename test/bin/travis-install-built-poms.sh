@@ -16,7 +16,7 @@ function install_file() {
     GROUP=$(jar tf $FILE | grep "META-INF/maven/" | grep -v "$ARTIFACT" | grep -v pom  | sed 's/META-INF\/maven//g' | perl -pe 's:[/\s]+::g');
     echo FILE: $FILE
     echo Installing $GROUP $ARTIFACT
-    echo mvn install:install-file            \
+    mvn install:install-file            \
         -DgroupId="$GROUP"              \
         -DartifactId="$ARTIFACT"        \
         -Dversion="$VERSION"            \
