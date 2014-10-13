@@ -12,11 +12,11 @@ echo REPO_DIR: $REPO_DIR
 
 function install_file() {
     FILE="$1"
-    ARTIFACT=`basename $g | sed "s/-${VERSION}.jar//"`;
+    ARTIFACT=`basename $FILE | sed "s/-${VERSION}.jar//"`;
     GROUP=$(jar tf $FILE | grep "META-INF/maven/" | grep -v "$ARTIFACT" | grep -v pom  | sed 's/META-INF\/maven//g' | perl -pe 's:[/\s]+::g');
-    echo Installing $GROUP $ARTIFACT
     echo FILE: $FILE
-    mvn install:install-file            \
+    echo Installing $GROUP $ARTIFACT
+    echo mvn install:install-file            \
         -DgroupId="$GROUP"              \
         -DartifactId="$ARTIFACT"        \
         -Dversion="$VERSION"            \
