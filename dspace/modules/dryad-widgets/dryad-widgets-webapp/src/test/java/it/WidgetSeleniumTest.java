@@ -22,9 +22,9 @@ public class WidgetSeleniumTest extends TestCase {
   protected boolean acceptNextAlert = true;
   protected StringBuffer verificationErrors = new StringBuffer();
 
-  protected long driverTimeoutSeconds = 5;
-  protected long widgetLoadedSecondsTimeout = 5;
-  protected long widgetPopupWaitSecondsTimeout = 5;
+  protected long driverTimeoutSeconds = 10;
+  protected long widgetLoadedSecondsTimeout = 10;
+  protected long widgetPopupWaitSecondsTimeout = 10;
 
   // some common selectors
   protected String lightbox_container_selector = "div.mfp-container";
