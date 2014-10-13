@@ -21,7 +21,7 @@ function install_file() {
         -Dversion="$VERSION"            \
         -Dpackaging=jar                 \
         -Dfile="$FILE"
-    echo Success for mvn: $!
+    echo Success for mvn: $?
 }
 
 for f in `ls "$REPO_DIR" | grep "dspace-"`;
