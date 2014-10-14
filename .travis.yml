@@ -20,23 +20,8 @@ before_install:
 install:
 - ./test/bin/travis-install-missing-poms.sh
 - ./test/bin/travis-install-dryad-dir.sh
-before_script:
-- "export ITPORT=2341"
-- "export SERVER=99"
-- "export SCREEN=0"
-- "export ITPORT=2341"
-- "export DISPLAY=:${SERVER}.${SCREEN}"
-- "sh -e /etc/init.d/xvfb start"
-- "python -m SimpleHTTPServer $ITPORT > /dev/null 2>&1 &"
-- "echo PORT $ITPORT DISPLAY $DISPLAY"
-- "ps aux | grep python"
 script: 
 - "mvn package -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test"
-- ./test/bin/travis-install-built-poms.sh
-- mvn -DskipTests=false failsafe:integration-test failsafe:verify -DseleniumTestURL="http://localhost:$ITPORT/dspace/modules/dryad-widgets/dryad-widgets-webapp/src/test/java/it"
-after_script:
-- pkill -f SimpleHTTPServer
-- sh -e /etc/init.d/xvfb stop
 after_failure: find . -type f -path "*/surefire-reports/*" -name "*.txt" -print -exec cat {} \;
 notifications:
   slack:
