@@ -38,13 +38,6 @@ function install() {
     echo Success for mvn: $?
 }
 
-# odds and ends
-install "$REPO_DIR/dspace/modules/api/target/api-${CURRENT_VERSION}-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION"
-install "$REPO_DIR/dspace/modules/bagit/dspace-bagit-api/target/bagit-api-0.0.1.jar" "bagit-api" "org.dspace.modules" "jar" "0.0.1"
-install "$REPO_DIR/dspace/modules/versioning/versioning-webapp/target/versioning-webapp-${CURRENT_VERSION}-classes.jar" \
-    "versioning-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
-install "$REPO_DIR/dspace/modules/payment-system/payment-webapp/target/payment-webapp-${CURRENT_VERSION}-classes.jar" \
-    "payment-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
 
 # install from dryad-repo dirs starting dspace-*
 for f in `ls "$REPO_DIR" | grep "dspace-"`;
@@ -64,4 +57,12 @@ for f in `find "$REPO_DIR/dspace/modules" -name "*${CURRENT_VERSION}.jar" | grep
 do
     install_file_path "$f" "jar" "$CURRENT_VERSION";
 done;
+
+# odds and ends
+install "$REPO_DIR/dspace/modules/api/target/api-${CURRENT_VERSION}-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION"
+install "$REPO_DIR/dspace/modules/bagit/dspace-bagit-api/target/bagit-api-0.0.1.jar" "bagit-api" "org.dspace.modules" "jar" "0.0.1"
+install "$REPO_DIR/dspace/modules/versioning/versioning-webapp/target/versioning-webapp-${CURRENT_VERSION}-classes.jar" \
+    "versioning-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
+install "$REPO_DIR/dspace/modules/payment-system/payment-webapp/target/payment-webapp-${CURRENT_VERSION}-classes.jar" \
+    "payment-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
 
