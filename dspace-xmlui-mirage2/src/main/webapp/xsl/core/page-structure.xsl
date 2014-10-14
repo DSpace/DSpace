@@ -157,13 +157,13 @@
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="$theme-path"/>
-                    <xsl:text>lib/images/favicon.ico</xsl:text>
+                    <xsl:text>images/favicon.ico</xsl:text>
                 </xsl:attribute>
             </link>
             <link rel="apple-touch-icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="$theme-path"/>
-                    <xsl:text>lib/images/apple-touch-icon.png</xsl:text>
+                    <xsl:text>images/apple-touch-icon.png</xsl:text>
                 </xsl:attribute>
             </link>
 
