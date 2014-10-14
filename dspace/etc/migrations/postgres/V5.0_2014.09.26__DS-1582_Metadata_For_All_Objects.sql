@@ -14,13 +14,15 @@
 
 ------------------------------------------------------
 -- DS-1582 Metadata on all DSpace Objects
+-- NOTE: This script also has a complimentary Flyway Java Migration
+-- which drops the "item_id" constraint on metadatavalue
+-- org.dspace.storage.rdbms.migration.V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
 ------------------------------------------------------
 alter table metadatavalue rename item_id to resource_id;
 alter table metadatavalue alter column resource_id set not null;
 alter table metadatavalue add column resource_type_id integer;
 UPDATE metadatavalue SET resource_type_id = 2;
 alter table metadatavalue alter column resource_type_id set not null;
-alter table metadatavalue drop constraint metadatavalue_item_id_fkey;
 
 
 -- ---------
@@ -303,5 +305,3 @@ CREATE VIEW dcvalue AS
   FROM MetadataValue, MetadataFieldRegistry
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
   AND MetadataFieldRegistry.metadata_schema_id = 1 AND MetadataValue.resource_type_id = 2;
-
-COMMIT;

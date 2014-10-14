@@ -15,4 +15,4 @@
 ------------------------------------------------------
 -- DS-1945 RequestItem Helpdesk, store request message
 ------------------------------------------------------
-ALTER TABLE requestitem ADD COLUMN request_message TEXT;
+ALTER TABLE requestitem ADD COLUMN request_message VARCHAR2(2000);
