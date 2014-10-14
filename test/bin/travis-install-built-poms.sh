@@ -37,9 +37,10 @@ function install() {
 }
 
 # odds and ends
-# api-1.7.3-SNAPSHOT-tests.jar
-install "$REPO_DIR/dspace/modules/api/target/api-1.7.3-SNAPSHOT-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION"
+install "$REPO_DIR/dspace/modules/api/target/api-${CURRENT_VERSION}-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION"
 install "$REPO_DIR/dspace/modules/bagit/dspace-bagit-api/target/bagit-api-0.0.1.jar" "bagit-api" "org.dspace.modules" "jar" "0.0.1"
+install "$REPO_DIR/dspace/modules/versioning/versioning-webapp/target/versioning-webapp-${CURRENT_VERSION}-classes.jar" \
+    "versioning-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION"
 
 # install from dryad-repo dirs starting dspace-*
 for f in `ls "$REPO_DIR" | grep "dspace-"`;
