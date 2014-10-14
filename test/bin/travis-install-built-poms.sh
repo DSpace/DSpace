@@ -14,10 +14,9 @@ function install_file_path() {
     FILE="$1"
     TYPE="$2"
     VERSION="$3"
-    CLASSIFIER="$6"
     ARTIFACT=`basename $FILE | sed "s/-${VERSION}.${TYPE}//"`;
     GROUP=$(jar tf $FILE | grep "META-INF/maven/" | grep -v "$ARTIFACT" | grep -v pom  | sed 's/META-INF\/maven//g' | perl -pe 's:[/\s]+::g');
-    install "$FILE" "$ARTIFACT" "$GROUP" "$TYPE" "$VERSION" "sources"
+    install "$FILE" "$ARTIFACT" "$GROUP" "$TYPE" "$VERSION" "" 
 }
 
 function install() {
@@ -26,7 +25,7 @@ function install() {
     GROUP="$3"
     TYPE="$4"
     VERSION="$5"
-    CLASSIFIER="$6"
+    OTHER="$6"
     echo FILE: $FILE
     echo Installing $GROUP $ARTIFACT
     mvn install:install-file            \
@@ -34,18 +33,18 @@ function install() {
         -DartifactId="$ARTIFACT"        \
         -Dversion="$VERSION"            \
         -Dpackaging="$TYPE"             \
-        -Dclassifier="$CLASSIFIER"      \
+        $OTHER                          \
         -Dfile="$FILE"
     echo Success for mvn: $?
 }
 
 # odds and ends
-install "$REPO_DIR/dspace/modules/api/target/api-${CURRENT_VERSION}-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION" "sources"
-install "$REPO_DIR/dspace/modules/bagit/dspace-bagit-api/target/bagit-api-0.0.1.jar" "bagit-api" "org.dspace.modules" "jar" "0.0.1" "sources"
+install "$REPO_DIR/dspace/modules/api/target/api-${CURRENT_VERSION}-tests.jar" "api" "org.dspace.modules" "test-jar" "$CURRENT_VERSION"
+install "$REPO_DIR/dspace/modules/bagit/dspace-bagit-api/target/bagit-api-0.0.1.jar" "bagit-api" "org.dspace.modules" "jar" "0.0.1"
 install "$REPO_DIR/dspace/modules/versioning/versioning-webapp/target/versioning-webapp-${CURRENT_VERSION}-classes.jar" \
-    "versioning-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "classes"
+    "versioning-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
 install "$REPO_DIR/dspace/modules/payment-system/payment-webapp/target/payment-webapp-${CURRENT_VERSION}-classes.jar" \
-    "payment-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "classes"
+    "payment-webapp" "org.dspace.modules" "jar" "$CURRENT_VERSION" "-Dclassifier=classes"
 
 # install from dryad-repo dirs starting dspace-*
 for f in `ls "$REPO_DIR" | grep "dspace-"`;
