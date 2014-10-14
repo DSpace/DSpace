@@ -7,16 +7,12 @@
  */
 package org.dspace;
 
-import java.io.BufferedReader;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -39,7 +35,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.MockDatabaseManager;
 import org.dspace.utils.DSpace;
 import org.junit.After;

@@ -26,19 +26,19 @@ import org.slf4j.LoggerFactory;
  * This class automatically migrates your DSpace Database to use the
  * XML-based Configurable Workflow system whenever it is enabled.
  * (i.e. workflow.framework=xmlworkflow in workflow.cfg)
- * 
+ * <P>
  * This class represents a Flyway DB Java Migration
  * http://flywaydb.org/documentation/migration/java.html
- * 
+ * <P>
  * It can upgrade a 4.0 (or above) version of DSpace to use the XMLWorkflow.
  * 
  * @author Tim Donohue
  */
-public class V5_0__XMLWorkflow_Migration 
+public class V5_0_2014_01_01__XMLWorkflow_Migration
     implements JdbcMigration, MigrationChecksumProvider
 {
     /** logging category */
-    private static final Logger log = LoggerFactory.getLogger(V5_0__XMLWorkflow_Migration.class);
+    private static final Logger log = LoggerFactory.getLogger(V5_0_2014_01_01__XMLWorkflow_Migration.class);
     
     // Size of migration script run
     Integer migration_file_size = -1;
@@ -61,9 +61,9 @@ public class V5_0__XMLWorkflow_Migration
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
         {
             //First, ensure both Migration Scripts exist (in src/main/resources)
-            String dbMigrationScript = V5_0__XMLWorkflow_Migration.class.getPackage().getName() +
+            String dbMigrationScript = V5_0_2014_01_01__XMLWorkflow_Migration.class.getPackage().getName() +
                     ".xmlworkflow." + DatabaseManager.getDbKeyword() + "xml_workflow_migration.sql";
-            String dataMigrationScript = V5_0__XMLWorkflow_Migration.class.getPackage().getName() +
+            String dataMigrationScript = V5_0_2014_01_01__XMLWorkflow_Migration.class.getPackage().getName() +
                     ".xmlworkflow." + DatabaseManager.getDbKeyword() + "data_workflow_migration.sql";
             
             File dbMigration = new File(dbMigrationScript);

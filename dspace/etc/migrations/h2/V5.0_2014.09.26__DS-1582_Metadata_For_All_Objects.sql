@@ -18,13 +18,14 @@
 -- which drops the "item_id" constraint on metadatavalue
 -- org.dspace.storage.rdbms.migration.V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
 ------------------------------------------------------
-alter table metadatavalue rename column item_id to resource_id;
 
-alter table metadatavalue MODIFY(resource_id not null);
-alter table metadatavalue add resource_type_id integer;
+alter table metadatavalue add column resource_type_id integer;
 UPDATE metadatavalue SET resource_type_id = 2;
-alter table metadatavalue MODIFY(resource_type_id not null);
+alter table metadatavalue alter column resource_type_id set not null;
 
+-- For some reason H2 wants us to wait to rename "item_id" column until AFTER we add "resource_type_id"
+alter table metadatavalue alter column item_id rename to resource_id;
+alter table metadatavalue alter column resource_id set not null;
 
 
 -- ---------
@@ -86,7 +87,7 @@ null AS text_lang,
 0 AS place
 FROM community where not name is null;
 
-alter table community drop (introductory_text, short_description, side_bar_text, copyright_text, name);
+alter table community drop column introductory_text, drop column short_description, drop column side_bar_text, drop column copyright_text, drop column name;
 
 
 -- ----------
@@ -172,7 +173,7 @@ null AS text_lang,
 0 AS place
 FROM collection where not license is null;
 
-alter table collection drop (introductory_text, short_description, copyright_text, side_bar_text, name, license, provenance_description);
+alter table collection drop column introductory_text, drop column short_description, drop column copyright_text, drop column side_bar_text, drop column name, drop column license, drop column provenance_description;
 
 
 -- ---------
@@ -243,7 +244,8 @@ null AS text_lang,
 0 AS place
 FROM bitstream where not source is null;
 
-alter table bitstream drop (name, description, user_format_description, source);
+alter table bitstream drop column name, drop column description, drop column user_format_description, drop column source;
+
 
 
 -- ---------
@@ -302,7 +304,6 @@ null AS text_lang,
 0 AS place
 FROM eperson where not phone is null;
 
-
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
 metadatavalue_seq.nextval as metadata_value_id,
@@ -314,7 +315,7 @@ null AS text_lang,
 0 AS place
 FROM eperson where not language is null;
 
-alter table eperson  drop (firstname, lastname, phone, language);
+alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column language;
 
 -- ---------
 -- dcvalue view

@@ -37,7 +37,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.internal.info.MigrationInfoDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +67,12 @@ public class DatabaseManager
     private static String dbms;
 
     /** Name of the DBMS, as used in DSpace:  "postgres", "oracle", or "h2". */
-    private static String dbms_keyword;
+    protected static String dbms_keyword;
+
+    /** The static variables which represent the DBMS keyword **/
+    public static final String DBMS_POSTGRES="postgres";
+    public static final String DBMS_ORACLE="oracle";
+    public static final String DBMS_H2="h2";
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
@@ -107,12 +111,17 @@ public class DatabaseManager
 
     public static boolean isOracle()
     {
-        try
+        // If we have NOT determined whether we are using Postgres
+        // or Oracle, then we need to initialize() first
+        if(isPostgres==false && isOracle==false)
         {
-            initialize();
-        } catch (SQLException ex)
-        {
-            log.error("Failed to initialize the database:  ", ex);
+            try
+            {
+                initialize();
+            } catch (SQLException ex)
+            {
+                log.error("Failed to initialize the database:  ", ex);
+            }
         }
         return isOracle;
     }
@@ -627,13 +636,12 @@ public class DatabaseManager
      */
     public static Connection getConnection() throws SQLException
     {
-        try{
-            initialize();
+        DataSource dsource = getDataSource();
 
-            if (dataSource != null) {
-                Connection conn = dataSource.getConnection();
-
-                return conn;
+        try
+        {
+            if (dsource != null) {
+                return dsource.getConnection();
             }
 
             return null;
@@ -645,16 +653,18 @@ public class DatabaseManager
 
     public static DataSource getDataSource()
     {
-        try
+        if(dataSource==null)
         {
-            initialize();
+            try
+            {
+                initialize();
+            }
+            catch (SQLException e)
+            {
+                log.error("SQL getDataSource Error - ",e);
+                throw new IllegalStateException(e.getMessage(), e);
+            }
         }
-        catch (SQLException e)
-        {
-            log.error("SQL getDataSource Error - ",e);
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-
         return dataSource;
     }
 
@@ -1550,19 +1560,23 @@ public class DatabaseManager
             if (dbms_lc.contains("postgresql"))
             {
                 isPostgres = true;
-                dbms_keyword = "postgres";
+                dbms_keyword = DBMS_POSTGRES;
                 log.info("DBMS is PostgreSQL");
             }
             else if (dbms_lc.contains("oracle"))
             {
                 isOracle = true;
-                dbms_keyword = "oracle";
+                dbms_keyword = DBMS_ORACLE;
                 log.info("DBMS is Oracle Database");
             }
-            else if (dbms_lc.contains("h2")) // Used in testing
+            else if (dbms_lc.contains("h2")) // Used for unit testing only
             {
+                // We set "isOracle=true" for H2 simply because it's NOT 100%
+                // PostgreSQL compatible. So, code which is highly PostgreSQL
+                // specific often may not work properly on H2.
+                // I.e. this acts more like a "isNotPostgreSQL" flag
                 isOracle = true;
-                dbms_keyword = "h2";
+                dbms_keyword = DBMS_H2;
                 log.info("DBMS is H2");
             }
             else
@@ -1571,8 +1585,9 @@ public class DatabaseManager
             }
             log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
             
-            // Ensure database scheme is up-to-date
-            // If not, upgrade/migrate database
+            // FINALLY, ensure database scheme is up-to-date. If not, upgrade/migrate database.
+            // (NOTE: This needs to run LAST as it may need some of the initialized
+            // variables set above)
             initializeDatabase(connection);
 
             connection.close();
@@ -1614,10 +1629,8 @@ public class DatabaseManager
         flyway.setDataSource(dataSource);
         flyway.setEncoding("UTF-8");
     
-        // Migration scripts are based on DBMS Keyword. But, for H2 we use the Oracle scripts
+        // Migration scripts are based on DBMS Keyword (see full path below)
         String scriptFolder = dbms_keyword;
-        if(dbms_keyword.equals("h2"))
-           scriptFolder = "oracle";
         
         // Set location where Flyway will load DB scripts from (based on DB Type)
         // e.g. [dspace.dir]/etc/[dbtype]/
@@ -1732,25 +1745,34 @@ public class DatabaseManager
      */
     public static String getDbName()
     {
-        try {
-            initialize();
-        } catch (SQLException ex) {
-            log.error("Failed to initialize the database:  ", ex);
+        if (StringUtils.isBlank(dbms))
+        {
+            try {
+                initialize();
+            } catch (SQLException ex) {
+                log.error("Failed to initialize the database:  ", ex);
+            }
         }
         return dbms;
     }
 
     /**
      * What is the string that we use to name the DBMS brand?
+     * <P>
+     * This will return one of: DatabaseManager.DBMS_POSTGRES,
+     * DatabaseManager.DBMS_ORACLE, or DatabaseManager.DBMS_H2
      *
      * @return a normalized "keyword" for the DBMS brand:  postgres, oracle, h2.
      */
     public static String getDbKeyword()
     {
-        try {
-            initialize();
-        } catch (SQLException ex) {
-            log.error("Failed to initialize the database:  ", ex);
+        if (StringUtils.isBlank(dbms_keyword))
+        {
+            try {
+                initialize();
+            } catch (SQLException ex) {
+                log.error("Failed to initialize the database:  ", ex);
+            }
         }
         return dbms_keyword;
     }

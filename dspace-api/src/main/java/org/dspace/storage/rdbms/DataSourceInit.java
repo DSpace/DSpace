@@ -136,6 +136,7 @@ public class DataSourceInit {
             dataSource = poolingDataSource;
 
             // Set the proper validation query by DBMS brand.
+            // For reference see: http://stackoverflow.com/a/10684260/3750035
             Connection connection = dataSource.getConnection();
             String productNameLC = connection.getMetaData().getDatabaseProductName()
                     .toLowerCase();
