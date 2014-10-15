@@ -450,3 +450,9 @@ header {
         }
     }
 }
+
+.label-white{
+  background-color: $almost-white;
+  color: $text-color;
+  border: 1px solid $text-color;
+}
