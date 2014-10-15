@@ -87,7 +87,11 @@ null AS text_lang,
 0 AS place
 FROM community where not name is null;
 
-alter table community drop column introductory_text, drop column short_description, drop column side_bar_text, drop column copyright_text, drop column name;
+alter table community drop column introductory_text;
+alter table community drop column short_description;
+alter table community drop column side_bar_text;
+alter table community drop column copyright_text;
+alter table community drop column name;
 
 
 -- ----------
@@ -173,7 +177,13 @@ null AS text_lang,
 0 AS place
 FROM collection where not license is null;
 
-alter table collection drop column introductory_text, drop column short_description, drop column copyright_text, drop column side_bar_text, drop column name, drop column license, drop column provenance_description;
+alter table collection drop column introductory_text;
+alter table collection drop column short_description;
+alter table collection drop column copyright_text;
+alter table collection drop column side_bar_text;
+alter table collection drop column name;
+alter table collection drop column license;
+alter table collection drop column provenance_description;
 
 
 -- ---------
@@ -244,7 +254,10 @@ null AS text_lang,
 0 AS place
 FROM bitstream where not source is null;
 
-alter table bitstream drop column name, drop column description, drop column user_format_description, drop column source;
+alter table bitstream drop column name;
+alter table bitstream drop column description;
+alter table bitstream drop column user_format_description;
+alter table bitstream drop column source;
 
 
 
@@ -315,7 +328,10 @@ null AS text_lang,
 0 AS place
 FROM eperson where not language is null;
 
-alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column language;
+alter table eperson drop column firstname;
+alter table eperson drop column lastname;
+alter table eperson drop column phone;
+alter table eperson drop column language;
 
 -- ---------
 -- dcvalue view
