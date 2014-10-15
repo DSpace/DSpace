@@ -3,6 +3,16 @@
 #set -euo pipefail
 set -e
 
+# NOTE: This script is currently unused. It was meant to enable running
+# the modules/dryad-widgets Integration/Selenium tests on the Travis-CI
+# platform, which requires having the Dryad Dspace POM's installed locally.
+# Since installation is not part of the standard build process (rather,
+# the `package` phase), this script is meant to do a local install. 
+#
+# Unfortunately, the installation below is currently unsuccessful, and.
+# this script is not called from .travis.yml.
+#
+
 CURRENT_VERSION="1.7.3-SNAPSHOT";
 BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_DIR="$( readlink -e $BIN_DIR/../../)";
