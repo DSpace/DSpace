@@ -71,6 +71,17 @@
             </modules>
         </profile>
         <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <file>
+                    <exists>rdf/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>rdf</module>
+            </modules>
+        </profile>
+        <profile>
             <id>dspace-rest</id>
             <activation>
                 <file>
