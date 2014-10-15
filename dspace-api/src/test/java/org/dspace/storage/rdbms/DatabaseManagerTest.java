@@ -8,6 +8,7 @@
 package org.dspace.storage.rdbms;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.core.ConfigurationManager;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -22,7 +23,10 @@ import org.junit.Test;
 public class DatabaseManagerTest
         extends AbstractUnitTest
 {
-
+    // Type of database that is being used in Unit Testing. See "setUpClass()" below.
+    // This variable is used to determine expected values for some Database specific unit tests below.
+    private static String dbtype = "";
+    
     public DatabaseManagerTest()
     {
     }
@@ -30,6 +34,14 @@ public class DatabaseManagerTest
     @BeforeClass
     public static void setUpClass()
     {
+        // Based on configured db.url, determine type of Database that is running Unit Tests
+        String dburl = ConfigurationManager.getProperty("db.url");
+        if(dburl.contains(":postgresql:"))
+            dbtype = DatabaseManager.DBMS_POSTGRES;
+        else if(dburl.contains(":oracle:"))
+            dbtype = DatabaseManager.DBMS_ORACLE;
+        else if(dburl.contains(":h2:"))
+            dbtype = DatabaseManager.DBMS_H2;
     }
 
     @AfterClass
@@ -54,7 +66,12 @@ public class DatabaseManagerTest
     public void testIsOracle()
     {
         System.out.println("isOracle");
+        
+        // Expected result = true for all DBMSes except PostgreSQL
         boolean expResult = true;
+        if(dbtype.equals(DatabaseManager.DBMS_POSTGRES))
+            expResult=false;
+        
         boolean result = DatabaseManager.isOracle();
         assertEquals("isOracle is true for Oracle-like DBMSs", expResult, result);
     }
@@ -628,7 +645,15 @@ public class DatabaseManagerTest
     public void testGetDbName()
     {
         System.out.println("getDbName");
-        String expResult = "H2";
+        String expResult = null;
+        // Based on the type of DB, the expected result is different
+        if (dbtype.equals(DatabaseManager.DBMS_H2))
+            expResult = "H2";
+        else if (dbtype.equals(DatabaseManager.DBMS_POSTGRES))
+            expResult = "PostgreSQL";
+        else if (dbtype.equals(DatabaseManager.DBMS_ORACLE))
+            expResult = "Oracle";
+        
         String result = DatabaseManager.getDbName();
         assertEquals("Database name names the configured database driver",
                 expResult, result);
@@ -641,7 +666,8 @@ public class DatabaseManagerTest
     public void testGetDbKeyword()
     {
         System.out.println("getDbKeyword");
-        String expResult = "h2";
+        // Expected result is what is configured in dbtype (see setUpClass())
+        String expResult = dbtype;
         String result = DatabaseManager.getDbKeyword();
         assertEquals("Database 'keyword' names the configured DBMS", expResult, result);
     }
