@@ -67,7 +67,7 @@ public class DatabaseManager
     private static String dbms;
 
     /** Name of the DBMS, as used in DSpace:  "postgres", "oracle", or "h2". */
-    protected static String dbms_keyword;
+    private static String dbms_keyword;
 
     /** The static variables which represent the DBMS keyword **/
     public static final String DBMS_POSTGRES="postgres";
