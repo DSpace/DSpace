@@ -1,10 +1,23 @@
-DSpace on Oracle
-Revision: 11-sep-04 dstuve
+# Oracle Flyway Database Migrations (i.e. Upgrades)
 
-(Installation notes moved to main DSpace documentation)
+The SQL scripts in this directory are Oracle-specific database migrations. They are
+used to automatically upgrade your DSpace database using [Flyway](http://flywaydb.org/).
+As such, these scripts are automatically called by Flyway when the DSpace
+`DatabaseManager` initializes itself (see `initializeDatabase()` method). During
+that process, Flyway determines which version of DSpace your database is using
+and then executes the appropriate upgrade script(s) to bring it up to the latest 
+version. 
 
+If any failures occur, Flyway will "rollback" the upgrade script which resulted
+in an error and log the issue in the DSpace log file at `[dspace]/log/dspace.log.[date]`
 
-Oracle Porting Notes for the Curious
+**WARNING:** IT IS NOT RECOMMENDED TO RUN THESE SCRIPTS MANUALLY. If you do so,
+Flyway will may throw failures the next time you startup DSpace, as Flyway will
+not realize you manually ran one or more scripts.
+
+Please see the Flyway Documentation for more information: http://flywaydb.org/
+
+## Oracle Porting Notes for the Curious
 
 Oracle is missing quite a number of cool features found in Postgres, so
 workarounds had to be found, most of which are hidden behind tests in 
@@ -42,7 +55,8 @@ for now.  Note that with UTF-8 encoding that 4k could translate to 1300
 characters worst-case (every character taking up 3 bytes is the worst case
 scenario.)
 
-==UPDATE 5 April 2007==
+### UPDATE 5 April 2007
+
 CLOBs are now used as follows:
 MetadataValue:text_value
 Community:introductory_text
@@ -50,7 +64,6 @@ Community:copyright_text
 Collection:introductory_text
 Collection:license
 Collection:copyright_text
-==                   ==
 
 DatabaseManager had to have some of the type checking changed, because Oracle's
 JDBC driver is reporting INTEGERS as type DECIMAL.
@@ -59,7 +72,8 @@ Oracle doesn't like it when you reference table names in lower case when
 getting JDBC metadata for the tables, so they are converted in TableRow
 to upper case.
 
-==UPDATE 27 November 2012==
+### UPDATE 27 November 2012
+
 Oracle complains with ORA-01408 if you attempt to create an index on a column which
 has already had the UNIQUE contraint added (such an index is implicit in maintaining the uniqueness
-of the column). See DS-1370 for details.
+of the column). See [DS-1370](https://jira.duraspace.org/browse/DS-1370) for details.
