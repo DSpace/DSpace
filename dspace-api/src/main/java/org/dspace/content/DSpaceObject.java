@@ -116,24 +116,8 @@ public abstract class DSpaceObject
             if (dcFields[dcIdx] == null)
             {
                 // Bad DC field, log and throw exception
-                log.warn(LogManager
-                        .getHeader(ourContext, "bad_dc",
-                                "Bad DC field. schema=" + dcv.schema
-                                        + ", element: \""
-                                        + ((dcv.element == null) ? "null"
-                                        : dcv.element)
-                                        + "\" qualifier: \""
-                                        + ((dcv.qualifier == null) ? "null"
-                                        : dcv.qualifier)
-                                        + "\" value: \""
-                                        + ((dcv.value == null) ? "null"
-                                        : dcv.value) + "\""
-                        ));
-
-                throw new SQLException("bad_dublin_core "
-                        + "schema="+dcv.schema+", "
-                        + dcv.element
-                        + " " + dcv.qualifier);
+                log.warn("Invalid metadata field: [" + dcv.getField() + "] : [" + dcv.value + "]");
+                throw new SQLException("Invalid metadata field: [" + dcv.getField() + "]");
             }
         }
 
