@@ -34,6 +34,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -645,14 +646,10 @@ public class ItemImport
             addItems(c, mycollections, sourceDir, mapFile, template);
         } catch (Exception addException) {
             log.error("AddItems encountered an error, will try to revert. Error: " + addException.getMessage());
-            try {
-                deleteItems(c, mapFile);
-                log.info("Was able to undo the import, by deleting the imported items");
-                throw addException;
-            } catch (Exception deleteException) {
-                log.error("Error occurred while cleaning up from failed import: + " + deleteException.getMessage());
-                throw deleteException;
-            }
+            deleteItems(c, mapFile);
+            c.commit();
+            log.info("Attempted to delete partial (errored) import");
+            throw addException;
         }
     }
 
@@ -702,9 +699,9 @@ public class ItemImport
                 throw new Exception("Error, cannot open source directory " + sourceDir);
             }
 
-        String[] dircontents = d.list(directoryFilter);
-        
-        Arrays.sort(dircontents);
+            String[] dircontents = d.list(directoryFilter);
+
+            Arrays.sort(dircontents, ComparatorUtils.naturalComparator());
 
         for (int i = 0; i < dircontents.length; i++)
         {
@@ -914,7 +911,13 @@ public class ItemImport
             // put item in system
             if (!isTest)
             {
-                InstallItem.installItem(c, wi, myhandle);
+                try {
+                    InstallItem.installItem(c, wi, myhandle);
+                } catch (Exception e) {
+                    wi.deleteAll();
+                    log.error("Exception after install item, try to revert...", e);
+                    throw e;
+                }
 
                 // find the handle, and output to map file
                 myhandle = HandleManager.findHandle(c, myitem);
