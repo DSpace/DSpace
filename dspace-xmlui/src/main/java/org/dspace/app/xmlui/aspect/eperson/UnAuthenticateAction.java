@@ -72,16 +72,33 @@ public class UnAuthenticateAction extends AbstractAction
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
         
-        // Forward the user to the home page.
-        if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
-				StringBuffer location = new StringBuffer("http://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
-						httpRequest.getContextPath());
-				httpResponse.sendRedirect(location.toString());
-			
-		}
-        else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+        // Redirect users to their logout page
+        HttpSession session = httpRequest.getSession(false);
+        String loginType = null;
+        if (session != null){
+           loginType = (String)session.getAttribute("loginType");
+        }
+
+        // Special logout if we're using CAS
+        // The ?url parameter may vary depending on CAS version, could be ?service instead
+        if (loginType != null && loginType.equals("CAS")){
+           StringBuffer location = new StringBuffer();
+           location.append(ConfigurationManager.getProperty("authentication-cas", "cas.logout.url")).append
+                   ("?url=http://").append(httpRequest.getServerName()).append(":").append(
+                   httpRequest.getServerPort()).append(httpRequest.getContextPath());
+           httpResponse.sendRedirect(location.toString());
+        }
+        else {
+           if ((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
+             StringBuffer location = new StringBuffer("http://");
+             location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
+             httpRequest.getContextPath());
+             httpResponse.sendRedirect(location.toString());
+
+           }
+           else {
+             httpResponse.sendRedirect(httpRequest.getContextPath());
+           }
         }
         
         return new HashMap();
