@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -631,17 +632,19 @@ public class ObjectManager implements Constants {
         }
 
         if(fromDate != null) {
-            log.info("Requested fromDate: " + fromDate);
+            Timestamp fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
+            log.info("queryDataFilesDatabase: Requested fromDate: " + fromTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
             queryBuilder.append("  mv.text_value::timestamp > ? AND ");
-            bindParameters.add(new java.sql.Date(fromDate.getTime()));
+            bindParameters.add(fromTimestamp);
         }
 
         if(toDate != null) {
-            log.info("Requested toDate: " + toDate);
+            Timestamp toTimestamp = new java.sql.Timestamp(toDate.getTime());
+            log.info("queryDataFilesDatabase: Requested toDate: " + toTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
             queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
-            bindParameters.add(new java.sql.Date(toDate.getTime()));
+            bindParameters.add(toTimestamp);
         }
         queryBuilder.append("  col.collection_id = ? "); 
         bindParameters.add(c.getID()); 
@@ -675,7 +678,7 @@ public class ObjectManager implements Constants {
         } else {
             queryBuilder.append("  md.text_value AS doi, ");
             queryBuilder.append("  mv.text_value::timestamp AS date_available, ");
-	    queryBuilder.append("  it.last_modified::timestamp AS last_modified ");
+	        queryBuilder.append("  it.last_modified::timestamp AS last_modified ");
         }        
         queryBuilder.append("FROM ");
         queryBuilder.append("  item AS it ");
@@ -692,17 +695,19 @@ public class ObjectManager implements Constants {
         bindParameters.add(dcIdentifierFieldId);
         queryBuilder.append("  md.place = 1 AND ");
         if(fromDate != null) {
-            log.info("Requested fromDate: " + fromDate);
+            Timestamp fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
+            log.info("queryDataPackagesDatabase: Requested fromDate: " + fromTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
             queryBuilder.append("  mv.text_value::timestamp > ? AND ");
-            bindParameters.add(new java.sql.Date(fromDate.getTime()));
+            bindParameters.add(fromTimestamp);
         }
 
         if(toDate != null) {
-            log.info("Requested toDate: " + toDate);
+            Timestamp toTimestamp = new java.sql.Timestamp(toDate.getTime());
+            log.info("queryDataPackagesDatabase: Requested toDate: " + toTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
             queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
-            bindParameters.add(new java.sql.Date(toDate.getTime()));
+            bindParameters.add(toTimestamp);
         }
         queryBuilder.append("  col.collection_id = ? "); 
         bindParameters.add(c.getID()); 
