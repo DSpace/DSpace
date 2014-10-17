@@ -10,8 +10,9 @@
  <!ELEMENT submission-map (name-map+) >
  
  <!ELEMENT name-map EMPTY >
- <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
+ <!ATTLIST name-map
+           handle CDATA #IMPLIED
+           collection-handle CDATA #IMPLIED
            submission-name NMTOKEN #REQUIRED>
 
  <!-- 'step-definitions' must contain at least one 'step' node -->

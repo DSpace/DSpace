@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 
@@ -153,10 +154,19 @@ public class DCInputsReader
      * @throws DCInputsReaderException
      *             if no default set defined
      */
-    public DCInputSet getInputs(String collectionHandle)
+    public DCInputSet getInputs(Collection collection)
                 throws DCInputsReaderException
     {
-        String formName = whichForms.get(collectionHandle);
+    	String formName;
+    	try
+    	{
+    		formName = Util.findDefinitionInMap(collection, whichForms);
+    	}
+    	catch(Exception e)
+    	{
+    		throw new DCInputsReaderException("Couldn't get the form definition for collection "+collection.getID(), e);
+    	}
+    	
         if (formName == null)
         {
                 formName = whichForms.get(DEFAULT_COLLECTION);
@@ -186,10 +196,10 @@ public class DCInputsReader
      * @return number of pages of input
      * @throws DCInputsReaderException if no default set defined
      */
-    public int getNumberInputPages(String collectionHandle)
+    public int getNumberInputPages(Collection collection)
         throws DCInputsReaderException
     {
-        return getInputs(collectionHandle).getNumberPages();
+        return getInputs(collection).getNumberPages();
     }
     
     /**
@@ -260,12 +270,14 @@ public class DCInputsReader
                 Node nd = nl.item(i);
                 if (nd.getNodeName().equals("name-map"))
                 {
+                		// preserves the collection-handle attribute for backward compatibility
                         String id = getAttribute(nd, "collection-handle");
+                        String handle = getAttribute(nd, "handle");
                         String value = getAttribute(nd, "form-name");
                         String content = getValue(nd);
-                        if (id == null)
+                        if (id == null && handle == null)
                         {
-                                throw new SAXException("name-map element is missing collection-handle attribute");
+                                throw new SAXException("name-map element is missing handle attribute");
                         }
                         if (value == null)
                         {
@@ -275,7 +287,7 @@ public class DCInputsReader
                         {
                                 throw new SAXException("name-map element has content, it should be empty.");
                         }
-                        whichForms.put(id, value);
+                        whichForms.put(handle != null ? handle : id, value);
                 }  // ignore any child node that isn't a "name-map"
         }
     }

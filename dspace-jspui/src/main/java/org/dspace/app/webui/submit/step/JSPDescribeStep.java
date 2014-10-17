@@ -209,8 +209,7 @@ public class JSPDescribeStep extends JSPStep
         // requires configurable form info per collection
         try
         {
-            request.setAttribute("submission.inputs", DescribeStep.getInputsReader(formFileName).getInputs(c
-                    .getHandle()));
+            request.setAttribute("submission.inputs", DescribeStep.getInputsReader(formFileName).getInputs(c));
         }
         catch (DCInputsReaderException e)
         {
