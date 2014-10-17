@@ -549,13 +549,21 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             throw new RuntimeException("Not linked to a data package");
         }
 
+        if (pkgLink.length == 0) {
+            throw new RuntimeException("Not linked to a data package");
+        }
+
         String packageDOIString = pkgLink[0].value;
         if (!packageDOIString.startsWith("doi:")) {
             throw new DOIFormatException("isPartOf value doesn't start with 'doi:'");
         }
 
         DCValue[] titles = item.getMetadata("dc.title");
-        String itemTitle = titles[0].value;
+
+        String itemTitle = "";
+        if (titles.length > 0) {
+            itemTitle = titles[0].value;
+        }
 
         log.warn("calculateDOIDataFile() - " + itemTitle + " is part of: " + packageDOIString);
 
