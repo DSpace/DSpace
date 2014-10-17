@@ -33,7 +33,8 @@
     xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
     xmlns:jstring="java.lang.String"
     xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights">
+    xmlns:confman="org.dspace.core.ConfigurationManager"
+    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
 
     <xsl:output indent="yes"/>
 
