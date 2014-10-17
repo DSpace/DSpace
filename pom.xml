@@ -43,7 +43,6 @@
 	        </excludes>
                 <!-- required when running JMockit under Java 1.5 -->
                 <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
-                <printSummary>false</printSummary>
             </configuration>
          </plugin>
          <plugin>
