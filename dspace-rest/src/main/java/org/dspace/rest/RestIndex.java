@@ -228,8 +228,7 @@ public class RestIndex {
         }
 
         //fallback status, unauth
-        Status status = new Status();
-        return status;
+        return new Status();
     }
 
 

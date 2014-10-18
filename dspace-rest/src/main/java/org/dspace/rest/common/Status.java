@@ -2,6 +2,7 @@ package org.dspace.rest.common;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -41,12 +42,12 @@ public class Status
         setToken(token);
     }
 
-    public Status(Context context, String token) {
+    public Status(EPerson eperson, String token) {
         setOkay(true);
-        if(context.getCurrentUser() != null) {
+        if(eperson != null) {
             setAuthenticated(true);
-            setEmail(context.getCurrentUser().getEmail());
-            setFullname(context.getCurrentUser().getFullName());
+            setEmail(eperson.getEmail());
+            setFullname(eperson.getFullName());
             setToken(token);
         } else {
             setAuthenticated(false);
