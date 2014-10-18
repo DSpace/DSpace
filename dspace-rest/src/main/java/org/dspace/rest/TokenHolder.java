@@ -74,7 +74,6 @@ public class TokenHolder
                 token = generateToken();
                 persons.put(token, dspaceUser);
                 tokens.put(user.getEmail(), token);
-                dspaceUser.setPassword(user.getPassword());
             }
 
             log.trace("User(" + user.getEmail() + ") has been logged.");
