@@ -165,34 +165,27 @@ public class CollectionsResource extends Resource
         try
         {
             context = createContext(getUser(headers));
-            org.dspace.content.Collection[] dspaceCollections;
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
-                log.warn("Pagging was badly set.");
+                log.warn("Paging was badly set.");
                 limit = 100;
                 offset = 0;
             }
 
-            // TODO Repair it in DSpace api
-            // dspaceCollections = org.dspace.content.Collection.findAll(context, limit, offset);
-            // Message:java.sql.SQLSyntaxErrorException: ORA-00933: SQL command not properly ended
-            dspaceCollections = org.dspace.content.Collection.findAll(context);
-
-            for (int i = offset; i < limit + offset; i++)
+            org.dspace.content.Collection[] dspaceCollections = org.dspace.content.Collection.findAll(context, limit, offset);
+            for(org.dspace.content.Collection dspaceCollection : dspaceCollections)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
+                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
-                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollections[i], null, context, limit,
+                    Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
                             offset);
                     collections.add(collection);
-                    writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwarderfor, headers, request);
                 }
             }
-
             context.complete();
-
         }
         catch (SQLException e)
         {
