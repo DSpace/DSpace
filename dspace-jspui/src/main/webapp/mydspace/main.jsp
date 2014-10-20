@@ -42,6 +42,7 @@
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="java.util.List" %>
+<%@page import="org.dspace.app.itemimport.BatchUpload"%>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -65,6 +66,8 @@
         (SupervisedItem[]) request.getAttribute("supervised.items");
     
     List<String> exportsAvailable = (List<String>)request.getAttribute("export.archives");
+    
+    List<BatchUpload> importsAvailable = (List<BatchUpload>)request.getAttribute("import.uploads");
     
     // Is the logged in user an admin
     Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
@@ -399,6 +402,57 @@
 		<% } %>
 	</ol>
 	<%} %>
+	
+	<%if(importsAvailable!=null && importsAvailable.size()>0){ %>
+	<h3><fmt:message key="jsp.mydspace.main.heading8"/></h3>
+	<ul class="exportArchives" style="list-style-type: none;">
+		<% int i=0;
+			for(BatchUpload batchUpload : importsAvailable){
+		%>
+			<li style="padding-top:5px; margin-top:10px">
+				<div style="float:left"><b><%= batchUpload.getDateFormatted() %></b></div>
+				<% if (batchUpload.isSuccessful()){ %>
+					<div style= "float:left">&nbsp;&nbsp;--> <span style="color:green"><fmt:message key="jsp.dspace-admin.batchimport.success"/></span></div>
+				<% } else { %>
+					<div style= "float:left;">&nbsp;&nbsp;--> <span style="color:red"><fmt:message key="jsp.dspace-admin.batchimport.failure"/></span></div>
+				<% } %>
+				<div style="float:left; padding-left:20px">
+					<a id="a2_<%= i%>" style="display:none; font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(hide)</i></a>
+					<a id="a1_<%= i%>" style="font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(show more)</i></a>
+				</div><br/>
+				<div id="moreinfo_<%= i%>" style="clear:both; display:none; margin-top:15px; padding:10px; border:1px solid; border-radius:4px; border-color:#bbb">
+					<div><fmt:message key="jsp.dspace-admin.batchimport.itemstobeimported"/>: <b><%= batchUpload.getTotalItems() %></b></div>
+					<div><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="margin-top:10px">
+						<form action="<%= request.getContextPath() %>/mydspace" method="post">
+							<input type="hidden" name="step" value="7">
+							<input type="hidden" name="uploadid" value="<%= batchUpload.getDir().getName() %>">
+							<input class="btn btn-info" type="submit" name="submit_mapfile" value="<fmt:message key="jsp.dspace-admin.batchimport.downloadmapfile"/>">
+							<% if (!batchUpload.isSuccessful()){ %>
+								<input class="btn btn-warning" type="submit" name="submit_resume" value="<fmt:message key="jsp.dspace-admin.batchimport.resume"/>">
+							<% } %>
+							<input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.batchimport.deleteitems"/>">
+						</form>
+					<div>
+				</div>
+				<br/>
+			</li> 
+		<% i++;
+			} 
+		%>
+	</ul>
+	<%} %>
+	
+	<script>
+		function showMoreClicked(index){
+			$('#moreinfo_'+index).toggle( "slow", function() {
+				// Animation complete.
+			  });
+			$('#a1_'+index).toggle();
+			$('#a2_'+index).toggle();
+		}
+	</script>
+	
 	</div>
 </div>	
 </dspace:layout>
