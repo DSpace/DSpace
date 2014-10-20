@@ -61,7 +61,7 @@ public class Resource
      *             in. Or can be caused by AuthorizeException if was problem to
      *             authorize to find user.
      */
-    protected org.dspace.core.Context createContext(EPerson person) throws ContextException
+    protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
     {
 
         org.dspace.core.Context context = null;
@@ -161,7 +161,7 @@ public class Resource
      * @throws WebApplicationException
      *             This exception is throw for user of REST api.
      */
-    protected void processException(String message, org.dspace.core.Context context) throws WebApplicationException
+    protected static void processException(String message, org.dspace.core.Context context) throws WebApplicationException
     {
         if ((context != null) && (context.isValid()))
         {
@@ -267,7 +267,7 @@ public class Resource
      * @return Return EPerson logged under token in headers. If token was wrong
      *         or header rest-dspace-token was missing, returns null.
      */
-    protected EPerson getUser(HttpHeaders headers)
+    protected static EPerson getUser(HttpHeaders headers)
     {
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
@@ -275,6 +275,17 @@ public class Resource
         {
             token = list.get(0);
             return TokenHolder.getEPerson(token);
+        }
+        return null;
+    }
+
+    protected static String getToken(HttpHeaders headers) {
+        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
+        String token = null;
+        if ((list != null) && (list.size() > 0))
+        {
+            token = list.get(0);
+            return token;
         }
         return null;
     }

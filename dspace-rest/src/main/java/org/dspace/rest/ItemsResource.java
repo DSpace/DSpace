@@ -825,7 +825,7 @@ public class ItemsResource extends Resource
      * @return Return status code OK(200) if is all ok. NOT_FOUND(404) if item
      *         or bitstream was not found. UNAUTHORIZED(401) if user is not
      *         allowed to delete bitstream.
-     * @throws WebApplicationExcetion
+     * @throws WebApplicationException
      *             It is thrown, when: Was problem with edditting database,
      *             SQLException. Or problem with authorization to item, bundle
      *             or bitstream, AuthorizeException. When was problem with
@@ -931,7 +931,7 @@ public class ItemsResource extends Resource
     @POST
     @Path("/find-by-metadata-field")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Item[] findItemsByMetadataField(MetadataEntry metadataEntry, @QueryParam("expand") String expnad,
+    public Item[] findItemsByMetadataField(MetadataEntry metadataEntry, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
