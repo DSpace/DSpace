@@ -244,6 +244,32 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
+    public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
+        String[] elements = getElementsFilled(mdString);
+        String schema = elements[0], element = elements[1], qualifier = elements[2];
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
+                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        TableRowIterator rows = null;
+        if (Item.ANY.equals(authority)) {
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        } else {
+            query += " AND metadatavalue.authority = ?";
+            rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), authority);
+        }
+        return new ItemIterator(context, rows);
+    }
+
+
     /**
      * Get the internal ID of this item. In general, this shouldn't be exposed
      * to users

@@ -68,8 +68,7 @@ public class AJAXMenuGenerator extends AbstractGenerator
         String locale = parameters.getParameter("locale",null);
         log.debug("AJAX menu generator: field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", locale = "+locale);
 
-        Choices result =
-            ChoiceAuthorityManager.getManager().getMatches(field, query, collection, start, limit, locale);
+        Choices result = ChoiceAuthorityManager.getManager().getMatches(field, query, collection, start, limit, locale, true);
 
         log.debug("Result count = "+result.values.length+", default="+result.defaultSelected);
 
