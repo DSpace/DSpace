@@ -68,8 +68,8 @@ public abstract class AuthorProfileField extends AbstractDSpaceTransformer {
         //Since our composite cannot add figures we add a text box & use the classes to pick this up in xsl
         //And transform it to the images
 //        composite.addText(request.getContextPath() + "/static/images/del.png", "author-profile-img del");
-        composite.addButton(metadataFieldDescriptor.toString() + "-author-profile-add", "author-profile-add").setValue(T_button_add);
-        composite.addButton(metadataFieldDescriptor.toString() + "-author-profile-remove", "author-profile-remove").setValue(T_button_remove);
+        composite.addButton(metadataFieldDescriptor.toString() + "-author-profile-add", "author-profile-add ds-add-button").setValue(T_button_add);
+        composite.addButton(metadataFieldDescriptor.toString() + "-author-profile-remove", "author-profile-remove ds-add-button").setValue(T_button_remove);
     }
 
     protected void addValidatorsToItem(AuthorProfileInput inputConfig, Item wingItem) throws WingException {

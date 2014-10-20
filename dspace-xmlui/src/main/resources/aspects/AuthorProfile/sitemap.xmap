@@ -84,7 +84,7 @@
                         <map:transform type="IncludePageMeta">
                             <map:parameter name="javascript#1" value="lib/js/author-profile.js"/>
                             <map:parameter name="javascript#2" value="lib/js/jquery.validate.min.js"/>
-                            <map:parameter name="javascript#3" value="lib/js/additional-methods.min.js"/>
+                            <!--<map:parameter name="javascript#3" value="lib/js/additional-methods.min.js"/>-->
                         </map:transform>
                         <map:transform type="EditAuthorProfileForm">
                         </map:transform>

@@ -29,21 +29,18 @@
             <div id="AuthorProfileHide" style="display:none"><i18n:text>xmlui.authorprofile.artifactbrowser.AuthorProfile.show</i18n:text></div>
 
         <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='biography' and @qualifier='title'] or
-                                    (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)] and
+                                    (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department'] and
                                     (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='author' and @qualifier='internal']='true'))">
 
         <h3>
             <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='biography' and @qualifier='title']" mode="profile"/>
 
             <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='biography' and @qualifier='title'] and
-                                    (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)] and
+                                    (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department'] and
                                     (./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='author' and @qualifier='internal']='true'))">
                 <xsl:text>, </xsl:text>
             </xsl:if>
 
-            <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='author' and @qualifier='internal']='true'">
-                <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)][1]" mode="profile"/>
-            </xsl:if>
         </h3>
         </xsl:if>
             <div class="ds-author-wrapper">
@@ -77,9 +74,12 @@
                     <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='specialization' and not(@qualifier)][1]" mode="profile"/>
 
                     <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='degree' and not(@qualifier)][1]" mode="profile"/>
+
+                    <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='department'][1]" mode="profile"/>
+
                     <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='OrchidId' and not(@qualifier)][1]" mode="profile"/>
 
-                    <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='site'  and not(@qualifier)][1]" mode="profile"/>
+
 
                     <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='external' and @qualifier='hostWork']" mode="profile"/>
 
@@ -95,7 +95,7 @@
                                     <xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='telephone' and not(@qualifier)]"/>
                                 </li>
                             </xsl:if>
-                            <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='email' and not(@qualifier)]">
+                            <xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='email' and @qualifier='private']='false'">
                                 <li>
                                     <a>
                                         <xsl:attribute name="href">
@@ -106,6 +106,7 @@
                                     </a>
                                 </li>
                             </xsl:if>
+                            <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='authorProfile' and @element='site'  and @qualifier='name'][1]" mode="profile"/>
                         </ul>
                     </xsl:if>
 
@@ -119,10 +120,10 @@
 
     <xsl:variable name="separator" select="':##:'"/>
 
-    <xsl:template match="dim:field[@mdschema='authorProfile' and @element='site'  and not(@qualifier)]" mode="profile">
-        <div class="ds-author-links">
-            <h2><i18n:text>xmlui.authorprofile.artifactbrowser.AuthorProfile.externalLinks</i18n:text></h2>
-            <ul>
+    <xsl:template match="dim:field[@mdschema='authorProfile' and @element='site'  and @qualifier='name']" mode="profile">
+        <!--<div class="ds-author-links">-->
+            <!--<h2><i18n:text>xmlui.authorprofile.artifactbrowser.AuthorProfile.externalLinks</i18n:text></h2>-->
+            <!--<ul>-->
                 <li>
                 <a>
                     <xsl:attribute name="href">
@@ -139,7 +140,7 @@
                 </li>
 
             <xsl:for-each
-                    select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='site'  and not(@qualifier)]">
+                    select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='site'  and @qualifier='name']">
 
                 <li>
                 <a>
@@ -156,9 +157,9 @@
                 </a>
                 </li>
             </xsl:for-each>
-            </ul>
+            <!--</ul>-->
 
-        </div>
+        <!--</div>-->
     </xsl:template>
 
     <xsl:template match="dim:field[@mdschema='authorProfile' and @element='biography' and not(@qualifier)]" mode="profile">
@@ -188,7 +189,10 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)]" mode="profile">
+    <xsl:template match="dim:field[@mdschema='authorProfile' and @element='department']" mode="profile">
+        <div class="simple-author-view-other">
+            <h2><i18n:text>xmlui.authorprofile.artifactbrowser.AuthorProfile.departments</i18n:text></h2>
+
 
                     <xsl:choose>
                         <xsl:when
@@ -212,7 +216,7 @@
                         </xsl:otherwise>
 
                     </xsl:choose>
-            <xsl:for-each select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)]">
+            <xsl:for-each select="./following-sibling::dim:field[@mdschema='authorProfile' and @element='department' and @qualifier='name']">
                 <xsl:text>, </xsl:text>
                 <xsl:choose>
                     <xsl:when
@@ -236,11 +240,12 @@
                     </xsl:otherwise>
 
                 </xsl:choose>
-                <xsl:if test="./following-sibling::dim:field[@mdschema='authorProfile' and @element='department' and not(@qualifier)]">
+                <xsl:if test="./following-sibling::dim:field[@mdschema='authorProfile' and @element='department' and @qualifier='name']">
                     <xsl:text>, </xsl:text>
                 </xsl:if>
             </xsl:for-each>
 
+        </div>
     </xsl:template>
 
     <xsl:template match="mets:fileSec/mets:fileGrp/mets:file" mode="author-pic">

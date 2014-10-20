@@ -71,4 +71,7 @@
         <!--</div>-->
     </xsl:template>
 
+    <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][text()='lib/js/author-profile.js']"/>
+    <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][text()='lib/js/jquery.validate.min.js']"/>
+
 </xsl:stylesheet>

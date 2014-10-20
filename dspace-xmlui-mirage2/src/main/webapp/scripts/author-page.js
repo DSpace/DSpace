@@ -7,14 +7,15 @@
  */
 (function ($) {
     $(document).ready(function () {
-        var initialMinimalContent, initialFullContent, detailsWrapper, showButton, hideButton, initHeight, buttons, stats;
+        var initialMinimalBiography, initialFullBiography, aditionalContent, detailsWrapper, showButton, hideButton, initHeight, buttons, stats;
         detailsWrapper = $('.author-details-wrapper');
-        initialFullContent = $('.author-details-full');
-        initialMinimalContent = $('.author-details-minimal');
+        initialFullBiography = $('.author-biography-full');
+        initialMinimalBiography = $('.author-biography-minimal');
         buttons = $('.author-details-button');
         showButton = $('#author-details-show-button');
         hideButton = $('#author-details-hide-button');
         stats =$('.discovery-stats-section-wrapper');
+        aditionalContent = $('.author-details-full');
 
         initHeight = detailsWrapper.outerHeight();
         showButton.click(function (event) {
@@ -22,10 +23,11 @@
             hideButton.removeClass('hidden').show();
             var content;
             event.preventDefault();
-            content = initialFullContent.html();
-            initialFullContent.html(initialMinimalContent.html());
+            content = initialFullBiography.html();
+            initialFullBiography.html(initialMinimalBiography.html());
             detailsWrapper.css('max-height', initHeight);
-            initialMinimalContent.html(content);
+            initialMinimalBiography.html(content);
+            aditionalContent.removeClass('hidden').show();
             detailsWrapper.animate({"max-height": $(window).height()}, 200, function () {
                 detailsWrapper.removeAttr('style');
             });
@@ -36,13 +38,14 @@
             hideButton.hide();
             var content;
             event.preventDefault();
-            content = initialFullContent.html();
-            initialFullContent.html(initialMinimalContent.html());
+            content = initialFullBiography.html();
+            initialFullBiography.html(initialMinimalBiography.html());
             buttons.show();
             $(buttons[0]).hide();
             detailsWrapper.css('max-height', detailsWrapper.outerHeight());
+            aditionalContent.hide();
             detailsWrapper.animate({"max-height": initHeight}, 200, function () {
-                initialMinimalContent.html(content);
+                initialMinimalBiography.html(content);
                 detailsWrapper.removeAttr('style');
 
             });

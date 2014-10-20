@@ -192,7 +192,7 @@ public class AuthorPage extends AbstractSearch{
 //        div.setHead(T_PROFILE_HEAD.parameterize(fullName));
 
         Division search = body.addDivision("search", "primary");
-        search.setHead(T_PROFILE_HEAD.parameterize(fullName));
+        //search.setHead(T_PROFILE_HEAD.parameterize(fullName));
 
         div.addReferenceSet("authors", ReferenceSet.TYPE_SUMMARY_VIEW).addReference(authorProfile);
 

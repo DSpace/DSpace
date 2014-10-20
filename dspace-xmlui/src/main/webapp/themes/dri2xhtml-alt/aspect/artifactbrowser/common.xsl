@@ -319,37 +319,6 @@
         </div>
     </xsl:template>
 
-    <xsl:template name="author-decorate">
-        <xsl:param name="currAuthor"/>
-        <xsl:param name="pageMeta"/>
-        <xsl:param name="context-path"/>
-        <xsl:choose>
-        <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])&lt;=0">
-            <a class="author-profile">
-                <xsl:attribute name="href">
-                    <xsl:value-of select="$context-path"/>
-                    <xsl:text>/author-page?author=</xsl:text>
-                    <xsl:value-of
-                            select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
-                </xsl:attribute>
-                <xsl:text>&#160;</xsl:text>
-            </a>
-        </xsl:when>
-        <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])>0">
-                <a class="author-profile-current">
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="$context-path"/>
-                        <xsl:text>/author-page?author=</xsl:text>
-                        <xsl:value-of
-                                select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
-                    </xsl:attribute>
-                    <xsl:text>&#160;</xsl:text>
-                </a>
-            </xsl:when>
-        </xsl:choose>
-
-    </xsl:template>
-
     <xsl:template match="dri:div[@n='search']">
         <xsl:apply-templates select="dri:head"/>
         <xsl:apply-templates select="dri:*[@n='hidden-fields']"/>
