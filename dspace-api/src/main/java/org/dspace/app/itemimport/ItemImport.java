@@ -43,17 +43,8 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -105,6 +96,8 @@ public class ItemImport
     private static boolean isQuiet = false;
 
     private static boolean template = false;
+
+    private static PrintWriter mapOut = null;
 
     private static final String tempWorkDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
 
@@ -668,7 +661,6 @@ public class ItemImport
     {
         // create the mapfile
         File outFile = null;
-        PrintWriter mapOut = null;
 
         try {
             Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
@@ -676,10 +668,6 @@ public class ItemImport
 
             System.out.println("Adding items from directory: " + sourceDir);
             System.out.println("Generating mapfile: " + mapFile);
-
-        // create the mapfile
-        File outFile = null;
-        PrintWriter mapOut = null;
 
         boolean directoryFileCollections = false;
         if (mycollections == null)
