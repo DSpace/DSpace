@@ -10,7 +10,8 @@
         "handlebars": "latest",
         "respond": "latest",
         "html5shiv": "latest",
-        "holderjs": "latest"
+        "holderjs": "latest",
+        "datatables": "latest"
     },
     "devDependencies": {}
 }
