@@ -154,7 +154,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     solr.query(solrQuery);                
                 } catch (SolrServerException e) {
-                    log.error("Error while initialinging solr server", e);
+                    log.error("Error while initializing solr server", e);
                 }
             }
             else

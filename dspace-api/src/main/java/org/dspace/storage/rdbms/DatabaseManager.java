@@ -77,13 +77,6 @@ public class DatabaseManager
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
     
-    /** Database Status Flags for Flyway setup. Fresh Install vs. pre-4.0 vs */
-    private static final int STATUS_PRE_4_0 = -1;
-    private static final int STATUS_FRESH_INSTALL = 0;
-    private static final int STATUS_NO_FLYWAY = 1;
-    private static final int STATUS_FLYWAY = 2;
-    
-
     /**
      * This regular expression is used to perform sanity checks
      * on database names (i.e. tables and columns).
@@ -1585,10 +1578,10 @@ public class DatabaseManager
             }
             log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
             
-            // FINALLY, ensure database scheme is up-to-date. If not, upgrade/migrate database.
-            // (NOTE: This needs to run LAST as it may need some of the initialized
-            // variables set above)
-            initializeDatabase(connection);
+            // FINALLY, ensure database schema is up-to-date.
+            // If not, upgrade/migrate database. (NOTE: This needs to run LAST
+            // as it may need some of the initialized variables set above)
+            DatabaseUtils.updateDatabase(dataSource, connection);
 
             connection.close();
             initialized = true;
@@ -1605,137 +1598,6 @@ public class DatabaseManager
             log.warn("Exception initializing DB pool", e);
             throw new SQLException(e.toString(), e);
         }
-    }
-    
-    /**
-     * Ensures the current database is up-to-date with regards
-     * to the latest DSpace DB schema. If the scheme is not up-to-date,
-     * then any necessary database migrations are performed.
-     * 
-     * @param connection
-     *      Database connection
-     */
-    private static synchronized void initializeDatabase(Connection connection) 
-            throws IOException, SQLException
-    {
-        // Get the name of the Schema that the DSpace Database is using
-        String schema = ConfigurationManager.getProperty("db.schema");
-        if(StringUtils.isBlank(schema)){
-            schema = null;
-        }
-        
-        // Initialize Flyway DB API (http://flywaydb.org/), used to perform DB migrations
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(dataSource);
-        flyway.setEncoding("UTF-8");
-    
-        // Migration scripts are based on DBMS Keyword (see full path below)
-        String scriptFolder = dbms_keyword;
-        
-        // Set location where Flyway will load DB scripts from (based on DB Type)
-        // e.g. [dspace.dir]/etc/[dbtype]/
-        String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
-                            System.getProperty("file.separator") + "etc" +
-                            System.getProperty("file.separator") + "migrations" +
-                            System.getProperty("file.separator") + scriptFolder;
-        
-        log.info("Loading Flyway DB scripts from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
-        flyway.setLocations("filesystem:" + scriptPath, "classpath:org.dspace.storage.rdbms.migration");
-        
-        // Get our Database migration status, so we know what to tell Flyway to do
-        int status = getDbMigrationStatus(schema, connection, flyway);
-        
-        // If we have a pre-4.0 Database, we need to exit immediately. There's nothing we can do here
-        if(status==STATUS_PRE_4_0)
-            throw new SQLException("CANNOT AUTOUPGRADE DSPACE DATABASE, AS IT DOES NOT LOOK TO BE A VALID DSPACE 4.0 DATABASE. " +
-                        "Please manually upgrade your database to DSpace 4.0 compatibility.");
-        // If this is a fresh install
-        else if (status==STATUS_FRESH_INSTALL)
-        {
-            // Just let Flyway initialize our database
-            flyway.init();
-        }
-        // If we have a valid 4.0 database, but haven't initialized Flyway on it
-        else if (status == STATUS_NO_FLYWAY)
-        {
-            // Initialize the Flyway database table.
-            // We are hardcoding the schema version to 4.0 because this should ONLY
-            // be encountered on a 4.0 database. After 4.0, all databases should 
-            // already have Flyway initialized.
-            // (NOTE: Flyway will also create the db.schema, if it doesn't exist)
-            flyway.setInitVersion("4.0");
-            flyway.setInitDescription("Initial DSpace 4.0 database schema");
-            flyway.init();
-        }
-           
-        // Determine pending Database migrations
-        MigrationInfo[] pending = flyway.info().pending();
-        
-        // Log info about pending migrations
-        if (pending!=null && pending.length>0) 
-        {   
-            log.info("Pending DSpace database schema migrations:");
-            for (MigrationInfo info : pending)
-            {
-                log.info("\t" + info.getVersion() + " " + info.getDescription() + " " + info.getType() + " " + info.getState());
-            }
-        }
-        else
-            log.info("DSpace database schema is up to date.");
-
-        // Ensure database is on the latest version of the DSpace schema
-        flyway.migrate();
-    }
-    
-    /**
-     * Determine the migration status of our Database
-     * so that we are able to properly migrate it to the latest schema
-     * via Flyway
-     * 
-     * @param schema
-     *          Name of the Schema being used by the DSpace database
-     * @param connection
-     *          Current Database Connection
-     * @param flyway
-     *          Our Flyway settings
-     * @return status flag 
-     */
-    private static int getDbMigrationStatus(String schema, Connection connection, Flyway flyway)
-            throws SQLException
-    {
-        // Get information about our database. We'll use this to determine DB status.
-        DatabaseMetaData meta = connection.getMetaData();
-       
-        // First, is this a "fresh_install"?  Check for an "item" table.
-        ResultSet tables = meta.getTables(null, schema, "item", null);
-        if (!tables.next()) 
-        {
-            tables.close();
-            // No "item" table, this is a fresh install of DSpace
-            return STATUS_FRESH_INSTALL;
-        }
-  
-        // Second, is this DSpace DB Schema compatible with 4.0?  Check for a "Webapp" table (which was added in 4.0)
-        // TODO: If the "Webapp" table is ever removed, then WE NEED TO CHANGE THIS CHECK.
-        tables = meta.getTables(null, schema, "Webapp", null);
-        if (!tables.next()) 
-        {
-            tables.close();
-            // No "Webapp" table, so this must be a pre-4.0 database
-            return STATUS_PRE_4_0;
-        }
-        
-        // Finally, Check if the necessary Flyway table ("schema_version") exists in this database
-        tables = meta.getTables(null, schema, flyway.getTable(), null);
-        if (!tables.next()) 
-        {
-            tables.close();
-            // No Flyway table, so we need to get Flyway initialized in this database
-            return STATUS_NO_FLYWAY;
-        }
-        
-        // IF we get here, we have 4.0 or above compatible database and Flyway is already installed
-        return STATUS_FLYWAY;
     }
     
     /**

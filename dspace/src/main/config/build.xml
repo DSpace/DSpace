@@ -26,7 +26,7 @@
 
 Common usage:
 
-  Fresh install, including database setup and registry loading:
+  Fresh install of DSpace:
     % ant fresh_install
 
   Update existing installation, leaving data and configuration intact:
@@ -136,14 +136,9 @@ Common usage:
         <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
         <echo message="install_code    --> Install compiled code into ${dspace.dir}" />
         <echo message="" />
-        <echo message="fresh_install   --> Perform a fresh installation of the software, " />
-        <echo message="                    including the databases &amp; config" />
-        <echo message="setup_database  --> Create database tables" />
-        <echo message="load_registries --> Load metadata &amp; file format registries into the " />
-        <echo message="                    database" />
+        <echo message="fresh_install   --> Perform a fresh installation of the software. " />
         <echo message="" />
         <echo message="clean_backups   --> Remove .bak directories under install directory" />
-        <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
         <echo message="test_database   --> Attempt to connect to the DSpace database in order to verify that configuration is correct" />
         <echo message="" />
         <echo message="" />
@@ -182,10 +177,10 @@ Common usage:
     </target>
 
     <!-- ============================================================= -->
-    <!-- Update an installation (except database)                      -->
+    <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps,update_registries" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_configs,update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -536,7 +531,7 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- Update an installation (except database)                      -->
+    <!-- Update core code only (no webapps or configs)                 -->
     <!-- ============================================================= -->
 
     <target name="update_code" description="Update installed code (without clobbering data/config)">
@@ -800,161 +795,6 @@ Common usage:
         </java>
     </target>
 
-
-    <!-- ============================================================= -->
-    <!-- Create the database tables                                    -->
-    <!-- ============================================================= -->
-
-    <!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-    <target name="setup_database" description="Create database tables">
-
-        <!-- Load the Schema -->
-        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="setup-database" />
-            <arg value="database_schema.sql" />
-        </java>
-
-        <!-- Add the browse tables -->
-        <java classname="org.dspace.browse.InitializeBrowseDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="database_schema.sql" />
-        </java>
-
-    </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Remove the database tables                                    -->
-    <!-- ============================================================= -->
-
-    <!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-    <target name="clean_database" description="Removes DSpace database tables, destroying data">
-
-        <java classname="org.dspace.browse.InitializeBrowseDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="clean-database.sql" />
-        </java>
-
-        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="clean-database" />
-            <arg value="clean-database.sql" />
-        </java>
-
-    </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Load the initial contents of the registries into the database -->
-    <!-- ============================================================= -->
-
-    <!-- Loads bitstream format and Dublin Core type registries -->
-    <target name="load_registries" description="Load initial contents of registries">
-
-        <!-- first import the bitstream registry -->
-        <java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="-bitstream" />
-            <arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
-        </java>
-
-        <!-- finally import the metadata elements -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'" />
-        </java>
-
-        <!-- Import the new DCTerms schema -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dcterms-types.xml'" />
-        </java>
-
-        <!-- Import the new EPerson schema -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/eperson-types.xml'" />
-        </java>
-
-        <!-- FIXME: this should be more modular -->
-        <!-- import the SWORD required metadata -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'" />
-        </java>
-
-    </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Update contents of the registries -->
-    <!-- ============================================================= -->
-
-    <target name="update_registries" description="Update the metadata registries">
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'" />
-            <arg line="-u"/>
-        </java>
-
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dcterms-types.xml'" />
-            <arg line="-u"/>
-        </java>
-
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/eperson-types.xml'" />
-            <arg line="-u"/>
-        </java>
-
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'" />
-            <arg line="-u"/>
-        </java>
-
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/workflow-types.xml'" />
-            <arg line="-u"/>
-        </java>
-    </target>
-
     <!-- ============================================================= -->
     <!-- Install fresh code but do not touch the database              -->
     <!-- ============================================================= -->
@@ -1011,7 +851,7 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="fresh_install"
-            depends="init_installation,init_configs,test_database,setup_database,load_registries,install_code"
+            depends="init_installation,init_configs,test_database,install_code"
             description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
@@ -1030,22 +870,9 @@ Common usage:
             <arg line="dsrun org.dspace.eperson.Group"/>
         </java>
 
-        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f" />
-        </java>
-
-        <java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        </java>
-
         <echo>
 ====================================================================
- The DSpace code has been installed, and the database initialized.
+ The DSpace code has been installed.
 
  To complete installation, you should do the following:
 
@@ -1056,11 +883,12 @@ Common usage:
    the appropriate place for your servlet container.
    (e.g. '$CATALINA_HOME/webapps' for Tomcat)
 
+ * Start up your servlet container (e.g. Tomcat). DSpace now will
+   initialize the database on the first startup.
+
  * Make an initial administrator account (an e-person) in DSpace:
 
    ${dspace.dir}/bin/dspace create-administrator
-
- * Start up your servlet container (Tomcat etc.)
 
  You should then be able to access your DSpace's 'home page':
 
@@ -1071,7 +899,7 @@ Common usage:
 
     </target>
 
-	<!-- installes GeoCity resolution database -->
+	<!-- installs GeoCity resolution database -->
     <target name="update_geolite">
         <echo>Downloading: ${geolite}</echo>
         <trycatch property="geolite.error">
