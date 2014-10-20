@@ -37,6 +37,7 @@
     <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>
     <xsl:import href="lib/xsl/aspect/administrative/administrative.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-list.xsl"/>
+    <xsl:import href="lib/xsl/aspect/artifactbrowser/author-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>

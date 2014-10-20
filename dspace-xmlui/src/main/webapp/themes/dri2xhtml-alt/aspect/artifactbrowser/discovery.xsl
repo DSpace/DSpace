@@ -295,4 +295,73 @@
         </div>
     </xsl:template>
 
+    <xsl:template
+            match="dri:options/dri:list[@id='aspect.discovery.Navigation.list.discovery']/dri:list[@id='aspect.discovery.SidebarFacetsTransformer.list.author' or @id='aspect.authorprofile.SidebarFacetsAuthorPageTransformer.list.author']/dri:item"
+            mode="nested" priority="4">
+        <li class="clearfix">
+            <span>
+
+                <xsl:variable name="last" select="substring-before(dri:xref/text(),',')"/>
+                <xsl:variable name="first" select="normalize-space(substring-after(dri:xref/text(),','))"/>
+                <xsl:choose>
+
+                    <xsl:when test="count(dri:xref)>0">
+                        <span class="disc_author"><xsl:apply-templates select="dri:xref"/><xsl:text>&#160;</xsl:text><xsl:value-of select="normalize-space(text())"/></span>
+                        <xsl:call-template name="author-decorate">
+
+                            <xsl:with-param name="currAuthor" select="dri:xref/text()" />
+                            <xsl:with-param name="pageMeta" select="$pageMeta"/>
+                            <xsl:with-param name="context-path" select="$context-path"/>
+
+                        </xsl:call-template>
+
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span class="disc_author"><xsl:apply-templates /></span>
+                        <xsl:call-template name="author-decorate">
+
+                            <xsl:with-param name="currAuthor" select="normalize-space(substring-before(./text(),'('))" />
+                            <xsl:with-param name="pageMeta" select="$pageMeta"/>
+                            <xsl:with-param name="context-path" select="$context-path"/>
+
+                        </xsl:call-template>
+
+                    </xsl:otherwise>
+                </xsl:choose>
+
+            </span>
+        </li>
+    </xsl:template>
+
+    <xsl:template name="author-decorate">
+        <xsl:param name="currAuthor"/>
+        <xsl:param name="pageMeta"/>
+        <xsl:param name="context-path"/>
+        <xsl:choose>
+        <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])&lt;=0">
+            <a class="author-profile">
+                <xsl:attribute name="href">
+                    <xsl:value-of select="$context-path"/>
+                    <xsl:text>/author-page?author=</xsl:text>
+                    <xsl:value-of
+                            select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
+                </xsl:attribute>
+                <xsl:text>&#160;</xsl:text>
+            </a>
+        </xsl:when>
+        <xsl:when test="count($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor])>0 and count($pageMeta/dri:metadata[@element='currentauthorprofile' and @qualifier=$currAuthor])>0">
+                <a class="author-profile-current">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$context-path"/>
+                        <xsl:text>/author-page?author=</xsl:text>
+                        <xsl:value-of
+                                select="encoder:encode($pageMeta/dri:metadata[@element='authorprofile' and @qualifier=$currAuthor],'UTF-8')"/>
+                    </xsl:attribute>
+                    <xsl:text>&#160;</xsl:text>
+                </a>
+            </xsl:when>
+        </xsl:choose>
+
+    </xsl:template>
+
 </xsl:stylesheet>

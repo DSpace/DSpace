@@ -232,6 +232,9 @@
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communitySummaryList-DIM"/>
             </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryList-DIM"/>
+            </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
             </xsl:otherwise>
@@ -275,6 +278,9 @@
             <xsl:when test="@LABEL='DSpace Community'">
                 <xsl:call-template name="communitySummaryView-DIM"/>
             </xsl:when>
+            <xsl:when test="@LABEL='DSpace author profile'">
+                <xsl:call-template name="authorSummaryView-DIM"/>
+            </xsl:when>
             <xsl:otherwise>
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
             </xsl:otherwise>
@@ -312,5 +318,18 @@
             </img>
         </div>
     </xsl:template>
+
+    <xsl:template match="dri:div[@n='search']">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="dri:*[@n='hidden-fields']"/>
+        <xsl:apply-templates select="dri:div[@n='general-query']"/>
+        <xsl:apply-templates select="dri:div[@n='search-filters']"/>
+        <xsl:apply-templates select="dri:div[@n='discovery-search-box']"/>
+        <xsl:apply-templates select="//dri:div[@n='statistics-controls']"/>
+        <xsl:apply-templates
+                select="(node())[@n!='hidden-fields' and @n!='general-query' and @n!='search-filters' and @n!='discovery-search-box']"/>
+
+    </xsl:template>
+
     
 </xsl:stylesheet>

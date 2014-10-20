@@ -84,7 +84,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     private static final Message T_rpp = message("xmlui.Discovery.AbstractSearch.rpp");
     private static final Message T_result_head_3 = message("xmlui.Discovery.AbstractSearch.head3");
-    private static final Message T_result_head_2 = message("xmlui.Discovery.AbstractSearch.head2");
+    protected static final Message T_result_head_2 = message("xmlui.Discovery.AbstractSearch.head2");
 
     /**
      * Cached query results
@@ -138,6 +138,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // Ignore all errors and just don't cache.
             return "0";
         }
+    }
+
+    protected void addToValidity(DSpaceValidity validity) throws Exception{
+        //do nothing by default
     }
 
     /**
@@ -206,12 +210,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * At the moment however this form is only used to track search result hits
      * @param searchDiv the division to add the form to
      */
-    protected void buildMainForm(Division searchDiv) throws WingException, SQLException {
+    protected Division buildMainForm(Division searchDiv) throws WingException, SQLException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         //We set our action to context path, since the eventual action will depend on which url we click on
-        Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_POST, "");
+        Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_POST, "discovery-main-form");
 
         String query = getQuery();
         //Indicate that the form we are submitting lists search results
@@ -256,6 +260,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             mainForm.addHidden("page").setValue(request.getParameter("page"));
         }
+
+        return mainForm;
     }
 
     protected abstract String getBasicUrl() throws SQLException;
@@ -275,20 +281,132 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 DSpaceObject scope = getScope();
                 this.performSearch(scope);
             }
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             log.error(e.getMessage(), e);
             queryResults = null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             queryResults = null;
         }
 
         Division results = search.addDivision("search-results", "primary");
         buildSearchControls(results);
+        setResultHead(results);
+
+        if (queryResults != null && 0 < queryResults.getDspaceObjects().size()) {
+            addPagination(results);
+            addResults(results);
 
 
+        } else {
+            results.addPara(T_no_results);
+        }
+    }
+
+    protected void addResults(Division results) throws WingException, SQLException {
+        // Look for any communities or collections in the mix
+        org.dspace.app.xmlui.wing.element.List dspaceObjectsList = null;
+
+        // Put it on the top of level search result list
+        dspaceObjectsList = results.addList("search-results-repository",
+                org.dspace.app.xmlui.wing.element.List.TYPE_DSO_LIST, "repository-search-results");
+
+        List<DSpaceObject> commCollList = new ArrayList<DSpaceObject>();
+        List<Item> itemList = new ArrayList<Item>();
+        for (DSpaceObject resultDso : queryResults.getDspaceObjects())
+        {
+            if(resultDso.getType() == Constants.COMMUNITY || resultDso.getType() == Constants.COLLECTION)
+            {
+                commCollList.add(resultDso);
+            }else
+            if(resultDso.getType() == Constants.ITEM)
+            {
+                itemList.add((Item) resultDso);
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(commCollList))
+        {
+            org.dspace.app.xmlui.wing.element.List commCollWingList = dspaceObjectsList.addList("comm-coll-result-list");
+            commCollWingList.setHead(T_result_head_2);
+            for (DSpaceObject dso : commCollList)
+            {
+                DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(dso);
+                if(dso.getType() == Constants.COMMUNITY)
+                {
+                    //Render our community !
+                    org.dspace.app.xmlui.wing.element.List communityMetadata = commCollWingList.addList(dso.getHandle() + ":community");
+
+                    renderCommunity((Community) dso, highlightedResults, communityMetadata);
+                }else
+                if(dso.getType() == Constants.COLLECTION)
+                {
+                    //Render our collection !
+                    org.dspace.app.xmlui.wing.element.List collectionMetadata = commCollWingList.addList(dso.getHandle() + ":collection");
+
+                    renderCollection((Collection) dso, highlightedResults, collectionMetadata);
+                }
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(itemList))
+        {
+            org.dspace.app.xmlui.wing.element.List itemWingList = dspaceObjectsList.addList("item-result-list");
+            if(CollectionUtils.isNotEmpty(commCollList))
+            {
+                itemWingList.setHead(T_result_head_3);
+
+            }
+            for (Item resultDso : itemList)
+            {
+                DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(resultDso);
+                renderItem(itemWingList, resultDso, highlightedResults);
+            }
+        }
+    }
+
+    protected void addPagination(Division results) throws UIException {
+        // Pagination variables.
+        int itemsTotal = (int) queryResults.getTotalSearchResults();
+        int firstItemIndex = (int) this.queryResults.getStart() + 1;
+        int lastItemIndex = (int) this.queryResults.getStart() + queryResults.getDspaceObjects().size();
+
+        //if (itemsTotal < lastItemIndex)
+        //    lastItemIndex = itemsTotal;
+        int currentPage = this.queryResults.getStart() / this.queryResults.getMaxResults() + 1;
+        int pagesTotal = (int) ((this.queryResults.getTotalSearchResults() - 1) / this.queryResults.getMaxResults()) + 1;
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("page", "{pageNum}");
+        String pageURLMask = generateURL(parameters);
+        pageURLMask = addFilterQueriesToUrl(pageURLMask);
+
+        results.setMaskedPagination(itemsTotal, firstItemIndex,
+                lastItemIndex, currentPage, pagesTotal, pageURLMask);
+    }
+
+    protected String addFilterQueriesToUrl(String pageURLMask) throws UIException {
+        Map<String, String[]> filterQueryParams = getParameterFilterQueries();
+        if(filterQueryParams != null)
+        {
+            StringBuilder maskBuilder = new StringBuilder(pageURLMask);
+            for (String filterQueryParam : filterQueryParams.keySet())
+            {
+                String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
+                if(filterQueryValues != null)
+                {
+                    for (String filterQueryValue : filterQueryValues)
+                    {
+                        maskBuilder.append("&").append(filterQueryParam).append("=").append(encodeForURL(filterQueryValue));
+                    }
+                }
+            }
+
+            pageURLMask = maskBuilder.toString();
+        }
+        return pageURLMask;
+    }
+
+    protected void setResultHead(Division results) throws SQLException, WingException {
         DSpaceObject searchScope = getScope();
 
         int displayedResults;
@@ -314,113 +432,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 results.setHead(T_head1_none.parameterize(displayedResults, totalResults, searchTime));
             }
         }
-
-        if (queryResults != null && 0 < queryResults.getDspaceObjects().size())
-        {
-
-            // Pagination variables.
-            int itemsTotal = (int) queryResults.getTotalSearchResults();
-            int firstItemIndex = (int) this.queryResults.getStart() + 1;
-            int lastItemIndex = (int) this.queryResults.getStart() + queryResults.getDspaceObjects().size();
-
-            //if (itemsTotal < lastItemIndex)
-            //    lastItemIndex = itemsTotal;
-            int currentPage = this.queryResults.getStart() / this.queryResults.getMaxResults() + 1;
-            int pagesTotal = (int) ((this.queryResults.getTotalSearchResults() - 1) / this.queryResults.getMaxResults()) + 1;
-            Map<String, String> parameters = new HashMap<String, String>();
-            parameters.put("page", "{pageNum}");
-            String pageURLMask = generateURL(parameters);
-            pageURLMask = addFilterQueriesToUrl(pageURLMask);
-
-            results.setMaskedPagination(itemsTotal, firstItemIndex,
-                    lastItemIndex, currentPage, pagesTotal, pageURLMask);
-
-            // Look for any communities or collections in the mix
-            org.dspace.app.xmlui.wing.element.List dspaceObjectsList = null;
-
-            // Put it on the top of level search result list
-            dspaceObjectsList = results.addList("search-results-repository",
-                    org.dspace.app.xmlui.wing.element.List.TYPE_DSO_LIST, "repository-search-results");
-
-            List<DSpaceObject> commCollList = new ArrayList<DSpaceObject>();
-            List<Item> itemList = new ArrayList<Item>();
-            for (DSpaceObject resultDso : queryResults.getDspaceObjects())
-            {
-                if(resultDso.getType() == Constants.COMMUNITY || resultDso.getType() == Constants.COLLECTION)
-                {
-                    commCollList.add(resultDso);
-                }else
-                if(resultDso.getType() == Constants.ITEM)
-                {
-                    itemList.add((Item) resultDso);
-                }
-            }
-
-            if(CollectionUtils.isNotEmpty(commCollList))
-            {
-                org.dspace.app.xmlui.wing.element.List commCollWingList = dspaceObjectsList.addList("comm-coll-result-list");
-                commCollWingList.setHead(T_result_head_2);
-                for (DSpaceObject dso : commCollList)
-                {
-                    DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(dso);
-                    if(dso.getType() == Constants.COMMUNITY)
-                    {
-                        //Render our community !
-                        org.dspace.app.xmlui.wing.element.List communityMetadata = commCollWingList.addList(dso.getHandle() + ":community");
-
-                        renderCommunity((Community) dso, highlightedResults, communityMetadata);
-                    }else
-                    if(dso.getType() == Constants.COLLECTION)
-                    {
-                        //Render our collection !
-                        org.dspace.app.xmlui.wing.element.List collectionMetadata = commCollWingList.addList(dso.getHandle() + ":collection");
-
-                        renderCollection((Collection) dso, highlightedResults, collectionMetadata);
-                    }
-                }
-            }
-
-            if(CollectionUtils.isNotEmpty(itemList))
-            {
-                org.dspace.app.xmlui.wing.element.List itemWingList = dspaceObjectsList.addList("item-result-list");
-                if(CollectionUtils.isNotEmpty(commCollList))
-                {
-                    itemWingList.setHead(T_result_head_3);
-
-                }
-                for (Item resultDso : itemList)
-                {
-                    DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(resultDso);
-                    renderItem(itemWingList, resultDso, highlightedResults);
-                }
-            }
-
-        } else {
-            results.addPara(T_no_results);
-        }
-        //}// Empty query
-    }
-
-    protected String addFilterQueriesToUrl(String pageURLMask) throws UIException {
-        Map<String, String[]> filterQueryParams = getParameterFilterQueries();
-        if(filterQueryParams != null)
-        {
-            StringBuilder maskBuilder = new StringBuilder(pageURLMask);
-            for (String filterQueryParam : filterQueryParams.keySet())
-            {
-                String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
-                if(filterQueryValues != null)
-                {
-                    for (String filterQueryValue : filterQueryValues)
-                    {
-                        maskBuilder.append("&").append(filterQueryParam).append("=").append(encodeForURL(filterQueryValue));
-                    }
-                }
-            }
-
-            pageURLMask = maskBuilder.toString();
-        }
-        return pageURLMask;
     }
 
     /**
@@ -961,8 +972,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             throws WingException, SQLException {
 
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
+        DiscoveryConfiguration discoveryConfiguration = getConfiguration();
 
         Division searchControlsGear = div.addDivision("masked-page-control").addDivision("search-controls-gear", "controls-gear-wrapper");
 
@@ -985,8 +995,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             {
                 String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
 
-                boolean selectedAsc = ((sortField.equals(currentSort) && "asc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.asc.equals(searchSortConfiguration.getDefaultSortOrder()));
-                boolean selectedDesc= ((sortField.equals(currentSort) && "desc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.desc.equals(searchSortConfiguration.getDefaultSortOrder()));
+                boolean selectedAsc = ((sortField.equals(currentSort) && "asc".equals(getParameterOrder())) || (currentSort == null && sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.asc.equals(searchSortConfiguration.getDefaultSortOrder()));
+                boolean selectedDesc= ((sortField.equals(currentSort) && "desc".equals(getParameterOrder())) || (currentSort == null && sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.desc.equals(searchSortConfiguration.getDefaultSortOrder()));
                 String sortFieldParam = "sort_by=" + sortField + "&order=";
                 sortOptions.addItem(sortField, "gear-option" + (selectedAsc ? " gear-option-selected" : "")).addXref(sortFieldParam + "asc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_asc"));
                 sortOptions.addItem(sortField, "gear-option" + (selectedDesc ? " gear-option-selected" : "")).addXref(sortFieldParam + "desc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_desc"));
@@ -1000,6 +1010,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             rppOptions.addItem("rpp-" + i, "gear-option" + (i == getParameterRpp() ? " gear-option-selected" : "")).addXref("rpp=" + i, Integer.toString(i));
         }
+    }
+
+    protected DiscoveryConfiguration getConfiguration() throws SQLException {
+        return SearchUtils.getDiscoveryConfiguration(HandleUtil.obtainHandle(objectModel));
     }
 
     /**

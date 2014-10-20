@@ -33,6 +33,8 @@
 	<message key="xmlui.general.return">Return</message>
 	<message key="xmlui.general.update">Update</message>
 	<message key="xmlui.general.delete">Delete</message>
+	<message key="xmlui.general.add">Add</message>
+	<message key="xmlui.general.remove">Remove</message>
 	<message key="xmlui.general.next">Next</message>
 	<message key="xmlui.general.untitled">Untitled</message>
         <message key="xmlui.general.perform">Perform</message>
@@ -261,6 +263,8 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
+    <message key="xmlui.ArtifactBrowser.Navigationauthor_profile.head">Author profiles</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_by_author_profile">View</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.title">Search</message>
@@ -2430,4 +2434,116 @@
     <message key="xmlui.mirage2.choice-authority-control.loading">Loading...</message>
 
     <message key="xmlui.mirage2.item-list.thumbnail">Thumbnail</message>
+
+
+    <!--Author profile messages: START -->
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileLastNameInput">Last name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileFirstNameInput">First name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileAuthorInput">Author values used for finding records</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileNameVariantInput">Displayed name variants</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSpecialization">Specialization</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileDegree">Degrees</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileOrchidId">ORCID</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileUnitInput">Unit</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileTitleInput">Biography Title</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileUnitInput">Please enter the author's unit</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileTitleInput">Please enter the biography's title</message>
+
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileNameSynonymInput">Human readable URL</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileNameSynonymInput">Enter a key for creating a human readable url for your author profile.</message>
+
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileDepartment">Department</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.department.name">Department name</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.department.url">Department url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileEmail">Email address</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileHidden">Email address visibility</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileHidden.true">Hide email address</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileTelephone">Telephone number</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSite">Link to Personal web page</message>
+    <message key="xmlui.authorprofile.administrative.field.head.site.url">Url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.site.name">Label</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileBiography">Biography</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileExternalHostWork">Externally hosted work</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileSingleImage">Picture</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfilePublic">Profile public</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfilePublic.true">Enable public profile</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileInternal">Internal author</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfileInternal.true">Is internal author</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileLastNameInput">The last name is required.</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileFirstNameInput">The first name is required.</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileEmail">An email address is required</message>
+    <message key="xmlui.authorprofile.administrative.field.error.authorProfileAuthorInput">The author profile is required</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileLastNameInput">The last name is invalid.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileFirstNameInput">The first name is invalid.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileEmail">The email address is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileAuthorInput">The author profile is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileSite">The url is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileTelephone">The telephone number is invalid</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileAuthorInput.DuplicateAuthorNameVariant">This name is already in use.</message>
+    <message key="xmlui.authorprofile.administrative.field.invalid.authorProfileEmail.regexFailed">{0} is not a valid email address.</message>
+
+
+
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileLastNameInput">Please enter the author's last name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileFirstNameInput">Please enter the author's first name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileAuthorInput">Enter any name variants to be used for searching items, exactly as they occur on the items in the DSpace. All the occurrences of the author's name should be entered here (including the "Last name, First name" combination above).
+        If the same person is intentionally written differently on separate items, including the variants here will ensure the items matching either one of the names will be displayed.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileNameVariantInput">Enter any name variants to be displayed on the author profile page.<br/>
+        The format to be user is "Last name, First name"</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSpecialization">Enter the author's fields of specialization</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileDegree">Enter the author's degrees</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileOrchidId">Enter the author's ORCID</message>
+
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileDepartment">Enter the department name and corresponding URL here. The URL is not mandatory.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.department.name">Department name</message>
+    <message key="xmlui.authorprofile.administrative.field.help.department.url">Department url</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileEmail">Enter the author's email address.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileHidden">Check if the author's email address should not be displayed on the author profile page</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileTelephone">Enter the author's telephone number if it can be displayed on the author profile page</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSite">Enter the link(s) to the Personal web page. Both the name and the URL are required.</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.site.url">Url</message>
+    <message key="xmlui.authorprofile.administrative.field.head.authorProfile.site.name">Label</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileBiography">Enter your biography here.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileExternalHostWork">Enter any Externally hosted work here.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileSingleImage">Please upload a Picture for the author profile. Please refrain from uploading large files. The picture will be resized automatically on the author profile page if necessary.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfilePublic">If the checkbox below is checked, the Author Profile will be publicly accessible. If it is not checked, only administrators will be able to see the link to the author profile or open the actual author profile page.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfilePublic.true">Enable public profile</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileInternal">Select whether the author is an internal or external author.</message>
+    <message key="xmlui.authorprofile.administrative.field.help.authorProfileInternal.true">Is internal author</message>
+
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.title">Edit author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.trail">Edit author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.create">Create author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.edit">Save author profile</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.remove.authorProfileSingleImage">Remove author profile image</message>
+    <message key="xmlui.authorprofile.administrative.EditAuthorProfileForm.submit.change.authorProfileSingleImage">Alter author profile image</message>
+    <message key="xmlui.authorprofile.administrative.author.link">View author profile (unsaved changes will be lost)</message>
+    <message key="xmlui.authorprofile.administrative.author.delete">Delete author profile</message>
+    <message key="xmlui.authorprofile.administrative.Navigation.create_author_profile">Create new author profile</message>
+
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.list.head">Browse by Author Profile</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.starts_with">Jump to last name</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.edit">Edit this author profile</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.show">Show Details</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.hide">Hide details</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.statistics">Statistics</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.downloads">downloads</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.views">views</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.head">Author page for: "{0}"</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.results.head">{0}'s hosted work.</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.contactInformation">Contact Information</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.nameVariants">Author Name Variants</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.fieldsOfSpecialization">Fields of Specialization</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.degrees">Degrees</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.orchid">ORCID</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.department">Department</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.departments">Departments</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.externalLinks">External Links</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.biography">Biography</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.externalHostwork">Externally hosted work:</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.updateDate">Last updated</message>
+    <message key="xmlui.authorprofile.artifactbrowser.AuthorProfile.help">Select the author profile icon next to the author's name in order to view their biography and list of publications.</message>
+    <message key="xmlui.AuthorProfile.trail">View author profile</message>
+
+    <!--Author profile messages: END -->
 </catalogue>

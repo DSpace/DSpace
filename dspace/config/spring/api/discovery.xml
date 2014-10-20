@@ -42,6 +42,7 @@
                     -->
                 <!--The default entry, DO NOT REMOVE the system requires this-->
                <entry key="default" value-ref="defaultConfiguration" />
+               <entry key="author-profile" value-ref="authorProfileConfiguration" />
 
                <!--Use site to override the default configuration for the home page & default discovery page-->
                <entry key="site" value-ref="homepageConfiguration" />
@@ -124,12 +125,14 @@
             </bean>
         </property>
         <!--Any default filter queries, these filter queries will be used for all queries done by discovery for this configuration-->
-        <!--<property name="defaultFilterQueries">-->
-            <!--<list>-->
+        <property name="defaultFilterQueries">
+            <list>
                 <!--Only find items-->
                 <!--<value>search.resourcetype:2</value>-->
-            <!--</list>-->
-        <!--</property>-->
+                <!--Ensure our search doesn't return author profiles-->
+                <value>-search.resourcetype: #{T(org.dspace.core.Constants).AUTHOR_PROFILE}</value>
+            </list>
+        </property>
         <!--The configuration for the recent submissions-->
         <property name="recentSubmissionConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
@@ -192,6 +195,52 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
+    <bean id="authorProfileConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="defaultSort" ref="sortDateIssued"/>
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all queries done by discovery for this configuration-->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items-->
+                <!--<value>search.resourcetype:2</value>-->
+                <!--Ensure our search doesn't return author profiles-->
+                <value>-search.resourcetype: #{T(org.dspace.core.Constants).AUTHOR_PROFILE}</value>
+            </list>
+        </property>
+
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+    </bean>
+
 
     <!--The Homepage specific configuration settings for discovery-->
     <bean id="homepageConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
@@ -225,6 +274,14 @@
                     </list>
                 </property>
             </bean>
+        </property>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items-->
+                <!--<value>search.resourcetype:2</value>-->
+                <!--Ensure our search doesn't return author profiles-->
+                <value>-search.resourcetype: #{T(org.dspace.core.Constants).AUTHOR_PROFILE}</value>
+            </list>
         </property>
         <!-- Limit recent submissions on homepage to only 5 (default is 20) -->
         <property name="recentSubmissionConfiguration">

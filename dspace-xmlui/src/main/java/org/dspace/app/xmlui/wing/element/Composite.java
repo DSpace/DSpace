@@ -256,7 +256,48 @@ public class Composite extends Field
     {
         return addTextArea(name, null);
     }
-    
+
+
+
+    /**
+     * Add a button input control that when activated by the user will submit
+     * the form, including all the fields, back to the server for processing.
+     *
+     * @param name
+     *            (Required) a non-unique local identifier used to differentiate
+     *            the element from its siblings within an interactive division.
+     *            This is the name of the field use when data is submitted back
+     *            to the server.
+     * @param rend
+     *            (May be null) a rendering hint used to override the default
+     *            display of the element.
+     * @return A new button field.
+     */
+    public Button addButton(String name, String rend) throws WingException
+    {
+        Button button = new Button(context, name, rend);
+        fields.add(button);
+        return button;
+    }
+
+    /**
+     * Add a button input control that when activated by the user will submit
+     * the form, including all the fields, back to the server for processing.
+     *
+     * @param name
+     *            (Required) a non-unique local identifier used to differentiate
+     *            the element from its siblings within an interactive division.
+     *            This is the name of the field use when data is submitted back
+     *            to the server.
+     * @return a new button field
+     */
+    public Button addButton(String name) throws WingException
+    {
+        return addButton(name, null);
+    }
+
+    /**
+
     /**
      * Add a field instance
      * @return instance

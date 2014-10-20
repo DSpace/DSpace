@@ -142,7 +142,8 @@
 	<message key="xmlui.Discovery.SimpleSearch.filter.notcontains">Not Contains</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.notequals">Not Equals</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.notauthority">Not ID</message>
-    
+    <message key="xmlui.Discovery.SimpleSearch.filter.oneof">One of</message>
+
     <message key="xmlui.Discovery.RelatedItems.head">Related items</message>
     <message key="xmlui.Discovery.RelatedItems.help">Showing items related by title, author, creator and subject.</message>
 
@@ -154,5 +155,8 @@
    	<message key="xmlui.Discovery.AbstractSearch.head3">Items matching your query</message>
 
    	<message key="xmlui.Discovery.SimpleSearch.did_you_mean">Did you mean: </message>
+
+    <message key="xmlui.Discovery.SimpleSearch.sort_head">Sort options</message>
+    <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
 
 </catalogue>

@@ -231,8 +231,12 @@
             return false;
         });
 
+
+
+
         $('.controls-gear-wrapper').find('li.gear-option,li.gear-option a').click(function(event){
-            var value, param, mainForm, params, listItem, $this;
+
+            //Ensure that our html click isn't called !
             event.stopPropagation();
             $this = $(this);
             if($this.is('li')){
@@ -251,7 +255,7 @@
             //Retrieve the params we are to fill in in our main form
             params = $this.attr('href').split('&');
 
-            mainForm = $('#aspect_discovery_SimpleSearch_div_main-form');
+            mainForm = $('form.discovery-main-form');
             //Split them & fill in in the main form, when done submit the main form !
             for(var i = 0; i < params.length; i++){
                 param = params[i].split('=')[0];
