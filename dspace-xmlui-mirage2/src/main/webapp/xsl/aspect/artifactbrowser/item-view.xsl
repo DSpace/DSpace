@@ -238,6 +238,12 @@
                                     <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
                                 </xsl:if>
                                 <xsl:copy-of select="node()"/>
+                                <xsl:text> </xsl:text>
+                                <xsl:call-template name="author-decorate">
+                                    <xsl:with-param name="currAuthor" select="node()"/>
+                                    <xsl:with-param name="context-path" select="$context-path"/>
+                                    <xsl:with-param name="pageMeta" select="$pagemeta"/>
+                                </xsl:call-template>
                             </div>
                         </xsl:for-each>
                     </xsl:when>

@@ -1728,3 +1728,8 @@ a.author-profile-current, .author-page-icon-current{
     margin-bottom: 0.2em;
 }
 
+
+.simple-item-view-authors .author-profile{
+    float: none;
+    display: inline-block;
+}
