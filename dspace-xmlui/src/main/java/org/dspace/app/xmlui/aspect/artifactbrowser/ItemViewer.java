@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -50,6 +52,7 @@ import org.xml.sax.SAXException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.sfx.SFXFileReader;
 import org.dspace.app.xmlui.wing.element.Metadata;
+import org.dspace.content.MetadataSchema;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierProvider;
@@ -147,6 +150,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     	return this.validity;
     }
 
+    /** Matches Handle System URIs. */
+    private static final Pattern handlePattern = Pattern.compile(
+            "hdl:|https?://hdl\\.handle\\.net/", Pattern.CASE_INSENSITIVE);
+
+    /** Matches DOI URIs. */
+    private static final Pattern doiPattern = Pattern.compile(
+            "doi:|https?://(dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
 
     /**
      * Add the item's title and trail links to the page's metadata.
@@ -199,6 +209,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
         
         // Add persistent identifiers
+        /* Temporarily switch to using metadata directly.
+         * FIXME Proper fix is to have IdentifierService handle all durable
+         * identifiers, whether minted here or elsewhere.
         List<IdentifierProvider> idPs = new DSpace().getServiceManager()
                 .getServicesByType(IdentifierProvider.class);
         for (IdentifierProvider idP : idPs)
@@ -225,6 +238,32 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             } catch (IdentifierNotFoundException | IdentifierNotResolvableException ex) {
                 continue;
             }
+        }
+        */
+        for (DCValue uri : dso.getMetadata(MetadataSchema.DC_SCHEMA,
+                "identifier", "uri", Item.ANY))
+        {
+            String idType, idValue;
+            Matcher handleMatcher = handlePattern.matcher(uri.value);
+            Matcher doiMatcher = doiPattern.matcher(uri.value);
+            if (handleMatcher.lookingAt())
+            {
+                idType = "handle";
+                idValue = uri.value.substring(handleMatcher.end());
+            }
+            else if (doiMatcher.lookingAt())
+            {
+                idType = "doi";
+                idValue = uri.value.substring(doiMatcher.end());
+            }
+            else
+            {
+                log.info("Unhandled identifier URI {}", uri.value);
+                continue;
+            }
+            log.debug("Adding identifier of type {}", idType);
+            Metadata md = pageMeta.addMetadata("identifier", idType);
+            md.addContent(idValue);
         }
 
         String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
