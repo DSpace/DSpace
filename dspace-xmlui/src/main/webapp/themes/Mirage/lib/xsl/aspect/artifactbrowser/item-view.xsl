@@ -568,31 +568,31 @@
             </script>
             <div id='altmetric'
                  class='altmetric-embed'>
-                <xsl:variable name='badge_type' select='confman:getProperty("metrics", "altmetric.badgeType")'/>
+                <xsl:variable name='badge_type' select='confman:getProperty("altmetrics", "altmetric.badgeType")'/>
                 <xsl:if test='boolean($badge_type)'>
                     <xsl:attribute name='data-badge-type'><xsl:value-of select='$badge_type'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_popover' select='confman:getProperty("metrics", "altmetric.popover")'/>
+                <xsl:variable name='badge_popover' select='confman:getProperty("altmetrics", "altmetric.popover")'/>
                 <xsl:if test='$badge_popover'>
                     <xsl:attribute name='data-badge-popover'><xsl:value-of select='$badge_popover'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='badge_details' select='confman:getProperty("metrics", "altmetric.details")'/>
+                <xsl:variable name='badge_details' select='confman:getProperty("altmetrics", "altmetric.details")'/>
                 <xsl:if test='$badge_details'>
                     <xsl:attribute name='data-badge-details'><xsl:value-of select='$badge_details'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='no_score' select='confman:getProperty("metrics", "altmetric.noScore")'/>
+                <xsl:variable name='no_score' select='confman:getProperty("altmetrics", "altmetric.noScore")'/>
                 <xsl:if test='$no_score'>
                     <xsl:attribute name='data-no-score'><xsl:value-of select='$no_score'/></xsl:attribute>
                 </xsl:if>
 
-                <xsl:if test='confman:getProperty("metrics", "altmetric.hideNoMentions")'>
+                <xsl:if test='confman:getProperty("altmetrics", "altmetric.hideNoMentions")'>
                     <xsl:attribute name='data-hide-no-mentions'>true</xsl:attribute>
                 </xsl:if>
 
-                <xsl:variable name='link_target' select='confman:getProperty("metrics", "altmetric.linkTarget")'/>
+                <xsl:variable name='link_target' select='confman:getProperty("altmetrics", "altmetric.linkTarget")'/>
                 <xsl:if test='$link_target'>
                     <xsl:attribute name='data-link-target'><xsl:value-of select='$link_target'/></xsl:attribute>
                 </xsl:if>
