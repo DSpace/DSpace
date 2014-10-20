@@ -364,18 +364,10 @@
     </command>
 
     <command>
-        <name>setup-database</name>
-        <description>Create the database tables</description>
+        <name>database</name>
+        <description>Create/Repair/Remove the database tables</description>
         <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
-        </step>
-    </command>
-
-    <command>
-        <name>clean-database</name>
-        <description>Remove the database tables</description>
-        <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
+            <class>org.dspace.storage.rdbms.DatabaseUtils</class>
         </step>
     </command>
 
