@@ -81,7 +81,7 @@ public class TagCloudTag extends SimpleTagSupport{
 				}
 			}
 
-			out.println("<div class=\"tagcloud\" style=\"width:"+parameters.getWidth()+";"+(parameters.isShouldCenter()?"text-align:center":"")+"\">");
+			out.println("<div class=\"tagcloud\">");
 			int counter = 0;
 
 			List<Tag> tagList = cloud.tags(new Tag.NameComparatorAsc());
@@ -96,51 +96,37 @@ public class TagCloudTag extends SimpleTagSupport{
 
 			for (Tag tag : tagList) { 
 
-				String colorPart = "";
-				String theColor = "";
-				String weightPart = "";
-
+				String tagClass = "";
+				
 				if (parameters.isRandomColors()){
 					if (counter==0){
-						colorPart = "color:#"+parameters.getColorLevel1();
-						theColor = parameters.getColorLevel1();
-						weightPart = "font-weight:"+parameters.getWeightLevel1();
+						tagClass = "tagcloud_1";
 					}
 					else if (counter==1){
-						colorPart = "color:#"+parameters.getColorLevel2();
-						theColor = parameters.getColorLevel2();
-						weightPart = "font-weight:"+parameters.getWeightLevel2();
+						tagClass = "tagcloud_2";
 					}
 					else if (counter==2){
-						colorPart = "color:#"+parameters.getColorLevel3();
-						theColor = parameters.getColorLevel3();
-						weightPart = "font-weight:"+parameters.getWeightLevel3();
+						tagClass = "tagcloud_3";
 					}
 				}
 				else {
 					if (tag.getNormScore()>0.3f){
-						colorPart = "color:#"+parameters.getColorLevel1();
-						theColor = parameters.getColorLevel1();
-						weightPart = "font-weight:"+parameters.getWeightLevel1();
+						tagClass = "tagcloud_1";
 					}
 					else if (tag.getNormScore()>0.2f){
-						colorPart = "color:#"+parameters.getColorLevel2();
-						theColor = parameters.getColorLevel2();
-						weightPart = "font-weight:"+parameters.getWeightLevel2();
+						tagClass = "tagcloud_2";
 					}
 					else if (tag.getNormScore()>0.1f){
-						colorPart = "color:#"+parameters.getColorLevel3();
-						theColor = parameters.getColorLevel3();
-						weightPart = "font-weight:"+parameters.getWeightLevel3();
+						tagClass = "tagcloud_3";
 					}
 				}
 
 				String scoreSup = "";
 				if (parameters.isDisplayScore()){
-					scoreSup = "<span style=\"font-size:1em\"><sup>("+tag.getScoreInt()+")</sup></span>";
+					scoreSup = "<span class=\"tag_sup\"><sup>("+tag.getScoreInt()+")</sup></span>";
 				}
 				
-				out.println("<a class=\"tagcloud_"+counter+"\" href=\"" + tag.getLink().replace(" & ", " %26 ") +"\" style=\"font-size: "+ tag.getWeight() +"em;"+colorPart+";"+weightPart+"; margin-right:"+parameters.getMarginRight()+"px\" onmouseout=\"this.style.color='#"+theColor+"'\" onmouseover=\"this.style.color='#0581a7'\">"+ tag.getName() + scoreSup +"</a>"); 
+				out.println("<a class=\""+tagClass+"\" href=\"" + tag.getLink().replace(" & ", " %26 ") +"\" style=\"font-size: "+ tag.getWeight() +"em;\">"+ tag.getName() + scoreSup +"</a>");
 
 
 				counter ++;
