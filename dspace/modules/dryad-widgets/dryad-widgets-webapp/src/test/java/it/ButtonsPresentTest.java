@@ -5,7 +5,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import org.openqa.selenium.By;
 
-public class WidgetLoad extends WidgetSeleniumTest {
+public class ButtonsPresentTest extends WidgetSeleniumTest {
 
   @Before
   public void setUp() throws Exception {
@@ -17,11 +17,15 @@ public class WidgetLoad extends WidgetSeleniumTest {
   }
 
   @Test
-  public void testWidgetLoad() throws Exception {
+  public void testButtonsPresent() throws Exception {
     driver.get(baseUrl + "/test.html");
     waitOnWidgetLoaded();
-    
+
     driver.switchTo().frame(0);
-    assertTrue(isElementPresent(By.cssSelector("img[alt=\"Data in Dryad\"]")));
+    assertTrue(isElementPresent(By.cssSelector("i.fa.fa-expand")));
+    assertTrue(isElementPresent(By.cssSelector("i.fa.fa-share-alt")));
+    assertTrue(isElementPresent(By.cssSelector("i.fa.fa-download")));
+    assertTrue(isElementPresent(By.cssSelector("i.fa.fa-quote-left")));
   }
+
 }
