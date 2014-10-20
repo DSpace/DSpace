@@ -2072,10 +2072,23 @@
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
 
 
+    <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+                     Google Analytics Statistics Aspect
 
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
 
+    <message key="xmlui.statisticsGoogleAnalytics.Navigation.title">Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.Navigation.usage.view">View Google Analytics Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.trail">Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.title">Google Analytics Statistics</message>
 
+    <message key="xmlui.statisticsGoogleAnalytics.dates.startDate">Start date</message>
+    <message key="xmlui.statisticsGoogleAnalytics.dates.endDate">End date</message>
+    <message key="xmlui.statisticsGoogleAnalytics.dates.refresh">Refresh</message>
+
+    <message key="xmlui.statisticsGoogleAnalytics.pageViews.title">Page Views</message>
+    <message key="xmlui.statisticsGoogleAnalytics.downloads.title">File Downloads</message>
 
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
