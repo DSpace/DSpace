@@ -71,18 +71,23 @@ function AuthorLookup(url, authorityInput, collectionID) {
                 modal: false,
                 width: 600
             });
+            $('.dataTables_wrapper').parent().attr('style', 'width: auto; min-height: 121px; height: auto;');
             var searchFilter = $('.dataTables_filter > input');
             var initialInput = "";
-            if (authorityInput.indexOf('value_') != -1) {
-                initialInput = $('textarea[name='+ authorityInput+']').val();
-            }else{
-                initialInput = ($('input[name=' + authorityInput + '_last]').val() + " "+$('input[name=' + authorityInput + '_first]').val()).trim();
+            if (authorityInput.indexOf('value_') != -1) { // edit item
+                initialInput = $('textarea[name=' + authorityInput + ']').val();
+            } else {   // submission
+                var lastName = $('input[name=' + authorityInput + '_last]');
+                if (lastName.size()) { // author input type
+                    initialInput = (lastName.val() + " " + $('input[name=' + authorityInput + '_first]').val()).trim();
+                } else { // other input types
+                    initialInput = $('input[name=' + authorityInput + ']').val();
+                }
             }
             searchFilter.val(initialInput);
             setTimeout(function () {
                 searchFilter.trigger($.Event("keyup", { keyCode: 13 }));
             },50);
-            $('.dataTables_wrapper').parent().attr('style','width: auto; min-height: 121px; height: auto;');
         },
         "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
           return "Showing "+ iEnd + " results. "+button;
@@ -142,9 +147,6 @@ function AuthorLookup(url, authorityInput, collectionID) {
                     return label;
                 }
                 
-//                vcard.find('.vcard-last-name span').text(aData['first-name']);
-//                vcard.find('.vcard-first-name span').text(aData['last-name']);
-//                vcard.find('.vcard-orcid span').empty().append('<a href="http://orcid.org/'+aData['symplectic']+'" target="_new">'+aData['symplectic']+'</a>');
                 if(aData['insolr']!="false"){
                     var discoverLink = window.orcid.contextPath + "/discover?filtertype=author&filter_relational_operator=authority&filter=" + aData['insolr'];
                     vcard.find('.vcard-insolr span').empty().append('<a href="'+ discoverLink+'" target="_new">view items</a>');
@@ -160,8 +162,15 @@ function AuthorLookup(url, authorityInput, collectionID) {
                         $('textarea[name='+ authorityInput+']').val(vcard.data('name'));
                     } else {
                         // submission
-                        $('input[name=' + authorityInput + '_last]').val(vcard.find('.vcard-last-name span').text());
+                        var lastName = $('input[name=' + authorityInput + '_last]');
+                        if (lastName.size()) { // author input type
+                            lastName.val(vcard.find('.vcard-last-name span').text());
                         $('input[name=' + authorityInput + '_first]').val(vcard.find('.vcard-first-name span').text());
+                        }
+                        else { // other input types
+                            $('input[name=' + authorityInput + ']').val(vcard.data('name'));
+                        }
+
                         $('input[name=' + authorityInput + '_authority]').val(vcard.data('authorityID'));
                         $('input[name=submit_'+ authorityInput +'_add]').click();
 
