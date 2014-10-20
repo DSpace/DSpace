@@ -308,19 +308,9 @@
 			 Default: Case.PRESERVE_CASE -->
 		<!--<property name="cloudCase" value="Case.PRESERVE_CASE"/> -->
 		
-		<!-- The three colors that will be used to render the tag cloud. Use the hex value of the color without the # in front -->
-		<!-- <property name="colorLevel1" value="D96C27"/> -->
-		<!-- <property name="colorLevel2" value="424242"/> -->
-		<!-- <property name="colorLevel3" value="818183"/> -->
-		
 		<!-- If the 3 colors of the tag cloud should be independent of score (random=yes) or based on the score. Possible values: true | false . Default: true-->
 		<!-- <property name="randomColors" value="true"/> -->
 
-		<!-- The three weight styles (font-weight css style) of the tag cloud. Possible values: normal | bold | bolder | lighter. Default: normal-->
-		<!-- <property name="weightLevel1" value="bold"/>-->
-		<!-- <property name="weightLevel2" value="bold"/>-->
-		<!-- <property name="weightLevel3" value="bold"/>-->
-	
 		<!-- The font size (in em) for the tag with the lowest score. Possible values: any decimal. Default: 1.1 -->
 		<!-- <property name="fontFrom" value="1.1"/>-->
 		
@@ -329,10 +319,7 @@
 		
 		<!-- The score that tags with lower than that will not appear in the rag cloud. Possible values: any integer from 1 to infinity. Default: 0 -->
 		<!-- <property name="cuttingLevel" value="0"/>-->
-	
-		<!-- The distance (in px) between the tags. Default: 5 -->
-		<!-- <property name="marginRight" value="5"/>-->
-		
+
 		<!-- The ordering of the tags (based either on the name or the score of the tag)
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
 			 Default: Tag.NameComparatorAsc  -->
@@ -355,19 +342,9 @@
 			 Default: Case.PRESERVE_CASE -->
 		<!--<property name="cloudCase" value="Case.PRESERVE_CASE"/> -->
 		
-		<!-- The three colors that will be used to render the tag cloud. Use the hex value of the color without the # in front -->
-		<!-- <property name="colorLevel1" value="D96C27"/> -->
-		<!-- <property name="colorLevel2" value="424242"/> -->
-		<!-- <property name="colorLevel3" value="818183"/> -->
-		
 		<!-- If the 3 colors of the tag cloud should be independent of score (random=yes) or based on the score. Possible values: true | false . Default: true-->
 		<!-- <property name="randomColors" value="true"/> -->
 
-		<!-- The three weight styles (font-weight css style) of the tag cloud. Possible values: normal | bold | bolder | lighter. Default: normal-->
-		<!-- <property name="weightLevel1" value="bold"/>-->
-		<!-- <property name="weightLevel2" value="bold"/>-->
-		<!-- <property name="weightLevel3" value="bold"/>-->
-	
 		<!-- The font size (in em) for the tag with the lowest score. Possible values: any decimal. Default: 1.1 -->
 		<!-- <property name="fontFrom" value="1.1"/>-->
 		
@@ -377,9 +354,6 @@
 		<!-- The score that tags with lower than that will not appear in the rag cloud. Possible values: any integer from 1 to infinity. Default: 0 -->
 		<!-- <property name="cuttingLevel" value="0"/>-->
 	
-		<!-- The distance (in px) between the tags. Default: 5 -->
-		<!-- <property name="marginRight" value="5"/>-->
-		
 		<!-- The ordering of the tags (based either on the name or the score of the tag)
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
 			 Default: Tag.NameComparatorAsc  -->

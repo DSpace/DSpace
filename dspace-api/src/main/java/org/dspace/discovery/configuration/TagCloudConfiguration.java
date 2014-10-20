@@ -15,18 +15,9 @@ public class TagCloudConfiguration {
 
 	String cloudCase;
 	String width;
-	String colorLevel1;
-	String colorLevel2;
-	String colorLevel3;
-	
-	String weightLevel1;
-	String weightLevel2;
-	String weightLevel3;
 	
 	String fontFrom;
 	String fontTo;
-	
-	String marginRight;
 	
 	String cuttingLevel;
 	int totalTags;
@@ -49,18 +40,8 @@ public class TagCloudConfiguration {
 		
 		cloudCase = "Case.PRESERVE_CASE";
 		
-		colorLevel1 = "D96C27";
-		colorLevel2 = "424242";
-		colorLevel3 = "818183";
-		
-		weightLevel1 = "normal";
-		weightLevel2 = "normal";
-		weightLevel3 = "normal";
-		
 		fontFrom = "1.1";//"15";
 		fontTo = "3.2";//"40";
-		
-		marginRight = "5";
 		
 		cuttingLevel = "0";
 		totalTags = -1;
@@ -103,90 +84,6 @@ public class TagCloudConfiguration {
 	}
 
 	/**
-	 * @return the colorLevel1
-	 */
-	public String getColorLevel1() {
-		return colorLevel1;
-	}
-
-	/**
-	 * @param colorLevel1 the colorLevel1 to set
-	 */
-	public void setColorLevel1(String colorLevel1) {
-		this.colorLevel1 = colorLevel1;
-	}
-
-	/**
-	 * @return the colorLevel2
-	 */
-	public String getColorLevel2() {
-		return colorLevel2;
-	}
-
-	/**
-	 * @param colorLevel2 the colorLevel2 to set
-	 */
-	public void setColorLevel2(String colorLevel2) {
-		this.colorLevel2 = colorLevel2;
-	}
-
-	/**
-	 * @return the colorLevel3
-	 */
-	public String getColorLevel3() {
-		return colorLevel3;
-	}
-
-	/**
-	 * @param colorLevel3 the colorLevel3 to set
-	 */
-	public void setColorLevel3(String colorLevel3) {
-		this.colorLevel3 = colorLevel3;
-	}
-
-	/**
-	 * @return the weightLevel1
-	 */
-	public String getWeightLevel1() {
-		return weightLevel1;
-	}
-
-	/**
-	 * @param weightLevel1 the weightLevel1 to set
-	 */
-	public void setWeightLevel1(String weightLevel1) {
-		this.weightLevel1 = weightLevel1;
-	}
-
-	/**
-	 * @return the weightLevel2
-	 */
-	public String getWeightLevel2() {
-		return weightLevel2;
-	}
-
-	/**
-	 * @param weightLevel2 the weightLevel2 to set
-	 */
-	public void setWeightLevel2(String weightLevel2) {
-		this.weightLevel2 = weightLevel2;
-	}
-
-	/**
-	 * @return the weightLevel3
-	 */
-	public String getWeightLevel3() {
-		return weightLevel3;
-	}
-
-	/**
-	 * @param weightLevel3 the weightLevel3 to set
-	 */
-	public void setWeightLevel3(String weightLevel3) {
-		this.weightLevel3 = weightLevel3;
-	}
-
-	/**
 	 * @return the fontFrom
 	 */
 	public String getFontFrom() {
@@ -212,20 +109,6 @@ public class TagCloudConfiguration {
 	 */
 	public void setFontTo(String fontTo) {
 		this.fontTo = fontTo;
-	}
-
-	/**
-	 * @return the marginRight
-	 */
-	public String getMarginRight() {
-		return marginRight;
-	}
-
-	/**
-	 * @param marginRight the marginRight to set
-	 */
-	public void setMarginRight(String marginRight) {
-		this.marginRight = marginRight;
 	}
 
 	/**
