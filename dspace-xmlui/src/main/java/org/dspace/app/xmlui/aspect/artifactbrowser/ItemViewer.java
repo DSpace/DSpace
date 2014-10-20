@@ -240,8 +240,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         */
-        for (DCValue uri : dso.getMetadata(MetadataSchema.DC_SCHEMA,
-                "identifier", "uri", Item.ANY))
+        String identifierField = new DSpace().getConfigurationService()
+                .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
+        for (DCValue uri : dso.getMetadataByMetadataString(identifierField))
         {
             String idType, idValue;
             Matcher handleMatcher = handlePattern.matcher(uri.value);
