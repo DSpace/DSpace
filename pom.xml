@@ -1148,17 +1148,17 @@
           <dependency>
               <groupId>com.google.apis</groupId>
               <artifactId>google-api-services-analytics</artifactId>
-              <version>v3-rev96-1.18.0-rc</version>
+              <version>v3-rev103-1.19.0</version>
           </dependency>
           <dependency>
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
-              <version>1.18.0-rc</version>
+              <version>1.19.0</version>
           </dependency>
           <dependency>
               <groupId>com.google.oauth-client</groupId>
               <artifactId>google-oauth-client-jetty</artifactId>
-              <version>1.18.0-rc</version>
+              <version>1.19.0</version>
           </dependency>
       </dependencies>
    </dependencyManagement>
