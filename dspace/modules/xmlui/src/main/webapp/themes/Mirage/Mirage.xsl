@@ -421,7 +421,7 @@
                   <!-- BMC Evolutionary Biology -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
                   <!-- Ecological Applications -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecological%5C+applications%5C%7C%5C%7C%5C%7CEcological%5C+Applications">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecoApp.png" alt="Ecological Applications" /></a>
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecological%5C+applications%5C%7C%5C%7C%5C%7CEcological%5C+Applications">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcoApp.png" alt="Ecological Applications" /></a>
                   <!-- Royal Society Open Science -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aroyal%5C+society%5C+open%5C+science%5C%7C%5C%7C%5C%7CRoyal%5C+Society%5C+Open%5C+Science">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-rsos.png" alt="Royal Society Open Science" /></a>
                 </div>
