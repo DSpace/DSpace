@@ -66,7 +66,7 @@ public class TagCloudConfiguration {
 		totalTags = -1;
 		randomColors = true;
 		
-		ordering = "Tag.GreekNameComparatorAsc";
+		ordering = "Tag.NameComparatorAsc";
 		
 		displayScore = false;
 		shouldCenter = true;
