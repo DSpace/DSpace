@@ -121,7 +121,7 @@
     <div class="nav navbar-nav navbar-right">
 	 <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-       <a href="#" class="dropdown-toggle" data-toggle="dropdown">LANG<b class="caret"></b></a>
+       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.language"/><b class="caret"></b></a>
         <ul class="dropdown-menu">
  <%
     for (int i = supportedLocales.length-1; i >= 0; i--)
