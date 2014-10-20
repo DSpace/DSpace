@@ -1138,12 +1138,28 @@
             <version>2.2.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.1</version>
-            <scope>compile</scope>
-        </dependency>
+          <!-- Google Analytics -->
+          <dependency>
+              <groupId>com.google.code.gson</groupId>
+              <artifactId>gson</artifactId>
+              <version>2.2.1</version>
+              <scope>compile</scope>
+          </dependency>
+          <dependency>
+              <groupId>com.google.apis</groupId>
+              <artifactId>google-api-services-analytics</artifactId>
+              <version>v3-rev96-1.18.0-rc</version>
+          </dependency>
+          <dependency>
+              <groupId>com.google.http-client</groupId>
+              <artifactId>google-http-client-jackson2</artifactId>
+              <version>1.18.0-rc</version>
+          </dependency>
+          <dependency>
+              <groupId>com.google.oauth-client</groupId>
+              <artifactId>google-oauth-client-jetty</artifactId>
+              <version>1.18.0-rc</version>
+          </dependency>
       </dependencies>
    </dependencyManagement>
 
