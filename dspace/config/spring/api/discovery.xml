@@ -335,8 +335,8 @@
 		
 		<!-- The ordering of the tags (based either on the name or the score of the tag)
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
-			 Default: Tag.GreekNameComparatorAsc  -->
-		<!-- <property name="ordering" value="Tag.GreekNameComparatorAsc"/>-->	
+			 Default: Tag.NameComparatorAsc  -->
+		<!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->	
     </bean>
     
     <!-- The tag cloud parameters for the tag clouds that appear in the browse pages -->
@@ -382,8 +382,8 @@
 		
 		<!-- The ordering of the tags (based either on the name or the score of the tag)
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
-			 Default: Tag.GreekNameComparatorAsc  -->
-		<!-- <property name="ordering" value="Tag.GreekNameComparatorAsc"/>-->	
+			 Default: Tag.NameComparatorAsc  -->
+		<!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->	
     </bean>
     
     <!--Search filter configuration beans-->
@@ -415,7 +415,7 @@
                 <value>dc.subject.*</value>
             </list>
         </property>
-        <property name="facetLimit" value="15"/>
+        <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
     </bean>
