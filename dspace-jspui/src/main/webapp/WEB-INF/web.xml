@@ -307,8 +307,8 @@
   </servlet>
 
   <servlet>
-    <servlet-name>batchmetadataimport</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BatchMetadataImportServlet</servlet-class>
+    <servlet-name>batchimport</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BatchImportServlet</servlet-class>
   </servlet>
   
   <servlet>
@@ -648,8 +648,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>batchmetadataimport</servlet-name>
-    <url-pattern>/dspace-admin/batchmetadataimport</url-pattern>
+    <servlet-name>batchimport</servlet-name>
+    <url-pattern>/dspace-admin/batchimport</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
