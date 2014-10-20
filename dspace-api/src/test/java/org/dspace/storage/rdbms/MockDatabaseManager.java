@@ -43,12 +43,6 @@ public final class MockDatabaseManager
     // Set our logger to specify the Mock class, so we know which logs are from the "real" vs "mock" class
     private static final Logger log = Logger.getLogger(MockDatabaseManager.class);
 
-    // Is our DBMS Oracle-like? Determine this from the (initialized) DatabaseManager class
-    private static final boolean isOracle = DatabaseManager.isOracle();
-
-    // Get the database type keyword from the (initialized) DatabaseManager class
-    private static final String dbms_keyword = DatabaseManager.getDbKeyword();
-
     /**
      * Override/Mock the default "setConstraintDeferred()" method in order to
      * add some custom H2-specific code (look for the comments with "H2" in them).
@@ -65,7 +59,10 @@ public final class MockDatabaseManager
     public static void setConstraintDeferred(Invocation inv, Context context,
             String constraintName) throws SQLException
     {
-        if(dbms_keyword!=null && !dbms_keyword.equals(DatabaseManager.DBMS_H2))
+        // What type of database is this?
+        String databaseType = DatabaseManager.getDbKeyword();
+
+        if(databaseType!=null && !databaseType.equals(DatabaseManager.DBMS_H2))
         {
             // If we are unit testing with a non-H2 database, just proceed to
             // DatabaseManager method of the same name
@@ -119,7 +116,10 @@ public final class MockDatabaseManager
     public static void setConstraintImmediate(Invocation inv, Context context,
             String constraintName) throws SQLException
     {
-        if(dbms_keyword!=null && !dbms_keyword.equals(DatabaseManager.DBMS_H2))
+        // What type of database is this?
+        String databaseType = DatabaseManager.getDbKeyword();
+
+        if(databaseType!=null && !databaseType.equals(DatabaseManager.DBMS_H2))
         {
             // If we are unit testing with a non-H2 database, just proceed to
             // DatabaseManager method of the same name
@@ -175,7 +175,12 @@ public final class MockDatabaseManager
     @Mock
     static TableRow process(Invocation inv, ResultSet results, String table, List<String> pColumnNames) throws SQLException
     {
-        if(dbms_keyword!=null && !dbms_keyword.equals(DatabaseManager.DBMS_H2))
+        // What type of database is this?
+        String databaseType = DatabaseManager.getDbKeyword();
+        // Also, is it Oracle-like?
+        boolean isOracle = DatabaseManager.isOracle();
+
+        if(databaseType!=null && !databaseType.equals(DatabaseManager.DBMS_H2))
         {
             // If we are unit testing with a non-H2 database, just proceed to
             // DatabaseManager method of the same name

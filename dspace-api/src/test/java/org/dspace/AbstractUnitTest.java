@@ -9,39 +9,27 @@ package org.dspace;
 
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.log4j.Logger;
-import org.dspace.administer.MetadataImporter;
-import org.dspace.administer.RegistryImportException;
-import org.dspace.administer.RegistryLoader;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.MetadataField;
-import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.MockDatabaseManager;
-import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.xml.sax.SAXException;
 
 
 
@@ -73,12 +61,9 @@ public class AbstractUnitTest
     /**
      * EPerson mock object to use in the tests.
      */
-    protected static EPerson eperson;
+    protected EPerson eperson;
 
     protected static DSpaceKernelImpl kernelImpl;
-    
-    // Whether the in-memory DB has been initiailzed for testing
-    protected static boolean dbInitialized = false;
 
     /** 
      * This method will be run before the first test as per @BeforeClass. It will
@@ -119,203 +104,20 @@ public class AbstractUnitTest
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
             
-            // Applies/initializes our mock database by invoking its constructor:
+            // Applies/initializes our mock database by invoking its constructor
+            // (NOTE: This also initializes the DatabaseManager, which in turn
+            // calls DatabaseUtils to initialize the entire DB via Flyway)
             new MockDatabaseManager();
             
-            // Also initialize these mock classes for general use
+            // Initialize a mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
-
-            // Load the default registries. This assumes the temporary
-            // filesystem is working and the in-memory DB in place.
-            Context ctx = new Context();
-            ctx.turnOffAuthorisationSystem();
-
-            // We can't check via a boolean value (even static) as the class is
-            // destroyed by the JUnit classloader. We rely on a value that will
-            // always be in the database, if it has been initialized, to avoid
-            // doing the work twice.
-            if(MetadataField.find(ctx, 1) == null)
-            {
-                String base = ConfigurationManager.getProperty("dspace.dir")
-                        + File.separator + "config" + File.separator
-                        + "registries" + File.separator;
-
-                RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
-                MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
-                MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
-                MetadataImporter.loadRegistry(base + "bitstream-formats.xml", true);
-                MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
-                ctx.commit();
-
-                //create eperson if required
-                eperson = EPerson.find(ctx, 1);
-                if(eperson == null)
-                {
-                    eperson = EPerson.create(ctx);
-                    eperson.setFirstName("first");
-                    eperson.setLastName("last");
-                    eperson.setEmail("test@email.com");
-                    eperson.setCanLogIn(true);
-                    eperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
-                }
-
-                //Create search and browse indexes
-                DSpace dspace = new DSpace();
-                IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
-                indexer.createIndex(ctx);
-                ctx.commit();
-                
-                // Nullify resources, so Junit will clean them up
-                dspace = null;
-                indexer = null;
-            }
-            Group.initDefaultGroupNames(ctx);
-            ctx.restoreAuthSystemState();
-            if(ctx.isValid())
-            {
-                ctx.complete();
-            }
-            ctx = null;    
         } 
-        catch (RegistryImportException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (NonUniqueMetadataException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (ParserConfigurationException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (SAXException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (TransformerException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (AuthorizeException ex)
-        {
-            log.error("Error loading default data", ex);
-            fail("Error loading default data");
-        }
-        catch (SQLException ex)
-        {
-            log.error("Error initializing the database", ex);
-            fail("Error initializing the database");
-        }
         catch (IOException ex)
         {
             log.error("Error initializing tests", ex);
             fail("Error initializing tests");
         }
     }
-
-    /**
-     * Copies one directory (And its contents) into another 
-     * 
-     * @param from Folder to copy
-     * @param to Destination
-     * @throws IOException There is an error while copying the content
-     */
-    /*
-    protected static void copyDir(File from, File to) throws IOException
-    {
-        if(!from.isDirectory() || !to.isDirectory())
-        {
-            throw new IOException("Both parameters must be directories. from is "+from.isDirectory()+", to is "+to.isDirectory());
-        }
-
-        File[] contents = from.listFiles();
-        for(File f: contents)
-        {
-            if(f.isFile())
-            {
-                File copy = new File(to.getAbsolutePath() + File.separator + f.getName());
-                copy.createNewFile();
-                copyFile(f, copy);
-            }
-            else if(f.isDirectory())
-            {
-                File copy = new File(to.getAbsolutePath() + File.separator + f.getName());
-                copy.mkdir();
-                copyDir(f, copy);
-            }
-        }
-    }
-     */
-
-    /**
-     * Removes the copies of the origin files from the destination folder. Used
-     * to remove the temporal copies of files done for testing
-     *
-     * @param from Folder to check
-     * @param to Destination from which to remove contents
-     * @throws IOException There is an error while copying the content
-     */
-    /*
-    protected static void deleteDir(File from, File to) throws IOException
-    {
-        if(!from.isDirectory() || !to.isDirectory())
-        {
-            throw new IOException("Both parameters must be directories. from is "+from.isDirectory()+", to is "+to.isDirectory());
-        }
-
-        File[] contents = from.listFiles();
-        for(File f: contents)
-        {
-            if(f.isFile())
-            {
-                File copy = new File(to.getAbsolutePath() + File.separator + f.getName());
-                if(copy.exists())
-                {
-                    copy.delete();
-                }
-                
-            }
-            else if(f.isDirectory())
-            {
-                File copy = new File(to.getAbsolutePath() + File.separator + f.getName());
-                if(copy.exists() && copy.listFiles().length > 0)
-                {
-                    deleteDir(f, copy);
-                }
-                copy.delete();
-            }
-        }
-    }
-     */
-
-    /**
-     * Copies one file into another
-     *
-     * @param from File to copy
-     * @param to Destination of copy
-     * @throws IOException There is an error while copying the content
-     */
-    /*
-    protected static void copyFile(File from, File to) throws IOException
-    {
-        if(!from.isFile() || !to.isFile())
-        {
-            throw new IOException("Both parameters must be files. from is "+from.isFile()+", to is "+to.isFile());
-        }
-
-        FileChannel in = (new FileInputStream(from)).getChannel();
-        FileChannel out = (new FileOutputStream(to)).getChannel();
-        in.transferTo(0, from.length(), out);
-        in.close();
-        out.close();
-    }
-     */
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -329,10 +131,38 @@ public class AbstractUnitTest
     {        
         try
         {
-            //we start the context
+            //Start a new context
             context = new Context();
+            context.turnOffAuthorisationSystem();
+
+            //Find our global test EPerson account. If it doesn't exist, create it.
+            eperson = EPerson.findByEmail(context, "test@email.com");
+            if(eperson == null)
+            {
+                // This EPerson creation should only happen once (i.e. for first test run)
+                log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
+                eperson = EPerson.create(context);
+                eperson.setFirstName("first");
+                eperson.setLastName("last");
+                eperson.setEmail("test@email.com");
+                eperson.setCanLogIn(true);
+                eperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
+                // actually save the eperson to unit testing DB
+                eperson.update();
+            }
+            // Set our global test EPerson as the current user in DSpace
             context.setCurrentUser(eperson);
+
+            // If our Anonymous/Administrator groups aren't initialized, initialize them as well
+            Group.initDefaultGroupNames(context);
+
+            context.restoreAuthSystemState();
             context.commit();
+        }
+        catch (AuthorizeException ex)
+        {
+            log.error("Error creating initial eperson or default groups", ex);
+            fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
         }
         catch (SQLException ex) 
         {
