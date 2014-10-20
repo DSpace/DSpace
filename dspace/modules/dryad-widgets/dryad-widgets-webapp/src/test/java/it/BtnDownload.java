@@ -10,7 +10,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class BtnDownloadTest extends WidgetSeleniumTest {
+public class BtnDownload extends WidgetSeleniumTest {
   private File downloadDir;
   private String downloadDirName = "selenium_downloads";
   private long dlWaitTimeout = 5;
