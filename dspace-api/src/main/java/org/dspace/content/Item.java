@@ -40,6 +40,7 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -1111,12 +1112,24 @@ public class Item extends DSpaceObject
         // leaving the database in an inconsistent state
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
+        // Remove this Item from any Collections it may be in.
         Collection[] collections = this.getCollections();
         for (Collection collection : collections)
         {  
             collection.removeItem(this);
         }
-        
+
+        // If it is in someone's workspace, remove it therefrom.
+        WorkspaceItem wsItem = WorkspaceItem.findByItem(ourContext, this);
+        if (null != wsItem)
+            wsItem.deleteWrapper();
+
+        // If it is in a workflow, remove it therefrom.
+        WorkflowItem wfItem = WorkflowItem.findByItem(ourContext, this);
+        if (null != wfItem)
+            wfItem.deleteWrapper();
+
+        // At last we can destroy the Item itself.
         this.delete(); // not strictly necessary as collection.removeItem() calls this if it's the item's only remaining owning collection
     }
     
