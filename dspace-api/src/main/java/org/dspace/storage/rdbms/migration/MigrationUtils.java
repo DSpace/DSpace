@@ -17,16 +17,16 @@ import org.dspace.storage.rdbms.DatabaseManager;
 /**
  * This Utility class offers utility methods which may be of use to perform
  * common Java migration task(s).
- * 
+ *
  * @author Tim Donohue
  */
-public class MigrationUtils 
+public class MigrationUtils
 {
     /**
      * Drop a given Database Constraint (based on the current database type).
-     * Returns a "checksum" for this migration which can be used as part of 
+     * Returns a "checksum" for this migration which can be used as part of
      * a Flyway Java migration
-     * 
+     *
      * @param connection the current Database connection
      * @param tableName the name of the table the constraint applies to
      * @param columnName the name of the column the constraint applies to
@@ -36,9 +36,9 @@ public class MigrationUtils
      */
     public static Integer dropDBConstraint(Connection connection, String tableName, String columnName, String constraintSuffix)
             throws SQLException
-    { 
+    {
         Integer checksum = -1;
-        
+
         // First, in order to drop the appropriate Database constraint, we
         // must determine the unique name of the constraint. As constraint
         // naming is DB specific, this is dependent on our DB Type
@@ -51,7 +51,7 @@ public class MigrationUtils
                 // In Postgres, constraints are always named:
                 // {tablename}_{columnname(s)}_{suffix}
                 // see: http://stackoverflow.com/a/4108266/3750035
-                constraintName = StringUtils.lowerCase(tableName) + "_" + StringUtils.lowerCase(columnName) + "_" + StringUtils.lowerCase(constraintSuffix); 
+                constraintName = StringUtils.lowerCase(tableName) + "_" + StringUtils.lowerCase(columnName) + "_" + StringUtils.lowerCase(constraintSuffix);
                 break;
             case DatabaseManager.DBMS_ORACLE:
                 // In Oracle, constraints are listed in the USER_CONS_COLUMNS table
@@ -95,7 +95,7 @@ public class MigrationUtils
         if (constraintName!=null && !constraintName.isEmpty())
         {
             // This drop constaint SQL should be the same in all databases
-            String dropConstraintSQL = "ALTER TABLE METADATAVALUE DROP CONSTRAINT " + constraintName;
+            String dropConstraintSQL = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
 
             PreparedStatement statement = connection.prepareStatement(dropConstraintSQL);
             try
@@ -110,9 +110,7 @@ public class MigrationUtils
             // This will be our "checksum" for this Flyway migration (see getChecksum())
             checksum = dropConstraintSQL.length();
         }
-        
+
         return checksum;
     }
-    
-    
 }
