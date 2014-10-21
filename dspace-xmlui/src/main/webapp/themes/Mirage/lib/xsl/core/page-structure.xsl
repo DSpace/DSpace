@@ -695,17 +695,7 @@
             <xsl:text>1.6.2</xsl:text>
         </xsl:variable>
 
-        <xsl:variable name="protocol">
-            <xsl:choose>
-                <xsl:when test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
-                    <xsl:text>https://</xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:text>http://</xsl:text>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
+        <script type="text/javascript" src="{concat($scheme, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 
         <xsl:variable name="localJQuerySrc">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
