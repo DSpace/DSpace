@@ -11,9 +11,21 @@ when the `DatabaseManager` initializes itself (see `initializeDatabase()` method
 
 The H2 migrations in this directory are *based on* the Oracle Migrations
 (`[src]/dspace/etc/migrations/oracle/*.sql`), but with some modifications in 
-order to be valid in H2. For reference see the [H2 SQL Grammar](http://www.h2database.com/html/grammar.html).
+order to be valid in H2. 
 
-## More Information
+## Oracle vs H2 script differences
+
+One of the primary differences between the Oracle scripts and these H2 ones
+is in the syntax of the `ALTER TABLE` command. Unfortunately, H2's syntax for
+that command differs greatly from Oracle (and PostgreSQL as well).
+
+Most of the remainder of the scripts contain the exact Oracle syntax (which is 
+usually valid in H2). But, to you can always `diff` scripts of the same name
+for further syntax differences.
+
+For additional info see the [H2 SQL Grammar](http://www.h2database.com/html/grammar.html).
+
+## More Information on Flyway
 
 The SQL scripts in this directory are H2-specific database migrations. They are
 used to automatically upgrade your DSpace database using [Flyway](http://flywaydb.org/).
