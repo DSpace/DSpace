@@ -7,6 +7,25 @@
  */
 package org.dspace.checker;
 
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,18 +33,7 @@ import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.mail.MessagingException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
+import java.util.Properties;
 
 /**
  * <p>
