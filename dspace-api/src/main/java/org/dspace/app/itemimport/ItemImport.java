@@ -2344,56 +2344,8 @@ public class ItemImport
 
 					is.close();
 					os.close();
-					
-					
-					
-					ZipFile zf = new ZipFile(dataZipPath);
-                    ZipEntry entry;
-                    Enumeration<? extends ZipEntry> entries = zf.entries();
-                    while (entries.hasMoreElements())
-                    {
-                        entry = entries.nextElement();
-                        if (entry.isDirectory())
-                        {
-                            if (!new File(dataZipDir + entry.getName()).mkdir())
-                            {
-                                log.error("Unable to create contents directory");
-                            }
-                        }
-                        else
-                        {
-                            //System.out.println("Extracting file: " + entry.getName());
-                            int index = entry.getName().lastIndexOf('/');
-                            if (index == -1)
-                            {
-                                // Was it created on Windows instead?
-                                index = entry.getName().lastIndexOf('\\');
-                            }
-                            if (index > 0)
-                            {
-                                File dir = new File(dataZipDir + entry.getName().substring(0, index));
-                                if (!dir.mkdirs())
-                                {
-                                    log.error("Unable to create directory");
-                                }
-                            }
-                            byte[] buffer = new byte[1024];
-                            int len;
-                            InputStream in = zf.getInputStream(entry);
-                            BufferedOutputStream out = new BufferedOutputStream(
-                                new FileOutputStream(dataZipDir + entry.getName()));
-                            while((len = in.read(buffer)) >= 0)
-                            {
-                                out.write(buffer, 0, len);
-                            }
-                            in.close();
-                            out.close();
-                        }
-                    }
-                    zf.close();
-                    
-					
-					String sourcePath = dataZipDir;
+
+					String sourcePath = unzip(new File(dataZipPath));
 					String mapFilePath = importDirFile + File.separator + "mapfile";
 					
 					
