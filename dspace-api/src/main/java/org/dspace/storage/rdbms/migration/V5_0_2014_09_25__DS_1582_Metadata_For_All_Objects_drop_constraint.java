@@ -9,10 +9,7 @@ package org.dspace.storage.rdbms.migration;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.slf4j.Logger;
@@ -48,8 +45,8 @@ public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     /** logging category */
     private static final Logger log = LoggerFactory.getLogger(V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint.class);
     
-    /* Size of the DROP Constraint SQL query. Used as the "checksum" of this change by getChecksum() */
-    private int drop_constraint_sql_size = -1;
+    /* The checksum to report for this migration (when successful) */
+    private int checksum = -1;
     
     /**
      * Actually migrate the existing database
@@ -59,75 +56,8 @@ public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     public void migrate(Connection connection)
             throws IOException, SQLException
     {
-        // First, in order to drop the appropriate Database constraint, we
-        // must determine the unique name of the constraint. As constraint
-        // naming is DB specific, this is dependent on our DB Type
-        String dbtype = DatabaseManager.getDbKeyword();
-        String constraintName = null;
-        String constraintNameSQL = null;
-        switch(dbtype)
-        {
-            case DatabaseManager.DBMS_POSTGRES:
-                // In Postgres, constraints are always named:
-                // {tablename}_{columnname(s)}_{suffix}
-                // see: http://stackoverflow.com/a/4108266/3750035
-                constraintName = "metadatavalue_item_id_fkey";
-                break;
-            case DatabaseManager.DBMS_ORACLE:
-                // In Oracle, constraints are listed in the USER_CONS_COLUMNS table
-                constraintNameSQL = "SELECT CONSTRAINT_NAME " +
-                                    "FROM USER_CONS_COLUMNS " +
-                                    "WHERE table_name='METADATAVALUE' AND COLUMN_NAME='ITEM_ID'";
-                break;
-            case DatabaseManager.DBMS_H2:
-                // In H2, constraints are listed in the "information_schema.constraints" table
-                constraintNameSQL = "SELECT DISTINCT CONSTRAINT_NAME " +
-                                    "FROM information_schema.constraints " +
-                                    "WHERE table_name='METADATAVALUE' AND column_list='ITEM_ID'";
-                break;
-            default:
-                throw new SQLException("DBMS " + dbtype + " is unsupported in this migration.");
-        }
-
-        // If we have a SQL query to run for the constraint name, then run it
-        if (constraintNameSQL!=null)
-        {
-            // Run the query to obtain the constraint name
-            PreparedStatement statement = connection.prepareStatement(constraintNameSQL);
-            try
-            {
-                ResultSet results = statement.executeQuery();
-                if(results.next())
-                {
-                    constraintName = results.getString("CONSTRAINT_NAME");
-                }
-                results.close();
-            }
-            finally
-            {
-                statement.close();
-            }
-        }
-
-        // As long as we have a constraint name, drop it
-        if (constraintName!=null && !constraintName.isEmpty())
-        {
-            // This drop constaint SQL should be the same in all databases
-            String dropConstraintSQL = "ALTER TABLE METADATAVALUE DROP CONSTRAINT " + constraintName;
-
-            PreparedStatement statement = connection.prepareStatement(dropConstraintSQL);
-            try
-            {
-                statement.execute();
-            }
-            finally
-            {
-                statement.close();
-            }
-            // Record the size of the query we just ran
-            // This will be our "checksum" for this Flyway migration (see getChecksum())
-            drop_constraint_sql_size = dropConstraintSQL.length();
-        }
+        // Drop the constraint associated with "item_id" column of "metadatavalue"
+        checksum = MigrationUtils.dropDBConstraint(connection, "metadatavalue", "item_id", "fkey");
     }
     
     /**
@@ -138,6 +68,6 @@ public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     @Override
     public Integer getChecksum()
     {
-        return drop_constraint_sql_size;
+        return checksum;
     }
 }
