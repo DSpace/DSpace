@@ -19,7 +19,6 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +31,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
 import org.dspace.utils.DSpace;
-import org.elasticsearch.common.collect.Lists;
 
 /**
  * Servlet to batch import metadata via the BTE
@@ -186,18 +184,18 @@ public class BatchImportServlet extends DSpaceServlet
     				//Decide if it is a new upload or a resume one!
     				if (uploadId != null){ //resume upload
     					if (f==null){
-    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, uploadId, context);
+    						ItemImport.processSAFUIImport(zipurl, owningCollection, reqCollections, uploadId, context);
     					}
     					else {
-    						ItemImport.processUIImport(f, owningCollection, reqCollections, uploadId, inputType, context);
+    						ItemImport.processBTEUIImport(f, owningCollection, reqCollections, uploadId, inputType, context);
     					}
     				}
     				else { //New upload
     					if (f==null){
-    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, null, context);
+    						ItemImport.processSAFUIImport(zipurl, owningCollection, reqCollections, null, context);
     					}
     					else {
-    						ItemImport.processUIImport(f, owningCollection, reqCollections, null, inputType, context);
+    						ItemImport.processBTEUIImport(f, owningCollection, reqCollections, null, inputType, context);
     					}
     				}
     				

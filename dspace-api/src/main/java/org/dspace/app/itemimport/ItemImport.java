@@ -2124,8 +2124,8 @@ public class ItemImport
      * @param context The context
      * @throws Exception
      */
-    public static void processUIImport(File file, Collection owningCollection, String[] collections, String resumeDir, 
-    		String bteInputType, Context context) throws Exception
+    public static void processBTEUIImport(File file, Collection owningCollection, String[] collections, String resumeDir,
+                                          String bteInputType, Context context) throws Exception
     {
         final EPerson eperson = context.getCurrentUser();
         final File myFile = file;
@@ -2273,7 +2273,7 @@ public class ItemImport
      * @param context The context
      * @throws Exception
      */
-    public static void processUIImport(String url, Collection owningCollection, String[] collections, String resumeDir, Context context) throws Exception
+    public static void processSAFUIImport(String url, Collection owningCollection, String[] collections, String resumeDir, Context context) throws Exception
 	{
 		final EPerson eperson = context.getCurrentUser();
 		final String[] otherCollections2 = collections;
