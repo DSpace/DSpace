@@ -23,7 +23,7 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
-  
+
 <%@ page import="java.util.List" %>
 
 <p class="locationBar">
@@ -45,14 +45,19 @@
         if (u.equals(""))
         {
 %>
-<%= s %>&nbsp;&gt;
+<%= s %>&nbsp;
 <%
         }
         else
         {
 %>
-<a href="<%= request.getContextPath() %><%= u %>"><%= s %></a>&nbsp;&gt;
+<a href="<%= request.getContextPath() %><%= u %>"><%= s %></a>&nbsp;
 <%
+        }
+
+        if (i < parentTitles.size()-1)
+        {
+%>&gt;<%
         }
 }
 %>

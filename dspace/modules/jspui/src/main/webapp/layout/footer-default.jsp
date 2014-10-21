@@ -92,6 +92,10 @@
                 </td>
             </tr>
         </table>
+
+        <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
+        <script> umdHeader.init(); </script>
+
         <script type="text/javascript">
 
 var _gaq = _gaq || [];
