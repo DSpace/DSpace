@@ -71,13 +71,10 @@ CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
 UPDATE item SET owning_collection = null WHERE item_id IN
         (SELECT template_item_id FROM collection WHERE template_item_id IS NOT null);
 
-ALTER TABLE community2collection DROP CONSTRAINT community2collection_collection_id_fkey;
+-- Recreate restraints with a know name and deferrable option!
+-- (The previous version of these constraints is dropped by org.dspace.storage.rdbms.migration.V1_5_9__Drop_constraint_for_DSpace_1_6_schema)
 ALTER TABLE community2collection ADD CONSTRAINT comm2coll_collection_fk FOREIGN KEY (collection_id) REFERENCES collection DEFERRABLE;
-
-ALTER TABLE community2community DROP CONSTRAINT community2community_child_comm_id_fkey;
 ALTER TABLE community2community ADD CONSTRAINT com2com_child_fk FOREIGN KEY (child_comm_id) REFERENCES community DEFERRABLE;
-
-ALTER TABLE collection2item DROP CONSTRAINT collection2item_item_id_fkey;
 ALTER TABLE collection2item ADD CONSTRAINT coll2item_item_fk FOREIGN KEY (item_id) REFERENCES item DEFERRABLE;
 
 
