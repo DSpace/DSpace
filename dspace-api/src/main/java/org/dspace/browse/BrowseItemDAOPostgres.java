@@ -104,13 +104,13 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
         {
             if (qualifier == null)
             {
-                Object[] params = { Integer.valueOf(itemId), element, schema };
-                tri = DatabaseManager.query(context, getByMetadataElement, params, Constants.ITEM);
+                Object[] params = { Integer.valueOf(itemId), element, schema, Constants.ITEM };
+                tri = DatabaseManager.query(context, getByMetadataElement, params);
             }
             else if (Item.ANY.equals(qualifier))
             {
-                Object[] params = { Integer.valueOf(itemId), element, schema };
-                tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params, Constants.ITEM);
+                Object[] params = { Integer.valueOf(itemId), element, schema, Constants.ITEM };
+                tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
             }
             else
             {
