@@ -38,8 +38,6 @@ public class Community extends DSpaceObject{
     private String copyrightText, introductoryText, shortDescription, sidebarText;
     private Integer countItems;
 
-    // Renamed because of xml annotation exception with this attribute and getSubCommunities.
-    @XmlElement(name = "subcommunities", required = true)
     private List<Community> subcommunities = new ArrayList<Community>();
 
     private List<Collection> collections = new ArrayList<Collection>();
@@ -173,6 +171,8 @@ public class Community extends DSpaceObject{
         return logo;
     }
 
+    // Renamed because of xml annotation exception with this attribute and getSubCommunities.
+    @XmlElement(name = "subcommunities", required = true)
 	public List<Community> getSubcommunities() {
 		return subcommunities;
 	}
