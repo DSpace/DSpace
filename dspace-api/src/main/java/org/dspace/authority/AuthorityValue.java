@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.utils.DSpace;
 import org.joda.time.DateTime;
@@ -19,6 +18,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.*;
+import org.dspace.content.Metadatum;
 
 /**
  *
@@ -167,8 +167,8 @@ public class AuthorityValue {
     /**
      * Replace an item's DCValue with this authority
      */
-    public void updateItem(Item currentItem, DCValue value) {
-        DCValue newValue = value.copy();
+    public void updateItem(Item currentItem, Metadatum value) {
+        Metadatum newValue = value.copy();
         newValue.value = getValue();
         newValue.authority = getId();
         currentItem.replaceMetadataValue(value,newValue);

@@ -12,7 +12,7 @@ import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
@@ -107,7 +107,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         // 1. iterate over the metadata values
 
         String metadataField = metadataFields.get(currentFieldIndex);
-        DCValue[] values = currentItem.getMetadataByMetadataString(metadataField);
+        Metadatum[] values = currentItem.getMetadataByMetadataString(metadataField);
         if (currentMetadataIndex < values.length) {
             prepareNextValue(metadataField, values[currentMetadataIndex]);
 
@@ -156,7 +156,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
      * @param metadataField Is one of the fields defined in dspace.cfg to be indexed.
      * @param value         Is one of the values of the given metadataField in one of the items being indexed.
      */
-    private void prepareNextValue(String metadataField, DCValue value) {
+    private void prepareNextValue(String metadataField, Metadatum value) {
 
         nextValue = null;
 
