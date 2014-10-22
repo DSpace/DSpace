@@ -703,18 +703,18 @@ public abstract class DSpaceObject
         return null;
     }
 
-    public List<DCValue> getMetadata(String mdString, String authority) {
+    public List<Metadatum> getMetadata(String mdString, String authority) {
         String[] elements = getElements(mdString);
         return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
     }
 
-    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
-        DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
-        List<DCValue> dcValues = Arrays.asList(metadata);
+    public List<Metadatum> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+        Metadatum[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<Metadatum> dcValues = Arrays.asList(metadata);
         if (!authority.equals(Item.ANY)) {
-            Iterator<DCValue> iterator = dcValues.iterator();
+            Iterator<Metadatum> iterator = dcValues.iterator();
             while (iterator.hasNext()) {
-                DCValue dcValue = iterator.next();
+                Metadatum dcValue = iterator.next();
                 if (!authority.equals(dcValue.authority)) {
                     iterator.remove();
                 }
@@ -759,7 +759,7 @@ public abstract class DSpaceObject
         return elements;
     }
 
-    public void replaceMetadataValue(DCValue oldValue, DCValue newValue)
+    public void replaceMetadataValue(Metadatum oldValue, Metadatum newValue)
     {
         // check both dcvalues are for the same field
         if (oldValue.hasSameFieldAs(newValue)) {
@@ -769,9 +769,9 @@ public abstract class DSpaceObject
             String qualifier = oldValue.qualifier;
 
             // Save all metadata for this field
-            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
             clearMetadata(schema, element, qualifier, Item.ANY);
-            for (DCValue dcvalue : dcvalues) {
+            for (Metadatum dcvalue : dcvalues) {
                 if (dcvalue.equals(oldValue)) {
                     addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
                 } else {
