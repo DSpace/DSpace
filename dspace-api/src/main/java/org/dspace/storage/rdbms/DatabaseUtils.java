@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -246,9 +247,6 @@ public class DatabaseUtils
     private static int getDbMigrationStatus(Connection connection, Flyway flyway)
             throws SQLException
     {
-        // Get information about our database. We'll use this to determine DB status.
-        DatabaseMetaData meta = connection.getMetaData();
-       
         // First, is this a "fresh_install"?  Check for an "item" table.
         if(!tableExists(connection, "item"))
         {
@@ -302,6 +300,17 @@ public class DatabaseUtils
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
             
+            // Check how this database stores its table names.
+            // i.e. lowercase vs uppercase (by default we assume mixed case)
+            if(meta.storesLowerCaseIdentifiers())
+            {
+                tableName = StringUtils.lowerCase(tableName);
+            }
+            else if(meta.storesUpperCaseIdentifiers())
+            {
+                tableName = StringUtils.upperCase(tableName);
+            }
+
             // Search for a table of the given name in our current schema
             results = meta.getTables(null, schema, tableName, null);
             if (results!=null && results.next()) 

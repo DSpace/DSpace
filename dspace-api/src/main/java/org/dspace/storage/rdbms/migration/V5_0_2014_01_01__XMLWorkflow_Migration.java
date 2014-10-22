@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.slf4j.Logger;
@@ -76,11 +77,8 @@ public class V5_0_2014_01_01__XMLWorkflow_Migration
             }
             
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
-            DatabaseMetaData meta = connection.getMetaData();
-            ResultSet tables = meta.getTables(null, schema, "cwf_workflowitem", null);
-        
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
-            if (!tables.next()) 
+            if (!DatabaseUtils.tableExists(connection, "cwf_workflowitem"))
             {
                 // Run the DB Migration first!
                 DatabaseManager.loadSql(new FileReader(dbMigration));
