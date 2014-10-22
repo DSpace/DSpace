@@ -148,6 +148,12 @@
                     </map:match>
                     <!-- flow match-->
 
+                    <map:match pattern="handle/*/*/edit_item_metadata">
+                    	<map:call function="doEditItemMetadata">
+                    		<map:parameter name="handle" value="{1}/{2}"/>
+						</map:call>
+					</map:match>
+
                     <map:serialize type="xml"/>
 
                 </map:when>

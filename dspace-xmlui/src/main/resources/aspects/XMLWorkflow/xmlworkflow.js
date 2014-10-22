@@ -20,6 +20,9 @@ importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 
+importClass(Packages.org.dspace.xmlworkflow.storedcomponents.PoolTask);
+importClass(Packages.org.dspace.xmlworkflow.storedcomponents.ClaimedTask);
+
 /* Global variable which stores a comma-separated list of all fields
  * which errored out during processing of the last step.
  */
@@ -158,3 +161,41 @@ function doWorkflow()
     }while(true);
 
 }
+
+function doEditItemMetadata() 
+{
+	var targetURL;
+	var contextPath = cocoon.request.getContextPath();
+	var handle = cocoon.parameters["handle"];
+
+	if(XmlWorkflowManager.canEditItemInWorkflow(getDSContext(), handle)) {
+	
+		var xmlWorkflowItem = XmlWorkflowManager.startEditItemMetadata(getDSContext(), handle);
+		if(xmlWorkflowItem == null)
+			throw "Error: could not create XmlWorkflowItem for item "+handle;
+	
+		var poolTaskList = PoolTask.find(getDSContext(), xmlWorkflowItem);
+		if(poolTaskList.length > 1)
+			throw "Error: Multiple PoolTasks found for item "+handle;
+		
+		// Ensures the status of PoolTask hasn't changed (in other browser tab for example)
+		if(poolTaskList.isEmpty()){
+			var claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(getDSContext(), xmlWorkflowItem.getID(), getDSContext().getCurrentUser().getID());
+			if (claimedTask == null){
+				targetURL = contextPath+"/handle/"+handle;
+			} else {
+				targetURL = contextPath+"/handle/"+handle+"/workflow_edit_metadata?"+"workflowID=X"+xmlWorkflowItem.getID()+"&stepID="+claimedTask.getStepID()+"&actionID="+claimedTask.getActionID();
+			}
+		} else {
+			var poolTask = poolTaskList.get(0);
+			targetURL = contextPath+"/handle/"+handle+"/xmlworkflow?"+"workflowID="+xmlWorkflowItem.getID()+"&stepID="+poolTask.getStepID()+"&actionID="+poolTask.getActionID();
+		}
+	} else {
+		targetURL = contextPath+"/handle/"+handle;
+	}
+		
+	cocoon.redirectTo(targetURL, true);
+    getDSContext().complete();
+    cocoon.exit();
+}
+

@@ -28,6 +28,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.app.xmlui.utils.HandleUtil;
 
 /**
  * Navigation class of the xml workfow
@@ -40,6 +48,10 @@ import org.xml.sax.SAXException;
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     private static final Message T_xmlworkflow_overview = message("xmlui.XMLWorkflow.Navigation.xmlworkflow_overview");
+
+    private static final Message T_edit_item = message("xmlui.XMLWorkflow.Navigation.edit_item_in_workflow");
+    
+    private static final Message T_edit_item_info = message("xmlui.XMLWorkflow.Navigation.edit_item_workflow_info");
 
     /** Cached validity object */
 	private SourceValidity validity;
@@ -59,7 +71,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // Special case, don't cache anything if the user is logging
         // in. The problem occures because of timming, this cache key
         // is generated before we know whether the operation has
-        // succeeded or failed. So we don't know whether to cache this
+        // succeded or failed. So we don't know whether to cache this
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
             request.getParameter("login_password") != null ||
@@ -143,6 +155,38 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
 	        admin.addItemXref(contextPath+ "/admin/xmlworkflowoverview", T_xmlworkflow_overview);
         }
+        
+        // Adds the Edit in Workflow option
+    	List contextOptions = options.addList("context");
+		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+		if (dso != null && dso.getType() == Constants.ITEM) {
+			Item item = (Item) dso;
+			if (item.canEdit()) {
+				// Gets the owner (if exists) to check if we can show the link
+				EPerson owner = XmlWorkflowManager.getXmlWorkflowItemOwner(context, item);
+				
+				if(owner == null) {
+					//TODO Should check if the current user can execute the first valid workflow step, to avoid a possible AuthorizeException 
+					contextOptions.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_edit_item);
+				} else {
+					if (owner.getID() == context.getCurrentUser().getID()) {
+						// It's the owner. We get all the info we need to build the link
+						XmlWorkflowItem workflowItem = XmlWorkflowManager.getWorkflowItem(context, item);
+						java.util.List<ClaimedTask> claimedTasks = ClaimedTask.find(context, workflowItem);
+			            ClaimedTask claimedTask = claimedTasks.get(0);
+			            String stepID = claimedTask.getStepID();
+			            String actionID = claimedTask.getActionID();
+			            int workflowID = workflowItem.getID();
+			            
+						contextOptions.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/workflow_edit_metadata?workflowID=X"+workflowID+"&stepID="+stepID+"&actionID="+actionID, T_edit_item);
+					} else {
+						// Can't take the task. Inform this
+						contextOptions.addItem(T_edit_item_info.parameterize(owner.getFullName()));
+					}
+				}
+			}
+		}
+        
     }
 
     /**
