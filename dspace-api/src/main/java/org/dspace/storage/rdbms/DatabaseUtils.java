@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -40,12 +39,6 @@ public class DatabaseUtils
     
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;
-    
-    /** Database Status Flags for Flyway setup. Fresh Install vs. pre-4.0 vs */
-    private static final int STATUS_PRE_4_0 = -1;
-    private static final int STATUS_FRESH_INSTALL = 0;
-    private static final int STATUS_NO_FLYWAY = 1;
-    private static final int STATUS_FLYWAY = 2;
     
     /**
      * Commandline tools for managing database changes, etc.
@@ -184,35 +177,31 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection) 
             throws SQLException
     {
-        // Setup Flyway against our database
+        // Setup Flyway API against our database
         Flyway flyway = setupFlyway(datasource);
         
-        // Get our Database migration status, so we know what to tell Flyway to do
-        int status = getDbMigrationStatus(connection, flyway);
+        // Does the necessary Flyway table ("schema_version") exist in this database?
+        // If not, then this is the first time Flyway has run, and we need to initialize
+        if(!tableExists(connection, flyway.getTable()))
+        {
+            // Try to determine our DSpace database version, so we know what to tell Flyway to do
+            String dbVersion = determineDBVersion(connection);
+
+            // If this is a fresh install, dbVersion will be null
+            if (dbVersion==null)
+            {
+                // Initialize the Flyway database table with defaults (version=1)
+                flyway.init();
+            }
+            else 
+            {
+                // Otherwise, pass our determined DB version to Flyway to initialize database table
+                flyway.setInitVersion(dbVersion);
+                flyway.setInitDescription("Initializing from DSpace " + dbVersion + " database schema");
+                flyway.init();
+            }
+        }
         
-        // If we have a pre-4.0 Database, we need to exit immediately. There's nothing we can do here
-        if(status==STATUS_PRE_4_0)
-            throw new SQLException("CANNOT AUTOUPGRADE DSPACE DATABASE, AS IT DOES NOT LOOK TO BE A VALID DSPACE 4.0 DATABASE. " +
-                        "Please manually upgrade your database to DSpace 4.0 compatibility.");
-        // If this is a fresh install
-        else if (status==STATUS_FRESH_INSTALL)
-        {
-            // Initialize the Flyway database table
-            flyway.init();
-        }
-        // If we have a valid 4.0 database, but haven't initialized Flyway on it
-        else if (status == STATUS_NO_FLYWAY)
-        {
-            // Initialize the Flyway database table.
-            // We are hardcoding the schema version to 4.0 because this should ONLY
-            // be encountered on a 4.0 database. After 4.0, all databases should 
-            // already have Flyway initialized.
-            // (NOTE: Flyway will also create the db.schema, if it doesn't exist)
-            flyway.setInitVersion("4.0");
-            flyway.setInitDescription("Initial DSpace 4.0 database schema");
-            flyway.init();
-        }
-           
         // Determine pending Database migrations
         MigrationInfo[] pending = flyway.info().pending();
         
@@ -233,44 +222,103 @@ public class DatabaseUtils
     }
     
     /**
-     * Determine the migration status of our Database
+     * Attempt to determine the version of our DSpace database,
      * so that we are able to properly migrate it to the latest schema
      * via Flyway
+     * <P>
+     * This determination is performed by checking which table(s) exist in 
+     * your database and matching them up with known tables that existed in
+     * different versions of DSpace.
      * 
      * @param connection
      *          Current Database Connection
      * @param flyway
      *          Our Flyway settings
      * @throws SQLException if DB status cannot be determined
-     * @return status flag 
+     * @return DSpace version as a String (e.g. "4.0"), or null if database is empty
      */
-    private static int getDbMigrationStatus(Connection connection, Flyway flyway)
+    private static String determineDBVersion(Connection connection)
             throws SQLException
     {
         // First, is this a "fresh_install"?  Check for an "item" table.
-        if(!tableExists(connection, "item"))
+        if(!tableExists(connection, "Item"))
         {
-            // No "item" table, this is a fresh install of DSpace
-            return STATUS_FRESH_INSTALL;
+            // Item table doesn't exist. This database must be a fresh install
+            return null;
         }
   
-        // Second, is this DSpace DB Schema compatible with 4.0?  Check for a "Webapp" table (which was added in 4.0)
-        // TODO: If the "Webapp" table is ever removed, then WE NEED TO CHANGE THIS CHECK.
-        if(!tableExists(connection, "Webapp"))
+        // We will now check prior versions in reverse chronological order, looking
+        // for specific tables or columns that were newly created in each version.
+        
+        // Is this DSpace 4.x? Look for the "Webapp" table created in that version.
+        if(tableExists(connection, "Webapp"))
         {
-            // No "Webapp" table, so this must be a pre-4.0 database
-            return STATUS_PRE_4_0;
+            return "4.0";
         }
         
-        // Finally, Check if the necessary Flyway table ("schema_version") exists in this database
-        if(!tableExists(connection, flyway.getTable()))
+        // Is this DSpace 3.x? Look for the "versionitem" table created in that version.
+        if(tableExists(connection, "versionitem"))
         {
-            // No Flyway table, so we need to get Flyway initialized in this database
-            return STATUS_NO_FLYWAY;
+            return "3.0";
         }
         
-        // IF we get here, we have 4.0 or above compatible database and Flyway is already installed
-        return STATUS_FLYWAY;
+        // Is this DSpace 1.8.x? Look for the "bitstream_order" column in the "bundle2bitstream" table
+        if(tableColumnExists(connection, "bundle2bitstream", "bitstream_order"))
+        {
+            return "1.8";
+        }
+        
+        // Is this DSpace 1.7.x? Look for the "dctyperegistry_seq" to NOT exist (it was deleted in 1.7)
+        // NOTE: DSPACE 1.7.x only differs from 1.6 in a deleted sequence.
+        /*if(@TODO HOW DO WE CHECK IF A SEQUENCE EXISTS??)
+        {
+            return "1.7";
+        }*/
+        
+        // Is this DSpace 1.6.x? Look for the "harvested_collection" table created in that version.
+        if(tableExists(connection, "harvested_collection"))
+        {
+            return "1.6";
+        }
+        
+        // Is this DSpace 1.5.x? Look for the "collection_item_count" table created in that version.
+        if(tableExists(connection, "collection_item_count"))
+        {
+            return "1.5";
+        }
+         
+        // Is this DSpace 1.4.x? Look for the "Group2Group" table created in that version.
+        if(tableExists(connection, "Group2Group"))
+        {
+            return "1.4";
+        }
+        
+        // Is this DSpace 1.4.x? Look for the "Group2Group" table created in that version.
+        if(tableExists(connection, "Group2Group"))
+        {
+            return "1.4";
+        }
+        
+        // Is this DSpace 1.3.x? Look for the "epersongroup2workspaceitem" table created in that version.
+        if(tableExists(connection, "epersongroup2workspaceitem"))
+        {
+            return "1.3";
+        }
+        
+        // Is this DSpace 1.2.x? Look for the "Community2Community" table created in that version.
+        if(tableExists(connection, "Community2Community"))
+        {
+            return "1.2";
+        }
+        
+        // Is this DSpace 1.1.x? Look for the "Community" table created in that version.
+        if(tableExists(connection, "Community"))
+        {
+            return "1.1";
+        }
+        
+        // IF we get here, something went wrong! This database is missing a LOT of DSpace tables
+        throw new SQLException("CANNOT AUTOUPGRADE DSPACE DATABASE, AS IT DOES NOT LOOK TO BE A VALID DSPACE DATABASE.");
     }
     
     
@@ -300,14 +348,16 @@ public class DatabaseUtils
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
             
-            // Check how this database stores its table names.
+            // Check how this database stores its table names, etc.
             // i.e. lowercase vs uppercase (by default we assume mixed case)
             if(meta.storesLowerCaseIdentifiers())
             {
+                schema = (schema == null) ? null : StringUtils.lowerCase(schema);
                 tableName = StringUtils.lowerCase(tableName);
             }
             else if(meta.storesUpperCaseIdentifiers())
             {
+                schema = (schema == null) ? null : StringUtils.upperCase(schema);
                 tableName = StringUtils.upperCase(tableName);
             }
 
@@ -321,6 +371,77 @@ public class DatabaseUtils
         catch(SQLException e)
         {
             log.error("Error attempting to determine if table " + tableName + " exists", e);
+        }
+        finally
+        {
+            try
+            {
+                // ensure the ResultSet gets closed
+                if(results!=null && !results.isClosed())
+                    results.close();
+            }
+            catch(SQLException e)
+            {
+                // ignore it
+            }
+        }
+        
+        return exists;
+    }
+    
+    /**
+     * Determine if a particular database column exists in our database
+     * 
+     * @param connection
+     *          Current Database Connection
+     * @param tableName
+     *          The name of the table
+     * @param columnName
+     *          The name of the column in the table
+     * @return true if column of that name exists, false otherwise
+     */
+    public static boolean tableColumnExists(Connection connection, String tableName, String columnName)
+    {
+        // Get the name of the Schema that the DSpace Database is using
+        // (That way we can search the right schema for this table)
+        String schema = ConfigurationManager.getProperty("db.schema");
+        if(StringUtils.isBlank(schema)){
+            schema = null;
+        }
+        
+        boolean exists = false;        
+        ResultSet results = null;
+        
+        try
+        {
+            // Get information about our database.
+            DatabaseMetaData meta = connection.getMetaData();
+            
+            // Check how this database stores its table names, etc.
+            // i.e. lowercase vs uppercase (by default we assume mixed case)
+            if(meta.storesLowerCaseIdentifiers())
+            {
+                schema = (schema == null) ? null : StringUtils.lowerCase(schema);
+                tableName = StringUtils.lowerCase(tableName);
+                columnName = StringUtils.lowerCase(columnName);
+            }
+            else if(meta.storesUpperCaseIdentifiers())
+            {
+                schema = (schema == null) ? null : StringUtils.upperCase(schema);
+                tableName = StringUtils.upperCase(tableName);
+                columnName = StringUtils.upperCase(columnName);
+            }
+
+            // Search for a column of that name in the specified table & schema
+            results = meta.getColumns(null, schema, tableName, columnName);
+            if (results!=null && results.next()) 
+            {
+                exists = true;
+            }   
+        }
+        catch(SQLException e)
+        {
+            log.error("Error attempting to determine if column " + columnName + " exists", e);
         }
         finally
         {
