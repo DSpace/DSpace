@@ -38,8 +38,81 @@
 
     <xsl:output indent="yes"/>
 
+    <!-- FIXME: avoid code duplication with itemSummaryView-DIM-file-section
+        template in item-view.xsl -->
+    <xsl:template match="mets:fileGrp[@USE='ORE']" mode="itemSummaryView-DIM">
+        <xsl:variable name="AtomMapURL" select="concat('cocoon:/',substring-after(mets:file/mets:FLocat[@LOCTYPE='URL']//@*[local-name(.)='href'],$context-path))"/>
+        <div class="item-page-field-wrapper table">
+            <h5>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+            </h5>
+
+            <xsl:for-each select="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+                <xsl:variable name="link_href" select="@href"/>
+                <xsl:if test="/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href][dcterms:description='ORIGINAL']
+                            or not(/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href])">
+                    <div>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="@href"/>
+                            </xsl:attribute>
+                            <xsl:call-template name="getFileIcon">
+                                <xsl:with-param name="mimetype">
+                                    <xsl:value-of select="substring-before(@type,'/')"/>
+                                    <xsl:text>/</xsl:text>
+                                    <xsl:value-of select="substring-after(@type,'/')"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                            <xsl:choose>
+                                <xsl:when test="@title">
+                                    <xsl:value-of select="@title"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:call-template name="getFileTypeDesc">
+                                        <xsl:with-param name="mimetype">
+                                            <xsl:value-of select="substring-before(@type,'/')"/>
+                                            <xsl:text>/</xsl:text>
+                                            <xsl:choose>
+                                                <xsl:when test="contains(@type,';')">
+                                                    <xsl:value-of select="substring-before(substring-after(@type,'/'),';')"/>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <xsl:value-of select="substring-after(@type,'/')"/>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </xsl:with-param>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:text> (</xsl:text>
+                            <xsl:choose>
+                                <xsl:when test="@length &lt; 1024">
+                                    <xsl:value-of select="@length"/>
+                                    <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+                                </xsl:when>
+                                <xsl:when test="@length &lt; 1024 * 1024">
+                                    <xsl:value-of select="substring(string(@length div 1024),1,5)"/>
+                                    <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+                                </xsl:when>
+                                <xsl:when test="@length &lt; 1024 * 1024 * 1024">
+                                    <xsl:value-of select="substring(string(@length div (1024 * 1024)),1,5)"/>
+                                    <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                                </xsl:when>
+                                <xsl:when test="@length &lt; 1024 * 1024 * 1024 * 1024">
+                                    <xsl:value-of select="substring(string(@length div (1024 * 1024 * 1024 * 1024)),1,5)"/>
+                                    <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                                </xsl:when>
+                            </xsl:choose>
+                            <xsl:text>)</xsl:text>
+                        </a>
+                    </div>
+                </xsl:if>
+            </xsl:for-each>
+        </div>
+    </xsl:template>
+
     <!-- Rendering the file list from an Atom ReM bitstream stored in the ORE bundle -->
-    <xsl:template match="mets:fileGrp[@USE='ORE']">
+    <xsl:template match="mets:fileGrp[@USE='ORE']" mode="itemDetailView-DIM">
         <xsl:variable name="AtomMapURL" select="concat('cocoon:/',substring-after(mets:file/mets:FLocat[@LOCTYPE='URL']//@*[local-name(.)='href'],$context-path))"/>
         <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
         <table class="ds-table file-list">
@@ -52,7 +125,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xsl:apply-templates select="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+                <xsl:apply-templates select="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']" mode="itemDetailView-DIM">
                     <xsl:sort select="@title"/>
                 </xsl:apply-templates>
             </tbody>
@@ -61,7 +134,7 @@
 
 
     <!-- Iterate over the links in the ORE resource maps and make them into bitstream references in the file section -->
-    <xsl:template match="atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+    <xsl:template match="atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']" mode="itemDetailView-DIM">
         <xsl:variable name="link_href" select="@href"/>
         <xsl:if test="/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href][dcterms:description='ORIGINAL']
                     or not(/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href])">
