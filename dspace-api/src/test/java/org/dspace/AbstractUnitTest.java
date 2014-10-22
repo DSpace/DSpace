@@ -7,39 +7,41 @@
  */
 package org.dspace;
 
+import java.io.BufferedReader;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import mockit.UsingMocksAndStubs;
-
 import org.apache.log4j.Logger;
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryImportException;
 import org.dspace.administer.RegistryLoader;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
-import org.dspace.browse.MockBrowseCreateDAOOracle;
 import org.dspace.content.MetadataField;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
-import org.dspace.search.DSIndexer;
+import org.dspace.eperson.Group;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.MockDatabaseManager;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -54,7 +56,6 @@ import org.xml.sax.SAXException;
  *
  * @author pvillega
  */
-@UsingMocksAndStubs({MockDatabaseManager.class, MockBrowseCreateDAOOracle.class, MockIndexEventConsumer.class})
 public class AbstractUnitTest
 {
     /** log4j category */
@@ -80,8 +81,11 @@ public class AbstractUnitTest
     protected static EPerson eperson;
 
     protected static DSpaceKernelImpl kernelImpl;
+    
+    // Whether the in-memory DB has been initiailzed for testing
+    protected static boolean dbInitialized = false;
 
-    /**
+    /** 
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize resources required for the tests.
      *
@@ -119,9 +123,14 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
-
-            // Start the mock database
+            
+            // Applies/initializes our mock database by invoking its constructor:
             new MockDatabaseManager();
+            // Now, initialize our Database itself by populating it
+            initializeDB();
+            
+            // Also initialize these mock classes for general use
+            new MockIndexEventConsumer();
 
             // Load the default registries. This assumes the temporary
             // filesystem is working and the in-memory DB in place.
@@ -140,6 +149,8 @@ public class AbstractUnitTest
 
                 RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
                 MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
+                MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
+                MetadataImporter.loadRegistry(base + "bitstream-formats.xml", true);
                 MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
                 ctx.commit();
 
@@ -156,16 +167,16 @@ public class AbstractUnitTest
                 }
 
                 //Create search and browse indexes
-                DSIndexer.cleanIndex(ctx);
-                DSIndexer.createIndex(ctx);
+                DSpace dspace = new DSpace();
+                IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+                indexer.createIndex(ctx);
                 ctx.commit();
-
-                //indexer does a 'complete' on the context
-                IndexBrowse indexer = new IndexBrowse(ctx);
-                indexer.setRebuild(true);
-                indexer.setExecute(true);
-                indexer.initBrowse();
+                
+                // Nullify resources, so Junit will clean them up
+                dspace = null;
+                indexer = null;
             }
+            Group.initDefaultGroupNames(ctx);
             ctx.restoreAuthSystemState();
             if(ctx.isValid())
             {
@@ -173,11 +184,6 @@ public class AbstractUnitTest
             }
             ctx = null;    
         } 
-        catch (BrowseException ex)
-        {
-            log.error("Error creating the browse indexes", ex);
-            fail("Error creating the browse indexes");
-        }
         catch (RegistryImportException ex)
         {
             log.error("Error loading default data", ex);
@@ -351,12 +357,9 @@ public class AbstractUnitTest
      */
     @After
     public void destroy()
-    {        
-        if(context != null && context.isValid())
-        {
-            context.abort();
-            context = null;
-        }
+    {
+        // Cleanup our global context object
+        cleanupContext(context);
     }
 
     /**
@@ -370,6 +373,11 @@ public class AbstractUnitTest
         //we clear the properties
         testProps.clear();
         testProps = null;
+        
+        //Also clear out the kernel & nullify (so JUnit will clean it up)
+        if (kernelImpl!=null)
+            kernelImpl.destroy();
+        kernelImpl = null;
     }
 
     /**
@@ -384,8 +392,6 @@ public class AbstractUnitTest
         assertTrue(5 != 0.67) ;
     }
     */
-     
-    
 
     /**
      * This method expects and exception to be thrown. It also has a time
@@ -398,4 +404,103 @@ public class AbstractUnitTest
         throw new Exception("Fail!");
     }
     */
+
+    /**
+     *  Utility method to cleanup a created Context object (to save memory).
+     *  This can also be used by individual tests to cleanup context objects they create.
+     */
+    protected void cleanupContext(Context c)
+    {
+        // If context still valid, abort it
+        if(c!=null && c.isValid())
+           c.abort();
+
+        // Cleanup Context object by setting it to null
+        if(c!=null)
+           c = null;
+    }
+
+    /**
+      * Create the database tables by running the schema SQL specified
+      * in the 'db.schema.path' system property
+      */
+     private static void initializeDB() throws SQLException
+     {
+        if(!dbInitialized)
+        {    
+            String schemaPath = "";
+            Connection dbConnection = null;
+            try
+            {
+                //preload the contents of the database
+                String s = new String();
+                StringBuilder sb = new StringBuilder();
+
+                schemaPath = System.getProperty("db.schema.path");
+                if (schemaPath == null)
+                    throw new IllegalArgumentException(
+                           "System property db.schema.path must be defined");
+
+                log.debug("Preloading Unit Test database from " + schemaPath);
+
+                FileReader fr = new FileReader(new File(schemaPath));
+                BufferedReader br = new BufferedReader(fr);
+
+                while((s = br.readLine()) != null)
+                {
+                    //we skip white lines and comments
+                    if(!"".equals(s.trim()) && !s.trim().startsWith("--"))
+                    {
+                        sb.append(s);
+                    }
+                }
+                br.close();
+
+                //we use ";" as a delimiter for each request. This assumes no triggers
+                //nor other calls besides CREATE TABLE, CREATE SEQUENCE and INSERT
+                //exist in the file
+                String[] stmts = sb.toString().split(";");
+
+                // Get a new database connection. This also initializes underlying DatabaseManager object
+                dbConnection = DatabaseManager.getConnection();
+                Statement st = dbConnection.createStatement();
+
+                for(int i = 0; i<stmts.length; i++)
+                {
+                    // we ensure that there is no spaces before or after the request string
+                    // in order to not execute empty statements
+                    if(!stmts[i].trim().equals(""))
+                    {
+                        st.executeUpdate(stmts[i]);
+                        log.debug("Loading into database: "+stmts[i]);
+                    }
+                }
+
+                // Commit all DB changes & mark DB as initialized
+                dbConnection.commit();
+                dbInitialized = true;
+            }
+            catch (IOException e)
+            {
+                // Re-throw as a SQL exception... but note that it's a problem with the Schema file
+                throw new SQLException("Unable to create test database from file '" + schemaPath + "'", e);
+            }
+            finally
+            { 
+                if (dbConnection!=null)
+                {   
+                    try
+                    {
+                        // close out our open DB connection
+                        dbConnection.close();
+                    }
+                    catch(SQLException se)
+                    {    
+                        //ignore if we cannot close
+                    }
+                    dbConnection = null;
+                }
+            }
+        }
+    }
 }

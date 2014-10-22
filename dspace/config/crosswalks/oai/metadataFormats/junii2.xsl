@@ -12,12 +12,15 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:doc="http://www.lyncode.com/xoai"
-                xmlns:Locale="http://xml.apache.org/xalan-j/java.util.Locale">
+                xmlns:Locale="http://xml.apache.org/xalan-j/java.util.Locale"
+                exclude-result-prefixes="doc Locale">
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 
     <xsl:template match="/">
-        <junii2
-                version="3.0">
+        <junii2 xmlns="http://irdb.nii.ac.jp/oai"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://irdb.nii.ac.jp/oai http://irdb.nii.ac.jp/oai/junii2-3-1.xsd"
+                version="3.1">
             <!-- title:none = title -->
             <xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element/doc:field">
                 <xsl:if test="position() = 1">

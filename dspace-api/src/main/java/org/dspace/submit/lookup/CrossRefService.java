@@ -21,11 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
@@ -38,6 +33,18 @@ import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 
 /**
  * @author Andrea Bollini
@@ -68,27 +75,32 @@ public class CrossRefService
             {
             	try
             	{
-            		GetMethod method = null;
+            		HttpGet method = null;
             		try
             		{
-            			HttpClient client = new HttpClient();
-            			client.setConnectionTimeout(timeout);
-            			method = new GetMethod(
-            					"http://www.crossref.org/openurl/");
+            			HttpClient client = new DefaultHttpClient();
+                        client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
 
-            			NameValuePair pid = new NameValuePair("pid", apiKey);
-            			NameValuePair noredirect = new NameValuePair(
-            					"noredirect", "true");
-            			NameValuePair id = new NameValuePair("id", record);
-            			method.setQueryString(new NameValuePair[] { pid,
-            					noredirect, id });
-            			// Execute the method.
-            			int statusCode = client.executeMethod(method);
+                        try {
+                        URIBuilder uriBuilder = new URIBuilder(
+            					"http://www.crossref.org/openurl/");
+                        uriBuilder.addParameter("pid", apiKey);
+                        uriBuilder.addParameter("noredirect", "true");
+                        uriBuilder.addParameter("id", record);
+                        method = new HttpGet(uriBuilder.build());
+                        } catch (URISyntaxException ex) {
+                            throw new HttpException("Request not sent", ex);
+                        }
+
+                        // Execute the method.
+            			HttpResponse response = client.execute(method);
+                        StatusLine statusLine = response.getStatusLine();
+                        int statusCode = statusLine.getStatusCode();
 
             			if (statusCode != HttpStatus.SC_OK)
             			{
             				throw new RuntimeException("Http call failed: "
-            						+ method.getStatusLine());
+            						+ statusLine);
             			}
 
             			Record crossitem;
@@ -102,8 +114,7 @@ public class CrossRefService
 
             				DocumentBuilder db = factory
             						.newDocumentBuilder();
-            				Document inDoc = db.parse(method
-            						.getResponseBodyAsStream());
+            				Document inDoc = db.parse(response.getEntity().getContent());
 
             				Element xmlRoot = inDoc.getDocumentElement();
             				Element queryResult = XMLUtils.getSingleElement(xmlRoot, "query_result");
@@ -142,57 +153,51 @@ public class CrossRefService
         return results;
     }
 
-    public NameValuePair[] buildQueryPart(String title, String author,
-            int year, int count)
-    {
-        StringBuffer sb = new StringBuffer();
-        if (StringUtils.isNotBlank(title))
-        {
-            sb.append(title);
-        }
-        sb.append(" ");
-        if (StringUtils.isNotBlank(author))
-        {
-            sb.append(author);
-        }
-        String q = sb.toString().trim();
-        NameValuePair qParam = new NameValuePair("q", title);
-        NameValuePair yearParam = new NameValuePair("year",
-                year != -1 ? String.valueOf(year) : "");
-        NameValuePair countParam = new NameValuePair("rows",
-                count != -1 ? String.valueOf(count) : "");
-
-        NameValuePair[] query = new NameValuePair[] { qParam, yearParam,
-                countParam };
-        return query;
-    }
-
     public List<Record> search(Context context, String title, String authors,
             int year, int count, String apiKey) throws IOException, HttpException
     {
-        GetMethod method = null;
+        HttpGet method = null;
         try
         {
-            NameValuePair[] query = buildQueryPart(title, authors, year, count);
-            HttpClient client = new HttpClient();
-            client.setTimeout(timeout);
-            method = new GetMethod("http://search.labs.crossref.org/dois");
+            HttpClient client = new DefaultHttpClient();
+            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
 
-            method.setQueryString(query);
+            URIBuilder uriBuilder = new URIBuilder("http://search.labs.crossref.org/dois");
+
+            StringBuilder sb = new StringBuilder();
+            if (StringUtils.isNotBlank(title))
+            {
+                sb.append(title);
+            }
+            sb.append(" ");
+            if (StringUtils.isNotBlank(authors))
+            {
+                sb.append(authors);
+            }
+            String q = sb.toString().trim();
+            uriBuilder.addParameter("q", q);
+
+            uriBuilder.addParameter("year", year != -1 ? String.valueOf(year) : "");
+            uriBuilder.addParameter("rows", count != -1 ? String.valueOf(count) : "");
+            method = new HttpGet(uriBuilder.build());
+
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse response = client.execute(method);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
 
             if (statusCode != HttpStatus.SC_OK)
             {
                 throw new RuntimeException("Http call failed:: "
-                        + method.getStatusLine());
+                        + statusLine);
             }
 
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Map>>()
             {
             }.getType();
-            List<Map> json = gson.fromJson(method.getResponseBodyAsString(),
+            List<Map> json = gson.fromJson(
+                    IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
                     listType);
             Set<String> dois = new HashSet<String>();
             for (Map r : json)

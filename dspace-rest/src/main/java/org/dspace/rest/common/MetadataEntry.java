@@ -10,37 +10,58 @@ package org.dspace.rest.common;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created with IntelliJ IDEA.
- * User: peterdietz
- * Date: 9/20/13
- * Time: 5:51 PM
- * To change this template use File | Settings | File Templates.
+ * @author peterdietz, Rostislav Novak (Computing and Information Centre, CTU in
+ *         Prague)
+ * 
  */
 @XmlRootElement(name = "metadataentry")
-public class MetadataEntry {
+public class MetadataEntry
+{
     String key;
+
     String value;
 
-    public MetadataEntry() {}
+    String language;
 
-    public MetadataEntry(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public MetadataEntry()
+    {
     }
 
-    public String getValue() {
+    public MetadataEntry(String key, String value, String language)
+    {
+        this.key = key;
+        this.value = value;
+        this.language = language;
+    }
+
+    public String getValue()
+    {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(String value)
+    {
         this.value = value;
     }
 
-    public String getKey() {
+    public String getKey()
+    {
         return key;
     }
 
-    public void setKey(String key) {
+    public void setKey(String key)
+    {
         this.key = key;
     }
+
+    public String getLanguage()
+    {
+        return language;
+    }
+
+    public void setLanguage(String language)
+    {
+        this.language = language;
+    }
+
 }

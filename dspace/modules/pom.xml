@@ -16,6 +16,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../..</root.basedir>
+        <license.skip>true</license.skip>
     </properties>
 
     <!-- The 'additions' module must *always* be built, as it is included
@@ -39,16 +40,20 @@
         <profile>
             <id>dspace-xmlui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>xmlui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>xmlui</module>
             </modules>
         </profile>
+        <!-- Note:- The LNI module is not built by default and is considered deprecated.
+            To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>lni</module>
@@ -57,16 +62,31 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>jspui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>jspui</module>
             </modules>
         </profile>
         <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <file>
+                    <exists>rdf/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>rdf</module>
+            </modules>
+        </profile>
+        <profile>
             <id>dspace-rest</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>rest/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>rest</module>
@@ -75,7 +95,9 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>sword/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>sword</module>
@@ -84,7 +106,9 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>swordv2/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>swordv2</module>
@@ -93,7 +117,9 @@
         <profile>
             <id>dspace-solr</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>solr/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>solr</module>
@@ -102,10 +128,27 @@
         <profile>
             <id>dspace-oai</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>oai/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>oai</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <!--Activates mirage2 on the presence of the property mirage2.on with any value e.g. mvn clean package -Dmirage2.on=on
+                Note the absence of activeByDefault. This module is optional. Also activeByDefault only works when no other profiles are active.
+            -->
+            <id>mirage2</id>
+            <activation>
+                <property>
+                    <name>mirage2.on</name>
+                </property>
+            </activation>
+            <modules>
+                <module>xmlui-mirage2</module>
             </modules>
         </profile>
     </profiles>

@@ -29,7 +29,7 @@ public class MetadataValueISSNExtractor implements ISSNItemExtractor
         List<String> values = new ArrayList<String>();
         for (String metadata : metadataList)
         {
-            DCValue[] dcvalues = item.getMetadata(metadata);
+            DCValue[] dcvalues = item.getMetadataByMetadataString(metadata);
             for (DCValue dcvalue : dcvalues)
             {
                 values.add(dcvalue.value);

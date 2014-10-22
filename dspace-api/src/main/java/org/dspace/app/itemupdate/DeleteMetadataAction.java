@@ -38,7 +38,7 @@ public class DeleteMetadataAction extends UpdateMetadataAction {
 		for (String f : targetFields)
 		{
 			DtoMetadata dummy = DtoMetadata.create(f, Item.ANY, "");
-			DCValue[] ardcv = item.getMetadata(f);
+			DCValue[] ardcv = item.getMetadataByMetadataString(f);
 
 			ItemUpdate.pr("Metadata to be deleted: ");
 			for (DCValue dcv : ardcv)

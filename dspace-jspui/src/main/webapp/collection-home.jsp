@@ -195,7 +195,7 @@
     	       width = 36;
     	    }
 %>
-    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
+    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" style="margin: 3px 0 3px" /></a>
 <%
     	} %>
     	</span><%
@@ -230,7 +230,7 @@
     <%-- give us the top report on what we are looking at --%>
     <fmt:message var="bi_name" key="<%= bi_name_key %>"/>
     <fmt:message var="so_name" key="<%= so_name_key %>"/>
-    <div align="center" class="browse_range">
+    <div class="browse_range">
         <fmt:message key="jsp.collection-home.content.range">
             <fmt:param value="${bi_name}"/>
             <fmt:param value="${so_name}"/>
@@ -241,7 +241,7 @@
     </div>
 
     <%--  do the top previous and next page links --%>
-    <div align="center">
+    <div class="prev-next-links">
 <% 
       if (bi.hasPrevPage())
       {
@@ -276,7 +276,7 @@
 %>
 
     <%-- give us the bottom report on what we are looking at --%>
-    <div align="center" class="browse_range">
+    <div class="browse_range">
         <fmt:message key="jsp.collection-home.content.range">
             <fmt:param value="${bi_name}"/>
             <fmt:param value="${so_name}"/>
@@ -287,7 +287,7 @@
     </div>
 
     <%--  do the bottom previous and next page links --%>
-    <div align="center">
+    <div class="prev-next-links">
 <% 
       if (bi.hasPrevPage())
       {

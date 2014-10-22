@@ -285,7 +285,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             LOG.debug("updating missing bitstreams");
             conn = DatabaseManager.getConnection();
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE);
             }
@@ -398,7 +398,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
 
             conn = DatabaseManager.getConnection();
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
             }
@@ -445,7 +445,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         try
         {
             conn = DatabaseManager.getConnection();
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
             }

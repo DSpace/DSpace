@@ -7,9 +7,8 @@ Revision: 11-sep-04 dstuve
 Oracle Porting Notes for the Curious
 
 Oracle is missing quite a number of cool features found in Postgres, so
-workarounds had to be found, most of which are hidden behind tests of
-the db.name configuration parameter in dspace.cfg.  If the db.name is
-set to Oracle the workarounds are activated:
+workarounds had to be found, most of which are hidden behind tests in 
+DatabaseManager.  If Oracle is your DBMS, the workarounds are activated:
 
 Oracle doesn't like ';' characters in JDBC SQL - they have all been removed
 from the DSpace source, including code in the .sql file reader to strip ;'s.
@@ -18,8 +17,8 @@ browse code - LIMIT and OFFSET is used to limit browse results, and an
 Oracle-hack is used to limit the result set to a given size
 
 Oracle has no boolean data type, so a new schema file was created that
-uses NUMBER(1) (AKA 'integers') and code is inserted everywhere to use 0 for false
-and 1 for true if the db.name is Oracle
+uses NUMBER(1) (AKA 'integers') and code is inserted everywhere to use 0 for
+false and 1 for true if DSpace is using Oracle.
 
 Oracle doesn't have a TEXT data type either, so TEXT columns are defined
 as VARCHAR2 in the Oracle-specific schema.

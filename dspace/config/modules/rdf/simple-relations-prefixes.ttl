@@ -1,0 +1,2 @@
+@prefix dspace:     <http://digital-repositories.org/ontologies/dspace/0.1.0#> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .

@@ -42,9 +42,6 @@ public class Bundle extends DSpaceObject
     /** log4j logger */
     private static Logger log = Logger.getLogger(Bundle.class);
 
-    /** Our context */
-    private Context ourContext;
-
     /** The table row corresponding to this bundle */
     private TableRow bundleRow;
 
@@ -53,9 +50,6 @@ public class Bundle extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Construct a bundle object with the given table row
@@ -67,7 +61,7 @@ public class Bundle extends DSpaceObject
      */
     Bundle(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
         String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
@@ -134,7 +128,6 @@ public class Bundle extends DSpaceObject
         context.cache(this, row.getIntColumn("bundle_id"));
 
         modified = false;
-        modifiedMetadata = false;
     }
 
     /**
@@ -201,6 +194,9 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
                 + row.getIntColumn("bundle_id")));
 
+        // if we ever use the identifier service for bundles, we should
+        // create the bundle before we create the Event and should add all 
+        // identifiers to it.
         context.addEvent(new Event(Event.CREATE, Constants.BUNDLE, row.getIntColumn("bundle_id"), null));
 
         return new Bundle(context, row);
@@ -223,7 +219,7 @@ public class Bundle extends DSpaceObject
      */
     public String getName()
     {
-        return bundleRow.getStringColumn("name");
+        return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
     }
 
     /**
@@ -235,8 +231,7 @@ public class Bundle extends DSpaceObject
      */
     public void setName(String name)
     {
-        bundleRow.setColumn("name", name);
-        modifiedMetadata = true;
+        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "title", null, null, name);
     }
 
     /**
@@ -443,7 +438,9 @@ public class Bundle extends DSpaceObject
         // Add the bitstream object
         bitstreams.add(b);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+        ourContext.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), 
+                Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID()),
+                getIdentifiers(ourContext)));
 
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
@@ -546,7 +543,9 @@ public class Bundle extends DSpaceObject
             }
         }
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), 
+                Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID()),
+                getIdentifiers(ourContext)));
 
         //Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject();
@@ -604,18 +603,19 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_bundle", "bundle_id="
                 + getID()));
 
+        DatabaseManager.update(ourContext, bundleRow);
+
         if (modified)
         {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(),
+                    null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.BUNDLE, getID(), null));
-            modifiedMetadata = false;
+            updateMetadata();
+            clearDetails();
         }
-
-        DatabaseManager.update(ourContext, bundleRow);
     }
 
     /**
@@ -628,7 +628,8 @@ public class Bundle extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_bundle", "bundle_id="
                 + getID()));
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), getName()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), 
+                getName(), getIdentifiers(ourContext)));
 
         // Remove from cache
         ourContext.removeCached(this, getID());
@@ -646,6 +647,8 @@ public class Bundle extends DSpaceObject
 
         // Remove ourself
         DatabaseManager.delete(ourContext, bundleRow);
+
+        removeMetadataFromDatabase();
     }
 
     /**

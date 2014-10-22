@@ -7,16 +7,6 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.Date;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
@@ -29,17 +19,22 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.Date;
 
 /**
  * Servlet for generate a statistisc report
@@ -215,20 +210,8 @@ public class RequestItemServlet extends DSpaceServlet
 				
 				String authorEmail = author.getEmail();
 				String authorName = author.getFullName();
-				String emailRequest;
 				
-				if (authorEmail != null) {
-					emailRequest = authorEmail;
-				} else {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.helpdesk");
-				}
-				
-				if (emailRequest == null) {
-					emailRequest = ConfigurationManager
-							.getProperty("mail.admin");
-				}
-				email.addRecipient(emailRequest);
+				email.addRecipient(authorEmail);
 
 				email.addArgument(reqname);
 				email.addArgument(requesterEmail);

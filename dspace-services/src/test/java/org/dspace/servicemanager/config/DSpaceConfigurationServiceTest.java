@@ -44,6 +44,7 @@ public class DSpaceConfigurationServiceTest {
         l.add( new DSpaceConfig("test.key2", "This is key1=${test.key1}") );
 
         configurationService.loadConfiguration(l, true);
+        l = null;
     }
 
     @After
@@ -87,6 +88,10 @@ public class DSpaceConfigurationServiceTest {
                 configMap.get("circular").getValue(), l.get(dirIdx).getValue());
         assertEquals("Indirect circular reference should not be replaced",
                 configMap.get("indirect.circular").getValue(), l.get(indirIdx).getValue());
+        
+        //trash the references
+        l = null;
+        configMap = null;
     }
 
     /**
@@ -99,6 +104,9 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(8, props.size());
         assertNotNull(props.get("service.name"));
         assertEquals("DSpace", props.get("service.name"));
+        
+        //trash the references
+        props = null;
     }
 
     /**
@@ -111,6 +119,9 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(8, props.size());
         assertNotNull(props.get("service.name"));
         assertEquals("DSpace", props.get("service.name"));
+        
+        //trash the references
+        props = null;
     }
 
     /**
@@ -124,6 +135,7 @@ public class DSpaceConfigurationServiceTest {
  
         prop = configurationService.getProperty("XXXXX");
         assertNull(prop);
+        prop = null;
     }
 
     /**
@@ -151,6 +163,7 @@ public class DSpaceConfigurationServiceTest {
 
         prop = configurationService.getPropertyAsType("XXXXX", String.class);
         assertNull(prop);
+        prop = null;
     }
 
     /**
@@ -181,6 +194,7 @@ public class DSpaceConfigurationServiceTest {
 
         prop = configurationService.getPropertyAsType("XXXXX", "XXX");
         assertEquals("XXX", prop);
+        prop = null;
     }
 
     @Test
@@ -202,6 +216,7 @@ public class DSpaceConfigurationServiceTest {
         prop = configurationService.getProperty("service.fake.thing");
         assertNotNull(prop);
         assertEquals("Fakey", prop);
+        prop = null;
     }
 
     @Test
@@ -234,6 +249,7 @@ public class DSpaceConfigurationServiceTest {
 
         prop = configurationService.getProperty("newBool");
         assertNull(prop);
+        prop = null;
     }
 
     /**
@@ -287,6 +303,9 @@ public class DSpaceConfigurationServiceTest {
         dscs = new DSpaceConfigurationService();
         assertEquals(size + 1, dscs.getConfiguration().size());
         assertEquals("Hello", dscs.getProperty("az.system.config"));
+        
+        dscs.clear();
+        dscs = null;
     }
 
 }

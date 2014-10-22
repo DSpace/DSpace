@@ -18,6 +18,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -39,8 +40,6 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
 import org.xml.sax.SAXException;
 
 /**
@@ -116,10 +115,11 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
     	Request request = ObjectModelHelper.getRequest(objectModel);
     	Context context = ContextUtil.obtainContext(objectModel);
 
-		TableRow requestItem = DatabaseManager.findByUnique(context,
-				"requestitem", "token", (String) request.getAttribute("token"));
+        String token = (String) request.getAttribute("token");
+        RequestItem requestItem = RequestItem.findByToken(context, token);
+
 		String title;
-		Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+		Item item = Item.find(context, requestItem.getItemID());
 		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
 		if (titleDC != null || titleDC.length > 0)
 			title = titleDC[0].value;
@@ -129,7 +129,7 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
 		EPerson submitter = item.getSubmitter();
 
 		Object[] args = new String[]{
-					requestItem.getStringColumn("request_name"),
+					requestItem.getReqName(),
 					HandleManager.getCanonicalForm(item.getHandle()), // User
 					title, // request item title
 					submitter.getFullName(), // # submmiter name

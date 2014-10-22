@@ -145,9 +145,9 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Fetch the document type (dc.type)
         String documentType = "";
-        if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+        if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
         {
-            documentType = item.getMetadata("dc.type")[0].value;
+            documentType = item.getMetadataByMetadataString("dc.type")[0].value;
         }
         
         // Step 1:
@@ -163,14 +163,21 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 continue;
             }
-            String qualifier = inputs[i].getQualifier();
-            if (qualifier == null
-                    && inputs[i].getInputType().equals("qualdrop_value"))
-            {
-                qualifier = Item.ANY;
-            }
-            item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
-                    qualifier, Item.ANY);
+	        if (inputs[i].getInputType().equals("qualdrop_value"))
+	        {
+		        @SuppressWarnings("unchecked") // This cast is correct
+		        List<String> pairs = inputs[i].getPairs();
+		        for (int j = 0; j < pairs.size(); j += 2)
+		        {
+			        String qualifier = pairs.get(j+1);
+			        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+		        }
+	        }
+	        else
+	        {
+		        String qualifier = inputs[i].getQualifier();
+		        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+	        }
         }
 
         // Clear required-field errors first since missing authority

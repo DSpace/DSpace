@@ -118,7 +118,6 @@ New BSD License (http://opensource.org/licenses/bsd-license.php)
   
 Other Open Source Licenses:
   * AOP Alliance (aopalliance:*) - Public Domain: http://aopalliance.sourceforge.net/
-  * backport-util-concurrent (backport-util-concurrent:*) - Public Domain: http://creativecommons.org/licenses/publicdomain
   * coverity-escapers (com.coverity.security:*) - Modified BSD
   * Handle API (org.dspace:handle) - Handle Public License Agreement: http://www.handle.net/HSj/hdlnet-2-LICENSE.pdf
   * ICU4J (com.ibm.icu:icu4j) - ICU License : http://source.icu-project.org/repos/icu/icu/trunk/license.html

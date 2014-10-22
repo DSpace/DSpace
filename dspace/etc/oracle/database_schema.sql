@@ -87,7 +87,7 @@ CREATE TABLE BitstreamFormatRegistry
   description         VARCHAR2(2000),
   support_level       INTEGER,
   -- Identifies internal types
-  internal             NUMBER(1)
+  internal            NUMBER(1)
 );
 
 -------------------------------------------------------
@@ -109,13 +109,9 @@ CREATE TABLE Bitstream
 (
    bitstream_id            INTEGER PRIMARY KEY,
    bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
-   name                    VARCHAR2(256),
    size_bytes              INTEGER,
    checksum                VARCHAR2(64),
    checksum_algorithm      VARCHAR2(32),
-   description             VARCHAR2(2000),
-   user_format_description VARCHAR2(2000),
-   source                  VARCHAR2(256),
    internal_id             VARCHAR2(256),
    deleted                 NUMBER(1),
    store_number            INTEGER,
@@ -134,16 +130,12 @@ CREATE TABLE EPerson
   password            VARCHAR2(128),
   salt                VARCHAR2(32),
   digest_algorithm    VARCHAR2(16),
-  firstname           VARCHAR2(64),
-  lastname            VARCHAR2(64),
   can_log_in          NUMBER(1),
   require_certificate NUMBER(1),
   self_registered     NUMBER(1),
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  phone               VARCHAR2(32),
-  netid               VARCHAR2(64) UNIQUE,
-  language            VARCHAR2(64)
+  netid               VARCHAR2(64) UNIQUE
 );
 
 -------------------------------------------------------
@@ -151,8 +143,7 @@ CREATE TABLE EPerson
 -------------------------------------------------------
 CREATE TABLE EPersonGroup
 (
-  eperson_group_id INTEGER PRIMARY KEY,
-  name             VARCHAR2(256) UNIQUE
+  eperson_group_id INTEGER PRIMARY KEY
 );
 
 ------------------------------------------------------
@@ -209,7 +200,8 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR2(16),  -- ORIGINAL | THUMBNAIL | TEXT
+  -- name: ORIGINAL | THUMBNAIL | TEXT
+  name               VARCHAR2(16),
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
@@ -268,7 +260,8 @@ CREATE TABLE MetadataFieldRegistry
 CREATE TABLE MetadataValue
 (
   metadata_value_id  INTEGER PRIMARY KEY,
-  item_id       INTEGER REFERENCES Item(item_id),
+  resource_id       INTEGER NOT NULL,
+  resource_type_id   INTEGER NOT NULL,
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value CLOB,
   text_lang  VARCHAR(24),
@@ -282,18 +275,16 @@ INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dc
 
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
-  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.item_id,
+  SELECT MetadataValue.metadata_value_id AS "dc_value_id", MetadataValue.resource_id,
     MetadataValue.metadata_field_id AS "dc_type_id", MetadataValue.text_value,
     MetadataValue.text_lang, MetadataValue.place
   FROM MetadataValue, MetadataFieldRegistry
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
-  AND MetadataFieldRegistry.metadata_schema_id = 1;
+  AND MetadataFieldRegistry.metadata_schema_id = 1 AND MetadataValue.resource_type_id = 2;
 
 -- An index for item_id - almost all access is based on
 -- instantiating the item object, which grabs all values
 -- related to that item
-CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
-CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
 CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
@@ -303,12 +294,7 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR2(128),
-  short_description VARCHAR2(512),
-  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  copyright_text    CLOB,
-  side_bar_text     VARCHAR2(2000),
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -321,15 +307,8 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
-  name              VARCHAR2(128),
-  short_description VARCHAR2(512),
-  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
-  provenance_description  VARCHAR2(2000),
-  license           CLOB,
-  copyright_text    CLOB,
-  side_bar_text     VARCHAR2(2000),
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
@@ -469,8 +448,8 @@ CREATE TABLE WorkspaceItem
   workspace_item_id INTEGER PRIMARY KEY,
   item_id           INTEGER REFERENCES Item(item_id),
   collection_id     INTEGER REFERENCES Collection(collection_id),
-  -- Answers to questions on first page of submit UI
-  multiple_titles   NUMBER(1),  -- boolean
+  -- Answers to questions on first page of submit UI (all boolean)
+  multiple_titles   NUMBER(1),
   published_before  NUMBER(1),
   multiple_files    NUMBER(1),
   -- How for the user has got in the submit process
@@ -487,7 +466,7 @@ CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
 CREATE TABLE WorkflowItem
 (
   workflow_id    INTEGER PRIMARY KEY,
-  item_id        INTEGER REFERENCES Item(item_id) UNIQUE,
+  item_id        INTEGER UNIQUE REFERENCES Item(item_id),
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
@@ -575,9 +554,9 @@ CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
 -- Community2Item view
 ------------------------------------------------------
 CREATE VIEW Community2Item as
-SELECT Community2Collection.community_id, Collection2Item.item_id
-FROM Community2Collection, Collection2Item
-WHERE Collection2Item.collection_id   = Community2Collection.collection_id
+ SELECT Community2Collection.community_id, Collection2Item.item_id
+ FROM Community2Collection, Collection2Item
+ WHERE Collection2Item.collection_id  = Community2Collection.collection_id
 ;
 
 -------------------------------------------------------------------------
@@ -599,8 +578,8 @@ CREATE TABLE community_item_count (
 --  and administrators
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0, 'Anonymous');
-INSERT INTO epersongroup VALUES(1, 'Administrator');
+INSERT INTO epersongroup VALUES(0);
+INSERT INTO epersongroup VALUES(1);
 
 
 -------------------------------------------------------
@@ -661,61 +640,61 @@ CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 -- possible
 
 insert into checksum_results
-values
+ values
 (
     'INVALID_HISTORY',
     'Install of the cheksum checking code do not consider this history as valid'
 );
 
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_NOT_FOUND',
     'The bitstream could not be found'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_MATCH',
     'Current checksum matched previous checksum'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_NO_MATCH',
     'Current checksum does not match previous checksum'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_PREV_NOT_FOUND',
     'Previous checksum was not found: no comparison possible'
 );
 
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_INFO_NOT_FOUND',
     'Bitstream info not found'
 );
 
 insert into checksum_results
-values
+ values
 (
     'CHECKSUM_ALGORITHM_INVALID',
     'Invalid checksum algorithm'
 );
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_NOT_PROCESSED',
     'Bitstream marked to_be_processed=false'
 );
 insert into checksum_results
-values
+ values
 (
     'BITSTREAM_MARKED_DELETED',
     'Bitstream marked deleted in bitstream table'
@@ -788,6 +767,7 @@ CREATE TABLE requestitem
   allfiles NUMBER(1),
   request_email VARCHAR2(64),
   request_name VARCHAR2(64),
+  request_message VARCHAR2(2000),
   request_date TIMESTAMP,
   accept_request NUMBER(1),
   decision_date TIMESTAMP,
