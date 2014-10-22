@@ -13,6 +13,12 @@ BEGIN;
 ------------------------------------------------------
 ALTER TABLE requestitem ADD request_message TEXT;
 
+------------------------------------------------------
+-- DS-1955 resize rpdescription for embargo reason
+------------------------------------------------------
+ALTER TABLE resourcepolicy ALTER COLUMN rpdescription TYPE TEXT;
+
+
 
 alter table metadatavalue rename item_id to resource_id;
 alter table metadatavalue alter column resource_id set not null;
