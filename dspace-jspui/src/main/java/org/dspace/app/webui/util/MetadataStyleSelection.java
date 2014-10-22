@@ -34,7 +34,7 @@ public class MetadataStyleSelection extends AKeyBasedStyleSelection
     public String getStyleForItem(Item item) throws SQLException
     {
         String metadata = ConfigurationManager.getProperty("webui.itemdisplay.metadata-style");
-        DCValue[] value = item.getMetadata(metadata);
+        DCValue[] value = item.getMetadataByMetadataString(metadata);
         String styleName = "default";
         if (value.length > 0)
         {

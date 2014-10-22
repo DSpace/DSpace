@@ -13,7 +13,6 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
 import java.util.ArrayList;

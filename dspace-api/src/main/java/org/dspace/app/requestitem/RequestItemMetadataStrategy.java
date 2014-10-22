@@ -35,14 +35,14 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 			throws SQLException {
 		if (emailMetadata != null)
 		{
-			DCValue[] vals = item.getMetadata(emailMetadata);
+			DCValue[] vals = item.getMetadataByMetadataString(emailMetadata);
 			if (vals.length > 0)
 			{
 				String email = vals[0].value;
 				String fullname = null;
 				if (fullNameMatadata != null)
 				{
-					DCValue[] nameVals = item.getMetadata(fullNameMatadata); 
+					DCValue[] nameVals = item.getMetadataByMetadataString(fullNameMatadata);
 					if (nameVals.length > 0)
 					{
 						fullname = nameVals[0].value;

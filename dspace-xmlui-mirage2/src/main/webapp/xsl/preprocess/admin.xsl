@@ -225,5 +225,12 @@
         </list>
     </xsl:template>
 
+    <!--remove the shared authority stylesheet, this theme has its own-->
+     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet'][@qualifier='screen'][@lang='datatables']"/>
+     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet'][@qualifier='screen'][@lang='person-lookup']"/>
+     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@lang='person-lookup']"/>
+     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@lang='datatables']"/>
+
+
 
 </xsl:stylesheet>

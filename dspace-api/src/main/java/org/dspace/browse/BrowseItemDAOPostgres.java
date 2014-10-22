@@ -7,6 +7,7 @@
  */
 package org.dspace.browse;
 
+import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -25,31 +26,34 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
 
     /** query to get the text value of a metadata element only (qualifier is NULL) */
     private String getByMetadataElement = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
+                                    "WHERE metadatavalue.resource_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.qualifier IS NULL " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
                                     " AND metadataschemaregistry.short_id = ? " +
+                                    " AND metadatavalue.resource_type_id = ? " +
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element and qualifier */
     private String getByMetadata = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
+                                    "WHERE metadatavalue.resource_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.qualifier = ? " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
                                     " AND metadataschemaregistry.short_id = ? " +
+                                    " AND metadatavalue.resource_type_id = ? " +
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element with the wildcard qualifier (*) */
     private String getByMetadataAnyQualifier = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
-                                    "WHERE metadatavalue.item_id = ? " +
+                                    "WHERE metadatavalue.resource_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
                                     " AND metadataschemaregistry.short_id = ? " +
+                                    " AND metadatavalue.resource_type_id = ? " +
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** DSpace context */
@@ -100,17 +104,17 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
         {
             if (qualifier == null)
             {
-                Object[] params = { Integer.valueOf(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema, Constants.ITEM };
                 tri = DatabaseManager.query(context, getByMetadataElement, params);
             }
             else if (Item.ANY.equals(qualifier))
             {
-                Object[] params = { Integer.valueOf(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema, Constants.ITEM };
                 tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
             }
             else
             {
-                Object[] params = { Integer.valueOf(itemId), element, qualifier, schema };
+                Object[] params = { Integer.valueOf(itemId), element, qualifier, schema, Constants.ITEM };
                 tri = DatabaseManager.query(context, getByMetadata, params);
             }
 

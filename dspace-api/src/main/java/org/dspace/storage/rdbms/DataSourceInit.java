@@ -20,6 +20,9 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
+import java.util.*;
+import org.apache.commons.lang.StringUtils;
+
 public class DataSourceInit {
     private static final Logger log = Logger.getLogger(DataSourceInit.class);
 
@@ -92,8 +95,6 @@ public class DataSourceInit {
             // the "real" Connections created by the ConnectionFactory with
             // the classes that implement the pooling functionality.
             //
-            String validationQuery = "SELECT 1";
-
             GenericKeyedObjectPoolFactory statementFactory = null;
             if (useStatementPool)
             {
@@ -118,7 +119,7 @@ public class DataSourceInit {
 
             PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(
                     connectionFactory, connectionPool, statementFactory,
-                    validationQuery, // validation query
+                    null, // validation query (none until we know DBMS brand)
                     false, // read only is not default for now
                     false); // Autocommit defaults to none
 
@@ -136,11 +137,27 @@ public class DataSourceInit {
 
             // Set the proper validation query by DBMS brand.
             Connection connection = dataSource.getConnection();
-            if ("oracle".equals(connection.getMetaData().getDatabaseProductName().toLowerCase()))
+            String productNameLC = connection.getMetaData().getDatabaseProductName()
+                    .toLowerCase();
+            if (productNameLC.contains("oracle"))
             {
                 poolableConnectionFactory.setValidationQuery("SELECT 1 FROM DUAL");
             }
+            else
+            {
+                poolableConnectionFactory.setValidationQuery("SELECT 1");
+    
+                String dbSchema = ConfigurationManager.getProperty("db.schema");
+                if (StringUtils.isBlank(dbSchema) != true)
+                {
+                    List initSql = Arrays.asList("set search_path to ".concat(dbSchema));
+                    poolableConnectionFactory.setConnectionInitSql(initSql);
+                }
+
+            }
             connection.close();
+
+            poolableConnectionFactory.getPool().clear();
 
             // Ready to use
             return poolingDataSource;

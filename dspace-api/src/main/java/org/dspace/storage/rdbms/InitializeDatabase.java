@@ -29,7 +29,7 @@ public class InitializeDatabase
 
     public static void main(String[] argv)
     {
-    	
+      
         // Usage checks
         if (argv.length != 1)
         {
@@ -67,7 +67,7 @@ public class InitializeDatabase
      */
     private static FileReader getScript(String name) throws FileNotFoundException, IOException
     {
-        String dbName = DatabaseManager.getDbName().toLowerCase(Locale.ROOT);
+        String dbName = DatabaseManager.getDbKeyword();
 
         File myFile = null;
         

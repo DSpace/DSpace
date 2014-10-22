@@ -224,6 +224,14 @@
     </command>
 
     <command>
+        <name>rdfizer</name>
+        <description>The RDFizer manages the attached triple store if dspace-rdf is enabled</description>
+        <step>
+            <class>org.dspace.rdf.RDFizer</class>
+        </step>
+    </command>
+
+    <command>
         <name>registry-loader</name>
         <description>Load entries into a registry</description>
         <step>
@@ -416,6 +424,14 @@
         <description>Display the version of DSpace and other troubleshooting information</description>
         <step>
             <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+
+    <command>
+        <name>index-authority</name>
+        <description>Indexes all metadata fields that use solr authority</description>
+        <step>
+            <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
         </step>
     </command>
 

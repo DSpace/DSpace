@@ -61,6 +61,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
     private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_administrative_batch_import      = message("xmlui.administrative.Navigation.administrative_batch_import");
     private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
     private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
@@ -297,6 +298,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
             admin.addItemXref(contextPath+"/statistics", T_statistics);
             admin.addItemXref(contextPath+ "/admin/metadataimport", T_administrative_import_metadata);
+            admin.addItemXref(contextPath+"/admin/batchimport", T_administrative_batch_import);
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
         }
     }

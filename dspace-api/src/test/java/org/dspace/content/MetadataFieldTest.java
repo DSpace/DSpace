@@ -65,11 +65,6 @@ public class MetadataFieldTest extends AbstractUnitTest
                     MetadataSchema.DC_SCHEMA_ID, element, qualifier);
             this.mf.setScopeNote(scopeNote);
         }
-        catch (AuthorizeException ex)
-        {
-            log.error("Authorize Error in init", ex);
-            fail("Authorize Error in init: " + ex.getMessage());
-        }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
