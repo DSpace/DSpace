@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
@@ -99,55 +100,27 @@ public class Resource
      * @param xforwarderfor
      * @param headers
      * @param request
+     * @param context
      */
     protected void writeStats(DSpaceObject dspaceObject, UsageEvent.Action action,
-                              String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request)
+                              String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request, Context context)
     {
-
         if (!writeStatistics)
         {
             return;
         }
 
-        org.dspace.core.Context context = null;
+        if ((user_ip == null) || (user_ip.length() == 0))
+        {
+            new DSpace().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
+        }
+        else
+        {
+            new DSpace().getEventService().fireEvent(
+                    new UsageEvent(action, user_ip, user_agent, xforwarderfor, context, dspaceObject));
+        }
 
-        try
-        {
-            context = createContext(getUser(headers));
-
-            if ((user_ip == null) || (user_ip.length() == 0))
-            {
-                new DSpace().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
-            }
-            else
-            {
-                new DSpace().getEventService().fireEvent(
-                        new UsageEvent(action, user_ip, user_agent, xforwarderfor, context, dspaceObject));
-            }
-
-            log.debug("fired event");
-            context.complete();
-        }
-        catch (SQLException e)
-        {
-            if ((context != null) && (context.isValid()))
-            {
-                context.abort();
-            }
-            log.error("Could not write usageEvent, SQLException. Message: " + e);
-        }
-        catch (ContextException e)
-        {
-            log.error("Could not write usageEvent, ContextException. Message: " + e.getMessage());
-        }
-        finally
-        {
-            if ((context != null) && (context.isValid()))
-            {
-                context.abort();
-                log.error("Something get wrong. Aborting context in finally statement.");
-            }
-        }
+        log.debug("fired event");
     }
 
     /**

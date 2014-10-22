@@ -104,7 +104,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             item = new Item(dspaceItem, expand, context);
             context.complete();
@@ -182,7 +182,7 @@ public class ItemsResource extends Resource
                     {
                         items.add(new Item(dspaceItem, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
-                                headers, request);
+                                headers, request, context);
                     }
                 }
             }
@@ -240,7 +240,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
@@ -299,7 +299,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
 
@@ -370,7 +370,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             for (MetadataEntry entry : metadata)
             {
@@ -450,7 +450,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             // Is better to add bitstream to ORIGINAL bundle or to item own?
             log.trace("Creating bitstream in item.");
@@ -616,7 +616,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             log.trace("Deleting original metadata from item.");
             for (MetadataEntry entry : metadata)
@@ -698,7 +698,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
-            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             log.trace("Deleting item.");
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context,
@@ -767,7 +767,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
@@ -862,9 +862,9 @@ public class ItemsResource extends Resource
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
-            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request);
+            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
             writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers,
-                    request);
+                    request, context);
 
             log.trace("Deleting bitstream...");
             for (org.dspace.content.Bundle bundle : item.getBundles())
@@ -1005,7 +1005,7 @@ public class ItemsResource extends Resource
                         org.dspace.core.Constants.READ);
                 Item item = new Item(dspaceItem, "", context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
-                        request);
+                        request, context);
                 items.add(item);
             }
 
