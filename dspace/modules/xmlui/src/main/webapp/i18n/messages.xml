@@ -877,6 +877,12 @@
 	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
 	<message key="xmlui.Submission.submit.DescribeStep.series_name">Volume</message>
 	<message key="xmlui.Submission.submit.DescribeStep.report_no">Number</message>
+	<message key="xmlui.Submission.submit.DescribeStep.add">Add</message>
+	<message key="xmlui.Submission.submit.DescribeStep.update">Update</message>
+	<message key="xmlui.Submission.submit.DescribeStep.remove">Remove</message>
+	<message key="xmlui.Submission.submit.DescribeStep.edit">Edit</message>
+	<message key="xmlui.Submission.submit.DescribeStep.order">Order</message>
+	<message key="xmlui.Submission.submit.DescribeStep.author">Author</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
