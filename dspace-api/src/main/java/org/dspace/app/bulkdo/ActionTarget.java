@@ -145,7 +145,7 @@ class ActionTarget {
 
     private String[] getMetadateValue(String field) {
         if (obj.getType() == Constants.ITEM) {
-            DCValue[] values =  ((Item) obj).getMetadata(field);
+            DCValue[] values =  ((Item) obj).getMetadataByMetadataString(field);
             return DCValue.valuesFor(values);
         }
         return null;
