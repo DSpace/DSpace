@@ -152,8 +152,7 @@ public class DatabaseUtils
             
             // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
             // In this situation, we have a Registry Updater that runs PRE-migration
-            // and a Reindexer that runs POST-migration
-            flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseReindexer());
+            flywaydb.setCallbacks(new DatabaseRegistryUpdater());
         }
         
         return flywaydb;
