@@ -169,6 +169,12 @@ public class RegistryLoader
         // Check if this format already exists in our registry (by mime type)
         BitstreamFormat exists = BitstreamFormat.findByMIMEType(context, mimeType);
         
+        // If not found by mimeType, check by short description (since this must also be unique)
+        if(exists==null)
+        {    
+            exists = BitstreamFormat.findByShortDescription(context, shortDesc);
+        }
+            
         // If it doesn't exist, create it..otherwise skip it.
         if(exists==null)
         {
