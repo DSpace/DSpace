@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -270,10 +271,10 @@ public class DatabaseUtils
         
         // Is this DSpace 1.7.x? Look for the "dctyperegistry_seq" to NOT exist (it was deleted in 1.7)
         // NOTE: DSPACE 1.7.x only differs from 1.6 in a deleted sequence.
-        /*if(@TODO HOW DO WE CHECK IF A SEQUENCE EXISTS??)
+        if(!sequenceExists(connection, "dctyperegistry_seq"))
         {
             return "1.7";
-        }*/
+        }
         
         // Is this DSpace 1.6.x? Look for the "harvested_collection" table created in that version.
         if(tableExists(connection, "harvested_collection"))
@@ -287,12 +288,6 @@ public class DatabaseUtils
             return "1.5";
         }
          
-        // Is this DSpace 1.4.x? Look for the "Group2Group" table created in that version.
-        if(tableExists(connection, "Group2Group"))
-        {
-            return "1.4";
-        }
-        
         // Is this DSpace 1.4.x? Look for the "Group2Group" table created in that version.
         if(tableExists(connection, "Group2Group"))
         {
@@ -457,6 +452,111 @@ public class DatabaseUtils
             }
         }
         
+        return exists;
+    }
+    
+    /*
+     * Determine if a particular database sequence exists in our database
+     * 
+     * @param connection
+     *          Current Database Connection
+     * @param sequenceName
+     *          The name of the table
+     * @return true if sequence of that name exists, false otherwise
+     */
+    public static boolean sequenceExists(Connection connection, String sequenceName)
+    {
+        // Get the name of the Schema that the DSpace Database is using
+        // (That way we can search the right schema)
+        String schema = ConfigurationManager.getProperty("db.schema");
+        if(StringUtils.isBlank(schema)){
+            schema = null;
+        }
+
+        boolean exists = false;
+        PreparedStatement statement = null;
+        ResultSet results = null;
+        // Whether or not to filter query based on schema (this is DB Type specific)
+        boolean schemaFilter = false;
+
+        try
+        {
+            // Different database types store sequence information in different tables
+            String dbtype = DatabaseManager.getDbKeyword();
+            String sequenceSQL = null;
+            switch(dbtype)
+            {
+                case DatabaseManager.DBMS_POSTGRES:
+                    // Default schema in PostgreSQL is "public"
+                    if(schema == null)
+                    {    
+                        schema = "public";
+                    }
+                    // PostgreSQL specific query for a sequence in a particular schema
+                    sequenceSQL = "SELECT COUNT(*) FROM pg_class, pg_namespace " +
+                                    "WHERE pg_class.relnamespace=pg_namespace.oid " +
+                                    "AND pg_class.relkind='S' " +
+                                    "AND pg_class.relname=? " +
+                                    "AND pg_namespace.nspname=?";
+                    // We need to filter by schema in PostgreSQL
+                    schemaFilter = true;
+                    break;
+                case DatabaseManager.DBMS_ORACLE:
+                    // Oracle specific query for a sequence owned by our current DSpace user
+                    // NOTE: No need to filter by schema for Oracle, as Schema = User
+                    sequenceSQL = "SELECT COUNT(*) FROM user_sequences WHERE sequence_name=?";
+                    break;
+                case DatabaseManager.DBMS_H2:
+                    // In H2, sequences are listed in the "information_schema.sequences" table
+                    // SEE: http://www.h2database.com/html/grammar.html#information_schema
+                    sequenceSQL = "SELECT COUNT(*) " +
+                                    "FROM INFORMATION_SCHEMA.SEQUENCES " +
+                                    "WHERE SEQUENCE_NAME = ?";
+                    break;
+                default:
+                    throw new SQLException("DBMS " + dbtype + " is unsupported.");
+            }
+            
+            // If we have a SQL query to run for the sequence, then run it
+            if (sequenceSQL!=null)
+            {
+                // Run the query, passing it our parameters
+                statement = connection.prepareStatement(sequenceSQL);
+                statement.setString(1, StringUtils.upperCase(sequenceName));
+                if(schemaFilter)
+                {
+                    statement.setString(2, StringUtils.upperCase(schema));
+                }
+                results = statement.executeQuery();
+
+                // If results are non-zero, then this sequence exists!
+                if(results!=null && results.next())
+                {
+                   exists = true;
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            log.error("Error attempting to determine if sequence " + sequenceName + " exists", e);
+        }
+        finally
+        {
+            try
+            {
+                // Ensure statement gets closed
+                if(statement!=null && !statement.isClosed())
+                    statement.close();
+                // Ensure ResultSet gets closed
+                if(results!=null && !results.isClosed())
+                    results.close();
+            }
+            catch(SQLException e)
+            {
+                // ignore it
+            }
+        }
+
         return exists;
     }
 }
