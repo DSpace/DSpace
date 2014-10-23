@@ -45,6 +45,8 @@ and searching the repository.
 			<map:transformer name="ItemRequestStatusChanged" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestStatusChanged" />
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
+			<map:transformer name="RequestCorrectionForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.RequestCorrectionForm" />
+			<map:transformer name="RequestCorrectionSent" 	src="org.dspace.app.xmlui.aspect.artifactbrowser.RequestCorrectionSent" />
         </map:transformers>
 
 
@@ -62,6 +64,7 @@ and searching the repository.
 			<map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction" />
 			<map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction" />
 			<map:action name="ItemRequestResponseAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseAction" />
+			<map:action name="SendRequestCorrectionAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendRequestCorrectionAction" />
 		</map:actions>
 
 
@@ -271,6 +274,30 @@ and searching the repository.
 
 			</map:match> <!-- End match handle/*/** -->
 
+			<map:match pattern="requestCorrection/**">
+				<map:select type="AuthenticatedSelector"> 
+				    <map:when test="eperson"> 
+				     	<map:act type="SendRequestCorrectionAction">
+							<map:parameter name="handle" value="{1}" />
+							<map:transform type="RequestCorrectionForm">
+								<map:parameter name="handle" value="{handle}" />
+								<map:parameter name="comments" value="{comments}" />
+								<map:parameter name="email" value="{email}" />
+								<map:parameter name="page" value="{page}" />
+							</map:transform>
+						<map:serialize type="xml" />
+					</map:act>
+					<map:transform type="RequestCorrectionSent" />
+					<map:serialize type="xml" />
+				   </map:when> 
+				    <map:otherwise> 
+				     <map:transform type="RestrictedItem"/> 
+						<map:serialize type="xml"/> 
+				    </map:otherwise> 
+				  </map:select>
+				<map:transform type="RequestCorrectionSent" />
+				<map:serialize type="xml" />
+			</map:match>
 
 			<!-- A simple feedback utility that presents the user with a form to fill 
 				out, the results of which are emailed to the site administrator. -->
