@@ -35,7 +35,7 @@ public class ItemMarkingMetadataStrategy implements ItemMarkingExtractor {
 		
 		if (metadataField != null && mapping!=null)
 		{
-			DCValue[] vals = item.getMetadata(metadataField);
+			DCValue[] vals = item.getMetadataByMetadataString(metadataField);
 			if (vals.length > 0)
 			{
 				for (DCValue value : vals){
