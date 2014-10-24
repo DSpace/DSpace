@@ -16,6 +16,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
@@ -23,7 +24,7 @@ import org.dspace.utils.DSpace;
 
 /**
  * Extracts metadata from manuscript objects and places in corresponding Dryad
- * Data Package submission (if DOI present)
+ * Data Package submission (if DOI or reviewer URL present)
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class ManuscriptMetadataSynchronizationHandler implements HandlerInterface<Manuscript>{
@@ -70,37 +71,32 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         // TODO: Anything for deletions?
     }
 
-
-    private static IdentifierService getIdentifierService() {
-        DSpace dspace = new DSpace();
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(IdentifierService.class.getName(), IdentifierService.class);
-    }
-
-
+    /**
+     * Find a data package based on manuscript data. Prefer DOI, then reviewer URL, then manuscript number
+     * @param manuscript a manuscript object containing one of the identifiers
+     * @param context database context
+     * @return a {@link DryadDataPackage} object if the item could be found, null otherwise
+     * @throws HandlerException if an error occurred during the lookup
+     */
     private static DryadDataPackage findDataPackage(Manuscript manuscript, Context context) throws HandlerException {
         String doi = manuscript.dryadDataDOI;
+        String reviewerURL = manuscript.dryadReviewerURL;
+        String manuscriptId = manuscript.manuscriptId;
         DryadDataPackage dataPackage = null;
         try {
-            // First look up by DOI
-            if(doi != null) {
-                DSpaceObject object = getIdentifierService().resolve(context, doi);
-                if(object.getType() == Constants.ITEM) {
-                    dataPackage = new DryadDataPackage((Item)object);
-                } else {
-                    throw new HandlerException("DOI " + doi + " does not resolve to an item");
-                }
-            } else {
-                try {
-                    dataPackage = DryadDataPackage.findByManuscriptNumber(context, manuscript.manuscriptId);
-                } catch (SQLException ex) {
-                    throw new HandlerException("SQLException finding package by manuscript ID", ex);
-                }
+            if(doi != null && !doi.isEmpty()) {
+                // 1. look up by DOI
+                dataPackage = DryadDataPackage.findByIdentifier(context, doi);
+            } else if(reviewerURL != null && !reviewerURL.isEmpty()) {
+                // 2. look up by reviewer url
+                dataPackage = DryadDataPackage.findByReviewerURL(context, reviewerURL);
+            } else if(manuscriptId != null && !manuscriptId.isEmpty()) {
+                dataPackage = DryadDataPackage.findByManuscriptNumber(context, manuscriptId);
             }
-        } catch (IdentifierNotFoundException ex) {
-            throw new HandlerException("Unable to find data package with DOI: " + doi, ex);
-        } catch (IdentifierNotResolvableException ex) {
-            throw new HandlerException("Unable to resolve DOI: " + doi, ex);
+        } catch (IdentifierException ex) {
+            throw new HandlerException("Identifier exception finding data package", ex);
+        } catch (SQLException ex) {
+            throw new HandlerException("SQL Exception finding data package", ex);
         }
         return dataPackage;
     }
