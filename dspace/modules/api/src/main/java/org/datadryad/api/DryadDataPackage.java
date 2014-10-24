@@ -3,11 +3,16 @@
 package org.datadryad.api;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -15,14 +20,21 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowConfigurationException;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -327,6 +339,75 @@ public class DryadDataPackage extends DryadObject {
     @Override
     Set<DryadObject> getRelatedObjects(final Context context) throws SQLException {
         return new HashSet<DryadObject>(getDataFiles(context));
+    }
+
+    public static DryadDataPackage findByIdentifier(Context context, String doi) throws IdentifierException {
+        DryadDataPackage dataPackage = null;
+        IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
+        DSpaceObject object = service.resolve(context, doi);
+        if(object.getType() == Constants.ITEM) {
+            dataPackage = new DryadDataPackage((Item)object);
+        } else {
+            throw new IdentifierException("DOI " + doi + " does not resolve to an item");
+        }
+        return dataPackage;
+    }
+
+    // From http://stackoverflow.com/questions/13592236/parse-the-uri-string-into-name-value-collection-in-java
+    public static Map<String, String> splitQuery(URL url) throws UnsupportedEncodingException {
+        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        String query = url.getQuery();
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            int idx = pair.indexOf("=");
+            query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+        }
+        return query_pairs;
+    }
+
+    /**
+     * Finds a data package by the reviewer URL. reviewer URL may have DOI or wfID
+     * @param context Database context
+     * @param reviewerURL a URL containing doi or wfID query parameters
+     * @return a DryadDataPackage if one exists matching the identifier
+     */
+    public static DryadDataPackage findByReviewerURL(Context context, String reviewerURL) throws IdentifierException, SQLException {
+        DryadDataPackage dataPackage = null;
+        // Decompose the reviewer URL. Contains identifiers in query parameters:
+        // wfID or doi
+        try {
+            URL url = new URL(reviewerURL);
+            Map<String, String> queryMap = splitQuery(url);
+            if(queryMap.containsKey("doi")) {
+                String doi = queryMap.get("doi");
+                return findByIdentifier(context, doi);
+            } else if(queryMap.containsKey("wfID")) {
+                Integer workflowItemId = Integer.valueOf(queryMap.get("wfID"));
+                return findByWorkflowItemId(context, workflowItemId);
+            }
+        } catch (MalformedURLException ex) {
+            log.error("Unable to parse URL: " + reviewerURL, ex);
+        } catch (UnsupportedEncodingException ex) {
+            log.error("Unable to decode URL:" + reviewerURL, ex);
+        } catch (NumberFormatException ex) {
+            log.error("Unable to read workflow id", ex);
+        }
+        return dataPackage;
+    }
+
+    public static DryadDataPackage findByWorkflowItemId(Context context, Integer workflowItemId) throws SQLException {
+        DryadDataPackage dataPackage = null;
+        try {
+            WorkflowItem wfi = WorkflowItem.find(context, workflowItemId);
+            dataPackage = new DryadDataPackage(wfi.getItem());
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception getting data package from Workflow Item ID", ex);
+        } catch (IOException ex) {
+            log.error("IO exception getting data package from Workflow Item ID", ex);
+        } catch (WorkflowConfigurationException ex) {
+            log.error("Workflow configuration exception", ex);
+        }
+        return dataPackage;
     }
 
     public static DryadDataPackage findByManuscriptNumber(Context context, String manuscriptNumber) throws SQLException {
