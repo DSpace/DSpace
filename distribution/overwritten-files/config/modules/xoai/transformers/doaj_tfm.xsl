@@ -23,7 +23,6 @@
 	</doc:element>
 	-->
 	<xsl:template match="doc:element" mode="transformLanguageInAttribute">
-		entrÉeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 		<doc:element>
 			<xsl:attribute name="name">
 				<xsl:call-template name="languageTransformer">
@@ -32,7 +31,6 @@
 			</xsl:attribute>
 			<xsl:copy-of select=".//*"/>
 		</doc:element>
-		/entrÉeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 	</xsl:template>
 	
 	<!-- Keywords accord ISO 639-2B:sedici.subject.(materias|lcsh|decs|eurovoc|descriptores|other|keyword) -->
@@ -47,7 +45,6 @@
 	
 	<!-- dc.title accord ISO 639-2B -->
 	<xsl:template match="doc:element[@name='dc']/doc:element[@name='title']/doc:element[@name != 'alternative']">
-		consegui el titulooooooooo <xsl:value-of select="./@name"/> <xsl:value-of select="./doc:field/text()"/>
 		<xsl:apply-templates select="." mode="transformLanguageInAttribute"/>
 	</xsl:template>
 	
