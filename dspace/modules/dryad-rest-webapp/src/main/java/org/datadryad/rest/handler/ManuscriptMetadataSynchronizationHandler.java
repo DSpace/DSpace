@@ -137,7 +137,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         // set Manuscript ID
         dataPackage.setManuscriptNumber(manuscript.manuscriptId);
         // union keywords
-        List<String> manuscriptKeywords = manuscript.keywords.keyword;
+        List<String> manuscriptKeywords = manuscript.getKeywords();
         dataPackage.addKeywords(manuscriptKeywords);
         // set title
         if(manuscript.title != null) {
@@ -158,7 +158,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
         dataPackage.setManuscriptNumber(null);
         // disjoin keywords
         List<String> packageKeywords = dataPackage.getKeywords();
-        List<String> manuscriptKeywords = manuscript.keywords.keyword;
+        List<String> manuscriptKeywords = manuscript.getKeywords();
         List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
         
         dataPackage.setKeywords(prunedKeywords);
