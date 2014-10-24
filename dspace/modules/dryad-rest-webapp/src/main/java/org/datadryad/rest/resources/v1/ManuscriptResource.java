@@ -52,6 +52,7 @@ public class ManuscriptResource {
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
             return Response.ok(manuscriptStorage.getAll(path)).build();
         } catch (StorageException ex) {
+            log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();
         }
@@ -73,6 +74,7 @@ public class ManuscriptResource {
                 return Response.ok(manuscript).build();
             }
         } catch (StorageException ex) {
+            log.error("Exception getting manuscript", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to get manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();
         }
@@ -90,6 +92,7 @@ public class ManuscriptResource {
                 manuscript.organization = organizationStorage.findByPath(organizationPath);
                 manuscriptStorage.create(organizationPath, manuscript);
             } catch (StorageException ex) {
+                log.error("Exception creating manuscript", ex);
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to create manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
@@ -119,6 +122,7 @@ public class ManuscriptResource {
                 manuscript.organization = organizationStorage.findByPath(organizationPath);
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
+                log.error("Exception updating manuscript", ex);
                 ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
@@ -142,6 +146,7 @@ public class ManuscriptResource {
         try {
             manuscriptStorage.deleteByPath(path);
         } catch (StorageException ex) {
+            log.error("Exception deleting manuscript", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to delete manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();
         }
