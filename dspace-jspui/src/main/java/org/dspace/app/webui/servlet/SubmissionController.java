@@ -46,6 +46,7 @@ import org.dspace.submit.AbstractProcessingStep;
 import com.google.gson.Gson;
 import java.util.Collections;
 import javax.servlet.http.HttpSession;
+import org.dspace.submit.step.UploadStep;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -270,21 +271,47 @@ public class SubmissionController extends DSpaceServlet
                         }
                         else
                         {
-                            // We got the complete file. Add the file to the 
-                            // list of files that should be saved into the 
-                            // request when the user clicks the next button.
+                            // We got the complete file. Assemble it and store
+                            // it in the repository.
                             log.debug("Going to assemble file chunks.");
-                            HttpSession session = request.getSession(false);
-                            if (session != null)
+
+                            if (completedFile.length() > 0)
                             {
-                                synchronized(mutex)
+                                String fileName = completedFile.getName();
+                                String filePath = tempDir + File.separator + fileName;
+                                // Read the temporary file
+                                InputStream fileInputStream = 
+                                        new BufferedInputStream(new FileInputStream(completedFile));
+                                
+                                // to safely store the file in the repository
+                                // we have to add it as a bitstream to the
+                                // appropriate item (or to be specific its
+                                // bundle). Instead of rewriting this code,
+                                // we should use the same code, that's used for
+                                // the "old" file upload (which is not using JS).
+                                SubmissionInfo si = getSubmissionInfo(context, request);
+                                UploadStep us = new UploadStep();
+                                request.setAttribute(fileName + "-path", filePath);
+                                request.setAttribute(fileName + "-inputstream", fileInputStream);
+                                request.setAttribute(fileName + "-description", request.getParameter("description"));
+                                int uploadResult = us.processUploadFile(context, request, response, si);
+
+                                // cleanup our temporary file
+                                if (!completedFile.delete())
                                 {
-                                    if (session.getAttribute("assembled_files") == null)
-                                    {
-                                        session.setAttribute("assembled_files", new ArrayList<File>());
-                                    }
-                                    ((List<File>) session.getAttribute("assembled_files")).add(completedFile);
+                                    log.error("Unable to delete temporary file " + filePath);
                                 }
+
+                                // We already assembled the complete file.
+                                // In case of any error it won't help to
+                                // reupload the last chunk. That makes the error
+                                // handling realy easy:
+                                if (uploadResult != UploadStep.STATUS_COMPLETE)
+                                {
+                                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                                    return;
+                                }
+                                context.commit();
                             }
                             return;
                         }
@@ -1499,79 +1526,35 @@ public class SubmissionController extends DSpaceServlet
                 // Wrap multipart request to get the submission info
                 wrapper = new FileUploadRequest(request);
             }
-
-            HttpSession session = request.getSession(false);
-            List<File> assembledFiles = null;
-            if (session != null)
+            
+            log.debug("Did not recoginze resumable upload, falling back to "
+                    + "simple upload.");
+            Enumeration fileParams = wrapper.getFileParameterNames();
+            while (fileParams.hasMoreElements()) 
             {
-                synchronized(mutex)
+                String fileName = (String) fileParams.nextElement();
+
+                File temp = wrapper.getFile(fileName);
+
+                //if file exists and has a size greater than zero
+                if (temp != null && temp.length() > 0) 
                 {
-                    assembledFiles = (List<File>) session.getAttribute("assembled_files");
-                    if (assembledFiles != null)
+                    // Read the temp file into an inputstream
+                    fileInputStream = new BufferedInputStream(
+                            new FileInputStream(temp));
+
+                    filePath = wrapper.getFilesystemName(fileName);
+
+                    // cleanup our temp file
+                    if (!temp.delete()) 
                     {
-                        session.removeAttribute("assembled_files");
+                        log.error("Unable to delete temporary file");
                     }
-                }
-            }
-            if (assembledFiles != null)
-            {
-                log.debug("Recoginzed resumable upload, will assemble files...");
 
-                for (File file : assembledFiles)
-                {
-                    if (file != null && file.length() > 0)
-                    {
-                        String fileName = file.getName();
-                        // Read the temp file into an inputstream
-                        fileInputStream = new BufferedInputStream(
-                                new FileInputStream(file));
-
-                        filePath = tempDir + File.separator + file.getName();
-
-                        // cleanup our temp file
-                        if (!file.delete())
-                        {
-                            log.error("Unable to delete temporary file " + filePath);
-                        }
-
-                        //save this file's info to request (for UploadStep class)
-                        request.setAttribute(fileName + "-path", filePath);
-                        request.setAttribute(fileName + "-inputstream", fileInputStream);
-                        request.setAttribute(fileName + "-description", wrapper.getParameter("description"));
-                    }
-                }
-            }
-            else // falling back to unresumable upload
-            {
-                log.debug("Did not recoginze resumable upload, falling back to "
-                        + "simple upload.");
-                Enumeration fileParams = wrapper.getFileParameterNames();
-                while (fileParams.hasMoreElements()) 
-                {
-                    String fileName = (String) fileParams.nextElement();
-
-                    File temp = wrapper.getFile(fileName);
-
-                    //if file exists and has a size greater than zero
-                    if (temp != null && temp.length() > 0) 
-                    {
-                        // Read the temp file into an inputstream
-                        fileInputStream = new BufferedInputStream(
-                                new FileInputStream(temp));
-
-                        filePath = wrapper.getFilesystemName(fileName);
-
-                        // cleanup our temp file
-                        if (!temp.delete()) 
-                        {
-                            log.error("Unable to delete temporary file");
-                        }
-
-                        //save this file's info to request (for UploadStep class)
-                        request.setAttribute(fileName + "-path", filePath);
-                        request.setAttribute(fileName + "-inputstream", fileInputStream);
-                        request.setAttribute(fileName + "-description", wrapper.getParameter("description"));
-                    }
+                    //save this file's info to request (for UploadStep class)
+                    request.setAttribute(fileName + "-path", filePath);
+                    request.setAttribute(fileName + "-inputstream", fileInputStream);
+                    request.setAttribute(fileName + "-description", wrapper.getParameter("description"));
                 }
             }
         }

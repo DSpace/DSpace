@@ -41,6 +41,7 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+    request.setAttribute("submission.info", subInfo);
 
     boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
 
@@ -419,7 +420,8 @@
             simultaneousUploads:1,
             testChunks: true,
             throttleProgressCallbacks:1,
-            method: "multipart"
+            method: "multipart",
+            query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
           });
         // Resumable.js isn't supported, fall back on a different method
 
