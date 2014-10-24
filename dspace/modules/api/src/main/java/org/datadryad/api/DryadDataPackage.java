@@ -28,13 +28,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowConfigurationException;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -404,8 +401,6 @@ public class DryadDataPackage extends DryadObject {
             log.error("Authorize exception getting data package from Workflow Item ID", ex);
         } catch (IOException ex) {
             log.error("IO exception getting data package from Workflow Item ID", ex);
-        } catch (WorkflowConfigurationException ex) {
-            log.error("Workflow configuration exception", ex);
         }
         return dataPackage;
     }
