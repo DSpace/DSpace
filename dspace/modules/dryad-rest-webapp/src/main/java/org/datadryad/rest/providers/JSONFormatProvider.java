@@ -3,6 +3,8 @@
 package org.datadryad.rest.providers;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -22,9 +24,11 @@ public class JSONFormatProvider implements ContextResolver<ObjectMapper> {
 
     public JSONFormatProvider() throws Exception {
         this.objectMapper = new ObjectMapper();
-    this.objectMapper
-        .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        this.objectMapper
+            .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(SerializationConfig.Feature.INDENT_OUTPUT, true)
+            .setDateFormat(df);
     }
 
     @Override
