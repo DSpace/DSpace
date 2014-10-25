@@ -805,4 +805,20 @@ public final class BrowseIndex
     {
         return "bi_" + Integer.toString(number);
     }
+    
+    public boolean isLocaleEnabled(){
+    	String definition = ConfigurationManager.getProperty("webui.browse.index.locale." + number);
+    	if (definition == null)
+    		return false;
+
+    	return Boolean.parseBoolean(definition);
+    }
+    
+    public boolean isValuePairIndexingEnabled(){
+    	String definition = ConfigurationManager.getProperty("webui.browse.index.inputforms." + number);
+    	if (definition == null)
+    		return false;
+
+    	return Boolean.parseBoolean(definition);
+    }
 }

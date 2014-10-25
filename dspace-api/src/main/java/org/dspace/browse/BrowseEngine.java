@@ -10,6 +10,7 @@ package org.dspace.browse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -62,8 +63,17 @@ public class BrowseEngine
 
         // prepare the data access object
         dao = BrowseDAOFactory.getInstance(context);
+        
     }
 
+    public void setLocale(String locale){
+    	if (dao instanceof SolrBrowseDAO){
+        	SolrBrowseDAO solrDao = (SolrBrowseDAO)dao;
+        	
+        	solrDao.setLocale(locale);
+        }
+    }
+    
     /**
      * Perform a standard browse, which will return a BrowseInfo
      * object that represents the results for the current page, the

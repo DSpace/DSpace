@@ -61,6 +61,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -78,6 +80,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.DiscoverResult.SearchDocument;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
@@ -90,6 +93,7 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
+import org.dspace.sort.OrderFormat;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
@@ -1159,14 +1163,60 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	//Add a special filter
                            	 	//We use a separator to split up the lowercase and regular case, this is needed to get our filters in regular case
                             	//Solr has issues with facet prefix and cases
-                            	if (authority != null)
-                            	{
-                                	String facetValue = preferedLabel != null?preferedLabel:value;
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue.toLowerCase() + separator + facetValue + AUTHORITY_SEPARATOR + authority);
+                            	
+                            	DiscoverySearchFilterFacet searchFilterFacet = (DiscoverySearchFilterFacet)searchFilter;
+
+                            	Map<String, String> data = new HashMap<String, String>();
+
+                            	if (searchFilterFacet.isInputFormEnabled()){
+                            		Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+                            		for (Locale locale : supportedLocales)
+                            		{
+                            			String displayValue = null;
+                            			try {
+                            				displayValue = Util.getDisplayValueForStoredValue(item, value, meta.schema,
+                            						meta.element,
+                            						meta.qualifier, locale);
+                            			} catch (SQLException e) {
+                            				e.printStackTrace();
+                            			} catch (DCInputsReaderException e) {
+                            				e.printStackTrace();
+                            			}
+
+                            			if (displayValue != null)
+                            			{
+                            				data.put(displayValue, locale.getLanguage());
+                            				
+                            				doc.addField(searchFilter.getIndexFieldName() + "_keyword", displayValue);
+                            			}
+                            		}
                             	}
-                            	else
-                            	{
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
+                            	else {
+                            		String lang = null;
+
+                            		if (searchFilterFacet.isLocaleEnabled() && meta.language!=null && !meta.language.trim().equals("")){
+                            			lang = meta.language;
+                            		}
+                            		
+                            		if (authority != null)
+                                	{
+                            			String facetValue = preferedLabel != null?preferedLabel:value;
+                            			data.put(facetValue, lang);
+                                	}
+                            		else {
+                            			data.put(value, lang);
+                            		}
+                            	}
+
+                            	for (String myValue : data.keySet()){
+                            		if (authority != null)
+                            		{
+                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", myValue.toLowerCase() + separator + myValue + AUTHORITY_SEPARATOR + authority);
+                            		}
+                            		else
+                            		{
+                            			doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", myValue.toLowerCase() + separator + myValue);
+                            		}
                             	}
                             }else
                                 if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
@@ -1235,8 +1285,43 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     //We add the field x times that it has occurred
                                     for(int j = i; j < subValues.length; j++)
                                     {
-                                        doc.addField(searchFilter.getIndexFieldName() + "_filter", indexValue.toLowerCase() + separator + indexValue);
-                                        doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
+                                    	Map<String, String> data = new HashMap<String, String>();
+                                    	DiscoverySearchFilterFacet searchFilterFacet = (DiscoverySearchFilterFacet)searchFilter;
+                                    	
+                                    	if (searchFilterFacet.isInputFormEnabled()){
+                                    		Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+                                    		for (Locale locale : supportedLocales)
+                                    		{
+                                    			String displayValue = null;
+                                    			try {
+                                    				displayValue = Util.getDisplayValueForStoredValue(item, value, meta.schema,
+                                    						meta.element,
+                                    						meta.qualifier, locale);
+                                    			} catch (SQLException e) {
+                                    				e.printStackTrace();
+                                    			} catch (DCInputsReaderException e) {
+                                    				e.printStackTrace();
+                                    			}
+
+                                    			if (displayValue != null)
+                                    			{
+                                    				data.put(displayValue, locale.getLanguage());
+                                    			}
+                                    		}
+                                    	}
+                                    	else {
+                                    		String lang = null;
+                                        	if (searchFilterFacet.isLocaleEnabled() && meta.language!=null && !meta.language.trim().equals("")){
+                                            	lang = meta.language;
+                                            }
+                                        	
+                                        	data.put(indexValue, lang);
+                                    	}
+                                    	
+                                    	for (String myValue : data.keySet()){
+                                    		doc.addField(searchFilter.getIndexFieldName() + (data.get(myValue)!=null?"_"+Util.getMappedLocaleForLanguage(data.get(myValue)):"") + "_filter", myValue.toLowerCase() + separator + myValue);
+                                    		doc.addField(searchFilter.getIndexFieldName() + "_keyword", myValue);
+                                    	}
                                     }
                                 }
                             }
@@ -2132,9 +2217,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             if(removePostfix)
             {
-                return field.substring(0, field.lastIndexOf("_filter"));
+                return field.substring(0, field.lastIndexOf("_filter")).replace(facetFieldConfig.getLocale(), "");
             }else{
-                return field + "_filter";
+                return field + facetFieldConfig.getLocale() + "_filter";
             }
         }else if(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
         {
