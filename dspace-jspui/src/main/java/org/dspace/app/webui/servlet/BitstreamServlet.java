@@ -218,6 +218,9 @@ public class BitstreamServlet extends DSpaceServlet
 			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
 		}
 
+        //DO NOT REMOVE IT - WE NEED TO FREE DB CONNECTION TO AVOID CONNECTION POOL EXHAUSTION FOR BIG FILES AND SLOW DOWNLOADS
+        context.complete();
+
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
