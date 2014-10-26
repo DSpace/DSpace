@@ -1050,7 +1050,7 @@ public class Collection extends DSpaceObject
             IOException
     {
         // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         // will the item be an orphan?
         TableRow row = DatabaseManager.querySingle(ourContext,
@@ -1061,6 +1061,7 @@ public class Collection extends DSpaceObject
         if (row.getLongColumn("num") == 1)
         {
             // Orphan; delete it
+            AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
             item.delete();
         }
         log.info(LogManager.getHeader(ourContext, "remove_item",
