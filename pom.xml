@@ -101,6 +101,24 @@
                 </configuration>
              </plugin>
              <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>findbugs-maven-plugin</artifactId>
+                  <version>3.0.0</version>
+                  <configuration>
+                      <effort>Max</effort>
+                      <threshold>Low</threshold>
+                      <xmlOutput>true</xmlOutput>
+                  </configuration>
+                  <executions>
+                      <execution>
+                          <phase>compile</phase>
+                          <goals>
+                              <goal>check</goal>
+                          </goals>
+                      </execution>
+                  </executions>
+             </plugin>
+             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
              </plugin>
@@ -1159,6 +1177,19 @@
               <groupId>com.google.oauth-client</groupId>
               <artifactId>google-oauth-client-jetty</artifactId>
               <version>1.19.0</version>
+          </dependency>
+          <!-- Findbugs annotations -->
+          <dependency>
+              <groupId>com.google.code.findbugs</groupId>
+              <artifactId>jsr305</artifactId>
+              <version>3.0.0</version>
+              <scope>provided</scope>
+          </dependency>
+          <dependency>
+              <groupId>com.google.code.findbugs</groupId>
+              <artifactId>annotations</artifactId>
+              <version>3.0.0</version>
+              <scope>provided</scope>
           </dependency>
       </dependencies>
    </dependencyManagement>
