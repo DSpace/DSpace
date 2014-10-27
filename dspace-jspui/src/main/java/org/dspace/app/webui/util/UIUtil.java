@@ -510,12 +510,21 @@ public class UIUtil extends Util
     		
             String mark = markType.replace("mark_", "");
             
-            ItemMarkingInfo markInfo = new DSpace()
+            ItemMarkingExtractor markingExtractor = new DSpace()
 				.getServiceManager()
 				.getServiceByName(
-					ItemMarkingExtractor.class.getName()+"."+mark,
-					ItemMarkingExtractor.class)
-					.getItemMarkingInfo(c, item);
+						ItemMarkingExtractor.class.getName()+"."+mark,
+						ItemMarkingExtractor.class);
+            
+            if (markingExtractor == null){ // In case we cannot find the corresponding extractor (strategy) in xml beans
+            	return "";
+            }
+            
+            ItemMarkingInfo markInfo = markingExtractor.getItemMarkingInfo(c, item);
+            
+            if (markInfo == null){
+            	return "";
+            }
             
             StringBuffer markFrag = new StringBuffer();
             
@@ -526,7 +535,7 @@ public class UIUtil extends Util
             		
             String markLink = markInfo.getLink();
             
-            if (markInfo!=null && markInfo.getImageName()!=null){
+            if (markInfo.getImageName()!=null){
             	
             	//Link
             	if (StringUtils.isNotEmpty(markLink)){
@@ -549,7 +558,7 @@ public class UIUtil extends Util
             		markFrag.append("</a>");
             	}
             }
-            else  if (markInfo!=null && markInfo.getClassInfo()!=null){
+            else  if (markInfo.getClassInfo()!=null){
             	//Link
             	if (StringUtils.isNotEmpty(markLink)){
             		markFrag.append("<a href=\"")
