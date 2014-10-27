@@ -7,25 +7,6 @@
  */
 package org.dspace.checker;
 
-import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,6 +15,19 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * <p>
@@ -157,23 +151,23 @@ public class DailyReportEmailer
 
         options.addOption("h", "help", false, "Help");
 
-        options.addOption("a", "All", false, "Generate all reports (default)");
-        options.addOption("d", "Deleted", false,
+        options.addOption("a", "all", false, "Generate all reports (default)");
+        options.addOption("d", "deleted", false,
                         "Generate report for all bitstreams set as deleted");
-        options.addOption("m", "Missing", false,
+        options.addOption("m", "missing", false,
                 "Generate report for all bitstreams not found in assetstore");
-        options.addOption("c", "Changed", false,
+        options.addOption("c", "changed", false,
                 "Generate report for all bitstreams where checksum has been changed");
-        options.addOption("u", "Unchecked", false,  "Generate Unchecked bitstream report");
-        options.addOption("n", "Not Processed", false,
+        options.addOption("u", "unchecked", false,  "Generate Unchecked bitstream report");
+        options.addOption("n", "notprocessed", false,
                 "Generate report for all bitstreams set to longer be processed for today");
 
-        options.addOption("e", "Eternity", false, "Include all checksum info not just the ones from today");
+        options.addOption("e", "eternity", false, "Include all checksum info not just the ones from today");
 
-        options.addOption("T", "TSV", false, "Generate tsv formatted output");
-        options.addOption("A", "ASCII", false, "Generate ASCII text output  (default)");
+        options.addOption("t", "tsv", false, "Generate tsv formatted output");
+        options.addOption("a", "ascii", false, "Generate ASCII text output  (default)");
 
-        options.addOption("V", "verbose", false, "Chatty data output");
+        options.addOption("v", "verbose", false, "Chatty data output");
 
         OptionBuilder emailadr = OptionBuilder
                 .withArgName("emailadr")
