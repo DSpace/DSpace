@@ -23,6 +23,9 @@ import org.dspace.storage.rdbms.TableRow;
 public class DSpaceProvider
         extends IdentifierProvider
 {
+    /** Database table to hold DSpace object identifiers. */
+    private static final String ID_TABLE = "ObjectID";
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
     {
@@ -32,7 +35,7 @@ public class DSpaceProvider
     @Override
     public boolean supports(String type)
     {
-        return QUALIFIER.equalsIgnoreCase(type);
+        return "dspace".equalsIgnoreCase(type);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class DSpaceProvider
     {
         String id = mint(context, dso);
         try {
-            TableRow row = DatabaseManager.create(context, "ObjectID");
+            TableRow row = DatabaseManager.create(context, ID_TABLE);
             row.setColumn("dspace_id", id);
             row.setColumn("object_id", dso.getID());
             row.setColumn("object_type", dso.getType());
@@ -68,7 +71,7 @@ public class DSpaceProvider
     {
         TableRow row;
         try {
-            row = DatabaseManager.querySingleTable(context, "ObjectID",
+            row = DatabaseManager.querySingleTable(context, ID_TABLE,
                     "SELECT object_id, object_type FROM ObjectID WHERE dspace_id = ?",
                     identifier);
         } catch (SQLException ex)
@@ -94,11 +97,12 @@ public class DSpaceProvider
     {
         TableRow row;
         try {
-            row = DatabaseManager.querySingleTable(context, "ObjectID",
+            row = DatabaseManager.querySingleTable(context, ID_TABLE,
                     "SELECT dspace_id from ObjectID WHERE object_id = ? AND object_type = ?",
                     object.getID(), object.getType());
         } catch (SQLException ex) {
-            throw new IdentifierNotFoundException(ex);
+            throw new IdentifierNotFoundException("Failed to fetch identifier for "
+                    + object.getTypeText() + " with ID " + object.getID(), ex);
         }
         return row.getStringColumn("dspace_id");
     }
@@ -107,7 +111,15 @@ public class DSpaceProvider
     public void delete(Context context, DSpaceObject dso)
             throws IdentifierException
     {
-        dso.clearMetadata(DSPACE_SCHEMA, ELEMENT, QUALIFIER, Item.ANY);
+        try {
+            DatabaseManager.querySingleTable(context, ID_TABLE,
+                    "DELETE FROM ObjectID WHERE object_id = ? AND object_type = ?",
+                    dso.getID(), dso.getType());
+            context.commit();
+        } catch (SQLException ex) {
+            throw new IdentifierException("Could not delete " + dso.getTypeText()
+                    + " with ID " + dso.getID(), ex);
+        }
     }
 
     @Override
