@@ -44,7 +44,7 @@ public class DSpaceProvider
     {
         String id = mint(context, dso);
         try {
-            TableRow row = DatabaseManager.create(context, ID_TABLE);
+            TableRow row = DatabaseManager.row(ID_TABLE);
             row.setColumn("dspace_id", id);
             row.setColumn("object_id", dso.getID());
             row.setColumn("object_type", dso.getType());
@@ -55,6 +55,13 @@ public class DSpaceProvider
             throw new IdentifierException("Unable to store a DSpace object identifier", ex);
         }
         return id;
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject object, String identifier)
+            throws IdentifierException
+    {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
@@ -72,7 +79,7 @@ public class DSpaceProvider
         TableRow row;
         try {
             row = DatabaseManager.querySingleTable(context, ID_TABLE,
-                    "SELECT object_id, object_type FROM ObjectID WHERE dspace_id = ?",
+                    "SELECT object_id, object_type FROM objectid WHERE dspace_id = ?",
                     identifier);
         } catch (SQLException ex)
         {
@@ -98,13 +105,16 @@ public class DSpaceProvider
         TableRow row;
         try {
             row = DatabaseManager.querySingleTable(context, ID_TABLE,
-                    "SELECT dspace_id from ObjectID WHERE object_id = ? AND object_type = ?",
+                    "SELECT dspace_id from objectid WHERE object_id = ? AND object_type = ?",
                     object.getID(), object.getType());
         } catch (SQLException ex) {
             throw new IdentifierNotFoundException("Failed to fetch identifier for "
                     + object.getTypeText() + " with ID " + object.getID(), ex);
         }
-        return row.getStringColumn("dspace_id");
+        if (null == row)
+            throw new IdentifierNotFoundException();
+        else
+            return row.getStringColumn("dspace_id");
     }
 
     @Override
@@ -113,7 +123,7 @@ public class DSpaceProvider
     {
         try {
             DatabaseManager.querySingleTable(context, ID_TABLE,
-                    "DELETE FROM ObjectID WHERE object_id = ? AND object_type = ?",
+                    "DELETE FROM objectid WHERE object_id = ? AND object_type = ?",
                     dso.getID(), dso.getType());
             context.commit();
         } catch (SQLException ex) {
@@ -131,13 +141,6 @@ public class DSpaceProvider
 
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier)
-            throws IdentifierException
-    {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public void register(Context context, DSpaceObject object, String identifier)
             throws IdentifierException
     {
         throw new UnsupportedOperationException("Not supported.");
