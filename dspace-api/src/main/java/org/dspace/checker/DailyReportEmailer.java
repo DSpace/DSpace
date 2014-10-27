@@ -257,8 +257,8 @@ public class DailyReportEmailer
 
             // create a new simple reporter that uses writer for output
             ReportWriter rw = null;
-            int verbose = line.hasOption('V') ? 1 : 0;
-            if (line.hasOption('T')) {
+            int verbose = line.hasOption('v') ? 1 : 0;
+            if (line.hasOption('t')) {
                 rw = new TSVReportWriter(writer, verbose, ctxt);
             }
             else
