@@ -24,22 +24,28 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is a FlywayCallback class which automatically reindexes Database
- * contents into your search/browse engine of choice.
+ * contents into your Legacy search/browse engine of choice. It is NOT needed
+ * for Solr, but is necessary for Lucene / RDBMS indexes.
  * <P>
  * Reindexing is performed AFTER any database migration or repair. This
  * ensures that your search/browse indexes are auto-updated post-upgrade.
  * 
  * @author Tim Donohue
  */
-public class DatabaseReindexer implements FlywayCallback
+public class DatabaseLegacyReindexer implements FlywayCallback
 {
     /** logging category */
-    private static final Logger log = LoggerFactory.getLogger(DatabaseReindexer.class);
+    private static final Logger log = LoggerFactory.getLogger(DatabaseLegacyReindexer.class);
     
     /**
      * Method to actually reindex all database contents. This method is "smart"
      * in that it determines which indexing consumer(s) you have enabled, 
      * and then ensures each is reindexed appropriately.
+     * <P>
+     * NOTE: However, because Solr is never running when the Database is initialized,
+     * this reindexer only really works for Lucene / DBMS. Once those are obsolete,
+     * this can be safely removed, along with the reference to it in
+     * DatabaseUtils.setupFlyway()
      */
     private void reindex()
     {
@@ -56,19 +62,10 @@ public class DatabaseReindexer implements FlywayCallback
             // If Discovery indexing is enabled
             if (consumerList.contains("discovery"))
             {
-                log.info("Reindexing all content in Discovery search and browse engine");
-                try
-                {
-                    // Reindex Discovery (just clean & update index)
-                    DSpace dspace = new DSpace();
-                    IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
-                    indexer.cleanIndex(true);
-                    indexer.updateIndex(context, true);
-                }
-                catch(SearchServiceException sse)
-                {
-                    log.warn("Unable to reindex content in Discovery search and browse engine. You will need to reindex manually.", sse);
-                }
+                // Do nothing
+                // Because Solr is normally not running when the DatabaseManager initializes,
+                // Discovery autoindexing takes place in DatabaseUtils.checkReindexDiscovery(),
+                // which is automatically called when Discover initializes.
             }
             
             // If Lucene indexing is enabled
@@ -78,6 +75,7 @@ public class DatabaseReindexer implements FlywayCallback
                 // Clean and update Lucene index
                 DSIndexer.cleanIndex(context);
                 DSIndexer.updateIndex(context, true);
+                log.info("Reindexing is complete");
             }
             
             // If traditional DBMS browse indexing is enabled
@@ -92,6 +90,7 @@ public class DatabaseReindexer implements FlywayCallback
                 indexer.initBrowse();
                 // Since the browse index is in the DB, we must commit & close context
                 context.complete();
+                log.info("Reindexing is complete");
             }
             else
             {
@@ -103,8 +102,6 @@ public class DatabaseReindexer implements FlywayCallback
                 // Commit changes to browse tables & close context
                 context.complete();
             }
-            
-            log.info("Reindexing is complete");
         }
         catch(Exception e)
         {

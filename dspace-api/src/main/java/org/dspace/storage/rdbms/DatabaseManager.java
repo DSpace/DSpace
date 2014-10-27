@@ -1511,72 +1511,38 @@ public class DatabaseManager
 
         try
         {
-            String jndiName = ConfigurationManager.getProperty("db.jndi");
-            if (!StringUtils.isEmpty(jndiName))
-            {
-                try
-                {
-                    javax.naming.Context ctx = new InitialContext();
-                    javax.naming.Context env = ctx == null ? null : (javax.naming.Context)ctx.lookup("java:/comp/env");
-                    dataSource = (DataSource)(env == null ? null : env.lookup(jndiName));
-                }
-                catch (Exception e)
-                {
-                    log.error("Error retrieving JNDI context: " + jndiName, e);
-                }
-
-                if (dataSource != null)
-                {
-                    log.debug("Using JNDI dataSource: " + jndiName);
-                }
-                else
-                {
-                    log.info("Unable to locate JNDI dataSource: " + jndiName);
-                }
-            }
-
-            if (dataSource == null)
-            {
-                if (!StringUtils.isEmpty(jndiName))
-                {
-                    log.info("Falling back to creating own Database pool");
-                }
-
-                dataSource = DataSourceInit.getDatasource();
-            }
+            // Initialize our data source
+            dataSource = initDataSource();
 
             // What brand of DBMS do we have?
             Connection connection = dataSource.getConnection();
             DatabaseMetaData meta = connection.getMetaData();
             dbms = meta.getDatabaseProductName();
-            String dbms_lc = dbms.toLowerCase(Locale.ROOT);
-            if (dbms_lc.contains("postgresql"))
+            log.info("DBMS is '{}'", dbms);
+            log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
+            
+            // Based on our DBMS type, determine how to categorize it
+            dbms_keyword = findDbKeyword(meta);
+            if(dbms_keyword!=null && dbms_keyword.equals(DBMS_POSTGRES))
             {
                 isPostgres = true;
-                dbms_keyword = DBMS_POSTGRES;
-                log.info("DBMS is PostgreSQL");
             }
-            else if (dbms_lc.contains("oracle"))
+            else if(dbms_keyword!=null && dbms_keyword.equals(DBMS_ORACLE))
             {
                 isOracle = true;
-                dbms_keyword = DBMS_ORACLE;
-                log.info("DBMS is Oracle Database");
             }
-            else if (dbms_lc.contains("h2")) // Used for unit testing only
+            else if(dbms_keyword!=null && dbms_keyword.equals(DBMS_H2))
             {
                 // We set "isOracle=true" for H2 simply because it's NOT 100%
                 // PostgreSQL compatible. So, code which is highly PostgreSQL
                 // specific often may not work properly on H2.
                 // I.e. this acts more like a "isNotPostgreSQL" flag
                 isOracle = true;
-                dbms_keyword = DBMS_H2;
-                log.info("DBMS is H2");
             }
             else
             {
                 log.error("DBMS {} is unsupported", dbms);
             }
-            log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
 
             // While technically we have one more step to complete (see below),
             // at this point the DatabaseManager class is initialized so that
@@ -1604,6 +1570,96 @@ public class DatabaseManager
         }
     }
     
+    /**
+     * Initialize just the DataSource for the DatabaseManager.
+     * <P>
+     * While this is normally called via initialize() to create the globally
+     * shared DataSource, it also may be called individually just to test the
+     * Database Connection settings. This second use case often needs to avoid
+     * a full initialization/migration of the Database, which takes much longer
+     * and may not be necessary just for testing a basic connection. See, for
+     * example, DatabaseUtils.main().
+     *
+     * @return initialized DataSource, or null if could not be initialized
+     * @throws SQLException if an initialization error occurs
+     */
+    protected static DataSource initDataSource()
+            throws SQLException
+    {
+        DataSource dSource = null;
+
+        String jndiName = ConfigurationManager.getProperty("db.jndi");
+        if (!StringUtils.isEmpty(jndiName))
+        {
+            try
+            {
+                javax.naming.Context ctx = new InitialContext();
+                javax.naming.Context env = ctx == null ? null : (javax.naming.Context)ctx.lookup("java:/comp/env");
+                dSource = (DataSource)(env == null ? null : env.lookup(jndiName));
+            }
+            catch (Exception e)
+            {
+                log.error("Error retrieving JNDI context: " + jndiName, e);
+            }
+
+            if (dSource != null)
+            {
+                log.debug("Using JNDI dataSource: " + jndiName);
+            }
+            else
+            {
+                log.info("Unable to locate JNDI dataSource: " + jndiName);
+            }
+        }
+
+        if (dSource == null)
+        {
+            if (!StringUtils.isEmpty(jndiName))
+            {
+                log.info("Falling back to creating own Database pool");
+            }
+
+            dSource = DataSourceInit.getDatasource();
+        }
+
+        return dSource;
+    }
+
+    /**
+     * Return the "DbKeyword" for a specific database name.
+     * <P>
+     * This is mostly a utility method for initialize(), but also comes in
+     * handy when you want basic info about the Database but *don't* want
+     * to actually fully initialize the DatabaseManager (as it will also
+     * run all pending DB migrations)
+     *
+     * @param meta the DatabaseMetaData
+     * @return DB Keyword for this database, or null if not found
+     * @throws SQLException if an initialization error occurs
+     */
+    protected static String findDbKeyword(DatabaseMetaData meta)
+            throws SQLException
+    {
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql"))
+        {
+            return DBMS_POSTGRES;
+        }
+        else if (dbms_lc.contains("oracle"))
+        {
+            return DBMS_ORACLE;
+        }
+        else if (dbms_lc.contains("h2")) // Used for unit testing only
+        {
+            return DBMS_H2;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /**
      * What is the name of our DBMS?
      *
@@ -1997,40 +2053,6 @@ public class DatabaseManager
 
         execute(context.getDBConnection(), sql, info, row);
         return newID;
-    }
-
-    /**
-     * Main method used to perform tests on the database
-     *
-     * @param args The command line arguments
-     */
-    public static void main(String[] args)
-    {
-        // Get something from dspace.cfg to get the log lines out the way
-        String url = ConfigurationManager.getProperty("db.url");
-
-        // Try to connect to the database
-        System.out.println("\nAttempting to connect to database: ");
-        System.out.println(" - URL: " + url);
-        System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
-        System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
-        System.out.println(" - Password: " + ConfigurationManager.getProperty("db.password"));
-        System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
-        System.out.println("\nTesting connection...");
-        try
-        {
-            Connection connection = DatabaseManager.getConnection();
-            connection.close();
-        }
-        catch (SQLException sqle)
-        {
-            System.err.println("\nError: ");
-            System.err.println(" - " + sqle);
-            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
-            System.exit(1);
-        }
-
-        System.out.println("Connected successfully!\n");
     }
 
     public static void applyOffsetAndLimit(StringBuffer query, List<Serializable> params, int offset, int limit){
