@@ -117,9 +117,28 @@
 
 
     <profiles>
+        <profile>
+            <id>findbugs</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <!-- property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property -->
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
              See also the 'skiptests' profile in Parent POM. -->
         <profile>
+            <id>test-environment</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
@@ -588,6 +607,16 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
+        </dependency>
+
+        <!-- FindBugs -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
         </dependency>
     </dependencies>
 
