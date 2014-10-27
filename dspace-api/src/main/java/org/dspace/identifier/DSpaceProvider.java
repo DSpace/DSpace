@@ -10,12 +10,7 @@ package org.dspace.identifier;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -28,10 +23,6 @@ import org.dspace.storage.rdbms.TableRow;
 public class DSpaceProvider
         extends IdentifierProvider
 {
-    private static final String DSPACE_SCHEMA = "dspace";
-    private static final String ELEMENT = "identifier";
-    private static final String QUALIFIER = "dspace";
-
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
     {
@@ -49,11 +40,15 @@ public class DSpaceProvider
             throws IdentifierException
     {
         String id = mint(context, dso);
-        dso.addMetadata(DSPACE_SCHEMA, ELEMENT, QUALIFIER, null, id);
         try {
-            dso.update();
-        }
-        catch (SQLException | AuthorizeException ex) {
+            TableRow row = DatabaseManager.create(context, "ObjectID");
+            row.setColumn("dspace_id", id);
+            row.setColumn("object_id", dso.getID());
+            row.setColumn("object_type", dso.getType());
+            DatabaseManager.insert(context, row);
+            context.commit();
+        } catch (SQLException ex)
+        {
             throw new IdentifierException("Unable to store a DSpace object identifier", ex);
         }
         return id;
@@ -73,19 +68,15 @@ public class DSpaceProvider
     {
         TableRow row;
         try {
-            MetadataSchema dspace = MetadataSchema.find(context, DSPACE_SCHEMA);
-            MetadataField identifier_dspace = MetadataField.findByElement(context,
-                    dspace.getSchemaID(), ELEMENT, QUALIFIER);
-            row = DatabaseManager.querySingleTable(context, "MetadataValue",
-                    "SELECT resource_id, resource_type_id FROM Metadatavalue" +
-                    " WHERE text_value = ? AND metadata_field_id = ?",
-                    identifier, identifier_dspace.getFieldID());
+            row = DatabaseManager.querySingleTable(context, "ObjectID",
+                    "SELECT object_id, object_type FROM ObjectID WHERE dspace_id = ?",
+                    identifier);
         } catch (SQLException ex)
         {
             throw new IdentifierNotResolvableException("ID unknown", ex);
         }
-        int type = row.getIntColumn("resource_type_id");
-        int id = row.getIntColumn("resource_id");
+        int type = row.getIntColumn("object_type");
+        int id = row.getIntColumn("object_id");
         DSpaceObject object;
         try
         {
@@ -101,12 +92,15 @@ public class DSpaceProvider
     public String lookup(Context context, DSpaceObject object)
             throws IdentifierNotFoundException, IdentifierNotResolvableException
     {
-        Metadatum[] identifiers = object.getMetadata(DSPACE_SCHEMA,
-                ELEMENT, QUALIFIER, Item.ANY);
-        if (identifiers.length > 0)
-            return identifiers[0].value;
-        else
-            throw new IdentifierNotFoundException();
+        TableRow row;
+        try {
+            row = DatabaseManager.querySingleTable(context, "ObjectID",
+                    "SELECT dspace_id from ObjectID WHERE object_id = ? AND object_type = ?",
+                    object.getID(), object.getType());
+        } catch (SQLException ex) {
+            throw new IdentifierNotFoundException(ex);
+        }
+        return row.getStringColumn("dspace_id");
     }
 
     @Override
