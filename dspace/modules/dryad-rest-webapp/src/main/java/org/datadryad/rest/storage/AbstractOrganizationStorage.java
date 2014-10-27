@@ -18,6 +18,7 @@ public abstract class AbstractOrganizationStorage extends AbstractStorage<Organi
 
     }
 
+    @Override
     public final void checkObjectPath(StoragePath path) throws StorageException {
         final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE);
         checkPath(path, expectedKeyPath);

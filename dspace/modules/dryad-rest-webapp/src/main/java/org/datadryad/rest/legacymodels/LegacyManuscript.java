@@ -2,8 +2,6 @@
  */
 package org.datadryad.rest.legacymodels;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;

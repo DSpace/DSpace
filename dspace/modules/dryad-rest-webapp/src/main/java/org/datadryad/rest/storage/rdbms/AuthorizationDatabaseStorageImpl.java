@@ -5,7 +5,6 @@ package org.datadryad.rest.storage.rdbms;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.auth.AuthorizationTuple;
