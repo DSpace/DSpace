@@ -1,0 +1,38 @@
+==== Cleanup ====
+
+
+The bitstream database table and file store may contain a number of 'deleted' bitstreams.
+The cleanup command goes through these bitstreams,
+and actually deletes any corresponding files left in the storage.
+It only removes 'deleted' bitstreams that are more than one hour old,
+just in case cleanup is happening in the middle of a storage operation.
+
+
+{|
+| Command used:
+| [dspace]/bin/dspace cleanup
+|-
+| Java class:
+| org.dspace.storage.bitstore.Cleanup
+| Arguments short and (long) forms):
+| Description
+|-
+| l or  leave
+| leave database records but delete file from assetstore
+|-
+| b or batchSize
+| commit batch size, default value 100
+|-
+|  v or  verbose
+| provide verbose output
+|-
+|}
+
+
+The cleanup command commits database changes every 'batchSize' records.
+It continues on the next batch of deleted bitstreams,
+even if it encounters an exception during commit.
+The smaller the batch size the less work is lost in the presence of a commit issue.
+
+When running with the -l option,  cleanup deletes
+files corresponding to 'deleted' bitstreams but leaves database entries in place,
