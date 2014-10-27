@@ -90,6 +90,7 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
@@ -152,7 +153,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-                    solr.query(solrQuery);                
+                    solr.query(solrQuery);
+
+                    // As long as Solr initialized, check with DatabaseUtils to see
+                    // if a reindex is in order. If so, reindex everything
+                    DatabaseUtils.checkReindexDiscovery(this);
                 } catch (SolrServerException e) {
                     log.error("Error while initializing solr server", e);
                 }
