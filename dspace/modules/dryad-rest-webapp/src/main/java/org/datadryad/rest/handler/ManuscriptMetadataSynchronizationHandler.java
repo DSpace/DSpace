@@ -4,23 +4,13 @@ package org.datadryad.rest.handler;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.apache.log4j.Logger;
-import org.apache.lucene.util.ArrayUtil;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
-import org.dspace.identifier.IdentifierNotFoundException;
-import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.utils.DSpace;
 
 /**
  * Extracts metadata from manuscript objects and places in corresponding Dryad

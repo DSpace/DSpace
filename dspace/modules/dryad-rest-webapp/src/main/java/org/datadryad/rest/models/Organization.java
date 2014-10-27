@@ -4,7 +4,6 @@ package org.datadryad.rest.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.datadryad.rest.storage.StoragePath;
 
 /**
  *

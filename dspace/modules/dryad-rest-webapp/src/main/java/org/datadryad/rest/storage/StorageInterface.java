@@ -3,7 +3,6 @@
 package org.datadryad.rest.storage;
 
 import java.util.List;
-import org.datadryad.rest.models.Manuscript;
 
 /**
  *

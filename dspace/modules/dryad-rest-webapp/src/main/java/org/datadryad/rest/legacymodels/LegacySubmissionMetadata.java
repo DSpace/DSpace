@@ -2,8 +2,6 @@
  */
 package org.datadryad.rest.legacymodels;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>

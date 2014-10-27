@@ -5,11 +5,9 @@ package org.datadryad.rest.handler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import javax.xml.bind.JAXBException;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.utils.JournalPropertiesUtilities;
 

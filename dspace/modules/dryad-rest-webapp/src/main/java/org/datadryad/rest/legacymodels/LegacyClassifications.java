@@ -4,7 +4,6 @@ package org.datadryad.rest.legacymodels;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * For XML/JSON conversion?

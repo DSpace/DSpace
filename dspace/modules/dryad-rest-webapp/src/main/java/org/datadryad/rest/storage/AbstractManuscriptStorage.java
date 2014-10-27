@@ -20,6 +20,7 @@ public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscri
 
     }
 
+    @Override
     public final void checkObjectPath(StoragePath path) throws StorageException {
         final List<String> expectedKeyPath = Arrays.asList(Organization.ORGANIZATION_CODE, Manuscript.MANUSCRIPT_ID);
         checkPath(path, expectedKeyPath);
