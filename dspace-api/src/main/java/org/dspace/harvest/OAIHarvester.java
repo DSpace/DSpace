@@ -1200,22 +1200,22 @@ public class OAIHarvester {
                 try
                 {
                     synchronized (HarvestScheduler.class) {
-                        switch (interrupt)
-                        {
-                        case HARVESTER_INTERRUPT_NONE:
-                            break;
-                        case HARVESTER_INTERRUPT_INSERT_THREAD:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            addThread(interruptValue);
-                            interruptValue = 0;
-                            break;
-                        case HARVESTER_INTERRUPT_PAUSE:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_PAUSED;
-                        case HARVESTER_INTERRUPT_STOP:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_STOPPED;
-                            return;
+                        switch (interrupt) {
+                            case HARVESTER_INTERRUPT_NONE:
+                                break;
+                            case HARVESTER_INTERRUPT_INSERT_THREAD:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                addThread(interruptValue);
+                                interruptValue = 0;
+                                break;
+                            case HARVESTER_INTERRUPT_PAUSE:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_PAUSED;
+                                break;
+                            case HARVESTER_INTERRUPT_STOP:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_STOPPED;
+                                return;
                         }
                     }
 
@@ -1223,8 +1223,8 @@ public class OAIHarvester {
                         while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
                             Thread.sleep(1000);
                         }
-                        if (interrupt != HARVESTER_INTERRUPT_STOP)
-                        {
+
+                        if (interrupt != HARVESTER_INTERRUPT_STOP) {
                             break;
                         }
                     }
