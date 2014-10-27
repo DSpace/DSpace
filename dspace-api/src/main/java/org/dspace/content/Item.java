@@ -271,6 +271,43 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Retrieve the list of Items submitted by eperson, ordered by recently submitted, optionally limitable
+     * @param context
+     * @param eperson
+     * @param limit a positive integer to limit, -1 or null for unlimited
+     * @return
+     * @throws SQLException
+     */
+    public static ItemIterator findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException
+    {
+        String querySorted =    "SELECT item.item_id, item.submitter_id, item.in_archive, item.withdrawn, " +
+                "item.owning_collection, item.last_modified, metadatavalue.text_value " +
+                "FROM item, metadatafieldregistry, metadatavalue " +
+                "WHERE metadatafieldregistry.metadata_field_id = metadatavalue.metadata_field_id AND " +
+                "  metadatavalue.resource_id = item.item_id AND " +
+                "  metadatavalue.resource_type_id = ? AND " +
+                "  metadatafieldregistry.element = 'date' AND " +
+                "  metadatafieldregistry.qualifier = 'accessioned' AND " +
+                "  item.submitter_id = ? AND \n" +
+                "  item.in_archive = true\n" +
+                "ORDER BY\n" +
+                "  metadatavalue.text_value desc";
+
+        TableRowIterator rows;
+
+        if(limit != null && limit > 0) {
+            querySorted += " limit ? ;";
+            rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID(), limit);
+        } else {
+            querySorted += ";";
+            rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID());
+        }
+
+        return new ItemIterator(context, rows);
+
+    }
+
+    /**
      * Get the internal ID of this item. In general, this shouldn't be exposed
      * to users
      *
