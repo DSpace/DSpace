@@ -701,6 +701,7 @@
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
+    <message key="xmlui.EPerson.StartRegistration.no_orcid_found">Please Create a user account then link your orcid account to it</message>
 
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>

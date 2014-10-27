@@ -447,7 +447,9 @@ div.bioText {
     font-size: 130%;
     text-align: center;
 }
-
+#aspect_eperson_PasswordLogin_div_login p a {
+    margin-right: 20px;
+}
 #aspect_eperson_PasswordLogin_div_login {
     margin: 20px 0px 40px; /* top right bottom left */
     float: right;
@@ -2552,4 +2554,8 @@ td.ds-author-input-col {
 }
 td.ds-author-input-col input {
     width: 45%;
+}
+
+.orcid-error{
+    color:red;
 }

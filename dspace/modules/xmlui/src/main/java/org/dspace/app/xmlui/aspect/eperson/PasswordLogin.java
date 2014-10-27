@@ -59,14 +59,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Password;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.usagelogging.EventLogger;
 import org.xml.sax.SAXException;
 
@@ -113,6 +106,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 
 	private static final Message T_email_address_help = message("xmlui.EPerson.StartRegistration.email_address_help");
 
+    private static final Message T_no_ocrid_found = message("xmlui.EPerson.StartRegistration.no_orcid_found");
 	/** The email address previously entered */
 	private String email;
 
@@ -253,6 +247,16 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
 				reason.addPara(characters);
 		}
 
+        if(request.getParameter("exist_orcid")!=null){
+            Division orcidDiv = body.addDivision("orcid-error");
+            orcidDiv.addPara("There is already a eperson linked to this orcid id:");
+            orcidDiv.addPara(request.getParameter("exist_orcid"));
+        }
+        if(request.getParameter("set_orcid")!=null){
+            Division orcidDiv = body.addDivision("orcid-error");
+            orcidDiv.addPara(T_no_ocrid_found);
+        }
+
 		Division register = body.addInteractiveDivision("register",
 				contextPath + "/register", Division.METHOD_POST,
 				"register-left");
@@ -302,9 +306,12 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
                 Item loginSubmitItem = loginList.addItem("loginsubmit-item", "login-row");
                 Button loginSubmitButton = loginSubmitItem.addButton("submit");
                 loginSubmitButton.setValue(T_submit_login);
+        Para p=login.addPara();
 
-		login.addPara().addXref("/forgot", T_forgot_link);
+        p.addXref("/oauth-login","Oauth login");
+                p.addXref("/forgot", T_forgot_link);
                 EventLogger.log(context, "login-form", "previous-email=" + (previousEmail != null ? previousEmail : ""));
+
 	}
 
 	// HttpServletRequest  httpRequest  = (HttpServletRequest)  objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
