@@ -521,4 +521,38 @@
     
   </tag>  
 
+  <tag>
+    <name>selectcollection</name>
+    <tagclass>org.dspace.app.webui.jsptag.SelectCollectionTag</tagclass>
+    <bodycontent>empty</bodycontent>
+    <info>
+        Tag for making collection select element with community heading
+    </info>
+
+   <attribute>
+      <name>klass</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>    
+
+   <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+   <attribute>
+      <name>name</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+
+   <attribute>
+      <name>collection</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    
+  </tag>  
+
 </taglib>
