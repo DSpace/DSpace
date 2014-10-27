@@ -1577,14 +1577,18 @@ public class DatabaseManager
                 log.error("DBMS {} is unsupported", dbms);
             }
             log.info("DBMS driver version is '{}'", meta.getDatabaseProductVersion());
-            
+
+            // While technically we have one more step to complete (see below),
+            // at this point the DatabaseManager class is initialized so that
+            // all its static "get" methods will return values
+            initialized = true;
+
             // FINALLY, ensure database schema is up-to-date.
             // If not, upgrade/migrate database. (NOTE: This needs to run LAST
             // as it may need some of the initialized variables set above)
             DatabaseUtils.updateDatabase(dataSource, connection);
 
             connection.close();
-            initialized = true;
         }
         catch (SQLException se)
         {
