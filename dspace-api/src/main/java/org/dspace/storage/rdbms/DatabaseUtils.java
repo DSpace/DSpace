@@ -8,6 +8,7 @@
 package org.dspace.storage.rdbms;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -45,11 +46,14 @@ public class DatabaseUtils
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;
 
-    // Whether or not Discovery requires reindexing. Whenever a migration occurs
-    // this flag is set to "true" to ensure the index is updated. When Discovery
-    // initializes it calls DatabaseUtils.checkReindexDiscovery() to determine
-    // whether a reindex is required.
-    private static boolean reindexDiscovery = false;
+     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
+    // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
+    // See also setReindexDiscovery()/getReindexDiscover()
+    private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
+                            File.separator + "solr" +
+                            File.separator + "search" +
+                            File.separator + "conf" +
+                            File.separator + "reindex.flag";
 
     /**
      * Commandline tools for managing database changes, etc.
@@ -228,7 +232,7 @@ public class DatabaseUtils
             flyway.migrate();
 
             // Flag that Discovery will need reindexing, since database was updated
-            reindexDiscovery = true;
+            setReindexDiscovery(true);
         }
         else
             log.info("DSpace database schema is up to date");
@@ -572,6 +576,66 @@ public class DatabaseUtils
         return exists;
     }
 
+    /**
+     * Whether or not to tell Discovery to reindex itself based on the updated
+     * database.
+     * <P>
+     * Whenever a DB migration occurs this is set to "true" to ensure the
+     * Discovery index is updated. When Discovery initializes it calls
+     * checkReindexDiscovery() to reindex if this flag is true.
+     * <P>
+     * Because the DB migration may be initialized by commandline or any one of
+     * the many DSpace webapps, setting this to "true" actually writes a temporary
+     * file which lets Solr know when reindex is needed.
+     * @param reindex true or false
+     */
+    public static void setReindexDiscovery(boolean reindex)
+    {
+        File reindexFlag = new File(reindexDiscoveryFilePath);
+
+        // If we need to flag Discovery to reindex, we'll create a temporary file to do so.
+        if(reindex)
+        {
+            try
+            {
+                //If our flag file doesn't exist, create it as writeable to all
+                if(!reindexFlag.exists())
+                {
+                    reindexFlag.createNewFile();
+                    reindexFlag.setWritable(true, false);
+                }
+            }
+            catch(IOException io)
+            {
+                log.error("Unable to create Discovery reindex flag file " + reindexFlag.getAbsolutePath() + ". You may need to reindex manually.", io);
+            }
+        }
+        else // Otherwise, Discovery doesn't need to reindex. Delete the temporary file if it exists
+        {
+            //If our flag file exists, delete it
+            if(reindexFlag.exists())
+            {
+                boolean deleted = reindexFlag.delete();
+                if(!deleted)
+                    log.error("Unable to delete Discovery reindex flag file " + reindexFlag.getAbsolutePath() + ". You may need to delete it manually.");
+            }
+        }
+    }
+
+    /**
+     * Whether or not reindexing is required in Discovery.
+     * <P>
+     * Because the DB migration may be initialized by commandline or any one of
+     * the many DSpace webapps, this checks for the existence of a temporary
+     * file to know when Discovery/Solr needs reindexing.
+     * @return whether reindex flag is true/false
+     */
+    public static boolean getReindexDiscovery()
+    {
+        // Simply check if the flag file exists
+        File reindexFlag = new File(reindexDiscoveryFilePath);
+        return reindexFlag.exists();
+    }
 
     /**
      * Method to check whether we need to reindex in Discovery (i.e. Solr). If
@@ -587,7 +651,7 @@ public class DatabaseUtils
     public static void checkReindexDiscovery(IndexingService indexer)
     {
         // We only do something if the reindexDiscovery flag has been triggered
-        if(reindexDiscovery)
+        if(getReindexDiscovery())
         {
             log.info("Post database migration, reindexing all content in Discovery search and browse engine");
             Context context = null;
@@ -600,7 +664,7 @@ public class DatabaseUtils
                 indexer.updateIndex(context, true);
 
                 // Reset our indexing flag
-                reindexDiscovery = false;
+                setReindexDiscovery(false);
                 log.info("Reindexing is complete");
             }
             catch(SearchServiceException sse)
