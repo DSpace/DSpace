@@ -356,16 +356,8 @@
     </command>
     
     <command>
-        <name>test-database</name>
-        <description>Test the DSpace database connection is OK</description>
-        <step>
-            <class>org.dspace.storage.rdbms.DatabaseManager</class>
-        </step>
-    </command>
-
-    <command>
         <name>database</name>
-        <description>Create/Repair/Remove the database tables</description>
+        <description>Perform database tasks like test database connection, migrate/repair database, remove database</description>
         <step>
             <class>org.dspace.storage.rdbms.DatabaseUtils</class>
         </step>

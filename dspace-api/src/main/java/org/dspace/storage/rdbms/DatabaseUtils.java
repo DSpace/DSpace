@@ -65,40 +65,82 @@ public class DatabaseUtils
         if (argv.length != 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions include: 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Valid actions include: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Or, type 'database help' for more information.");
             System.exit(1);
         }
 
         try
         {
-            // This is just to ensure DatabaseManager.initialize() gets called!
-            String dbName = DatabaseManager.getDbName();
-            System.out.println("Initialized connection to " + dbName + " database");
+            // Call initDataSource to JUST initialize the dataSource WITHOUT fully
+            // initializing the DatabaseManager itself. This ensures we do NOT
+            // immediately run our Flyway DB migrations on this database
+            DataSource dataSource = DatabaseManager.initDataSource();
+            
+            // Point Flyway API to our database
+            Flyway flyway = setupFlyway(dataSource);
 
-            // Setup Flyway against our database
-            Flyway flyway = setupFlyway(DatabaseManager.getDataSource());
+            // "test" = Test Database Connection
+            if(argv[0].equalsIgnoreCase("test"))
+            {
+                // Get our DB url info
+                String url = ConfigurationManager.getProperty("db.url");
 
-            if(argv[0].equalsIgnoreCase("info"))
+                // Try to connect to the database
+                System.out.println("\nAttempting to connect to database: ");
+                System.out.println(" - URL: " + url);
+                System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
+                System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
+                System.out.println(" - Password: " + ConfigurationManager.getProperty("db.password"));
+                System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
+                System.out.println("\nTesting connection...");
+                try
+                {
+                    // Just do a high level test by getting our configured DataSource and attempting to connect to it
+                    // NOTE: We specifically do NOT call DatabaseManager.getConnection() because that will attempt
+                    // a full initialization of DatabaseManager & also cause database migrations/upgrades to occur
+                    Connection connection = dataSource.getConnection();
+                    connection.close();
+                }
+                catch (SQLException sqle)
+                {
+                    System.err.println("\nError: ");
+                    System.err.println(" - " + sqle);
+                    System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                    System.exit(1);
+                }
+
+                System.out.println("Connected successfully!\n");
+            }
+            // "info" = Basic Database Information
+            else if(argv[0].equalsIgnoreCase("info"))
             {
                 // Get basic Database info
-                Connection connection = DatabaseManager.getConnection();
+                Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
+                connection.close();
 
                 // Get info table from Flyway
                 System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
             }
+            // "migrate" = Manually run any outstanding Database migrations (if any)
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
                 System.out.println("Migrating database to latest version... (Check logs for details)");
-                flyway.migrate();
+                // NOTE: This looks odd, but all we really need to do is ensure the
+                // DatabaseManager auto-initializes. It'll take care of the migration itself.
+                // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
+                DatabaseManager.getDbName();
             }
+            // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
-                System.out.println("Attempting to repair database via FlywayDB... (Check logs for details)");
+                System.out.println("Attempting to repair migrations table via FlywayDB... (Check logs for details)");
                 flyway.repair();
             }
+            // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
@@ -116,8 +158,13 @@ public class DatabaseUtils
             }
             else
             {
-                System.out.println("\nDatabase action " + argv[0] + " is not valid.");
-                System.out.println("Valid actions include: 'info', 'migrate', 'repair' or 'clean'");
+                System.out.println("\nUsage: database [action]");
+                System.out.println("Valid actions include: 'test', info', 'migrate', 'repair' or 'clean'");
+                System.out.println(" - test    = Test database connection is OK");
+                System.out.println(" - info    = Describe basic info about Database (type, version, driver)");
+                System.out.println(" - migrate = Migrate the Database to the latest version");
+                System.out.println(" - repair  = Attempt to repair the Database migration metadata table (see Flyway repair command)");
+                System.out.println(" - clean   = Destroy all data (Warning there is no going back!)");
             }
 
             System.exit(0);
@@ -144,29 +191,41 @@ public class DatabaseUtils
     {
         if (flywaydb==null)
         {
-            // Initialize Flyway DB API (http://flywaydb.org/), used to perform DB migrations
-            flywaydb = new Flyway();
-            flywaydb.setDataSource(datasource);
-            flywaydb.setEncoding("UTF-8");
+            try(Connection connection = datasource.getConnection())
+            {
+                // Initialize Flyway DB API (http://flywaydb.org/), used to perform DB migrations
+                flywaydb = new Flyway();
+                flywaydb.setDataSource(datasource);
+                flywaydb.setEncoding("UTF-8");
 
-            // Migration scripts are based on DBMS Keyword (see full path below)
-            String scriptFolder = DatabaseManager.getDbKeyword();
+                // Migration scripts are based on DBMS Keyword (see full path below)
+                DatabaseMetaData meta = connection.getMetaData();
+                // NOTE: we use "findDbKeyword()" here as it won't cause
+                // DatabaseManager.initialize() to be called (which in turn auto-calls Flyway)
+                String scriptFolder = DatabaseManager.findDbKeyword(meta);
+                connection.close();
 
-            // Set location where Flyway will load DB scripts from (based on DB Type)
-            // e.g. [dspace.dir]/etc/[dbtype]/
-            String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
-                                System.getProperty("file.separator") + "etc" +
-                                System.getProperty("file.separator") + "migrations" +
-                                System.getProperty("file.separator") + scriptFolder;
+                // Set location where Flyway will load DB scripts from (based on DB Type)
+                // e.g. [dspace.dir]/etc/[dbtype]/
+                String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
+                                    System.getProperty("file.separator") + "etc" +
+                                    System.getProperty("file.separator") + "migrations" +
+                                    System.getProperty("file.separator") + scriptFolder;
 
-            // Flyway will look in "scriptPath" for SQL migrations AND
-            // in 'org.dspace.storage.rdbms.migration.*' for Java migrations
-            log.info("Loading Flyway DB migrations from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
-            flywaydb.setLocations("filesystem:" + scriptPath, "classpath:org.dspace.storage.rdbms.migration");
+                // Flyway will look in "scriptPath" for SQL migrations AND
+                // in 'org.dspace.storage.rdbms.migration.*' for Java migrations
+                log.info("Loading Flyway DB migrations from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
+                flywaydb.setLocations("filesystem:" + scriptPath, "classpath:org.dspace.storage.rdbms.migration");
 
-            // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
-            // In this situation, we have a Registry Updater that runs PRE-migration
-            flywaydb.setCallbacks(new DatabaseRegistryUpdater());
+                // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
+                // In this situation, we have a Registry Updater that runs PRE-migration
+                // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
+                flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseLegacyReindexer());
+            }
+            catch(SQLException e)
+            {
+                log.error("Unable to setup Flyway against DSpace database", e);
+            }
         }
 
         return flywaydb;
@@ -498,7 +557,7 @@ public class DatabaseUtils
         try
         {
             // Different database types store sequence information in different tables
-            String dbtype = DatabaseManager.getDbKeyword();
+            String dbtype = DatabaseManager.findDbKeyword(connection.getMetaData());
             String sequenceSQL = null;
             switch(dbtype)
             {
