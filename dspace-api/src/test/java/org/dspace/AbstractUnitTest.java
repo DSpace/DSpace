@@ -7,9 +7,9 @@
  */
 package org.dspace;
 
+import java.io.IOException;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -30,8 +30,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-
 
 /**
  * This is the base class for Unit Tests. It contains some generic mocks and
@@ -81,7 +79,6 @@ public class AbstractUnitTest
      * "dspace.cfg".
      */
     @BeforeClass
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public static void initOnce()
     {
         try
