@@ -16,7 +16,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Try to look to an item signing via the collection it bellongs
+ * This is an item marking Strategy class that tries to mark an item
+ * based on the collection the items belong to
  * 
  * @author Kostas Stamatis
  * 
