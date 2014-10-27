@@ -2506,3 +2506,13 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 #SpiderTrap p a{
     color: transparent;
 }
+
+input.ds-author-order-col {
+    width: 2em;
+}
+td.ds-author-input-col {
+    width: 80%;
+}
+td.ds-author-input-col input {
+    width: 45%;
+}
