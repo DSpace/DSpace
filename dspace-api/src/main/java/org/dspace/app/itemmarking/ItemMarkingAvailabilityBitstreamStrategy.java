@@ -17,7 +17,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
- * Try to look to an item signing via the collection it bellongs
+ * This is an item marking Strategy class that tries to mark an item availability
+ * based on the existence of bitstreams within the ORIGINAL bundle.
  * 
  * @author Kostas Stamatis
  * 

@@ -8,8 +8,7 @@
 package org.dspace.app.itemmarking;
 
 /**
- * Simple DTO to transfer data about the signing info for the item
- * Copy feature
+ * Simple DTO to transfer data about the marking info for an item
  * 
  * @author Kostas Stamatis
  * 
