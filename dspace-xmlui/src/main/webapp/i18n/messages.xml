@@ -729,7 +729,7 @@
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
-	<message key="batch">Select a collection</message>
+	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection you wish to submit an item to.</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
