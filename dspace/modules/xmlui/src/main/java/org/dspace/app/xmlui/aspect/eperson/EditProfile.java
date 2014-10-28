@@ -480,6 +480,8 @@ public class EditProfile extends AbstractDSpaceTransformer
                passwordConfirm.addError(T_error_unconfirmed_password);
            }
        }
+       /* temporarily disable ORCID linking
+          
        List orcid = form.addList("orcid",List.TYPE_FORM);
        orcid.setHead("Associate Account with ORCID");
        if(defaultOrcidId!=null&&defaultOrcidId.length()>0){
@@ -494,6 +496,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            orcid.addItem().addContent("Select the following button to connect to ORCID and associate this profile with your ORCID account.");
            orcid.addItem().addButton("link").setValue("Link to Orcid");
        }
+       */
        List tl = form.addList("terms",List.TYPE_FORM);
        tl.setHead(T_terms);
        tl.addItem(T_terms_help);
