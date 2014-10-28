@@ -10,6 +10,8 @@ package org.dspace.app.webui.jsptag;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.itemmarking.ItemMarkingExtractor;
+import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.*;
 import org.dspace.content.Bitstream;
@@ -24,6 +26,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -388,8 +391,14 @@ public class BrowseListTag extends TagSupport
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
                 String message = "itemlist." + field;
 
+                String markClass = "";
+                if (field.startsWith("mark_"))
+                {
+                	markClass = " "+field+"_th";
+                }
+                
                 // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                out.print("<th id=\"" + id +  "\" class=\"" + css + markClass +"\">"
                         + (emph[colIdx] ? "<strong>" : "")
                         + LocaleSupport.getLocalizedMessage(pageContext, message)
                         + (emph[colIdx] ? "</strong>" : "") + "</th>");
@@ -473,6 +482,10 @@ public class BrowseListTag extends TagSupport
                     if (field.equals("thumbnail"))
                     {
                         metadata = getThumbMarkup(hrq, items[i]);
+                    }
+                    else  if (field.startsWith("mark_"))
+                    {
+                        metadata = UIUtil.getMarkingMarkup(hrq, items[i], field);
                     }
                     else if (metadataArray.length > 0)
                     {
@@ -594,10 +607,16 @@ public class BrowseListTag extends TagSupport
                     {
                         extras = "nowrap=\"nowrap\" align=\"right\"";
                     }
+                    
+                    String markClass = "";
+                    if (field.startsWith("mark_"))
+                    {
+                    	markClass = " "+field+"_tr";
+                    }
 
                     String id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
-                    	+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + extras + ">"
+                    		+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col" + markClass + "\" " + extras + ">"
                     	+ (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
                     	+ "</td>");
                 }
