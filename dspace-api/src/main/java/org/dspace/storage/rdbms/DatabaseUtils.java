@@ -137,16 +137,16 @@ public class DatabaseUtils
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
-                System.out.println("Attempting to repair migrations table via FlywayDB... (Check logs for details)");
+                System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
                 flyway.repair();
             }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                System.out.println("If you continue, ALL DATA IN YOUR DATABASE WILL BE DELETED. \n");
+                System.out.println("If you continue, ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED. \n");
                 System.out.println("There is no turning back from this action. You should backup your database before continuing. \n");
-                System.out.print("Are you ready to destroy your entire database? [y/n]: ");
+                System.out.print("Are you sure you want to clear your entire database? [y/n]: ");
                 String choiceString = input.readLine();
                 input.close();
 
@@ -163,7 +163,7 @@ public class DatabaseUtils
                 System.out.println(" - test    = Test database connection is OK");
                 System.out.println(" - info    = Describe basic info about Database (type, version, driver)");
                 System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println(" - repair  = Attempt to repair the Database migration metadata table (see Flyway repair command)");
+                System.out.println(" - repair  = Attempt to repair any previously failed database migrations (see also Flyway repair command)");
                 System.out.println(" - clean   = Destroy all data (Warning there is no going back!)");
             }
 
