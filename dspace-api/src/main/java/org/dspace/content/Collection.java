@@ -1506,6 +1506,11 @@ public class Collection extends DSpaceObject
 
     public static Collection[] findAuthorizedOptimized(Context context, int actionID) throws java.sql.SQLException
     {
+        if(! ConfigurationManager.getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", true)) {
+            // Fallback to legacy query if config says so. The rationale could be that a site found a bug.
+            return findAuthorized(context, null, actionID);
+        }
+
         List<Collection> myResults = new ArrayList<Collection>();
 
         if(AuthorizeManager.isAdmin(context))
