@@ -76,7 +76,7 @@ public class DatabaseUtils
             // initializing the DatabaseManager itself. This ensures we do NOT
             // immediately run our Flyway DB migrations on this database
             DataSource dataSource = DatabaseManager.initDataSource();
-            
+
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
 
@@ -120,10 +120,23 @@ public class DatabaseUtils
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-                connection.close();
 
                 // Get info table from Flyway
                 System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
+
+                // If Flyway is NOT yet initialized, also print the determined version information
+                if(!tableExists(connection, flyway.getTable()))
+                {
+                    System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
+                    // Determine which version of DSpace this looks like
+                    String dbVersion = determineDBVersion(connection);
+                    if (dbVersion!=null)
+                    {
+                        System.out.println("Your database looks to be compatible with DSpace version " + dbVersion);
+                        System.out.println("All upgrades *after* version " + dbVersion + " will be automatically run during the next migration.");
+                    }
+                }
+                connection.close();
             }
             // "migrate" = Manually run any outstanding Database migrations (if any)
             else if(argv[0].equalsIgnoreCase("migrate"))
@@ -325,6 +338,18 @@ public class DatabaseUtils
 
         // We will now check prior versions in reverse chronological order, looking
         // for specific tables or columns that were newly created in each version.
+
+        // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
+        if(tableColumnExists(connection, "metadatavalue", "resource_id"))
+        {
+            return "5.0.2014.09.26"; // This version matches the version in the SQL migration for this feature
+        }
+
+        // Is this pre-DSpace 5.0 (with Helpdesk plugin)? Look for the "request_message" column in the "requestitem" table
+        if(tableColumnExists(connection, "requestitem", "request_message"))
+        {
+            return "5.0.2014.08.08"; // This version matches the version in the SQL migration for this feature
+        }
 
         // Is this DSpace 4.x? Look for the "Webapp" table created in that version.
         if(tableExists(connection, "Webapp"))
