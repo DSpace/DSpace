@@ -655,15 +655,19 @@ Common usage:
 
     <target name="copy_webapps">
 
+        <!-- Copy webapp files to /webapps (excluding any filtered files) -->
         <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
             <fileset dir="webapps">
                 <exclude name="**/web.xml" />
+                <exclude name="**/robots.txt" />
             </fileset>
         </copy>
 
+        <!-- Ensure specific webapp files (web.xml, robots.txt) are filtered -->
         <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
             <fileset dir="webapps">
                 <include name="**/web.xml" />
+                <include name="**/robots.txt" />
             </fileset>
             <filterchain>
                 <expandproperties />
