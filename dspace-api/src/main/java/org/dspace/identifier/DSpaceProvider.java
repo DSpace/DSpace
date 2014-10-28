@@ -24,7 +24,7 @@ public class DSpaceProvider
         extends IdentifierProvider
 {
     /** Database table to hold DSpace object identifiers. */
-    private static final String ID_TABLE = "ObjectID";
+    static final String ID_TABLE = "ObjectID";
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
