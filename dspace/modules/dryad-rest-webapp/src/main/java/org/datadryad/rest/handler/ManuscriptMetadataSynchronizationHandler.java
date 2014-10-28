@@ -70,7 +70,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
      */
     private static DryadDataPackage findDataPackage(Manuscript manuscript, Context context) throws HandlerException {
         String doi = manuscript.dryadDataDOI;
-        String reviewerURL = manuscript.dryadReviewerURL;
+        String reviewerURL = manuscript.dataReviewURL;
         String manuscriptId = manuscript.manuscriptId;
         DryadDataPackage dataPackage = null;
         try {
