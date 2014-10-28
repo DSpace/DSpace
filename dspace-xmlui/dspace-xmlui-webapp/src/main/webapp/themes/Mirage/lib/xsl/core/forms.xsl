@@ -217,8 +217,6 @@
                     <xsl:with-param name="position" select="1"/>
                 </xsl:call-template>
             </table>
-            <!-- UPDATE button -->
-            <input type="submit" disabled="disabled" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.update" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-update-button"/>
         </div>
     </xsl:template>
 
@@ -235,7 +233,7 @@
                 <!-- ORDER -->
                 <td>
                     <!--<span><xsl:value-of select="string($position)"/></span>-->
-                    <select disabled="disabled" class="ds-author-order-select">
+                    <select class="ds-author-order-select">
                         <xsl:for-each select="dri:instance">
                             <option>
                                 <xsl:if test="$position = position()">
@@ -322,7 +320,8 @@
     <xsl:template name="fieldAttributes">
         <xsl:call-template name="standardAttributes">
             <xsl:with-param name="class">
-                <xsl:text>ds-</xsl:text><xsl:value-of select="@type"/>
+                <xsl:text>ds-</xsl:text>
+                <xsl:value-of select="@type"/>
                 <xsl:text>-field </xsl:text>
                 <xsl:if test="dri:error">
                     <xsl:text>error </xsl:text>
