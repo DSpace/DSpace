@@ -13,7 +13,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>CRIS-4.1.3-SNAPSHOT</version>
+        <version>CRIS-4.2.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -114,4 +114,12 @@
         </dependency>
     </dependencies>
 
+    <developers>
+        <developer>
+            <id>lyncode</id>
+            <email>dspace@lyncode.com</email>
+            <name>DSpace @ Lyncode</name>
+            <url>http://www.lyncode.com</url>
+        </developer>
+    </developers>
 </project>

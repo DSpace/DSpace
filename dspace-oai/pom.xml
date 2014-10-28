@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>CRIS-4.1.3-SNAPSHOT</version>
+        <version>CRIS-4.2.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -81,6 +81,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
+            <version>${solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
