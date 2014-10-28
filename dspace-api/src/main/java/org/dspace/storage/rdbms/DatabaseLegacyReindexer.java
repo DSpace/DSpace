@@ -11,12 +11,9 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.search.DSIndexer;
-import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -55,8 +52,11 @@ public class DatabaseLegacyReindexer implements FlywayCallback
             context = new Context();
 
             // What indexing consumer(s) are configured in this DSpace?
-            ConfigurationService config = new DSpace().getConfigurationService();
-            String consumers = config.getPropertyAsType("event.dispatcher.default.consumers", ""); // Avoid null pointer
+            // TODO: This really should use the ConfigurationService, BUT for
+            // some reason the DSpace Kernel is often not yet initialized at this point
+            String consumers = ConfigurationManager.getProperty("event.dispatcher.default.consumers");
+            if(consumers==null)
+                consumers = "";
             List<String> consumerList = Arrays.asList(consumers.split("\\s*,\\s*"));
 
             // If Discovery indexing is enabled
@@ -65,7 +65,7 @@ public class DatabaseLegacyReindexer implements FlywayCallback
                 // Do nothing
                 // Because Solr is normally not running when the DatabaseManager initializes,
                 // Discovery autoindexing takes place in DatabaseUtils.checkReindexDiscovery(),
-                // which is automatically called when Discover initializes.
+                // which is automatically called when Discovery initializes.
             }
             
             // If Lucene indexing is enabled
@@ -92,20 +92,10 @@ public class DatabaseLegacyReindexer implements FlywayCallback
                 context.complete();
                 log.info("Reindexing is complete");
             }
-            else
-            {
-                log.info("Checking for (and cleaning up) unused DBMS Browse tables");
-                // If traditional browse tables are not being used, 
-                // then clean them up from database (they can always be recreated later)
-                IndexBrowse indexer = new IndexBrowse(context);
-                indexer.clearDatabase();
-                // Commit changes to browse tables & close context
-                context.complete();
-            }
         }
         catch(Exception e)
         {
-            log.error("Error attempting to reindex all contents for search/browse", e);
+            log.error("Error attempting to reindex all contents for search/browse. You may need to manually reindex Lucene or DBMS", e);
         }
         finally
         {
