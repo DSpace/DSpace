@@ -146,7 +146,7 @@ public class DatabaseUtils
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("If you continue, ALL DATA IN YOUR DATABASE WILL BE DELETED. \n");
                 System.out.println("There is no turning back from this action. You should backup your database before continuing. \n");
-                System.out.println("Are you ready to destroy your entire database? [y/n]: ");
+                System.out.print("Are you ready to destroy your entire database? [y/n]: ");
                 String choiceString = input.readLine();
                 input.close();
 
@@ -707,23 +707,54 @@ public class DatabaseUtils
      *          The actual indexer to use to reindex Discovery, if needed
      * @see org.dspace.discovery.SolrServiceImpl
      */
-    public static void checkReindexDiscovery(IndexingService indexer)
+    public static synchronized void checkReindexDiscovery(IndexingService indexer)
     {
         // We only do something if the reindexDiscovery flag has been triggered
         if(getReindexDiscovery())
         {
             log.info("Post database migration, reindexing all content in Discovery search and browse engine");
+
+            // Kick off a custom thread to perform the reindexing in Discovery
+            // (See ReindexerThread nested class below)
+            ReindexerThread go = new ReindexerThread(indexer);
+            go.start();
+        }
+    }
+
+    /**
+     * Internal class to actually perform re-indexing in a separate thread.
+     * (See checkReindexDiscovery() method)>
+     */
+    private static class ReindexerThread extends Thread
+    {
+        IndexingService indexer;
+
+        /**
+         * Constructor. Pass it an existing IndexingService
+         * @param indexer
+         */
+        ReindexerThread(IndexingService is)
+        {
+            this.indexer = is;
+        }
+
+        /**
+         * Actually perform Reindexing in Discovery/Solr
+         */
+        @Override
+        public void run()
+        {
             Context context = null;
             try
             {
                 context = new Context();
 
                 // Reindex Discovery (just clean & update index)
-                indexer.cleanIndex(true);
-                indexer.updateIndex(context, true);
+                this.indexer.cleanIndex(true);
+                this.indexer.updateIndex(context, true);
 
-                // Reset our indexing flag
-                setReindexDiscovery(false);
+                // Reset our indexing flag. Indexing is done.
+                DatabaseUtils.setReindexDiscovery(false);
                 log.info("Reindexing is complete");
             }
             catch(SearchServiceException sse)
@@ -742,5 +773,4 @@ public class DatabaseUtils
             }
         }
     }
-
 }
