@@ -48,7 +48,7 @@ public class Manuscript {
     public String title;
     public String publicationDOI;
     public Date publicationDate;
-    public String dryadReviewerURL;
+    public String dataReviewURL;
     public String dataAvailabilityStatement;
     public Manuscript() {} // JAXB needs this
 
