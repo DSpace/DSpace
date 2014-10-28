@@ -648,7 +648,7 @@ public class DatabaseUtils
      * file which lets Solr know when reindex is needed.
      * @param reindex true or false
      */
-    public static void setReindexDiscovery(boolean reindex)
+    public static synchronized void setReindexDiscovery(boolean reindex)
     {
         File reindexFlag = new File(reindexDiscoveryFilePath);
 
@@ -712,8 +712,6 @@ public class DatabaseUtils
         // We only do something if the reindexDiscovery flag has been triggered
         if(getReindexDiscovery())
         {
-            log.info("Post database migration, reindexing all content in Discovery search and browse engine");
-
             // Kick off a custom thread to perform the reindexing in Discovery
             // (See ReindexerThread nested class below)
             ReindexerThread go = new ReindexerThread(indexer);
@@ -727,7 +725,7 @@ public class DatabaseUtils
      */
     private static class ReindexerThread extends Thread
     {
-        IndexingService indexer;
+        private final IndexingService indexer;
 
         /**
          * Constructor. Pass it an existing IndexingService
@@ -739,37 +737,48 @@ public class DatabaseUtils
         }
 
         /**
-         * Actually perform Reindexing in Discovery/Solr
+         * Actually perform Reindexing in Discovery/Solr.
+         * This is synchronized so that only one thread can get in at a time.
          */
         @Override
         public void run()
         {
-            Context context = null;
-            try
+            synchronized(this.indexer)
             {
-                context = new Context();
+                // Make sure reindexDiscovery flag is still true
+                // If multiple threads get here we only want to reindex ONCE
+                if(DatabaseUtils.getReindexDiscovery())
+                {
+                    Context context = null;
+                    try
+                    {
+                        context = new Context();
 
-                // Reindex Discovery (just clean & update index)
-                this.indexer.cleanIndex(true);
-                this.indexer.updateIndex(context, true);
+                        log.info("Post database migration, reindexing all content in Discovery search and browse engine");
 
-                // Reset our indexing flag. Indexing is done.
-                DatabaseUtils.setReindexDiscovery(false);
-                log.info("Reindexing is complete");
-            }
-            catch(SearchServiceException sse)
-            {
-                log.warn("Unable to reindex content in Discovery search and browse engine. You may need to reindex manually.", sse);
-            }
-            catch(SQLException | IOException e)
-            {
-                log.error("Error attempting to reindex all contents for search/browse", e);
-            }
-            finally
-            {
-                // Clean up our context, if it still exists
-                if(context!=null && context.isValid())
-                    context.abort();
+                        // Reindex Discovery (just clean & update index)
+                        this.indexer.cleanIndex(true);
+                        this.indexer.updateIndex(context, true);
+
+                        // Reset our indexing flag. Indexing is done.
+                        DatabaseUtils.setReindexDiscovery(false);
+                        log.info("Reindexing is complete");
+                    }
+                    catch(SearchServiceException sse)
+                    {
+                        log.warn("Unable to reindex content in Discovery search and browse engine. You may need to reindex manually.", sse);
+                    }
+                    catch(SQLException | IOException e)
+                    {
+                        log.error("Error attempting to reindex all contents for search/browse", e);
+                    }
+                    finally
+                    {
+                        // Clean up our context, if it still exists
+                        if(context!=null && context.isValid())
+                            context.abort();
+                    }
+                }
             }
         }
     }
