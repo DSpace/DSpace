@@ -608,7 +608,6 @@
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
         </dependency>
-
         <!-- FindBugs -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
