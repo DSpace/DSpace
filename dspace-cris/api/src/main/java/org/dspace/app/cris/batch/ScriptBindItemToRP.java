@@ -10,7 +10,9 @@ package org.dspace.app.cris.batch;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,10 +23,17 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.BindItemToRP;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
 public class ScriptBindItemToRP
@@ -46,7 +55,8 @@ public class ScriptBindItemToRP
                 + new Date() + " ----- ####");
 
         DSpace dspace = new DSpace();
-                
+  
+        SearchService searchService = dspace.getSingletonService(SearchService.class);
         RelationPreferenceService relationPreferenceService = dspace.getServiceManager().getServiceByName(
                 "org.dspace.app.cris.service.RelationPreferenceService", RelationPreferenceService.class);
         ApplicationService applicationService = dspace.getServiceManager().getServiceByName(
@@ -129,7 +139,29 @@ public class ScriptBindItemToRP
             else
             {
                 log.info("...it will work on all researcher...");
-                rps = applicationService.getList(ResearcherPage.class);
+                SolrQuery query = new SolrQuery("*:*");
+                query.addFilterQuery("{!field f=search.resourcetype}" + CrisConstants.RP_TYPE_ID);
+                query.setFields("search.resourceid", "search.resourcetype");
+                query.setRows(Integer.MAX_VALUE);
+                rps = new ArrayList<ResearcherPage>();
+                try
+                {
+                    QueryResponse response = searchService.search(query);
+                    SolrDocumentList docList = response.getResults();
+                    Iterator<SolrDocument> solrDoc = docList.iterator();
+                    while (solrDoc.hasNext())
+                    {
+                        SolrDocument doc = solrDoc.next();
+                        Integer rpId = (Integer) doc
+                                .getFirstValue("search.resourceid");
+                        rps.add(applicationService.get(ResearcherPage.class, rpId));
+                    }
+                }
+                catch (SearchServiceException e)
+                {
+                    log
+                    .error("Error retrieving documents", e);
+                }
             }
             BindItemToRP.work(rps, relationPreferenceService);
         }
