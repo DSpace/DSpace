@@ -77,15 +77,15 @@ public class DatabaseUtils
             // immediately run our Flyway DB migrations on this database
             DataSource dataSource = DatabaseManager.initDataSource();
 
+            // Get configured DB URL for reporting below
+            String url = ConfigurationManager.getProperty("db.url");
+            
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
 
             // "test" = Test Database Connection
             if(argv[0].equalsIgnoreCase("test"))
             {
-                // Get our DB url info
-                String url = ConfigurationManager.getProperty("db.url");
-
                 // Try to connect to the database
                 System.out.println("\nAttempting to connect to database: ");
                 System.out.println(" - URL: " + url);
@@ -118,7 +118,8 @@ public class DatabaseUtils
                 // Get basic Database info
                 Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
-                System.out.println("\nDatabase: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
+                System.out.println("\nDatabase URL: " + url);
+                System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
                 // Get info table from Flyway
@@ -141,6 +142,7 @@ public class DatabaseUtils
             // "migrate" = Manually run any outstanding Database migrations (if any)
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
+                System.out.println("\nDatabase URL: " + url);
                 System.out.println("Migrating database to latest version... (Check logs for details)");
                 // NOTE: This looks odd, but all we really need to do is ensure the
                 // DatabaseManager auto-initializes. It'll take care of the migration itself.
@@ -151,6 +153,7 @@ public class DatabaseUtils
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
+                System.out.println("\nDatabase URL: " + url);
                 System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
                 flyway.repair();
                 System.out.println("Done.");
@@ -159,6 +162,7 @@ public class DatabaseUtils
             else if(argv[0].equalsIgnoreCase("clean"))
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println("\nDatabase URL: " + url);
                 System.out.println("\nIf you continue, ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
                 System.out.println("There is NO turning back from this action. You should backup your database before continuing.");
                 System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
