@@ -25,24 +25,24 @@ import org.slf4j.LoggerFactory;
  * any Database migration occurs.
  * <P>
  * The reason this runs BEFORE a migration is to ensure that any new
- * metadata fields are FIRST added to our registries, so that the 
+ * metadata fields are FIRST added to our registries, so that the
  * migrations can make use of those new metadata fields, etc.
  * <P>
- * However, there is one exception. If this is a "fresh install" of DSpace, 
+ * However, there is one exception. If this is a "fresh install" of DSpace,
  * we'll need to wait until the necessary database tables are created. In
  * that scenario we will load registries AFTER the initial migration.
- * 
+ *
  * @author Tim Donohue
  */
 public class DatabaseRegistryUpdater implements FlywayCallback
 {
      /** logging category */
     private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
-    
+
     // Whether or not this is a fresh install of DSpace
     // This determines whether to update registries PRE or POST migration
     private boolean freshInstall = false;
-    
+
     /**
      * Method to actually update our registries from latest configs
      */
@@ -53,11 +53,11 @@ public class DatabaseRegistryUpdater implements FlywayCallback
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
-            
+
             String base = ConfigurationManager.getProperty("dspace.dir")
                             + File.separator + "config" + File.separator
                             + "registries" + File.separator;
-            
+
             // Load updates to Bitstream format registry (if any)
             log.info("Updating Bitstream Format Registry based on " + base + "bitstream-formats.xml");
             RegistryLoader.loadBitstreamFormats(context, base + "bitstream-formats.xml");
@@ -96,91 +96,87 @@ public class DatabaseRegistryUpdater implements FlywayCallback
                 context.abort();
         }
     }
-    
-    
+
+
     @Override
     public void afterClean(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void afterEachMigrate(Connection connection, MigrationInfo info)
     {
-        // If this is a fresh install, we must update registries AFTER the
-        // initial migration runs (since the registry tables won't exist until
-        // the initial migration are performed)
-        if(freshInstall)
-        {
-            // As soon as the MetadataSchemaRegistry table exists, we can update the registries
-            if(DatabaseUtils.tableExists(connection, "MetadataSchemaRegistry"))
-            {
-                updateRegistries();
-                freshInstall = false;
-            }
-        }
+        // do nothing
     }
-    
+
     @Override
     public void afterInfo(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void afterInit(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void afterMigrate(Connection connection)
     {
-        // do nothing
+        // If this is a fresh install, we must update registries AFTER the
+        // initial migrations (since the registry tables won't exist until the
+        // initial migrations are performed)
+        if(freshInstall)
+        {
+            updateRegistries();
+            freshInstall = false;
+        }
     }
-    
+
     @Override
     public void afterRepair(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void afterValidate(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeClean(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeEachMigrate(Connection connection, MigrationInfo info)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeInfo(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeInit(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeMigrate(Connection connection)
     {
-        // Check if our MetadataSchemaRegistry table exists yet. 
-        // If it does NOT, then this is a fresh install & we'll need to 
-        // updateRegistries() AFTER migration 
+        // Check if our MetadataSchemaRegistry table exists yet.
+        // If it does NOT, then this is a fresh install & we'll need to
+        // updateRegistries() AFTER migration
         if(DatabaseUtils.tableExists(connection, "MetadataSchemaRegistry"))
         {
             // Ensure registries are updated BEFORE a database migration (upgrade)
@@ -195,17 +191,16 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             freshInstall = true;
         }
     }
-    
+
     @Override
     public void beforeRepair(Connection connection)
     {
         // do nothing
     }
-    
+
     @Override
     public void beforeValidate(Connection connection)
     {
         // do nothing
     }
-    
 }

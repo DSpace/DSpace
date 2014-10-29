@@ -1495,11 +1495,21 @@ public class Group extends DSpaceObject
      * @throws AuthorizeException
      */
     public static void initDefaultGroupNames(Context context) throws SQLException, AuthorizeException {
-        Group anonymousGroup = Group.find(context, 0);
+        // Check for Anonymous group. If not found, create it
+        Group anonymousGroup = Group.find(context, ANONYMOUS_ID);
+        if(anonymousGroup==null)
+        {
+            anonymousGroup = Group.create(context);
+        }
         anonymousGroup.setName("Anonymous");
         anonymousGroup.update();
 
-        Group adminGroup = Group.find(context, 1);
+        // Check for Administrator group. If not found, create it
+        Group adminGroup = Group.find(context, ADMIN_ID);
+        if(adminGroup==null)
+        {
+            adminGroup = Group.create(context);
+        }
         adminGroup.setName("Administrator");
         adminGroup.update();
     }
