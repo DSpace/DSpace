@@ -326,10 +326,10 @@ public class SolrLogger
                 log.error("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
-			if(request.getHeader("User-Agent") != null)
-			{
-				doc1.addField("userAgent", request.getHeader("User-Agent"));
-			}
+		    if(request.getHeader("User-Agent") != null)
+		    {
+		        doc1.addField("userAgent", request.getHeader("User-Agent"));
+		    }
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -411,10 +411,10 @@ public class SolrLogger
                 log.error("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
-			if(userAgent != null)
-			{
-				doc1.addField("userAgent", userAgent);
-			}
+		    if(userAgent != null)
+		    {
+		        doc1.addField("userAgent", userAgent);
+		    }
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
