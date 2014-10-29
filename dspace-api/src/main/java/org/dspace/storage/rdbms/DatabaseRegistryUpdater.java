@@ -13,6 +13,7 @@ import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * <P>
  * However, there is one exception. If this is a "fresh install" of DSpace, 
  * we'll need to wait until the necessary database tables are created. In
- * that scenario we will load registries AFTER the initial migrations.
+ * that scenario we will load registries AFTER the initial migration.
  * 
  * @author Tim Donohue
  */
@@ -74,7 +75,11 @@ public class DatabaseRegistryUpdater implements FlywayCallback
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);
             }
-            
+
+            // While it's not really a formal "registry", we need to ensure the
+            // default, required Groups exist in DSpace
+            Group.initDefaultGroupNames(context);
+
             context.restoreAuthSystemState();
             // Commit changes and close context
             context.complete();
@@ -102,7 +107,18 @@ public class DatabaseRegistryUpdater implements FlywayCallback
     @Override
     public void afterEachMigrate(Connection connection, MigrationInfo info)
     {
-        // do nothing
+        // If this is a fresh install, we must update registries AFTER the
+        // initial migration runs (since the registry tables won't exist until
+        // the initial migration are performed)
+        if(freshInstall)
+        {
+            // As soon as the MetadataSchemaRegistry table exists, we can update the registries
+            if(DatabaseUtils.tableExists(connection, "MetadataSchemaRegistry"))
+            {
+                updateRegistries();
+                freshInstall = false;
+            }
+        }
     }
     
     @Override
@@ -120,14 +136,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
     @Override
     public void afterMigrate(Connection connection)
     {
-        // If this is a fresh install, we must update registries AFTER the
-        // initial migrations (since the registry tables won't exist until the
-        // initial migrations are performed)
-        if(freshInstall)
-        {
-            updateRegistries();
-            freshInstall = false;
-        }
+        // do nothing
     }
     
     @Override
