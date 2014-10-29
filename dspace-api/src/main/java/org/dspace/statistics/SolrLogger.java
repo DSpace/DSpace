@@ -11,15 +11,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
-
-import java.io.*;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +46,14 @@ import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Static holder for a HttpSolrClient connection pool to issue
@@ -327,7 +326,10 @@ public class SolrLogger
                 log.error("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
-
+			if(request.getHeader("User-Agent") != null)
+			{
+				doc1.addField("userAgent", request.getHeader("User-Agent"));
+			}
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -353,10 +355,7 @@ public class SolrLogger
                     doc1.addField("longitude", location.longitude);
                     doc1.addField("isBot",isSpiderBot);
 
-                    if(request.getHeader("User-Agent") != null)
-                    {
-                        doc1.addField("userAgent", request.getHeader("User-Agent"));
-                    }
+
                 }
             }
         }
@@ -412,7 +411,10 @@ public class SolrLogger
                 log.error("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(),e);
             }
-
+			if(userAgent != null)
+			{
+				doc1.addField("userAgent", userAgent);
+			}
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -438,10 +440,7 @@ public class SolrLogger
                     doc1.addField("longitude", location.longitude);
                     doc1.addField("isBot",isSpiderBot);
 
-                    if(userAgent != null)
-                    {
-                        doc1.addField("userAgent", userAgent);
-                    }
+
                 }
             }
         }
