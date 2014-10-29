@@ -173,7 +173,7 @@ public class ComponentInfoDTO<T extends DSpaceObject>
     public String buildMyLink(int q)
     {
 
-        String myLink = "<a class='pagination' href=\""
+        String myLink = "<a href=\""
                 + "?open="
                 + type
                 + "&amp;sort_by"
@@ -188,7 +188,7 @@ public class ComponentInfoDTO<T extends DSpaceObject>
 
         if (q == pagecurrent)
         {
-            myLink = "" + q;
+            myLink =  "<a href=\"#\">" + q + "</a>";
         }
         else
         {
