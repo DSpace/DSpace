@@ -61,7 +61,7 @@ public class UpdateHandlePrefix
                 System.out.print("Updating metadatavalues table... ");
                 sql = "UPDATE metadatavalue SET text_value= (SELECT 'http://hdl.handle.net/' || " +
                       "handle FROM handle WHERE handle.resource_id=item_id AND " +
-                      "handle.resource_type_id=2) WHERE  text_value LIKE 'http://hdl.handle.net/%';";
+                      "handle.resource_type_id=2) WHERE  text_value LIKE 'http://hdl.handle.net/%'";
                 updated = DatabaseManager.updateQuery(context, sql, new Object[] {});
                 System.out.println(updated + " metadata values updated");
 
