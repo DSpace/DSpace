@@ -176,4 +176,13 @@ public class Researcher implements EPersonCRISIntegration
         }
         return ResearcherPageUtils.getPersistentIdentifier(result);
     }
+    
+    public String getResearcherBySourceIdAndSourceRef(String sourceID, String sourceRef)
+    {
+        ResearcherPage result = getApplicationService().getEntityBySourceId(sourceRef, sourceID, ResearcherPage.class);
+        if(result==null) {
+            return null;
+        }
+        return ResearcherPageUtils.getPersistentIdentifier(result);
+    }    
 }

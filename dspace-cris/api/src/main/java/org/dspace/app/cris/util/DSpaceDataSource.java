@@ -17,8 +17,12 @@ import org.dspace.services.ConfigurationService;
 
 public class DSpaceDataSource {
 	private ConfigurationService configurationService;
-
+	private Properties hibernateProperties;
+	
 	public Properties getHibernateProperties(){
+	    if(hibernateProperties!=null) {
+	        return hibernateProperties;
+	    }
 		String dspaceDir = configurationService.getProperty("dspace.dir");
 		Properties prop = new Properties();
 		FileReader reader = null;
@@ -42,7 +46,8 @@ public class DSpaceDataSource {
 				}
 			}
 		}
-		return prop;
+		this.hibernateProperties = prop;
+		return this.hibernateProperties;
 	}
 	
 	public String getUsername()
@@ -64,6 +69,47 @@ public class DSpaceDataSource {
 	{
 		return configurationService.getProperty("db.driver");
 	}
+
+    public String getHibernateAcquireIncrement()
+    {
+        return getHibernateProperties().getProperty("hibernate.acquireIncrement");
+    }
+
+    public String getHibernateInitialPoolSize()
+    {
+        return getHibernateProperties().getProperty("hibernate.initialPoolSize");
+    }
+
+    public String getHibernateMinPoolSize()
+    {
+        return getHibernateProperties().getProperty("hibernate.minPoolSize");
+    }
+    
+    public String getHibernateMaxPoolSize()
+    {
+        return getHibernateProperties().getProperty("hibernate.maxPoolSize");
+    }
+
+    public String getHibernateMaxIdleTime()
+    {
+        return getHibernateProperties().getProperty("hibernate.maxIdleTime");
+    }
+    
+    public String getHibernateMaxStatements()
+    {
+        return getHibernateProperties().getProperty("hibernate.maxStatements");
+    }
+    
+    public String getHibernateIdleConnectionTestPeriod()
+    {
+        return getHibernateProperties().getProperty("hibernate.idleConnectionTestPeriod");
+    }
+
+    public String getHibernateLoginTimeout()
+    {
+        return getHibernateProperties().getProperty("hibernate.loginTimeout");
+    }
+        	
 	
 	public void setConfigurationService(
 			ConfigurationService configurationService) {

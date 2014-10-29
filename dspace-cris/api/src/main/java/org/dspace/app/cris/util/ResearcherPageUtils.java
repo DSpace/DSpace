@@ -9,8 +9,6 @@ package org.dspace.app.cris.util;
 
 import it.cilea.osd.jdyna.model.ANestedObject;
 
-
-import it.cilea.osd.jdyna.model.ANestedObject;
 import it.cilea.osd.jdyna.model.Property;
 
 import java.text.DecimalFormat;
@@ -403,7 +401,7 @@ return decorator.generateDisplayValue(alternativeName, rp);
 			SearchService _searchService) throws SearchServiceException
 	{
 		Choices choicesResult;
-		if (query != null && query.length() > 2)
+		if (query != null && query.length() > 1)
 		{
 		    DCPersonName tmpPersonName = new DCPersonName(
 		            query.toLowerCase());
