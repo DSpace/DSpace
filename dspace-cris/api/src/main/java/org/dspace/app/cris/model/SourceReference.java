@@ -7,11 +7,13 @@
  */
 package org.dspace.app.cris.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class SourceReference
+public class SourceReference implements Serializable
 {
     /** Cris internal unique identifier, must be null */
     @Column(nullable=true)

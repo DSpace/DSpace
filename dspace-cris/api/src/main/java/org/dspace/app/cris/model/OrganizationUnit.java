@@ -47,6 +47,7 @@ import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
         @NamedQuery(name = "OrganizationUnit.uniqueUUID", query = "from OrganizationUnit where uuid = ?"),
         @NamedQuery(name = "OrganizationUnit.uniqueBySourceID", query = "from OrganizationUnit where sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
         @NamedQuery(name = "OrganizationUnit.uniqueByCrisID", query = "from OrganizationUnit where crisID = ?"),
+		@NamedQuery(name = "OrganizationUnit.uniqueLastModifiedTimeStamp", query = "select timeStampInfo.timestampLastModified.timestamp from OrganizationUnit rp where rp.id = ?"),
         @NamedQuery(name = "OrganizationUnit.uniqueByUUID", query = "from OrganizationUnit where uuid = ?")
 })
 public class OrganizationUnit extends

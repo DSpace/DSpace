@@ -53,6 +53,7 @@ import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
         @NamedQuery(name = "ResearchObject.uniqueByCrisID", query = "from ResearchObject where crisID = ?"),
         @NamedQuery(name = "ResearchObject.paginateByType.id.asc", query = "from ResearchObject where (typo = :par0) order by id asc"),
         @NamedQuery(name = "ResearchObject.paginateByType.id.desc", query = "from ResearchObject where (typo = :par0) order by id desc"),
+		@NamedQuery(name = "ResearchObject.uniqueLastModifiedTimeStamp", query = "select timeStampInfo.timestampLastModified.timestamp from ResearchObject rp where rp.id = ?"),
         @NamedQuery(name = "ResearchObject.uniqueByUUID", query = "from ResearchObject where uuid = ?")
   })
 public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, DynamicPropertiesDefinition, DynamicNestedProperty, DynamicNestedPropertiesDefinition, DynamicNestedObject, DynamicTypeNestedObject>

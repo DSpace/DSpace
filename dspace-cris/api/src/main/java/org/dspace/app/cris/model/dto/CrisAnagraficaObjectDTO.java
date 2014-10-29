@@ -16,14 +16,14 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
 
     private Boolean status;
     private String sourceID;
-    private String sourceRef;
+
     
     public CrisAnagraficaObjectDTO(ACrisObject object)
     {
         super();
         setSourceID(object.getSourceID());
         setStatus(object.getStatus());
-        setSourceRef(object.getSourceRef());
+
     }
 
     public Boolean getStatus()
@@ -45,14 +45,5 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
     {
         this.sourceID = souceID;
     }
-    
-    public void setSourceRef(String sourceRef)
-    {
-        this.sourceRef = sourceRef;
-    }
-    
-    public String getSourceRef()
-    {
-        return sourceRef;
-    }
+
 }

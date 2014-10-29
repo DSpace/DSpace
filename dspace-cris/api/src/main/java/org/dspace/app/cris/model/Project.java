@@ -46,6 +46,7 @@ import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
         @NamedQuery(name = "Project.uniqueBySourceID", query = "from Project where sourceReference.sourceRef = ? and sourceReference.sourceID = ?"),
         @NamedQuery(name = "Project.uniqueUUID", query = "from Project where uuid = ?"),
         @NamedQuery(name = "Project.uniqueByCrisID", query = "from Project where crisID = ?"),
+		@NamedQuery(name = "Project.uniqueLastModifiedTimeStamp", query = "select timeStampInfo.timestampLastModified.timestamp from Project rp where rp.id = ?"),
         @NamedQuery(name = "Project.uniqueByUUID", query = "from Project where uuid = ?")
   })
 public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefinition, ProjectNestedProperty, ProjectNestedPropertiesDefinition, ProjectNestedObject, ProjectTypeNestedObject>
