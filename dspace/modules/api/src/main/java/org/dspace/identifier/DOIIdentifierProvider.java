@@ -611,7 +611,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     // If versioning has already begun, we have to mint two DOIs: the current DOI, but also the canonical file DOI. Look for that first.
                     // mint the canonical file DOI:
                     DOI canonicalFileDOI = new DOI(canonicalFileDOIString, item);
-                    mint(canonicalFileDOI,true,createListMetadata(item));
+                    mint(canonicalFileDOI,false,createListMetadata(item));
 
                     String packageVersion = getDataPackageVersion(packageDOIString);
                     if (packageVersion.equals("")) {
