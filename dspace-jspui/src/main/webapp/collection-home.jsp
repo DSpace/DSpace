@@ -42,7 +42,6 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.net.URLEncoder" %>
 
-
 <%
     // Retrieve attributes
     Collection collection = (Collection) request.getAttribute("collection");
@@ -202,6 +201,10 @@
     }
 %>
         </form>
+
+<div class="row">
+	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
+</div>
 
 <% if (show_items)
    {

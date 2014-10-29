@@ -208,4 +208,10 @@ if (communities != null && communities.length != 0)
     %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
 </div>
+
+<div class="row">
+	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
+</div>
+	
+</div>
 </dspace:layout>
