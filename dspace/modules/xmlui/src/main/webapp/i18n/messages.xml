@@ -891,9 +891,7 @@
 		the file from reaching us correctly, or you have attempted to upload a file format marked for
 		internal system use only. Please try again.</message>
 	<message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief
-		description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-		readings</i>".</message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload"
 		>Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
@@ -918,9 +916,7 @@
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionally, provide a brief
-		description of the contents; for example, "<i>Main article</i>", or "<i>Experiment data
-			readings</i>".</message>
+	<message key="xmlui.Submission.submit.EditFileStep.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the
 		list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>." <strong>If the format is
 			not in the list</strong>, please describe it in the input box below the list.</message>
@@ -1779,9 +1775,7 @@
 		file on your computer corresponding to your item. If you click "Browse...", a new window will
 		appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionally, provide a
-		brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-			readings</i>".</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Upload</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">You need the ADD &amp; WRITE
 		privilege on at least one bundle to be able to upload new bitstreams.</message>
@@ -1879,9 +1873,7 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_yes">yes</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_no">no</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionally, provide a
-		brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data
-			readings</i>"."</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Enter either "<i>dataset-file</i>", or "<i>dc_readme</i>".</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file
 		from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the
 		format is not in the list, please describe it in the box below.</message>
