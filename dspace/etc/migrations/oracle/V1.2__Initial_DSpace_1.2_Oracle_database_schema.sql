@@ -16,7 +16,8 @@ CREATE SEQUENCE bitstreamformatregistry_seq;
 CREATE SEQUENCE fileextension_seq;
 CREATE SEQUENCE bitstream_seq;
 CREATE SEQUENCE eperson_seq;
-CREATE SEQUENCE epersongroup_seq START WITH 2; -- we reserve 0 and 1
+CREATE SEQUENCE epersongroup_seq START WITH 2; 
+-- we reserve 0 and 1
 CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
@@ -106,9 +107,6 @@ CREATE TABLE EPerson
   sub_frequency       INTEGER,
   phone	              VARCHAR2(32)
 );
-
--- index by email
-CREATE INDEX eperson_email_idx ON EPerson(email);
 
 -------------------------------------------------------
 -- EPersonGroup table
@@ -310,9 +308,6 @@ CREATE TABLE Handle
   resource_type_id INTEGER,
   resource_id      INTEGER
 );
-
--- index by handle, commonly looked up
-CREATE INDEX handle_handle_idx ON Handle(handle);
 
 -------------------------------------------------------
 --  WorkspaceItem table
