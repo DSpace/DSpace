@@ -146,33 +146,37 @@ public class DatabaseUtils
                 // DatabaseManager auto-initializes. It'll take care of the migration itself.
                 // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
                 DatabaseManager.getDbName();
+                System.out.println("Done.");
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
                 System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
                 flyway.repair();
+                System.out.println("Done.");
             }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                System.out.println("If you continue, ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED. \n");
-                System.out.println("There is no turning back from this action. You should backup your database before continuing. \n");
-                System.out.print("Are you sure you want to clear your entire database? [y/n]: ");
+                System.out.println("\nIf you continue, ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
+                System.out.println("There is NO turning back from this action. You should backup your database before continuing.");
+                System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
+                System.out.print("Are you sure you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
                 String choiceString = input.readLine();
                 input.close();
 
                 if (choiceString.equalsIgnoreCase("y"))
                 {
                     System.out.println("Scrubbing database clean... (Check logs for details)");
-                    flyway.clean();
+                    cleanDatabase(flyway, dataSource);
+                    System.out.println("Done.");
                 }
             }
             else
             {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions include: 'test', info', 'migrate', 'repair' or 'clean'");
+                System.out.println("Valid actions include: 'test', 'info', 'migrate', 'repair' or 'clean'");
                 System.out.println(" - test    = Test database connection is OK");
                 System.out.println(" - info    = Describe basic info about Database (type, version, driver)");
                 System.out.println(" - migrate = Migrate the Database to the latest version");
@@ -308,6 +312,58 @@ public class DatabaseUtils
         }
         else
             log.info("DSpace database schema is up to date");
+    }
+    
+    /**
+     * Clean the existing database, permanently removing all data and tables
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to clean the database
+     *
+     * @param flyway
+     *      Initialized Flyway object
+     * @param dataSource
+     *      Initialized DataSource
+     * @throws SQLException
+     *      If database cannot be cleaned.
+     */
+    private static synchronized void cleanDatabase(Flyway flyway, DataSource dataSource)
+            throws SQLException
+    {
+        // First, run Flyway's clean command on database.
+        // For MOST database types, this takes care of everything
+        flyway.clean();
+
+        Connection connection = null;
+        try
+        {
+            // Get info about which database type we are using
+            connection = dataSource.getConnection();
+            DatabaseMetaData meta = connection.getMetaData();
+            String dbKeyword = DatabaseManager.findDbKeyword(meta);
+
+            // If this is Oracle, the only way to entirely clean the database
+            // is to also purge the "Recyclebin". See:
+            // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
+            if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE))
+            {
+                PreparedStatement statement = null;
+                try
+                {
+                    statement = connection.prepareStatement("PURGE RECYCLEBIN");
+                    statement.executeQuery();
+                }
+                finally
+                {
+                    if(statement!=null && !statement.isClosed())
+                        statement.close();
+                }
+            }
+        }
+        finally
+        {
+            if(connection!=null && !connection.isClosed())
+                connection.close();
+        }
     }
 
     /**
