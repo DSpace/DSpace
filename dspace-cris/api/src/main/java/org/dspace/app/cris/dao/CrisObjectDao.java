@@ -7,6 +7,8 @@
  */
 package org.dspace.app.cris.dao;
 
+import java.util.Date;
+
 import it.cilea.osd.common.dao.PaginableObjectDao;
 
 import org.dspace.app.cris.model.ACrisObject;
@@ -21,5 +23,7 @@ public interface CrisObjectDao<T extends ACrisObject> extends PaginableObjectDao
     T uniqueBySourceID(String sourceRef, String sourceID);
 
     T uniqueByUUID(String uuid);
+    
+    Date uniqueLastModifiedTimeStamp(Integer id);
     
 }

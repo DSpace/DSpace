@@ -59,7 +59,7 @@ public interface ResearcherPageDao extends CrisObjectDao<ResearcherPage>
     public List<ResearcherPage> findAllResearcherInSourceIDRange(String start,
             String end);
     
-    public Date uniqueLastModifiedTimeStamp(Integer id);
+
 
     public List<RPProperty> findAnagraficaByRPID(Integer id);
 
