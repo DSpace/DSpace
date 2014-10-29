@@ -21,7 +21,6 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.webui.cris.dto.ManageRelationDTO;
 import org.dspace.app.webui.cris.util.RelationPreferenceUtil;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -107,7 +106,7 @@ public class FormRelationManagementController extends BaseFormController
     {
         Context context = UIUtil.obtainContext(request);
         ACrisObject cris = getCRISObject(request);
-        AuthorizeManager.authorizeActionBoolean(context, cris, Constants.ADMIN, false);
+        AuthorizeManager.authorizeAction(context, cris, Constants.ADMIN, false);
         
         String relationType = getRelationType(request);
         Map<String, Object> data = new HashMap<String, Object>();
