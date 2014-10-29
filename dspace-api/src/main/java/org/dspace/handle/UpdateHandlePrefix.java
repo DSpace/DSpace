@@ -41,7 +41,8 @@ public class UpdateHandlePrefix
             Context context = new Context();
             System.out.println("If you continue, all handles in your repository with prefix " +
                                 oldH + " will be updated to have handle prefix " + newH + "\n");
-            String sql = "SELECT count(*) as count FROM handle " +
+            String sql = "SELECT count(*) as count " +
+                         "FROM handle " +
                          "WHERE handle LIKE '" + oldH + "%'";
             TableRow row = DatabaseManager.querySingle(context, sql, new Object[] {});
             long count = row.getLongColumn("count");
@@ -53,15 +54,21 @@ public class UpdateHandlePrefix
             {
                 // Make the changes
                 System.out.print("Updating handle table... ");
-                sql = "update handle set handle = '" + newH + "' || '/' || handle_id " +
-                      "where handle like '" + oldH + "/%'";
+                sql = "UPDATE handle " +
+                      "SET handle = '" + newH + "' || '/' || handle_id " +
+                      "WHERE handle like '" + oldH + "/%'";
                 int updated = DatabaseManager.updateQuery(context, sql, new Object[] {});
                 System.out.println(updated + " items updated");
 
                 System.out.print("Updating metadatavalues table... ");
-                sql = "UPDATE metadatavalue SET text_value= (SELECT 'http://hdl.handle.net/' || " +
-                      "handle FROM handle WHERE handle.resource_id=item_id AND " +
-                      "handle.resource_type_id=2) WHERE  text_value LIKE 'http://hdl.handle.net/%'";
+                sql = "UPDATE metadatavalue " +
+                      "SET text_value = " +
+                        "(" +
+                          "SELECT 'http://hdl.handle.net/' || handle " +
+                          "FROM handle " +
+                          "WHERE handle.resource_id = item_id AND handle.resource_type_id = 2" +
+                        ") " +
+                      "WHERE text_value LIKE 'http://hdl.handle.net/%'";
                 updated = DatabaseManager.updateQuery(context, sql, new Object[] {});
                 System.out.println(updated + " metadata values updated");
 
