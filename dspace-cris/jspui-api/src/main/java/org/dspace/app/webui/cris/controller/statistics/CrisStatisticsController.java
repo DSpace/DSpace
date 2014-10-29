@@ -7,6 +7,8 @@
  */
 package org.dspace.app.webui.cris.controller.statistics;
 
+
+import it.cilea.osd.jdyna.components.IBeanSubComponent;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
@@ -40,6 +42,7 @@ import org.dspace.app.cris.statistics.bean.TwoKeyMap;
 import org.dspace.app.webui.cris.components.statistics.StatsComponent;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.springframework.web.servlet.ModelAndView;
 
 public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>>
@@ -58,6 +61,8 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
         String id = getId(request);
         String type = request.getParameter("type");
         String mode = request.getParameter("mode");
+        ACrisObject crisObject = (ACrisObject) getObject(request);
+        
         if (mode == null || mode.isEmpty())
         {
             mode = StatsComponent.VIEW;
@@ -94,30 +99,44 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
                 }
                 rightMenu.add(menuV);
 
-                RightMenuBean menuD = new RightMenuBean();
-                menuD.setMode(StatsComponent.DOWNLOAD);
-                menuD.setType(AStatComponentService._SELECTED_OBJECT);
-                if (type.equals(menuD.getType())
-                        && mode.equals(menuD.getMode()))
+                if (ConfigurationManager.getBooleanProperty("solr-statistics",
+                        "statistics.show.download.file."
+                                + getTarget().getName()))
                 {
-                    menuD.setCurrent(true);
+                    RightMenuBean menuD = new RightMenuBean();
+                    menuD.setMode(StatsComponent.DOWNLOAD);
+                    menuD.setType(AStatComponentService._SELECTED_OBJECT);
+                    if (type.equals(menuD.getType())
+                            && mode.equals(menuD.getMode()))
+                    {
+                        menuD.setCurrent(true);
+                    }
+                    rightMenu.add(menuD);
                 }
-                rightMenu.add(menuD);
             }
 
             for (String key : components.keySet())
             {
+                ICRISComponent component = (ICRISComponent) components.get(key);
+
+                Map<String, IBeanSubComponent> comp = component.getTypes();
+				request.setAttribute(component.getClass().getName() + "-"
+						+ component.getRelationConfiguration().getRelationName(), crisObject);
+				List l = component.sublinks(request, response);
+				boolean hasValue = l != null && l.size() > 0;
+				
                 boolean createMenu = true;
                 if (ResearchObject.class.isAssignableFrom(getTarget()))
                 {
                     String relationName = ((ICRISComponent) components.get(key))
                             .getRelationConfiguration().getRelationName();
-                    if(!relationName.startsWith(getApplicationService().get(ResearchObject.class, Integer.parseInt(id)).getTypeText())) {
-                        createMenu = false;
+                    if(!relationName.startsWith(getApplicationService().get(ResearchObject.class, Integer.parseInt(id)).getTypeText()))
+                    {   
+                    	createMenu = false;
                     }
                 }
 
-                if (createMenu)
+                if (createMenu && hasValue)
                 {
                     RightMenuBean menuV = new RightMenuBean();
                     menuV.setMode(StatsComponent.VIEW);
@@ -129,15 +148,21 @@ public class CrisStatisticsController<T extends ACrisObject<P, TP, NP, NTP, ACNO
                     }
                     rightMenu.add(menuV);
 
-                    RightMenuBean menuD = new RightMenuBean();
-                    menuD.setMode(StatsComponent.DOWNLOAD);
-                    menuD.setType(key);
-                    if (type.equals(menuD.getType())
-                            && mode.equals(menuD.getMode()))
-                    {
-                        menuD.setCurrent(true);
+                    if (ConfigurationManager.getBooleanProperty(
+                            "solr-statistics", "statistics.show.download.file."
+                                    + component.getRelationConfiguration()
+                                            .getRelationClass().getName()))
+                    {                    
+	                    RightMenuBean menuD = new RightMenuBean();
+	                    menuD.setMode(StatsComponent.DOWNLOAD);
+	                    menuD.setType(key);
+	                    if (type.equals(menuD.getType())
+	                            && mode.equals(menuD.getMode()))
+	                    {
+	                        menuD.setCurrent(true);
+	                    }
+	                    rightMenu.add(menuD);
                     }
-                    rightMenu.add(menuD);
                 }
             }
 
