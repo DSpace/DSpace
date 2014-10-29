@@ -25,4 +25,11 @@ public class OUAuthority extends CRISAuthority
         return OrganizationUnit.class;
     }
 
+    
+    @Override
+    public String getPublicPath() {
+    	return "ou";
+    }
+    
+
 }

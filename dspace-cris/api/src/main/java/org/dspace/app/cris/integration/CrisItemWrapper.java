@@ -107,15 +107,16 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
             {
                 for (String cM : crisMetadata)
                 {
-                    extraMetadata = CrisItemEnhancerUtility
-                            .getCrisMetadata(item, cM);
+                	extraMetadata.addAll(CrisItemEnhancerUtility.getCrisMetadata(item, cM));
+
                 }
             }
         }
         else if ("crisitem".equals(schema))
         {
-            extraMetadata = CrisItemEnhancerUtility.getCrisMetadata(item,
-                    schema + "." + element + "." + qualifier);
+        	extraMetadata.addAll(CrisItemEnhancerUtility
+					.getCrisMetadata(item, schema + "." + element + "." + qualifier));
+
         }
         if (extraMetadata.size() == 0)
         {
@@ -138,8 +139,9 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
     {
         List<DCValue> extraMetadata = new ArrayList<DCValue>();
         
-          extraMetadata = ItemEnhancerUtility.getMetadata(item,
-                    schema + "." + element + "." + qualifier);
+
+		extraMetadata = ItemEnhancerUtility.getMetadata(item, schema + "." + element
+				+ (qualifier != null ? "." + qualifier : ""));
         
         if (extraMetadata == null || extraMetadata.size() == 0)
         {

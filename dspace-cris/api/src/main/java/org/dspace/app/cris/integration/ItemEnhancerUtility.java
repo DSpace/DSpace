@@ -43,7 +43,7 @@ public class ItemEnhancerUtility
         String element = tokens[1];
         String qualifier = tokens[2];
 
-        if (!"item".equals(schema))
+        if (!"item".equals(schema) && !Item.ANY.equals(schema))
         {
             return null;
         }
@@ -60,24 +60,27 @@ public class ItemEnhancerUtility
             List<DefaultValuesBean> vals = getMetadata(item, enh, qualifier);
             for (DefaultValuesBean e : vals)
             {
-                DCValue dc = new DCValue();
-                dc.schema = "item";
-                dc.element = enh.getAlias();
-                dc.qualifier = qualifier;
-                dc.value = e.getValues()[0];
-                if (e.getAuthorities() != null && e.getAuthorities().length > 0)
-                {
-                    dc.authority = e.getAuthorities()[0];
-                    dc.confidence = StringUtils
-                            .isNotEmpty(e.getAuthorities()[0]) ? Choices.CF_ACCEPTED
-                            : Choices.CF_UNSET;
-                }
-                else
-                {
-                    dc.authority = null;
-                    dc.confidence = Choices.CF_UNSET;
-                }
-                result.add(dc);
+				if (e.getValues() != null) {
+					for (int idx = 0; idx < e.getValues().length; idx++) {
+						DCValue dc = new DCValue();
+						dc.schema = "item";
+						dc.element = enh.getAlias();
+						dc.qualifier = Item.ANY.equalsIgnoreCase(qualifier) || StringUtils.isBlank(qualifier) ? null
+								: qualifier;
+						dc.value = e.getValues()[idx];
+						if (StringUtils.isNotBlank(dc.value)) {
+							if (e.getAuthorities() != null && e.getAuthorities().length > 0) {
+								dc.authority = e.getAuthorities()[idx];
+								dc.confidence = StringUtils.isNotEmpty(e.getAuthorities()[idx]) ? Choices.CF_ACCEPTED
+										: Choices.CF_UNSET;
+							} else {
+								dc.authority = null;
+								dc.confidence = Choices.CF_UNSET;
+							}
+							result.add(dc);
+						}
+					}
+				}
             }
 
         }
@@ -97,26 +100,34 @@ public class ItemEnhancerUtility
             for (String md : mdList)
             {
                 DCValue[] dcvalues = item.getMetadata(md);
-                for (DCValue dc : dcvalues)
-                {
-                    DefaultValuesBean valueGenerated = null;
-                    String schema = dc.schema;
-                    String element = dc.element;
-                    String qual = dc.qualifier;
-                    String value = dc.value;
-                    for (EnhancedValuesGenerator vg : enh.getGenerators())
-                    {
-                        valueGenerated = vg.generateValues(item, schema,
-                                element, qual, value);
-                        if (valueGenerated.getValues() != null
-                                && valueGenerated.getValues().length > 0)
-                        {
-                            value = valueGenerated.getValues()[0];
-                        }
-                    }
-                    result.add(valueGenerated);
-                }
-            }
+				if ("placeholder.placeholder.placeholder".equalsIgnoreCase(md)) {
+					DefaultValuesBean valueGenerated = null;
+					String schema = "placeholder";
+					String element = "placeholder";
+					String qual = "placeholder";
+					String value = null;
+					for (EnhancedValuesGenerator vg : enh.getGenerators()) {
+						valueGenerated = vg.generateValues(item, schema, element, qual, value);
+						if (valueGenerated.getValues() != null && valueGenerated.getValues().length > 0) {
+							result.add(valueGenerated);
+						}
+					}
+				} else {
+					for (DCValue dc : dcvalues) {
+						DefaultValuesBean valueGenerated = null;
+						String schema = dc.schema;
+						String element = dc.element;
+						String qual = dc.qualifier;
+						String value = dc.value;
+						for (EnhancedValuesGenerator vg : enh.getGenerators()) {
+							valueGenerated = vg.generateValues(item, schema, element, qual, value);
+							if (valueGenerated.getValues() != null && valueGenerated.getValues().length > 0) {
+								result.add(valueGenerated);
+							}
+						}
+					}
+				}
+			}
 
         }
         catch (Exception ex)

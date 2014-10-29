@@ -509,11 +509,8 @@ public class BindItemToRP
             IOException
     {
         Set<Integer> ids = getPotentialMatch(context, researcher);
-        DatabaseManager
-                .updateQuery(
-                        context,
-                        "DELETE FROM potentialmatches WHERE rp like ? AND pending IS NULL",
-                        researcher.getCrisID());
+        String crisID = researcher.getCrisID();
+		deletePotentialMatch(context, crisID);
         for (Integer id : ids)
         {
             TableRow pmTableRow = DatabaseManager.create(context,
@@ -525,6 +522,15 @@ public class BindItemToRP
         context.commit();
     }
 
+	public static void deletePotentialMatch(Context context, String crisID) throws SQLException {
+		DatabaseManager
+                .updateQuery(
+                        context,
+                        "DELETE FROM potentialmatches WHERE rp like ? AND pending IS NULL",
+                        crisID);
+	}
+	
+	
     public static void generatePotentialMatches(
             ApplicationService applicationService, Context context, String rp)
             throws SQLException, AuthorizeException, IOException

@@ -98,9 +98,11 @@ public class CrisItemEnhancerUtility
                         dc.element = enh.getAlias();
                         dc.qualifier = qual;
                         dc.value = e[0];
-                        dc.authority = e[1];
-                        dc.confidence = StringUtils.isNotEmpty(e[1])?Choices.CF_ACCEPTED:Choices.CF_UNSET;
-                        result.add(dc);
+						if (StringUtils.isNotBlank(dc.value)) {
+							dc.authority = e[1];
+							dc.confidence = StringUtils.isNotEmpty(e[1]) ? Choices.CF_ACCEPTED : Choices.CF_UNSET;
+							result.add(dc);
+						}
                     }
                 }
             }
@@ -128,9 +130,11 @@ public class CrisItemEnhancerUtility
                     dc.element = enh.getAlias();
                     dc.qualifier = qualifier;
                     dc.value = e[0];
-                    dc.authority = e[1];
-                    dc.confidence = StringUtils.isNotEmpty(e[1])?Choices.CF_ACCEPTED:Choices.CF_UNSET;
-                    result.add(dc);
+					if (StringUtils.isNotBlank(dc.value)) {
+						dc.authority = e[1];
+						dc.confidence = StringUtils.isNotEmpty(e[1]) ? Choices.CF_ACCEPTED : Choices.CF_UNSET;
+						result.add(dc);
+					}
                 }
             }
         }
@@ -179,6 +183,9 @@ public class CrisItemEnhancerUtility
         {
             DSpace dspace = new DSpace();
             String path = enh.getQualifiers2path().get(qualifier);
+			if (path == null) {
+				return result;
+			}            
             ApplicationService as = dspace.getServiceManager()
                     .getServiceByName("applicationService",
                             ApplicationService.class);

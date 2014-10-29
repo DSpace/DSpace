@@ -36,13 +36,19 @@ public class CrisRetrievePotentialMatchPlugin implements
     private static Logger log = Logger
             .getLogger(CrisRetrievePotentialMatchPlugin.class);
 
+    /**
+     * the name of the browse index where lookup for potential matches.
+     * Configured in the dspace.cfg with the property
+     * <code>researcherpage.browseindex</code>
+     */
+    private static final String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
+            .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
+    
     @Override
     public Set<Integer> retrieve(Context context, Set<Integer> invalidIds,
             ResearcherPage researcher)
     {
 
-        String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
-                .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
 
         String authority = researcher.getCrisID();
         Integer id = researcher.getId();
@@ -108,9 +114,7 @@ public class CrisRetrievePotentialMatchPlugin implements
             Map<String, Set<Integer>> mapInvalids, List<ResearcherPage> rps)
     {
         
-        String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
-                .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
-        
+      
         Map<NameResearcherPage, Item[]> result = new HashMap<NameResearcherPage, Item[]>();
 
         for (ResearcherPage researcher : rps)

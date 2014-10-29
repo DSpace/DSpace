@@ -27,6 +27,7 @@ import org.dspace.content.authority.ChoiceAuthorityDetails;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.services.ConfigurationService;
@@ -138,6 +139,8 @@ public abstract class CRISAuthority implements ChoiceAuthority, ChoiceAuthorityD
                                         luceneQuery.length() - 1) + "\")");
                 
                 discoverQuery.setMaxResults(50);
+                discoverQuery.setSortField("crisauthoritylookup_sort", SORT_ORDER.asc);
+                
                 DiscoverResult result = searchService.search(null,
                         discoverQuery, true);
 
@@ -148,7 +151,7 @@ public abstract class CRISAuthority implements ChoiceAuthority, ChoiceAuthorityD
                     ACrisObject cris = (ACrisObject) dso;
                     choiceList.add(new Choice(ResearcherPageUtils
                             .getPersistentIdentifier(cris), cris.getName(),
-                            cris.getName()));
+                            getDisplayEntry(cris)));
                 }
 
                 Choice[] results = new Choice[choiceList.size()];
@@ -165,6 +168,10 @@ public abstract class CRISAuthority implements ChoiceAuthority, ChoiceAuthorityD
         }
     }
 
+	protected String getDisplayEntry(ACrisObject cris) {
+		return cris.getName();
+	}    
+    
     protected abstract int getCRISTargetTypeID();
 
     private String getPluginName()
@@ -217,6 +224,8 @@ public abstract class CRISAuthority implements ChoiceAuthority, ChoiceAuthorityD
     }
 
     protected abstract Class<? extends ACrisObject> getCRISTargetClass();
+  
+    public abstract String getPublicPath();
     
     @Override
     public Object getDetailsInfo(String field, String key, String locale) {
