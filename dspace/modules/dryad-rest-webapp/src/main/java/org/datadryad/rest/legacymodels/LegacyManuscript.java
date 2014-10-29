@@ -34,17 +34,23 @@ public class LegacyManuscript {
         for(Author author : manuscript.authors.author) {
             this.Authors.Author.add(author.fullName());
         }
-        this.Corresponding_Author = manuscript.correspondingAuthor.author.fullName();
-        this.Email = manuscript.correspondingAuthor.email;
-        this.Address_Line_1 = manuscript.correspondingAuthor.address.addressLine1;
-        this.Address_Line_2 = manuscript.correspondingAuthor.address.addressLine2;
-        this.Address_Line_3 = manuscript.correspondingAuthor.address.addressLine3;
-        this.City = manuscript.correspondingAuthor.address.city;
-        this.State = manuscript.correspondingAuthor.address.state;
-        this.Country = manuscript.correspondingAuthor.address.country;
-        this.Zip = manuscript.correspondingAuthor.address.zip;
+        if(manuscript.correspondingAuthor != null) {
+            if(manuscript.correspondingAuthor.author != null) {
+                this.Corresponding_Author = manuscript.correspondingAuthor.author.fullName();
+            }
+            this.Email = manuscript.correspondingAuthor.email;
+            if(manuscript.correspondingAuthor.address != null) {
+                this.Address_Line_1 = manuscript.correspondingAuthor.address.addressLine1;
+                this.Address_Line_2 = manuscript.correspondingAuthor.address.addressLine2;
+                this.Address_Line_3 = manuscript.correspondingAuthor.address.addressLine3;
+                this.City = manuscript.correspondingAuthor.address.city;
+                this.State = manuscript.correspondingAuthor.address.state;
+                this.Country = manuscript.correspondingAuthor.address.country;
+                this.Zip = manuscript.correspondingAuthor.address.zip;
+            }
+        }
         this.Abstract = manuscript.manuscript_abstract;
-        for(String keyword : manuscript.keywords.keyword) {
+        for(String keyword : manuscript.getKeywords()) {
             this.Classification.keyword.add(keyword);
         }
     }
