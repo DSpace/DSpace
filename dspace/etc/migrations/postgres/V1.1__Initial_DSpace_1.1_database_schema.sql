@@ -54,7 +54,8 @@ CREATE SEQUENCE bitstreamformatregistry_seq;
 CREATE SEQUENCE fileextension_seq;
 CREATE SEQUENCE bitstream_seq;
 CREATE SEQUENCE eperson_seq;
-CREATE SEQUENCE epersongroup_seq;
+-- start group sequence at 0, since Anonymous group = 0
+CREATE SEQUENCE epersongroup_seq MINVALUE 0 START WITH 0;
 CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
@@ -563,12 +564,3 @@ SELECT Community2Item.community_id, ItemsByDateAccessioned.*
 FROM ItemsByDateAccessioned, Community2Item
 WHERE ItemsByDateAccessioned.item_id = Community2Item.item_id
 ;
-
-
--------------------------------------------------------
---  Create 'special' groups, for anonymous access
---  and administrators
--------------------------------------------------------
--- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0, 'Anonymous');
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
