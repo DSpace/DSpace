@@ -75,7 +75,7 @@ public class UpdateHandlePrefix
                 // Commit the changes
                 context.complete();
 
-                System.out.print("Re-creating browse and search indexes... ");                
+                System.out.print("Re-creating browse and search indexes... ");
 
                 // Reinitialise the browse system
                 IndexBrowse.main(new String[] {"-i"});
