@@ -40,6 +40,7 @@ import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.core.ConfigurationManager;
 import org.hibernate.Session;
 
 /**
@@ -69,7 +70,11 @@ public class ApplicationService extends ExtendedTabService
     private CacheManager cacheManager;
 
     private Cache cache;
-
+	private Cache cacheRpByEPerson;
+	private Cache cacheByCrisID;
+	private Cache cacheBySource;
+	private Cache cacheByUUID;
+	
     private static Logger log = Logger.getLogger(ApplicationService.class);
 
     /**
@@ -86,20 +91,60 @@ public class ApplicationService extends ExtendedTabService
         relationPreferenceDao = (RelationPreferenceDao) getDaoByModel(RelationPreference.class);
         researchDao = (DynamicObjectDao) getDaoByModel(ResearchObject.class);
         
-        if (cache == null)
+		if (ConfigurationManager.getBooleanProperty("cris", "applicationServiceCache.enabled", true)
+        		&& cache == null)
         {
             try
             {
                 cacheManager = CacheManager.create();
                 if (cacheManager != null)
                 {
+					int maxInMemoryObjects = ConfigurationManager.getIntProperty("cris",
+							"applicationServiceCache.max-in-memory-objects", 100);
+					boolean overflowToDisk = ConfigurationManager.getBooleanProperty("cris",
+							"applicationServiceCache.overflow-to-disk", true);
+					int timeToLive = ConfigurationManager.getIntProperty("cris",
+							"applicationServiceCache.time-to-live", 0);
+					int timeToIdle = ConfigurationManager.getIntProperty("cris",
+							"applicationServiceCache.time-to-idle", 0);
+					int diskExpireThreadInterval = ConfigurationManager.getIntProperty("cris",
+							"applicationServiceCache.disk-expire-thread-interval", 600);
+                	
                     cache = cacheManager.getCache("applicationServiceCache");
                     if (cache == null)
                     {
-                        cache = new Cache("applicationServiceCache", 100, true,
-                                true, 0, 0, false, 600);
+						cache = new Cache("applicationServiceCache", maxInMemoryObjects, overflowToDisk, false,
+								timeToLive, timeToIdle, false, diskExpireThreadInterval);
+
                         cacheManager.addCache(cache);
                     }
+					cacheRpByEPerson = cacheManager.getCache("applicationServiceCacheRpByEPerson");
+					if (cacheRpByEPerson == null) {
+						cacheRpByEPerson = new Cache("applicationServiceCacheRpByEPerson", maxInMemoryObjects,
+								overflowToDisk, false, timeToLive, timeToIdle, false, diskExpireThreadInterval);
+						cacheManager.addCache(cacheRpByEPerson);
+					}
+
+					cacheByCrisID = cacheManager.getCache("applicationServicecacheByCrisID");
+					if (cacheByCrisID == null) {
+						cacheByCrisID = new Cache("applicationServicecacheByCrisID", maxInMemoryObjects,
+								overflowToDisk, false, timeToLive, timeToIdle, false, diskExpireThreadInterval);
+						cacheManager.addCache(cacheByCrisID);
+					}
+
+					cacheBySource = cacheManager.getCache("applicationServiceCacheBySource");
+					if (cacheBySource == null) {
+						cacheBySource = new Cache("applicationServiceCacheBySource", maxInMemoryObjects,
+								overflowToDisk, false, timeToLive, timeToIdle, false, diskExpireThreadInterval);
+						cacheManager.addCache(cacheBySource);
+					}
+
+					cacheByUUID = cacheManager.getCache("applicationServiceCacheBySource");
+					if (cacheByUUID == null) {
+						cacheByUUID = new Cache("applicationServiceCacheByUUID", maxInMemoryObjects, overflowToDisk,
+								false, timeToLive, timeToIdle, false, diskExpireThreadInterval);
+						cacheManager.addCache(cacheByUUID);
+					}                    
                 }
             }
             catch (Exception ex)
@@ -114,6 +159,10 @@ public class ApplicationService extends ExtendedTabService
         if (cacheManager != null)
         {
             cache = null;
+			cacheRpByEPerson = null;
+			cacheBySource = null;
+			cacheByCrisID = null;
+			cacheByUUID = null;            
             cacheManager.shutdown();
         }
     }
@@ -495,6 +544,18 @@ public class ApplicationService extends ExtendedTabService
 
     public ResearcherPage getResearcherPageByEPersonId(Integer id)
     {
+		if (cacheRpByEPerson != null) {
+			Element element = cacheRpByEPerson.get(id);
+			if (element != null) {
+				ResearcherPage rp = (ResearcherPage) element.getValue();
+				if (!isExpiredCache(ResearcherPage.class, element, id, rp)) {
+					return rp;
+				}
+				else if (rp != null) {
+					return get(ResearcherPage.class, rp.getId(), false);
+				}
+			}
+		}    	
         return researcherPageDao.uniqueByEPersonId(id);
     }
 
@@ -522,19 +583,61 @@ public class ApplicationService extends ExtendedTabService
     public <T extends ACrisObject> T getEntityByCrisId(String crisID,
             Class<T> className)
     {        
+		if (cacheByCrisID != null) {
+			Element element = cacheByCrisID.get(crisID);
+			if (element != null) {
+				T crisObject = (T) element.getValue();
+				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
+					return crisObject;
+				}
+				else if (crisObject != null) {
+					return get(className, crisObject.getId(), false);
+				}
+			}
+		}
+
         CrisObjectDao<T> dao = (CrisObjectDao<T>) getDaoByModel(className);
-        return dao.uniqueByCrisID(crisID);
+		T object = dao.uniqueByCrisID(crisID);
+		if (object != null) {
+			putToCache(className, object, object.getId());
+		}
+		return object;
     }
   
     public <T extends ACrisObject> T getEntityBySourceId(String sourceRef, String sourceID,
             Class<T> className)
     {
+		if (cacheBySource != null) {
+			Element element = cacheBySource.get(sourceRef + "-" + sourceID);
+			if (element != null) {
+				T crisObject = (T) element.getValue();
+				if (!isExpiredCache(className, element, crisObject.getId(), crisObject)) {
+					return crisObject;
+				}
+				else if (crisObject != null) {
+					return get(className, crisObject.getId(), false);
+				}
+			}
+		}
         CrisObjectDao<T> dao = (CrisObjectDao<T>) getDaoByModel(className);
-        return dao.uniqueBySourceID(sourceRef, sourceID);
+		T object = dao.uniqueBySourceID(sourceRef, sourceID);
+		if (object != null) {
+			putToCache(className, object, object.getId());
+		}
+		return object;
     }
 
     public ACrisObject getEntityByUUID(String uuid)
     {
+		if (cacheByUUID != null) {
+			Element element = cacheByUUID.get(uuid);
+			if (element != null) {
+				ACrisObject crisObject = (ACrisObject) element.getValue();
+				if (!isExpiredCache(crisObject.getClass(), element, crisObject.getId(), crisObject)) {
+					return crisObject;
+				}
+			}
+		}    	
         // return ((ApplicationDao) getApplicationDao()).uniqueByUUID(uuid);
         // HIBERNATE 4 seems not support polymorphic query on mappedsuperclass
         ACrisObject obj = researcherPageDao.uniqueByUUID(uuid);
@@ -550,6 +653,9 @@ public class ApplicationService extends ExtendedTabService
                 }
             }
         }
+		if (obj != null) {
+			putToCache((Class) obj.getClass(), obj, obj.getId());
+		}        
         return obj;
     }
 
@@ -564,9 +670,10 @@ public class ApplicationService extends ExtendedTabService
         return userWSDao.uniqueByToken(token);
     }
 
-    public Date uniqueLastModifiedTimeStamp(int id)
+	public <T extends ACrisObject> Date uniqueLastModifiedTimeStamp(Class<T> model, int id)
     {
-        return researcherPageDao.uniqueLastModifiedTimeStamp(id);
+		CrisObjectDao<T> dao = (CrisObjectDao<T>) getDaoByModel(model);
+		return dao.uniqueLastModifiedTimeStamp(id);
     }
     
     public ResearcherPage uniqueByCrisID(String crisID)
@@ -633,17 +740,14 @@ public class ApplicationService extends ExtendedTabService
     public <T extends ACrisObject> T get(
             Class<T> model, Integer objectId, boolean forceDetach)
     {
-        T rp = getFromCache(model, objectId);
-        if (rp == null
-                || rp.getTimeStampInfo().getTimestampLastModified() == null
-                || !rp.getTimeStampInfo().getTimestampLastModified()
-                        .getTimestamp()
-                        .equals(uniqueLastModifiedTimeStamp(objectId)))
+		Element element = getFromCache(model, objectId);
+		T rp = element != null ? (T) element.getValue() : null;
+		if (isExpiredCache(model, element, objectId, rp))
         {
             rp = super.get(model, objectId);
             if (rp != null)
             {
-                putToCache(rp, objectId);
+				putToCache(model, rp, objectId);
                 if (forceDetach)
                 {
                     rp.getAnagrafica();
@@ -654,16 +758,38 @@ public class ApplicationService extends ExtendedTabService
         return rp;
     }
 
-    public <T extends Serializable, PK extends Serializable> T getFromCache(
+
+	private <T extends ACrisObject> boolean isExpiredCache(Class<T> model, Element element, Integer objectId,
+			ACrisObject rp) {
+		Date now = new Date();
+		boolean result = rp == null
+				|| (rp.getTimeStampInfo().getTimestampLastModified() != null
+				&& (now.getTime() - element.getLastAccessTime() > 1000 && !rp.getTimeStampInfo()
+						.getTimestampLastModified().getTimestamp().equals(uniqueLastModifiedTimeStamp(model, objectId))));
+		if (!result) {
+			element.updateAccessStatistics();
+		}
+		return result;
+	}
+
+	@Override
+	public <T, PK extends Serializable> T get(Class<T> modelClass, PK pkey) {
+		if (ACrisObject.class.isAssignableFrom(modelClass) && pkey instanceof Integer) {
+			return (T) get((Class<? extends ACrisObject>) modelClass, (Integer) pkey, false);
+		} else {
+			return super.get(modelClass, pkey);
+		}
+	}
+
+	public <T extends Serializable, PK extends Serializable> Element getFromCache(
             Class<T> model, PK objectId)
     {
         if (cache != null)
         {
             try
             {
-                Element element = cache.get(objectId);
-                if (element != null)
-                    return (T) element.getValue();
+				Element element = cache.getQuiet(model.getName() + "#" + objectId);
+				return element;
             }
             catch (Exception ex)
             {
@@ -673,20 +799,51 @@ public class ApplicationService extends ExtendedTabService
         return null;
     }
 
-    public <T extends Serializable, PK extends Serializable> void putToCache(
+	public <T extends Serializable, PK extends Serializable> void putToCache(Class<T> model,
             T object, PK objectId)
     {
+		if (object == null) {
+			return;
+		}
         if (cache != null)
         {
             try
             {
-                cache.put(new Element(objectId, object));
+				cache.put(new Element(model.getName() + "#" + objectId, object));
             }
             catch (Exception ex)
             {
                 log.error("putToCache", ex);
             }
         }
+		if (cacheRpByEPerson != null && object instanceof ResearcherPage) {
+			Integer eid = ((ResearcherPage) object).getEpersonID();
+			if (eid != null) {
+				cacheRpByEPerson.put(new Element(eid, object));
+			}
+		}
+		if (object instanceof ACrisObject) {
+			if (cacheByCrisID != null) {
+				String key = ((ACrisObject) object).getCrisID();
+				if (key != null) {
+					cacheByCrisID.put(new Element(key, object));
+				}
+			}
+			if (cacheBySource != null) {
+				String sourceRef = ((ACrisObject) object).getSourceRef();
+				String sourceID = ((ACrisObject) object).getSourceID();
+				if (sourceID != null) {
+					String key = sourceRef + "-" + sourceID;
+					cacheBySource.put(new Element(key, object));
+				}
+			}
+			if (cacheByUUID != null) {
+				String key = ((ACrisObject) object).getUuid();
+				if (key != null) {
+					cacheByUUID.put(new Element(key, object));
+				}
+			}
+		}        
     }
 
     public Integer getRPidFindMax()
