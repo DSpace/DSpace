@@ -71,6 +71,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
@@ -103,11 +104,15 @@ public class CrisSearchService extends SolrServiceImpl
     {
         if (dso != null && dso.getType() >= CrisConstants.CRIS_TYPE_ID_START)
         {
-            indexCrisObject((ACrisObject) dso, false);
+            indexCrisObject((ACrisObject) dso, force);
         }
         else
         {
-            super.indexContent(context, dso, force);
+			if (dso.getType() == Constants.ITEM) {
+				super.indexContent(context, ((Item) dso).getWrapper(), force);
+			} else {
+				super.indexContent(context, dso, force);
+			}
         }
     }
 
@@ -196,12 +201,6 @@ public class CrisSearchService extends SolrServiceImpl
         }
     }
 
-    @Override
-    protected void buildDocument(Context context, Item item)
-            throws SQLException, IOException
-    {
-        super.buildDocument(context, item.getWrapper());
-    }
 
     public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> boolean indexCrisObject(
             ACrisObject<P, TP, NP, NTP, ACNO, ATNO> dso, boolean b)
@@ -234,13 +233,12 @@ public class CrisSearchService extends SolrServiceImpl
                 toProjectionFields, sortFields);
 
         // add the special crisXX.this metadata
-        if(dso.getName()!=null && !(dso.getName().isEmpty())) {
             indexProperty(doc, dso.getUuid(), schema + ".this", dso.getName(),
                     ResearcherPageUtils.getPersistentIdentifier(dso),
                     toIgnoreFields, searchFilters, toProjectionFields,
                     sortFields, sortFieldsAdded, hitHighlightingFields,
                     moreLikeThisFields);
-        }
+
 
         commonsIndexerAnagrafica(dso, doc, schema, sortFieldsAdded,
                 hitHighlightingFields, uuid, toIgnoreFields, searchFilters,
@@ -266,7 +264,7 @@ public class CrisSearchService extends SolrServiceImpl
         // write the index and close the inputstreamreaders
         try
         {
-            writeDocument(doc);
+            writeDocument(doc,null);
             result = true;
             log.info("Wrote cris: " + dso.getUuid() + " to Index");
         }
@@ -664,7 +662,7 @@ public class CrisSearchService extends SolrServiceImpl
         // write the index and close the inputstreamreaders
         try
         {
-            writeDocument(doc);
+            writeDocument(doc,null);
             result = true;
             log.info("Wrote cris: " + dso.getUuid() + " to Index");
         }
@@ -936,6 +934,34 @@ public class CrisSearchService extends SolrServiceImpl
             log.error(exception.getMessage(), exception);
             emailException(exception);
         }
-    }
-
+       }
+        
+        
+        public void updateIndex(Context context, List<Integer> ids, boolean force, int type) {
+            if (type >= CrisConstants.CRIS_TYPE_ID_START)
+            {
+                for (Integer id : ids)
+                {
+                    if (type >= CrisConstants.CRIS_DYNAMIC_TYPE_ID_START) {
+                        indexCrisObject(getApplicationService().get(ResearchObject.class, id), force);
+                    }                    
+                    else if (CrisConstants.RP_TYPE_ID == type)
+                    {
+                        indexCrisObject(getApplicationService().get(ResearcherPage.class, id), force);
+                    }
+                    else if (CrisConstants.PROJECT_TYPE_ID == type)
+                    {
+                        indexCrisObject(getApplicationService().get(Project.class, id), force);
+                    }
+                    else if (CrisConstants.OU_TYPE_ID == type)
+                    {
+                        indexCrisObject(getApplicationService().get(OrganizationUnit.class, id), force);
+                    }
+                }
+            }
+            else
+            {
+                super.updateIndex(context, ids, force, type);
+            }
+        }
 }

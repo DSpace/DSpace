@@ -57,6 +57,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
+import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -388,6 +389,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         updateIndex(context, force, Constants.COMMUNITY);
     }
 
+    
+    public void updateIndex(Context context, List<Integer> ids, boolean force, int type) {
+        if(type!=Constants.ITEM) {
+            throw new RuntimeException("Only ITEM is supported in this mode - type founded: " + type);
+        }
+        startMultiThreadIndex(force, ids);
+    }
+    
     @Override
     public void updateIndex(Context context, boolean force, int type)
     {
@@ -447,6 +456,26 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
+    private void startMultiThreadIndex(boolean force, List<Integer> ids)
+    {
+        int numThreads = ConfigurationManager.getIntProperty("discovery", "indexer.items.threads", 5);
+
+        List<Integer>[] arrayIDList = Util.splitList(ids, numThreads);
+        List<IndexerThread> threads = new ArrayList<IndexerThread>();
+        for (List<Integer> hl : arrayIDList) {
+        	IndexerThread thread = new IndexerThread(hl, force);
+        	thread.start();
+        	threads.add(thread);
+        }
+        boolean finished = false;
+        while (!finished) {
+        	finished = true;
+        	for (IndexerThread thread : threads) {
+        		finished = finished && !thread.isAlive();
+        	}
+        }
+    }
+    
     /**
      * Iterates over all documents in the Lucene index and verifies they are in
      * database, if not, they are removed.
@@ -2429,4 +2458,39 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     e.getMessage(), e);
         }
     }
+
+	class IndexerThread extends Thread {
+		private boolean force;
+		private List<Integer> itemids;
+
+		public IndexerThread(List<Integer> itemids, boolean force) {
+			this.force = force;
+			this.itemids = itemids;
+		}
+
+		@Override
+		public void run() {
+			Context context = null;
+			try {
+				context = new Context();
+				context.turnOffAuthorisationSystem();
+				int idx = 1;
+				final String head = this.getName() + "#" + this.getId();
+				final int size = itemids.size();
+				for (Integer id : itemids) {
+					Item item = Item.find(context, id);
+					indexContent(context, item, force);
+					System.out.println(head + ":" + (idx++) + " / " + size);
+					item.decache();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (context != null) {
+					context.abort();
+				}
+			}
+		}
+	}
+	
 }

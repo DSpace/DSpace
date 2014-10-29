@@ -70,7 +70,7 @@ public class NativeCrisListenerSolrIndexer implements NativePostUpdateEventListe
         {
             log.error("Failed to update CRIS metadata in discovery index for cris-"
                     + cris.getPublicPath() + " uuid:"+cris.getUuid());
-            emailException(e);
+            //emailException(e);
         }
     }
     
