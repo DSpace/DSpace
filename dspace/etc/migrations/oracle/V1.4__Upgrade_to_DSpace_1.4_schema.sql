@@ -103,9 +103,6 @@ CREATE VIEW dcvalue AS
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
   AND MetadataFieldRegistry.metadata_schema_id = 1;
 
-@updateseq.sql metadatafieldregistry_seq metadatafieldregistry metadata_field_id;
-@updateseq.sql metadatavalue_seq metadatavalue metadata_value_id;
-@updateseq.sql metadataschemaregistry_seq metadataschemaregistry metadata_schema_id;
 
 DROP TABLE dctyperegistry;
 
