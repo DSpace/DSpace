@@ -33,6 +33,35 @@
     <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
 
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
+
+        <property name="config">
+            <list>
+                <bean class="org.dspace.authority.config.AuthorityTypeConfiguration">
+                    <!--
+                    AuthorityType that this configuration applies to
+                     -->
+                     <property name="type">
+                         <bean class="org.dspace.authority.AuthorityValue"/>
+                     </property>
+                    <!--
+                    choice select fields that should be exposed by default for any AuthorityValue
+                         These map to Concept metadata stored in "otherMetadata" in the AuthorityValue.
+                    -->
+                     <property name="choiceSelectFields">
+                         <map>
+                             <!--
+                             choice meta to show for authors from Concept meta. Mapped to
+                              simple i18n keys for Labeling
+                              -->
+                             <entry key="first-name" value="person.givenName"/>
+                             <entry key="last-name" value="person.familyName"/>
+                             <entry key="orcid" value="person.orcid.id"/>
+                         </map>
+                     </property>
+                </bean>
+            </list>
+        </property>
+
         <property name="types">
             <list>
                 <bean class="org.dspace.authority.orcid.OrcidAuthorityValue"/>
@@ -58,6 +87,7 @@
     <alias name="OrcidSource" alias="AuthoritySource"/>
     <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
         <constructor-arg value="http://pub.orcid.org"/>
+        <constructor-arg value="http://api.sandbox.orcid.org/v1.1"/>
     </bean>
 
 

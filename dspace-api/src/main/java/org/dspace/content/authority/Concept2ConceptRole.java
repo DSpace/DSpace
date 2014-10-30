@@ -48,6 +48,11 @@ public class Concept2ConceptRole
 
     // cache of relation by ID (Integer)
     private static Map<Integer, Concept2ConceptRole> id2relation = null;
+    public static String relation_hier="hierarchical";
+    public static String relation_asso="hierarchical";
+    public static String relation_incoming="incoming";
+    public static String relation_outgoing="outgoing";
+
 
 
     /**
