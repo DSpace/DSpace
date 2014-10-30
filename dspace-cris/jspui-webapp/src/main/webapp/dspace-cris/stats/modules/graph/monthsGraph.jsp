@@ -129,7 +129,10 @@ j(document).ready(function() {
     				});       				
             }
             else {
-            	saveAsImg(document.getElementById('chart_${targetDiv}'),0,'statspng_${targetDiv}');
+            	/*For PNG we use new google api features */
+              	/* saveAsImg(document.getElementById('chart_${targetDiv}'),0,'statspng_${targetDiv}'); */
+              	$("#statspng_${targetDiv}").attr("href", chart.getChart().getImageURI());
+              	
             	saveAsImg(document.getElementById('chart_${targetDiv}'),1,'statsjpg_${targetDiv}');   		
             }	
      	   google.visualization.events.removeListener(l);
