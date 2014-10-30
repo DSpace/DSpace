@@ -91,7 +91,7 @@ public class DatabaseUtils
                 System.out.println(" - URL: " + url);
                 System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
                 System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
-                System.out.println(" - Password: " + ConfigurationManager.getProperty("db.password"));
+                System.out.println(" - Password: [hidden]");
                 System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
                 System.out.println("\nTesting connection...");
                 try
@@ -126,7 +126,9 @@ public class DatabaseUtils
                 System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
 
                 // If Flyway is NOT yet initialized, also print the determined version information
-                if(!tableExists(connection, flyway.getTable()))
+                // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+                // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+                if(!tableExists(connection, flyway.getTable(), true))
                 {
                     System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
                     // Determine which version of DSpace this looks like
@@ -276,7 +278,9 @@ public class DatabaseUtils
 
         // Does the necessary Flyway table ("schema_version") exist in this database?
         // If not, then this is the first time Flyway has run, and we need to initialize
-        if(!tableExists(connection, flyway.getTable()))
+        // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+        // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+        if(!tableExists(connection, flyway.getTable(), true))
         {
             // Try to determine our DSpace database version, so we know what to tell Flyway to do
             String dbVersion = determineDBVersion(connection);
@@ -476,7 +480,6 @@ public class DatabaseUtils
         throw new SQLException("CANNOT AUTOUPGRADE DSPACE DATABASE, AS IT DOES NOT LOOK TO BE A VALID DSPACE DATABASE.");
     }
 
-
     /**
      * Determine if a particular database table exists in our database
      *
@@ -487,6 +490,24 @@ public class DatabaseUtils
      * @return true if table of that name exists, false otherwise
      */
     public static boolean tableExists(Connection connection, String tableName)
+    {
+        //By default, do a case-insensitive search
+        return tableExists(connection, tableName, false);
+    }
+
+    /**
+     * Determine if a particular database table exists in our database
+     *
+     * @param connection
+     *          Current Database Connection
+     * @param tableName
+     *          The name of the table
+     * @param caseSensitive
+     *          When "true", the case of the tableName will not be changed.
+     *          When "false, the name may be uppercased or lowercased based on DB type.
+     * @return true if table of that name exists, false otherwise
+     */
+    public static boolean tableExists(Connection connection, String tableName, boolean caseSensitive)
     {
         // Get the name of the Schema that the DSpace Database is using
         // (That way we can search the right schema for this table)
@@ -503,17 +524,21 @@ public class DatabaseUtils
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
 
-            // Check how this database stores its table names, etc.
-            // i.e. lowercase vs uppercase (by default we assume mixed case)
-            if(meta.storesLowerCaseIdentifiers())
+            // If this is not a case sensitive search
+            if(!caseSensitive)
             {
-                schema = (schema == null) ? null : StringUtils.lowerCase(schema);
-                tableName = StringUtils.lowerCase(tableName);
-            }
-            else if(meta.storesUpperCaseIdentifiers())
-            {
-                schema = (schema == null) ? null : StringUtils.upperCase(schema);
-                tableName = StringUtils.upperCase(tableName);
+                // Check how this database stores its table names, etc.
+                // i.e. lowercase vs uppercase (by default we assume mixed case)
+                if(meta.storesLowerCaseIdentifiers())
+                {
+                    schema = (schema == null) ? null : StringUtils.lowerCase(schema);
+                    tableName = StringUtils.lowerCase(tableName);
+                }
+                else if(meta.storesUpperCaseIdentifiers())
+                {
+                    schema = (schema == null) ? null : StringUtils.upperCase(schema);
+                    tableName = StringUtils.upperCase(tableName);
+                }
             }
 
             // Search for a table of the given name in our current schema
