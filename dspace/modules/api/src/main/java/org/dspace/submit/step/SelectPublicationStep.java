@@ -408,10 +408,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
     private void addEmailsAndEmbargoSettings(String journalID, Item item) {
         List<String> reviewEmails = journalNotifyOnReview.get(journalID);
-        item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));
+        if(reviewEmails != null) {
+            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));
+        }
 
         List<String> archiveEmails = journalNotifyOnArchive.get(journalID);
-        item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails.toArray(new String[archiveEmails.size()]));
+        if(archiveEmails != null) {
+            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails.toArray(new String[archiveEmails.size()]));
+        }
 
         Boolean embargoAllowed = Boolean.valueOf(journalEmbargo.get(journalVals.indexOf(journalID)));
         if(!embargoAllowed){
