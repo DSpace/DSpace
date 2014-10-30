@@ -42,6 +42,8 @@
             .getAttribute("showsamedept");
     boolean radiographlayout = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,
             "network.customgraphlayout", true);
+    boolean allowexternal = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,
+            "network.allowexternal", true);    
 %>
 <c:set value="${researcher.dynamicField}" var="anagraficaObject"></c:set>
 <c:set value="${authority}" var="authority"></c:set>
@@ -51,6 +53,7 @@
 <head>
 		
 	<meta name="author" content="CINECA" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />	
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	
 	<meta name="language" content="english"/>
@@ -60,7 +63,7 @@
 	<meta name="keywords" content="<c:if test="${!empty researcher.preferredName}">${researcher.preferredName.value},</c:if> ${researcher.fullName},<c:if test="${!empty researcher.translatedName}"> ${researcher.translatedName.value}, </c:if>
 	<c:forEach items="${researcher.variants}" var="variant">${variant.value}, </c:forEach> bibliometric, bibliometrics, scientometric,
 	scientometrics, contact details, publication list, paper list, statistics,
-	<c:forEach items="${researcher.anagrafica4view['title']}" var="title">${title.value}, </c:forEach>
+	<c:forEach items="${researcher.anagrafica4view['title']}" var="title">${title.value}, </c:forEach>" />
 	
 	<meta name="robots" content="index follow"/>
 	
@@ -225,17 +228,19 @@
 					<img id='imgscreen' alt='Return to visualization' title='Return to visualization'  src='../image/window_size.png'/>
 				</a--%>
 				<button type="button" class="btn btn-default"
-                                        href="javascript:void(0)" id="printWithoutWest"><img
-                                        alt="Print without name card" title="Print without name card"
-                                        src="<%= request.getContextPath() %>/image/network/layout-content-icon_print.png" />
+                                        href="javascript:void(0)" id="printWithoutWest">
+                                        <span class="fa fa-print" 
+                                        alt="Print without name card" title="Print without name card">
+                                        </span>
                                 </button>
                                 <button type="button" class="btn btn-default"
-                                        href="javascript:void(0)" id="printWithWest"><img
-                                        alt="Print with name card" title="Print with name card"
-                                        src="<%= request.getContextPath() %>/image/network/layout-sidebar-icon_print.png" />
+                                        href="javascript:void(0)" id="printWithWest">
+										<span class="fa fa-print text-success" 
+                                        alt="Print with name card" title="Print with name card">
+                                        </span>
                                 </button>
                                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#networkInformation">
-    								<span class="fa fa-cog" style="height: 18px;"></span>
+    								<span class="fa fa-question-circle text-info"></span>
   								</button>
 
 			</div>
@@ -394,11 +399,12 @@
 
 
 				<div class="sliders-separator"></div>
-
+<%  if (allowexternal) { %>
 				<div class="network-option">
 					<input type="checkbox" name="radio" class="radio network-checkbox" <%if (showexternal) {%> checked="checked" value="true"<%} else {%> value="false" <% } %> />
 					<div><fmt:message key="jsp.network.label.mainconfiguration.showexternalresearcher"/></div>
 				</div>
+<% }%>
 				<div class="network-option" style="display: none;">
 					<input type="checkbox" name="radiodept" class="radiodept network-checkbox" <%if (showsamedept) {%> checked="checked" value="true"<%} else {%> value="false" <% } %>/>
 					<div><fmt:message key="jsp.network.label.mainconfiguration.showsamedept"/></div>
@@ -948,8 +954,9 @@
         <ul style="padding-left: 15px;">
 			<li>Best printed with IE/FireFox</li>
 			<li>Because of space limitations, approximately 20 names only appear in the first circle for any given facet.</li>
+			<% if (allowexternal) { %>
 			<li>External name variants have not been merged.</li>
-		</ul>        
+			<% } %>		</ul>        
         </p>
       </div>
     </div><!-- /.modal-content -->
