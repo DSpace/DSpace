@@ -729,6 +729,10 @@ public class Group extends DSpaceObject
             }
             else
             {
+                // Force the row to be a Group row, as it has all epersongroup
+                // columns but also some others, so could not be typed using
+                // querySingleTable.
+                row.setTable("epersongroup");
                 return new Group(context, row);
             }
         }
