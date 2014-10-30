@@ -44,7 +44,7 @@
         		<a data-toggle="collapse" data-parent="#${holder.shortName}" href="#collapseOne${holder.shortName}">
           			${holder.title} <fmt:message
 				key="jsp.layout.dspace.detail.fieldset-legend.component.boxtitle.${info[holder.shortName].type}"/>
-        		</a>
+        		</a></h4>
         		<% if(subLinks!=null && subLinks.size()>1) {%>
         		<div class="btn-group">
 			    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
@@ -57,7 +57,6 @@
 				</ul>
 				</div>
 				<% } %>	
-        	</h4>
     	</div>
 	<div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
 		<div class="panel-body">	
@@ -68,32 +67,36 @@
 <%
     // create the URLs accessing the previous and next search result pages
     StringBuilder sb = new StringBuilder();
-	sb.append("<div align=\"center\">");
-	sb.append("Result pages:");
+	sb.append("<div class=\"block text-center\"><ul class=\"pagination\">");
 	
     String prevURL = info.buildPrevURL(); 
     String nextURL = info.buildNextURL();
 
 
 if (info.getPagefirst() != info.getPagecurrent()) {
-  sb.append(" <a class=\"pagination\" href=\"");
-  sb.append(prevURL);
-  sb.append("\">previous</a>");
+	  sb.append("<li><a class=\"pagination\" href=\"");
+	  sb.append(prevURL);
+	  sb.append("\"><i class=\"fa fa-long-arrow-left\"> </i></a></li>");
 };
 
 for( int q = info.getPagefirst(); q <= info.getPagelast(); q++ )
 {
    	String myLink = info.buildMyLink(q);
-    sb.append(" " + myLink);
+    sb.append("<li");
+    if (q == info.getPagecurrent()) {
+    	sb.append(" class=\"active\"");	
+    }
+    sb.append("> " + myLink+"</li>");
 } // for
 
+
 if (info.getPagetotal() > info.getPagecurrent()) {
-  sb.append(" <a class=\"pagination\" href=\"");
+  sb.append("<li><a class=\"pagination\" href=\"");
   sb.append(nextURL);
-  sb.append("\">next</a>");
+  sb.append("\"><i class=\"fa fa-long-arrow-right\"> </i></a></li>");
 }
 
-sb.append("</div>");
+sb.append("</ul></div>");
 
 %>
 
