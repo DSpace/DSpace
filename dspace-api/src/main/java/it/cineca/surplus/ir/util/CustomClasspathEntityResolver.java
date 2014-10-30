@@ -7,10 +7,12 @@
  */
 package it.cineca.surplus.ir.util;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.dspace.core.ConfigurationManager;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -18,7 +20,11 @@ import org.xml.sax.SAXException;
 
 public class CustomClasspathEntityResolver implements EntityResolver
 {
+	private Class clazz;
 
+	public CustomClasspathEntityResolver(Class clazz) {
+		this.clazz = clazz;
+	}
     @Override
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException, IOException
@@ -38,25 +44,29 @@ public class CustomClasspathEntityResolver implements EntityResolver
             {
                 try
                 {
-                    inputStream = ClassLoader
-                            .getSystemResourceAsStream(systemId.replaceFirst(
-                                    "classpath://", ""));
+                	inputStream = clazz.getResourceAsStream(systemId.replaceFirst("classpath://", "/"));
+
                     if (inputStream == null)
                     {
                         throw new FileNotFoundException();
                     }
-                    inputSource = new InputSource(inputStream);
-                    return inputSource;
                 }
-                catch (Exception e)
+                catch (Exception ex1)
                 {
+                    
+                    String basePath = ConfigurationManager.getProperty("dspace.dir") + "/config/";
+                    try {
+						inputStream = new FileInputStream(basePath + systemId.substring(systemId.lastIndexOf("/") + 1));
+                    }
+                    catch(Exception ex2) {
                     // No action; just let the null InputSource pass through
                     throw new SAXException("The entity " + publicId + " "
                             + systemId + " was not found in the classpath");
                 }
             }
-
+            }
         }
+        inputSource = new InputSource(inputStream);
         return inputSource;
     }
 

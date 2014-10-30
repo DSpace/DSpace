@@ -100,7 +100,7 @@ public class PMCEntrezLocalSOLRServices
                 + ":\""
                 + org.springframework.util.StringUtils.arrayToDelimitedString(
                         lookupValues, "\" OR \"") + "\"");
-        query.setRows(Integer.MAX_VALUE);
+        query.setRows(10000);
         query.setFields(returnID, lookupField);
         QueryResponse qresp = null;
         try

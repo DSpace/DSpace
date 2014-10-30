@@ -295,7 +295,7 @@ public class PMCEntrezServices
             factory.setIgnoringElementContentWhitespace(true);
 
             DocumentBuilder db = factory.newDocumentBuilder();
-            db.setEntityResolver(new CustomClasspathEntityResolver());
+            db.setEntityResolver(new CustomClasspathEntityResolver(getClass()));
             Document inDoc = db.parse(xmlResponse,
                     "classpath://org/dspace/app/cris/pmc/services/");
 
@@ -373,7 +373,7 @@ public class PMCEntrezServices
             factory.setIgnoringElementContentWhitespace(true);
 
             DocumentBuilder dbuilder = factory.newDocumentBuilder();
-            dbuilder.setEntityResolver(new CustomClasspathEntityResolver());
+            dbuilder.setEntityResolver(new CustomClasspathEntityResolver(getClass()));
             Document inDoc = dbuilder.parse(xmlResponse,
                     "classpath://org/dspace/app/cris/pmc/services/");
 
