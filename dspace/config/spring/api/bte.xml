@@ -58,7 +58,7 @@
 	<!-- **************************************************************************************************** -->
 
 	<bean class="org.dspace.submit.lookup.SubmissionLookupService"
-		name="org.dspace.submit.lookup.SubmissionLookupService">
+		name="org.dspace.submit.lookup.SubmissionLookupService" scope="prototype">
 		<property name="phase1TransformationEngine" ref="phase1TransformationEngine" />
 		<property name="phase2TransformationEngine" ref="phase2TransformationEngine" />
 		<!-- Uncomment the following property if you want specific fields to appear in the detail presentation
@@ -97,13 +97,13 @@
 	<!-- Submission Lookup Transformation Engine (phase 1) 												      -->
 	<!-- **************************************************************************************************** -->
 	
-	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine">
+	<bean name="phase1TransformationEngine" class="gr.ekt.bte.core.TransformationEngine" scope="prototype">
 	    <property name="dataLoader" ref="multipleDataLoader"/>
     	<property name="workflow" ref="phase1LinearWorkflow"/>
     	<property name="outputGenerator" ref="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
   	</bean>
 
-	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader">
+	<bean name="multipleDataLoader" class="org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader" scope="prototype">
 	    <property name="dataloadersMap">
 	        <map>
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
@@ -126,14 +126,15 @@
 	    </property>
 	</bean>
 
-	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator"/>
+	<bean name="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" class="org.dspace.submit.lookup.SubmissionLookupOutputGenerator" scope="prototype"/>
 	
 	<!-- Specify here any filters or modifiers to run before the output -->
-	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow">
+	<bean name="phase1LinearWorkflow" class="gr.ekt.bte.core.LinearWorkflow" scope="prototype">
 	    <property name="process">
 			<list>
 			    <ref bean="mapConverter_arxivSubject"/>
 			    <ref bean="mapConverter_pubstatusPubmed"/>
+				<ref bean="mapConverter_classificationASJC" />			    
 			    <ref bean="removeLastDot"/>
 			</list>
 		</property>
@@ -165,7 +166,21 @@
 	        </list>
 	    </property>
 	</bean>
-	
+
+	<!-- Converts an input value to an output one -->
+	<bean name="mapConverter_classificationASJC" class="org.dspace.submit.lookup.MapConverterModifier"
+		init-method="init">
+		<constructor-arg value="mapConverter_classificationASJC Modifier" />
+		<property name="converterNameFile" value="mapConverter-classificationASJC.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="fieldKeys">
+			<list>
+				<!-- Specify the internal BTE keys that this modifiers needs to be applied -->
+				<value>classificationASJC</value>
+			</list>
+		</property>
+	</bean>
+		
 	<!-- Remove the last dot in the specified field keys -->
 	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier">
 	    <constructor-arg value="removeLastDot Modifier"/>
@@ -195,6 +210,7 @@
 			    <ref bean="fieldMergeModifier"/>
 			    <ref bean="valueConcatenationModifier"/>
 			    <ref bean="languageCodeModifier"/>
+
 			</list>
 		</property>
 	</bean>
@@ -211,6 +227,9 @@
 	                <list>
 						<value>keywords</value>
 						<value>mesh</value>
+						<value>arxivCategory</value>
+						<value>wosCategory</value>
+						<value>classificationASJC</value>						
 					</list>
 	            </entry>
 	        </map>
@@ -225,7 +244,7 @@
 
         <bean name="languageCodeModifier" class="org.dspace.submit.lookup.LanguageCodeModifier"/>
 
-	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator">
+	<bean name="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" class="org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator" scope="prototype">
 	    <property name="outputMap" ref="outputMap"/>
 
 	    <property name="extraMetadataToKeep">
@@ -514,6 +533,7 @@
                     <entry key="epage" value="lastpage" />
                     <entry key="language" value="language" />
                     <entry key="description" value="abstract" />
+					<entry key="descriptionen" value="abstracteng" />                    
                     <entry key="subjects" value="keywords" />
                     <entry key="authors" value="authors" />
                     <entry key="publisher" value="publisher" />
