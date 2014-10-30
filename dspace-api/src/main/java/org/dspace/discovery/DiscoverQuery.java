@@ -7,7 +7,12 @@
  */
 package org.dspace.discovery;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a query which the discovery backend can use
@@ -51,7 +56,8 @@ public class DiscoverQuery
 
     /** Misc attributes can be implementation dependent **/
     private Map<String, List<String>> properties;
-
+    private List<String> fields;
+    
     public DiscoverQuery()
     {
         // Initialize all our lists
@@ -64,6 +70,7 @@ public class DiscoverQuery
         this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<String, List<String>>();
+		this.fields = new ArrayList<String>();        
     }
 
     public void setQuery(String query)
@@ -354,4 +361,13 @@ public class DiscoverQuery
     public void setSpellCheck(boolean spellCheck) {
         this.spellCheck = spellCheck;
     }
+
+	public void setFields(List<String> fields) {
+		this.fields = fields;
+	}
+
+	public List<String> getFields() {
+		return fields;
+	}
+    
 }
