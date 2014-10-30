@@ -49,30 +49,27 @@
 <c:set var="type"><%=request.getParameter("type") %></c:set>
 <c:set var="mode"><%=request.getParameter("mode") %></c:set>
 
-<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.${data.jspKey}.${mode}title">
-
+<dspace:layout titlekey="jsp.statistics.${data.jspKey}.${mode}title">
 
 <div id="content">
-<div class="row">
+
 	<div class="col-lg-12">
-		<div>
+		<div class="form-inline">
 	         <div class="form-group">
 			 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param>${data.target.simpleName}</fmt:param><fmt:param><a href="${contextPath}/cris/${data.object.publicPath}/${data.object.crisID}">${data.title}</a></fmt:param></fmt:message></h1>
 			 </div>
-			 <c:set var="type"><%=request.getParameter("type") %></c:set>
-			<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport-right.jsp" %>
 		</div>
-	</div>
+	</div>			 
+	 <c:set var="type"><%=request.getParameter("type") %></c:set>
+	<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport-right.jsp" %>
+
+	<div class="richeditor">
+		<div class="top"></div>
+			<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport.jsp" %>
+		<div class="bottom"></div>
+	</div> <%--close richeditor --%>
+  </div><%--close tab contents --%>
 </div>
-
-
-
-<div class="richeditor">
-<div class="top"></div>
-	<%@ include file="/dspace-cris/stats/crisStatistic/_crisStatisticReport.jsp" %>
-<div class="bottom"></div>
 </div>
-<div class="clear"></div>
-</div>
-
+	<div class="clear"></div>
 </dspace:layout>

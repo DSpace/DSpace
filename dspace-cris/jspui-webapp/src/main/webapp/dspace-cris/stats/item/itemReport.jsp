@@ -45,20 +45,18 @@
 	</script>
 </c:set>
 
-<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.item-title">
+<dspace:layout titlekey="jsp.statistics.item-title">
 
 <div id="content">
-<div class="row">
 	<div class="col-lg-12">
 		<div class="form-inline">
 	         <div class="form-group">
 			 	<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><a href="${contextPath}/handle/${data.object.handle}">${data.title}</a></fmt:param></fmt:message></h1>
 			 </div>
-			 <c:set var="type"><%=request.getParameter("type") %></c:set>
-			<%@ include file="/dspace-cris/stats/item/_itemReport-right.jsp" %>
 		</div>
 	</div>
-</div>
+	 <c:set var="type"><%=request.getParameter("type") %></c:set>
+	<%@ include file="/dspace-cris/stats/item/_itemReport-right.jsp" %>
 
 
 
@@ -66,8 +64,9 @@
 <div class="top"></div>
 	<%@ include file="/dspace-cris/stats/item/_itemReport.jsp" %>
 <div class="bottom"></div>
+	</div>
+	</div>
+	</div>
 </div>
 <div class="clear"></div>
-</div>
-
 </dspace:layout>

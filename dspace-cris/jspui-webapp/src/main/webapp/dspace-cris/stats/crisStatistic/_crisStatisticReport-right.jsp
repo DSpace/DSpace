@@ -17,34 +17,27 @@
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
 
- <div class="form-group">
-	<div class="btn-group">
-	<c:forEach items="${data.rightMenu}" var="menu" varStatus="status">
-	<c:if test="${menu.current}">
-		<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a>
-	</c:if>
-	</c:forEach>
-				<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-   				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
- 				</button>
- 					<ul role="menu" class="dropdown-menu">
-			    
-<c:forEach items="${data.rightMenu}" var="menu" varStatus="status">
+ <div style="margin-top:1.5em;" class="form-group">
+	<div class="col-md-12">
+		<div>
+		<ul class="nav nav-tabs">
+<c:forEach items="${data.rightMenu}" var="menu">
+	<c:set var="active">
+		<c:if test="${menu.current}">active</c:if>
+	</c:set>
+	
+	<li class="${active}"><a class="ui-tabs-anchor" href="${link}&type=${menu.type}&mode=${menu.mode}"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a></li>
 
-	<c:if test="${!menu.current}">
-	<li>
-		<a class="btn btn-default" href="${link}&type=${menu.type}&mode=${menu.mode}"><fmt:message key="view.stats-crisStatistics.menu.link.${menu.type}.${menu.mode}.${data.object.type}" /></a>
-	</li>
-	</c:if>	
 </c:forEach>
 	
 	</ul>
 	</div>
-	<div class="btn-group">
-			<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.statistics.label" /></a>
-			<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+	<div class="titlestats tab-content with-padding">
+		<div class="btn-group pull-right">
+			<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.statistics.label" /> <span class="fa fa-caret-down"></span></a>
+			<!-- <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
    				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
- 				</button>
+ 				</button> -->
 			<ul role="menu" class="dropdown-menu">
 			    <li>
 					<c:choose>
@@ -86,15 +79,15 @@
 				</li>
 			</ul>
 		</div>
-		<div class="btn-group">
-		<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.rss.label" /></a>
-		<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-  				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
-				</button>
+		<div class="btn-group  pull-right">
+		<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.rss.label" /> <span class="fa fa-caret-down"></span></a>
+		<!-- <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
+  			<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
+		</button> -->
 		<ul role="menu" class="dropdown-menu">
 			<li><a href="${rssLink}daily?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.daily" /></a></li>
 			<li><a href="${rssLink}weekly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.weekly" /></a></li>
 			<li><a href="${rssLink}monthly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.monthly" /></a></li>
 		</ul>
-	</div>
- </div>
+		</div>
+		<div class="clearfix">&nbsp;</div>

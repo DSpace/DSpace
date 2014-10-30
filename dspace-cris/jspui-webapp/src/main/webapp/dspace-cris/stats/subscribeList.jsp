@@ -17,10 +17,10 @@
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<c:set var="dspace.layout.head" scope="request">
-	<link href="<%=request.getContextPath() %>/css/misctable.css" type="text/css" rel="stylesheet" />
-</c:set>
-<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.title-subscription-list">
+<dspace:layout style="submission" locbar="link"
+               parentlink="/mydspace"
+               parenttitlekey="jsp.mydspace"
+               titlekey="jsp.statistics.title-subscription-list">
 
 <h1><fmt:message key="jsp.mydspace.subscriptions.title"/>
 	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
@@ -40,6 +40,7 @@
 
 	<%@ include file="/dspace-cris/stats/_subscribeList.jsp" %>
 
+</div>
 </div>
 </div>
 

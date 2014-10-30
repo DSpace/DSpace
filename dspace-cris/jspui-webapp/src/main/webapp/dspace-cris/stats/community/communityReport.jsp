@@ -34,7 +34,7 @@
 	  #map_canvas { height: 100% }
 	</style>
 	<script type="text/javascript"
-	    src="http://maps.google.com/maps/api/js?sensor=true">
+	    src="http://maps.google.com/maps/api/js?sensor=true&v=3">
 	</script>	
 	
 	<script type="text/javascript">
@@ -47,25 +47,27 @@
 	</script>
 </c:set>
 
-<c:set var="type"><%=request.getParameter("type") %></c:set>
-<c:set var="dspace.cris.navbar" scope="request">
-	<%@ include file="/dspace-cris/stats/community/_communityReport-right.jsp" %>
-</c:set>
-
-
-<dspace:layout style="submission" locbar="link" titlekey="jsp.statistics.item-title">
+<dspace:layout titlekey="jsp.statistics.item-title">
 
 <div id="content">
-<div class="title detail"><h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><a href="${contextPath}/handle/${data.object.handle}">${data.title}</a></fmt:param></fmt:message></h1></div>
-    
-<div class="richeditor">
-<div class="top"></div>
-<div class="container">
-	<%@ include file="/dspace-cris/stats/community/_communityReport.jsp" %>
-</div>
-<div class="bottom"></div>
+
+	<div class="col-lg-12">
+		<div class="form-inline">
+	         <div class="form-group">
+				<h1><fmt:message key="view.${data.jspKey}.page.title"><fmt:param><a href="${contextPath}/handle/${data.object.handle}">${data.title}</a></fmt:param></fmt:message></h1>
+   			 </div>
+		</div>
+	</div>
+	<c:set var="type"><%=request.getParameter("type") %></c:set>
+		<%@ include file="/dspace-cris/stats/community/_communityReport-right.jsp" %> 
+	<div class="richeditor">
+		<div class="top"></div>
+			<%@ include file="/dspace-cris/stats/community/_communityReport.jsp" %>
+		<div class="bottom"></div>
+	</div>
+	</div>
+	</div>	
 </div>
 <div class="clear"></div>
-</div>
 
 </dspace:layout>

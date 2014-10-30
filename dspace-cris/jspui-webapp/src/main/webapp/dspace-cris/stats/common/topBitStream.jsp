@@ -10,8 +10,8 @@
 <%@ taglib uri="statstags" prefix="stats" %>
 <c:set var="objectName" scope="page">bitstream</c:set>
 <c:set var="statType" >top</c:set>
-<%--h2 class="titlestats">${markerasnumber}) <span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.${objectName}.page.title" /></span></h2--%>
-<h2 class="titlestats"><span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.${objectName}.page.title" /></span></h2>
+<%--h2 class="titlestats">${markerasnumber}) <span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.${objectName}.page.title" /></span></h2
+<h2 class="titlestats"><span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.${objectName}.page.title" /></span></h2>--%>
 <c:choose>
         <c:when test="${data.resultBean.dataBeans[statType][objectName]['total'].dataTable[0][0] > 0}">
                 <c:set var="drillDownInfo" >drillDown-${pieType}-${objectName}</c:set>

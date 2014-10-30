@@ -13,10 +13,10 @@
         <c:set var="itemId" scope="page">${data.id}</c:set>
 		<c:set var="statType">selectedObject</c:set>
 
-<%--		<h2 class="titlestats">${markerasnumber}) <span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.page.title" /></span> --%>
+<%--		<h2 class="titlestats">${markerasnumber}) <span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.page.title" /></span> 
 		<h2 class="titlestats"><span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.page.title"><fmt:param>${data.target.simpleName}</fmt:param></fmt:message></span>
 			<span class="titlestats-condition">${condition}</span>
-		</h2>
+		</h2>--%>
 
 	
 		<c:choose>
@@ -94,7 +94,7 @@
 </div>
 </c:when>
 <c:otherwise> 
-	<fmt:message key="view.${data.jspKey}.${statType}.data.empty" />
+	<span class="titlestats"><fmt:message key="view.${data.jspKey}.${statType}.data.empty" /></span>
 </c:otherwise>
 </c:choose>
 				 

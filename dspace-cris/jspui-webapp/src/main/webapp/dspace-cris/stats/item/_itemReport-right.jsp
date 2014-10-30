@@ -19,20 +19,23 @@
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
 
- <div style="margin-top:1.5em;" class="form-group pull-right">
-	<div class="btn-group">
+ <div style="margin-top:1.5em;" class="form-group">
+	<div class="col-md-12">
+		<div>
+			<ul class="nav nav-tabs">
 		<c:if test="${type ne 'bitstream'}">
-			<a class="btn btn-default" href="${link}&amp;type=bitstream"><fmt:message key="view.stats-item.top.bitstream.page.title" /></a>
+					<c:set var="activeBitstream"></c:set>
+				<c:set var="activeProdotto">active</c:set>	
 		</c:if>
 		<c:if test="${type eq 'bitstream'}">
-			<a class="btn btn-default" href="${link}"><fmt:message key="view.stats-item.selectedObject.page.title" /></a>
+				<c:set var="activeBitstream">active</c:set>
+				<c:set var="activeProdotto"></c:set>	
 		</c:if>
 	</div>
-	<div class="btn-group">
-			<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.statistics.label" /></a>
-			<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-   				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
- 				</button>
+	<div class="titlestats tab-content with-padding">		
+		<div class="btn-group pull-right">
+				<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.statistics.label" /> <span  class="fa fa-caret-down"></span ></a>
+
 			<ul role="menu" class="dropdown-menu">
 			    <li>
 					<c:choose>
@@ -74,18 +77,14 @@
 				</li>
 			</ul>
 		</div>
-		<div class="btn-group">
-		<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.rss.label" /></a>
-		<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
-  				<i class="fa fa-cog"></i> <i class="fa fa-caret-down"></i>
-				</button>
-		<ul role="menu" class="dropdown-menu">
-			<li><a href="${rssLink}daily?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.daily" /></a></li>
-			<li><a href="${rssLink}weekly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.weekly" /></a></li>
-			<li><a href="${rssLink}monthly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.monthly" /></a></li>
-		</ul>
-	</div>
- </div>
-		 
+			<div class="btn-group pull-right">
+			<a href="#" class="btn btn-default" data-toggle="dropdown"><fmt:message key="view.stats.subscribe.rss.label" /> <span  class="fa fa-caret-down"></span ></a>
+			<ul role="menu" class="dropdown-menu">
+				<li><a href="${rssLink}daily?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.daily" /></a></li>
+				<li><a href="${rssLink}weekly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.weekly" /></a></li>
+				<li><a href="${rssLink}monthly?uid=${data.object.handle}&amp;type=${data.object.type}" title="Subscribe to RSS statistics update"><fmt:message key="view.stats.subscribe.rss.monthly" /></a></li>
+			</ul>
+			</div>
+			<div class="clearfix">&nbsp;</div>
 			 
 	
