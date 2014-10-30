@@ -104,6 +104,48 @@ CREATE VIEW dcvalue AS
   AND MetadataFieldRegistry.metadata_schema_id = 1;
 
 
+-- After copying data from dctypregistry to metadataschemaregistry, we need to reset our sequences
+-- Update metadatafieldregistry_seq to new max value
+DECLARE
+  curr  NUMBER := 0;
+BEGIN
+  SELECT max(metadata_field_id) INTO curr FROM metadatafieldregistry;
+
+  curr := curr + 1;
+
+  EXECUTE IMMEDIATE 'DROP SEQUENCE metadatafieldregistry_seq';
+
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE metadatafieldregistry_seq START WITH ' || NVL(curr,1);
+END;
+/
+-- Update metadatavalue_seq to new max value
+DECLARE
+  curr  NUMBER := 0;
+BEGIN
+  SELECT max(metadata_value_id) INTO curr FROM metadatavalue;
+
+  curr := curr + 1;
+
+  EXECUTE IMMEDIATE 'DROP SEQUENCE metadatavalue_seq';
+
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE metadatavalue_seq START WITH ' || NVL(curr,1);
+END;
+/
+-- Update metadataschemaregistry_seq to new max value
+DECLARE
+  curr  NUMBER := 0;
+BEGIN
+  SELECT max(metadata_schema_id) INTO curr FROM metadataschemaregistry;
+
+  curr := curr + 1;
+
+  EXECUTE IMMEDIATE 'DROP SEQUENCE metadataschemaregistry_seq';
+
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE metadataschemaregistry_seq START WITH ' || NVL(curr,1);
+END;
+/
+
+-- Drop the old dctyperegistry
 DROP TABLE dctyperegistry;
 
 -- create indexes for the metadata tables

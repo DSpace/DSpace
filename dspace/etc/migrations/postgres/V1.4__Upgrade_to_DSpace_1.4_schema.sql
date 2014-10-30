@@ -108,10 +108,12 @@ CREATE VIEW dcvalue AS
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
   AND MetadataFieldRegistry.metadata_schema_id = 1;
 
+-- After copying data from dctypregistry to metadataschemaregistry, we need to reset our sequences
 SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
 SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 
+-- Drop the old dctyperegistry
 DROP TABLE dctyperegistry;
 
 ------------------------------------------------------
