@@ -76,10 +76,6 @@ public class DatabaseRegistryUpdater implements FlywayCallback
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);
             }
 
-            // While it's not really a formal "registry", we need to ensure the
-            // default, required Groups exist in DSpace
-            Group.initDefaultGroupNames(context);
-
             context.restoreAuthSystemState();
             // Commit changes and close context
             context.complete();
@@ -132,6 +128,30 @@ public class DatabaseRegistryUpdater implements FlywayCallback
         {
             updateRegistries();
             freshInstall = false;
+        }
+
+        // After every migrate, ensure default Groups are setup correctly.
+        Context context = null;
+        try
+        {
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+            // While it's not really a formal "registry", we need to ensure the
+            // default, required Groups exist in the DSpace database
+            Group.initDefaultGroupNames(context);
+            context.restoreAuthSystemState();
+            // Commit changes and close context
+            context.complete();
+        }
+        catch(Exception e)
+        {
+            log.error("Error attempting to add/update default DSpace Groups", e);
+        }
+        finally
+        {
+            // Clean up our context, if it still exists & it was never completed
+            if(context!=null && context.isValid())
+                context.abort();
         }
     }
 
