@@ -17,10 +17,10 @@
 <c:when test="${pmccitation != null}">
 <c:choose>
 	<c:when test="${pmccitation.numCitations gt 0}">
+<fmt:message key="jsp.display-item.citation.pmccentral" />	
 	<c:choose>
 		<c:when test="${fn:length(pmccitation.pmcRecords) == pmccitation.numCitations}">
-<fmt:message
-		key="jsp.display-item.citation.pmccentral" /><a id="openerPMC" data-toggle="modal" href="<%=request.getContextPath()%>/pmcCitedBy?pmid=${pmccitation.id}" data-target="#dialogPMC" title="<fmt:message key="jsp.pmc.details.title" />"><span class="badge pull-right">${pmccitation.numCitations}</span></a>
+			<a id="openerPMC" data-toggle="modal" href="<%=request.getContextPath()%>/pmcCitedBy?pmid=${pmccitation.id}" data-target="#dialogPMC" title="<fmt:message key="jsp.pmc.details.title" />"><span class="badge pull-right">${pmccitation.numCitations}</span></a>
 
 <div class="modal fade" id="dialogPMC" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -37,6 +37,9 @@
 		</c:otherwise>
 	</c:choose>
 	</c:when>
+	<c:otherwise>
+		<fmt:message key="jsp.pmc.details.notfound" />
+	</c:otherwise>	
 </c:choose>
 </c:when>
 <c:otherwise>

@@ -21,7 +21,7 @@
 		<fmt:param value="${pmccitation.numCitations}" />		
 </fmt:message></h4>        
 </div>
-<div class="modal-body">
+<div class="modal-body-with-padding">
   
  <c:forEach var="pmc" items="${pmccitation.pmcRecords}" varStatus="count">
 
