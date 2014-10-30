@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
 
@@ -273,53 +274,61 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
-        // Setup Flyway API against our database
-        Flyway flyway = setupFlyway(datasource);
-
-        // Does the necessary Flyway table ("schema_version") exist in this database?
-        // If not, then this is the first time Flyway has run, and we need to initialize
-        // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
-        // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-        if(!tableExists(connection, flyway.getTable(), true))
+        try
         {
-            // Try to determine our DSpace database version, so we know what to tell Flyway to do
-            String dbVersion = determineDBVersion(connection);
+            // Setup Flyway API against our database
+            Flyway flyway = setupFlyway(datasource);
 
-            // If this is a fresh install, dbVersion will be null
-            if (dbVersion==null)
+            // Does the necessary Flyway table ("schema_version") exist in this database?
+            // If not, then this is the first time Flyway has run, and we need to initialize
+            // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+            // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+            if(!tableExists(connection, flyway.getTable(), true))
             {
-                // Initialize the Flyway database table with defaults (version=1)
-                flyway.init();
+                // Try to determine our DSpace database version, so we know what to tell Flyway to do
+                String dbVersion = determineDBVersion(connection);
+
+                // If this is a fresh install, dbVersion will be null
+                if (dbVersion==null)
+                {
+                    // Initialize the Flyway database table with defaults (version=1)
+                    flyway.init();
+                }
+                else
+                {
+                    // Otherwise, pass our determined DB version to Flyway to initialize database table
+                    flyway.setInitVersion(dbVersion);
+                    flyway.setInitDescription("Initializing from DSpace " + dbVersion + " database schema");
+                    flyway.init();
+                }
+            }
+
+            // Determine pending Database migrations
+            MigrationInfo[] pending = flyway.info().pending();
+
+            // As long as there are pending migrations, log them and run migrate()
+            if (pending!=null && pending.length>0)
+            {
+                log.info("Pending DSpace database schema migrations:");
+                for (MigrationInfo info : pending)
+                {
+                    log.info("\t" + info.getVersion() + " " + info.getDescription() + " " + info.getType() + " " + info.getState());
+                }
+
+                // Run all pending Flyway migrations to ensure the DSpace Database is up to date
+                flyway.migrate();
+
+                // Flag that Discovery will need reindexing, since database was updated
+                setReindexDiscovery(true);
             }
             else
-            {
-                // Otherwise, pass our determined DB version to Flyway to initialize database table
-                flyway.setInitVersion(dbVersion);
-                flyway.setInitDescription("Initializing from DSpace " + dbVersion + " database schema");
-                flyway.init();
-            }
+                log.info("DSpace database schema is up to date");
         }
-
-        // Determine pending Database migrations
-        MigrationInfo[] pending = flyway.info().pending();
-
-        // As long as there are pending migrations, log them and run migrate()
-        if (pending!=null && pending.length>0)
+        catch(FlywayException fe)
         {
-            log.info("Pending DSpace database schema migrations:");
-            for (MigrationInfo info : pending)
-            {
-                log.info("\t" + info.getVersion() + " " + info.getDescription() + " " + info.getType() + " " + info.getState());
-            }
-
-            // Run all pending Flyway migrations to ensure the DSpace Database is up to date
-            flyway.migrate();
-
-            // Flag that Discovery will need reindexing, since database was updated
-            setReindexDiscovery(true);
+            // If any FlywayException (Runtime) is thrown, change it to a SQLException
+            throw new SQLException("Flyway initilization/migration error occurred", fe);
         }
-        else
-            log.info("DSpace database schema is up to date");
     }
     
     /**
@@ -337,40 +346,48 @@ public class DatabaseUtils
     private static synchronized void cleanDatabase(Flyway flyway, DataSource dataSource)
             throws SQLException
     {
-        // First, run Flyway's clean command on database.
-        // For MOST database types, this takes care of everything
-        flyway.clean();
-
-        Connection connection = null;
         try
         {
-            // Get info about which database type we are using
-            connection = dataSource.getConnection();
-            DatabaseMetaData meta = connection.getMetaData();
-            String dbKeyword = DatabaseManager.findDbKeyword(meta);
+            // First, run Flyway's clean command on database.
+            // For MOST database types, this takes care of everything
+            flyway.clean();
 
-            // If this is Oracle, the only way to entirely clean the database
-            // is to also purge the "Recyclebin". See:
-            // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-            if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE))
+            Connection connection = null;
+            try
             {
-                PreparedStatement statement = null;
-                try
+                // Get info about which database type we are using
+                connection = dataSource.getConnection();
+                DatabaseMetaData meta = connection.getMetaData();
+                String dbKeyword = DatabaseManager.findDbKeyword(meta);
+
+                // If this is Oracle, the only way to entirely clean the database
+                // is to also purge the "Recyclebin". See:
+                // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
+                if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE))
                 {
-                    statement = connection.prepareStatement("PURGE RECYCLEBIN");
-                    statement.executeQuery();
-                }
-                finally
-                {
-                    if(statement!=null && !statement.isClosed())
-                        statement.close();
+                    PreparedStatement statement = null;
+                    try
+                    {
+                        statement = connection.prepareStatement("PURGE RECYCLEBIN");
+                        statement.executeQuery();
+                    }
+                    finally
+                    {
+                        if(statement!=null && !statement.isClosed())
+                            statement.close();
+                    }
                 }
             }
+            finally
+            {
+                if(connection!=null && !connection.isClosed())
+                    connection.close();
+            }
         }
-        finally
+        catch(FlywayException fe)
         {
-            if(connection!=null && !connection.isClosed())
-                connection.close();
+            // If any FlywayException (Runtime) is thrown, change it to a SQLException
+            throw new SQLException("Flyway clean error occurred", fe);
         }
     }
 
