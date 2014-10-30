@@ -68,7 +68,7 @@ public class ResolverDisplayStrategy extends AUniformDisplayStrategy
         }
     }
 
-    protected String getDisplayForValue(HttpServletRequest hrq, String value)
+    protected String getDisplayForValue(HttpServletRequest hrq, String value, int itemid)
     {
         init();
         String url = null;

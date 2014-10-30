@@ -16,7 +16,7 @@ public class AbstractDisplayStrategy extends AUniformDisplayStrategy
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractDisplayStrategy.class);
 
-    protected String getDisplayForValue(HttpServletRequest hrq, String value)
+    protected String getDisplayForValue(HttpServletRequest hrq, String value, int itemid)
     {
         if (value != null) 
         {

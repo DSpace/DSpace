@@ -20,6 +20,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.content.Item;
 import org.dspace.core.PluginManager;
 
 /**
@@ -88,11 +89,49 @@ public final class ChoiceAuthorityManager
                     try {
                         String[] metadata = fkey.split("\\_");
                         context = new Context();
-                        int schemaID = MetadataSchema.find(context, metadata[0]).getSchemaID();
-                        MetadataField.findByElement(context, schemaID, metadata[1], metadata.length > 2 ? metadata[2] : null).getFieldID();
-                        ChoiceAuthority ma = (ChoiceAuthority) PluginManager
-                                .getNamedPlugin(ChoiceAuthority.class,
-                                        ConfigurationManager.getProperty(key));
+                        int schemaID = MetadataSchema.find(context,
+                                metadata[0]).getSchemaID();
+                        ChoiceAuthority ma = null;
+                        if (fkey.equals("dc_authority_default"))
+                        {
+
+                            ma = (ChoiceAuthority) PluginManager
+                                    .getNamedPlugin(ChoiceAuthority.class,
+                                            ConfigurationManager
+                                                    .getProperty(key));
+                            if (ma == null)
+                            {
+                                log.warn("Skipping invalid configuration for "
+                                        + key
+                                        + " because named plugin not found: "
+                                        + ConfigurationManager.getProperty(key));
+                                continue property;
+                            }
+                            
+                            MetadataField[] tmp = MetadataField.findAllByElement(
+                                    context, schemaID, "authority", Item.ANY);
+                            for(MetadataField mf : tmp) {
+                                String tmpKey = makeFieldKey(metadata[0], mf.getElement(), mf.getQualifier());
+                                String tmpfKey = ConfigurationManager.getProperty(choicesPlugin+metadata[0]+"."+mf.getElement()+"."+mf.getQualifier());
+                                if (tmpfKey == null)
+                                {
+                                    md2authorityname.put(tmpKey,
+                                            ConfigurationManager.getProperty(key));
+                                    controller.put(tmpKey, ma);
+                                }                                
+                            }                            
+                        }
+                        else
+                        {
+
+                            MetadataField.findByElement(context, schemaID,
+                                    metadata[1],
+                                    metadata.length > 2 ? metadata[2] : null)
+                                    .getFieldID();
+                            ma = (ChoiceAuthority) PluginManager
+                                    .getNamedPlugin(ChoiceAuthority.class,
+                                            ConfigurationManager
+                                                    .getProperty(key));
                         if (ma == null)
                         {
                             log.warn("Skipping invalid configuration for "
@@ -104,7 +143,7 @@ public final class ChoiceAuthorityManager
 
                         md2authorityname.put(fkey,
                                 ConfigurationManager.getProperty(key));
-
+                        }
                         log.debug("Choice Control: For field=" + fkey
                                 + ", Plugin=" + ma);
                     }
@@ -247,9 +286,12 @@ public final class ChoiceAuthorityManager
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
         {
-            throw new IllegalArgumentException(
+            ma = reloadCache(fieldKey);
+            if(ma == null) {
+                throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
+            }
         }
         return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }
@@ -275,9 +317,12 @@ public final class ChoiceAuthorityManager
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
         {
-            throw new IllegalArgumentException(
-                    "No choices plugin was configured for  field \"" + fieldKey
-                            + "\".");
+            ma = reloadCache(fieldKey);
+            if(ma == null) {
+                throw new IllegalArgumentException(
+                        "No choices plugin was configured for  field \""
+                                + fieldKey + "\".");
+            }
         }
         return ma.getBestMatch(fieldKey, query, collection, locale);
     }
@@ -302,9 +347,12 @@ public final class ChoiceAuthorityManager
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
         {
-            throw new IllegalArgumentException(
+            ma = reloadCache(fieldKey);
+            if(ma == null) {
+                throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
+            }
         }
         return ma.getLabel(fieldKey, authKey, locale);
     }
@@ -317,7 +365,12 @@ public final class ChoiceAuthorityManager
      */
     public boolean isChoicesConfigured(String fieldKey)
     {
-        return controller.containsKey(fieldKey);
+        boolean result = controller.containsKey(fieldKey);
+        if(fieldKey.contains("_authority_") && !result) {
+            reloadCache();
+            return true;
+        }
+        return result;
     }
 
     /**
@@ -330,7 +383,11 @@ public final class ChoiceAuthorityManager
      */
     public String getPresentation(String fieldKey)
     {
-        return presentation.get(fieldKey);
+        String result = presentation.get(fieldKey);
+        if(result==null && fieldKey.contains("_authority_")) {
+            result = presentation.get("dc_authority_default");
+        }
+        return result;
     }
 
     /**
@@ -340,8 +397,12 @@ public final class ChoiceAuthorityManager
      */
     public boolean isClosed(String fieldKey)
     {
-        return closed.containsKey(fieldKey) ? closed.get(fieldKey)
+        boolean result = closed.containsKey(fieldKey) ? closed.get(fieldKey)
                 .booleanValue() : false;
+        if(result==false && fieldKey.contains("_authority_")) {
+            result = closed.containsKey(fieldKey) ?closed.get("dc_authority_default").booleanValue() : false;
+        }
+        return result;
     }
 
     /**
@@ -386,8 +447,12 @@ public final class ChoiceAuthorityManager
     public void notifyReject(int itemID, String schema, String element,
             String qualifier, String authorityKey)
     {
-        ChoiceAuthority ma = controller.get(makeFieldKey(schema, element,
-                qualifier));
+        String makeFieldKey = makeFieldKey(schema, element,
+                qualifier);
+        ChoiceAuthority ma = controller.get(makeFieldKey);
+        if(ma == null) {
+            reloadCache(makeFieldKey);
+        }
         if (ma instanceof NotificableAuthority)
         {
             NotificableAuthority avs = (NotificableAuthority) ma;
@@ -396,14 +461,38 @@ public final class ChoiceAuthorityManager
     }
 
     /**
+     * Wrapper that calls accept potential method of the plugin corresponding
+     * 
+     */
+    public void notifyAccept(int itemID, String schema, String element,
+			String qualifier, String authorityKey, int confidence)
+    {
+        String makeFieldKey = makeFieldKey(schema, element,
+                qualifier);
+        ChoiceAuthority ma = controller.get(makeFieldKey);
+        if(ma == null) {
+            reloadCache(makeFieldKey);
+        }
+        if (ma instanceof NotificableAuthority)
+        {
+            NotificableAuthority avs = (NotificableAuthority) ma;
+			avs.accept(itemID, authorityKey, confidence);
+        }
+    }
+        
+    /**
      * Wrapper that calls reject method of the plugin corresponding
      * 
      */
     public void notifyReject(int[] itemIDs, String schema, String element,
             String qualifier, String authorityKey)
     {
-        ChoiceAuthority ma = controller.get(makeFieldKey(schema, element,
-                qualifier));
+        String makeFieldKey = makeFieldKey(schema, element,
+                qualifier);
+        ChoiceAuthority ma = controller.get(makeFieldKey);
+        if(ma == null) {
+            reloadCache(makeFieldKey);
+        }
         if (ma instanceof NotificableAuthority)
         {
             NotificableAuthority avs = (NotificableAuthority) ma;
@@ -411,6 +500,21 @@ public final class ChoiceAuthorityManager
         }
     }
 
+    public Object getDetailsInfo(String field, String key, String locale)
+    {
+        ChoiceAuthority ma = controller.get(field);
+        if(ma == null) {
+            reloadCache(field);
+        }
+        if (ma instanceof ChoiceAuthorityDetails)
+        {
+        	ChoiceAuthorityDetails avs = (ChoiceAuthorityDetails) ma;
+            return avs.getDetailsInfo(field, key, locale);
+        }
+        return null;
+    }
+    
+    
     public Set<String> getAuthorities()
     {
         Set<String> set = new HashSet<String>();
@@ -433,5 +537,48 @@ public final class ChoiceAuthorityManager
         }
         return result;
     }
+    private ChoiceAuthority reloadCache(String fieldKey)
+    {
+        ChoiceAuthority ma = null;
+        if(fieldKey.contains("_authority_")) {
+            reloadCache();
+            ma = controller.get(fieldKey);
+        }
+        return ma;
+    }
+    
+    public static void reloadCache() {
+        cached = null;
+        getManager();
+    }
+
+	public String getAuthorityName(String fieldKey) {
+		return md2authorityname.get(fieldKey);
+	}
+	
+	public ChoiceAuthority getChoiceAuthority(String metadata) {
+		String fieldKey = makeFieldKey(metadata);
+		return getChoose(fieldKey);
+	}
+
+	public ChoiceAuthority getChoiceAuthority(String schema, String element,
+			String qualifier) {
+		String fieldKey = makeFieldKey(schema, element, qualifier);
+		return getChoose(fieldKey);
+	}
+	
+	private ChoiceAuthority getChoose(String fieldKey) {
+		ChoiceAuthority ma = controller.get(fieldKey);
+        if (ma == null)
+        {
+            ma = reloadCache(fieldKey);
+            if(ma == null) {
+                throw new IllegalArgumentException(
+                        "No choices plugin was configured for  field \""
+                                + fieldKey + "\".");
+            }
+        }
+        return ma;
+	}    
 
 }

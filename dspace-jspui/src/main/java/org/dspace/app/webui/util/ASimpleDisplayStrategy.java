@@ -20,7 +20,7 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
         IDisplayMetadataValueStrategy
 {
     public abstract String getMetadataDisplay(HttpServletRequest hrq,
-            int limit, boolean viewFull, String browseType, int colIdx,
+            int limit, boolean viewFull, String browseType, int colIdx,int itemid,
             String field, DCValue[] metadataArray, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException;
 
@@ -57,7 +57,7 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
             throws JspException
     {
-        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,
+        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,item.getID(),
                 field, metadataArray, disableCrossLinks, emph, pageContext);
     }
 
@@ -66,7 +66,7 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
             DCValue[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException
     {
-        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,
+        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx,item.getID(),
                 field, metadataArray, disableCrossLinks, emph, pageContext);
     }
 

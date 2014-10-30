@@ -19,7 +19,7 @@ public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
     private static Logger log = Logger.getLogger(AUniformDisplayStrategy.class);
     
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
-            boolean viewFull, String browseType, int colIdx, String field,
+            boolean viewFull, String browseType, int colIdx, int itemid, String field,
             DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext)
     {
@@ -41,7 +41,7 @@ public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < loopLimit; j++)
         {
-            sb.append(getDisplayForValue(hrq, metadataArray[j].value));
+            sb.append(getDisplayForValue(hrq, metadataArray[j].value, itemid));
             if (j < (loopLimit - 1))
             {
                 if (colIdx != -1) // we are showing metadata in a table row
@@ -84,5 +84,5 @@ public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
         return metadata;
     }
 
-    protected abstract String getDisplayForValue(HttpServletRequest hrq, String value);
+    protected abstract String getDisplayForValue(HttpServletRequest hrq, String value,int itemid);
 }

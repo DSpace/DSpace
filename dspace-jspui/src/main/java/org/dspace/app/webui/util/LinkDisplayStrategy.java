@@ -8,8 +8,11 @@
 package org.dspace.app.webui.util;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.DCValue;
 import org.dspace.core.Utils;
 
 public class LinkDisplayStrategy extends AUniformDisplayStrategy
@@ -17,7 +20,7 @@ public class LinkDisplayStrategy extends AUniformDisplayStrategy
     /** log4j category */
     private static Logger log = Logger.getLogger(LinkDisplayStrategy.class);
 
-    protected String getDisplayForValue(HttpServletRequest hrq, String value)
+    protected String getDisplayForValue(HttpServletRequest hrq, String value, int itemid)
     {
         StringBuffer sb = new StringBuffer();
         String startLink = "<a href=\"" + value + "\">";
@@ -27,4 +30,5 @@ public class LinkDisplayStrategy extends AUniformDisplayStrategy
         sb.append(endLink);
         return sb.toString();
     }
+
 }

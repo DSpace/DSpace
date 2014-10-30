@@ -28,7 +28,7 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
 
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
-            boolean viewFull, String browseType, int colIdx, String field,
+            boolean viewFull, String browseType, int colIdx, int itemid, String field,
             DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext) throws JspException
     {

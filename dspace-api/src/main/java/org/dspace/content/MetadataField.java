@@ -13,8 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -698,4 +698,48 @@ public class MetadataField
         hash = 47 * hash + this.schemaID;
         return hash;
     }
+
+    
+    /**
+     * Return all metadata fields that are found in a given schema.
+     *
+     * @param context dspace context
+     * @param schemaID schema by db ID
+     * @return array of metadata fields
+     * @throws SQLException
+     */
+    public static MetadataField[] findAllByElement(Context context, int schemaID,
+            String element, String qualifier) throws SQLException,
+            AuthorizeException
+    {
+        List<MetadataField> fields = new ArrayList<MetadataField>();
+
+        // Get all the metadatafieldregistry rows
+        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " + 
+                "AND element= ?",
+                schemaID, element);
+
+        try
+        {
+            // Make into DC Type objects
+            while (tri.hasNext())
+            {
+                fields.add(new MetadataField(tri.next()));
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        // Convert list into an array
+        MetadataField[] typeArray = new MetadataField[fields.size()];
+        return (MetadataField[]) fields.toArray(typeArray);
+    }
+    
 }
