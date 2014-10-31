@@ -34,7 +34,25 @@
 			</map>
 		</property>
 	</bean>
-	
+	<bean class="org.dspace.app.cris.integration.CrisItemEnhancer">
+		<property name="alias" value="project" />
+		<property name="metadata">
+			<list>
+				<value>dc.authority.project</value>
+			</list>
+		</property>
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.Project</value>
+		</property>
+		<property name="qualifiers2path">
+			<map>
+				<entry key="grantno">
+					<value>projectNumber</value>
+				</entry>
+			</map>
+		</property>
+	</bean>	
+
 	<!-- CRIS enhanced metadata, used to add dynamically to the CRIS entity information from linked
          CRIS entities as it was metadata of the current CRIS entity from clazz -->
 	<bean class="org.dspace.app.cris.integration.CrisEnhancer">
@@ -124,4 +142,26 @@
 			</map>
 		</property>
 	</bean>
+	
+
+	<bean class="org.dspace.app.cris.integration.CrisNestedEnhancer"
+		scope="prototype">
+		<property name="applicationService" ref="applicationService" />
+		<property name="nestedClazz" value="org.dspace.app.cris.model.jdyna.RPNestedObject" />
+		<property name="clazz">
+			<value>org.dspace.app.cris.model.ResearcherPage</value>
+		</property>
+		<property name="alias" value="department" />
+		<property name="qualifiers2path">
+			<map>
+				<entry key="department">
+					<value>department</value>
+				</entry>
+				<entry key="departmentrole">
+					<value>departmentrole</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
 </beans>
