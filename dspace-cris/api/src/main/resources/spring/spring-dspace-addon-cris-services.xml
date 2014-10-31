@@ -1522,6 +1522,14 @@
 	<bean id="dspaceDBPassword" factory-bean="dspaceDatasource" factory-method="getPassword" />
 	<bean id="dspaceDBUrl" factory-bean="dspaceDatasource" factory-method="getUrl" />
 	<bean id="hibernateProperties" factory-bean="dspaceDatasource" factory-method="getHibernateProperties" />
+	<bean id="hibernateAcquireIncrement" factory-bean="dspaceDatasource" factory-method="getHibernateAcquireIncrement" />
+	<bean id="hibernateInitialPoolSize" factory-bean="dspaceDatasource" factory-method="getHibernateInitialPoolSize" />
+	<bean id="hibernateMaxPoolSize" factory-bean="dspaceDatasource" factory-method="getHibernateMaxPoolSize" />
+	<bean id="hibernateMinPoolSize" factory-bean="dspaceDatasource" factory-method="getHibernateMinPoolSize" />
+	<bean id="hibernateMaxIdleTime" factory-bean="dspaceDatasource" factory-method="getHibernateMaxIdleTime" />
+	<bean id="hibernateMaxStatements" factory-bean="dspaceDatasource" factory-method="getHibernateMaxStatements" />
+	<bean id="hibernateIdleConnectionTestPeriod" factory-bean="dspaceDatasource" factory-method="getHibernateIdleConnectionTestPeriod" />
+	<bean id="hibernateLoginTimeout" factory-bean="dspaceDatasource" factory-method="getHibernateLoginTimeout" />
 
 	<bean id="dataSource"
 		class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
@@ -1634,5 +1642,12 @@
 		<property name="applicationService" ref="applicationService" />
 		<property name="crisSearchService" ref="org.dspace.discovery.SearchService" />
 	</bean>
-       
+	
+	<bean id="sectionStatsExtraIndexer" 
+    	class="org.dspace.app.cris.statistics.SectionStatsIndexPlugin">
+    </bean>     
+    
+    <bean id="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData" 
+    	class="org.dspace.app.cris.statistics.YearsAdditionalStatisticsData">
+    </bean>           
 </beans>
