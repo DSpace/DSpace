@@ -16,7 +16,7 @@
 <%@ page import="org.dspace.app.bulkedit.BulkEditChange" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="java.util.List" %>
 
@@ -72,8 +72,8 @@
             for (BulkEditChange change : changes)
             {
                 // Get the changes
-                List<DCValue> adds = change.getAdds();
-                List<DCValue> removes = change.getRemoves();
+                List<Metadatum> adds = change.getAdds();
+                List<Metadatum> removes = change.getRemoves();
                 List<Collection> newCollections = change.getNewMappedCollections();
                 List<Collection> oldCollections = change.getOldMappedCollections();
                 boolean first = false;
@@ -256,7 +256,7 @@
                 }
 
                 // Show additions
-                for (DCValue dcv : adds)
+                for (Metadatum dcv : adds)
                 {
                     String md = dcv.schema + "." + dcv.element;
                     if (dcv.qualifier != null)
@@ -286,7 +286,7 @@
                 }
 
                 // Show removals
-                for (DCValue dcv : removes)
+                for (Metadatum dcv : removes)
                 {
                     String md = dcv.schema + "." + dcv.element;
                     if (dcv.qualifier != null)
