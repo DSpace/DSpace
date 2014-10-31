@@ -151,7 +151,7 @@
 		  <div class="carousel-inner">
 	<%	for (int i = 0; i < items.length; i++)
 		{
-			DCValue[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
+			Metadatum[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
 			String displayTitle = "Untitled";
 			if (dcv != null)
 			{

@@ -23,7 +23,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
@@ -49,7 +49,7 @@
 <p class="help-block"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.subheading"/></p>
 
 <%
-        DCValue[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
+        Metadatum[] titleArray = wsItem.getItem().getDC("title", null, Item.ANY);
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = wsItem.getItem().getSubmitter();
 %>
