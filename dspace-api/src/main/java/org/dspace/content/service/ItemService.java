@@ -7,7 +7,7 @@
  */
 package org.dspace.content.service;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
@@ -53,7 +53,7 @@ public class ItemService
     }
 
     public static String getFirstMetadataValue(Item item, String metadataKey) {
-        DCValue[] dcValue = item.getMetadataByMetadataString(metadataKey);
+        Metadatum[] dcValue = item.getMetadataByMetadataString(metadataKey);
         if(dcValue.length > 0) {
             return dcValue[0].value;
         } else {

@@ -402,7 +402,7 @@ public class XmlWorkflowManager {
             String handle = HandleManager.findHandle(c, i);
 
             // Get title
-            DCValue[] titles = i.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            Metadatum[] titles = i.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
             String title = "";
             try {
                 title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");

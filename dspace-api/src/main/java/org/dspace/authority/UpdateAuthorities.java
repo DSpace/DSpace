@@ -9,7 +9,6 @@ package org.dspace.authority;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
@@ -20,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.dspace.content.Metadatum;
 
 /**
  *
@@ -150,9 +150,9 @@ public class UpdateAuthorities {
             ItemIterator itemIterator = Item.findByMetadataFieldAuthority(context, authority.getField(), authority.getId());
             while (itemIterator.hasNext()) {
                 Item next = itemIterator.next();
-                List<DCValue> metadata = next.getMetadata(authority.getField(), authority.getId());
+                List<Metadatum> metadata = next.getMetadata(authority.getField(), authority.getId());
                 authority.updateItem(next, metadata.get(0)); //should be only one
-                List<DCValue> metadataAfter = next.getMetadata(authority.getField(), authority.getId());
+                List<Metadatum> metadataAfter = next.getMetadata(authority.getField(), authority.getId());
                 if (!metadata.get(0).value.equals(metadataAfter.get(0).value)) {
                     print.println("Updated item with handle " + next.getHandle());
                 }

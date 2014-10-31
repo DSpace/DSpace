@@ -493,7 +493,7 @@ public class StatisticsDataVisits extends StatisticsData
                         case Constants.ITEM:
                             Item item = (Item) dso;
                             String name = "untitled";
-                            DCValue[] vals = item.getMetadata("dc", "title", null, Item.ANY);
+                            Metadatum[] vals = item.getMetadata("dc", "title", null, Item.ANY);
                             if(vals != null && 0 < vals.length)
                             {
                                 name = vals[0].value;

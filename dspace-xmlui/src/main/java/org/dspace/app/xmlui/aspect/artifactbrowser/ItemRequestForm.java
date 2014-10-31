@@ -31,7 +31,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -192,7 +192,7 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 
         itemRequest.addPara(T_para1);
 
-		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
 		if (titleDC != null && titleDC.length > 0)
 			itemRequest.addPara(titleDC[0].value);
 

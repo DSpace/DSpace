@@ -17,7 +17,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
@@ -149,7 +149,7 @@ public class RequestItemServlet extends DSpaceServlet
         {   
         	JSPManager.showInvalidIDError(request, response, handle, -1);
         }
-        DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
         if (titleDC != null || titleDC.length > 0)
         {
             title = titleDC[0].value;
@@ -290,7 +290,7 @@ public class RequestItemServlet extends DSpaceServlet
             String title = "";
              if (item != null)
             {   
-                DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+                Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
                 if (titleDC != null || titleDC.length > 0) 
                     title = titleDC[0].value; 
             }
@@ -327,7 +327,7 @@ public class RequestItemServlet extends DSpaceServlet
 		if (requestItem != null && (yes || no)) {
 			Item item = Item.find(context, requestItem.getIntColumn("item_id"));
 
-			DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+			Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
 			String title = titleDC.length > 0 ? titleDC[0].value : I18nUtil
 					.getMessage("jsp.general.untitled", context);
 			
