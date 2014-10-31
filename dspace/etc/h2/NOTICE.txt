@@ -1,8 +1,0 @@
-DSpace does NOT support the use of the H2 Database (http://www.h2database.com/)
-in Production. Instead, DSpace uses the H2 Database to perform Unit Testing
-during development.
-
-By default, the DSpace Unit Testing environment configures H2 to run in "Oracle
-Mode" and initializes the H2 database using the Oracle schema (at
-../oracle/database_schema.sql). In the future, if we find the Oracle schema is
-unable to work for H2, we may need to (re)create an H2-specific database_schema.sql.

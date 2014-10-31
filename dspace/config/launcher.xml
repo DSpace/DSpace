@@ -356,26 +356,10 @@
     </command>
     
     <command>
-        <name>test-database</name>
-        <description>Test the DSpace database connection is OK</description>
+        <name>database</name>
+        <description>Perform database tasks like test database connection, migrate/repair database, remove database</description>
         <step>
-            <class>org.dspace.storage.rdbms.DatabaseManager</class>
-        </step>
-    </command>
-
-    <command>
-        <name>setup-database</name>
-        <description>Create the database tables</description>
-        <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
-        </step>
-    </command>
-
-    <command>
-        <name>clean-database</name>
-        <description>Remove the database tables</description>
-        <step>
-            <class>org.dspace.storage.rdbms.InitializeDatabase</class>
+            <class>org.dspace.storage.rdbms.DatabaseUtils</class>
         </step>
     </command>
 

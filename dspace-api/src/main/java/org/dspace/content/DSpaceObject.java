@@ -1278,7 +1278,7 @@ public abstract class DSpaceObject
 
                             if (field == null)
                             {
-                                log.error("Loading item - cannot find metadata field " + fieldID);
+                                log.error("Loading item - cannot find metadata field " + fieldID + " for resourceType=" + resourceTypeId + " and resourceId=" + resourceId);
                             }
                             else
                             {

@@ -1049,25 +1049,26 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will the item be an orphan?
+        // will the item be an orphan? is it in other collections?
         TableRow row = DatabaseManager.querySingle(ourContext,
                 "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
                 item.getID());
+        boolean orphan = (row.getLongColumn("num") == 1);
 
-        DatabaseManager.setConstraintDeferred(ourContext, "coll2item_item_fk");
-        if (row.getLongColumn("num") == 1)
-        {
-            // Orphan; delete it
-            item.delete();
-        }
         log.info(LogManager.getHeader(ourContext, "remove_item",
                 "collection_id=" + getID() + ",item_id=" + item.getID()));
 
+        // First, remove its association with this collection
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM collection2item WHERE collection_id= ? "+
                 "AND item_id= ? ",
                 getID(), item.getID());
-        DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
+
+        // Then, if it is an orphaned Item, delete it
+        if (orphan)
+        {
+            item.delete();
+        }
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, 
                 getID(), Constants.ITEM, item.getID(), item.getHandle(),

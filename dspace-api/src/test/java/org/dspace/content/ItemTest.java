@@ -1465,14 +1465,24 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     {
         //we disable the permission testing as it's shared with other methods where it's already tested (can edit)
         context.turnOffAuthorisationSystem();
+
+        // Create two new collections to test with
         Collection from = Collection.create(context);
         Collection to = Collection.create(context);
-        it.setOwningCollection(from);
 
-        it.move(from, to);
+        // Create a new item to test with
+        // (Ensures the item is not already mapped to another collection by a different test)
+        Item item = Item.create(context);
+        item.setOwningCollection(from);
+        from.addItem(item);
+        assertThat("testMove 0",item.getOwningCollection(), equalTo(from));
+
+        // Now, test the move
+        item.move(from, to);
         context.restoreAuthSystemState();
-        assertThat("testMove 0",it.getOwningCollection(), notNullValue());
-        assertThat("testMove 1",it.getOwningCollection(), equalTo(to));
+
+        assertThat("testMove 1",item.getOwningCollection(), notNullValue());
+        assertThat("testMove 2",item.getOwningCollection(), equalTo(to));
     }
 
     /**
