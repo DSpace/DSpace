@@ -41,6 +41,7 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 import org.hibernate.Session;
 
 /**
@@ -67,6 +68,8 @@ public class ApplicationService extends ExtendedTabService
 
     private UserWSDao userWSDao;
 
+    private ConfigurationService configurationService;
+    
     private CacheManager cacheManager;
 
     private Cache cache;
@@ -91,7 +94,7 @@ public class ApplicationService extends ExtendedTabService
         relationPreferenceDao = (RelationPreferenceDao) getDaoByModel(RelationPreference.class);
         researchDao = (DynamicObjectDao) getDaoByModel(ResearchObject.class);
         
-		if (ConfigurationManager.getBooleanProperty("cris", "applicationServiceCache.enabled", true)
+		if (configurationService.getPropertyAsType("cris.applicationServiceCache.enabled", true, true)
         		&& cache == null)
         {
             try
@@ -99,16 +102,21 @@ public class ApplicationService extends ExtendedTabService
                 cacheManager = CacheManager.create();
                 if (cacheManager != null)
                 {
-					int maxInMemoryObjects = ConfigurationManager.getIntProperty("cris",
-							"applicationServiceCache.max-in-memory-objects", 100);
-					boolean overflowToDisk = ConfigurationManager.getBooleanProperty("cris",
-							"applicationServiceCache.overflow-to-disk", true);
-					int timeToLive = ConfigurationManager.getIntProperty("cris",
-							"applicationServiceCache.time-to-live", 0);
-					int timeToIdle = ConfigurationManager.getIntProperty("cris",
-							"applicationServiceCache.time-to-idle", 0);
-					int diskExpireThreadInterval = ConfigurationManager.getIntProperty("cris",
-							"applicationServiceCache.disk-expire-thread-interval", 600);
+					int maxInMemoryObjects = 100;
+//					ConfigurationManager.getIntProperty("cris",
+//							"applicationServiceCache.max-in-memory-objects", 100);
+					boolean overflowToDisk = true;
+//					ConfigurationManager.getBooleanProperty("cris",
+//							"applicationServiceCache.overflow-to-disk", true);
+					int timeToLive = 0;
+//					ConfigurationManager.getIntProperty("cris",
+//							"applicationServiceCache.time-to-live", 0);
+					int timeToIdle = 0;
+//					ConfigurationManager.getIntProperty("cris",
+//							"applicationServiceCache.time-to-idle", 0);
+					int diskExpireThreadInterval = 600;
+//					ConfigurationManager.getIntProperty("cris",
+//							"applicationServiceCache.disk-expire-thread-interval", 600);
                 	
                     cache = cacheManager.getCache("applicationServiceCache");
                     if (cache == null)
@@ -219,6 +227,11 @@ public class ApplicationService extends ExtendedTabService
         return dao.countByEpersonIDandUUID(epersonID, uuid);
     }
 
+    public void setConfigurationService(
+			ConfigurationService configurationService) {
+		this.configurationService = configurationService;
+	}
+    
     /**
      * Get all researcher in a specific status. If status is null all the
      * ResearcherPage will be returned

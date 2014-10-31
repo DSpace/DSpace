@@ -295,6 +295,7 @@
 		<property name="target">
 			<bean class="org.dspace.app.cris.service.ApplicationService"
 				init-method="init" destroy-method="destroy" parent="baseService">
+				<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 				<property name="applicationDao" ref="applicationDao" />
 				<property name="listenerOnPostUpdate">
 					<list>
