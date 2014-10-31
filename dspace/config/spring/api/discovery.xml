@@ -58,12 +58,22 @@
 		document -->
 	<bean id="resourceTypeIndexer" class="org.dspace.app.cris.discovery.ResourceTypeSolrIndexer">
 	</bean>
+	<!-- Additional indexing plugin to add rpsurnames SOLR -->
+	<bean id="RPSurnameSolrIndexer" class="org.dspace.app.cris.discovery.RPSurnameSolrIndexer">
+	</bean>
 	
+	<!-- Additional indexing plugin to add sorting field for authority -->
+	<bean id="CRISAuthoritySortSolrIndexPlugin" class="org.dspace.app.cris.discovery.CRISAuthoritySortSolrIndexPlugin">
+	</bean>
+		
 	<!-- Additional indexing plugin to add cris authoritylookup for authority framework works with dynamic resource type to item SOLR 
 		document -->
 	<bean id="researchObjectAuthorityLookupIndexer" class="org.dspace.app.cris.discovery.ResearchObjectAuthorityLookupSolrIndexer">
 	</bean>
-	
+	<!--  Additional indexing plugin to add info for author pending match  - confidence <> 600 -->
+	<bean id="pendingMatchIndexer" class="org.dspace.app.cris.discovery.PendingMatchSolrIndexer">
+	</bean>
+			
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->
 	<bean
@@ -168,6 +178,9 @@
 					<list>
 						<ref bean="sortTitle" />
 						<ref bean="sortDateIssued" />
+						<ref bean="sortRPName" />
+						<ref bean="sortPJTitle"/>
+						<ref bean="sortOUName"/>						
 					</list>
 				</property>
 			</bean>
