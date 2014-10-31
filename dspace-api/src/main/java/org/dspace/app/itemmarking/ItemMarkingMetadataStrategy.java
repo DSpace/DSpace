@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 
 /**
@@ -37,10 +37,10 @@ public class ItemMarkingMetadataStrategy implements ItemMarkingExtractor {
 		
 		if (metadataField != null && mapping!=null)
 		{
-			DCValue[] vals = item.getMetadataByMetadataString(metadataField);
+			Metadatum[] vals = item.getMetadataByMetadataString(metadataField);
 			if (vals.length > 0)
 			{
-				for (DCValue value : vals){
+				for (Metadatum value : vals){
 					String type = value.value;
 					if (mapping.containsKey(type)){
 						return mapping.get(type);

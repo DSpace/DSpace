@@ -487,11 +487,11 @@ public class CitationDocument {
     }
 
     public String getAllMetadataSeparated(Item item, String metadataKey) {
-        DCValue[] dcValues = item.getMetadataByMetadataString(metadataKey);
+        Metadatum[] dcValues = item.getMetadataByMetadataString(metadataKey);
 
         ArrayList<String> valueArray = new ArrayList<String>();
 
-        for(DCValue dcValue : dcValues) {
+        for(Metadatum dcValue : dcValues) {
             if(StringUtils.isNotBlank(dcValue.value)) {
                 valueArray.add(dcValue.value);
             }
