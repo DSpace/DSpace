@@ -64,3 +64,9 @@ input.ds-authority-lock.is-unlocked
 
 /* field required in submission */
 .label-required:after { content:" *"; }
+
+.tab-content{
+		border: 1px solid #ddd;
+		border-top: 0;
+		background-color: #fff;
+}
