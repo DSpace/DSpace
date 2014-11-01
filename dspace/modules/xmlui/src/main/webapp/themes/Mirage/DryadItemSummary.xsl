@@ -113,6 +113,13 @@
                   <xsl:value-of select="$title"/>
               </p>
         </div>
+        <xsl:if test=".//dim:field[@element='curatorNote']">
+        <div class="ds-static-div primary">
+            <p class="ds-paragraph">
+                <xsl:value-of select=".//dim:field[@element='curatorNote']"/>
+            </p>
+        </div>
+        </xsl:if>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
             <div class="ds-static-div primary">&#160;
