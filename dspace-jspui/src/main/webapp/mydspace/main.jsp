@@ -32,7 +32,7 @@
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.SupervisedItem" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
@@ -117,7 +117,7 @@
 
         for (int i = 0; i < owned.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 owned[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                                                   : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -184,7 +184,7 @@
 
         for (int i = 0; i < pooled.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 pooled[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -254,7 +254,7 @@
 
         for (int i = 0; i < workspaceItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 workspaceItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -300,7 +300,7 @@
 
         for (int i = 0; i < supervisedItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 supervisedItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -353,7 +353,7 @@
 <%
         for (int i = 0; i < workflowItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 workflowItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
