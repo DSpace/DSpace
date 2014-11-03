@@ -40,12 +40,7 @@ public class Metadatum
     /** Authority control confidence. */
     public int confidence = Choices.CF_UNSET;
 
-    /**
-     * Get the name of the field in dot notation:  schema.element.qualifier,
-     * as in {@code dc.date.issued}.
-     *
-     * @return stringified name of this field.
-     */
+
 
     public Metadatum copy() {
         Metadatum copy = new Metadatum();
@@ -58,7 +53,12 @@ public class Metadatum
         copy.schema = this.schema;
         return copy;
     }
-
+    /**
+     * Get the name of the field in dot notation:  schema.element.qualifier,
+     * as in {@code dc.date.issued}.
+     *
+     * @return stringified name of this field.
+     */
     public String getField() {
         return schema + "." + element + (qualifier == null ? "" : ("." + qualifier));
     }
