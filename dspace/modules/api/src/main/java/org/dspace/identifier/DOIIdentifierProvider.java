@@ -318,7 +318,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
     
     private void mint(DOI doi, String target, boolean register, Map<String, String> metadata) throws IOException {
-
+        log.debug("mintDOI is going to be called on "+doi.toString());
         perstMinter.mintDOI(doi);
 
         if(register) {
@@ -543,17 +543,29 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     private DOI calculateDOIDataFile(Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
-        String doiString;
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
 
         if (pkgLink == null) {
             throw new RuntimeException("Not linked to a data package");
         }
-        if (!(doiString = pkgLink[0].value).startsWith("doi:")) {
+
+        if (pkgLink.length == 0) {
+            throw new RuntimeException("Not linked to a data package");
+        }
+
+        String packageDOIString = pkgLink[0].value;
+        if (!packageDOIString.startsWith("doi:")) {
             throw new DOIFormatException("isPartOf value doesn't start with 'doi:'");
         }
 
-        log.warn("calculateDOIDataFile() - is part of: " + doiString);
+        DCValue[] titles = item.getMetadata("dc.title");
+
+        String itemTitle = "";
+        if (titles.length > 0) {
+            itemTitle = titles[0].value;
+        }
+
+        log.warn("calculateDOIDataFile() - " + itemTitle + " is part of: " + packageDOIString);
 
         // Versioning: if it is a new version of an existing Item, the new DOI must be: oldDOI.(versionNumber)
         if (history != null) { // NEW VERSION OF AN EXISTING ITEM
@@ -563,63 +575,52 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.warn("calculateDOIDataFile() - new version of an existing - version: " + version.getVersionNumber());
             log.warn("calculateDOIDataFile() - new version of an existing - previous: " + previous.getVersionNumber());
 
-            String idPrevious=null;
-            // FIRST time a VERSION is created: update identifier of the previous item adding ".1" before /
+            // we need to get the DOI of the previous versioned file so we can update it to the new version.
+            String previousDOIString = null;
+            // FIRST time a VERSION is created: we need to create the versioned DOIs.
             if (history.isFirstVersion(previous)) {
                 log.warn("calculateDOIDataFile() - calculateDOIDataFileFirstTime()");
-                idPrevious = calculateDOIDataFileFirstTime(previous.getItem());
-                //idPrevious= updateIdentifierPreviousDF(context,previous.getItem());
+                previousDOIString = calculateDOIDataFileFirstTime(previous.getItem());
             }
-            else
-                idPrevious = DOIIdentifierProvider.getDoiValue(previous.getItem());
+            else {
+                previousDOIString = getDoiValue(previous.getItem());
+            }
 
-            // mint NEW DOI: taking first part from id dataPackage father (until the /) + taking last part from id previous dataFile (after the slash)  e.g., 1111.3 / 1.1
-            log.warn("calculateDOIDataFile() - new version of an existing - idPrevious: " + idPrevious);
-
-            String suffixDF = idPrevious.substring(idPrevious.lastIndexOf(SLASH) + 1);
-
-            log.warn("calculateDOIDataFile() - new version of an existing - suffixDF: " + suffixDF);
-
-
-            // the item has been modified? if yes: increment version number
-            DOI childDOI=null;
-//            if(countBitstreams(previous.getItem())!= countBitstreams(item)){
-
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified");
-
-                int versionN = Integer.parseInt(suffixDF.substring(suffixDF.lastIndexOf(DOT)+1));
-
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified -  doiString" + doiString);
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified -  suffixDF" + suffixDF);
-                log.warn("calculateDOIDataFile() - new version of an existing - dataFile modified -  versionN" + versionN);
-
-                childDOI = new DOI(doiString + "/" + suffixDF.substring(0, suffixDF.lastIndexOf(DOT)) + DOT  + (versionN+1), item);
-//            }
-//            else{
-//                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  doiString" + doiString);
-//                log.warn("calculateDOIDataFile() - new version of an existing - dataFile not modified -  suffixDF" + suffixDF);
-//                childDOI = new DOI(doiString + "/" + suffixDF, item);
-//            }
-            log.warn("calculateDOIDataFile() - new version of an existing: " + childDOI);
+            // mint NEW DOI: packageDOIString + fileIndex from previous DOI + new version number
+            String fileSuffix = getDataFileSuffix(previousDOIString);
+            String fileIndex = fileSuffix.substring(0,fileSuffix.indexOf(DOT));
+            String versionN = String.valueOf(version.getVersionNumber());
+            DOI childDOI = new DOI(packageDOIString + SLASH + fileIndex + DOT + versionN, item);
+            log.warn("calculateDOIDataFile() - new version of an existing item: " + childDOI.toString());
             return childDOI;
         }
         else { // NEW ITEM: mint a new DOI
             // has an arbitrary max; in reality much, much less
             for (int index = 1; index < MAX_NUM_OF_FILES; index++) {
-
                 // check if canonical already exists
-                String idDOI = getCanonicalDataPackage(doiString) + "/" + index;
-                if (existsIdDOI(idDOI)) {
-                    String dbDoiURL = lookup(idDOI);
+                String canonicalFileDOIString = getCanonicalDataPackage(packageDOIString) + SLASH + index;
+                if (existsIdDOI(canonicalFileDOIString)) {
+                    String dbDoiURL = lookup(canonicalFileDOIString);
                     if (dbDoiURL.equals(DOI.getInternalForm(item))) {
-                        log.warn("calculateDOIDataFile() - new item canonical exists: " + (doiString + "/" + index));
-                        return new DOI(doiString + "/" + index, item);
+                        log.warn("calculateDOIDataFile() - new item canonical exists: " + canonicalFileDOIString);
+                        return new DOI(packageDOIString + SLASH + index, item);
                     }
                 }
                 else {
-                    log.warn("calculateDOIDataFile() - new item canonical not exists: " + (doiString + "/" + index));
-                    DOI childDOI = new DOI(doiString + "/" + index, item);
-                    return childDOI;
+                    log.warn("calculateDOIDataFile() - new item canonical not exists: " + canonicalFileDOIString);
+                    // If versioning has already begun, we have to mint two DOIs: the current DOI, but also the canonical file DOI. Look for that first.
+                    // mint the canonical file DOI:
+                    DOI canonicalFileDOI = new DOI(canonicalFileDOIString, item);
+                    mint(canonicalFileDOI,false,createListMetadata(item));
+
+                    String packageVersion = getDataPackageVersion(packageDOIString);
+                    if (packageVersion.equals("")) {
+                        // no version
+                        return new DOI(packageDOIString + SLASH + index, item);
+                    } else {
+                        // versioned; file version needs to match package version
+                        return new DOI(packageDOIString + SLASH + index + DOT + packageVersion, item);
+                    }
                 }
             }
         }
@@ -830,27 +831,46 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private DOI getCanonicalDataPackage(DOI doi, Item item) {
-        String canonicalID = doi.toString().substring(0, doi.toString().lastIndexOf(DOT));
-        DOI canonical = new DOI(canonicalID, item);
-        return canonical;
+        String canonicalID = getCanonicalDataPackage(doi.toString());
+        return new DOI(canonicalID, item);
     }
 
     private String getCanonicalDataPackage(String doi) {
         // no version present
-        if(countDots(doi) <=2) return doi;
-        String canonicalID = doi.toString().substring(0, doi.toString().lastIndexOf(DOT));
-        return canonicalID;
+        if(!isVersionedDOI(doi)) return doi;
+        return doi.toString().substring(0, doi.toString().lastIndexOf(DOT));
     }
 
-    private short countDots(String doi){
-        short index=0;
-        int indexDot=0;
-        while( (indexDot=doi.indexOf(DOT))!=-1){
-            doi=doi.substring(indexDot+1);
-            index++;
+    // given a package DOI (eg doi:10.5061/dryad.9054.1)
+    // returns the version number of the package (eg 1)
+    private String getDataPackageVersion(String doi) {
+        // no version present
+        if(!isVersionedDOI(doi)) return "";
+        return doi.toString().substring(doi.toString().lastIndexOf(DOT) + 1);
+    }
+
+    // given a file DOI (eg doi:10.5061/dryad.9054.1/3.1)
+    // returns the file portion of the DOI (eg 3.1)
+    private String getDataFileSuffix(String doi) {
+        // TODO: test to make sure this is a file DOI.
+        return doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
+    }
+
+    private boolean isVersionedDOI(String doi){
+        // if a DOI has 2 or less dots, it is not a versioned DOI.
+        // eg: doi:10.5061/dryad.xxxxx or doi:10.5061/dryad.xxxxx/4 (two dots)
+        // instead of doi:10.5061/dryad.xxxxx.2 or doi:10.5061/dryad.xxxxx.2/4.2 (3 or 4 dots)
+        short numDots=0;
+        int indexDot = doi.indexOf(DOT);
+        while(indexDot != -1){
+            indexDot = doi.indexOf(DOT, indexDot+1);
+            numDots++;
         }
 
-        return index;
+        if (numDots <= 2) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -859,16 +879,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
      * output doi.toString()=  2rdfer334/1
      */
     private DOI getCanonicalDataFile(DOI doi, Item item) {
-
-        log.warn("getCanonicalDataFile() doi in input: " + doi);
-
-
         // doi:10.5061/dryad.9054.1 (based on the input example)
         String idDP = doi.toString().substring(0, doi.toString().lastIndexOf(SLASH));
 
         // idDF=1.1
         String idDF = doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
-
 
         String canonicalDP = idDP.substring(0, idDP.lastIndexOf(DOT));
         String canonicalDF = idDF;

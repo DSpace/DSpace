@@ -11,10 +11,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.authority.config.AuthorityTypeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Term;
@@ -77,8 +77,6 @@ public class AuthorityValue {
 
 
     private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
-
-
 
     public AuthorityValue() {
     }
@@ -196,7 +194,7 @@ public class AuthorityValue {
 
     public void clearOtherMetadata()
     {
-         otherMetadata.clear();
+        otherMetadata.clear();
     }
 
     /**
@@ -215,6 +213,18 @@ public class AuthorityValue {
         doc.addField("creation_date", dateToString(getCreationDate()));
         doc.addField("last_modified_date", dateToString(getLastModified()));
         doc.addField("authority_type", getAuthorityType());
+        for(String name:nameVariants)
+        {
+            doc.addField(ALTERNATE_LABEL,name);
+        }
+        for(String key:otherMetadata.keySet())
+        {
+            for(String v:otherMetadata.get(key))
+            {
+                doc.addField(LABELPREFIX+key,v);
+            }
+
+        }
         return doc;
     }
 
@@ -236,7 +246,7 @@ public class AuthorityValue {
         Collection<Object> document_name_variant = document.getFieldValues(ALTERNATE_LABEL);
         if (document_name_variant != null) {
             for (Object name_variants : document_name_variant) {
-                addNameVariant(String.valueOf(name_variants));
+                addNameVariant(name_variants.toString());
             }
         }
 
@@ -245,11 +255,11 @@ public class AuthorityValue {
         for (String fieldName : document.getFieldNames()) {
             String labelPrefix = LABELPREFIX;
             if (fieldName.startsWith(labelPrefix)) {
-                String label = fieldName.substring(labelPrefix.length());
+                String label = fieldName.substring(labelPrefix.length()).replace("_", ".");
                 List<String> list = new ArrayList<String>();
                 Collection<Object> fieldValues = document.getFieldValues(fieldName);
                 for (Object o : fieldValues) {
-                    list.add(String.valueOf(o));
+                    list.add(o.toString());
                 }
                 otherMetadata.put(label, list);
             }
@@ -270,7 +280,37 @@ public class AuthorityValue {
      * Information that can be used the choice ui
      */
     public Map<String, String> choiceSelectMap() {
-        return new HashMap<String, String>();
+        return getChoiceSelectMap("Internal");
+    }
+
+    protected Map<String, String> getChoiceSelectMap(String type)
+    {
+        HashMap<String,String> map =  new HashMap<String, String>();
+
+        //todo:add choiceSelectFields
+        AuthorityTypeConfiguration config = getAuthorityTypes().getConfigForType(type);
+
+        if(config != null  && config.getChoiceSelectFields() != null)
+        {
+            Map<String, String> choiceSelectFields = config.getChoiceSelectFields();
+            for(Object key:choiceSelectFields.keySet())
+            {
+                String keyValue = (String)key;
+                String metadataField = (String) choiceSelectFields.get(key);
+                String metadataValue = null;
+                if(this.getOtherMetadata().get(metadataField)!=null&&this.getOtherMetadata().get(metadataField).size()>0)
+                {
+                    ArrayList<String> metadataValues = (ArrayList<String>) this.getOtherMetadata().get(metadataField);
+                    metadataValue = metadataValues.get(0);
+                }
+                if (metadataValue!=null) {
+                    map.put(keyValue,metadataValue );
+                } else {
+                    map.put(keyValue, "/");
+                }
+            }
+        }
+        return map;
     }
 
 
@@ -498,4 +538,6 @@ public class AuthorityValue {
 
         return true;
     }
+
+
 }
