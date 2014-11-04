@@ -82,8 +82,10 @@ public class OAuthTokenDatabaseStorageImpl implements OAuthTokenStorageInterface
     private OAuthToken getOAuthTokenByString(String tokenString) throws SQLException {
             String query = "SELECT * FROM " + OAUTH_TOKEN_TABLE + " WHERE " +
                     COLUMN_TOKEN + " = ? ";
-            TableRow row = DatabaseManager.querySingleTable(getContext(), OAUTH_TOKEN_TABLE, query, tokenString);
+            Context context = getContext();
+            TableRow row = DatabaseManager.querySingleTable(context, OAUTH_TOKEN_TABLE, query, tokenString);
             OAuthToken oAuthToken = oAuthTokenFromTableRow(row);
+            completeContext(context);
             return oAuthToken;
     }
 

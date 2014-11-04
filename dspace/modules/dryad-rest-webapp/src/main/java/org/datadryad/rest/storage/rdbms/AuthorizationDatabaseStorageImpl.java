@@ -85,12 +85,14 @@ public class AuthorizationDatabaseStorageImpl implements AuthorizationStorageInt
             String query = "SELECT * FROM " + AUTHZ_TABLE + " WHERE " +
                     COLUMN_EPERSON_ID + " = ? AND " +
                     COLUMN_HTTP_METHOD + " = ?";
-            TableRowIterator rowIterator = DatabaseManager.queryTable(getContext(), AUTHZ_TABLE, query, tuple.ePersonId, tuple.httpMethod);
+            Context context = getContext();
+            TableRowIterator rowIterator = DatabaseManager.queryTable(context, AUTHZ_TABLE, query, tuple.ePersonId, tuple.httpMethod);
             while(rowIterator.hasNext()) {
                 TableRow row = rowIterator.next();
                 AuthorizationTuple databaseTuple = authTupleFromTableRow(row);
                 tuples.add(databaseTuple);
             }
+            completeContext(context);
         return tuples;
     }
 
