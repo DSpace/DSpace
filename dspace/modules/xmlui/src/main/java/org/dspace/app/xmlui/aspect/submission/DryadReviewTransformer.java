@@ -69,13 +69,14 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         // 1. wfID + token
         // 2. provisional DOI (since it is not yet public)
 
-        wfItem = getWFItem(request); // Looks up by wfID or doi params in request
-        if(wfItem == null) {
-            return;
-        }
         String requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
-            // DOI is present. Set authorized and the reviewerToken for downloads
+            loadWFItemByDOI(doi);
+            if(wfItem == null) {
+                // Not found
+                return;
+            }
+            // DOI was found. Set authorized true and the reviewerToken for downloads
             authorized = true;
             String reviewerKey = getItemToken();
             request.getSession().setAttribute("reviewerToken", reviewerKey);
@@ -83,6 +84,12 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             // DOI not present, require token
             String token = request.getParameter("token");
             if (token != null) {
+                loadWFItem(request); // Looks up by wfID or itemId
+                if(wfItem == null) {
+                    // item not found
+                    return;
+                }
+                // item lookup successful, make sure token matches
                 String reviewerKey = getItemToken();
                 authorized = token.equals(reviewerKey);
                 if (authorized) {
@@ -183,24 +190,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
     }
 
-    private WorkflowItem
-    getWFItem(Request request) throws IOException {
-        int wfItemId;
+    private void loadWFItemByDOI(String doi) throws IOException {
+        wfItem = null;
+        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         try {
-            if (request.getParameter("wfID") != null) {
-                wfItemId = Integer.parseInt(request.getParameter("wfID"));
-                wfItem = WorkflowItem.find(context, wfItemId);
-            }
-            else if (request.getParameter("doi") != null) {
-                DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                DSpaceObject obj = null;
-                obj = dis.resolve(context, request.getParameter("doi"));
-                if (obj instanceof Item)
-                    wfItem = WorkflowItem.findByItemId(context, obj.getID());
-            }
-            else if (request.getParameter("itemID") != null) {
-                Item item = Item.find(context, Integer.parseInt(request.getParameter("itemID")));
-                wfItem = WorkflowItem.findByItemId(context, item.getID());
+            DSpaceObject obj = dis.resolve(context, doi);
+            if (obj instanceof Item) {
+                wfItem = WorkflowItem.findByItemId(context, obj.getID());
             }
         } catch (IdentifierNotFoundException e) {
             log.error(e);
@@ -211,7 +207,26 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         } catch (AuthorizeException e) {
             log.error(e);
         }
-        return wfItem;
+    }
+
+    private void
+    loadWFItem(Request request) throws IOException {
+        int wfItemId;
+        wfItem = null;
+        try {
+            if (request.getParameter("wfID") != null) {
+                wfItemId = Integer.parseInt(request.getParameter("wfID"));
+                wfItem = WorkflowItem.find(context, wfItemId);
+            }
+            else if (request.getParameter("itemID") != null) {
+                Item item = Item.find(context, Integer.parseInt(request.getParameter("itemID")));
+                wfItem = WorkflowItem.findByItemId(context, item.getID());
+            }
+        } catch (SQLException e) {
+            log.error(e);
+        } catch (AuthorizeException e) {
+            log.error(e);
+        }
     }
 
     private String getItemToken() {
