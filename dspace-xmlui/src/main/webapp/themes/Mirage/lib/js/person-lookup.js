@@ -167,6 +167,7 @@ function AuthorLookup(url, authorityInput, collectionID) {
 
                     }
                     content.dialog('destroy');
+                    content.remove();
                 });
                 vcard.show();
             });
