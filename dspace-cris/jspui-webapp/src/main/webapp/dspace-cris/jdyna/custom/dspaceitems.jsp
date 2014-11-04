@@ -74,7 +74,7 @@
 
 
 if (info.getPagefirst() != info.getPagecurrent()) {
-	  sb.append("<li><a class=\"pagination\" href=\"");
+	  sb.append("<li><a class=\"\" href=\"");
 	  sb.append(prevURL);
 	  sb.append("\"><i class=\"fa fa-long-arrow-left\"> </i></a></li>");
 };
@@ -91,7 +91,7 @@ for( int q = info.getPagefirst(); q <= info.getPagelast(); q++ )
 
 
 if (info.getPagetotal() > info.getPagecurrent()) {
-  sb.append("<li><a class=\"pagination\" href=\"");
+  sb.append("<li><a class=\"\" href=\"");
   sb.append(nextURL);
   sb.append("\"><i class=\"fa fa-long-arrow-right\"> </i></a></li>");
 }

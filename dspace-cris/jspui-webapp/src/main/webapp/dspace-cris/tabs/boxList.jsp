@@ -79,26 +79,12 @@
 					title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 					href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteBox.htm?id=${box.id}">
-				<img
-					src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-					border="0"
-					alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-					title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-					name="remove" id="remove_${box.id}" /> </a>
+				<span class="fa fa-trash" id="remove_${box.id}" ></span> </a>
 			<a class="jdynaeditbutton"
 				title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/editBox.htm?id=${box.id}">
-			<img
-				src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-				border="0"
-				alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-				title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-				name="edit" id="edit_${box.id}" /> </a>
+			<span class="fa fa-edit" id="edit_${box.id}" ></span> </a>
 			
 			<c:if test="${hasCustomDisplayJSP eq true}">
 			

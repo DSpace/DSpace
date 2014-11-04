@@ -48,6 +48,10 @@
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
 
+	// Is the logged in user an admin
+	Boolean admin = (Boolean)request.getAttribute("is.admin");
+	boolean isAdmin = (admin == null ? false : admin.booleanValue());
+	
     WorkspaceItem[] workspaceItems =
         (WorkspaceItem[]) request.getAttribute("workspace.items");
 
@@ -74,6 +78,7 @@
     
     ConfigurationService configurationService = new DSpace().getConfigurationService();
     boolean crisEnabled = configurationService.getPropertyAsType("cris.enabled", false);
+    boolean rpChangeStatusAdmin =  configurationService.getPropertyAsType("cris.rp.changestatus.admin", false);
 
     if (crisEnabled)
     {
@@ -144,6 +149,20 @@
                                        }
                        }
                });
+               j('#cris-rp-change-admin').dialog({
+                   autoOpen: false, modal: true, width: 750, minHeight: 300,
+                           buttons: {
+                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
+                                   function(){
+                                           j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
+                                   },
+                           	    "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/>":
+                                   function(){
+                                           j(this).dialog("close");
+                                   }
+                   }
+           });
+               
 
                var myRP = function(myaction){
                        j.ajax( {
@@ -152,6 +171,7 @@
                                                "action" : myaction
                                        },
                                        success : function(data) {
+                                    	   	
                                                myrpstatus = data.myrp;
                                                if (data.myrp.url != null && data.myrp.active)
                                                {
@@ -159,7 +179,14 @@
                                                        j('#cris-rp-status-value').addClass("cris-rp-status-active");
                                                        j('#cris-rp-changestatus').off('click');
                                                        j('#cris-rp-changestatus').on('click', function(){
-                                                               j('#cris-rp-change-active').dialog("open");
+                                                    	   <% if(rpChangeStatusAdmin && !isAdmin){%>
+                                                    		   j('#cris-rp-change-admin').dialog("open");
+        	                                       	   		<%}else{
+		                                               	   %>
+		                                               			j('#cris-rp-change-active').dialog("open");
+		                                               		<%
+		                                               			}%>
+                                                               
                                                        });
                                                }
                                                else if (data.myrp.url != null && !data.myrp.active)
@@ -168,7 +195,12 @@
                                                        j('#cris-rp-status-value').addClass("cris-rp-status-inactive");
                                                        j('#cris-rp-changestatus').off('click');
                                                        j('#cris-rp-changestatus').on('click', function(){
+                                                    	   <% if(rpChangeStatusAdmin && !isAdmin){ %>
+                                                    		   j('#cris-rp-change-admin').dialog("open");
+        	                                       	   		<%}else{
+		                                               	   %>
                                                                j('#cris-rp-change-inactive').dialog("open");
+                                                               <%}%>
                                                        });
                                                }
                                                else
@@ -206,7 +238,7 @@
         <h2 class="cris-rp-status">
         	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
         	<a href="#" id="cris-rp-changestatus"><span id="cris-rp-status-value" class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-loading"/></span>
-        	<img class="jdyna-icon jdyna-icon-action" src="<%= request.getContextPath() %>/image/jdyna/edit.gif" /></a>
+        	<span class="fa fa-edit"></span></a>
         </h2>
 
         <div id="cris-rp-change-active" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.title"/>">
@@ -218,6 +250,9 @@
         <div id="cris-rp-change-undefined" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.title"/>">
         	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.text"/></p>
         </div>
+        <div id="cris-rp-change-admin" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.title"/>">
+        	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.text"/></p>
+        </div>        
 <%        
 	}
  %>
@@ -543,4 +578,5 @@
 	<%} %>
 	</div>
 </div>	
+	
 </dspace:layout>

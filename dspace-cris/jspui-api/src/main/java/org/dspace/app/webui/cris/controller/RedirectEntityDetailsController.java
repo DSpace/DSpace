@@ -27,7 +27,7 @@ public class RedirectEntityDetailsController<T extends ACrisObject> extends
     
     /** log4j category */
     private static Logger log = Logger
-            .getLogger(RedirectResearcherPageDetailsController.class);
+            .getLogger(RedirectEntityDetailsController.class);
 
     
     public RedirectEntityDetailsController(Class<T> modelClazz)

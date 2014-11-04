@@ -29,30 +29,22 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
     {
         try
         {
-            boolean save = false;
-            if (StringUtils.isNotBlank(eperson.getNetid())) {
-	            ResearcherPage rp = applicationService.getResearcherPageByEPersonId(eperson.getID());
-	            if(rp==null) {
-					rp = applicationService.getEntityBySourceId(netidSourceRef,
-							eperson.getNetid(), ResearcherPage.class);
-	                if(rp != null) {
-	                	if (rp.getEpersonID()!=null) {
-		                    if (rp.getEpersonID() != eperson.getID())
-		                    {
-		                        rp.setEpersonID(eperson.getID());
-		                        save = true;
-		                    }
-		                }
-		                else {
-		                    rp.setEpersonID(eperson.getID());
-		                    save = true;
-		                }
+            ResearcherPage rp = applicationService.getResearcherPageByEPersonId(eperson.getID());
+            if(rp==null && eperson.getNetid() != null) {
+				rp = applicationService.getEntityBySourceId(netidSourceRef,
+						eperson.getNetid(), ResearcherPage.class);
+                if (rp != null) {
+					if(rp.getEpersonID()!=null) {
+	                    if (rp.getEpersonID() != eperson.getID())
+	                    {
+	                        rp.setEpersonID(eperson.getID());
+	                    }
 	                }
-	            }
-	            if (save)
-	            {
-	                applicationService.saveOrUpdate(ResearcherPage.class, rp);
-	            }
+	                else {
+	                    rp.setEpersonID(eperson.getID());
+	                }
+					applicationService.saveOrUpdate(ResearcherPage.class, rp);
+                }
             }
         }
         catch (Exception e)

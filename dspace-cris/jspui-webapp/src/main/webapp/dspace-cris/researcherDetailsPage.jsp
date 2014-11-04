@@ -17,6 +17,7 @@
 <%@ page import="org.dspace.app.cris.network.NetworkPlugin"%>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
@@ -39,6 +40,7 @@
 	</c:if>
 </c:forEach>
 <%
+
     String subscribe = request.getParameter("subscribe");
 	boolean showSubMsg = false;
 	boolean showUnSubMsg = false;
@@ -63,8 +65,11 @@
     }
     
     boolean networkModuleEnabled = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,"network.enabled");
+    boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris.cfg","rp.changestatus.admin");
 %>
 <c:set var="admin" scope="request"><%=isAdmin%></c:set>
+<c:set var="statusAdmin" scope="request"><%=changeStatusAdmin%></c:set>
+
 <c:set var="dspace.cris.navbar" scope="request">
 
 </c:set>
@@ -73,7 +78,7 @@
     <script type="text/javascript"><!--
 
 		var j = jQuery;
-    
+
 	    var activeTab = function(){
     		var ajaxurlrelations = "<%=request.getContextPath()%>/cris/${specificPartPath}/viewNested.htm";
 		   	j('.nestedinfo').each(function(){
@@ -138,6 +143,41 @@
     	
 		j(document).ready(function()
 		{
+			j('#claimrp-modal-close').on('click',function(){
+				j('#claimrp-modal').hide();
+			});
+			
+			j('#claim-rp').on('click',function(){
+				j('#claimrp-validation').val('');
+				j('#label-success').remove();
+				j('#label-error').remove();
+         		j('#claimrp-modal').show();				
+			});
+			
+			j('#claimrp-button').on('click', function(){
+				j('#label-success').remove();
+				j('#label-error').remove();				
+				j.ajax({
+					url: "<%= request.getContextPath() %>/json/claimrp",
+					data: {
+						"rpKey": j('#claimrp-rpkey').val(),
+						"mailUser" : j('#claimrp-validation').val()
+					},
+					success : function(data) {
+						send = data.result;
+						if(send==-1){
+							j('#claimrp-result').append('<span id="label-error" class="label label-warning"><fmt:message key="jsp.cris.detail.claimrp.error-1" /></span>');	
+						}else if(send==-2){
+							j('#claimrp-result').append('<span id="label-error" class="label label-warning"><fmt:message key="jsp.cris.detail.claimrp.error-2" /></span>');
+						}
+						else{
+							j('#claimrp-result').append('<span id="label-success" class="label label-success"><fmt:message key="jsp.cris.detail.claimrp.success" /></span>');
+							
+						}
+					}
+				});
+				
+			});
 			
 			j("#tabs").tabs({
 				cache: true,
@@ -245,11 +285,16 @@
 						<a class="btn btn-default" href="${root}/cris/uuid/${researcher.uuid}/relMgmt/publications"><i class="fa fa-book"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.manage-publication"/></a>
 					</div> --%>
 				</c:if>
+				<c:if test="${empty researcher.epersonID}" >
+				<div class="btn-group">
+					<span id="claim-rp" class="btn btn-primary"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></span>
+				</div>
+				</c:if>
 			 </div>
 		</div>
 	</div>
 </div>
-	<c:if test="${!entity.status}">
+	<c:if test="${!entity.status or (!statusAdmin && !admin)}">
 		<p class="warning">
 			<fmt:message
 				key="jsp.layout.hku.detail.researcher-disabled" /><a				
@@ -283,6 +328,67 @@
 			<jsp:include page="commonDetailsPage.jsp"></jsp:include>
 		</div>
 </div>
+
+<div id="claimrp-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    	<div class="modal-header">
+    		<%-- <button type="button" class="close" data-target="claimrp-modal" data-dismiss="modal" aria-hidden="true">
+    			<span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>--%>
+			<h4 class="modal-title"><fmt:message key="jsp.cris.detail.claimrp.title" /></h4>
+		</div>
+		<div class="modal-body">
+			<p><fmt:message key="jsp.cris.detail.claimrp.text1" />
+			</p>
+			<p>Emails:
+		 	<c:set var="indexAt" value="${fn:indexOf(researcher.email.value,'@')}" />
+			<c:set var="len" value="${fn:length(researcher.email.value)}" />
+              	<%-- <c:forEach var="chr" items="${researcher.email.value}" varStatus="i">--%>
+              	<c:forEach begin="0" end="${len}"  var="i">
+                        	<c:choose>
+                                <c:when test="${i le 3}">
+                                         <c:out  value="${fn:substring(entity.email.value, i, i + 1)}" />
+                                </c:when>
+                                <c:when test="${i eq indexAt }">
+                                        <c:out  value="${fn:substring(entity.email.value, i, i + 1)}" />
+                                </c:when>
+                                <c:when test="${i ge (len - 4)}">
+                                        <c:out  value="${fn:substring(entity.email.value, i, i + 1)}" />
+                                </c:when>
+                                <c:otherwise>
+                                        <c:out value="*" />
+                                </c:otherwise>
+                        </c:choose>
+                        
+                </c:forEach>
+			</p>
+   			<div class="input-group">
+	      		<input type="text" class="form-control" id="claimrp-validation" />
+      			<input type="hidden" value="${requestScope.authority}" id="claimrp-rpkey"/>
+      			<span class="input-group-btn">
+	        		<span href="" class="btn btn-success" id="claimrp-button"><fmt:message key="jsp.cris.detail.claimrp.button.text" /></span>
+      			</span>
+    		</div>
+     		<h4 id="claimrp-result"></h4>
+	     	<c:if test="${!empty anagraficaObject.anagrafica4view['orcid']}">
+     		<hr />
+		     	<div class="col-md-12">
+		     		<h4><fmt:message key="jsp.cris.detail.claimrp.orcid"/></h4>
+		     		      <a href="<%= request.getContextPath() %>/oauth-login">
+      						<button class="btn btn-default">ORCID Login 
+						      	<img src="<%= request.getContextPath() %>/image/orcid_64x64.png" title="ORCID Authentication">
+      						</button>
+      					</a>
+	     		</div>
+     		</c:if>
+     </div>
+      <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal" id="claimrp-modal-close">Close</button>
+      </div>
+     
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 </dspace:layout>
 </c:otherwise>

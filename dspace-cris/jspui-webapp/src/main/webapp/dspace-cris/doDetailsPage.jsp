@@ -157,7 +157,7 @@
 	<div class="col-lg-12">
 		<div class="form-inline">
 	         <div class="form-group">
-				 <h1><fmt:message key="jsp.layout.ou.detail.name" /> ${entity.name}</h1>
+				 <h1><fmt:message key="jsp.layout.do.detail.name" /> ${entity.name}</h1>
 			      <%
 			      if (isAdmin) {
 				  %>		

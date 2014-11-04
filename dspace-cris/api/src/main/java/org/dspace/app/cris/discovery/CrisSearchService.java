@@ -352,7 +352,7 @@ public class CrisSearchService extends SolrServiceImpl
             List<String> sortFieldsAdded, Set<String> hitHighlightingFields,
             Set<String> moreLikeThisFields)
     {
-        if (toIgnoreFields.contains(field))
+        if (toIgnoreFields.contains(field) || svalue == null)
         {
             return;
         }

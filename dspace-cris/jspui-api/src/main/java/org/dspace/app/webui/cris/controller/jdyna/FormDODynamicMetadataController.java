@@ -22,6 +22,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.dto.DynamicAnagraficaObjectDTO;
 import org.dspace.app.cris.model.jdyna.BoxDynamicObject;
@@ -43,6 +45,7 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
@@ -284,6 +287,9 @@ public class FormDODynamicMetadataController
 
         EditTabDynamicObject editT = getApplicationService().get(
                 EditTabDynamicObject.class, anagraficaObjectDTO.getTabId());
+        
+        ResearchObject entity = getApplicationService().get(ResearchObject.class,
+                anagraficaObjectDTO.getParentId());        
         if (anagraficaObjectDTO.getNewTabId() != null)
         {
             exitPage += "&tabId=" + anagraficaObjectDTO.getNewTabId();
@@ -292,8 +298,7 @@ public class FormDODynamicMetadataController
         {
             exitPage = "redirect:/cris/"+ getSpecificPartPath() +"/"
                     + ResearcherPageUtils.getPersistentIdentifier(
-                            anagraficaObjectDTO.getParentId(),
-                            ResearchObject.class) + "/"
+                            entity) + "/"
                     + editT.getShortName().substring(4) + ".html";
         }
         if (request.getParameter("cancel") != null)
@@ -301,8 +306,6 @@ public class FormDODynamicMetadataController
             return new ModelAndView(exitPage);
         }
 
-        ResearchObject entity = getApplicationService().get(ResearchObject.class,
-                anagraficaObjectDTO.getParentId());
         DynamicAdditionalFieldStorage myObject = entity.getDynamicField();
 
         List<BoxDynamicObject> propertyHolders = new LinkedList<BoxDynamicObject>();
@@ -352,6 +355,8 @@ public class FormDODynamicMetadataController
 
         myObject.pulisciAnagrafica();
         entity.setSourceID(anagraficaObjectDTO.getSourceID());
+        String sourceref = StringUtils.isNotBlank(anagraficaObjectDTO.getSourceRef()) ? anagraficaObjectDTO.getSourceRef() : ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "sourceref.default");
+        entity.setSourceRef(sourceref); 
         entity.setStatus(anagraficaObjectDTO.getStatus());
         entity.setTypo(getApplicationService().get(DynamicObjectType.class, anagraficaObjectDTO.getTipologiaId()));
 

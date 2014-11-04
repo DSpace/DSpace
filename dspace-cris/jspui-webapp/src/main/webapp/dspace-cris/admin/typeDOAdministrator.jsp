@@ -52,7 +52,9 @@
 				<display:column titleKey="jsp.layout.table.cris.admin-list.id"> 
 					<a href="<%=request.getContextPath()%>/cris/administrator/${objectList.shortName}/index.htm?id=${objectList.id}">${objectList.id}</a>
 				</display:column>									
-				<display:column titleKey="jsp.layout.table.cris.admin-list.shortname" property="shortName" sortable="true" />										
+				<display:column titleKey="jsp.layout.table.cris.admin-list.shortname" sortable="true" >
+					<a href="<%=request.getContextPath()%>/cris/administrator/${objectList.shortName}/index.htm?id=${objectList.id}">${objectList.shortName}</a>
+			   </display:column>
 				<display:column titleKey="jsp.layout.table.cris.admin-list.label" property="label" sortable="true"/>
 				<display:column titleKey="jsp.layout.table.cris.admin-list.typodef" sortable="true">
 					${objectList.id + CRIS_DYNAMIC_TYPE_ID_START}

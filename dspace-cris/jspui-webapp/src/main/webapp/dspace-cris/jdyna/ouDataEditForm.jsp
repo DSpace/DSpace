@@ -415,7 +415,7 @@
 </c:set>
 <dspace:layout titlekey="jsp.researcher-page.primary-data-form" style="submission" navbar="off">
 
-<h1>${organizationunit.name} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${organizationunit.id}"> <fmt:message key="jsp.layout.hku.researcher.button.delete"/> </a></c:if></h1>
+<h1>${organizationunit.name} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${organizationunit.id}"> <span class="glyphicon glyphicon-trash"></span> </a></c:if></h1>
 
 
 <c:if test="${not empty messages}">

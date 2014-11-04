@@ -76,7 +76,7 @@
 	<dyna:display-nested values="${results}" typeDefinition="${decoratorPropertyDefinition}" editmode="${editmode}" parentID="${parentID}" specificPartPath="${specificContextPath}${specificPartPath}" admin="${admin}"/>
 	</c:if>	
 	<c:if test="${(editmode && admin) || ((editmode && decoratorPropertyDefinition.accessLevel eq HIGH_ACCESS) && ((editmode && decoratorPropertyDefinition.repeatable) || (editmode && empty results)))}">
-		<img id="nested_${decoratorPropertyDefinition.real.id}_addbutton" src="<%= request.getContextPath() %>/image/jdyna/main_plus.gif" class="nested_add_button" />
+		<span class="glyphicon glyphicon-plus"id="nested_${decoratorPropertyDefinition.real.id}_addbutton" ></span>
 	</c:if>	
 	</div>
 	<c:if test="${decoratorPropertyDefinition.real.newline}">

@@ -51,7 +51,9 @@
 			
 			<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id" property="id" url="/cris/rp/details.htm" paramId="id" paramProperty="id" sortable="true"/>							
 			<display:column headerClass="uuid" titleKey="jsp.layout.table.cris.admin-list.uuid" property="uuid" url="/cris/rp/details.htm" paramId="id" paramProperty="id" sortable="true"/>		
-			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" property="sourceID" url="/cris/rp/details.htm" paramId="sourceid" paramProperty="sourceID" sortable="true"/>			
+			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" sortable="false">
+							<a href="<%=request.getContextPath()%>/cris/rp/details.htm?code=${objectList.sourceID}&ref=${objectList.rp.sourceRef}">${objectList.sourceID}</a>
+			</display:column>								
 			<display:column headerClass="names" class="names" titleKey="jsp.layout.table.cris.admin-list.rp.fullName" property="fullName" sortable="false"/>			
 			<display:column headerClass="dept" class="dept" titleKey="jsp.layout.table.cris.admin-list.rp.department" sortable="false">				
 				<a href="<%=request.getContextPath()%>/cris/${objectList.rp.dynamicField.anagrafica4view['dept'][0].value.real.publicPath}/details.htm?id=${objectList.rp.dynamicField.anagrafica4view['dept'][0].value.real.id}">${dyna:getDisplayValue(objectList.rp.dynamicField.anagrafica4view['dept'][0].value.real, objectList.rp.dynamicField.anagrafica4view['dept'][0].typo.rendering.display)}</a> 
@@ -62,7 +64,6 @@
 			<display:column headerClass="internalnote" titleKey="jsp.layout.table.hku.researchers.iternalnote" sortable="false">				
 				${objectList.rp.dynamicField.anagrafica4view['internalnote'][0]}				
 			</display:column>	
-
 		</display:table>
 		
 		<input type="submit" class="btn btn-primary" 

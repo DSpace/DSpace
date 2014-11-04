@@ -21,6 +21,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.dto.RPAnagraficaObjectDTO;
 import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
@@ -39,6 +41,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.validation.BindException;
@@ -372,6 +375,8 @@ public class FormRPDynamicMetadataController
 
         myObject.pulisciAnagrafica();
         researcher.setSourceID(anagraficaObjectDTO.getSourceID());
+        String sourceref = StringUtils.isNotBlank(anagraficaObjectDTO.getSourceRef()) ? anagraficaObjectDTO.getSourceRef() : ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "sourceref.default");
+        researcher.setSourceRef(sourceref); 
         researcher.setStatus(anagraficaObjectDTO.getStatus());
         researcher.setEpersonID(anagraficaObjectDTO.getEpersonID());
         

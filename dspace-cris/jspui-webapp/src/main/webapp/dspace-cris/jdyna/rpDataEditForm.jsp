@@ -506,7 +506,7 @@
 </c:set>
 <dspace:layout titlekey="jsp.researcher-page.primary-data-form" style="submission" navbar="off">
 
-<h1>${researcher.fullName} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${researcher.id}"> <fmt:message key="jsp.layout.hku.researcher.button.delete"/> </a></c:if></h1>
+<h1>${researcher.fullName} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${researcher.id}"> <span class="fa fa-trash"></span> </a></c:if></h1>
 
 
 <c:if test="${not empty messages}">

@@ -163,7 +163,9 @@ public abstract class DSpaceObject
         return null;
     }
     
-    public abstract String getTypeText();
+    public String getTypeText() {
+        return Constants.typeText[getType()];
+    }
     
     public abstract void update() throws SQLException, AuthorizeException;
 

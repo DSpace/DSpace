@@ -120,7 +120,7 @@ public class StartupMetadataConfiguratorTool
         }
 
         Context dspaceContext = new Context();
-        dspaceContext.setIgnoreAuthorization(true);
+        dspaceContext.turnOffAuthorisationSystem();
         DSpace dspace = new DSpace();
         ApplicationService applicationService = dspace.getServiceManager()
                 .getServiceByName("applicationService",

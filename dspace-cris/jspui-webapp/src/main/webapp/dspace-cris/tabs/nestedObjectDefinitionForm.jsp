@@ -408,14 +408,7 @@
 								title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 								href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteNestedFieldDefinition.htm?pDId=${subtypo.id}&parentId=${propertiesdefinition.real.id}&boxId=${boxId}&tabId=${tabId}">
-							<img
-								src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-								border="0"
-								alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-								title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-								name="remove" id="remove_${boxed.id}" /> </a>
+							<span class="fa fa-trash" id="remove_${boxed.id}" ></span></a>
 							
 							
 							</fieldset>

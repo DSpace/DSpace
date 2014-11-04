@@ -43,26 +43,12 @@
 					title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 					href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteEditTabs.htm?id=${tab.id}">
-				<img
-					src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-					border="0"
-					alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-					title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-					name="remove" id="remove_${tab.id}" /> </a>
+				<span class="fa fa-trash" id="remove_${tab.id}" ></span> </a>
 			</c:if> <a class="jdynaeditbutton"
 				title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/editEditTabs.htm?id=${tab.id}">
-			<img
-				src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-				border="0"
-				alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-				title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-				name="edit" id="edit_${tab.id}" /> </a>
+			<span class="fa fa-edit" id="edit_${tab.id}" ></span> </a>
 			</li>
 		</c:forEach>
 	</ul>

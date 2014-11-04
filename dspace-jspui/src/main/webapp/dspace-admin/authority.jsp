@@ -35,20 +35,17 @@
 %>
 
 
-<dspace:layout locbar="link" navbar="admin" titlekey="jsp.dspace-admin.authority">
+<dspace:layout locbar="link" navbar="admin" titlekey="jsp.dspace-admin.authority"  parenttitlekey="jsp.administer"
+               parentlink="/dspace-admin">
 
-<table width="95%">
-    <tr>      
-      <td align="left"><h1><fmt:message key="jsp.dspace-admin.authority"/></h1>   
-      </td>
-      <td align="right" class="standard">
-      	<a target="_blank"
+<h1><fmt:message key="jsp.dspace-admin.authority"/>      	
+<!--  <small><a target="_blank"
 				href='<%=LocaleSupport.getLocalizedMessage(pageContext,
-                                "help.site-admin.authority")%>'><fmt:message
-				key="jsp.help" /></a>        
-      </td>
-    </tr>
-</table>
+                                "help.site-admin")%>'><fmt:message
+				key="jsp.help" /></a></small>-->
+				 </h1>   
+       
+
 <% if (message != null){ %>
     <div id="authority-message"><%= message %></div>
 <%
@@ -83,9 +80,9 @@
 <h3><fmt:message key="jsp.dspace-admin.authority-heading">
         <fmt:param value="<%= md %>"/>
     </fmt:message></h3>    
-    <table class="authority-statistics">
+    <table class="authority-statistics table table-striped">
         <thead>
-            <tr>
+            <tr class="info">
                 <th><fmt:message key="jsp.dspace-admin.authority-statistics.label" /></th>
                 <th><fmt:message key="jsp.dspace-admin.authority-statistics.value" /></th>
             </tr>
@@ -99,8 +96,26 @@
                             <tr>
                                 
                                 <% int numAuthMet = 0;
-                                    for (int i = 0; i < 7; i++){ numAuthMet += info.getNumMetadataWithKey()[i]; %>
-                                <th><span title="<fmt:message key="<%= \"jsp.common.authority-level\" + i %>" />" class="ds-authority-confidence cf-<%= Choices.getConfidenceText(i*100)%>">&nbsp;&nbsp;&nbsp;</span></th>
+                                	String icon = "";
+                                    for (int i = 0; i < 7; i++){ numAuthMet += info.getNumMetadataWithKey()[i]; 
+                                    	if(Choices.getConfidenceText(i*100).equalsIgnoreCase("novalue") ){
+                                    		icon="bug";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("rejected")){
+                                    		icon="ban";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("failed")){
+                                    		icon="warning";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("notfound")){
+                                    		icon="times-circle";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("ambiguous")){
+                                    		icon="question-circle";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("uncertain")){
+                                    		icon="gear";
+                                    	}else if(Choices.getConfidenceText(i*100).equalsIgnoreCase("accepted")){
+                                    		icon="check-square";
+                                    	}
+                                    %>
+                                    
+                                <th><span title="<fmt:message key="<%= \"jsp.common.authority-level\" + i %>" />" class="fa fa-<%= icon%>">&nbsp;&nbsp;&nbsp;</span></th>
                                 <% }%>
                             </tr>
                         </thead>

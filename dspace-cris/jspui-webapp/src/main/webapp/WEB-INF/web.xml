@@ -925,7 +925,16 @@
         <servlet-name>wsuploadcommonxs</servlet-name>
         <url-pattern>/webservices/staticresponsepublication.xsd</url-pattern>
     </servlet-mapping>     -->
-      
+
+	<servlet>
+        <servlet-name>oauth-login</servlet-name>
+        <servlet-class>org.dspace.app.webui.servlet.OAuthAuthenticationServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>oauth-login</servlet-name>
+        <url-pattern>/oauth-login</url-pattern>
+    </servlet-mapping>
             
     <servlet>
         <servlet-name>spring-ws</servlet-name>

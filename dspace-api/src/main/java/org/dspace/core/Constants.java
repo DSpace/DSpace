@@ -40,6 +40,14 @@ public class Constants
     /** Type of individual eperson objects */
     public static final int EPERSON = 7;
 
+    public static final int SCHEME = 8;
+
+    /** Type of eperson groups */
+    public static final int CONCEPT = 9;
+
+    /** Type of individual eperson objects */
+    public static final int TERM = 10;
+
     /**
      * lets you look up type names from the type IDs
      */

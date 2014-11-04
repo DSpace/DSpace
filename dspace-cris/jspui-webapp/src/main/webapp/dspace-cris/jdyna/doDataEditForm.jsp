@@ -414,7 +414,7 @@
 </c:set>
 <dspace:layout title="${entity.typo.label}" style="submission" navbar="off">
 
-<h1>${entity.name} <c:if test="${admin}"><a id="delete" href="delete.htm?id=${entity.id}"> <fmt:message key="jsp.layout.hku.researcher.button.delete"/> </a></c:if></h1>
+<h1>${entity.name} <c:if test="${admin}"> <a id="delete" href="delete.htm?id=${entity.id}"><span class="ta ta-trash"></span></a></c:if></h1>
 
 
 <c:if test="${not empty messages}">

@@ -181,14 +181,7 @@
 					title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 					href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/editBox.htm?id=${box.id}&tabId=${tab.id}">
-				<img
-					src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-					border="0"
-					alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-					title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-					name="edit" id="edit_${box.id}" /> </a>
+				<span class="fa fa-edit" id="edit_${box.id}" ></span> </a>
 
 
 				

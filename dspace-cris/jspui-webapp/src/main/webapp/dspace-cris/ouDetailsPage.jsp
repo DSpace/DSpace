@@ -171,7 +171,7 @@
 			 <div class="form-group pull-right" style="margin-top:1.5em;">
 				<div class="btn-group">
 					   <% if(networkModuleEnabled) { %>
-					      <a class="btn btn-default" href="#"><i class="fa fa-globe"></i> <fmt:message key="jsp.cris.detail.link.network" /> </a>
+					      <%--  <a class="btn btn-default" href="#"><i class="fa fa-globe"></i> <fmt:message key="jsp.cris.detail.link.network" /> </a>--%>
 					   <% } %>				
 						<a class="btn btn-default" href="<%= request.getContextPath() %>/cris/stats/ou.html?id=${entity.uuid}"><i class="fa fa-bar-chart-o"></i> <fmt:message key="jsp.cris.detail.link.statistics" /></a>
 						<c:choose>
