@@ -507,36 +507,6 @@ public class DatabaseManagerTest
 */
 
     /**
-     * Test of loadSql method, of class DatabaseManager.
-     */
-/*
-    @Test
-    public void testLoadSql_String() throws Exception
-    {
-        System.out.println("loadSql");
-        String sql = "";
-        DatabaseManager.loadSql(sql);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
-     * Test of loadSql method, of class DatabaseManager.
-     */
-/*
-    @Test
-    public void testLoadSql_Reader() throws Exception
-    {
-        System.out.println("loadSql");
-        Reader r = null;
-        DatabaseManager.loadSql(r);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
-
-    /**
      * Test of process method, of class DatabaseManager.
      */
 /*

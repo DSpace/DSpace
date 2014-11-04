@@ -16,6 +16,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -26,6 +27,9 @@ import org.dspace.discovery.SearchServiceException;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.internal.dbsupport.DbSupport;
+import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
+import org.flywaydb.core.internal.dbsupport.SqlScript;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
 
 /**
@@ -66,8 +70,8 @@ public class DatabaseUtils
         if (argv.length != 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions include: 'test', 'info', 'migrate', 'repair' or 'clean'");
-            System.out.println("Or, type 'database help' for more information.");
+            System.out.println("Valid actions include: 'test', 'info', 'migrate', 'migrate-ignored, 'repair' or 'clean'");
+            System.out.println("Or, type 'database help' for more information.\n");
             System.exit(1);
         }
 
@@ -153,6 +157,18 @@ public class DatabaseUtils
                 DatabaseManager.getDbName();
                 System.out.println("Done.");
             }
+            // "migrate-ignored" = Manually run any "ignored" Database migrations (if any)
+            else if(argv[0].equalsIgnoreCase("migrate-ignored"))
+            {
+                System.out.println("\nDatabase URL: " + url);
+                System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
+
+                Connection connection = dataSource.getConnection();
+                // Update the database, but set "outOfOrder=true"
+                updateDatabase(dataSource, connection, true);
+                connection.close();
+                System.out.println("Done.");
+            }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
@@ -183,12 +199,14 @@ public class DatabaseUtils
             else
             {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions include: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - test    = Test database connection is OK");
-                System.out.println(" - info    = Describe basic info about Database (type, version, driver)");
-                System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println(" - repair  = Attempt to repair any previously failed database migrations (see also Flyway repair command)");
-                System.out.println(" - clean   = Destroy all data (Warning there is no going back!)");
+                System.out.println("Valid actions include: 'test', 'info', 'migrate', 'migrate-ignored, 'repair' or 'clean'");
+                System.out.println(" - test             = Test database connection is OK");
+                System.out.println(" - info             = Describe basic info about database (type, version, driver, migrations run)");
+                System.out.println(" - migrate          = Migrate the Database to the latest version");
+                System.out.println(" - migrate-ignored  = If any migrations are \"Ignored\", run them AND migrate to the latest version");
+                System.out.println(" - repair           = Attempt to repair any previously failed database migrations");
+                System.out.println(" - clean            = Destroy all data and tables in Database (WARNING there is no going back!)");
+                System.out.println("");
             }
 
             System.exit(0);
@@ -229,17 +247,28 @@ public class DatabaseUtils
                 String scriptFolder = DatabaseManager.findDbKeyword(meta);
                 connection.close();
 
-                // Set location where Flyway will load DB scripts from (based on DB Type)
-                // e.g. [dspace.dir]/etc/[dbtype]/
-                String scriptPath = ConfigurationManager.getProperty("dspace.dir") +
-                                    System.getProperty("file.separator") + "etc" +
-                                    System.getProperty("file.separator") + "migrations" +
-                                    System.getProperty("file.separator") + scriptFolder;
+                // Determine location(s) where Flyway will load all DB migrations
+                ArrayList<String> scriptLocations = new ArrayList<String>();
 
-                // Flyway will look in "scriptPath" for SQL migrations AND
-                // in 'org.dspace.storage.rdbms.migration.*' for Java migrations
-                log.info("Loading Flyway DB migrations from " + scriptPath + " and Package 'org.dspace.storage.rdbms.migration.*'");
-                flywaydb.setLocations("filesystem:" + scriptPath, "classpath:org.dspace.storage.rdbms.migration");
+                // First, add location of SQL migrations (based on DB Type)
+                // e.g. [dspace.dir]/etc/[dbtype]/
+                scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
+                                    "/etc/migrations/" + scriptFolder);
+
+                // Next, add the Java package where Flyway will load Java migrations from
+                scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
+
+                // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
+                // as it REQUIRES database schema changes. XMLWorkflow uses Java migrations
+                // which first check whether the XMLWorkflow tables already exist
+                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+                {
+                    scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
+                }
+
+                // Now tell Flyway which locations to load SQL / Java migrations from
+                log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
+                flywaydb.setLocations(scriptLocations.toArray(new String[scriptLocations.size()]));
 
                 // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
                 // In this situation, we have a Registry Updater that runs PRE-migration
@@ -274,10 +303,40 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
+        // By default, never run migrations out of order
+        updateDatabase(datasource, connection, false);
+    }
+
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
+     * If a Flyway DB migration fails it will be rolled back to the last
+     * successful migration, and any errors will be logged.
+     *
+     * @param datasource
+     *      DataSource object (retrieved from DatabaseManager())
+     * @param connection
+     *      Database connection
+     * @param outOfOrder
+     *      If true, Flyway will run any lower version migrations that were previously "ignored".
+     *      If false, Flyway will only run new migrations with a higher version number.
+     * @throws SQLException
+     *      If database cannot be upgraded.
+     */
+    protected static synchronized void updateDatabase(DataSource datasource, Connection connection, boolean outOfOrder)
+            throws SQLException
+    {
         try
         {
             // Setup Flyway API against our database
             Flyway flyway = setupFlyway(datasource);
+
+            // Set whethe Flyway will run migrations "out of order". By default, this is false,
+            // and Flyway ONLY runs migrations that have a higher version number.
+            flyway.setOutOfOrder(outOfOrder);
 
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
@@ -327,7 +386,7 @@ public class DatabaseUtils
         catch(FlywayException fe)
         {
             // If any FlywayException (Runtime) is thrown, change it to a SQLException
-            throw new SQLException("Flyway initilization/migration error occurred", fe);
+            throw new SQLException("Flyway migration error occurred", fe);
         }
     }
     
@@ -760,6 +819,37 @@ public class DatabaseUtils
         }
 
         return exists;
+    }
+
+    /**
+     * Execute a block of SQL against the current database connection.
+     * <P>
+     * The SQL is executed using the Flyway SQL parser.
+     *
+     * @param connection
+     *            Current Database Connection
+     * @param sqlToExecute
+     *            The actual SQL to execute as a String
+     * @throws SQLException
+     *            If a database error occurs
+     */
+    public static void executeSql(Connection connection, String sqlToExecute) throws SQLException
+    {
+        try
+        {
+            // Create a Flyway DbSupport object (based on our connection)
+            // This is how Flyway determines the database *type* (e.g. Postgres vs Oracle)
+            DbSupport dbSupport = DbSupportFactory.createDbSupport(connection, false);
+
+            // Load our SQL string & execute via Flyway's SQL parser
+            SqlScript script = new SqlScript(sqlToExecute, dbSupport);
+            script.execute(dbSupport.getJdbcTemplate());
+        }
+        catch(FlywayException fe)
+        {
+            // If any FlywayException (Runtime) is thrown, change it to a SQLException
+            throw new SQLException("Flyway executeSql() error occurred", fe);
+        }
     }
 
     /**
