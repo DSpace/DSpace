@@ -53,7 +53,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
 
 
-    private String doi;
     private WorkflowItem wfItem;
     private boolean authorized;
     List<Item> dataFiles = new ArrayList<Item>();
@@ -71,7 +70,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
         String requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
-            loadWFItemByDOI(doi);
+            loadWFItemByDOI(requestDoi);
             if(wfItem == null) {
                 // Not found
                 return;
@@ -299,7 +298,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
      */
     public void recycle()
     {
-        this.doi = null;
         this.wfItem = null;
 	this.authorized = false;
 	this.dataFiles=new ArrayList<Item>();
