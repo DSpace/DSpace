@@ -886,7 +886,7 @@
     {
       Metadatum[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
       // filter out both unqualified and qualified values occurring elsewhere in inputs
-      List<Metadatum> filtered = new ArrayList<>();
+      List<Metadatum> filtered = new ArrayList<Metadatum>();
       for (int i = 0; i < unfiltered.length; i++)
       {
           String unfilteredFieldName = unfiltered[i].element;
