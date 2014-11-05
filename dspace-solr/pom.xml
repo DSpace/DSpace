@@ -31,8 +31,8 @@
     <packaging>war</packaging>
 
     <properties>
-        <lucene.version>4.4.0</lucene.version>
-        <solr.version>4.4.0</solr.version>
+
+        <solr.version>4.10.2</solr.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -142,10 +142,6 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
             <version>${solr.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
         </dependency>
 
         <!-- Replace J.U.L. logging with log4j -->

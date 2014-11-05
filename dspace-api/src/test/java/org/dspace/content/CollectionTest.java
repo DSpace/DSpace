@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.hadoop.security.authorize.ServiceAuthorizationManager;
+
 import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
