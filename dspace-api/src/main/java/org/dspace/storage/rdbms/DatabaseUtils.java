@@ -67,7 +67,7 @@ public class DatabaseUtils
     public static void main(String[] argv)
     {
         // Usage checks
-        if (argv.length != 1)
+        if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
             System.out.println("Valid actions include: 'test', 'info', 'migrate', 'migrate-ignored, 'repair' or 'clean'");
@@ -92,7 +92,7 @@ public class DatabaseUtils
             if(argv[0].equalsIgnoreCase("test"))
             {
                 // Try to connect to the database
-                System.out.println("\nAttempting to connect to database: ");
+                System.out.println("\nAttempting to connect to database using these configurations: ");
                 System.out.println(" - URL: " + url);
                 System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
                 System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
@@ -124,6 +124,7 @@ public class DatabaseUtils
                 Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase URL: " + url);
+                System.out.println("Database Schema: " + getSchemaName(connection));
                 System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
@@ -150,23 +151,40 @@ public class DatabaseUtils
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
                 System.out.println("\nDatabase URL: " + url);
-                System.out.println("Migrating database to latest version... (Check logs for details)");
-                // NOTE: This looks odd, but all we really need to do is ensure the
-                // DatabaseManager auto-initializes. It'll take care of the migration itself.
-                // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
-                DatabaseManager.getDbName();
-                System.out.println("Done.");
-            }
-            // "migrate-ignored" = Manually run any "ignored" Database migrations (if any)
-            else if(argv[0].equalsIgnoreCase("migrate-ignored"))
-            {
-                System.out.println("\nDatabase URL: " + url);
-                System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-
-                Connection connection = dataSource.getConnection();
-                // Update the database, but set "outOfOrder=true"
-                updateDatabase(dataSource, connection, true);
-                connection.close();
+                
+                // "migrate" allows for an OPTIONAL second argument:
+                //    - "ignored" = Also run any previously "ignored" migrations during the migration
+                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
+                if(argv.length==2)
+                {
+                    if(argv[1].equalsIgnoreCase("ignored"))
+                    {
+                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
+                        Connection connection = dataSource.getConnection();
+                        // Update the database to latest version, but set "outOfOrder=true"
+                        // This will ensure any old migrations in the "ignored" state are now run
+                        updateDatabase(dataSource, connection, null, true);
+                        connection.close();
+                    }
+                    else
+                    {
+                        // Otherwise, we assume "argv[1]" is a valid migration version number
+                        // This is only for testing! Never specify for Production!
+                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                        Connection connection = dataSource.getConnection();
+                        // Update the database, to the version specified.
+                        updateDatabase(dataSource, connection, argv[1], false);
+                        connection.close();
+                    }
+                }
+                else
+                {
+                    System.out.println("Migrating database to latest version... (Check logs for details)");
+                    // NOTE: This looks odd, but all we really need to do is ensure the
+                    // DatabaseManager auto-initializes. It'll take care of the migration itself.
+                    // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
+                    DatabaseManager.getDbName();
+                }
                 System.out.println("Done.");
             }
             // "repair" = Run Flyway repair script
@@ -203,7 +221,7 @@ public class DatabaseUtils
                 System.out.println(" - test             = Test database connection is OK");
                 System.out.println(" - info             = Describe basic info about database (type, version, driver, migrations run)");
                 System.out.println(" - migrate          = Migrate the Database to the latest version");
-                System.out.println(" - migrate-ignored  = If any migrations are \"Ignored\", run them AND migrate to the latest version");
+                System.out.println("                      Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
                 System.out.println(" - repair           = Attempt to repair any previously failed database migrations");
                 System.out.println(" - clean            = Destroy all data and tables in Database (WARNING there is no going back!)");
                 System.out.println("");
@@ -303,8 +321,8 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
-        // By default, never run migrations out of order
-        updateDatabase(datasource, connection, false);
+        // By default, upgrade to the *latest* version and never run migrations out-of-order
+        updateDatabase(datasource, connection, null, false);
     }
 
     /**
@@ -320,13 +338,16 @@ public class DatabaseUtils
      *      DataSource object (retrieved from DatabaseManager())
      * @param connection
      *      Database connection
+     * @param targetVersion
+     *      If specified, only migrate the database to a particular *version* of DSpace. This is mostly just useful for testing.
+     *      If null, the database is migrated to the latest version.
      * @param outOfOrder
      *      If true, Flyway will run any lower version migrations that were previously "ignored".
      *      If false, Flyway will only run new migrations with a higher version number.
      * @throws SQLException
      *      If database cannot be upgraded.
      */
-    protected static synchronized void updateDatabase(DataSource datasource, Connection connection, boolean outOfOrder)
+    protected static synchronized void updateDatabase(DataSource datasource, Connection connection, String targetVersion, boolean outOfOrder)
             throws SQLException
     {
         try
@@ -337,7 +358,14 @@ public class DatabaseUtils
             // Set whethe Flyway will run migrations "out of order". By default, this is false,
             // and Flyway ONLY runs migrations that have a higher version number.
             flyway.setOutOfOrder(outOfOrder);
-
+            
+            // If a target version was specified, tell Flyway to ONLY migrate to that version
+            // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
+            if(!StringUtils.isBlank(targetVersion))
+            {
+                flyway.setTarget(targetVersion);
+            }
+            
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
@@ -585,36 +613,24 @@ public class DatabaseUtils
      */
     public static boolean tableExists(Connection connection, String tableName, boolean caseSensitive)
     {
-        // Get the name of the Schema that the DSpace Database is using
-        // (That way we can search the right schema for this table)
-        String schema = ConfigurationManager.getProperty("db.schema");
-        if(StringUtils.isBlank(schema)){
-            schema = null;
-        }
-
         boolean exists = false;
         ResultSet results = null;
 
         try
         {
+            // Get the name of the Schema that the DSpace Database is using
+            // (That way we can search the right schema)
+            String schema = getSchemaName(connection);
+            
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
 
             // If this is not a case sensitive search
             if(!caseSensitive)
             {
-                // Check how this database stores its table names, etc.
-                // i.e. lowercase vs uppercase (by default we assume mixed case)
-                if(meta.storesLowerCaseIdentifiers())
-                {
-                    schema = (schema == null) ? null : StringUtils.lowerCase(schema);
-                    tableName = StringUtils.lowerCase(tableName);
-                }
-                else if(meta.storesUpperCaseIdentifiers())
-                {
-                    schema = (schema == null) ? null : StringUtils.upperCase(schema);
-                    tableName = StringUtils.upperCase(tableName);
-                }
+                // Canonicalize everything to the proper case based on DB type
+                schema = canonicalize(connection, schema);
+                tableName = canonicalize(connection, tableName);
             }
 
             // Search for a table of the given name in our current schema
@@ -658,35 +674,22 @@ public class DatabaseUtils
      */
     public static boolean tableColumnExists(Connection connection, String tableName, String columnName)
     {
-        // Get the name of the Schema that the DSpace Database is using
-        // (That way we can search the right schema for this table)
-        String schema = ConfigurationManager.getProperty("db.schema");
-        if(StringUtils.isBlank(schema)){
-            schema = null;
-        }
-
         boolean exists = false;
         ResultSet results = null;
 
         try
         {
+            // Get the name of the Schema that the DSpace Database is using
+            // (That way we can search the right schema)
+            String schema = getSchemaName(connection);
+            
+            // Canonicalize everything to the proper case based on DB type
+            schema = canonicalize(connection, schema);
+            tableName = canonicalize(connection, tableName);
+            columnName = canonicalize(connection, columnName);
+            
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
-
-            // Check how this database stores its table names, etc.
-            // i.e. lowercase vs uppercase (by default we assume mixed case)
-            if(meta.storesLowerCaseIdentifiers())
-            {
-                schema = (schema == null) ? null : StringUtils.lowerCase(schema);
-                tableName = StringUtils.lowerCase(tableName);
-                columnName = StringUtils.lowerCase(columnName);
-            }
-            else if(meta.storesUpperCaseIdentifiers())
-            {
-                schema = (schema == null) ? null : StringUtils.upperCase(schema);
-                tableName = StringUtils.upperCase(tableName);
-                columnName = StringUtils.upperCase(columnName);
-            }
 
             // Search for a column of that name in the specified table & schema
             results = meta.getColumns(null, schema, tableName, columnName);
@@ -727,13 +730,6 @@ public class DatabaseUtils
      */
     public static boolean sequenceExists(Connection connection, String sequenceName)
     {
-        // Get the name of the Schema that the DSpace Database is using
-        // (That way we can search the right schema)
-        String schema = ConfigurationManager.getProperty("db.schema");
-        if(StringUtils.isBlank(schema)){
-            schema = null;
-        }
-
         boolean exists = false;
         PreparedStatement statement = null;
         ResultSet results = null;
@@ -742,6 +738,11 @@ public class DatabaseUtils
 
         try
         {
+            // Get the name of the Schema that the DSpace Database is using
+            // (That way we can search the right schema)
+            String schema = getSchemaName(connection);
+            schema = canonicalize(connection, schema);
+            
             // Different database types store sequence information in different tables
             String dbtype = DatabaseManager.findDbKeyword(connection.getMetaData());
             String sequenceSQL = null;
@@ -793,7 +794,10 @@ public class DatabaseUtils
                 // If results are non-zero, then this sequence exists!
                 if(results!=null && results.next())
                 {
-                   exists = true;
+                   if(results.getInt(1) > 0)
+                   {
+                      exists = true;
+                   }
                 }
             }
         }
@@ -852,6 +856,84 @@ public class DatabaseUtils
         }
     }
 
+    /**
+     * Get the Database Schema Name in use by this Connection, so that it can
+     * be used to limit queries in other methods (e.g. tableExists()).
+     * <P>
+     * For PostgreSQL, schema is simply what is configured in db.schema or "public"
+     * For Oracle, schema is actually the database *USER* or owner.
+     * 
+     * @param connection 
+     *            Current Database Connection
+     * @return Schema name as a string, or "null" if cannot be determined or unspecified
+     */
+    public static String getSchemaName(Connection connection)
+            throws SQLException
+    {
+        String schema = null;
+        DatabaseMetaData meta = connection.getMetaData();
+        
+        // Determine our DB type
+        String dbType = DatabaseManager.findDbKeyword(meta);
+        
+        if(dbType.equals(DatabaseManager.DBMS_POSTGRES))
+        {
+            // Get the schema name from "db.schema"
+            schema = ConfigurationManager.getProperty("db.schema");
+            
+            // If unspecified, default schema is "public"
+            if(StringUtils.isBlank(schema)){
+                schema = "public";
+            }
+        }
+        else if (dbType.equals(DatabaseManager.DBMS_ORACLE))
+        {
+            // Schema is actually the user account
+            // See: http://stackoverflow.com/a/13341390
+            schema = meta.getUserName();
+        }
+        else
+            schema = null;
+        
+        return schema;
+    }
+    
+    /**
+     * Return the canonical name for a database identifier based on whether this
+     * database defaults to storing identifiers in uppercase or lowercase.
+     *
+     * @param connection 
+     *            Current Database Connection
+     * @param dbIdentifier 
+     *            Identifier to canonicalize (may be a table name, column name, etc)
+     * @return The canonical name of the identifier.
+     */
+    public static String canonicalize(Connection connection, String dbIdentifier)
+            throws SQLException
+    {
+        // Avoid any null pointers
+        if(dbIdentifier==null)
+            return null;
+        
+        DatabaseMetaData meta = connection.getMetaData();
+
+        // Check how this database stores its identifiers, etc.
+        // i.e. lowercase vs uppercase (by default we assume mixed case)
+        if(meta.storesLowerCaseIdentifiers())
+        {
+            return StringUtils.lowerCase(dbIdentifier);
+            
+        }
+        else if(meta.storesUpperCaseIdentifiers())
+        {
+            return StringUtils.upperCase(dbIdentifier);
+        }
+        else // Otherwise DB doesn't care about case
+        {    
+            return dbIdentifier;
+        }
+    }
+    
     /**
      * Whether or not to tell Discovery to reindex itself based on the updated
      * database.
