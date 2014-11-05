@@ -68,6 +68,7 @@
   <h1 class="ds-div-head">Integrated Journals and Costs for Submitters<a id="journals">&#160;</a></h1>
   <div class="ds-static-div primary">
 
+
      <div style="text-align: right;">
          <span class="field-help" style="display: inline;">Show all amounts in </span>
          <!-- TODO: refactor this to share code with 'MembershipApplicationForm' -->
@@ -88,13 +89,23 @@
            <a href="/pages/pricing" target="_blank">Data Publishing Charges</a> 
            are listed below. Our
            <a href="/pages/institutionalSponsors" target="_blank">institutional sponsors</a>
-           fund submissions by their affiliated researchers. Note that for large
+           fund submissions by their affiliated researchers. If you see a sponsor listed under "Payment" below, the DPC is covered. Note that for large
            data packages, submitters will be asked to pay an additional <span
                class="msg-excessDataStorageFee_first_GB">$15</span> for the
            first GB beyond 10GB and <span
                class="msg-excessDataStorageFee_per_additional_GB">$10</span>
            for each GB thereafter.
        </p>
+
+		<p>
+			<strong>When to submit*</strong>
+			<ul>
+				<li><strong>D</strong> = <em>submit your <strong>data first</strong>, provide Dryad DOI when you submit your manuscript</em></li>
+				<li><strong>R</strong> = <em>submit your MS first, then await journal instructions for data submission and <strong>review</strong></em></li>
+				<li><strong>A</strong> = <em>submit your MS first, then submit your data to Dryad upon article <strong>acceptance</strong></em></li>	
+			</ul>
+			<br />
+		</p>
 
     <!-- TODO: To generate this table dynamically:
         * Add a row for each journal entry in database (first row is alwys default-policies)
@@ -119,14 +130,14 @@
                 <td>&#160;</td>
             </tr>
             <tr>
-                <th class="right-border background-on" colspan="1">Journal</th>
-                <th class="right-border background-on" colspan="4">Submission</th>
+                <th class="right-border background-on" colspan="1">Journal name</th>
+                <th class="right-border background-on" colspan="4">Submission policies</th>
                 <th class="background-on" colspan="1">Payment</th>
             </tr>
             <tr>
                 <th class="right-border" style="font-weight: normal;" colspan="1">&#160;</th>
                 <th style="font-weight: normal;">Integrated</th>
-                <th style="font-weight: normal;">Submit:<br/>R: Prior to Review<br/>A: On Acceptance</th>
+                <th style="font-weight: normal;">When to submit*</th>
                 <th style="font-weight: normal;">Data embargo allowed</th>
                 <th class="right-border" style="font-weight: normal;">Metadata hidden until publication</th>
                 <th style="font-weight: normal;">Sponsor/Cost to submitter</th>
@@ -661,20 +672,60 @@
             <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">PLOS Biology </td>
                 <td class="ds-table-cell">Y</td>
-                <td class="ds-table-cell">R</td>
+                <td class="ds-table-cell">D</td>
                 <td class="ds-table-cell">N</td>
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
             </tr>
             <tr class="ds-table-row odd">
-                <td class="right-border ds-table-cell">PLOS Genetics </td>
+                <td class="right-border ds-table-cell">PLOS Computational Biology </td>
                 <td class="ds-table-cell">Y</td>
-                <td class="ds-table-cell">R</td>
+                <td class="ds-table-cell">D</td>
                 <td class="ds-table-cell">N</td>
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
             </tr>
             <tr class="ds-table-row even">
+                <td class="right-border ds-table-cell">PLOS Genetics </td>
+                <td class="ds-table-cell">Y</td>
+                <td class="ds-table-cell">D</td>
+                <td class="ds-table-cell">N</td>
+                <td class="right-border ds-table-cell">Y</td>
+                <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
+            </tr>
+            <tr class="ds-table-row odd">
+                <td class="right-border ds-table-cell">PLOS Medicine </td>
+                <td class="ds-table-cell">Y</td>
+                <td class="ds-table-cell">D</td>
+                <td class="ds-table-cell">N</td>
+                <td class="right-border ds-table-cell">Y</td>
+                <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
+            </tr>
+            <tr class="ds-table-row even">
+                <td class="right-border ds-table-cell">PLOS Neglected Tropical Diseases </td>
+                <td class="ds-table-cell">Y</td>
+                <td class="ds-table-cell">D</td>
+                <td class="ds-table-cell">N</td>
+                <td class="right-border ds-table-cell">Y</td>
+                <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
+            </tr>
+            <tr class="ds-table-row odd">
+                <td class="right-border ds-table-cell">PLOS ONE </td>
+                <td class="ds-table-cell">Y</td>
+                <td class="ds-table-cell">D</td>
+                <td class="ds-table-cell">N</td>
+                <td class="right-border ds-table-cell">Y</td>
+                <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
+            </tr>
+            <tr class="ds-table-row even">
+                <td class="right-border ds-table-cell">PLOS Pathogens </td>
+                <td class="ds-table-cell">Y</td>
+                <td class="ds-table-cell">D</td>
+                <td class="ds-table-cell">N</td>
+                <td class="right-border ds-table-cell">Y</td>
+                <td class="ds-table-cell"><span class="msg-DPC_pay_on_submission">$80</span></td>
+            </tr>
+            <tr class="ds-table-row odd">
                 <td class="right-border ds-table-cell">Proceedings of the Royal Society A</td>
                 <td class="ds-table-cell">N</td>
                 <td class="ds-table-cell">A</td>
@@ -682,7 +733,7 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">The Royal Society</td>
             </tr>
-             <tr class="ds-table-row odd">
+             <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">Proceedings of the Royal Society B</td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">R</td>
@@ -690,7 +741,7 @@
                 <td class="right-border ds-table-cell">N</td>
                 <td class="ds-table-cell">The Royal Society</td>
             </tr>
-            <tr class="ds-table-row even">
+            <tr class="ds-table-row odd">
                 <td class="right-border ds-table-cell">Royal Society Open Science</td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">A</td>
@@ -698,15 +749,15 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">The Royal Society</td>
             </tr>  
-            <tr class="ds-table-row odd">
+            <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">Scientific Data</td>
                 <td class="ds-table-cell">Y</td>
-                <td class="ds-table-cell">R</td>
+                <td class="ds-table-cell">D</td>
                 <td class="ds-table-cell">Y</td>
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">Nature Publishing Group</td>
             </tr>
-             <tr class="ds-table-row even">
+             <tr class="ds-table-row odd">
                 <td class="right-border ds-table-cell">Special Papers in Palaeontology</td>
                 <td class="ds-table-cell">N</td>
                 <td class="ds-table-cell">A</td>
@@ -714,7 +765,7 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">The Palaeontological Association</td>
             </tr>
-             <tr class="ds-table-row odd">
+             <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">Subterranean Biology</td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">R</td>
@@ -722,7 +773,7 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">Pensoft</td>
             </tr>
-            <tr class="ds-table-row even">
+            <tr class="ds-table-row odd">
                 <td class="right-border ds-table-cell">Systematic Biology </td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">R</td>
@@ -730,7 +781,7 @@
                 <td class="right-border ds-table-cell">N</td>
                 <td class="ds-table-cell">Society of Systematic Biologists</td>
             </tr>
-            <tr class="ds-table-row odd">
+            <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">Systematic Botany</td>
                 <td class="ds-table-cell">N</td>
                 <td class="ds-table-cell">A</td>
@@ -738,7 +789,7 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">American Society of Plant Taxonomists</td>
             </tr>
-            <tr class="ds-table-row even">
+            <tr class="ds-table-row odd">
                 <td class="right-border ds-table-cell">ZooKeys </td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">R</td>
@@ -746,7 +797,7 @@
                 <td class="right-border ds-table-cell">Y</td>
                 <td class="ds-table-cell">Pensoft</td>
             </tr>
-            <tr class="ds-table-row odd">
+            <tr class="ds-table-row even">
                 <td class="right-border ds-table-cell">Zoological Systematics and Evolution </td>
                 <td class="ds-table-cell">Y</td>
                 <td class="ds-table-cell">A</td>
