@@ -141,8 +141,9 @@ public class DatabaseUtils
                     String dbVersion = determineDBVersion(connection);
                     if (dbVersion!=null)
                     {
-                        System.out.println("Your database looks to be compatible with DSpace version " + dbVersion);
+                        System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
                         System.out.println("All upgrades *after* version " + dbVersion + " will be automatically run during the next migration.");
+                        System.out.println("If you'd like to upgrade now, simply run 'dspace database migrate'.");
                     }
                 }
                 connection.close();
@@ -171,6 +172,9 @@ public class DatabaseUtils
                         // Otherwise, we assume "argv[1]" is a valid migration version number
                         // This is only for testing! Never specify for Production!
                         System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata or Bitstream Format Registry auto-update.");
+                        System.out.println("This is because you are attempting to use an OLD version " + argv[1] + " Database with a newer DSpace API.");
+                        System.out.println("Obviously, NEVER do this in a Production scenario. The resulting old stlye database is only useful for DB migration testing.");
                         Connection connection = dataSource.getConnection();
                         // Update the database, to the version specified.
                         updateDatabase(dataSource, connection, argv[1], false);
@@ -792,12 +796,9 @@ public class DatabaseUtils
                 results = statement.executeQuery();
 
                 // If results are non-zero, then this sequence exists!
-                if(results!=null && results.next())
+                if(results!=null && results.next() && results.getInt(1)>0)
                 {
-                   if(results.getInt(1) > 0)
-                   {
-                      exists = true;
-                   }
+                    exists = true;
                 }
             }
         }
