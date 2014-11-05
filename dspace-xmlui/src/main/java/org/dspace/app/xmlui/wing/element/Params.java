@@ -83,8 +83,9 @@ public class Params extends AbstractWingElement implements StructuralElement
     public static final String PRESENTATION_SUGGEST = "suggest";
     public static final String PRESENTATION_LOOKUP = "lookup";
     public static final String PRESENTATION_AUTHORLOOKUP = "authorLookup";
+    public static final String PRESENTATION_RAW = "raw";
     public static final String PRESENTATION_NONE = "none";
-    public static final String[] PRESENTATIONS = { PRESENTATION_SELECT, PRESENTATION_SUGGEST, PRESENTATION_LOOKUP, PRESENTATION_NONE, PRESENTATION_AUTHORLOOKUP };
+    public static final String[] PRESENTATIONS = { PRESENTATION_SELECT, PRESENTATION_SUGGEST, PRESENTATION_LOOKUP, PRESENTATION_NONE, PRESENTATION_AUTHORLOOKUP, PRESENTATION_RAW };
 
 
     /** *********** Parameter Attributes *************** */
