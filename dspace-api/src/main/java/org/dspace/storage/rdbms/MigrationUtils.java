@@ -5,14 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.storage.rdbms.migration;
+package org.dspace.storage.rdbms;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This Utility class offers utility methods which may be of use to perform
@@ -42,7 +42,10 @@ public class MigrationUtils
         // First, in order to drop the appropriate Database constraint, we
         // must determine the unique name of the constraint. As constraint
         // naming is DB specific, this is dependent on our DB Type
-        String dbtype = DatabaseManager.getDbKeyword();
+        DatabaseMetaData meta = connection.getMetaData();
+        // NOTE: We use "findDbKeyword()" here as it won't cause
+        // DatabaseManager.initialize() to be called (which in turn re-calls Flyway)
+        String dbtype = DatabaseManager.findDbKeyword(meta);
         String constraintName = null;
         String constraintNameSQL = null;
         switch(dbtype)
