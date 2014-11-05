@@ -793,7 +793,10 @@ public class DatabaseUtils
                 // If results are non-zero, then this sequence exists!
                 if(results!=null && results.next())
                 {
-                   exists = true;
+                   if(results.getInt(1) > 0)
+                   {
+                       exists = true;
+                   }
                 }
             }
         }
