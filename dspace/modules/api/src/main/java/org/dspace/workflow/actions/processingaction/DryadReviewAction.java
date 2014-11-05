@@ -208,8 +208,8 @@ public class DryadReviewAction extends ProcessingAction {
         //add the submitter
         email.addArgument(wf.getSubmitter().getFullName() + " ("  + wf.getSubmitter().getEmail() + ")");
 
-	// add the review URL (with access token)
-        email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?wfID=" + wf.getID() + "&token=" + key);
+	// add the review URL (using provisional DOI as key)
+        email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?doi=" + doi);
 
 	// add journal's manuscript number
 	String manuScriptIdentifier = "";
@@ -224,7 +224,14 @@ public class DryadReviewAction extends ProcessingAction {
 	
 	email.addArgument(manuScriptIdentifier);
 
-	
+	// Add journal name
+	String journalName = "";
+	DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
+	if(0 < journalNames.length){
+	    journalName = "not available";
+	}
+        
+        email.addArgument(journalName);
 
             email.send();
         } catch (Exception e) {
