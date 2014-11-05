@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
+import org.dspace.content.service.ItemService;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -263,7 +264,7 @@ public class CollectionsResource extends Resource
                 if (i >= offset)
                 {
                     org.dspace.content.Item dspaceItem = dspaceItems.next();
-                    if (AuthorizeManager.authorizeActionBoolean(context, dspaceItem, org.dspace.core.Constants.READ))
+                    if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
