@@ -117,7 +117,7 @@
             <scope>provided</scope>
         </dependency>
         <!-- Ensure slf4j api version 1.5.6.
-             otlu brings in 1.6.1, but rest of DSpace 1.7 expects 1.5.6 -->
+             oltu brings in 1.6.1, but rest of DSpace 1.7 expects 1.5.6 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
