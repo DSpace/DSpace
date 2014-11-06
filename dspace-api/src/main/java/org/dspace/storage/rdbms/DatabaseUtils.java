@@ -84,7 +84,7 @@ public class DatabaseUtils
 
             // Get configured DB URL for reporting below
             String url = ConfigurationManager.getProperty("db.url");
-            
+
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
 
@@ -152,7 +152,7 @@ public class DatabaseUtils
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
                 System.out.println("\nDatabase URL: " + url);
-                
+
                 // "migrate" allows for an OPTIONAL second argument:
                 //    - "ignored" = Also run any previously "ignored" migrations during the migration
                 //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
@@ -362,14 +362,14 @@ public class DatabaseUtils
             // Set whethe Flyway will run migrations "out of order". By default, this is false,
             // and Flyway ONLY runs migrations that have a higher version number.
             flyway.setOutOfOrder(outOfOrder);
-            
+
             // If a target version was specified, tell Flyway to ONLY migrate to that version
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
             if(!StringUtils.isBlank(targetVersion))
             {
                 flyway.setTarget(targetVersion);
             }
-            
+
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
@@ -421,7 +421,7 @@ public class DatabaseUtils
             throw new SQLException("Flyway migration error occurred", fe);
         }
     }
-    
+
     /**
      * Clean the existing database, permanently removing all data and tables
      * <P>
@@ -625,7 +625,7 @@ public class DatabaseUtils
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
             String schema = getSchemaName(connection);
-            
+
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
 
@@ -686,12 +686,12 @@ public class DatabaseUtils
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
             String schema = getSchemaName(connection);
-            
+
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
             tableName = canonicalize(connection, tableName);
             columnName = canonicalize(connection, columnName);
-            
+
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
 
@@ -745,8 +745,11 @@ public class DatabaseUtils
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
             String schema = getSchemaName(connection);
+
+            // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
-            
+            sequenceName = canonicalize(connection, sequenceName);
+
             // Different database types store sequence information in different tables
             String dbtype = DatabaseManager.findDbKeyword(connection.getMetaData());
             String sequenceSQL = null;
@@ -788,10 +791,10 @@ public class DatabaseUtils
             {
                 // Run the query, passing it our parameters
                 statement = connection.prepareStatement(sequenceSQL);
-                statement.setString(1, StringUtils.upperCase(sequenceName));
+                statement.setString(1, sequenceName);
                 if(schemaFilter)
                 {
-                    statement.setString(2, StringUtils.upperCase(schema));
+                    statement.setString(2, schema);
                 }
                 results = statement.executeQuery();
 
