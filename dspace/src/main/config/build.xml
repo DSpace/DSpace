@@ -996,19 +996,6 @@ Common usage:
 
     	<antcall target="init_geolite" />
 
-        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f" />
-        </java>
-
-        <java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        </java>
-
         <echo>
 ====================================================================
  The DSpace code has been installed, and the database initialized.
