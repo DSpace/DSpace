@@ -275,8 +275,12 @@ public class DatabaseUtils
 
                 // First, add location for custom SQL migrations, if any (based on DB Type)
                 // e.g. [dspace.dir]/etc/[dbtype]/
-                scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
-                                    "/etc/" + dbType);
+                // (We skip this for H2 as it's only used for unit testing)
+                if(!dbType.equals(DatabaseManager.DBMS_H2))
+                {
+                    scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
+                                        "/etc/" + dbType);
+                }
 
                 // Also add the Java package where Flyway will load SQL migrations from (based on DB Type)
                 scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration." + dbType);
