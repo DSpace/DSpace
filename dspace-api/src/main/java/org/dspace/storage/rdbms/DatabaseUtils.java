@@ -174,7 +174,7 @@ public class DatabaseUtils
                         System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
                         System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata or Bitstream Format Registry auto-update.");
                         System.out.println("This is because you are attempting to use an OLD version " + argv[1] + " Database with a newer DSpace API.");
-                        System.out.println("Obviously, NEVER do this in a Production scenario. The resulting old stlye database is only useful for DB migration testing.");
+                        System.out.println("Obviously, NEVER do this in a Production scenario. The resulting old style database is only useful for DB migration testing.");
                         Connection connection = dataSource.getConnection();
                         // Update the database, to the version specified.
                         updateDatabase(dataSource, connection, argv[1], false);
