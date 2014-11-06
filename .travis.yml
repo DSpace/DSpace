@@ -43,4 +43,4 @@ script:
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
   #        -P !dspace-* => SKIP rebuilding the source
-  - "mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly,!dspace-api,!dspace-jspui,!dspace-lni,!dspace-oai,!dspace-rdf,!dspace-rest,!dspace-services,!dspace-solr,!dspace-sword,!dspace-swordv2,!dspace-xmlui ,!dspace-xmlui-mirage2 -B -V"
+  - "mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly,!dspace-api,!dspace-jspui,!dspace-lni,!dspace-oai,!dspace-rdf,!dspace-rest,!dspace-services,!dspace-solr,!dspace-sword,!dspace-swordv2,!dspace-xmlui,!dspace-xmlui-mirage2 -B -V"
