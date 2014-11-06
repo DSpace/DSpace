@@ -81,6 +81,7 @@
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
+                        <exclude>src/main/java/org/apache/solr/handler/extraction/ExtractingParams.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
