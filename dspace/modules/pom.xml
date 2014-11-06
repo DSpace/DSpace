@@ -38,7 +38,7 @@
     -->
     <profiles>
         <profile>
-            <id>dspace-xmlui</id>
+            <id>dspace-xmlui-custom</id>
             <activation>
                 <file>
                     <exists>xmlui/pom.xml</exists>
@@ -51,7 +51,7 @@
         <!-- Note:- The LNI module is not built by default and is considered deprecated.
             To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
-            <id>dspace-lni</id>
+            <id>dspace-lni-custom</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -60,7 +60,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-jspui</id>
+            <id>dspace-jspui-custom</id>
             <activation>
                 <file>
                     <exists>jspui/pom.xml</exists>
@@ -71,7 +71,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-rdf</id>
+            <id>dspace-rdf-custom</id>
             <activation>
                 <file>
                     <exists>rdf/pom.xml</exists>
@@ -82,7 +82,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-rest</id>
+            <id>dspace-rest-custom</id>
             <activation>
                 <file>
                     <exists>rest/pom.xml</exists>
@@ -93,7 +93,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-sword</id>
+            <id>dspace-sword-custom</id>
             <activation>
                 <file>
                     <exists>sword/pom.xml</exists>
@@ -104,7 +104,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-swordv2</id>
+            <id>dspace-swordv2-custom</id>
             <activation>
                 <file>
                     <exists>swordv2/pom.xml</exists>
@@ -115,7 +115,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-solr</id>
+            <id>dspace-solr-custom</id>
             <activation>
                 <file>
                     <exists>solr/pom.xml</exists>
@@ -126,7 +126,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-oai</id>
+            <id>dspace-oai-custom</id>
             <activation>
                 <file>
                     <exists>oai/pom.xml</exists>
