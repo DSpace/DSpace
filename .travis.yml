@@ -15,12 +15,14 @@ before_install:
 - psql dryad_test -U dryad_test_user < ./dspace/etc/atmire-versioning-changes.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_dryad_groups_collections.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_dryad_registries.sql
+- psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/dryad-rest-webapp.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/update-sequences.sql
 - export PATH="$TRAVIS_BUILD_DIR/apache-maven-2.2.1/bin:$PATH"
 install:
 - ./test/bin/travis-install-missing-poms.sh
 - ./test/bin/travis-install-dryad-dir.sh
 script: mvn package -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test
+after_failure: find . -type f -path "*/surefire-reports/*" -name "*.txt" -print -exec cat {} \;
 notifications:
   slack:
     secure: EqYW7e3FhVxoZzVS4FR52ajePoDbyeOsYcXA9b2BjUWDNc5WNFxRDwNfkxmD09BOAI1g7fKH+Fj5VrtnsUwh7kYosNBj9anjl9CleJ8xGQR35avoaXMJQ3BcULIBfSsUUEwaT+M8uHnM1PNC9DW1uq5w+Hd/9wASwJR5g5BU49I=

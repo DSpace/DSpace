@@ -414,21 +414,20 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-                <h1 class="ds-div-head">Recently integrated journals</h1>
-                <div id="recently_integrated_journals" class="ds-static-div primary">
-		  <div class="container">
-<!-- Proceedings of the Royal Society B -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
-        <!-- Scientific Data -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ascientific%5C+data%5C%7C%5C%7C%5C%7CScientific%5C+Data">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ScientificData.png" alt="Scientific Data" /></a>
-        <!-- BMC Ecology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+ecology%5C%7C%5C%7C%5C%7CBMC%5C+Ecology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEcology.png" alt="BMC Ecology" /></a>
-        <!-- BMC Evolutionary Biology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
+              <h1 class="ds-div-head">Recently integrated journals</h1>
+              <div id="recently_integrated_journals" class="ds-static-div primary">
+                <div class="container">
+                  <!-- Proceedings of the Royal Society B -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
+                  <!-- BMC Evolutionary Biology -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
+                  <!-- Ecological Applications -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecological%5C+applications%5C%7C%5C%7C%5C%7CEcological%5C+Applications">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcoApp.png" alt="Ecological Applications" /></a>
+                  <!-- Royal Society Open Science -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aroyal%5C+society%5C+open%5C+science%5C%7C%5C%7C%5C%7CRoyal%5C+Society%5C+Open%5C+Science">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-rsos.png" alt="Royal Society Open Science" /></a>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
-
 
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
