@@ -9,9 +9,8 @@ By default, the DSpace Unit Testing environment configures H2 to run in
 These database migrations are automatically called by [Flyway](http://flywaydb.org/)
 when the `DatabaseManager` initializes itself (see `initializeDatabase()` method).
 
-The H2 migrations in this directory are *based on* the Oracle Migrations
-(`[src]/dspace/etc/migrations/oracle/*.sql`), but with some modifications in 
-order to be valid in H2. 
+The H2 migrations in this directory are *based on* the Oracle Migrations, but
+with some modifications in order to be valid in H2.
 
 ## Oracle vs H2 script differences
 

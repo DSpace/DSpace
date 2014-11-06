@@ -267,18 +267,22 @@ public class DatabaseUtils
                 DatabaseMetaData meta = connection.getMetaData();
                 // NOTE: we use "findDbKeyword()" here as it won't cause
                 // DatabaseManager.initialize() to be called (which in turn auto-calls Flyway)
-                String scriptFolder = DatabaseManager.findDbKeyword(meta);
+                String dbType = DatabaseManager.findDbKeyword(meta);
                 connection.close();
 
                 // Determine location(s) where Flyway will load all DB migrations
                 ArrayList<String> scriptLocations = new ArrayList<String>();
 
-                // First, add location of SQL migrations (based on DB Type)
+                // First, add location for custom SQL migrations, if any (based on DB Type)
                 // e.g. [dspace.dir]/etc/[dbtype]/
                 scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
-                                    "/etc/migrations/" + scriptFolder);
+                                    "/etc/" + dbType);
 
-                // Next, add the Java package where Flyway will load Java migrations from
+                // Also add the Java package where Flyway will load SQL migrations from (based on DB Type)
+                scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration." + dbType);
+
+                // Also add the Java package where Flyway will load Java migrations from
+                // NOTE: this also loads migrations from any sub-package
                 scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
 
                 // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
