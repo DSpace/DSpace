@@ -70,8 +70,8 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions include: 'test', 'info', 'migrate', 'migrate-ignored, 'repair' or 'clean'");
-            System.out.println("Or, type 'database help' for more information.\n");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
 
@@ -142,8 +142,8 @@ public class DatabaseUtils
                     if (dbVersion!=null)
                     {
                         System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
-                        System.out.println("All upgrades *after* version " + dbVersion + " will be automatically run during the next migration.");
-                        System.out.println("If you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
+                        System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
                     }
                 }
                 connection.close();
@@ -172,9 +172,10 @@ public class DatabaseUtils
                         // Otherwise, we assume "argv[1]" is a valid migration version number
                         // This is only for testing! Never specify for Production!
                         System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata or Bitstream Format Registry auto-update.");
-                        System.out.println("This is because you are attempting to use an OLD version " + argv[1] + " Database with a newer DSpace API.");
-                        System.out.println("Obviously, NEVER do this in a Production scenario. The resulting old style database is only useful for DB migration testing.");
+                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
+                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
+                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
+                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
                         Connection connection = dataSource.getConnection();
                         // Update the database, to the version specified.
                         updateDatabase(dataSource, connection, argv[1], false);
@@ -204,10 +205,10 @@ public class DatabaseUtils
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 System.out.println("\nDatabase URL: " + url);
-                System.out.println("\nIf you continue, ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
-                System.out.println("There is NO turning back from this action. You should backup your database before continuing.");
+                System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
+                System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
                 System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
-                System.out.print("Are you sure you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
+                System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
                 String choiceString = input.readLine();
                 input.close();
 
@@ -221,13 +222,13 @@ public class DatabaseUtils
             else
             {
                 System.out.println("\nUsage: database [action]");
-                System.out.println("Valid actions include: 'test', 'info', 'migrate', 'migrate-ignored, 'repair' or 'clean'");
-                System.out.println(" - test             = Test database connection is OK");
-                System.out.println(" - info             = Describe basic info about database (type, version, driver, migrations run)");
-                System.out.println(" - migrate          = Migrate the Database to the latest version");
-                System.out.println("                      Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
-                System.out.println(" - repair           = Attempt to repair any previously failed database migrations");
-                System.out.println(" - clean            = Destroy all data and tables in Database (WARNING there is no going back!)");
+                System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+                System.out.println(" - test    = Test database connection is OK");
+                System.out.println(" - info    = Describe basic info about database, including migrations run");
+                System.out.println(" - migrate = Migrate the Database to the latest version");
+                System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
+                System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
+                System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
                 System.out.println("");
             }
 
