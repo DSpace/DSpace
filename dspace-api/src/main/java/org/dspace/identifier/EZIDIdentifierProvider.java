@@ -610,6 +610,7 @@ public class EZIDIdentifierProvider
             DataCiteXMLCreator xmlGen = new DataCiteXMLCreator();
             xmlGen.setDisseminationCrosswalkName(DATACITE_XML_CROSSWALK);
             String xmlString = xmlGen.getXMLString(dso);
+            log.debug("Generated DataCite XML:  {}", xmlString);
             mapped.put("datacite", xmlString);
         }
 
