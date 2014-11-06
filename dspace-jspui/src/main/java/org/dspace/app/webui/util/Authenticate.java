@@ -10,6 +10,7 @@ package org.dspace.app.webui.util;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
@@ -21,11 +22,14 @@ import javax.servlet.jsp.jstl.core.Config;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.PostLoggedInAction;
+import org.dspace.authenticate.PostLoggedOutAction;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
 
 /**
  * Methods for authenticating the user. This is DSpace platform code, as opposed
@@ -269,6 +273,16 @@ public class Authenticate
                 session.setAttribute("interrupted.request.info", requestInfo);
                 session.setAttribute("interrupted.request.url", requestUrl);
             }
+
+			List<PostLoggedInAction> postLoggedInActions = new DSpace().getServiceManager().getServicesByType(
+					PostLoggedInAction.class);
+
+			if (postLoggedInActions != null) {
+				for (PostLoggedInAction pAction : postLoggedInActions) {
+					pAction.loggedIn(context, request, context.getCurrentUser());
+				}
+
+			}
         }
 
         context.setCurrentUser(eperson);
@@ -298,6 +312,8 @@ public class Authenticate
         // so we can detect session hijacking.
         session.setAttribute("dspace.current.remote.addr",
                              request.getRemoteAddr());
+
+
 
     }
 
@@ -337,11 +353,23 @@ public class Authenticate
             Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
         }
         
+		// Remove user detail from context
+		List<PostLoggedOutAction> postLoggedOutActions = new DSpace().getServiceManager().getServicesByType(
+				PostLoggedOutAction.class);
+
+		if (postLoggedOutActions != null) {
+			for (PostLoggedOutAction pAction : postLoggedOutActions) {
+				pAction.loggedOut(context, request, context.getCurrentUser());
+			}
+		}
+
         if (previousUserID != null)
         {
             session.removeAttribute("dspace.previous.user.id");
             EPerson ePerson = EPerson.find(context, previousUserID);
+            context.setCurrentUser(ePerson);
             loggedIn(context, request, ePerson);
         }
+
     }
 }

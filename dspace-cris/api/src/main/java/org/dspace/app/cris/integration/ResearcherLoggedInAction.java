@@ -12,7 +12,9 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
 {
 
     private ApplicationService applicationService;
-
+    
+    private String netidSourceRef;
+    
     @Override
     public void loggedIn(Context context, HttpServletRequest request,
             EPerson eperson)
@@ -23,7 +25,7 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
             boolean save = false;
             ResearcherPage rp = applicationService.getResearcherPageByEPersonId(eperson.getID());
             if(rp==null) {
-				rp = applicationService.getEntityBySourceId("person",
+				rp = applicationService.getEntityBySourceId(netidSourceRef,
 						eperson.getNetid(), ResearcherPage.class);
                 if(rp.getEpersonID()!=null) {
                     if (rp.getEpersonID() != eperson.getID())
@@ -54,4 +56,7 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
         this.applicationService = applicationService;
     }
 
+    public void setNetidSourceRef(String netidSourceRef) {
+		this.netidSourceRef = netidSourceRef;
+	}
 }
