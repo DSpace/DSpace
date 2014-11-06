@@ -75,8 +75,9 @@ abstract public class AbstractDSpaceWebapp
     {
         // Create the database entry
         Timestamp now = new Timestamp(started.getTime());
+        Context context = null;
         try {
-            Context context = new Context();
+            context = new Context();
             row = DatabaseManager.create(context, "Webapp");
             row.setColumn("AppName", kind);
             row.setColumn("URL", url);
@@ -87,18 +88,29 @@ abstract public class AbstractDSpaceWebapp
         } catch (SQLException e) {
             log.error("Failed to record startup in Webapp table.", e);
         }
+        finally {
+        	if (context != null && context.isValid()){
+        		context.abort();
+        	}
+        }
     }
 
     /** Record that this application is not running. */
     public void deregister()
     {
         // Remove the database entry
+    	Context context = null;
         try {
-            Context context = new Context();
+            context = new Context();
             DatabaseManager.delete(context, row);
             context.complete();
         } catch (SQLException e) {
             log.error("Failed to record shutdown in Webapp table.", e);
+        }
+        finally {
+        	if (context != null && context.isValid()){
+        		context.abort();
+        	}
         }
     }
 
