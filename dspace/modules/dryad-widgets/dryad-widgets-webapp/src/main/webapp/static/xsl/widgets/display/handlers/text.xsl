@@ -10,8 +10,10 @@
     
     <xsl:template name="text-plain">
         <html>
-            <head></head>
-            <body>
+            <head>
+                <link type="text/css" rel="stylesheet" href="{$ddwcss}"></link>
+            </head>
+            <body class="dryad-ddw">
                 <pre>
 <xsl:value-of select="/xhtml:xhtml/xhtml:body"/>
 </pre>
