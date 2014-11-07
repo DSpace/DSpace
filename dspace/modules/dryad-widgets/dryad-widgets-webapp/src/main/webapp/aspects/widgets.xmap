@@ -76,12 +76,10 @@
             </map:handle-errors>
         </map:pipeline>
 
-        
         <!-- 
-            pipelines below match: /widgets/v1/display/{doi}/...
-            sitemap's @uri-prefix="widgets/v1/"
+            pipelines below match: /widgets/vN/display/{doi}/...
+            sitemap's @uri-prefix="widgets/"
         -->
-        
         <map:pipeline type="caching">
             <!-- do not cache this file request, as it is a dynamic JS resource -->
             <map:parameter name="expires" value="now"/>
@@ -91,10 +89,7 @@
             -->
             <map:match pattern="v1/display/debug/**/loader.js">
                 <!-- request a data file from the DataOne-MN service running on the local machine -->
-
-                <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                <!-- <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}"/> -->
-                <map:generate type="file" src="http://datadryad.org/mn/object/{1}"/>
+                <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"/>
 
                 <map:serialize type="xml"/>
             </map:match>
@@ -121,11 +116,7 @@
             -->
             <map:match pattern="v1/display/**/loader.js">
                 <!-- request a data file from the DataOne-MN service running on the local machine -->
-
-                <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                <!-- <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}"/> -->
-                <map:generate type="file" src="http://datadryad.org/mn/object/{1}"/>
-
+                <map:generate type="file"  src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"/>
                 <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileLoader.xsl">
 
                     <!-- cocoon-mapped values: url's for resources -->
@@ -156,22 +147,13 @@
         </map:pipeline>
 
         <map:pipeline type="caching">
-            <!-- {1} : doi
-            -->
+            <!-- {1} : doi -->
             <map:match pattern="v1/display/debug/**/frame">
                 <map:aggregate element="parts">
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <map:part src="http://datadryad.org/mn/meta/{1}"              element="meta"/>
-                    <map:part src="http://datadryad.org/mn/meta/{1}/bitstream"    element="meta-bitstream"/>
-                    <map:part src="http://datadryad.org/mn/object/{1}"            element="object"/>
-                    <map:part src="http://datadryad.org/resource/{1}/DRI"         element="dri"/>
-                    <!--
-                    <map:part src="http://localhost:{request:serverPort}/mn/meta/{1}"              element="meta"/>
-                    <map:part src="http://localhost:{request:serverPort}/mn/meta/{1}/bitstream"    element="meta-bitstream"/>
-                    <map:part src="http://localhost:{request:serverPort}/mn/object/{1}"            element="object"/>
-                    <map:part src="http://localhost:{request:serverPort}/resource/{1}/DRI"         element="dri"/>
-                    -->
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}"              element="meta"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}/bitstream"    element="meta-bitstream"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"            element="object"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}/DRI"            element="dri"/>
                 </map:aggregate>
                 <map:serialize type="xml"/>
             </map:match>
@@ -181,38 +163,21 @@
         <map:pipeline type="caching">
             <map:match pattern="v1/display/**/frame">
                 <map:aggregate element="parts">
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <map:part src="http://datadryad.org/mn/meta/{1}"              element="meta"/>
-                    <map:part src="http://datadryad.org/mn/meta/{1}/bitstream"    element="meta-bitstream"/>
-                    <map:part src="http://datadryad.org/mn/object/{1}"            element="object"/>
-                    <map:part src="http://datadryad.org/resource/{1}/DRI"         element="dri"/>
-                    <!--
-                    <map:part src="http://localhost:{request:serverPort}/mn/meta/{1}"              element="meta"/>
-                    <map:part src="http://localhost:{request:serverPort}/mn/meta/{1}/bitstream"    element="meta-bitstream"/>
-                    <map:part src="http://localhost:{request:serverPort}/mn/object/{1}"            element="object"/>
-                    <map:part src="http://localhost:{request:serverPort}/resource/{1}/DRI"         element="dri"/>
-                    -->
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}"              element="meta"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}/bitstream"    element="meta-bitstream"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"            element="object"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}/DRI"            element="dri"/>
                 </map:aggregate>
-                <!-- -->
                 <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileFrame.xsl">
                     <map:parameter name="bitstream-url"     value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/v1/display/{1}/bitstream?referrer={request-param:referrer}"/>
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!-- <map:parameter name="download-url"      value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}/bitstream"/> -->
-                    <map:parameter name="download-url"      value="http://datadryad.org/mn/object/{1}/bitstream"/>
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!-- <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}"/> -->
-                    <map:parameter name="datapackage-url"   value="http://datadryad.org/resource/{1}"/>
-
+                    <map:parameter name="download-url"      value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
+                    <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}"/>
                     <map:parameter name="ddwcss"            value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
                     <map:parameter name="datapackage-img"   value="{request:scheme}://{request:serverName}:{request:serverPort}/static/img/bannerForPub.png"/>
                     <map:parameter name="link1"             value="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"/>
                     <map:parameter name="link2"             value="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300italic,300,400italic,400,600italic,600,700italic,700,900italic,900"/>
                     <map:parameter name="referrer"          value="{request-param:referrer}"/>
                     <map:parameter name="request-origin"    value="{request-param:origin}"/>
-
                 </map:transform>
                 <map:transform type="i18n">
                     <map:parameter name="locale" value="{locale}"/>
@@ -240,10 +205,7 @@
                 <map:generate type="WidgetDisplayBitstreamGenerator">
                     <map:parameter name="referrer"   value="{request-param:referrer}"/>
                     <map:parameter name="doi"        value="{1}"/>
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!-- <map:parameter name="bitstream" value="http://localhost:{request:serverPort}/mn/object/{1}/bitstream"/> -->
-                    <map:parameter name="bitstream" value="http://datadryad.org/mn/object/{1}/bitstream"/>
+                    <map:parameter name="bitstream"  value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
                 </map:generate>
                 <map:serialize/>
             </map:match>
@@ -256,20 +218,13 @@
                 <map:generate type="WidgetDisplayBitstreamGenerator">
                     <map:parameter name="referrer"   value="{request-param:referrer}"/>
                     <map:parameter name="doi"        value="{1}"/>
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!-- <map:parameter name="bitstream" value="http://localhost:{request:serverPort}/mn/object/{1}/bitstream"/> -->
-                    <map:parameter name="bitstream" value="http://datadryad.org/mn/object/{1}/bitstream"/>
-
+                    <map:parameter name="bitstream"  value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
                 </map:generate>
 
                 <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileBitstream.xsl">
-                    <map:parameter name="doi"    value="{1}"/>
-                    <map:parameter name="ddwcss" value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
-
-                    <!-- TODO: until deployment on prod, have prod server (not local server) be used for D-O requests -->
-                    <!--<map:parameter name="bitstream" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/object/{1}/bitstream"/>-->
-                    <map:parameter name="bitstream" value="http://datadryad.org/mn/object/{1}/bitstream"/>
+                    <map:parameter name="doi"       value="{1}"/>
+                    <map:parameter name="ddwcss"    value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
+                    <map:parameter name="bitstream" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
                 </map:transform>
                 <map:transform type="i18n">
                     <map:parameter name="locale" value="{locale}"/>
