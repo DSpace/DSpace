@@ -244,5 +244,25 @@
 
         </map:pipeline>
 
+        <!-- data-file content handler -->
+        <map:pipeline type="caching">
+            <map:match pattern="v1/display/preview">
+                <map:generate type="file" src="../static/html/preview.html"/>
+                <map:serialize type="html"/>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="400">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/html/widgets/display/bitstreamException.xsl"/>
+                        <map:serialize type="html" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+
+        </map:pipeline>
+
+
+
     </map:pipelines>
 </map:sitemap>
