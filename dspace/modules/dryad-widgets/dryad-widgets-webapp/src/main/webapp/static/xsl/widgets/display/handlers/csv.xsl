@@ -17,10 +17,12 @@
                 <style type="text/css">
                     .sorting, .sorting_asc, .sorting_desc {
                         background : none !important;
+                    }
                 </style>
                 <link type="text/css" rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.css"></link>
+                <link type="text/css" rel="stylesheet" href="{$ddwcss}"></link>
             </head>
-            <body>
+            <body class="dryad-ddw">
                 <xsl:variable name="colmax" select="math:max(//csv:record/csv:field/@number)"/>
                 <!-- <table id="example" class="compact hover" cellspacing="0" width="100%"></table> -->
                 <table id="table" class="display" cellspacing="0" width="100%">
