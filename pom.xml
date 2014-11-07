@@ -769,7 +769,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[4.0.0,5.0.0)</version>
+            <version>[5.0.0,6.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
