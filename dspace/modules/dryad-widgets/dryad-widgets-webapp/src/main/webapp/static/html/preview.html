@@ -2,11 +2,8 @@
 <html>
     <head>
         <title>Dryad Data Display Widget preview</title>
-        <script src="../js/jquery-1.9.1.min.js"></script>
-        <script src="../js/widget-preview.js"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"></link>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css"></link>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     </head>
     <body>
         <div class="col-md-12">
@@ -22,14 +19,14 @@
                     <form class="form-horizontal" role="form">
                         <div class="form-group">
                             <label for="doi" class="control-label">Dryad Data Package DOI</label>
-                            <input id="doi" class="form-control" type="text" placeholder="(e.g., doi:10.5061/dryad.781pv)"></input>
+                            <input id="doi" class="form-control" type="text" placeholder="e.g., doi:10.5061/dryad.781pv"></input>
                         </div>
                         <div class="form-group">
                             <div class="col-md-4">
                                 <button id="update-preview" type="submit" class="btn btn-default">Preview</button>
                             </div>
                             <div class="col-sm-8">
-                                <select class="form-control">
+                                <select id="server-select" class="form-control">
                                     <option value="http://datadryad.org" disabled="disabled">Prod</option>
                                     <option value="http://staging.datadryad.org" disabled="disabled">Staging</option>
                                     <option value="http://dev.datadryad.org" selected="selected">Dev</option>
@@ -62,8 +59,13 @@
             </div>
             <!-- Widget -->
             <div class="row">
-                <div id="dryad-ddw-target"></div>                
+                <div id="dryad-ddw-wrapper">
+                    <div id="dryad-ddw-target"></div>
+                </div>
             </div>
         </div>
+        <script src="../js/jquery-1.9.1.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <script src="../js/widget-preivew.js"></script>
     </body>
 </html>
