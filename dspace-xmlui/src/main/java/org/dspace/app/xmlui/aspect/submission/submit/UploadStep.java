@@ -377,12 +377,12 @@ public class UploadStep extends AbstractSubmissionStep
 
 
         if (ConfigurationManager.getBooleanProperty("webui.submission.sherparomeo-policy-enabled", true)){
-            List div = divIn.addList("submit-upload-new", List.TYPE_FORM);
-            div.setHead(T_sherpa_title);
 
             SHERPASubmitService sherpaSubmitService = new DSpace().getSingletonService(SHERPASubmitService.class);
 
             if(sherpaSubmitService.hasISSNs(context, item)) {
+                List div = divIn.addList("submit-upload-new", List.TYPE_FORM);
+                div.setHead(T_sherpa_title);
 
                 //Since sherpa web service doesn't work reliable with more than 1 issn, perform the service for each issn
                 Set<String> issns = sherpaSubmitService.getISSNs(context, item);
