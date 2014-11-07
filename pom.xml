@@ -774,7 +774,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[4.0.0,5.0.0)</version>
+            <version>[5.0.0,6.0.0)</version>
             <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
