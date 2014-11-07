@@ -1995,6 +1995,10 @@ public class ItemImport
     }
 
     public static String unzip(File zipfile) throws IOException {
+    	return unzip(zipfile, null);
+    }
+    
+    public static String unzip(File zipfile, String destDir) throws IOException {
         // 2
         // does the zip file exist and can we write to the temp directory
         if (!zipfile.canRead())
@@ -2002,8 +2006,12 @@ public class ItemImport
             log.error("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
         }
 
+        String destinationDir = destDir;
+        if (destinationDir == null){
+        	destinationDir = tempWorkDir;
+        }
 
-        File tempdir = new File(tempWorkDir);
+        File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory())
         {
             log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
@@ -2015,8 +2023,8 @@ public class ItemImport
         {
             log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
-        String sourcedir = tempWorkDir + System.getProperty("file.separator") + zipfile.getName();
-        String zipDir = tempWorkDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+        String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
+        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
 
 
         // 3
@@ -2084,6 +2092,9 @@ public class ItemImport
             }
         }
 
+        //Close zip file
+        zf.close();
+        
         if(sourceDirForZip != sourcedir) {
             sourcedir = sourceDirForZip;
             System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
@@ -2114,172 +2125,24 @@ public class ItemImport
     }
 
     /**
-     * Given an uploaded file, this method calls the method to instantiate a BTE instance to
-     * transform the input data and batch import them to DSpace
-     * @param file The input file to read data from
-     * @param owningCollection The owning collection the items will belong to
-     * @param collections The collections the created items will be inserted to, apart from the owning one
-     * @param bteInputType The input type of the data (bibtex, csv, etc.)
-     * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data 
-     * @param context The context
-     * @throws Exception
-     */
-    public static void processBTEUIImport(File file, Collection owningCollection, String[] collections, String resumeDir,
-                                          String bteInputType, Context context) throws Exception
-    {
-        final EPerson eperson = context.getCurrentUser();
-        final File myFile = file;
-        final String[] otherCollections2 = collections;
-        final Collection theOwningCollection = owningCollection;
-        final String myBteInputType = bteInputType;
-        final String resumePath = resumeDir;
-
-        // if the file exists
-        if (file.exists())
-        {
-            Thread go = new Thread()
-            {
-                public void run()
-                {
-                    Context context = null;
-                    ItemIterator iitems = null;
-                    try
-                    {
-                        // create a new dspace context
-                        context = new Context();
-                        context.setCurrentUser(eperson);
-                        context.setIgnoreAuthorization(true);
-
-                        String importDir = null;
-                        
-                        boolean isResume = resumePath!=null;
-                        
-                        List<Collection> collectionList = new ArrayList<Collection>();
-    	    			if (otherCollections2 != null){
-    	    				for (String colID : otherCollections2){
-    	    					int colId = Integer.parseInt(colID);
-    	    					if (colId != theOwningCollection.getID()){
-    	    						Collection col = Collection.find(context, colId);
-    	    						if (col != null){
-    	    							collectionList.add(col);
-    	    						}
-    	    					}
-    	    				}
-    	    			}
-    	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
-    	    			
-    	    			importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (isResume?resumePath:(new GregorianCalendar()).getTimeInMillis());
-    	    			File importDirFile = new File(importDir);
-    	    			if (!importDirFile.exists()){
-    						boolean success = importDirFile.mkdirs();
-    						if (!success) {
-    							log.info("Cannot create batch import directory!");
-    							throw new Exception("Cannot create batch import directory!");
-    						}
-    					}
-    	    			
-    	    			String dataPath = importDirFile + File.separator + myFile.getName();
-    	    			String dataDir = importDirFile + File.separator + "data" + File.separator;
-    					
-    					//Clear these files, if a resume
-    	    			if (isResume){
-	    					(new File(dataPath)).delete();
-	    					FileDeleteStrategy.FORCE.delete(new File(dataDir));
-    	    			}
-    	    			//Copy the new file
-    					FileUtils.copyFile(myFile, new File(dataPath));
-
-                        //Create the import working directory
-                        boolean success = (new File(dataDir)).mkdir();
-                    	if (!success) {
-                    		log.info("Cannot create batch import working directory!");
-                    		throw new Exception();
-                    	}
-
-                        //Create mapfile path;
-                        String mapfile = importDirFile + File.separator+ "mapfile";
-
-                        Collection[] finalCollections = null;
-    					if (theOwningCollection != null){
-    						finalCollections = new Collection[otherCollections.length + 1];
-    						finalCollections[0] = theOwningCollection;
-    						for (int i=0; i<otherCollections.length; i++){
-    							finalCollections[i+1] = otherCollections[i];
-    						}
-    					}
-    					
-                        ItemImport myloader = new ItemImport();
-                        myloader.isResume = isResume;
-                        myloader.addBTEItems(context, finalCollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, dataDir);
-
-                        // email message letting user know the file is ready for
-                        // download
-                        emailSuccessMessage(context, eperson, mapfile);
-
-                        // return to enforcing auths
-                        context.setIgnoreAuthorization(false);
-                    }
-                    catch (Exception e1)
-                    {
-                        try
-                        {
-                            emailErrorMessage(eperson, e1.getMessage());
-                        }
-                        catch (Exception e)
-                        {
-                            // wont throw here
-                        }
-                        throw new IllegalStateException(e1);
-                    }
-                    finally
-                    {
-                        if (iitems != null)
-                        {
-                            iitems.close();
-                        }
-                        
-                        // close the mapfile writer
-                        if (mapOut != null)
-                        {
-                            mapOut.close();
-                        }
-
-                        // Make sure the database connection gets closed in all conditions.
-                    	try {
-							context.complete();
-						} catch (SQLException sqle) {
-							context.abort();
-						}
-                    }
-                }
-
-            };
-
-            go.isDaemon();
-            go.start();
-        }
-        else {
-        	log.error("Unable to find the uploadable file");
-        }
-    }
-    
-    /**
      * 
-     * Given a public URL to a zip file that has the Simple Archive Format, this method imports the contents to DSpace
-     * @param url The public URL of the zip file
+     * Given a local file or public URL to a zip file that has the Simple Archive Format, this method imports the contents to DSpace
+     * @param filepath The filepath to local file or the public URL of the zip file
      * @param owningCollection The owning collection the items will belong to
-     * @param collections The collections the created items will be inserted to, apart from the owning one
+     * @param otherCollections The collections the created items will be inserted to, apart from the owning one
      * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data 
+     * @param inputType The input type of the data (bibtex, csv, etc.), in case of local file
      * @param context The context
      * @throws Exception
      */
-    public static void processSAFUIImport(String url, Collection owningCollection, String[] collections, String resumeDir, Context context) throws Exception
+    public static void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context) throws Exception
 	{
 		final EPerson eperson = context.getCurrentUser();
-		final String[] otherCollections2 = collections;
+		final String[] theOtherCollections = otherCollections;
 		final Collection theOwningCollection = owningCollection;
-		final String zipurl = url;
-		final String resumePath = resumeDir;
+		final String theFilePath = filepath;
+		final String theInputType = inputType;
+		final String theResumeDir = resumeDir;
 		
 		Thread go = new Thread()
 		{
@@ -2287,8 +2150,6 @@ public class ItemImport
 			{
 				Context context = null;
 
-				String importDir = null;
-				
 				try {
 					
 					// create a new dspace context
@@ -2296,11 +2157,12 @@ public class ItemImport
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
 					
-					boolean isResume = resumePath!=null;
+					String importDir = null;
+					boolean isResume = theResumeDir!=null;
 					
 					List<Collection> collectionList = new ArrayList<Collection>();
-	    			if (otherCollections2 != null){
-	    				for (String colID : otherCollections2){
+	    			if (theOtherCollections != null){
+	    				for (String colID : theOtherCollections){
 	    					int colId = Integer.parseInt(colID);
 	    					if (colId != theOwningCollection.getID()){
 	    						Collection col = Collection.find(context, colId);
@@ -2312,9 +2174,7 @@ public class ItemImport
 	    			}
 	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
 	    			
-					InputStream is = new URL(zipurl).openStream();
-
-					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (isResume?resumePath:(new GregorianCalendar()).getTimeInMillis());
+					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (isResume?theResumeDir:(new GregorianCalendar()).getTimeInMillis());
 					File importDirFile = new File(importDir);
 					if (!importDirFile.exists()){
 						boolean success = importDirFile.mkdirs();
@@ -2324,33 +2184,50 @@ public class ItemImport
 						}
 					}
 					
-					String dataZipPath = importDirFile + File.separator + "data.zip";
-					String dataZipDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+					String dataPath = null;
+					String dataDir = null;
+					
+					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+						dataPath = importDirFile + File.separator + "data.zip";
+						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
+					}
+					else { // For all other imports
+						dataPath = importDirFile + File.separator + (new File(theFilePath)).getName();
+    	    			dataDir = importDirFile + File.separator + "data" + File.separator;
+					}
 					
 					//Clear these files, if a resume
 					if (isResume){
-						(new File(dataZipPath)).delete();
-						FileDeleteStrategy.FORCE.delete(new File(dataZipDir));
+						(new File(dataPath)).delete();
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+					}
+
+					//In case of Simple Archive Format import we need an extra effort to download the zip file and unzip it
+					String sourcePath = null;
+					if (theInputType.equals("saf")){ 
+						OutputStream os = new FileOutputStream(dataPath);
+
+						byte[] b = new byte[2048];
+						int length;
+
+						InputStream is = new URL(theFilePath).openStream();
+						while ((length = is.read(b)) != -1) {
+							os.write(b, 0, length);
+						}
+
+						is.close();
+						os.close();
+
+						sourcePath = unzip(new File(dataPath), dataDir);
+						
+						//Move files to the required folder
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					}
 					
-					OutputStream os = new FileOutputStream(dataZipPath);
-
-					byte[] b = new byte[2048];
-					int length;
-
-					while ((length = is.read(b)) != -1) {
-						os.write(b, 0, length);
-					}
-
-					is.close();
-					os.close();
-
-					String sourcePath = unzip(new File(dataZipPath));
+					//Create mapfile path
 					String mapFilePath = importDirFile + File.separator + "mapfile";
-					
-					
-					ItemImport myloader = new ItemImport();
-					myloader.isResume = isResume;
 					
 					Collection[] finalCollections = null;
 					if (theOwningCollection != null){
@@ -2361,7 +2238,15 @@ public class ItemImport
 						}
 					}
 					
-					myloader.addItems(context, finalCollections, sourcePath, mapFilePath, template);
+					ItemImport myloader = new ItemImport();
+					myloader.isResume = isResume;
+					
+					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+						myloader.addItems(context, finalCollections, dataDir, mapFilePath, template);
+					}
+					else { // For all other imports (via BTE)
+						myloader.addBTEItems(context, finalCollections, theFilePath, mapFilePath, template, theInputType, dataDir);
+					}
 					
 					// email message letting user know the file is ready for
                     // download
@@ -2381,11 +2266,6 @@ public class ItemImport
 
 	                mapOut = null;
 	                
-					//Delete file
-					if (importDir != null){
-						//FileDeleteStrategy.FORCE.delete(new File(importDir));
-					}
-					
 					try
                     {
                         emailErrorMessage(eperson, e.getMessage());
@@ -2420,7 +2300,7 @@ public class ItemImport
 		go.start();
 		
 	}
-	
+
     /**
      * Since the BTE batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplish this

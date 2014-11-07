@@ -181,23 +181,14 @@ public class BatchImportServlet extends DSpaceServlet
     			}
 
     			try {
-    				//Decide if it is a new upload or a resume one!
-    				if (uploadId != null){ //resume upload
-    					if (f==null){
-    						ItemImport.processSAFUIImport(zipurl, owningCollection, reqCollections, uploadId, context);
-    					}
-    					else {
-    						ItemImport.processBTEUIImport(f, owningCollection, reqCollections, uploadId, inputType, context);
-    					}
+    				String finalInputType = "saf";
+    				String filePath = zipurl;
+    				if (f!=null){
+    					finalInputType = inputType;
+        				filePath = f.getAbsolutePath();
     				}
-    				else { //New upload
-    					if (f==null){
-    						ItemImport.processSAFUIImport(zipurl, owningCollection, reqCollections, null, context);
-    					}
-    					else {
-    						ItemImport.processBTEUIImport(f, owningCollection, reqCollections, null, inputType, context);
-    					}
-    				}
+    				
+    				ItemImport.processUIImport(filePath, owningCollection, reqCollections, uploadId, finalInputType, context);
     				
     				request.setAttribute("has-error", "false");
     				request.setAttribute("uploadId", null);
