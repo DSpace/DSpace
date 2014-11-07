@@ -32,7 +32,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
 import org.dspace.utils.DSpace;
-import org.elasticsearch.common.collect.Lists;
 
 /**
  * Servlet to batch import metadata via the BTE
