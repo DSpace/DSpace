@@ -13,7 +13,7 @@
             <head>
                 <link type="text/css" rel="stylesheet" href="{$ddwcss}"></link>
             </head>
-            <body class="dryad-ddw">
+            <body class="dryad-ddw-bitstream">
                 <pre>
 <xsl:value-of select="/xhtml:xhtml/xhtml:body"/>
 </pre>

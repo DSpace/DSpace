@@ -1,4 +1,5 @@
-.dryad-ddw-outer {
+.dryad-ddw-outer,
+.dryad-ddw-bitstream {
   /* HTML5 display-role reset for older browsers */
   width: 100%;
   display: block;
@@ -7,56 +8,107 @@
   text-align: center;
 }
 .dryad-ddw-outer div,
+.dryad-ddw-bitstream div,
 .dryad-ddw-outer span,
+.dryad-ddw-bitstream span,
 .dryad-ddw-outer object,
+.dryad-ddw-bitstream object,
 .dryad-ddw-outer iframe,
+.dryad-ddw-bitstream iframe,
 .dryad-ddw-outer h1,
+.dryad-ddw-bitstream h1,
 .dryad-ddw-outer h2,
+.dryad-ddw-bitstream h2,
 .dryad-ddw-outer h3,
+.dryad-ddw-bitstream h3,
 .dryad-ddw-outer h4,
+.dryad-ddw-bitstream h4,
 .dryad-ddw-outer h5,
+.dryad-ddw-bitstream h5,
 .dryad-ddw-outer h6,
+.dryad-ddw-bitstream h6,
 .dryad-ddw-outer p,
+.dryad-ddw-bitstream p,
 .dryad-ddw-outer pre,
+.dryad-ddw-bitstream pre,
 .dryad-ddw-outer a,
+.dryad-ddw-bitstream a,
 .dryad-ddw-outer code,
+.dryad-ddw-bitstream code,
 .dryad-ddw-outer em,
+.dryad-ddw-bitstream em,
 .dryad-ddw-outer img,
+.dryad-ddw-bitstream img,
 .dryad-ddw-outer small,
+.dryad-ddw-bitstream small,
 .dryad-ddw-outer strike,
+.dryad-ddw-bitstream strike,
 .dryad-ddw-outer strong,
+.dryad-ddw-bitstream strong,
 .dryad-ddw-outer sub,
+.dryad-ddw-bitstream sub,
 .dryad-ddw-outer sup,
+.dryad-ddw-bitstream sup,
 .dryad-ddw-outer tt,
+.dryad-ddw-bitstream tt,
 .dryad-ddw-outer b,
+.dryad-ddw-bitstream b,
 .dryad-ddw-outer u,
+.dryad-ddw-bitstream u,
 .dryad-ddw-outer i,
+.dryad-ddw-bitstream i,
 .dryad-ddw-outer center,
+.dryad-ddw-bitstream center,
 .dryad-ddw-outer ol,
+.dryad-ddw-bitstream ol,
 .dryad-ddw-outer ul,
+.dryad-ddw-bitstream ul,
 .dryad-ddw-outer li,
+.dryad-ddw-bitstream li,
 .dryad-ddw-outer label,
+.dryad-ddw-bitstream label,
 .dryad-ddw-outer legend,
+.dryad-ddw-bitstream legend,
 .dryad-ddw-outer table,
+.dryad-ddw-bitstream table,
 .dryad-ddw-outer caption,
+.dryad-ddw-bitstream caption,
 .dryad-ddw-outer tbody,
+.dryad-ddw-bitstream tbody,
 .dryad-ddw-outer tfoot,
+.dryad-ddw-bitstream tfoot,
 .dryad-ddw-outer thead,
+.dryad-ddw-bitstream thead,
 .dryad-ddw-outer tr,
+.dryad-ddw-bitstream tr,
 .dryad-ddw-outer th,
+.dryad-ddw-bitstream th,
 .dryad-ddw-outer td,
+.dryad-ddw-bitstream td,
 .dryad-ddw-outer figure,
+.dryad-ddw-bitstream figure,
 .dryad-ddw-outer figcaption,
+.dryad-ddw-bitstream figcaption,
 .dryad-ddw-outer footer,
+.dryad-ddw-bitstream footer,
 .dryad-ddw-outer header,
+.dryad-ddw-bitstream header,
 .dryad-ddw-outer menu,
+.dryad-ddw-bitstream menu,
 .dryad-ddw-outer nav,
+.dryad-ddw-bitstream nav,
 .dryad-ddw-outer section,
+.dryad-ddw-bitstream section,
 .dryad-ddw-outer summary,
+.dryad-ddw-bitstream summary,
 .dryad-ddw-outer time,
+.dryad-ddw-bitstream time,
 .dryad-ddw-outer mark,
+.dryad-ddw-bitstream mark,
 .dryad-ddw-outer audio,
-.dryad-ddw-outer video {
+.dryad-ddw-bitstream audio,
+.dryad-ddw-outer video,
+.dryad-ddw-bitstream video {
   margin: 0;
   padding: 0;
   border: 0;
@@ -65,37 +117,58 @@
   vertical-align: baseline;
 }
 .dryad-ddw-outer article,
+.dryad-ddw-bitstream article,
 .dryad-ddw-outer aside,
+.dryad-ddw-bitstream aside,
 .dryad-ddw-outer details,
+.dryad-ddw-bitstream details,
 .dryad-ddw-outer figcaption,
+.dryad-ddw-bitstream figcaption,
 .dryad-ddw-outer figure,
+.dryad-ddw-bitstream figure,
 .dryad-ddw-outer footer,
+.dryad-ddw-bitstream footer,
 .dryad-ddw-outer header,
+.dryad-ddw-bitstream header,
 .dryad-ddw-outer hgroup,
+.dryad-ddw-bitstream hgroup,
 .dryad-ddw-outer menu,
+.dryad-ddw-bitstream menu,
 .dryad-ddw-outer nav,
-.dryad-ddw-outer section {
+.dryad-ddw-bitstream nav,
+.dryad-ddw-outer section,
+.dryad-ddw-bitstream section {
   display: block;
 }
-.dryad-ddw-outer body {
+.dryad-ddw-outer body,
+.dryad-ddw-bitstream body {
   line-height: 1;
 }
 .dryad-ddw-outer ol,
-.dryad-ddw-outer ul {
+.dryad-ddw-bitstream ol,
+.dryad-ddw-outer ul,
+.dryad-ddw-bitstream ul {
   list-style: none;
 }
 .dryad-ddw-outer blockquote,
-.dryad-ddw-outer q {
+.dryad-ddw-bitstream blockquote,
+.dryad-ddw-outer q,
+.dryad-ddw-bitstream q {
   quotes: none;
 }
 .dryad-ddw-outer blockquote:before,
+.dryad-ddw-bitstream blockquote:before,
 .dryad-ddw-outer blockquote:after,
+.dryad-ddw-bitstream blockquote:after,
 .dryad-ddw-outer q:before,
-.dryad-ddw-outer q:after {
+.dryad-ddw-bitstream q:before,
+.dryad-ddw-outer q:after,
+.dryad-ddw-bitstream q:after {
   content: '';
   content: none;
 }
-.dryad-ddw-outer table {
+.dryad-ddw-outer table,
+.dryad-ddw-bitstream table {
   border-collapse: collapse;
   border-spacing: 0;
 }
