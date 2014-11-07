@@ -39,6 +39,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.Metadatum;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
@@ -178,7 +179,7 @@ public class ItemsResource extends Resource
                 org.dspace.content.Item dspaceItem = dspaceItems.next();
                 if (i >= offset)
                 {
-                    if (AuthorizeManager.authorizeActionBoolean(context, dspaceItem, org.dspace.core.Constants.READ))
+                    if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
