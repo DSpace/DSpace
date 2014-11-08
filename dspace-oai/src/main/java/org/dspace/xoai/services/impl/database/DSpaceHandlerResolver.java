@@ -9,7 +9,7 @@ package org.dspace.xoai.services.impl.database;
 
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.database.HandleResolver;
@@ -25,7 +25,7 @@ public class DSpaceHandlerResolver implements HandleResolver {
     @Override
     public DSpaceObject resolve(String handle) throws HandleResolverException {
         try {
-            return HandleManager.resolveToObject(contextService.getContext(), handle);
+            return HandleServiceImpl.resolveToObject(contextService.getContext(), handle);
         } catch (ContextServiceException e) {
             throw new HandleResolverException(e);
         } catch (SQLException e) {
@@ -36,7 +36,7 @@ public class DSpaceHandlerResolver implements HandleResolver {
     @Override
     public String getHandle(DSpaceObject object) throws HandleResolverException {
         try {
-            return HandleManager.findHandle(contextService.getContext(), object);
+            return HandleServiceImpl.findHandle(contextService.getContext(), object);
         } catch (SQLException e) {
             throw new HandleResolverException(e);
         } catch (ContextServiceException e) {

@@ -17,6 +17,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.services.model.Event;
@@ -46,6 +48,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     private CloseableHttpClient httpclient;
     private String GoogleURL = "https://www.google-analytics.com/collect";
     private static Logger log = Logger.getLogger(GoogleRecorderEventListener.class);
+    protected ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
 
 
     public GoogleRecorderEventListener() {
@@ -53,6 +56,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
         httpclient = HttpClients.createDefault();
     }
 
+    @Override
     public void receiveEvent(Event event) {
         if((event instanceof UsageEvent))
         {
@@ -134,11 +138,12 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     private String getParentType(UsageEvent ue) {
         try {
-            if (ue.getObject().getParentObject().getType() == Constants.ITEM) {
+            int parentType = contentServiceFactory.getDSpaceObjectService(ue.getObject()).getParentObject(ue.getContext(), ue.getObject()).getType();
+            if (parentType == Constants.ITEM) {
                 return "item";
-            } else if (ue.getObject().getParentObject().getType() == Constants.COLLECTION) {
+            } else if (parentType == Constants.COLLECTION) {
                 return "collection";
-            }  else if (ue.getObject().getParentObject().getType() == Constants.COMMUNITY) {
+            }  else if (parentType == Constants.COMMUNITY) {
                 return "community";
             }
         } catch (SQLException e) {
@@ -154,7 +159,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
         try {
             if (ue.getObject().getType() == Constants.BITSTREAM) {
                 // For a bitstream download we really want to know the title of the owning item rather than the bitstream name.
-                return ue.getObject().getParentObject().getName();
+                return contentServiceFactory.getDSpaceObjectService(ue.getObject()).getParentObject(ue.getContext(), ue.getObject()).getName();
             }  else {
                 return ue.getObject().getName();
             }

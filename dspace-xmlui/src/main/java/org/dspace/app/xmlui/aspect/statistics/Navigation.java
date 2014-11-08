@@ -15,7 +15,9 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.excalibur.source.SourceValidity;
@@ -43,6 +45,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_statistics_usage_view = message("xmlui.statistics.Navigation.usage.view");
     private static final Message T_statistics_search_view = message("xmlui.statistics.Navigation.search.view");
     private static final Message T_statistics_workflow_view = message("xmlui.statistics.Navigation.workflow.view");
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     public Serializable getKey() {
         //TODO: DO THIS
@@ -113,7 +117,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     protected boolean displayStatsType(Context context, String type, DSpaceObject dso) throws SQLException {
         ConfigurationService cs = new DSpace().getConfigurationService();
-        return !cs.getPropertyAsType("usage-statistics.authorization.admin." + type, Boolean.TRUE) || AuthorizeManager.isAdmin(context, dso);
+        return !cs.getPropertyAsType("usage-statistics.authorization.admin." + type, Boolean.TRUE) || authorizeService.isAdmin(context, dso);
 
     }
 }

@@ -17,11 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.versioning.Version;
@@ -96,8 +95,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
 						// a new version is available
 						newVersionAvailable = true;
 						try {
-							latestVersionURL = HandleManager.resolveToURL(
-									context, latestVersionItem.getHandle());
+							latestVersionURL = HandleServiceImpl.resolveToURL(
+                                    context, latestVersionItem.getHandle());
 						} catch (SQLException e) {
 							throw new PluginException(e.getMessage());
 						}

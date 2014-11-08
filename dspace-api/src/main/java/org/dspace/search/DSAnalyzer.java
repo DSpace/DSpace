@@ -8,7 +8,6 @@
 package org.dspace.search;
 
 import java.io.Reader;
-import java.util.Set;
 
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.en.PorterStemFilter;

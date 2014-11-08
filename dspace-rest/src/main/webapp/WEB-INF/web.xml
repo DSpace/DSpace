@@ -98,4 +98,9 @@
         </listener-class>
     </listener>
 
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+    </listener>
+
+
 </web-app>

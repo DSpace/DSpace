@@ -13,7 +13,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.purl.sword.base.SWORDErrorException;
@@ -134,7 +134,7 @@ public class SWORDUrlManager
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
 
 			if (!(dso instanceof Collection))
 			{
@@ -179,7 +179,7 @@ public class SWORDUrlManager
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
 
 			if (!(dso instanceof Collection) && !(dso instanceof Item))
 			{
@@ -258,7 +258,7 @@ public class SWORDUrlManager
 					url = url.substring(0, url.length() - 1);
 				}
 
-				DSpaceObject dso = HandleManager.resolveToObject(context, url);
+				DSpaceObject dso = HandleServiceImpl.resolveToObject(context, url);
 				if (dso instanceof Collection || dso instanceof Community)
 				{
 					return dso;

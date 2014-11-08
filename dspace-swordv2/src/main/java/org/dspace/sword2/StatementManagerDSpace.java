@@ -9,7 +9,7 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -21,9 +21,7 @@ import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordConfiguration;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
-import org.swordapp.server.UriRegistry;
 
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +64,7 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
             }
 
             // find out if we are allowed to read the item's statement
-            AuthorizeManager.authorizeAction(context, item, Constants.READ);
+            AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
 
 			// find out, now we know what we're being asked for, whether this is allowed
 			WorkflowManagerFactory.getInstance().retrieveStatement(context, item);

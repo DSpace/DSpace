@@ -19,8 +19,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
 
 /**
  * Servlet for aborting workflows
@@ -47,7 +47,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
         if (button.equals("submit_abort"))
         {
             // bring up the confirm page
-            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+            BasicWorkflowItem wi = BasicWorkflowItem.find(c, UIUtil.getIntParameter(
                     request, "workflow_id"));
 
             request.setAttribute("workflow", wi);
@@ -57,10 +57,10 @@ public class WorkflowAbortServlet extends DSpaceServlet
         else if (button.equals("submit_abort_confirm"))
         {
             // do the actual abort
-            WorkflowItem wi = WorkflowItem.find(c, UIUtil.getIntParameter(
+            BasicWorkflowItem wi = BasicWorkflowItem.find(c, UIUtil.getIntParameter(
                     request, "workflow_id"));
 
-            WorkflowManager.abort(c, wi, c.getCurrentUser());
+            BasicWorkflowServiceImpl.abort(c, wi, c.getCurrentUser());
 
             // now show what's left
             showWorkflows(c, request, response);
@@ -79,7 +79,7 @@ public class WorkflowAbortServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        WorkflowItem[] w = WorkflowItem.findAll(c);
+        BasicWorkflowItem[] w = BasicWorkflowItem.findAll(c);
 
         request.setAttribute("workflows", w);
         JSPManager

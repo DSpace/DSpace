@@ -34,6 +34,7 @@ public class FormattableArgument implements Formattable
         this.object = object;
     }
 
+    @Override
     public void formatTo(Formatter formatter, int flags, int width,
             int precision)
     {

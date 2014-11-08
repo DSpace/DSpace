@@ -97,6 +97,16 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-core</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -211,6 +221,14 @@
             <artifactId>yuicompressor</artifactId>
             <version>2.3.6</version>
         </dependency>
+
+        <!--Latest spring version requires an up to date jackson core -->
+        <dependency>
+        	<groupId>com.fasterxml.jackson.core</groupId>
+        	<artifactId>jackson-core</artifactId>
+        	<version>2.5.0</version>
+        </dependency>
+
         <!-- Needed for Form Validation -->
         <dependency>
             <groupId>commons-validator</groupId>

@@ -35,6 +35,7 @@
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
+        <hibernate.version>4.3.10.Final</hibernate.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -826,6 +827,30 @@
          </dependency>
          <!-- DSpace third Party Dependencies -->
 
+          <dependency>
+              <groupId>org.hibernate</groupId>
+              <artifactId>hibernate-core</artifactId>
+              <version>${hibernate.version}</version>
+          </dependency>
+
+          <dependency>
+          	<groupId>org.hibernate</groupId>
+          	<artifactId>hibernate-ehcache</artifactId>
+          	<version>${hibernate.version}</version>
+          </dependency>
+          <dependency>
+             <groupId>org.hibernate</groupId>
+             <artifactId>hibernate-c3p0</artifactId>
+             <version>${hibernate.version}</version>
+          </dependency>
+
+
+          <dependency>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-orm</artifactId>
+              <!--<version>4.1.4.RELEASE</version>-->
+              <version>3.2.0.RELEASE</version>
+          </dependency>
          <dependency>
             <groupId>org.swordapp</groupId>
             <artifactId>sword-common</artifactId>
@@ -835,49 +860,49 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-beans</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-jdbc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-web</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.0.RELEASE</version>
         </dependency>
 
          <dependency>
@@ -1201,7 +1226,7 @@
          <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.180</version>
+            <version>1.4.187</version>
             <scope>test</scope>
          </dependency>
          <!-- Contiperf is used for performance tests within our Unit/Integration tests -->
@@ -1237,6 +1262,16 @@
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
               <version>1.19.0</version>
+              <exclusions>
+                  <exclusion>
+                      <artifactId>jackson-core</artifactId>
+                      <groupId>com.fasterxml.jackson.core</groupId>
+                  </exclusion>
+                  <exclusion>
+                      <artifactId>jackson-databind</artifactId>
+                      <groupId>com.fasterxml.jackson.core</groupId>
+                  </exclusion>
+              </exclusions>
           </dependency>
           <dependency>
               <groupId>com.google.oauth-client</groupId>

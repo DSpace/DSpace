@@ -23,6 +23,14 @@ public class UserSelectionActionConfig extends WorkflowActionConfig{
         super(id);
     }
 
+    public void setProcessingAction(UserSelectionAction processingAction){
+        this.processingAction = processingAction;
+        processingAction.setParent(this);
+
+    }
+
+
+    @Override
     public UserSelectionAction getProcessingAction(){
         return (UserSelectionAction) processingAction;
     }

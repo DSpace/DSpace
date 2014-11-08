@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
 import org.dspace.utils.DSpace;
@@ -39,9 +39,9 @@ public class SearchResultLogServlet extends DSpaceServlet{
     protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         String redirectUrl = request.getParameter("redirectUrl");
         String scopeHandle = request.getParameter("scope");
-        DSpaceObject scope = HandleManager.resolveToObject(context, scopeHandle);
+        DSpaceObject scope = HandleServiceImpl.resolveToObject(context, scopeHandle);
         String resultHandle = StringUtils.substringAfter(redirectUrl, "/handle/");
-        DSpaceObject result = HandleManager.resolveToObject(context, resultHandle);
+        DSpaceObject result = HandleServiceImpl.resolveToObject(context, resultHandle);
 
         //Fire an event to log our search result
         UsageSearchEvent searchEvent = new UsageSearchEvent(

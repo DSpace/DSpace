@@ -10,9 +10,11 @@ package org.dspace.authenticate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 
 /**
@@ -31,7 +33,7 @@ import org.dspace.eperson.EPerson;
  * and validate the credentials and fail gracefully if they are not
  * appropriate for it.  The next method in the stack is then called.
  *
- * @see AuthenticationManager
+ * @see org.dspace.authenticate.service.AuthenticationService
  *
  * @author Larry Stone
  * @version $Revision$
@@ -148,7 +150,7 @@ public interface AuthenticationMethod {
      * @return array of EPerson-group IDs, possibly 0-length, but never
      *         <code>null</code>.
      */
-    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException;
 
     /**

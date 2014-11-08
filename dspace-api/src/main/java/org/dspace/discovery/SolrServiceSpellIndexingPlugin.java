@@ -8,10 +8,12 @@
 package org.dspace.discovery;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -24,30 +26,18 @@ import java.util.List;
  */
 public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
 
+    @Autowired(required = true)
+    protected ItemService itemService;
+
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
         if(dso instanceof Item){
             Item item = (Item) dso;
-            Metadatum[] dcValues = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            List<MetadataValue> dcValues = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
-            for (Metadatum dcValue : dcValues) {
-                String field = dcValue.schema + "." + dcValue.element;
-                String unqualifiedField = field;
-
-                String value = dcValue.value;
-
-                if (value == null)
-                {
-                    continue;
-                }
-
-                if (dcValue.qualifier != null && !dcValue.qualifier.trim().equals(""))
-                {
-                    field += "." + dcValue.qualifier;
-                }
-
-                if(!toIgnoreMetadataFields.contains(field)){
-                    document.addField("a_spell", dcValue.value);
+            for (MetadataValue dcValue : dcValues) {
+                if(!toIgnoreMetadataFields.contains(dcValue.getMetadataField().toString('.'))){
+                    document.addField("a_spell", dcValue.getValue());
                 }
             }
         }

@@ -22,7 +22,7 @@ import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -188,7 +188,7 @@ public class JSPAccessStep extends JSPStep
         List<ResourcePolicy> rpolicies = new ArrayList<ResourcePolicy>();
         try
         {
-            rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+            rpolicies = AuthorizeServiceImpl.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
         }
         catch (SQLException e)
         {

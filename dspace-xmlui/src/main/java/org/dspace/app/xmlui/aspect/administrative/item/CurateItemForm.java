@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -53,7 +57,9 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_trail = message("xmlui.administrative.item.CurateItemForm.trail");
         private static final Message T_label_name = message("xmlui.administrative.item.CurateItemForm.label_name");
         private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-        
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
         public void setup(SourceResolver resolver, Map objectModel, String src,
 		          Parameters parameters) throws ProcessingException, SAXException, IOException
 		{
@@ -86,8 +92,8 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
                                     throws WingException, SQLException,
                                                         AuthorizeException, UnsupportedEncodingException
 	{
-                int itemID = parameters.getParameterAsInteger("itemID", -1);
-		Item item = Item.find(context, itemID);
+                UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
+		Item item = itemService.find(context, itemID);
                 
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId() ;

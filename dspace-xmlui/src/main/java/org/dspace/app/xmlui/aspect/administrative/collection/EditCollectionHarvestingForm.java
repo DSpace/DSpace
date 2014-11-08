@@ -8,6 +8,8 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.UUID;
+
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -20,8 +22,12 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
 
 
 /**
@@ -76,6 +82,8 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_import_now = message("xmlui.administrative.collection.EditCollectionHarvestingForm.submit_import_now");
 	private static final Message T_submit_reimport_collection = message("xmlui.administrative.collection.EditCollectionHarvestingForm.submit_reimport_collection");
 	
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -88,9 +96,9 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
-		Collection thisCollection = Collection.find(context, collectionID);
-		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+		Collection thisCollection = collectionService.find(context, collectionID);
+		HarvestedCollection hc = harvestedCollectionService.find(context, thisCollection);
 				
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 		
@@ -102,7 +110,7 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 					    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-harvesting-edit",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getMetadata("name")));   
+	    main.setHead(T_main_head.parameterize(collectionService.getMetadata(thisCollection, "name")));
 	    
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);

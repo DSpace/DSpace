@@ -7,7 +7,10 @@
  */
 package org.dspace.browse;
 
+import org.dspace.content.Item;
+
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Interface for any class wishing to interact with the Browse storage layer for
@@ -63,7 +66,7 @@ public interface BrowseDAO
      * @return  List of BrowseItem objects
      * @throws BrowseException
      */
-    public List<BrowseItem> doQuery() throws BrowseException;
+    public List<Item> doQuery() throws BrowseException;
 
     /**
      * This executes a query which returns the value of the "highest" (max) value
@@ -144,7 +147,7 @@ public interface BrowseDAO
      *
      * @return  the database id of the container, or -1 if none is set
      */
-    public int getContainerID();
+    public UUID getContainerID();
 
     /**
      * Set the database id of the container object.  This should be the id of a
@@ -153,7 +156,7 @@ public interface BrowseDAO
      *
      * @param containerID
      */
-    public void setContainerID(int containerID);
+    public void setContainerID(UUID containerID);
 
     /**
      * get the name of the field in which to look for the container id.  This is

@@ -27,7 +27,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -238,7 +238,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = itemHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = HandleServiceImpl.resolveToObject(context, myhandle);
 
             resultsItems[i] = (Item) o;
 
@@ -253,7 +253,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = collectionHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = HandleServiceImpl.resolveToObject(context, myhandle);
 
             resultsCollections[i] = (Collection) o;
 
@@ -268,7 +268,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = communityHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = HandleServiceImpl.resolveToObject(context, myhandle);
 
             resultsCommunities[i] = (Community) o;
 

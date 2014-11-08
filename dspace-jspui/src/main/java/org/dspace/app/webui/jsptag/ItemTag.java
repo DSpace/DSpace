@@ -8,7 +8,6 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,11 +29,11 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.util.MetadataExposureServiceImpl;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -42,7 +41,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
-import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -457,7 +456,7 @@ public class ItemTag extends TagSupport
             }
 
             // check for hidden field, even if it's configured..
-            if (MetadataExposure.isHidden(context, schema, element, qualifier))
+            if (MetadataExposureServiceImpl.isHidden(context, schema, element, qualifier))
             {
                 continue;
             }
@@ -607,7 +606,7 @@ public class ItemTag extends TagSupport
                         {
 	                        String argument, value;
 	                        if ( values[j].authority != null &&
-	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
+	                                            values[j].confidence >= MetadataAuthorityServiceImpl.getManager()
 	                                                .getMinConfidence( values[j].schema,  values[j].element,  values[j].qualifier))
 	                        {
 	                            argument = "authority";
@@ -680,7 +679,7 @@ public class ItemTag extends TagSupport
 
         for (int i = 0; i < values.length; i++)
         {
-            if (!MetadataExposure.isHidden(context, values[i].schema, values[i].element, values[i].qualifier))
+            if (!MetadataExposureServiceImpl.isHidden(context, values[i].schema, values[i].element, values[i].qualifier))
             {
                 out.print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
                 out.print(values[i].schema);
@@ -1023,10 +1022,10 @@ public class ItemTag extends TagSupport
                                             + "</a>");
             					
 								try {
-									if (showRequestCopy && !AuthorizeManager
+									if (showRequestCopy && !AuthorizeServiceImpl
 											.authorizeActionBoolean(context,
-													bitstreams[k],
-													Constants.READ))
+                                                    bitstreams[k],
+                                                    Constants.READ))
 										out.print("&nbsp;<a class=\"btn btn-success\" href=\""
 												+ request.getContextPath()
 												+ "/request-item?handle="

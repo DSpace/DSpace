@@ -70,11 +70,11 @@ public class TaskResolver
 	private static Logger log = Logger.getLogger(TaskResolver.class);
 	
 	// base directory of task scripts & catalog name
-	private static final String CATALOG = "task.catalog";
-	private static final String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
+	protected static final String CATALOG = "task.catalog";
+	protected static final String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
 	
 	// catalog of script tasks
-	private Properties catalog;
+	protected Properties catalog;
 	
 	public TaskResolver()
 	{
@@ -255,7 +255,7 @@ public class TaskResolver
 	/**
 	 * Loads catalog of descriptors for tasks if not already loaded
 	 */
-	private void loadCatalog()
+	protected void loadCatalog()
 	{
 		if (catalog == null)
 		{

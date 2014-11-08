@@ -25,12 +25,14 @@ import net.handle.util.StreamTable;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
  * handles into DSpace API calls. The implementation simply stubs out most of
  * the methods, and delegates the rest to the
- * {@link org.dspace.handle.HandleManager}. This only provides some of the
+ * {@link HandleService}. This only provides some of the
  * functionality (namely, the resolving of handles to URLs) of the CNRI
  * HandleStorage interface.
  * 
@@ -48,11 +50,14 @@ public class HandlePlugin implements HandleStorage
     /** log4j category */
     private static Logger log = Logger.getLogger(HandlePlugin.class);
 
+    protected HandleService handleService;
+
     /**
      * Constructor
      */
     public HandlePlugin()
     {
+        handleService = HandleServiceFactory.getInstance().getHandleService();
     }
 
     ////////////////////////////////////////
@@ -62,6 +67,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void init(StreamTable st) throws Exception
     {
         // Not implemented
@@ -74,6 +80,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void setHaveNA(byte[] theHandle, boolean haveit)
             throws HandleException
     {
@@ -87,6 +94,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void createHandle(byte[] theHandle, HandleValue[] values)
             throws HandleException
     {
@@ -100,6 +108,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public boolean deleteHandle(byte[] theHandle) throws HandleException
     {
         // Not implemented
@@ -114,6 +123,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void updateValue(byte[] theHandle, HandleValue[] values)
             throws HandleException
     {
@@ -127,6 +137,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void deleteAllRecords() throws HandleException
     {
         // Not implemented
@@ -139,6 +150,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void checkpointDatabase() throws HandleException
     {
         // Not implemented
@@ -151,6 +163,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void shutdown()
     {
         // Not implemented
@@ -163,6 +176,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void scanHandles(ScanCallback callback) throws HandleException
     {
         // Not implemented
@@ -175,6 +189,7 @@ public class HandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void scanNAs(ScanCallback callback) throws HandleException
     {
         // Not implemented
@@ -203,6 +218,7 @@ public class HandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public byte[][] getRawHandleValues(byte[] theHandle, int[] indexList,
             byte[][] typeList) throws HandleException
     {
@@ -224,7 +240,7 @@ public class HandlePlugin implements HandleStorage
 
             context = new Context();
 
-            String url = HandleManager.resolveToURL(context, handle);
+            String url = handleService.resolveToURL(context, handle);
 
             if (url == null)
             {
@@ -299,6 +315,7 @@ public class HandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public boolean haveNA(byte[] theHandle) throws HandleException
     {
         if (log.isInfoEnabled())
@@ -329,7 +346,7 @@ public class HandlePlugin implements HandleStorage
         {
 	        // First, construct a string representing the naming authority Handle
 	        // we'd expect.
-	        String expected = "0.NA/" + HandleManager.getPrefix();
+	        String expected = "0.NA/" + handleService.getPrefix();
 	
 	        // Which authority does the request pertain to?
 	        String received = Util.decodeString(theHandle);
@@ -354,6 +371,7 @@ public class HandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public Enumeration getHandlesForNA(byte[] theNAHandle)
             throws HandleException
     {
@@ -370,7 +388,7 @@ public class HandlePlugin implements HandleStorage
         {
             context = new Context();
 
-            List<String> handles = HandleManager.getHandlesForPrefix(context, naHandle);
+            List<String> handles = handleService.getHandlesForPrefix(context, naHandle);
             List<byte[]> results = new LinkedList<byte[]>();
 
             for (Iterator<String> iterator = handles.iterator(); iterator.hasNext();)

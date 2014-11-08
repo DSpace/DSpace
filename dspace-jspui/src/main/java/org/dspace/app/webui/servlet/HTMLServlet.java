@@ -27,7 +27,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -181,7 +181,7 @@ public class HTMLServlet extends DSpaceServlet
                 }
                 else
                 {
-                    item = (Item) HandleManager
+                    item = (Item) HandleServiceImpl
                             .resolveToObject(context, handle);
                 }
             }

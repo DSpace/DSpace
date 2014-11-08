@@ -28,7 +28,7 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -147,7 +147,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
 
-            if (AuthorizeManager.isAdmin(context))
+            if (AuthorizeServiceImpl.isAdmin(context))
             {
                 // set a variable to show all buttons
                 request.setAttribute("sysadmin_button", Boolean.TRUE);
@@ -263,12 +263,12 @@ public class CollectionWizardServlet extends DSpaceServlet
         // "Public read" checkbox. Only need to do anything
         // if it's not checked (only system admin can uncheck this!).
         if (!UIUtil.getBoolParameter(request, "public_read")
-                && AuthorizeManager.isAdmin(context))
+                && AuthorizeServiceImpl.isAdmin(context))
         {
             // Remove anonymous default policies for new items
-            AuthorizeManager.removePoliciesActionFilter(context, collection,
+            AuthorizeServiceImpl.removePoliciesActionFilter(context, collection,
                     Constants.DEFAULT_ITEM_READ);
-            AuthorizeManager.removePoliciesActionFilter(context, collection,
+            AuthorizeServiceImpl.removePoliciesActionFilter(context, collection,
                     Constants.DEFAULT_BITSTREAM_READ);
         }
 
@@ -340,15 +340,15 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (permission == PERM_READ)
             {
                 // assign default item and bitstream read to mitGroup
-                AuthorizeManager.addPolicy(context, collection,
+                AuthorizeServiceImpl.addPolicy(context, collection,
                         Constants.DEFAULT_ITEM_READ, mitGroup);
-                AuthorizeManager.addPolicy(context, collection,
+                AuthorizeServiceImpl.addPolicy(context, collection,
                         Constants.DEFAULT_BITSTREAM_READ, mitGroup);
             }
             else
             {
                 // Must be submit
-                AuthorizeManager.addPolicy(context, collection, Constants.ADD,
+                AuthorizeServiceImpl.addPolicy(context, collection, Constants.ADD,
                         mitGroup);
             }
         }
@@ -370,9 +370,9 @@ public class CollectionWizardServlet extends DSpaceServlet
                             + "_DEFAULT_ITEM_READ");
 
             // Give it the needed permission
-            AuthorizeManager.addPolicy(context, collection,
+            AuthorizeServiceImpl.addPolicy(context, collection,
                     Constants.DEFAULT_ITEM_READ, g);
-            AuthorizeManager.addPolicy(context, collection,
+            AuthorizeServiceImpl.addPolicy(context, collection,
                     Constants.DEFAULT_BITSTREAM_READ, g);
 
             break;
@@ -514,7 +514,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 // Identify the format
                 BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
                 logoBS.setFormat(bf);
-                AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
+                AuthorizeServiceImpl.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
                 logoBS.update();
 
                 // Remove temp file
@@ -615,7 +615,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             // Next page is 'permission to read' page iff ITEM_DEFAULT_READ
             // for anonymous group is NOT there
-            List<ResourcePolicy> anonReadPols = AuthorizeManager.getPoliciesActionFilter(
+            List<ResourcePolicy> anonReadPols = AuthorizeServiceImpl.getPoliciesActionFilter(
                     context, collection, Constants.DEFAULT_ITEM_READ);
 
             // At this stage, if there's any ITEM_DEFAULT_READ, it can only

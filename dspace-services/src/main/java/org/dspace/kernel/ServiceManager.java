@@ -98,6 +98,7 @@ public interface ServiceManager {
      */
     public void registerService(String name, Object service);
 
+    public void registerServiceNoAutowire(String name, Object service);
     /**
      * Allows adding singleton services and providers in at runtime or 
      * after the service manager has started up.

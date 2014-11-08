@@ -12,7 +12,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Community;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.swordapp.server.SwordCollection;
 
 public class CommunityCollectionGenerator implements AtomCollectionGenerator
@@ -38,7 +38,7 @@ public class CommunityCollectionGenerator implements AtomCollectionGenerator
 		String location = urlManager.getDepositLocation(com);
 		if (location == null)
 		{
-			location = HandleManager.getCanonicalForm(com.getHandle());
+			location = HandleServiceImpl.getCanonicalForm(com.getHandle());
 		}
 		scol.setLocation(location);
 

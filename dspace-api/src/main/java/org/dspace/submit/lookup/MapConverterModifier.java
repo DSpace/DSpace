@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.services.ConfigurationService;
 
 import gr.ekt.bte.core.AbstractModifier;
@@ -35,19 +34,19 @@ import gr.ekt.bte.core.Value;
 public class MapConverterModifier extends AbstractModifier
 {
 
-	private String mappingFile; //The properties absolute filename
+	protected String mappingFile; //The properties absolute filename
 	
-	private String converterNameFile; //The properties filename
+    protected String converterNameFile; //The properties filename
 
-	private ConfigurationService configurationService;
+    protected ConfigurationService configurationService;
 	
-    private Map<String, String> mapping;
+    protected Map<String, String> mapping;
 
-    private String defaultValue = "";
+    protected String defaultValue = "";
 
-    private List<String> fieldKeys;
+    protected List<String> fieldKeys;
 
-    private Map<String, String> regexConfig = new HashMap<String, String>();
+    protected Map<String, String> regexConfig = new HashMap<String, String>();
 
     public final String REGEX_PREFIX = "regex.";
 

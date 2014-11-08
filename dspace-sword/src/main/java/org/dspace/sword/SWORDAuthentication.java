@@ -7,8 +7,8 @@
  */
 package org.dspace.sword;
 
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.core.Context;
-import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 
 /**
@@ -31,7 +31,7 @@ public class SWORDAuthentication
 	 */
 	public boolean authenticates(Context context, String un, String pw)
 	{
-		int auth = AuthenticationManager.authenticate(context, un, pw, null, null);
+		int auth = AuthenticationServiceImpl.authenticate(context, un, pw, null, null);
 		if (auth == AuthenticationMethod.SUCCESS)
 		{
 			return true;

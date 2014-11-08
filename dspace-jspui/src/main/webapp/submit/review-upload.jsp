@@ -16,7 +16,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@page import="org.dspace.core.ConfigurationManager"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
@@ -99,7 +99,7 @@
 %>    
 <%
 if(isUploadWithEmbargo) {
-List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
+List<ResourcePolicy> rpolicies = AuthorizeServiceImpl.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
 		<% int countPolicies = 0;
 		   //show information about policies setting only in the case of advanced embargo form

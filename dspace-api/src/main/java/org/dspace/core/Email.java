@@ -563,20 +563,24 @@ public class Email
                baos.write(buff, 0, read);            
            }        
        }                
-       
-       public String getContentType() {            
+
+       @Override
+       public String getContentType() {
            return contentType;        
        }         
        
-       public InputStream getInputStream() throws IOException {            
-           return new ByteArrayInputStream(baos.toByteArray());        
+       @Override
+       public InputStream getInputStream() throws IOException {
+           return new ByteArrayInputStream(baos.toByteArray());
        }         
        
-       public String getName() {            
+       @Override
+       public String getName() {
            return name;        
        }         
-       
-       public OutputStream getOutputStream() throws IOException {            
+
+       @Override
+       public OutputStream getOutputStream() throws IOException {
            throw new IOException("Cannot write to this read-only resource");        
        }    
    }

@@ -23,6 +23,10 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -49,6 +53,10 @@ public class FlowRegistryUtils
 		new Message("default","xmlui.administrative.FlowRegistryUtils.edit_bitstream_format_success_notice");
 	private static final Message T_delete_bitstream_format_success_notice =
 		new Message("default","xmlui.administrative.FlowRegistryUtils.delete_bitstream_format_success_notice");
+
+	protected static final MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+	protected static final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+	protected static final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
 	
 	
@@ -94,13 +102,8 @@ public class FlowRegistryUtils
 		
 		if (result.getErrors() == null)
 		{
-			MetadataSchema schema = new MetadataSchema();
-		    schema.setNamespace(namespace);
-		    schema.setName(name);
-		    schema.create(context);
+			MetadataSchema schema = metadataSchemaService.create(context, name, namespace);
 
-		    context.commit();
-		    
 		    result.setContinue(true);
 		    result.setOutcome(true);
 		    result.setMessage(T_add_metadata_schema_success_notice);   
@@ -124,24 +127,22 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : schemaIDs) 
     	{
-			MetadataSchema schema = MetadataSchema.find(context, Integer.valueOf(id));
+			MetadataSchema schema = metadataSchemaService.find(context, Integer.valueOf(id));
 			
 			// First remove and fields in the schema
-			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+			List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
 			for (MetadataField field : fields)
             {
-				field.delete(context);
+				metadataFieldService.delete(context, field);
             }
 			
 			// Once all the fields are gone, then delete the schema.
-	        schema.delete(context);
+	        metadataSchemaService.delete(context, schema);
 	        count++;
     	}
 		
 		if (count > 0)
 		{
-			context.commit();
-			
 			result.setContinue(true);
 			result.setOutcome(true);
 			result.setMessage(T_delete_metadata_schema_success_notice);
@@ -191,16 +192,10 @@ public class FlowRegistryUtils
 		{
 			try
 			{
-				
-				MetadataField field = new MetadataField();
-				field.setSchemaID(schemaID);
-				field.setElement(element);
-				field.setQualifier(qualifier);
-				field.setScopeNote(note);
-				field.create(context);
-				
-				context.commit();
-				
+
+				MetadataSchema schema = metadataSchemaService.find(context, schemaID);
+				MetadataField field = metadataFieldService.create(context, schema, element, qualifier, note);
+
 				result.setContinue(true);
 				result.setOutcome(true);
 				result.setMessage(T_add_metadata_field_success_notice);
@@ -254,7 +249,7 @@ public class FlowRegistryUtils
         }
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
-		MetadataField possibleDuplicate = MetadataField.findByElement(context, schemaID, element, qualifier);
+		MetadataField possibleDuplicate = metadataFieldService.findByElement(context, metadataSchemaService.find(context, schemaID), element, qualifier);
 		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
         {
             result.addError("duplicate_field");
@@ -265,13 +260,11 @@ public class FlowRegistryUtils
 			try
 			{
 				// Update the metadata for a DC type
-				MetadataField field = MetadataField.find(context, fieldID);
+				MetadataField field = metadataFieldService.find(context, fieldID);
 				field.setElement(element);
 				field.setQualifier(qualifier);
 				field.setScopeNote(note);
-				field.update(context);
-				
-				context.commit();
+				metadataFieldService.update(context, field);
 				
 				result.setContinue(true);
 				result.setOutcome(true);
@@ -361,16 +354,14 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : fieldIDs) 
 		{
-			MetadataField field = MetadataField.find(context, Integer.valueOf(id));
-			field.setSchemaID(schemaID);
-			field.update(context);
+			MetadataField field = metadataFieldService.find(context, Integer.valueOf(id));
+			field.setMetadataSchema(metadataSchemaService.find(context, schemaID));
+			metadataFieldService.update(context, field);
 			count++;
 		}
 
 		if (count > 0)
 		{
-			context.commit();
-
 			result.setContinue(true);
 			result.setOutcome(true);
 			result.setMessage(T_move_metadata_field_sucess_notice);
@@ -394,15 +385,13 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : fieldIDs) 
     	{
-			MetadataField field = MetadataField.find(context, Integer.valueOf(id));
-	        field.delete(context);
+			MetadataField field = metadataFieldService.find(context, Integer.valueOf(id));
+			metadataFieldService.delete(context, field);
 	        count++;
     	}
 		
 		if (count > 0)
 		{
-			context.commit();
-			
 			result.setContinue(true);
 			result.setOutcome(true);
 			result.setMessage(T_delete_metadata_field_success_notice);
@@ -436,8 +425,7 @@ public class FlowRegistryUtils
         String supportLevel = request.getParameter("support_level");
         String internal = request.getParameter("internal");
         List<String> extensionsList = RequestUtils.getFieldValues(request, "extensions");
-        String[] extensions = extensionsList.toArray(new String[extensionsList.size()]);
-		
+
         // The format must at least have a name.
         if (formatID != 1 && (shortDescription == null || shortDescription.length() == 0))
         {
@@ -446,11 +434,11 @@ public class FlowRegistryUtils
         }
         
         // Remove leading periods from file extensions.
-        for (int i = 0; i < extensions.length; i++)
+        for (int i = 0; i < extensionsList.size(); i++)
         {
-        	if (extensions[i].startsWith("."))
+        	if (extensionsList.get(i).startsWith("."))
             {
-                extensions[i] = extensions[i].substring(1);
+				extensionsList.set(i, extensionsList.get(i).substring(1));
             }
         }
         
@@ -459,18 +447,18 @@ public class FlowRegistryUtils
         BitstreamFormat format;
 		if (formatID >= 0)
         {
-            format = BitstreamFormat.find(context, formatID);
+            format = bitstreamFormatService.find(context, formatID);
         }
 		else
         {
-            format = BitstreamFormat.create(context);
+            format = bitstreamFormatService.create(context);
         }
         
 		// Update values
 		format.setMIMEType(mimeType);
 		if (formatID != 1) // don't change the unknow format.
         {
-            format.setShortDescription(shortDescription);
+            format.setShortDescription(context, shortDescription);
         }
 		format.setDescription(description);
 		format.setSupportLevel(Integer.valueOf(supportLevel));
@@ -482,13 +470,12 @@ public class FlowRegistryUtils
         {
             format.setInternal(true);
         }
-		format.setExtensions(extensions);
+		format.setExtensions(extensionsList);
 
 		
 		// Commit the change
-        format.update();
-        context.commit();
-		
+		bitstreamFormatService.update(context, format);
+
 		// Return status
         result.setContinue(true);
 		result.setOutcome(true);
@@ -512,15 +499,13 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : formatIDs) 
     	{
-			BitstreamFormat format = BitstreamFormat.find(context,Integer.valueOf(id));
-			format.delete();
+			BitstreamFormat format = bitstreamFormatService.find(context,Integer.valueOf(id));
+			bitstreamFormatService.delete(context, format);
 	        count++;
     	}
 		
 		if (count > 0)
 		{
-			context.commit();
-			
 			result.setContinue(true);
 			result.setOutcome(true);
 			result.setMessage(T_delete_bitstream_format_success_notice);

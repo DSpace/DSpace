@@ -34,6 +34,9 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
 
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.jdom.Namespace;
 
 /**
@@ -83,6 +86,9 @@ public class RoleDisseminator implements PackageDisseminator
     public static final String GROUP_TYPE_WORKFLOW_STEP_1 = "WORKFLOW_STEP_1";
     public static final String GROUP_TYPE_WORKFLOW_STEP_2 = "WORKFLOW_STEP_2";
     public static final String GROUP_TYPE_WORKFLOW_STEP_3 = "WORKFLOW_STEP_3";
+
+    protected final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     /*
      * (non-Javadoc)
@@ -146,7 +152,7 @@ public class RoleDisseminator implements PackageDisseminator
      * 
      * @author mwood
      */
-    private class Serializer implements Runnable
+    protected class Serializer implements Runnable
     {
         private Context context;
         private DSpaceObject object;
@@ -199,19 +205,19 @@ public class RoleDisseminator implements PackageDisseminator
      * @throws XMLStreamException
      * @throws SQLException
      */
-    private void writeToStream(Context context, DSpaceObject object, OutputStream stream,
+    protected void writeToStream(Context context, DSpaceObject object, OutputStream stream,
             boolean emitPasswords)
     throws PackageException
     {
         try
         {
             //First, find all Groups/People associated with our current Object
-            Group[] groups = findAssociatedGroups(context, object);
-            EPerson[] people = findAssociatedPeople(context, object);
+            List<Group> groups = findAssociatedGroups(context, object);
+            List<EPerson> people = findAssociatedPeople(context, object);
 
             //Only continue if we've found Groups or People which we need to disseminate
-            if((groups!=null && groups.length>0) ||
-               (people!=null && people.length>0))
+            if((groups!=null && groups.size()>0) ||
+               (people!=null && people.size()>0))
             {
                 XMLOutputFactory factory = XMLOutputFactory.newInstance();
                 XMLStreamWriter writer;
@@ -296,10 +302,10 @@ public class RoleDisseminator implements PackageDisseminator
      *            the DSpaceObject related to this group (if any)
      * @param group
      *            the Group to describe
-     * @param write
+     * @param writer
      *            the description to this stream
      */
-    private void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
+    protected void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
             throws XMLStreamException, PackageException
     {
         //Translate the Group name for export.  This ensures that groups with Internal IDs in their names
@@ -327,7 +333,7 @@ public class RoleDisseminator implements PackageDisseminator
         }
 
         //Add People to Group (if any belong to this group)
-        if(group.getMembers().length>0)
+        if(group.getMembers().size()>0)
         {
             writer.writeStartElement(MEMBERS);
             for (EPerson member : group.getMembers())
@@ -341,7 +347,7 @@ public class RoleDisseminator implements PackageDisseminator
         }
 
         //Add Groups as Member Groups (if any belong to this group)
-        if(group.getMemberGroups().length>0)
+        if(group.getMemberGroups().size()>0)
         {
             writer.writeStartElement(MEMBER_GROUPS);
             for (Group member : group.getMemberGroups())
@@ -377,7 +383,7 @@ public class RoleDisseminator implements PackageDisseminator
      *          the group
      * @return a group type string or null
      */
-    private String getGroupType(DSpaceObject dso, Group group)
+    protected String getGroupType(DSpaceObject dso, Group group)
     {
         if (dso == null || group == null)
         {
@@ -408,17 +414,17 @@ public class RoleDisseminator implements PackageDisseminator
                 //Check if Submitters group
                 return GROUP_TYPE_SUBMIT;
             }
-            else if (group.equals(collection.getWorkflowGroup(1)))
+            else if (group.equals(collection.getWorkflowStep1()))
             {
                 //Check if workflow step 1 group
                 return GROUP_TYPE_WORKFLOW_STEP_1;
             }
-            else if (group.equals(collection.getWorkflowGroup(2)))
+            else if (group.equals(collection.getWorkflowStep2()))
             {
                 //check if workflow step 2 group
                 return GROUP_TYPE_WORKFLOW_STEP_2;
             }
-            else if (group.equals(collection.getWorkflowGroup(3)))
+            else if (group.equals(collection.getWorkflowStep3()))
             {
                 //check if workflow step 3 group
                 return GROUP_TYPE_WORKFLOW_STEP_3;
@@ -434,12 +440,12 @@ public class RoleDisseminator implements PackageDisseminator
      * 
      * @param eperson
      *            the EPerson to describe
-     * @param write
+     * @param writer
      *            the description to this stream
      * @param emitPassword
      *            do not export the password hash unless true
      */
-    private void writeEPerson(EPerson eperson, XMLStreamWriter writer,
+    protected void writeEPerson(EPerson eperson, XMLStreamWriter writer,
             boolean emitPassword) throws XMLStreamException
     {
         writer.writeStartElement(EPERSON);
@@ -482,7 +488,7 @@ public class RoleDisseminator implements PackageDisseminator
         
         if (emitPassword)
         {
-            PasswordHash password = eperson.getPasswordHash();
+            PasswordHash password = ePersonService.getPasswordHash(eperson);
             if (null != password)
             {
                 writer.writeStartElement(PASSWORD_HASH);
@@ -536,14 +542,14 @@ public class RoleDisseminator implements PackageDisseminator
      * @param object the DSpace object
      * @return array of all associated groups
      */
-    private Group[] findAssociatedGroups(Context context, DSpaceObject object)
+    protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
             throws SQLException
     {
         if(object.getType()==Constants.SITE)
         {
             // @TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
-            return Group.findAll(context, Group.NAME);
+            return groupService.findAll(context, GroupService.NAME);
         }
         else if(object.getType()==Constants.COMMUNITY)
         {
@@ -559,7 +565,7 @@ public class RoleDisseminator implements PackageDisseminator
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COMMUNITY_<ID>_"
             // (There should be none, but this code is here just in case)
-            Group[] matchingGroups = Group.search(context, "COMMUNITY\\_" + community.getID() + "\\_");
+            List<Group> matchingGroups = groupService.search(context, "COMMUNITY\\_" + community.getID() + "\\_");
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
@@ -570,9 +576,7 @@ public class RoleDisseminator implements PackageDisseminator
 
             if(list.size()>0)
             {
-                Group[] groupArray = new Group[list.size()];
-                groupArray = (Group[]) list.toArray(groupArray);
-                return groupArray;
+                return list;
             }
         }
         else if(object.getType()==Constants.COLLECTION)
@@ -592,24 +596,24 @@ public class RoleDisseminator implements PackageDisseminator
                 list.add(collection.getSubmitters());
             }
             //check for workflow step 1 group
-            if(collection.getWorkflowGroup(1)!=null)
+            if(collection.getWorkflowStep1()!=null)
             {
-                list.add(collection.getWorkflowGroup(1));
+                list.add(collection.getWorkflowStep1());
             }
             //check for workflow step 2 group
-            if(collection.getWorkflowGroup(2)!=null)
+            if(collection.getWorkflowStep2()!=null)
             {
-                list.add(collection.getWorkflowGroup(2));
+                list.add(collection.getWorkflowStep2());
             }
             //check for workflow step 3 group
-            if(collection.getWorkflowGroup(3)!=null)
+            if(collection.getWorkflowStep3()!=null)
             {
-                list.add(collection.getWorkflowGroup(3));
+                list.add(collection.getWorkflowStep3());
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
             // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
-            Group[] matchingGroups = Group.search(context, "COLLECTION\\_" + collection.getID() + "\\_");
+            List<Group> matchingGroups = groupService.search(context, "COLLECTION\\_" + collection.getID() + "\\_");
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
@@ -620,9 +624,7 @@ public class RoleDisseminator implements PackageDisseminator
 
             if(list.size()>0)
             {
-                Group[] groupArray = new Group[list.size()];
-                groupArray = (Group[]) list.toArray(groupArray);
-                return groupArray;
+                return list;
             }
         }
 
@@ -642,12 +644,12 @@ public class RoleDisseminator implements PackageDisseminator
      * @param object the DSpace object
      * @return array of all associated EPerson objects
      */
-    private EPerson[] findAssociatedPeople(Context context, DSpaceObject object)
+    protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
             throws SQLException
     {
         if(object.getType()==Constants.SITE)
         {
-            return EPerson.findAll(context, EPerson.EMAIL);
+            return ePersonService.findAll(context, EPerson.EMAIL);
         }
 
         //by default, return nothing

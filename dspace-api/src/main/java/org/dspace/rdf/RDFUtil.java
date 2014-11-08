@@ -10,14 +10,18 @@ package org.dspace.rdf;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import java.sql.SQLException;
-import java.util.logging.Level;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -27,7 +31,8 @@ import org.dspace.core.Context;
  */
 public class RDFUtil {
     private static final Logger log = Logger.getLogger(RDFUtil.class);
-        
+    private static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Loads converted data of a DSpaceObject identified by the URI provided
      * as {@code identifier}. This method uses the RDFStorage configurated in
@@ -80,8 +85,8 @@ public class RDFUtil {
      *         persistent identifier like DOIs or Handles but there is no such
      *         identifier assigned to the provided DSO.
      */
-    public static String generateIdentifier(Context context, int type, int id,
-            String handle, String[] identifier)
+    public static String generateIdentifier(Context context, int type, UUID id,
+            String handle, List<String> identifier)
             throws SQLException
     {
         return RDFConfiguration.getURIGenerator().generateIdentifier(context, 
@@ -124,11 +129,11 @@ public class RDFUtil {
                 && dso.getType() != Constants.COLLECTION
                 && dso.getType() != Constants.ITEM)
         {
-            throw new IllegalArgumentException(dso.getTypeText()
+            throw new IllegalArgumentException(ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso)
                     + " is currently not supported as independent entity.");
         }
         
-        if (!RDFConfiguration.isConvertType(dso.getTypeText()))
+        if (!RDFConfiguration.isConvertType(ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso)))
         {
             return null;
         }
@@ -176,7 +181,7 @@ public class RDFUtil {
         if (StringUtils.isEmpty(identifier))
         {
             log.error("Cannot generate identifier for dso from type " 
-                    + dso.getTypeText() + " (id: " + dso.getID() + ").");
+                    + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso) + " (id: " + dso.getID() + ").");
             if (convertedData != null) convertedData.close();
             throw new RDFMissingIdentifierException(dso.getType(), dso.getID());
         }
@@ -225,7 +230,7 @@ public class RDFUtil {
         {
             return;
         }
-        AuthorizeManager.authorizeAction(context, dso, Constants.READ);
+        authorizeService.authorizeAction(context, dso, Constants.READ);
         if (dso instanceof Item)
         {
             Item item = (Item) dso;
@@ -282,7 +287,7 @@ public class RDFUtil {
      * @throws SQLException
      * @throws RDFMissingIdentifierException In case that no Identifier could be generated.
      */
-    public static void delete(Context ctx, int type, int id, String handle, String[] identifiers)
+    public static void delete(Context ctx, int type, UUID id, String handle, List<String> identifiers)
             throws SQLException, RDFMissingIdentifierException
     {
         String uri = RDFConfiguration.getURIGenerator().generateIdentifier(ctx,

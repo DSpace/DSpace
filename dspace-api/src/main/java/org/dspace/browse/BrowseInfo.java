@@ -12,12 +12,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.sort.SortOption;
 
 /**
@@ -101,6 +98,8 @@ public class BrowseInfo
 
 	/** number of metadata elements to display before truncating using "et al" */
 	private int etAl = -1;
+
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Constructor
@@ -478,7 +477,7 @@ public class BrowseInfo
      *
      * @return Result list. This list cannot be modified.
      */
-    public List getResults()
+    public List<Item> getResults()
     {
         return results;
     }
@@ -504,37 +503,13 @@ public class BrowseInfo
     }
 
     /**
-     * Return the results of the Browse as an Item array.
-     *
-     * @return The results of the Browse as an Item array.
-     */
-    public Item[] getItemResults(Context context)
-    	throws BrowseException
-    {
-    	try
-    	{
-    		BrowseItem[] bis = getBrowseItemResults();
-    		Item[] items = new Item[bis.length];
-    		for (int i = 0; i < bis.length; i++)
-    		{
-    			items[i] = Item.find(context, bis[i].getID());
-    		}
-    		return items;
-    	}
-    	catch (SQLException e)
-    	{
-    		throw new BrowseException(e);
-    	}
-    }
-
-    /**
      * Return the results of the Browse as a BrowseItem array
      *
      * @return		the results of the browse as a BrowseItem array
      */
-    public BrowseItem[] getBrowseItemResults()
+    public List<Item> getBrowseItemResults()
     {
-        return (BrowseItem[]) results.toArray(new BrowseItem[results.size()]);
+        return results;
     }
 
     /**
@@ -749,7 +724,7 @@ public class BrowseInfo
     		String containerID = "no id available/necessary";
     		if (theContainer != null)
     		{
-    			containerID = Integer.toString(theContainer.getID()) + " (" + theContainer.getHandle() + ")";
+    			containerID = theContainer.getID().toString() + " (" + theContainer.getHandle() + ")";
     		}
 
     		sb.append("Browsing in " + container + ": " + containerID);
@@ -872,13 +847,13 @@ public class BrowseInfo
 		Iterator itr = results.iterator();
 		while (itr.hasNext())
 		{
-			BrowseItem bi = (BrowseItem) itr.next();
+			Item bi = (Item) itr.next();
 			if (bi == null)
 			{
 				sb.append("{{ NULL ITEM }}");
 				break;
 			}
-			sb.append("{{Item ID: " + Integer.toString(bi.getID()) + " :: ");
+			sb.append("{{Item ID: " + bi.getID().toString() + " :: ");
 
 			for (int j = 1; j <= config.numCols(); j++)
 			{
@@ -888,17 +863,17 @@ public class BrowseInfo
     				sb.append("{{ NULL METADATA }}");
     				break;
     			}
-				Metadatum[] values = bi.getMetadata(md[0], md[1], md[2], Item.ANY);
+				List<MetadataValue> values = itemService.getMetadata(bi, md[0], md[1], md[2], Item.ANY);
 				StringBuffer value = new StringBuffer();
 				if (values != null)
 				{
-					for (int i = 0; i < values.length; i++)
+					for (int i = 0; i < values.size(); i++)
 					{
 						if (i > 0)
 						{
 							value.append(",");
 						}
-						value.append(values[i].value);
+						value.append(values.get(i).getValue());
 					}
 				}
 				else

@@ -31,6 +31,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,7 +71,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
 	/** Cached validity object */
 	private SourceValidity validity;
-	
+
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
     /**
      * Generate the unique key.
      * This key must be unique inside the space of this component.
@@ -139,12 +143,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 		        try {
 		            DSpaceValidity validity = new DSpaceValidity();
 		            
-		            validity.add(eperson);
+		            validity.add(context, eperson);
 		            
-		            Group[] groups = Group.allMemberGroups(context, eperson);
+		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
 		            for (Group group : groups)
 		            {
-		            	validity.add(group);
+		            	validity.add(context, group);
 		            }
 		            
 		            this.validity = validity.complete();
@@ -205,7 +209,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if (eperson != null)
         {
             userMeta.setAuthenticated(true);
-            userMeta.addMetadata("identifier").addContent(eperson.getID());
+            userMeta.addMetadata("identifier").addContent(eperson.getID().toString());
             userMeta.addMetadata("identifier","email").addContent(eperson.getEmail());
             userMeta.addMetadata("identifier","firstName").addContent(eperson.getFirstName());
             userMeta.addMetadata("identifier","lastName").addContent(eperson.getLastName());

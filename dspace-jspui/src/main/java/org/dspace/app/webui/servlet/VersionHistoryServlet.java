@@ -19,7 +19,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
@@ -51,8 +51,8 @@ public class VersionHistoryServlet extends DSpaceServlet
         	throw new IllegalArgumentException("Item is null");
         }
         
-        if(!AuthorizeManager.isAdmin(context,
-                        item.getOwningCollection()))
+        if(!AuthorizeServiceImpl.isAdmin(context,
+                item.getOwningCollection()))
         {
             // Check if only administrators can view the item history
             if (new DSpace().getConfigurationService().getPropertyAsType(

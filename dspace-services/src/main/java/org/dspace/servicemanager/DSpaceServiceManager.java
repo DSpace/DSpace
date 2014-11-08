@@ -236,6 +236,18 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         }
     }
 
+    @Override
+    public void registerServiceNoAutowire(String name, Object service) {
+        checkRunning();
+        if (name == null || service == null) {
+            throw new IllegalArgumentException("name and service cannot be null");
+        }
+        // register service/provider with all
+        for (ServiceManagerSystem sms : serviceManagers) {
+            sms.registerServiceNoAutowire(name, service);
+        }
+    }
+
     public <T> T registerServiceClass(String name, Class<T> type) {
         checkRunning();
         if (name == null || type == null) {

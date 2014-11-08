@@ -27,7 +27,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 /**
  * Servlet to export metadata as CSV (comma separated values)
@@ -61,7 +61,7 @@ public class MetadataExportServlet extends DSpaceServlet
         if (handle != null)
         {
             log.info(LogManager.getHeader(context, "metadataexport", "exporting_handle:" + handle));
-            DSpaceObject thing = HandleManager.resolveToObject(context, handle);
+            DSpaceObject thing = HandleServiceImpl.resolveToObject(context, handle);
             if (thing != null)
             {
                 if (thing.getType() == Constants.ITEM)

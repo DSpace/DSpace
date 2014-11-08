@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.itemexport.ItemExport;
+import org.dspace.app.itemexport.ItemExportServiceImpl;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
@@ -48,11 +48,11 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 				request.getPathInfo().lastIndexOf('/')+1);
 		System.out.println(filename);
 
-		if (ItemExport.canDownload(context, filename)) {
+		if (ItemExportServiceImpl.canDownload(context, filename)) {
 			try {
-				InputStream exportStream = ItemExport
+				InputStream exportStream = ItemExportServiceImpl
 						.getExportDownloadInputStream(filename, context
-								.getCurrentUser());
+                                .getCurrentUser());
 
 				if (exportStream == null || filename == null) {
 					// No bitstream found or filename was wrong -- ID invalid
@@ -71,7 +71,7 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 				// TODO: Currently the date of the item, since we don't have
 				// dates
 				// for files
-				long lastModified = ItemExport
+				long lastModified = ItemExportServiceImpl
 						.getExportFileLastModified(filename);
 				response.setDateHeader("Last-Modified", lastModified);
 
@@ -86,10 +86,10 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 				}
 
 				// Set the response MIME type
-				response.setContentType(ItemExport.COMPRESSED_EXPORT_MIME_TYPE);
+				response.setContentType(ItemExportServiceImpl.COMPRESSED_EXPORT_MIME_TYPE);
 
 				// Response length
-				long size = ItemExport.getExportFileSize(filename);
+				long size = ItemExportServiceImpl.getExportFileSize(filename);
 				response.setHeader("Content-Length", String.valueOf(size));
 
 				response.setHeader("Content-Disposition",

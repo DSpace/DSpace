@@ -19,7 +19,7 @@ import javax.servlet.jsp.jstl.core.Config;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -60,8 +60,8 @@ public class PasswordServlet extends DSpaceServlet
         String jsp = null;
 
         // Locate the eperson
-        int status = AuthenticationManager.authenticate(context, email, password,
-                        null, request);
+        int status = AuthenticationServiceImpl.authenticate(context, email, password,
+                null, request);
  
        
         if (status == AuthenticationMethod.SUCCESS)

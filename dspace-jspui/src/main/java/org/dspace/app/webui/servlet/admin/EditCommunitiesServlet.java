@@ -26,7 +26,7 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
@@ -299,7 +299,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
-        if (AuthorizeManager.authorizeActionBoolean(context, community, Constants.DELETE))
+        if (AuthorizeServiceImpl.authorizeActionBoolean(context, community, Constants.DELETE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
         }
@@ -316,7 +316,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         catch (AuthorizeException authex) {
             request.setAttribute("policy_button", Boolean.FALSE);
         }
-        if (AuthorizeManager.isAdmin(context, community))
+        if (AuthorizeServiceImpl.isAdmin(context, community))
         {
             request.setAttribute("admin_community", Boolean.TRUE);
         }
@@ -339,7 +339,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
     static void storeAuthorizeAttributeCollectionEdit(Context context,
             HttpServletRequest request, Collection collection) throws SQLException
     {
-        if (AuthorizeManager.isAdmin(context, collection))
+        if (AuthorizeServiceImpl.isAdmin(context, collection))
         {
             request.setAttribute("admin_collection", Boolean.TRUE);
         }
@@ -393,7 +393,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             request.setAttribute("template_button", Boolean.FALSE);
         }
         
-        if (AuthorizeManager.authorizeActionBoolean(context, collection.getParentObject(), Constants.REMOVE))
+        if (AuthorizeServiceImpl.authorizeActionBoolean(context, collection.getParentObject(), Constants.REMOVE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
         }
@@ -959,7 +959,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Identify the format
             BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
             logoBS.setFormat(bf);
-            AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
+            AuthorizeServiceImpl.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
             logoBS.update();
 
             String jsp;
@@ -986,7 +986,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 jsp = "/tools/edit-collection.jsp";
             }
             
-            if (AuthorizeManager.isAdmin(context, dso))
+            if (AuthorizeServiceImpl.isAdmin(context, dso))
             {
                 // set a variable to show all buttons
                 request.setAttribute("admin_button", Boolean.TRUE);

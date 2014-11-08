@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.RequestItemServlet;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
@@ -136,7 +136,7 @@ public class RequestItemManager {
     
      public static boolean isRestricted(Context context, DSpaceObject o) throws SQLException
     {
-		List<ResourcePolicy> policies = AuthorizeManager
+		List<ResourcePolicy> policies = AuthorizeServiceImpl
 				.getPoliciesActionFilter(context, o, Constants.READ);
 		for (ResourcePolicy rp : policies)
 		{

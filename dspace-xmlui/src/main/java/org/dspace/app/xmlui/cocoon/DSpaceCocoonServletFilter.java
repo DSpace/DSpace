@@ -28,6 +28,8 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestSchedulingService;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that performs two functions, 1) it 
@@ -42,7 +44,8 @@ public class DSpaceCocoonServletFilter implements Filter
 	
 	private static final long serialVersionUID = 1L;
 	
-	
+    protected HarvestSchedulingService harvestSchedulingService = HarvestServiceFactory.getInstance().getHarvestSchedulingService();
+
     /**
      * The DSpace config paramater, this is where the path to the DSpace
      * configuration file can be obtained
@@ -202,7 +205,7 @@ public class DSpaceCocoonServletFilter implements Filter
 		if (ConfigurationManager.getBooleanProperty("oai", "harvester.autoStart"))
     	{
     		try {
-    			OAIHarvester.startNewScheduler();
+                harvestSchedulingService.startNewScheduler();
     		}
             catch (RuntimeException e)
             {

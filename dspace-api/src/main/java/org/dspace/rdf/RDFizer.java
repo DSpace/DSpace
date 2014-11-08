@@ -11,6 +11,8 @@ package org.dspace.rdf;
 import com.hp.hpl.jena.rdf.model.Model;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.cli.CommandLine;
@@ -28,11 +30,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
@@ -54,6 +59,10 @@ public class RDFizer {
     protected boolean dryrun;
     protected String lang;
     protected Context context;
+    protected final ContentServiceFactory contentServiceFactory;
+    protected final CommunityService communityService;
+    protected final ItemService itemService;
+    protected final HandleService handleService;
 
     /**
      * Set to remember with DSpaceObject were converted or deleted from the 
@@ -72,6 +81,10 @@ public class RDFizer {
         this.lang = "TURTLE";
         this.processed = new CopyOnWriteArraySet<String>();
         this.context = new Context(Context.READ_ONLY);
+        this.contentServiceFactory = ContentServiceFactory.getInstance();
+        this.communityService = contentServiceFactory.getCommunityService();
+        this.itemService = contentServiceFactory.getItemService();
+        this.handleService = HandleServiceFactory.getInstance().getHandleService();
     }
     
     /**
@@ -173,7 +186,7 @@ public class RDFizer {
                 && dso.getType() != Constants.COLLECTION
                 && dso.getType() != Constants.ITEM)
         {
-            throw new IllegalArgumentException(dso.getTypeText()
+            throw new IllegalArgumentException(contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                     + " is currently not supported as independent entity.");
         }
 
@@ -192,11 +205,11 @@ public class RDFizer {
                 if (StringUtils.isEmpty(identifier))
                 {
                     System.err.println("Cannot determine RDF URI for " 
-                            + dso.getTypeText() + " " + dso.getID() + "(handle " 
+                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle " 
                             + dso.getHandle() + ")" + ", skipping. Please "
                             + "delete it specifing the RDF URI.");
                     log.error("Cannot detgermine RDF URI for " 
-                            + dso.getTypeText() + " " + dso.getID() + "(handle "
+                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle "
                             + dso.getHandle() + ")" + ", skipping deletion.");
                     return;
                 }
@@ -231,7 +244,7 @@ public class RDFizer {
                 && dso.getType() != Constants.COLLECTION
                 && dso.getType() != Constants.ITEM)
         {
-            throw new IllegalArgumentException(dso.getTypeText()
+            throw new IllegalArgumentException(contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                     + " is currently not supported as independent entity.");
         }
         
@@ -268,13 +281,13 @@ public class RDFizer {
                             + "discoverable.");
                     return;
                 } catch (AuthorizeException ex) {
-                    report("Skipping conversion of " + dso.getTypeText() + " " 
+                    report("Skipping conversion of " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " 
                             + dso.getID() + " (handle " + dso.getHandle() + ")" 
                             + ", not authorized: " + ex.getMessage());
                     return;
                 } catch (RDFMissingIdentifierException ex) {
                     String errormessage = "Skipping conversion of " 
-                            + dso.getTypeText() + " " + dso.getID() 
+                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() 
                             + " (handle " + dso.getHandle() + ").";
                     log.error(errormessage, ex);
                     System.err.println(errormessage 
@@ -286,7 +299,7 @@ public class RDFizer {
                 if (stdout) {
                     if (converted == null)
                     {
-                        System.err.println("Conversion of " + dso.getTypeText() 
+                        System.err.println("Conversion of " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) 
                                 + " " + dso.getID() + " resulted in no data.");
                     } else {
                         converted.write(System.out, lang);
@@ -307,7 +320,7 @@ public class RDFizer {
                 && dso.getType() != Constants.COLLECTION
                 && dso.getType() != Constants.ITEM)
         {
-            throw new IllegalArgumentException(dso.getTypeText()
+            throw new IllegalArgumentException(contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                     + " is currently not supported as independent entity.");
         }
 
@@ -318,14 +331,14 @@ public class RDFizer {
         
         if (isProcessed(dso))
         {
-            log.debug("Skipping processing of " + dso.getTypeText() + " " 
+            log.debug("Skipping processing of " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " 
                     + dso.getID() + " (handle " + dso.getHandle() 
                     + "), already processed.");
             return;
         }
         markProcessed(dso);
         // this is useful to debug depth first search, but it is really noisy.
-        // log.debug("Procesing " + dso.getTypeText() + " " + dso.getID() + handle + ".");
+        // log.debug("Procesing " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + handle + ".");
         
         // if this method is used for conversion we should check if we have the
         // permissions to read a DSO before converting all of it decendents
@@ -356,7 +369,7 @@ public class RDFizer {
                         + "discoverable.");
                 return;
             } catch (AuthorizeException ex) {
-                report("Skipping processing of " + dso.getTypeText() + " " 
+                report("Skipping processing of " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " 
                         + dso.getID() + " (handle " + dso.getHandle() + ")" 
                         + ", not authorized: " + ex.getMessage());
                 return;
@@ -365,7 +378,7 @@ public class RDFizer {
 
         if (dso instanceof Site)
         {
-            Community[] communities = Community.findAllTop(context);
+            List<Community> communities = communityService.findAllTop(context);
             for (Community community : communities)
             {
                 this.dspaceDFS(community, callback, check, false);
@@ -375,12 +388,12 @@ public class RDFizer {
         
         if (dso instanceof Community)
         {
-            Community[] subcommunities = ((Community) dso).getSubcommunities();
+            List<Community> subcommunities = ((Community) dso).getSubcommunities();
             for (Community sub : subcommunities)
             {
                 this.dspaceDFS(sub, callback, check, false);
             }
-            Collection[] collections = ((Community) dso).getCollections();
+            List<Collection> collections = ((Community) dso).getCollections();
             for (Collection collection : collections)
             {
                 this.dspaceDFS(collection, callback, check, false);
@@ -389,12 +402,11 @@ public class RDFizer {
         
         if (dso instanceof Collection)
         {
-            ItemIterator items = ((Collection) dso).getAllItems();
+            Iterator<Item> items = itemService.findAllByCollection(context, (Collection) dso);
             while (items.hasNext())
             {
                 Item item = items.next();
                 this.dspaceDFS(item, callback, check, false);
-                item.decache();
             }
         }
 
@@ -421,21 +433,21 @@ public class RDFizer {
 //        }
         
         callback.callback(dso);
-        report("Processed " + dso.getTypeText() + " " + dso.getID() 
+        report("Processed " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() 
                 + " (handle " + dso.getHandle() + ").");
     }
     
     protected boolean isProcessed(DSpaceObject dso)
     {
         String key = Integer.toString(dso.getType()) + "/" 
-                + Integer.toString(dso.getID());
+                + dso.getID().toString();
         return this.processed.contains(key);
     }
     
     protected void markProcessed(DSpaceObject dso)
     {
         String key = Integer.toString(dso.getType()) + "/" 
-                + Integer.toString(dso.getID());
+                + dso.getID().toString();
         this.processed.add(key);
     }
     
@@ -575,7 +587,7 @@ public class RDFizer {
                 }
                 
                 log.debug("Resolved identifier " + handle + " as " 
-                        + dso.getTypeText() + " " + dso.getID());
+                        + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID());
                 
                 try
                 {
@@ -662,7 +674,7 @@ public class RDFizer {
         DSpaceObject dso = null;
         try
         {
-            dso = HandleManager.resolveToObject(this.context, handle);
+            dso = handleService.resolveToObject(this.context, handle);
         }
         catch (SQLException ex)
         {
@@ -693,7 +705,7 @@ public class RDFizer {
                 && dso.getType() != Constants.COLLECTION
                 && dso.getType() != Constants.ITEM)
         {
-            System.err.println(dso.getTypeText() + " are currently not "
+            System.err.println(contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " are currently not "
                     + "supported as independent entities. Bundles and Bitstreams "
                     + "should be processed as part of their item.");
             return null;
@@ -779,19 +791,8 @@ public class RDFizer {
         // data into a triple store that provides a public sparql endpoint.
         // all exported rdf data can be read by anonymous users.
         // We won't change the database => read_only context will assure this.
-        Context context = null;
-        try {
-            context = new Context(Context.READ_ONLY);
-        }
-        catch (SQLException sqle)
-        {
-            log.info("Caught SQLException: ", sqle);
-            System.err.println("Can't connect to database: " + sqle.getMessage());
-            context.abort();
-            System.exit(-1);
-        }
-        
-        
+        Context context = new Context(Context.READ_ONLY);
+
         RDFizer myself = null;
         try {
             myself = new RDFizer();

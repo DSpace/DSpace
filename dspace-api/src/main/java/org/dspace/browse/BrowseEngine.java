@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.sort.SortOption;
@@ -161,7 +162,7 @@ public class BrowseEngine
         dao.setOrderField(orderBy);
 
         // now run the query
-        List<BrowseItem> results = dao.doQuery();
+        List<Item> results = dao.doQuery();
 
         // construct the mostly empty BrowseInfo object to pass back
         BrowseInfo browseInfo = new BrowseInfo(results, 0, scope.getResultsPerPage(), 0);
@@ -294,7 +295,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List<BrowseItem> results = null;
+            List<Item> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -322,7 +323,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList<BrowseItem>();
+                results = new ArrayList<>();
             }
 
             // construct the BrowseInfo object to pass back

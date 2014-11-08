@@ -8,9 +8,19 @@
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.excalibur.pool.Recyclable;
@@ -26,15 +36,12 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.ItemIterator;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
@@ -81,6 +88,10 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
 
     private static Logger log = Logger.getLogger(MetadataExportReader.class);
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 
     DSpaceCSV csv = null;
     MetadataExport exporter = null;
@@ -102,7 +113,7 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             this.response = ObjectModelHelper.getResponse(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
 
-            if(AuthorizeManager.isAdmin(context))
+            if(authorizeService.isAdmin(context))
             {
 
             /* Get our parameters that identify the item, collection
@@ -111,18 +122,18 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
              */
 
             String handle = par.getParameter("handle");
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            DSpaceObject dso = handleService.resolveToObject(context, handle);
             
-            java.util.List<Integer> itemmd = new ArrayList<Integer>();
+            java.util.List<Item> itemmd = new ArrayList<>();
             if(dso.getType() == Constants.ITEM)
             {
-               itemmd.add(dso.getID());
-               exporter = new MetadataExport(context, new ItemIterator(context, itemmd), false);
+               itemmd.add(itemService.find(context, dso.getID()));
+               exporter = new MetadataExport(context, itemmd.iterator(), false);
             }
             else if(dso.getType() == Constants.COLLECTION)
             {
                Collection collection = (Collection)dso;
-               ItemIterator toExport = collection.getAllItems();
+               Iterator<Item> toExport = itemService.findByCollection(context, collection);
                exporter = new MetadataExport(context, toExport, false);
             }
             else if(dso.getType() == Constants.COMMUNITY)

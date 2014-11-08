@@ -52,7 +52,7 @@ public class V1_3_9__Drop_constraint_for_DSpace_1_4_schema
             throws IOException, SQLException
     {
         // Drop the constraint associated with "name" column of "community"
-        checksum = MigrationUtils.dropDBConstraint(connection, "community", "name");
+        checksum = MigrationUtils.dropDBConstraint(connection, "community", "name", "key");
     }
 
     /**

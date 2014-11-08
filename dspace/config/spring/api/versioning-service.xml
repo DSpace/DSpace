@@ -23,12 +23,6 @@
           class="org.dspace.versioning.VersioningServiceImpl"
           autowire="byType"
           scope="singleton">
-       <property name="versionDAO">
-          <bean class="org.dspace.versioning.VersionDAO"/>
-       </property>
-       <property name="versionHistoryDAO">
-          <bean class="org.dspace.versioning.VersionHistoryDAO"/>
-       </property>
        <property name="provider">
            <!-- Default Item Versioning Provider, defines behavior for replicating
                 Item, Metadata, Budles and Bitstreams. Autowired at this time. -->

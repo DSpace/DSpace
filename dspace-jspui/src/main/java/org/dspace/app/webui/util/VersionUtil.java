@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Metadatum;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
@@ -23,8 +23,8 @@ import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflowbasic.BasicWorkflowItem;
 
 /**
  * Item level versioning feature utility method
@@ -59,7 +59,7 @@ public class VersionUtil
 
             Item item = Item.find(context, itemID);
 
-            if (AuthorizeManager.authorizeActionBoolean(context, item,
+            if (AuthorizeServiceImpl.authorizeActionBoolean(context, item,
                     Constants.WRITE) || item.canEdit())
             {
                 VersioningService versioningService = new DSpace()
@@ -106,7 +106,7 @@ public class VersionUtil
 
             Item item = Item.find(context, itemID);
 
-            if (AuthorizeManager.authorizeActionBoolean(context, item,
+            if (AuthorizeServiceImpl.authorizeActionBoolean(context, item,
                     Constants.WRITE))
             {
                 VersioningService versioningService = new DSpace()
@@ -270,8 +270,8 @@ public class VersionUtil
             for (Version version : allVersions)
             {
                 if (version.getItem().isArchived()
-                        || AuthorizeManager.isAdmin(context,
-                                item.getOwningCollection()))
+                        || AuthorizeServiceImpl.isAdmin(context,
+                        item.getOwningCollection()))
                 {
                     // We have a newer version
                     return version;
@@ -309,7 +309,7 @@ public class VersionUtil
             throws SQLException
     {
         WorkspaceItem workspaceItem = WorkspaceItem.findByItem(context, item);
-        InProgressSubmission workflowItem = WorkflowItem.findByItem(context,
+        InProgressSubmission workflowItem = BasicWorkflowItem.findByItem(context,
                 item);
 
         return workspaceItem != null || workflowItem != null;

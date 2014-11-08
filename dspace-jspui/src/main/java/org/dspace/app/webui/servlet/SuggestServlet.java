@@ -28,7 +28,7 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Metadatum;
@@ -83,7 +83,7 @@ public class SuggestServlet extends DSpaceServlet
         String collName = null;
         if (handle != null && !handle.equals(""))
         {
-            Item item = (Item) HandleManager.resolveToObject(context, handle);
+            Item item = (Item) HandleServiceImpl.resolveToObject(context, handle);
             if (item != null)
             {
                 Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
@@ -175,8 +175,8 @@ public class SuggestServlet extends DSpaceServlet
             	// use authEmail if available
                 senderAddr = authEmail;
             }
-            String itemUri = HandleManager.getCanonicalForm(handle);
-            String itemUrl = HandleManager.resolveToURL(context,handle);
+            String itemUri = HandleServiceImpl.getCanonicalForm(handle);
+            String itemUrl = HandleServiceImpl.resolveToURL(context, handle);
             String message = request.getParameter("message");
             String siteName = ConfigurationManager.getProperty("dspace.name");
 

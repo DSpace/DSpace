@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -21,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 
 /**
  * Presents the user with a form to enter the initial metadata for creation of a new collection
@@ -47,7 +50,9 @@ public class CreateCollectionForm extends AbstractDSpaceTransformer
 
 	private static final Message T_submit_save = message("xmlui.administrative.collection.CreateCollectionForm.submit_save");
 	private static final Message T_submit_cancel = message("xmlui.general.cancel");
-	
+
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -58,12 +63,12 @@ public class CreateCollectionForm extends AbstractDSpaceTransformer
 	
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
-		int communityID = parameters.getParameterAsInteger("communityID", -1);
-		Community parentCommunity = Community.find(context, communityID);
+		UUID communityID = UUID.fromString(parameters.getParameter("communityID", null));
+		Community parentCommunity = communityService.find(context, communityID);
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("create-collection",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(parentCommunity.getMetadata("name")));
+	    main.setHead(T_main_head.parameterize(communityService.getMetadata(parentCommunity, "name")));
 	        
 	    
 	    // The grand list of metadata options

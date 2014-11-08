@@ -39,6 +39,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
      * Return the list of definite and indefinite article codes
      * for this language.
      */
+    @Override
     protected String[] getArticleWords(String lang)
     {
         // No language - no words
@@ -332,6 +333,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     // Compare strings according to their length - longest to shortest
     private static class InverseLengthComparator implements Comparator, Serializable
     {
+        @Override
         public int compare(Object arg0, Object arg1)
         {
             return ((String)arg1).length() - ((String)arg0).length(); 

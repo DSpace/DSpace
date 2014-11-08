@@ -7,13 +7,14 @@
  */
 package org.dspace.app.statistics;
 
-import org.dspace.content.MetadataSchema;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 
 import java.sql.SQLException;
 
@@ -292,8 +293,7 @@ public class LogAnalyser
                                     String myFileTemplate, String myConfigFile, 
                                     String myOutFile, Date myStartDate, 
                                     Date myEndDate, boolean myLookUp)
-        throws IOException, SQLException
-    {
+            throws IOException, SQLException, SearchServiceException {
         // FIXME: perhaps we should have all parameters and aggregators put 
         // together in a single aggregating object
         
@@ -1142,132 +1142,42 @@ public class LogAnalyser
      * @return              an integer containing the relevant count
      */
     public static Integer getNumItems(Context context, String type)
-        throws SQLException
-    {
-        boolean oracle = DatabaseManager.isOracle();
-
+            throws SQLException, SearchServiceException {
         // FIXME: this method is clearly not optimised
         
         // FIXME: we don't yet collect total statistics, such as number of items
         // withdrawn, number in process of submission etc.  We should probably do
         // that
-        
-        // start the type constraint
-        String typeQuery = null;
-        
-        if (type != null)
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        if(StringUtils.isNotBlank(type))
         {
-            typeQuery = "SELECT resource_id " +
-                        "FROM metadatavalue " +
-                        "WHERE text_value LIKE '%" + type + "%' " + " AND resource_type_id="+ Constants.ITEM +
-                        " AND metadata_field_id = (" +
-                        " SELECT metadata_field_id " +
-                        " FROM metadatafieldregistry " +
-                        " WHERE metadata_schema_id = (" +
-                        "  SELECT metadata_schema_id" +
-                        "   FROM MetadataSchemaRegistry" +
-                        "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
-                        "  AND element = 'type' " +
-                        "  AND qualifier IS NULL) ";
+            discoverQuery.addFilterQueries("dc.type=" + type +"*");
         }
-        
-        // start the date constraint query buffer
-        StringBuffer dateQuery = new StringBuffer();
-        if (oracle)
+        StringBuilder accessionedQuery = new StringBuilder();
+        accessionedQuery.append("dc.date.accessioned_dt:[");
+        if(startDate != null)
         {
-            dateQuery.append("SELECT /*+ ORDERED_PREDICATES */ resource_id ");
+            accessionedQuery.append(unParseDate(startDate));
         }
         else
         {
-            dateQuery.append("SELECT resource_id ");
+            accessionedQuery.append("*");
         }
-
-        dateQuery.append("FROM metadatavalue " +
-                          "WHERE " + "resource_type_id="+ Constants.ITEM +  " AND metadata_field_id = (" +
-                          " SELECT metadata_field_id " +
-                          " FROM metadatafieldregistry " +
-                          " WHERE metadata_schema_id = (" +
-                          "  SELECT metadata_schema_id" +
-                          "   FROM MetadataSchemaRegistry" +
-                          "   WHERE short_id = '" + MetadataSchema.DC_SCHEMA + "')" +
-                          "  AND element = 'date' " +
-                          "  AND qualifier = 'accessioned') ");
-
-        // Verifies that the metadata contains a valid date, otherwise the
-        // postgres queries blow up when doing the ::timestamp cast.
-        if (!oracle && (startDate != null || endDate != null)) {
-        	dateQuery.append(" AND text_value LIKE '____-__-__T__:__:__Z' ");
-        }
-        
-        if (startDate != null)
+        accessionedQuery.append(" TO ");
+        if(endDate != null)
         {
-            if (oracle)
-            {
-                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
-                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) >= TO_DATE('" +
-                        unParseDate(startDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
-            }
-            else
-            {
-                dateQuery.append(" AND text_value::timestamp >= '" +
-                        unParseDate(startDate) + "'::timestamp ");
-            }
-        }
-
-        if (endDate != null)
-        {
-            // adjust end date to account for timestamp comparison
-            GregorianCalendar realEndDate = new GregorianCalendar();
-            realEndDate.setTime(endDate);
-            realEndDate.add(Calendar.DAY_OF_MONTH, 1);
-            Date queryEndDate = realEndDate.getTime();
-            if (oracle)
-            {
-                dateQuery.append(" AND TO_TIMESTAMP( TO_CHAR(text_value), "+
-                        "'yyyy-mm-dd\"T\"hh24:mi:ss\"Z\"' ) < TO_DATE('" +
-                        unParseDate(queryEndDate) + "', 'yyyy-MM-dd\"T\"hh24:mi:ss\"Z\"') ");
-            }
-            else
-            {
-                dateQuery.append(" AND text_value::timestamp < '" +
-                        unParseDate(queryEndDate) + "'::timestamp ");
-            }
-        }
-        
-        // build the final query
-        StringBuffer query = new StringBuffer();
-        
-        query.append("SELECT COUNT(*) AS num " +
-                  "FROM item " +
-                  "WHERE in_archive = " + (oracle ? "1 " : "true ") +
-                  "AND withdrawn = " + (oracle ? "0 " : "false "));
-        
-        if (startDate != null || endDate != null)
-        {
-            query.append(" AND item_id IN ( " +
-                         dateQuery.toString() + ") ");
-        }
-
-        if (type != null)
-        {
-            query.append(" AND item_id IN ( " +
-                         typeQuery + ") ");
-        }
-        
-        TableRow row = DatabaseManager.querySingle(context, query.toString());
-
-        Integer numItems;
-        if (oracle)
-        {
-            numItems = Integer.valueOf(row.getIntColumn("num"));
+            accessionedQuery.append(unParseDate(endDate));
         }
         else
         {
-            // for some reason the number column is of "long" data type!
-            Long count = Long.valueOf(row.getLongColumn("num"));
-            numItems = Integer.valueOf(count.intValue());
+            accessionedQuery.append("*");
         }
-        return numItems;
+        discoverQuery.addFilterQueries(accessionedQuery.toString());
+        discoverQuery.addFilterQueries("withdrawn: false");
+        discoverQuery.addFilterQueries("archived: true");
+
+        return SearchUtils.getSearchService().search(context, discoverQuery).getMaxResults();
     }
     
     
@@ -1281,8 +1191,7 @@ public class LogAnalyser
      *                      archive
      */
     public static Integer getNumItems(Context context)
-        throws SQLException
-    {
+            throws SQLException, SearchServiceException {
         return getNumItems(context, null);
     }
     

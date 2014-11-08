@@ -22,9 +22,12 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -52,7 +55,10 @@ public class CSVOutputter extends AbstractReader implements Recyclable
     protected Request request;
     protected Context context;
     protected CSVWriter writer = null;
-    
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     public void setup(SourceResolver sourceResolver, Map objectModel, String src, Parameters parameters) throws IOException, SAXException, ProcessingException {
         log.info("CSV Writer for stats");
         super.setup(sourceResolver, objectModel, src, parameters);
@@ -178,19 +184,19 @@ public class CSVOutputter extends AbstractReader implements Recyclable
         {
             if(termType.equalsIgnoreCase("bitstream"))
             {
-                Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm().string()));
-                Item item = (Item) bitstream.getParentObject();
+                Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, facetEntry.getTerm().string());
+                Item item = (Item) bitstreamService.getParentObject(context, bitstream);
                 
                 String[] entryValues = new String[9];
                 
                 entryValues[0] = bitstream.getID() + "";
                 entryValues[1] = bitstream.getName();
-                entryValues[2] = bitstream.getBundles()[0].getName();
+                entryValues[2] = bitstream.getBundles().get(0).getBundle().getName();
                 entryValues[3] = item.getName();
                 entryValues[4] = "http://hdl.handle.net/" + item.getHandle();
-                entryValues[5] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.creator"));
-                entryValues[6] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.publisher"));
-                entryValues[7] = wrapInDelimitedString(item.getMetadataByMetadataString("dc.date.issued"));
+                entryValues[5] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.creator"));
+                entryValues[6] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.publisher"));
+                entryValues[7] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.date.issued"));
                 entryValues[8] = facetEntry.getCount() + "";
                 writer.writeNext(entryValues);
             } else {
@@ -199,15 +205,15 @@ public class CSVOutputter extends AbstractReader implements Recyclable
         }
     }
     
-    public String wrapInDelimitedString(Metadatum[] metadataEntries) {
+    public String wrapInDelimitedString(List<MetadataValue> metadataEntries) {
         StringBuilder metadataString = new StringBuilder();
 
-        for(Metadatum metadataEntry : metadataEntries) {
+        for(MetadataValue metadataEntry : metadataEntries) {
             if(metadataString.length() > 0) {
                 // Delimit entries with the || double pipe character sequence.
                 metadataString.append("\\|\\|");
             }
-            metadataString.append(metadataEntry.value);
+            metadataString.append(metadataEntry.getValue());
         }
         
         return metadataString.toString();

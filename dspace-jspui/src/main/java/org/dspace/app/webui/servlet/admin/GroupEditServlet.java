@@ -22,7 +22,7 @@ import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -60,7 +60,7 @@ public class GroupEditServlet extends DSpaceServlet
         if (group != null)
         {
             // is this user authorized to edit this group?
-            AuthorizeManager.authorizeAction(c, group, Constants.ADD);
+            AuthorizeServiceImpl.authorizeAction(c, group, Constants.ADD);
 
             boolean submit_edit = (request.getParameter("submit_edit") != null);
             boolean submit_group_update = (request.getParameter("submit_group_update") != null);
@@ -230,7 +230,7 @@ public class GroupEditServlet extends DSpaceServlet
             else if (submit_confirm_delete)
             {
                 // phony authorize, only admins can do this
-                AuthorizeManager.authorizeAction(c, group, Constants.WRITE);
+                AuthorizeServiceImpl.authorizeAction(c, group, Constants.WRITE);
 
                 // delete group, return to group-list.jsp
                 group.delete();

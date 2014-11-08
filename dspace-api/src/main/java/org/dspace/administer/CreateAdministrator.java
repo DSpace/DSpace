@@ -22,6 +22,9 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * A command-line tool for creating an initial administrator for setting up a
@@ -46,7 +49,10 @@ public final class CreateAdministrator
 {
 	/** DSpace Context object */
 	private final Context context;
-	
+
+    protected EPersonService ePersonService;
+    protected GroupService groupService;
+
     /**
      * For invoking via the command line.  If called with no command line arguments,
      * it will negotiate with the user for the administrator details
@@ -88,10 +94,12 @@ public final class CreateAdministrator
      * 
      * @throws Exception
      */
-    private CreateAdministrator()
+    protected CreateAdministrator()
     	throws Exception
     {
     	context = new Context();
+        groupService = EPersonServiceFactory.getInstance().getGroupService();
+        ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     }
     
     /**
@@ -100,7 +108,7 @@ public final class CreateAdministrator
      * 
      * @throws Exception
      */
-    private void negotiateAdministratorDetails()
+    protected void negotiateAdministratorDetails()
     	throws Exception
     {
         Console console = System.console();
@@ -222,7 +230,7 @@ public final class CreateAdministrator
      * 
      * @throws Exception
      */
-    private void createAdministrator(String email, String first, String last,
+    protected void createAdministrator(String email, String first, String last,
     		String language, String pw)
     	throws Exception
     {
@@ -231,7 +239,7 @@ public final class CreateAdministrator
     	context.setIgnoreAuthorization(true);
     	
     	// Find administrator group
-    	Group admins = Group.find(context, 1);
+    	Group admins = groupService.findByName(context, Group.ADMIN);
     	
     	if (admins == null)
     	{
@@ -239,27 +247,27 @@ public final class CreateAdministrator
     	}
     	
     	// Create the administrator e-person
-        EPerson eperson = EPerson.findByEmail(context,email);
+        EPerson eperson = ePersonService.findByEmail(context,email);
         
         // check if the email belongs to a registered user,
         // if not create a new user with this email
         if (eperson == null)
         {
-            eperson = EPerson.create(context);
+            eperson = ePersonService.create(context);
             eperson.setEmail(email);
             eperson.setCanLogIn(true);
             eperson.setRequireCertificate(false);
             eperson.setSelfRegistered(false);
         }
     	
-    	eperson.setLastName(last);
-    	eperson.setFirstName(first);
-    	eperson.setLanguage(language);
-    	eperson.setPassword(pw);
-    	eperson.update();
+    	eperson.setLastName(context, last);
+    	eperson.setFirstName(context, first);
+    	eperson.setLanguage(context, language);
+        ePersonService.setPassword(eperson, pw);
+        ePersonService.update(context, eperson);
     	
-    	admins.addMember(eperson);
-    	admins.update();
+    	groupService.addMember(context, admins, eperson);
+        groupService.update(context, admins);
     	
     	context.complete();
     	

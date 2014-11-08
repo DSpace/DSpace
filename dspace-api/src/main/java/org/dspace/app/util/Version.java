@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
@@ -50,12 +52,12 @@ public class Version
                           sys.get("os.version"));
 
         // UIs used
-        List<AbstractDSpaceWebapp> apps = AbstractDSpaceWebapp.getApps();
+        List<WebApp> apps = UtilServiceFactory.getInstance().getWebAppService().getApps();
         System.out.println("  Applications:");
-        for (AbstractDSpaceWebapp app : apps)
+        for (WebApp app : apps)
         {
             System.out.printf("                %s at %s\n",
-                    app.getKind(), app.getURL());
+                    app.getAppName(), app.getUrl());
         }
 
         // Is Discovery available?

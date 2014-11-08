@@ -11,7 +11,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
@@ -97,7 +97,7 @@ public class AccessSettingTag extends TagSupport
             List<ResourcePolicy> policies = null;
             if (!advanced && dso != null)
             {
-                policies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+                policies = AuthorizeServiceImpl.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
             }
             else if (rp != null)
             {

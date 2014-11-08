@@ -7,14 +7,10 @@
  */
 package org.dspace.sword2;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -25,7 +21,7 @@ import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
@@ -145,7 +141,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleManager.findHandle(context, installedItem);
+			String handle = HandleServiceImpl.findHandle(context, installedItem);
 
 			verboseDescription.append("Ingest successful");
 			verboseDescription.append("Item created with internal identifier: " + installedItem.getID());
@@ -248,7 +244,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleManager.findHandle(context, installedItem);
+			String handle = HandleServiceImpl.findHandle(context, installedItem);
 
 			verboseDescription.append("Replace successful");
 

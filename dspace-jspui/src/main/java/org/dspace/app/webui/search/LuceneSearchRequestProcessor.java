@@ -26,13 +26,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
-import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.OpenSearchServiceImpl;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.SimpleSearchServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -43,7 +43,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -333,7 +333,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
                     }
                     else
                     {
-                        resultsItems[itemCount] = (Item)HandleManager.resolveToObject(context, myHandle);
+                        resultsItems[itemCount] = (Item) HandleServiceImpl.resolveToObject(context, myHandle);
                     }
 
                     if (resultsItems[itemCount] == null)
@@ -351,7 +351,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
                     }
                     else
                     {
-                        resultsCollections[collCount] = (Collection)HandleManager.resolveToObject(context, myHandle);
+                        resultsCollections[collCount] = (Collection) HandleServiceImpl.resolveToObject(context, myHandle);
                     }
 
                     if (resultsCollections[collCount] == null)
@@ -370,7 +370,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
                     }
                     else
                     {
-                        resultsCommunities[commCount] = (Community)HandleManager.resolveToObject(context, myHandle);
+                        resultsCommunities[commCount] = (Community) HandleServiceImpl.resolveToObject(context, myHandle);
                     }
 
                     if (resultsCommunities[commCount] == null)
@@ -434,7 +434,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
             request.setAttribute("order",  qArgs.getSortOrder());
             request.setAttribute("sortedBy", sortOption);
 
-            if (AuthorizeManager.isAdmin(context))
+            if (AuthorizeServiceImpl.isAdmin(context))
             {
                 // Set a variable to create admin buttons
                 request.setAttribute("admin_button", Boolean.TRUE);
@@ -555,8 +555,8 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
         String path = request.getPathInfo();
         if (path != null && path.endsWith("description.xml"))
         {
-                String svcDescrip = OpenSearch.getDescription(scope);
-                response.setContentType(OpenSearch.getContentType("opensearchdescription"));
+                String svcDescrip = OpenSearchServiceImpl.getDescription(scope);
+                response.setContentType(OpenSearchServiceImpl.getContentType("opensearchdescription"));
                 response.setContentLength(svcDescrip.length());
                 response.getWriter().write(svcDescrip);
                 return;
@@ -571,7 +571,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
         }
         
         // do some sanity checking
-        if (! OpenSearch.getFormats().contains(format))
+        if (! OpenSearchServiceImpl.getFormats().contains(format))
         {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
@@ -624,7 +624,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
         DSpaceObject container;
         try
         {
-            container = (scope != null) ? HandleManager.resolveToObject(context, scope) : null;
+            container = (scope != null) ? HandleServiceImpl.resolveToObject(context, scope) : null;
         }
         catch (IllegalStateException e)
         {
@@ -670,7 +670,7 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
             DSpaceObject dso;
             try
             {
-                dso = HandleManager.resolveToObject(context, myHandle);
+                dso = HandleServiceImpl.resolveToObject(context, myHandle);
             }
             catch (IllegalStateException e)
             {
@@ -693,13 +693,13 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
 
         // format and return results
         Map<String, String> labelMap = getLabels(request);
-        Document resultsDoc = OpenSearch.getResultsDoc(format, query,
+        Document resultsDoc = OpenSearchServiceImpl.getResultsDoc(format, query,
                 qResults.getHitCount(), qResults.getStart(),
                 qResults.getPageSize(), container, results, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
-            response.setContentType(OpenSearch.getContentType(format));
+            response.setContentType(OpenSearchServiceImpl.getContentType(format));
             xf.transform(new DOMSource(resultsDoc), new StreamResult(response.getWriter()));
         }
         catch (TransformerException e)
@@ -739,12 +739,12 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
         {
             for (String handle : handles)
             {
-                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+                DSpaceObject resultDSO = HandleServiceImpl.resolveToObject(context, handle);
     
                 if (resultDSO.getType() == Constants.ITEM)
                 {
                     Item item = (Item) resultDSO;
-                    if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+                    if (AuthorizeServiceImpl.authorizeActionBoolean(context, item, Constants.READ))
                     {
                         items.put(Integer.valueOf(item.getID()), item);
                     }

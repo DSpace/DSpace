@@ -7,15 +7,13 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.search.DSIndexer;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.dspace.services.KernelStartupCallbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Tim Donohue
  */
-public class DatabaseLegacyReindexer implements FlywayCallback
+public class DatabaseLegacyReindexer implements KernelStartupCallbackService
 {
     /** logging category */
     private static final Logger log = LoggerFactory.getLogger(DatabaseLegacyReindexer.class);
@@ -104,92 +102,10 @@ public class DatabaseLegacyReindexer implements FlywayCallback
                 context.abort();
         }
     }
-    
-    
+
+
     @Override
-    public void afterClean(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void afterInfo(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void afterInit(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void afterMigrate(Connection connection)
-    {
-        // Reindex after a database migration (upgrade)
+    public void executeCallback() {
         reindex();
     }
-    
-    @Override
-    public void afterRepair(Connection connection)
-    {
-        // Reindex after a database repair
-        reindex();
-    }
-    
-    @Override
-    public void afterValidate(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeClean(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo info)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeInfo(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeInit(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeMigrate(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeRepair(Connection connection)
-    {
-        // do nothing
-    }
-    
-    @Override
-    public void beforeValidate(Connection connection)
-    {
-        // do nothing
-    }
-    
 }

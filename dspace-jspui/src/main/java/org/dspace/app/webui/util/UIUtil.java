@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemmarking.ItemMarkingExtractor;
 import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.util.Util;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -127,7 +127,7 @@ public class UIUtil extends Util
             }
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(c, request);
+            int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(c, request);
 
             for (int i = 0; i < groupIDs.length; i++)
             {

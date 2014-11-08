@@ -28,12 +28,13 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
@@ -45,7 +46,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.eperson.Group;
 
@@ -155,7 +155,7 @@ public class FeedServlet extends DSpaceServlet
         if(handle != null && !handle.equals(SITE_FEED_KEY))
         { 	
         	// Determine if handle is a valid reference
-        	dso = HandleManager.resolveToObject(context, handle);
+        	dso = HandleServiceImpl.resolveToObject(context, handle);
                 if (dso == null)
                 {
                     log.info(LogManager.getHeader(context, "invalid_handle", "path=" + path));
@@ -324,7 +324,7 @@ public class FeedServlet extends DSpaceServlet
                 for (Item result : results)
                     {
                 checkAccess:
-                    for (Group group : AuthorizeManager.getAuthorizedGroups(context, result, Constants.READ))
+                    for (Group group : AuthorizeServiceImpl.getAuthorizedGroups(context, result, Constants.READ))
                         {
                         if ((group.getID() == Group.ANONYMOUS_ID))
                         {

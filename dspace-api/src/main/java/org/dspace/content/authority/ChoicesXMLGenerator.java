@@ -22,8 +22,8 @@ import org.xml.sax.helpers.AttributesImpl;
 public class ChoicesXMLGenerator
 {
     // use the XHTML NS, even though this is  a fragment.
-    private static final String NS_URI = "http://www.w3.org/1999/xhtml";
-    private static final String NS_NAME = "";
+    protected static final String NS_URI = "http://www.w3.org/1999/xhtml";
+    protected static final String NS_NAME = "";
 
     public static void generate(Choices result, String format, ContentHandler contentHandler)
         throws SAXException

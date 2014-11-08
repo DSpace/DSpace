@@ -18,15 +18,17 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.storage.rdbms.MockDatabaseManager;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -66,6 +68,8 @@ public class AbstractUnitTest
 
     protected static DSpaceKernelImpl kernelImpl;
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /** 
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize resources required for the tests.
@@ -104,12 +108,7 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
-            
-            // Applies/initializes our mock database by invoking its constructor
-            // (NOTE: This also initializes the DatabaseManager, which in turn
-            // calls DatabaseUtils to initialize the entire DB via Flyway)
-            new MockDatabaseManager();
-            
+
             // Initialize mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
             
@@ -131,8 +130,7 @@ public class AbstractUnitTest
      * but no execution order is guaranteed
      */
     @Before
-    public void init()
-    {        
+    public void init() {
         try
         {
             //Start a new context
@@ -140,28 +138,29 @@ public class AbstractUnitTest
             context.turnOffAuthorisationSystem();
 
             //Find our global test EPerson account. If it doesn't exist, create it.
-            eperson = EPerson.findByEmail(context, "test@email.com");
+            EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+            eperson = ePersonService.findByEmail(context, "test@email.com");
             if(eperson == null)
             {
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
-                eperson = EPerson.create(context);
-                eperson.setFirstName("first");
-                eperson.setLastName("last");
+                eperson = ePersonService.create(context);
+                eperson.setFirstName(context, "first");
+                eperson.setLastName(context, "last");
                 eperson.setEmail("test@email.com");
                 eperson.setCanLogIn(true);
-                eperson.setLanguage(I18nUtil.getDefaultLocale().getLanguage());
+                eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
                 // actually save the eperson to unit testing DB
-                eperson.update();
+                ePersonService.update(context, eperson);
             }
             // Set our global test EPerson as the current user in DSpace
             context.setCurrentUser(eperson);
 
             // If our Anonymous/Administrator groups aren't initialized, initialize them as well
-            Group.initDefaultGroupNames(context);
+            EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
             context.restoreAuthSystemState();
-            context.commit();
+//            context.commit();
         }
         catch (AuthorizeException ex)
         {
@@ -186,7 +185,11 @@ public class AbstractUnitTest
     public void destroy()
     {
         // Cleanup our global context object
-        cleanupContext(context);
+        try {
+            cleanupContext(context);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -195,12 +198,11 @@ public class AbstractUnitTest
      *
      */
     @AfterClass
-    public static void destroyOnce()
-    {
+    public static void destroyOnce() throws SQLException {
         //we clear the properties
         testProps.clear();
         testProps = null;
-        
+
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl!=null)
             kernelImpl.destroy();
@@ -236,11 +238,10 @@ public class AbstractUnitTest
      *  Utility method to cleanup a created Context object (to save memory).
      *  This can also be used by individual tests to cleanup context objects they create.
      */
-    protected void cleanupContext(Context c)
-    {
+    protected void cleanupContext(Context c) throws SQLException {
         // If context still valid, abort it
         if(c!=null && c.isValid())
-           c.abort();
+           c.complete();
 
         // Cleanup Context object by setting it to null
         if(c!=null)

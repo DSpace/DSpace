@@ -20,7 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommons;
 
 import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.Mets;
@@ -57,19 +56,19 @@ public class DSpaceMETSDisseminator
      * Profile.  Though not strictly true, there is no DIP standard yet
      * so it's the most meaningful label we can apply.
      */
-    private static final String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
+    protected static final String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
 
     // MDTYPE value for deposit license -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private static final String DSPACE_DEPOSIT_LICENSE_MDTYPE = "DSpaceDepositLicense:DSPACE_DEPLICENSE";
+    protected static final String DSPACE_DEPOSIT_LICENSE_MDTYPE = "DSpaceDepositLicense:DSPACE_DEPLICENSE";
 
     // MDTYPE value for CC license in RDF -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private static final String CREATIVE_COMMONS_RDF_MDTYPE = "CreativeCommonsRDF:DSPACE_CCRDF";
+    protected static final String CREATIVE_COMMONS_RDF_MDTYPE = "CreativeCommonsRDF:DSPACE_CCRDF";
 
     // MDTYPE value for CC license in Text -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private static final String CREATIVE_COMMONS_TEXT_MDTYPE = "CreativeCommonsText:DSPACE_CCTXT";
+    protected static final String CREATIVE_COMMONS_TEXT_MDTYPE = "CreativeCommonsText:DSPACE_CCTXT";
 
     /**
      * Return identifier string for the profile this produces.
@@ -209,11 +208,11 @@ public class DSpaceMETSDisseminator
                 result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
             }
 
-            if (CreativeCommons.getLicenseRdfBitstream(item) != null)
+            if (creativeCommonsService.getLicenseRdfBitstream(item) != null)
             {
                 result.add(CREATIVE_COMMONS_RDF_MDTYPE);
             }
-            else if (CreativeCommons.getLicenseTextBitstream(item) != null)
+            else if (creativeCommonsService.getLicenseTextBitstream(item) != null)
             {
                 result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
             }

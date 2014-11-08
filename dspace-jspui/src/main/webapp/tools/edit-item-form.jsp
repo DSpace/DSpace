@@ -46,8 +46,8 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
-<%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
+<%@ page import="org.dspace.content.authority.MetadataAuthorityServiceImpl" %>
+<%@ page import="org.dspace.content.authority.ChoiceAuthorityServiceImpl" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.ArrayList" %>
@@ -103,7 +103,7 @@
         collectionID = collections[0].getID();
 %>
 <%!
-     StringBuffer doAuthority(MetadataAuthorityManager mam, ChoiceAuthorityManager cam,
+     StringBuffer doAuthority(MetadataAuthorityServiceImpl mam, ChoiceAuthorityServiceImpl cam,
             PageContext pageContext,
             String contextPath, String fieldName, String idx,
             Metadatum dcv, int collectionID)
@@ -420,8 +420,8 @@
                 <th id="t5" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
-    MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-    ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+    MetadataAuthorityServiceImpl mam = MetadataAuthorityServiceImpl.getManager();
+    ChoiceAuthorityServiceImpl cam = ChoiceAuthorityServiceImpl.getManager();
     Metadatum[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
     String row = "even";
     
@@ -434,7 +434,7 @@
     {
         // Find out how many values with this element/qualifier we've found
 
-        String key = ChoiceAuthorityManager.makeFieldKey(dcv[i].schema, dcv[i].element, dcv[i].qualifier);
+        String key = ChoiceAuthorityServiceImpl.makeFieldKey(dcv[i].schema, dcv[i].element, dcv[i].qualifier);
 
         Integer count = dcCounter.get(key);
         if (count == null)

@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -340,7 +340,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             
             request.setAttribute("browse.info", binfo);
 
-            if (AuthorizeManager.isAdmin(context))
+            if (AuthorizeServiceImpl.isAdmin(context))
             {
                 // Set a variable to create admin buttons
                 request.setAttribute("admin_button", Boolean.TRUE);

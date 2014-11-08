@@ -21,6 +21,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataSchemaService;
 
 /**
  * Prompt the user to determin if they really want to delete the displayed schemas.
@@ -56,7 +58,9 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
 		message("xmlui.general.delete");
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
+
+	protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -75,7 +79,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
 		ArrayList<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
 		for (String id : idsString.split(","))
 		{
-			MetadataSchema schema = MetadataSchema.find(context,Integer.valueOf(id));
+			MetadataSchema schema = metadataSchemaService.find(context,Integer.valueOf(id));
 			schemas.add(schema);
 		}
  

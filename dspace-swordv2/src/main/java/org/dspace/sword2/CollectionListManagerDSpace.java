@@ -20,7 +20,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowItem;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.CollectionListManager;
 import org.swordapp.server.SwordAuthException;
@@ -141,8 +141,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			}
 
 			// finally get the ones out of the workflow
-			WorkflowItem[] wfis = WorkflowItem.findByEPerson(sc.getContext(), person);
-			for (WorkflowItem wfi : wfis)
+			BasicWorkflowItem[] wfis = BasicWorkflowItem.findByEPerson(sc.getContext(), person);
+			for (BasicWorkflowItem wfi : wfis)
 			{
 				Item item = wfi.getItem();
 

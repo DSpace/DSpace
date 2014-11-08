@@ -24,6 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.*;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -52,7 +53,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
     private static final int RECENT_SUBMISSIONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<BrowseItem> recentSubmittedItems;
+    private java.util.List<Item> recentSubmittedItems;
 
     /** Cached validity object */
     private SourceValidity validity;
@@ -98,12 +99,12 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
 	            community = (Community) dso;
 
 	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(community);
+	            validity.add(context, community);
 
 	            // Recently submitted items
-	            for (BrowseItem item : getRecentlySubmittedItems(community))
+	            for (Item item : getRecentlySubmittedItems(community))
 	            {
-	                validity.add(item);
+	                validity.add(context, item);
 	            }
 
 	            this.validity = validity.complete();
@@ -129,7 +130,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
 
         Division home = body.addDivision("community-home", "primary repository community");
 
-        java.util.List<BrowseItem> items = getRecentlySubmittedItems(community);
+        java.util.List<Item> items = getRecentlySubmittedItems(community);
         if(items.size() == 0)
         {
             return;
@@ -141,7 +142,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
         ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                 "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                 null, "recent-submissions");
-        for (BrowseItem item : items)
+        for (Item item : items)
         {
             lastSubmitted.addReference(item);
         }
@@ -155,7 +156,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
      * @return List of recently submitted items
      */
     @SuppressWarnings("unchecked")
-    private java.util.List<BrowseItem> getRecentlySubmittedItems(Community community)
+    private java.util.List<Item> getRecentlySubmittedItems(Community community)
             throws SQLException
     {
         if (recentSubmittedItems != null)
@@ -167,7 +168,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
         int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         if(numRecentSubmissions == 0)
         {
-            return new ArrayList<BrowseItem>();
+            return new ArrayList<>();
         }
         BrowserScope scope = new BrowserScope(context);
         scope.setCommunity(community);

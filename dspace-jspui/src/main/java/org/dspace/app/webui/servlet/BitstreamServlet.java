@@ -29,7 +29,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -121,7 +121,7 @@ public class BitstreamServlet extends DSpaceServlet
         }
         
         // Now try and retrieve the item
-        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+        DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
         
         // Make sure we have valid item and sequence number
         if (dso != null && dso.getType() == Constants.ITEM && sequenceID >= 0)

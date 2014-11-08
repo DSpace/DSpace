@@ -11,6 +11,7 @@ package org.dspace.identifier;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -38,7 +39,7 @@ public class DataCiteXMLCreator
      */
     protected DisseminationCrosswalk xwalk;
 
-    public String getXMLString(DSpaceObject dso)
+    public String getXMLString(Context context, DSpaceObject dso)
     {
         if (dso == null)
         {
@@ -59,7 +60,7 @@ public class DataCiteXMLCreator
         Element root = null;
         try
         {
-            root = xwalk.disseminateElement(dso);
+            root = xwalk.disseminateElement(context, dso);
         }
         catch (Exception e)
         {

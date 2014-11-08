@@ -9,33 +9,27 @@ package org.dspace.app.webui.servlet.admin;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
-import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.browse.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.core.PluginConfigurationError;
 import org.dspace.core.PluginManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,8 +85,8 @@ public class ItemMapServlet extends DSpaceServlet
     	Collection myCollection = Collection.find(context, myID);
     	
     	// authorize check
-    	AuthorizeManager.authorizeAction(context, myCollection,
-    			Constants.COLLECTION_ADMIN);
+    	AuthorizeServiceImpl.authorizeAction(context, myCollection,
+                Constants.COLLECTION_ADMIN);
     	
     	String action = request.getParameter("action");
     	
@@ -268,7 +262,7 @@ public class ItemMapServlet extends DSpaceServlet
     				
     				Item myItem = Item.find(context, i);
     				
-    				if (AuthorizeManager.authorizeActionBoolean(context, myItem, Constants.READ))
+    				if (AuthorizeServiceImpl.authorizeActionBoolean(context, myItem, Constants.READ))
     				{
     					// make sure item doesn't belong to this collection
     					if (!myItem.isOwningCollection(myCollection))

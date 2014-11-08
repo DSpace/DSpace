@@ -200,7 +200,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
         // Make sure that the spring files from the config directoy can override the spring files from our jars
         applicationContext.setAllowBeanDefinitionOverriding(true);
-        applicationContext.setAllowCircularReferences(false);
+        applicationContext.setAllowCircularReferences(true);
         //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
         // add the config interceptors (partially done in the xml)
         applicationContext.addBeanFactoryPostProcessor( new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode) );
@@ -239,6 +239,13 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             applicationContext.getBeanFactory().autowireBean(service);
         } catch (BeansException e) {
             throw new IllegalArgumentException("Invalid service ("+service+") with name ("+name+") registration: " + e.getMessage(), e);
+        }
+        registerBean(name, service);
+    }
+
+    public void registerServiceNoAutowire(String name, Object service) {
+        if (name == null || service == null) {
+            throw new IllegalArgumentException("name and service must not be null for service registration");
         }
         registerBean(name, service);
     }

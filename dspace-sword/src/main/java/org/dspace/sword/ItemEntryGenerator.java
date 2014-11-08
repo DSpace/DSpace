@@ -13,7 +13,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.InvalidMediaTypeException;
@@ -119,7 +119,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 						// return a link to the DSpace entry page
 						Content content = new Content();
 						content.setType("text/html");
-						content.setSource(HandleManager.getCanonicalForm(handle));
+						content.setSource(HandleServiceImpl.getCanonicalForm(handle));
 						entry.setContent(content);
 					}
 				}
@@ -156,7 +156,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 
 			if (handle != null && !"".equals(handle))
 			{
-				entry.setId(HandleManager.getCanonicalForm(handle));
+				entry.setId(HandleServiceImpl.getCanonicalForm(handle));
 				return;
 			}
 		}
@@ -216,7 +216,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 
 			// link to the item splash page
 			Link splash = new Link();
-			splash.setHref(HandleManager.getCanonicalForm(handle));
+			splash.setHref(HandleServiceImpl.getCanonicalForm(handle));
 			splash.setRel("alternate");
 			splash.setType("text/html");
 			entry.addLink(splash);

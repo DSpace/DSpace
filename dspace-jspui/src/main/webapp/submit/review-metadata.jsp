@@ -36,7 +36,7 @@
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
 
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
+<%@ page import="org.dspace.content.authority.MetadataAuthorityServiceImpl" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
@@ -100,7 +100,7 @@
                                                    ip.hasMultipleTitles(),
                                                    ip.isPublishedBefore());
 
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+        MetadataAuthorityServiceImpl mam = MetadataAuthorityServiceImpl.getManager();
 
 
        for (int z = 0; z < inputs.length; z++)
@@ -212,7 +212,7 @@
 <%--             DESCRIBE ITEM ELEMENTS                     --%>
 <%-- ====================================================== --%>
             
-<%@page import="org.dspace.workflow.WorkflowItem"%>
+<%@page import="org.dspace.workflowbasic.BasicWorkflowItem"%>
 <div class="col-md-10">
 
 <%

@@ -81,7 +81,7 @@ public class SearchUtils {
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item) throws SQLException {
         Map<String, DiscoveryConfiguration> result = new HashMap<String, DiscoveryConfiguration>();
 
-        Collection[] collections = item.getCollections();
+        List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
             DiscoveryConfiguration configuration = getDiscoveryConfiguration(collection);
             if(!result.containsKey(configuration.getId())){

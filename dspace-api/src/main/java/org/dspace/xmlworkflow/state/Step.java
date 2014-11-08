@@ -8,11 +8,14 @@
 package org.dspace.xmlworkflow.state;
 
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.*;
+import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -31,6 +34,9 @@ import java.util.Map;
 public class Step {
 
 
+    protected InProgressUserService inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
+    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+
 
     private UserSelectionActionConfig userSelectionMethod;
     private HashMap<String, WorkflowActionConfig> actionConfigsMap;
@@ -42,7 +48,7 @@ public class Step {
     private int requiredUsers;
 
     public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers){
-        this.actionConfigsMap = new HashMap<String, WorkflowActionConfig>();
+        this.actionConfigsMap = new HashMap<>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
         this.role = role;
@@ -58,7 +64,7 @@ public class Step {
         if(actionConfigsMap.get(actionID)!=null){
             return actionConfigsMap.get(actionID);
         }else{
-            WorkflowActionConfig action = WorkflowFactory.createWorkflowActionConfig(actionID);
+            WorkflowActionConfig action = xmlWorkflowFactory.createWorkflowActionConfig(actionID);
             action.setStep(this);
             actionConfigsMap.put(actionID, action);
             return action;
@@ -118,7 +124,7 @@ public class Step {
      * @return if enough users have finished this task
      */
     public boolean isFinished(Context c, XmlWorkflowItem wfi) throws SQLException {
-        return InProgressUser.getNumberOfFinishedUsers(c, wfi.getID()) == requiredUsers;
+        return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;
     }
 
     public int getRequiredUsers(){

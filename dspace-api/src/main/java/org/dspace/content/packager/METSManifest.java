@@ -130,14 +130,14 @@ public class METSManifest
     public static final String CONFIG_METS_PREFIX = "mets.";
 
     /** prefix of config lines identifying local XML Schema (XSD) files */
-    private static final String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
+    protected static final String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
 
     /** Dublin core element namespace */
-    private static final Namespace dcNS = Namespace
+    protected static final Namespace dcNS = Namespace
             .getNamespace("http://purl.org/dc/elements/1.1/");
 
     /** Dublin core term namespace (for qualified DC) */
-    private static final Namespace dcTermNS = Namespace
+    protected static final Namespace dcTermNS = Namespace
             .getNamespace("http://purl.org/dc/terms/");
 
     /** METS namespace -- includes "mets" prefix for use in XPaths */
@@ -149,24 +149,24 @@ public class METSManifest
             .getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** root element of the current METS manifest. */
-    private Element mets = null;
+    protected Element mets = null;
 
     /** all mdRef elements in the manifest */
-    private List mdFiles = null;
+    protected List mdFiles = null;
 
     /** <file> elements in "original" file group (bundle) */
-    private List<Element> contentFiles = null;
-    private List<Element> bundleFiles = null;
+    protected List<Element> contentFiles = null;
+    protected List<Element> bundleFiles = null;
 
     /** builder to use for mdRef streams, inherited from create() */
-    private SAXBuilder parser = null;
+    protected SAXBuilder parser = null;
 
     /** name of packager who created this manifest object, for looking up configuration entries. */
-    private String configName;
+    protected String configName;
 
     // Create list of local schemas at load time, since it depends only
     // on the DSpace configuration.
-    private static String localSchemas;
+    protected static String localSchemas;
     static
     {
         String dspace_dir = ConfigurationManager.getProperty("dspace.dir");
@@ -233,7 +233,7 @@ public class METSManifest
      * @param builder XML parser (for parsing mdRef'd files and binData)
      * @param mets parsed METS document
      */
-    private METSManifest(SAXBuilder builder, Element mets, String configName)
+    protected METSManifest(SAXBuilder builder, Element mets, String configName)
     {
         super();
         this.mets = mets;
@@ -448,7 +448,7 @@ public class METSManifest
 
     // translate bundle name from METS to DSpace; METS may be "CONTENT"
     // or "ORIGINAL" for the DSpace "ORIGINAL", rest are left alone.
-    private static String normalizeBundleName(String in)
+    protected static String normalizeBundleName(String in)
     {
         if (in.equals("CONTENT"))
         {
@@ -939,7 +939,7 @@ public class METSManifest
 
     // return a single Element node found by one-off path.
     // use only when path varies each time you call it.
-    private Element getElementByXPath(String path, boolean nullOk)
+    protected Element getElementByXPath(String path, boolean nullOk)
         throws MetadataValidationException
     {
         try
@@ -968,7 +968,7 @@ public class METSManifest
     }
 
     // Find crosswalk for the indicated metadata type (e.g. "DC", "MODS")
-    private Object getCrosswalk(String type, Class clazz)
+    protected Object getCrosswalk(String type, Class clazz)
     {
         /**
          * Allow DSpace Config to map the metadata type to a
@@ -1085,7 +1085,7 @@ public class METSManifest
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        crosswalkXmd(context, params, dso, dmdSec, callback);
+        crosswalkXmd(context, params, dso, dmdSec, callback, false);
     }
 
     /**
@@ -1103,15 +1103,15 @@ public class METSManifest
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("digiprovMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback, false);
             }
         }
     }
@@ -1132,7 +1132,7 @@ public class METSManifest
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback, false);
                 result = true;
             }
         }
@@ -1145,7 +1145,7 @@ public class METSManifest
      * @return
      * @throws MetadataValidationException
      */
-    private String[] getAmdIDs()
+    protected String[] getAmdIDs()
         throws MetadataValidationException
     {
         // div@ADMID is actually IDREFS, a space-separated list of IDs:
@@ -1163,9 +1163,9 @@ public class METSManifest
     }
 
     // Crosswalk *any* kind of metadata section - techMD, rightsMD, etc.
-    private void crosswalkXmd(Context context, PackageParameters params,
+    protected void crosswalkXmd(Context context, PackageParameters params,
                               DSpaceObject dso,
-                              Element xmd, Mdref callback)
+                              Element xmd, Mdref callback, boolean createMissingMetadataFields)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
@@ -1190,7 +1190,7 @@ public class METSManifest
                     wrapper.setPackagingParameters(params);
                 }
 
-                xwalk.ingest(context, dso, getMdContentAsXml(xmd,callback));
+                xwalk.ingest(context, dso, getMdContentAsXml(xmd,callback), false);
             }
             // Otherwise, try stream-based crosswalk
             else
@@ -1307,15 +1307,15 @@ public class METSManifest
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback, false);
             }
         }
     }
@@ -1347,15 +1347,15 @@ public class METSManifest
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback, false);
             }
             for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bundle, (Element)ti.next(), callback, false);
             }
         }
     }

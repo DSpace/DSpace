@@ -7,87 +7,72 @@
  */
 package org.dspace.checker;
 
+import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * <p>
  * Represents a history record for the bitstream.
  * </p>
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
+ *
  */
+@Entity
+@Table(name="checksum_history", schema = "public")
 public class ChecksumHistory
 {
 
-    /** Unique bitstream id. */
-    private int bitstreamId;
 
-    /** Date the process started. */
+    @Id
+    @Column(name="check_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="checksum_history_check_id_seq")
+    @SequenceGenerator(name="checksum_history_check_id_seq", sequenceName="checksum_history_check_id_seq", allocationSize = 1)
+    private long id;
+
+    @Column(name = "bitstream_id")
+    private UUID bitstreamId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "process_start_date", nullable = false)
     private Date processStartDate;
 
-    /** Date the process ended. */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "process_end_date", nullable = false)
     private Date processEndDate;
 
-    /** The expected checksum. */
+    @Column(name= "checksum_expected", nullable = false)
     private String checksumExpected;
 
-    /** The checksum calculated. */
+    @Column(name= "checksum_calculated", nullable = false)
     private String checksumCalculated;
 
-    /** The string result. */
-    private String result;
+    @ManyToOne
+    @JoinColumn(name = "result")
+    private ChecksumResult checksumResult;
+
 
     public ChecksumHistory()
     {
     }
 
-    /**
-     * Minimal Constructor.
-     * 
-     * @param bitstreamId
-     *            bitstream id in the database
-     */
-    public ChecksumHistory(int bitstreamId)
-    {
-        this.bitstreamId = bitstreamId;
-    }
-
-    /**
-     * * Full history info Constructor.
-     * 
-     * @param bitstrmId
-     *            bitstream Id.
-     * @param startDate
-     *            process start date
-     * @param endDate
-     *            process end date
-     * @param checksumExpted
-     *            expected checksum
-     * @param checksumCalc
-     *            calculated checksum
-     * @param inResult
-     *            result information
-     */
-    public ChecksumHistory(int bitstrmId, Date startDate, Date endDate,
-            String checksumExpted, String checksumCalc, String inResult)
-    {
-        this.bitstreamId = bitstrmId;
-        this.processStartDate = (startDate == null ? null : new Date(startDate.getTime()));
-        this.processEndDate = (endDate == null ? null : new Date(endDate.getTime()));
-        this.checksumExpected = checksumExpted;
-        this.checksumCalculated = checksumCalc;
-        this.result = inResult;
+    public long getId() {
+        return id;
     }
 
     /**
      * @return Returns the bitstreamId.
      */
-    public int getBitstreamId()
+    public UUID getBitstreamId()
     {
         return bitstreamId;
+    }
+
+    public void setBitstreamId(UUID bitstreamId) {
+        this.bitstreamId = bitstreamId;
     }
 
     /**
@@ -100,7 +85,7 @@ public class ChecksumHistory
 
     /**
      * Set the checksum calculated.
-     * 
+     *
      * @param checksumCalculated
      *            The checksumCalculated to set.
      */
@@ -111,7 +96,7 @@ public class ChecksumHistory
 
     /**
      * Get the extpected checksum.
-     * 
+     *
      * @return Returns the checksumExpected.
      */
     public String getChecksumExpected()
@@ -121,7 +106,7 @@ public class ChecksumHistory
 
     /**
      * Set the expected checksum.
-     * 
+     *
      * @param checksumExpected
      *            The checksumExpected to set.
      */
@@ -132,7 +117,7 @@ public class ChecksumHistory
 
     /**
      * Get the process end date. This is the date and time the processing ended.
-     * 
+     *
      * @return Returns the processEndDate.
      */
     public Date getProcessEndDate()
@@ -142,7 +127,7 @@ public class ChecksumHistory
 
     /**
      * Set the process end date. This is the date and time the processing ended.
-     * 
+     *
      * @param processEndDate
      *            The processEndDate to set.
      */
@@ -154,7 +139,7 @@ public class ChecksumHistory
     /**
      * Get the process start date. This is the date and time the processing
      * started.
-     * 
+     *
      * @return Returns the processStartDate.
      */
     public Date getProcessStartDate()
@@ -165,7 +150,7 @@ public class ChecksumHistory
     /**
      * Set the process start date. This is the date and time the processing
      * started.
-     * 
+     *
      * @param processStartDate
      *            The processStartDate to set.
      */
@@ -177,19 +162,19 @@ public class ChecksumHistory
     /**
      * Return the processing result.
      */
-    public String getResult()
+    public ChecksumResult getResult()
     {
-        return result;
+        return checksumResult;
     }
 
     /**
      * Set the checksum processing result.
-     * 
+     *
      * @param result
      *            The result to set.
      */
-    public void setResult(String result)
+    public void setResult(ChecksumResult result)
     {
-        this.result = result;
+        this.checksumResult = result;
     }
 }

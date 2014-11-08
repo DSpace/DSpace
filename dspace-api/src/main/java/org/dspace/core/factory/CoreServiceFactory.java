@@ -1,0 +1,29 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.core.factory;
+
+import org.dspace.core.service.LicenseService;
+import org.dspace.core.service.NewsService;
+import org.dspace.utils.DSpace;
+
+/**
+ * Abstract factory to get services for the core package, use CoreServiceFactory.getInstance() to retrieve an implementation
+ *
+ * @author kevinvandevelde at atmire.com
+ */
+public abstract class CoreServiceFactory {
+
+    public abstract LicenseService getLicenseService();
+
+    public abstract NewsService getNewsService();
+
+    public static CoreServiceFactory getInstance()
+    {
+        return new DSpace().getServiceManager().getServiceByName("coreServiceFactory", CoreServiceFactory.class);
+    }
+}

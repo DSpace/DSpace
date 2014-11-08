@@ -25,6 +25,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,9 @@ import org.xml.sax.SAXException;
  */
 public class MetadataImporter
 {
+    protected static MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected static MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+
     /** logging category */
     private static final Logger log = LoggerFactory.getLogger(MetadataImporter.class);
 
@@ -173,14 +179,13 @@ public class MetadataImporter
         }
 
         // check to see if the schema already exists
-        MetadataSchema s = MetadataSchema.find(context, name);
+        MetadataSchema s = metadataSchemaService.find(context, name);
         
         if (s == null)
         {
             // Schema does not exist - create
             log.info("Registering Schema " + name + " (" + namespace + ")");
-            MetadataSchema schema = new MetadataSchema(namespace, name);
-            schema.create(context);
+            MetadataSchema schema = metadataSchemaService.create(context, name, namespace);
         }
         else
         {
@@ -197,7 +202,7 @@ public class MetadataImporter
                 // Update the existing schema namespace and continue to type import
                 log.info("Updating Schema " + name + ": New namespace " + namespace);
                 s.setNamespace(namespace);
-                s.update(context);
+                metadataSchemaService.update(context, s);
             }
             else
             {
@@ -236,14 +241,14 @@ public class MetadataImporter
 
         
         // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        MetadataSchema schemaObj = metadataSchemaService.find(context, schema);
         
         if (schemaObj == null)
         {
             throw new RegistryImportException("Schema '" + schema + "' is not registered and does not exist.");
         }
         
-        MetadataField mf = MetadataField.findByElement(context, schemaObj.getSchemaID(), element, qualifier);
+        MetadataField mf = metadataFieldService.findByElement(context, schemaObj, element, qualifier);
         if (mf != null)
         {
             // Metadata field already exists, skipping it
@@ -255,12 +260,8 @@ public class MetadataImporter
         if(qualifier==null)
             fieldName = schema + "." + element;
         log.info("Registering metadata field " + fieldName);
-        MetadataField field = new MetadataField();
-        field.setSchemaID(schemaObj.getSchemaID());
-        field.setElement(element);
-        field.setQualifier(qualifier);
-        field.setScopeNote(scopeNote);
-        field.create(context);
+        MetadataField field = metadataFieldService.create(context, schemaObj, element, qualifier, scopeNote);
+        metadataFieldService.update(context, field);
     }
     
     /**

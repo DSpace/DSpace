@@ -9,11 +9,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
 
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
@@ -26,7 +22,6 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.LicenseUtils;
-import org.dspace.license.CreativeCommons;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 

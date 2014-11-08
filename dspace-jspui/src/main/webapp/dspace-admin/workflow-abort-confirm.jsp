@@ -20,13 +20,13 @@
     prefix="fmt" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.WorkflowAbortServlet" %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    WorkflowItem workflow = (WorkflowItem) request.getAttribute("workflow");
+    BasicWorkflowItem workflow = (BasicWorkflowItem) request.getAttribute("workflow");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -53,13 +53,13 @@
         <div class="row">
         <%-- <li>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></li> --%>
         <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
-            <fmt:param><%= WorkflowManager.getSubmitterName(workflow) %></fmt:param>
+            <fmt:param><%= BasicWorkflowServiceImpl.getSubmitterName(workflow) %></fmt:param>
         </fmt:message></span>
         </div>
         <div class="row">
         <%-- <li>Title: <%= WorkflowManager.getItemTitle(workflow) %></li> --%>
         <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.item-title">
-            <fmt:param><%= WorkflowManager.getItemTitle(workflow) %></fmt:param>
+            <fmt:param><%= BasicWorkflowServiceImpl.getItemTitle(workflow) %></fmt:param>
         </fmt:message></span>
     	</div>
     <form method="post" action="">

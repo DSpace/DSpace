@@ -26,11 +26,11 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.Metadatum;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFUtil;
@@ -58,9 +58,10 @@ public class MetadataConverterPlugin implements ConverterPlugin
     public Model convert(Context context, DSpaceObject dso)
             throws SQLException, AuthorizeException {
         String uri = RDFUtil.generateIdentifier(context, dso);
+        DSpaceObjectService<DSpaceObject> dsoService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         if (uri == null)
         {
-            log.error("Cannot create URI for " + dso.getTypeText() + " " 
+            log.error("Cannot create URI for " + dsoService.getTypeText(dso) + " " 
                     + dso.getID() + " stopping conversion.");
             return null;
         }
@@ -127,23 +128,25 @@ public class MetadataConverterPlugin implements ConverterPlugin
         // should be changed, if Communities and Collections have metadata as well.
         if (!(dso instanceof Item))
         {
-            log.error("This DspaceObject (" + dso.getTypeText() + " " 
+            log.error("This DspaceObject (" + dsoService.getTypeText(dso) + " " 
                     + dso.getID() + ") should not have bin submitted to this "
                     + "plugin, as it supports Items only!");
             return null;
         }
         
         Item item = (Item) dso;
-        Metadatum[] metadata_values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
-        for (Metadatum value : metadata_values)
+        List<MetadataValue> metadata_values = dsoService.getMetadata(item, MetadataSchema.DC_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue value : metadata_values)
         {
-            String fieldname = value.schema + "." + value.element;
-            if (value.qualifier != null) 
+            MetadataField metadataField = value.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            String fieldname = metadataSchema.getName() + "." + metadataField.getElement();
+            if (metadataField.getQualifier() != null) 
             {
-                fieldname = fieldname + "." + value.qualifier;
+                fieldname = fieldname + "." + metadataField.getQualifier();
             }
-            if (MetadataExposure.isHidden(context, value.schema, value.element,
-                    value.qualifier))
+            if (UtilServiceFactory.getInstance().getMetadataExposureService().isHidden(context, metadataSchema.getName(), metadataField.getElement(),
+                    metadataField.getQualifier()))
             {
                 log.debug(fieldname + " is a hidden metadata field, won't "
                         + "convert it.");
@@ -151,29 +154,29 @@ public class MetadataConverterPlugin implements ConverterPlugin
             }
 
             boolean converted = false;
-            if (value.qualifier != null)
+            if (metadataField.getQualifier() != null)
             {
                 Iterator<MetadataRDFMapping> iter = mappings.iterator();
                 while (iter.hasNext())
                 {
                     MetadataRDFMapping mapping = iter.next();
-                    if (mapping.matchesName(fieldname) && mapping.fulfills(value.value))
+                    if (mapping.matchesName(fieldname) && mapping.fulfills(value.getValue()))
                     {
-                        mapping.convert(value.value, value.language, uri, convertedData);
+                        mapping.convert(value.getValue(), value.getLanguage(), uri, convertedData);
                         converted = true;
                     }
                 }
             }
             if (!converted)
             {
-                String name = value.schema + "." + value.element;
+                String name = metadataSchema.getName() + "." + metadataField.getElement();
                 Iterator<MetadataRDFMapping> iter = mappings.iterator();
                 while (iter.hasNext() && !converted)
                 {
                     MetadataRDFMapping mapping = iter.next();
-                    if (mapping.matchesName(name) && mapping.fulfills(value.value))
+                    if (mapping.matchesName(name) && mapping.fulfills(value.getValue()))
                     {
-                        mapping.convert(value.value, value.language, uri, convertedData);
+                        mapping.convert(value.getValue(), value.getLanguage(), uri, convertedData);
                         converted = true;
                     }
                 }

@@ -8,7 +8,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
@@ -74,7 +74,7 @@ public class Community extends DSpaceObject{
             org.dspace.content.Collection[] collectionArray = community.getCollections();
             collections = new ArrayList<Collection>();
             for(org.dspace.content.Collection collection : collectionArray) {
-                if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
+                if(AuthorizeServiceImpl.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
                     collections.add(new Collection(collection, null, context, null, null));
                 } else {
                     log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
@@ -88,7 +88,7 @@ public class Community extends DSpaceObject{
             org.dspace.content.Community[] communityArray = community.getSubcommunities();
             subcommunities = new ArrayList<Community>();
             for(org.dspace.content.Community subCommunity : communityArray) {
-                if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
+                if(AuthorizeServiceImpl.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
                 	subcommunities.add(new Community(subCommunity, null, context));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());

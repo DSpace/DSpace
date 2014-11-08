@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.logging.Level;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +19,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.ConfigurationManager;
@@ -159,7 +158,7 @@ public class Authenticate
          * 2. if those fail, redirect to enter credentials.
          *    return false.
          */
-        if (AuthenticationManager.authenticateImplicit(context, null, null,
+        if (AuthenticationServiceImpl.authenticateImplicit(context, null, null,
                 null, request) == AuthenticationMethod.SUCCESS)
         {
             try {
@@ -206,7 +205,7 @@ public class Authenticate
              * ones with a "redirect" login page -- if there's only one,
              * go directly there.  If there is a choice, go to JSP chooser.
              */
-            Iterator ai = AuthenticationManager.authenticationMethodIterator();
+            Iterator ai = AuthenticationServiceImpl.authenticationMethodIterator();
             AuthenticationMethod am;
             int count = 0;
             String url = null;
@@ -289,7 +288,7 @@ public class Authenticate
         
         try
         {
-            isAdmin = AuthorizeManager.isAdmin(context);
+            isAdmin = AuthorizeServiceImpl.isAdmin(context);
         }
         catch (SQLException se)
         {

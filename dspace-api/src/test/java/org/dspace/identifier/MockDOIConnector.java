@@ -9,6 +9,8 @@ package org.dspace.identifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import mockit.Mock;
 import mockit.MockUp;
 import org.dspace.content.DSpaceObject;
@@ -25,13 +27,13 @@ extends MockUp<DOIConnector>
 implements org.dspace.identifier.doi.DOIConnector
 {
 
-    public Map<String, Integer> reserved;
-    public Map<String, Integer> registered;
+    public Map<String, UUID> reserved;
+    public Map<String, UUID> registered;
     
     public MockDOIConnector()
     {
-        reserved = new HashMap<String, Integer>();
-        registered = new HashMap<String, Integer>();
+        reserved = new HashMap<String, UUID>();
+        registered = new HashMap<String, UUID>();
     }
     
     public void reset()
@@ -57,8 +59,8 @@ implements org.dspace.identifier.doi.DOIConnector
         {
             throw new NullPointerException();
         }
-        Integer itemId = reserved.get(doi);
-        return (itemId != null && itemId.intValue() == dso.getID()) ? true : false;
+        UUID itemId = reserved.get(doi);
+        return (itemId != null && itemId.equals(dso.getID())) ? true : false;
     }
 
     @Override
@@ -78,8 +80,8 @@ implements org.dspace.identifier.doi.DOIConnector
         {
             throw new NullPointerException();
         }
-        Integer itemId = registered.get(doi);
-        return (itemId != null && itemId.intValue() == dso.getID()) ? true : false;
+        UUID itemId = registered.get(doi);
+        return (itemId != null && itemId.equals(dso.getID())) ? true : false;
     }
 
     @Override
@@ -100,10 +102,10 @@ implements org.dspace.identifier.doi.DOIConnector
     public void reserveDOI(Context context, DSpaceObject dso, String doi)
             throws DOIIdentifierException
     {
-        Integer itemId = reserved.get(doi);
+        UUID itemId = reserved.get(doi);
         if (null != itemId)
         {
-            if (dso.getID() == itemId.intValue())
+            if (dso.getID().equals(itemId))
             {
                 return;
             }
@@ -114,7 +116,7 @@ implements org.dspace.identifier.doi.DOIConnector
                         DOIIdentifierException.MISMATCH);
             }
         }
-        reserved.put(doi, new Integer(dso.getID()));
+        reserved.put(doi, dso.getID());
     }
 
     @Override
@@ -128,7 +130,7 @@ implements org.dspace.identifier.doi.DOIConnector
                     + "DOI.", DOIIdentifierException.RESERVE_FIRST);
         }
         
-        if (reserved.get(doi).intValue() != dso.getID())
+        if (!reserved.get(doi).equals(dso.getID()))
         {
             throw new DOIIdentifierException("Trying to register a DOI that is"
                     + " reserved for another item.", DOIIdentifierException.MISMATCH);
@@ -136,7 +138,7 @@ implements org.dspace.identifier.doi.DOIConnector
         
         if (registered.containsKey(doi))
         {
-            if (registered.get(doi).intValue() == dso.getID())
+            if (registered.get(doi).equals(dso.getID()))
             {
                 return;
             }
@@ -148,7 +150,7 @@ implements org.dspace.identifier.doi.DOIConnector
             }
         }
         
-        registered.put(doi, new Integer(dso.getID()));
+        registered.put(doi, dso.getID());
     }
 
     @Override
@@ -161,7 +163,7 @@ implements org.dspace.identifier.doi.DOIConnector
             throw new DOIIdentifierException("Trying to update a DOI that is not "
                     + "registered!", DOIIdentifierException.DOI_DOES_NOT_EXIST);
         }
-        if (reserved.get(doi).intValue() != dso.getID())
+        if (!reserved.get(doi).equals(dso.getID()))
         {
             throw new DOIIdentifierException("Trying to update metadata of an "
                     + "unreserved DOI.", DOIIdentifierException.DOI_DOES_NOT_EXIST);

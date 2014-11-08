@@ -7,7 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,15 +14,8 @@ import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.apache.cocoon.util.ConfigurationUtil;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
 
 /**
  * Use the configuration in Dspace.cfg to select paths in sitemap.xmap

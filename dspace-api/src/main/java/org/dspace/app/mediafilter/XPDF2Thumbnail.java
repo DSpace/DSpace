@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
 
@@ -62,62 +63,67 @@ public class XPDF2Thumbnail extends MediaFilter
     private static Logger log = Logger.getLogger(XPDF2Thumbnail.class);
 
     // maximum size of either preview image dimension
-    private static final int MAX_PX = 800;
+    protected static final int MAX_PX = 800;
 
     // maxium DPI - use common screen res, 100dpi.
-    private static final int MAX_DPI = 100;
+    protected static final int MAX_DPI = 100;
 
     // command to get image from PDF; @FILE@, @OUTPUT@ are placeholders
-    private static final String XPDF_PDFTOPPM_COMMAND[] =
+    protected static final String XPDF_PDFTOPPM_COMMAND[] =
     {
         "@COMMAND@", "-q", "-f", "1", "-l", "1",
         "-r", "@DPI@", "@FILE@", "@OUTPUTFILE@"
     };
 
     // command to get image from PDF; @FILE@, @OUTPUT@ are placeholders
-    private static final String XPDF_PDFINFO_COMMAND[] =
+    protected static final String XPDF_PDFINFO_COMMAND[] =
     {
         "@COMMAND@", "-f", "1", "-l", "1", "-box", "@FILE@"
     };
 
     // executable path for "pdftoppm", comes from DSpace config at runtime.
-    private String pdftoppmPath = null;
+    protected String pdftoppmPath = null;
 
     // executable path for "pdfinfo", comes from DSpace config at runtime.
-    private String pdfinfoPath = null;
+    protected String pdfinfoPath = null;
 
     // match line in pdfinfo output that describes file's MediaBox
-    private static final Pattern MEDIABOX_PATT = Pattern.compile(
+    protected static final Pattern MEDIABOX_PATT = Pattern.compile(
         "^Page\\s+\\d+\\s+MediaBox:\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)");
 
     // also from thumbnail.maxwidth in config
-    private int xmax = 0;
+    protected int xmax = 0;
 
     // backup default for size, on the large side.
-    private static final int DEFAULT_XMAX = 500;
+    protected static final int DEFAULT_XMAX = 500;
 
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".jpg";
     }
 
+    @Override
     public String getBundleName()
     {
         return "THUMBNAIL";
     }
 
+    @Override
     public String getFormatString()
     {
         return "JPEG";
     }
 
+    @Override
     public String getDescription()
     {
         return "Generated Thumbnail";
     }
 
     // canonical MediaFilter method to generate the thumbnail as stream.
-    public InputStream getDestinationStream(InputStream sourceStream)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream sourceStream, boolean verbose)
             throws Exception
     {
         // get config params
@@ -301,7 +307,7 @@ public class XPDF2Thumbnail extends MediaFilter
         
         // if verbose flag is set, print out dimensions
         // to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("original size: " + xsize + "," + ysize);
         }
@@ -314,7 +320,7 @@ public class XPDF2Thumbnail extends MediaFilter
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("x scale factor: " + scale_factor);
             }
@@ -326,7 +332,7 @@ public class XPDF2Thumbnail extends MediaFilter
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("new size: " + xsize + "," + ysize);
             }
@@ -344,7 +350,7 @@ public class XPDF2Thumbnail extends MediaFilter
         }
 
         // if verbose flag is set, print details to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("created thumbnail size: " + xsize + ", "
                     + ysize);

@@ -10,9 +10,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -39,11 +37,10 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -146,6 +143,8 @@ public class UploadStep extends AbstractSubmissionStep
      **/
     private EditFileStep editFile = null;
 
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     /**
      * Establish our required parameters, abstractStep will enforce these.
      */
@@ -194,11 +193,11 @@ public class UploadStep extends AbstractSubmissionStep
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
         boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
-        Bundle[] bundles = item.getBundles("ORIGINAL");
-        Bitstream[] bitstreams = new Bitstream[0];
-        if (bundles.length > 0)
+        java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        if (bundles.size() > 0)
         {
-            bitstreams = bundles[0].getBitstreams();
+            bitstreams = bundles.get(0).getBitstreams();
         }
 
         // Part A:
@@ -255,9 +254,9 @@ public class UploadStep extends AbstractSubmissionStep
 
         // Part B:
         //  If the user has already uploaded files provide a list for the user.
-        if (bitstreams.length > 0 || disableFileEditing)
+        if (bitstreams.size() > 0 || disableFileEditing)
         {
-            Table summary = div.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
+            Table summary = div.addTable("submit-upload-summary",(bitstreams.size() * 2) + 2,7);
             summary.setHead(T_head2);
 
             Row header = summary.addRow(Row.ROLE_HEADER);
@@ -269,9 +268,10 @@ public class UploadStep extends AbstractSubmissionStep
             header.addCellContent(T_column5); // format
             header.addCellContent(T_column6); // edit button
 
-            for (Bitstream bitstream : bitstreams)
+            for (BundleBitstream bundleBitstream : bitstreams)
             {
-                int id = bitstream.getID();
+                Bitstream bitstream = bundleBitstream.getBitstream();
+                UUID id = bitstream.getID();
                 String name = bitstream.getName();
                 String url = makeBitstreamLink(item, bitstream);
                 long bytes = bitstream.getSize();
@@ -288,7 +288,7 @@ public class UploadStep extends AbstractSubmissionStep
 
                 // If this bitstream is already marked as the primary bitstream
                 // mark it as such.
-                if(bundles[0].getPrimaryBitstreamID() == id) {
+                if(bundles.get(0).getPrimaryBitstream() != null && bundles.get(0).getPrimaryBitstream().getID().equals(id)) {
                     primary.setOptionSelected(String.valueOf(id));
                 }
 
@@ -297,7 +297,7 @@ public class UploadStep extends AbstractSubmissionStep
                     // Workflow users can not remove files.
                     CheckBox remove = row.addCell().addCheckBox("remove");
                     remove.setLabel("remove");
-                    remove.addOption(id);
+                    remove.addOption(id.toString());
                 }
                 else
                 {
@@ -315,7 +315,7 @@ public class UploadStep extends AbstractSubmissionStep
                     row.addCellContent(desc);
                 }
 
-                BitstreamFormat format = bitstream.getFormat();
+                BitstreamFormat format = bitstream.getFormat(context);
                 if (format == null)
                 {
                     row.addCellContent(T_unknown_format);
@@ -451,16 +451,17 @@ public class UploadStep extends AbstractSubmissionStep
 
         // Review all uploaded files
         Item item = submission.getItem();
-        Bundle[] bundles = item.getBundles("ORIGINAL");
-        Bitstream[] bitstreams = new Bitstream[0];
-        if (bundles.length > 0)
+        java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        if (bundles.size() > 0)
         {
-            bitstreams = bundles[0].getBitstreams();
+            bitstreams = bundles.get(0).getBitstreams();
         }
 
-        for (Bitstream bitstream : bitstreams)
+        for (BundleBitstream bundleBitstream : bitstreams)
         {
-            BitstreamFormat bitstreamFormat = bitstream.getFormat();
+            Bitstream bitstream = bundleBitstream.getBitstream();
+            BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
 
             String name = bitstream.getName();
             String url = makeBitstreamLink(item, bitstream);

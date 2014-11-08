@@ -10,6 +10,7 @@ package org.dspace.content.authority;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.http.message.BasicNameValuePair;
+import org.dspace.content.Collection;
 
 /**
  * Sample Publisher name authority based on SHERPA/RoMEO
@@ -25,10 +26,10 @@ import org.apache.http.message.BasicNameValuePair;
  */
 public class SHERPARoMEOPublisher extends SHERPARoMEOProtocol
 {
-    private static final String RESULT = "publisher";
-    private static final String LABEL = "name";
+    protected static final String RESULT = "publisher";
+    protected static final String LABEL = "name";
     // note: the publisher records have nothing we can use as authority code.
-    private static final String AUTHORITY = null;
+    protected static final String AUTHORITY = null;
 
     public SHERPARoMEOPublisher()
     {
@@ -36,7 +37,7 @@ public class SHERPARoMEOPublisher extends SHERPARoMEOProtocol
     }
 
     @Override
-    public Choices getMatches(String text, int collection, int start, int limit, String locale)
+    public Choices getMatches(String text, Collection collection, int start, int limit, String locale)
     {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0)
@@ -58,7 +59,7 @@ public class SHERPARoMEOPublisher extends SHERPARoMEOProtocol
     }
 
     @Override
-    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale) {
+    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         return getMatches(text, collection, start, limit, locale);
     }    
 }

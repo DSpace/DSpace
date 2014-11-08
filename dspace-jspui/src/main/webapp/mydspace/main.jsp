@@ -34,13 +34,13 @@
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.SupervisedItem" %>
+<%@ page import="org.dspace.content.SupervisedItemServiceImpl" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
 <%@ page import="java.util.List" %>
 <%@page import="org.dspace.app.itemimport.BatchUpload"%>
 
@@ -50,20 +50,20 @@
     WorkspaceItem[] workspaceItems =
         (WorkspaceItem[]) request.getAttribute("workspace.items");
 
-    WorkflowItem[] workflowItems =
-        (WorkflowItem[]) request.getAttribute("workflow.items");
+    BasicWorkflowItem[] workflowItems =
+        (BasicWorkflowItem[]) request.getAttribute("workflow.items");
 
-    WorkflowItem[] owned =
-        (WorkflowItem[]) request.getAttribute("workflow.owned");
+    BasicWorkflowItem[] owned =
+        (BasicWorkflowItem[]) request.getAttribute("workflow.owned");
 
-    WorkflowItem[] pooled =
-        (WorkflowItem[]) request.getAttribute("workflow.pooled");
+    BasicWorkflowItem[] pooled =
+        (BasicWorkflowItem[]) request.getAttribute("workflow.pooled");
 	
     Group [] groupMemberships =
         (Group []) request.getAttribute("group.memberships");
 
-    SupervisedItem[] supervisedItems =
-        (SupervisedItem[]) request.getAttribute("supervised.items");
+    SupervisedItemServiceImpl[] supervisedItems =
+        (SupervisedItemServiceImpl[]) request.getAttribute("supervised.items");
     
     List<String> exportsAvailable = (List<String>)request.getAttribute("export.archives");
     
@@ -130,9 +130,9 @@
             {
 
             //There was once some code...
-            case WorkflowManager.WFSTATE_STEP1: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
-            case WorkflowManager.WFSTATE_STEP2: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
-            case WorkflowManager.WFSTATE_STEP3: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP1: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP2: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP3: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                 </td>
@@ -195,9 +195,9 @@
 <%
             switch (pooled[i].getState())
             {
-            case WorkflowManager.WFSTATE_STEP1POOL: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
-            case WorkflowManager.WFSTATE_STEP2POOL: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
-            case WorkflowManager.WFSTATE_STEP3POOL: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP1POOL: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP2POOL: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case BasicWorkflowServiceImpl.WFSTATE_STEP3POOL: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                     </td>

@@ -46,8 +46,8 @@
 <%@ page import="org.dspace.content.DCSeriesNumber" %>
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
-<%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
+<%@ page import="org.dspace.content.authority.MetadataAuthorityServiceImpl" %>
+<%@ page import="org.dspace.content.authority.ChoiceAuthorityServiceImpl" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Utils" %>
@@ -111,7 +111,7 @@
     // is this field going to be rendered as Choice-driven <select>?
     boolean isSelectable(String fieldKey)
     {
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        ChoiceAuthorityServiceImpl cam = ChoiceAuthorityServiceImpl.getManager();
         return (cam.isChoicesConfigured(fieldKey) &&
             "select".equals(cam.getPresentation(fieldKey)));
     }
@@ -119,8 +119,8 @@
     // Get the presentation type of the authority if any, null otherwise
     String getAuthorityType(PageContext pageContext, String fieldName, int collectionID)
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        MetadataAuthorityServiceImpl mam = MetadataAuthorityServiceImpl.getManager();
+        ChoiceAuthorityServiceImpl cam = ChoiceAuthorityServiceImpl.getManager();
         StringBuffer sb = new StringBuffer();
 
         if (cam.isChoicesConfigured(fieldName))
@@ -137,8 +137,8 @@
             int confidenceValue, boolean isName, boolean repeatable,
             Metadatum[] dcvs, StringBuffer inputBlock, int collectionID)
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        MetadataAuthorityServiceImpl mam = MetadataAuthorityServiceImpl.getManager();
+        ChoiceAuthorityServiceImpl cam = ChoiceAuthorityServiceImpl.getManager();
         StringBuffer sb = new StringBuffer();
 
         if (cam.isChoicesConfigured(fieldName))

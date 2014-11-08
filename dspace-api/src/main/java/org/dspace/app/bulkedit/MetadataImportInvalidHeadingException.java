@@ -85,6 +85,7 @@ public class MetadataImportInvalidHeadingException extends Exception
      *
      * @return The exception message
      */
+    @Override
     public String getMessage()
     {
         if (type == SCHEMA)

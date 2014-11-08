@@ -9,6 +9,8 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -17,11 +19,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * AbstractCurationTask encapsulates a few common patterns of task use,
@@ -39,12 +44,19 @@ public abstract class AbstractCurationTask implements CurationTask
     private Properties taskProps = null;
     // logger
     private static Logger log = Logger.getLogger(AbstractCurationTask.class);
+    protected CommunityService communityService;
+    protected ItemService itemService;
+    protected HandleService handleService;
+
 
     @Override
     public void init(Curator curator, String taskId) throws IOException
     {
         this.curator = curator;
         this.taskId = taskId;
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        handleService = HandleServiceFactory.getInstance().getHandleService();
     }
 
     @Override
@@ -78,7 +90,7 @@ public abstract class AbstractCurationTask implements CurationTask
             int type = dso.getType();
             if (Constants.COLLECTION == type)
             {
-                ItemIterator iter = ((Collection)dso).getItems();
+                Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
                 while (iter.hasNext())
                 {
                     performObject(iter.next());
@@ -98,7 +110,7 @@ public abstract class AbstractCurationTask implements CurationTask
             }
             else if (Constants.SITE == type)
             {
-                Community[] topComm = Community.findAllTop(Curator.curationContext());
+                List<Community> topComm = communityService.findAllTop(Curator.curationContext());
                 for (Community comm : topComm)
                 {
                     distribute(comm);
@@ -181,7 +193,7 @@ public abstract class AbstractCurationTask implements CurationTask
     {
         try
         {
-            return HandleManager.resolveToObject(ctx, id);
+            return handleService.resolveToObject(ctx, id);
         }
         catch (SQLException sqlE)
         {

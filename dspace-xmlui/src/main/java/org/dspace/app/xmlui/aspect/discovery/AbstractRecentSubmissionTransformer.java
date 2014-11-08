@@ -93,13 +93,13 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
 	            DSpaceValidity validity = new DSpaceValidity();
 
 	            // Add the actual collection;
-	            validity.add(dso);
+	            validity.add(context, dso);
 
                 getRecentlySubmittedItems(dso);
                 if(queryResults != null){
                     List<DSpaceObject> resultingObjects = queryResults.getDspaceObjects();
                     for(DSpaceObject resultObject : resultingObjects){
-                        validity.add(resultObject);
+                        validity.add(context, resultObject);
                     }
                     validity.add("numFound:" + resultingObjects.size());
                 }

@@ -26,15 +26,14 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.administer.DCType" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.workflow.WorkflowManager" %>
-<%@ page import="org.dspace.workflow.WorkflowItem" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
+<%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
 
 <%
-    WorkflowItem[] workflows =
-        (WorkflowItem[]) request.getAttribute("workflows");
+    BasicWorkflowItem[] workflows =
+        (BasicWorkflowItem[]) request.getAttribute("workflows");
 %>
 
 <dspace:layout style="submission" 
@@ -66,10 +65,10 @@
                     <%= workflows[i].getCollection().getMetadata("name") %>
             </td>
             <td class="<%= row %>RowOddCol">
-                    <%= WorkflowManager.getSubmitterName(workflows[i])   %>
+                    <%= BasicWorkflowServiceImpl.getSubmitterName(workflows[i])   %>
             </td>
             <td class="<%= row %>RowEvenCol">
-                    <%= Utils.addEntities(WorkflowManager.getItemTitle(workflows[i]))  %>
+                    <%= Utils.addEntities(BasicWorkflowServiceImpl.getItemTitle(workflows[i]))  %>
             </td>
             <td class="<%= row %>RowOddCol">
                <form method="post" action="">

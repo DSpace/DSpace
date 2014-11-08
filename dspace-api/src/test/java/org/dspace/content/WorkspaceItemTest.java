@@ -7,16 +7,25 @@
  */
 package org.dspace.content;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
-import org.dspace.authorize.AuthorizeManager;
 import mockit.NonStrictExpectations;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -35,6 +44,14 @@ public class WorkspaceItemTest extends AbstractUnitTest
      * WorkspaceItem instance for the tests
      */
     private WorkspaceItem wi;
+    private Community owningCommunity;
+    private Collection collection;
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -52,17 +69,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
         {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            Collection col = Collection.create(context);
-            this.wi = WorkspaceItem.create(context, col, true);
+            this.owningCommunity = communityService.create(null, context);
+            this.collection = collectionService.create(context, owningCommunity);
+            this.wi = workspaceItemService.create(context, collection, true);
             //we need to commit the changes so we don't block the table for testing
-            context.commit();
             context.restoreAuthSystemState();
-        }
-        catch (IOException ex) {
-            log.error("IO Error in init", ex);
-            fail("IO Error in init: " + ex.getMessage());
-        }
-        catch (AuthorizeException ex)
+        } catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -86,6 +98,27 @@ public class WorkspaceItemTest extends AbstractUnitTest
     public void destroy()
     {
         wi = null;
+        try {
+            context.turnOffAuthorisationSystem();
+            communityService.removeCollection(context, owningCommunity, collection);
+        }
+        catch (IOException ex) {
+            log.error("IO Error in init", ex);
+            fail("IO Error in init: " + ex.getMessage());
+        }
+        catch (AuthorizeException ex)
+        {
+            log.error("Authorization Error in init", ex);
+            fail("Authorization Error in init: " + ex.getMessage());
+        }
+        catch (SQLException ex)
+        {
+            log.error("SQL Error in init", ex);
+            fail("SQL Error in init: " + ex.getMessage());
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        context.restoreAuthSystemState();
         super.destroy();
     }
 
@@ -96,7 +129,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
     public void testFind() throws Exception
     {
         int id = wi.getID();
-        WorkspaceItem found = WorkspaceItem.find(context, id);
+        WorkspaceItem found = workspaceItemService.find(context, id);
         assertThat("testFind 0",found,notNullValue());
         assertThat("testFind 1",found.getID(), equalTo(id));
         assertThat("testFind 2",found, equalTo(wi));
@@ -109,32 +142,27 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test
     public void testCreateAuth() throws Exception
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Allow Collection ADD perms
-            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                authorizeService.authorizeAction((Context) any, (Collection) any,
                     Constants.ADD); result = null;
         }};
 
-        Collection coll = null;
         boolean template = false;
         WorkspaceItem created = null;
 
-        coll = Collection.create(context);
         template = false;
-        created = WorkspaceItem.create(context, coll, template);
-        context.commit();
+        created = workspaceItemService.create(context, collection, template);
         assertThat("testCreate 0",created,notNullValue());
         assertTrue("testCreate 1",created.getID() >= 0);
-        assertThat("testCreate 2",created.getCollection(),equalTo(coll));
+        assertThat("testCreate 2",created.getCollection(),equalTo(collection));
 
-        coll = Collection.create(context);
         template = true;
-        created = WorkspaceItem.create(context, coll, template);
-        context.commit();
+        created = workspaceItemService.create(context, collection, template);
         assertThat("testCreate 3",created,notNullValue());
         assertTrue("testCreate 4",created.getID() >= 0);
-        assertThat("testCreate 5",created.getCollection(),equalTo(coll));
+        assertThat("testCreate 5",created.getCollection(),equalTo(collection));
     }
 
     /**
@@ -143,21 +171,18 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth() throws Exception
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Disallow Collection ADD perms
-            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                authorizeService.authorizeAction((Context) any, (Collection) any,
                     Constants.ADD); result = new AuthorizeException();
         }};
 
-        Collection coll = null;
         boolean template = false;
         WorkspaceItem created = null;
 
-        coll = Collection.create(context);
-        context.commit();
         template = false;
-        created = WorkspaceItem.create(context, coll, template);
+        created = workspaceItemService.create(context, collection, template);
         fail("Exception expected");
     }
 
@@ -168,9 +193,9 @@ public class WorkspaceItemTest extends AbstractUnitTest
     public void testFindByEPerson() throws Exception
     {
         EPerson ep = context.getCurrentUser();
-        WorkspaceItem[] found = WorkspaceItem.findByEPerson(context, ep);
+        List<WorkspaceItem> found = workspaceItemService.findByEPerson(context, ep);
         assertThat("testFindByEPerson 0",found,notNullValue());
-        assertTrue("testFindByEPerson 1",found.length >= 1);
+        assertTrue("testFindByEPerson 1",found.size() >= 1);
         boolean exists = false;
         for(WorkspaceItem w: found)
         {
@@ -189,12 +214,12 @@ public class WorkspaceItemTest extends AbstractUnitTest
     public void testFindByCollection() throws Exception
     {
         Collection c = wi.getCollection();
-        WorkspaceItem[] found = WorkspaceItem.findByCollection(context, c);
+        List<WorkspaceItem> found = workspaceItemService.findByCollection(context, c);
         assertThat("testFindByCollection 0",found,notNullValue());
-        assertTrue("testFindByCollection 1",found.length >= 1);
-        assertThat("testFindByCollection 2",found[0].getID(), equalTo(wi.getID()));
-        assertThat("testFindByCollection 3",found[0], equalTo(wi));
-        assertThat("testFindByCollection 4",found[0].getCollection(),equalTo(wi.getCollection()));
+        assertTrue("testFindByCollection 1",found.size() >= 1);
+        assertThat("testFindByCollection 2",found.get(0).getID(), equalTo(wi.getID()));
+        assertThat("testFindByCollection 3",found.get(0), equalTo(wi));
+        assertThat("testFindByCollection 4",found.get(0).getCollection(),equalTo(wi.getCollection()));
     }
 
     /**
@@ -203,8 +228,8 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test
     public void testFindAll() throws Exception
     {
-        WorkspaceItem[] found = WorkspaceItem.findAll(context);
-        assertTrue("testFindAll 0",found.length >= 1);
+        List<WorkspaceItem> found = workspaceItemService.findAll(context);
+        assertTrue("testFindAll 0",found.size() >= 1);
         boolean added = false;
         for(WorkspaceItem f: found)
         {
@@ -273,7 +298,7 @@ public class WorkspaceItemTest extends AbstractUnitTest
     public void testUpdate() throws Exception
     {
         //TODO: how can we verify it works?
-        wi.update();
+        workspaceItemService.update(context, wi);
         System.out.println("update");
     }
 
@@ -285,8 +310,8 @@ public class WorkspaceItemTest extends AbstractUnitTest
     {
         int id = wi.getID();
         //we are the user that created it (same context) so we can delete
-        wi.deleteAll();
-        WorkspaceItem found = WorkspaceItem.find(context, id);
+        workspaceItemService.deleteAll(context, wi);
+        WorkspaceItem found = workspaceItemService.find(context, id);
         assertThat("testDeleteAllAuth 0",found,nullValue());
     }
 
@@ -299,11 +324,11 @@ public class WorkspaceItemTest extends AbstractUnitTest
         //we create a new user in context so we can't delete
         EPerson old = context.getCurrentUser();
         context.turnOffAuthorisationSystem();
-        context.setCurrentUser(EPerson.create(context));
+        context.setCurrentUser(ePersonService.create(context));
         context.restoreAuthSystemState();
         try
         {
-            wi.deleteAll();
+            workspaceItemService.deleteAll(context, wi);
             fail("Exception expected");
         }
         catch(AuthorizeException ex)
@@ -318,19 +343,19 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test
     public void testDeleteWrapperAuth() throws Exception
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Allow Item WRITE perms
-            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.WRITE); result = null;
         }};
 
-        int itemid = wi.getItem().getID();
+        UUID itemid = wi.getItem().getID();
         int id = wi.getID();
-        wi.deleteWrapper();
-        Item found = Item.find(context, itemid);
+        workspaceItemService.deleteWrapper(context, wi);
+        Item found = itemService.find(context, itemid);
         assertThat("testDeleteWrapperAuth 0",found,notNullValue());
-        WorkspaceItem wfound = WorkspaceItem.find(context, id);
+        WorkspaceItem wfound = workspaceItemService.find(context, id);
         assertThat("testDeleteWrapperAuth 1",wfound,nullValue());
     }
 
@@ -340,14 +365,14 @@ public class WorkspaceItemTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteWrapperNoAuth() throws Exception
     {
-        new NonStrictExpectations(AuthorizeManager.class)
+        new NonStrictExpectations(authorizeService.getClass())
         {{
             // Disallow Item WRITE perms
-            AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                authorizeService.authorizeAction((Context) any, (Item) any,
                     Constants.WRITE); result = new AuthorizeException();
         }};
 
-        wi.deleteWrapper();
+        workspaceItemService.deleteWrapper(context, wi);
         fail("Exception expected");
     }
 

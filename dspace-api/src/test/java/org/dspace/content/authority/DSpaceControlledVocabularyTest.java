@@ -8,6 +8,8 @@
 package org.dspace.content.authority;
 
 import java.io.IOException;
+
+import org.dspace.content.Collection;
 import org.dspace.core.PluginManager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -75,7 +77,7 @@ public class DSpaceControlledVocabularyTest
         // Ensure that 'id' attribute is optional
         String field = null; // not used
         String text = "north 40";
-        int collection = 0;
+        Collection collection = null;
         int start = 0;
         int limit = 0;
         String locale = null;

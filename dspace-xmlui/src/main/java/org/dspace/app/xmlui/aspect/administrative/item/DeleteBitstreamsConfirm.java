@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
@@ -23,6 +24,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 
 /**
  * Present the user with a list of not-yet-but-soon-to-be-deleted-bitstreams.
@@ -45,7 +48,8 @@ public class DeleteBitstreamsConfirm extends AbstractDSpaceTransformer
 	private static final Message T_column3 = message("xmlui.administrative.item.DeleteBitstreamConfirm.column3");
 	private static final Message T_submit_delete = message("xmlui.general.delete");
 	private static final Message T_submit_cancel = message("xmlui.general.cancel");		
-	
+
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
@@ -71,9 +75,9 @@ public class DeleteBitstreamsConfirm extends AbstractDSpaceTransformer
                 throw new UIException("Unable to parse id into bundle and bitstream id: " + id);
             }
 
-			int bitstreamID = Integer.valueOf(parts[1]);
+			UUID bitstreamID = UUID.fromString(parts[1]);
 
-			Bitstream bitstream = Bitstream.find(context,bitstreamID);
+			Bitstream bitstream = bitstreamService.find(context,bitstreamID);
 			bitstreams.add(bitstream);
 
 		}
@@ -93,7 +97,7 @@ public class DeleteBitstreamsConfirm extends AbstractDSpaceTransformer
 		for (Bitstream bitstream : bitstreams) 
 		{
 			String format = null;
-			BitstreamFormat bitstreamFormat = bitstream.getFormat();
+			BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
 			if (bitstreamFormat != null)
             {
                 format = bitstreamFormat.getShortDescription();

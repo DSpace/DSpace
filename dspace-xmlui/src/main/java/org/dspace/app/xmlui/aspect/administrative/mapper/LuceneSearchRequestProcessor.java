@@ -15,7 +15,9 @@ import java.util.List;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -28,6 +30,8 @@ import org.dspace.search.QueryResults;
 public class LuceneSearchRequestProcessor
         implements SearchRequestProcessor
 {
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
     @Override
     public List<DSpaceObject> doItemMapSearch(Context context, String query, Collection collection)
             throws IOException, SQLException
@@ -40,7 +44,7 @@ public class LuceneSearchRequestProcessor
         results.getHitHandles();
         List<DSpaceObject> dsos = new ArrayList<DSpaceObject>();
         for (String handle : results.getHitHandles())
-            dsos.add(HandleManager.resolveToObject(context, handle));
+            dsos.add(handleService.resolveToObject(context, handle));
 
         return dsos;
     }

@@ -29,13 +29,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
-import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.OpenSearchServiceImpl;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -105,8 +105,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         String path = request.getPathInfo();
         if (path != null && path.endsWith("description.xml"))
         {
-            String svcDescrip = OpenSearch.getDescription(scope);
-            response.setContentType(OpenSearch
+            String svcDescrip = OpenSearchServiceImpl.getDescription(scope);
+            response.setContentType(OpenSearchServiceImpl
                     .getContentType("opensearchdescription"));
             response.setContentLength(svcDescrip.length());
             response.getWriter().write(svcDescrip);
@@ -122,7 +122,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         }
 
         // do some sanity checking
-        if (!OpenSearch.getFormats().contains(format))
+        if (!OpenSearchServiceImpl.getFormats().contains(format))
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -169,13 +169,13 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         DSpaceObject[] dsoResults = new DSpaceObject[qResults
                 .getDspaceObjects().size()];
         qResults.getDspaceObjects().toArray(dsoResults);
-        Document resultsDoc = OpenSearch.getResultsDoc(format, query,
-                (int)qResults.getTotalSearchResults(), qResults.getStart(),
+        Document resultsDoc = OpenSearchServiceImpl.getResultsDoc(format, query,
+                (int) qResults.getTotalSearchResults(), qResults.getStart(),
                 qResults.getMaxResults(), container, dsoResults, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
-            response.setContentType(OpenSearch.getContentType(format));
+            response.setContentType(OpenSearchServiceImpl.getContentType(format));
             xf.transform(new DOMSource(resultsDoc),
                     new StreamResult(response.getWriter()));
         }
@@ -410,7 +410,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 
             try
             {
-                if (AuthorizeManager.isAdmin(context))
+                if (AuthorizeServiceImpl.isAdmin(context))
                 {
                     // Set a variable to create admin buttons
                     request.setAttribute("admin_button", new Boolean(true));

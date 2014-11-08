@@ -9,12 +9,10 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -50,7 +48,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
     {
         try
         {
-            return AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ);
+            return AuthorizeServiceImpl.authorizeActionBoolean(context, bitstream, Constants.READ);
         }
         catch (SQLException e)
         {
@@ -63,7 +61,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
     {
         try
         {
-            return AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+            return AuthorizeServiceImpl.authorizeActionBoolean(context, item, Constants.READ);
         }
         catch (SQLException e)
         {

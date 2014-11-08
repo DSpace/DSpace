@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.core.Constants;
@@ -86,7 +86,7 @@ public class ViewWorkspaceItemServlet
         Collection[] collections = {wsItem.getCollection()};
         
         // Ensure the user has authorisation
-        AuthorizeManager.authorizeAction(c, item, Constants.READ);
+        AuthorizeServiceImpl.authorizeAction(c, item, Constants.READ);
         
         log.info(LogManager.getHeader(c, 
             "View Workspace Item Metadata", 

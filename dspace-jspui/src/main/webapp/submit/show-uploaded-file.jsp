@@ -31,12 +31,11 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
-<%@ page import="org.dspace.authorize.AuthorizeManager" %>
+<%@ page import="org.dspace.authorize.AuthorizeServiceImpl" %>
 <%@ page import="org.dspace.authorize.ResourcePolicy" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Item" %>
 
