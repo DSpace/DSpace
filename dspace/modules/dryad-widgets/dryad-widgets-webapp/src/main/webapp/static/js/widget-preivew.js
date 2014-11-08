@@ -8,25 +8,30 @@ $(document).ready(function(){
       , select_id       = 'server-select'
       , target_id       = 'dryad-ddw-target'
       , script_id       = 'dryad-ddw-script'
+      , css_id          = 'dryad-ddw-css'
       , path            = 'widgets/v1/display'
       , wrapper_id      = 'dryad-ddw-wrapper'
       , js_file         = 'loader.js?referrer=JDryadDev&wrapper=' + target_id
       , doi_regex       = new RegExp('^doi:10.5061');
     $('#update-preview').on('click', function(evt) {
-        var base = $('#' + select_id).find('option[selected]').val()
+        var base = $('#' + select_id).find('option:selected').val()
           , doi = $('#doi').val()
           , url = [base, path, doi, js_file].join('/')
           , $script = $('<script async="true" type="text/javascript"'
                     + ' id="'  + script_id  + '"' 
                     + ' src="' + url        + '"'
-                    + '></script>');
+                    + '></script>')
+          , $css = $('<link type="text/css" rel="stylesheet" id="' + css_id + '" href="' + base + '/static/css/widgets/display/dryad-ddw.min.css">');
         doi.trim();
         if (doi.match(doi_regex)) {
             dimension_wrapper(height,width);
-            if ($('#' + script_id).length > 0) {
-                $('#' + script_id).remove();    
+            remove_ids([script_id, css_id]);
+            try {
+                $('body').append($css);
+                $('body').append($script);
+            } catch (e) {
+                console.log("Error: " + e.toString());
             }
-            $(body).append($script);
         } else {
             alert('The doi value "' + doi + '" does not look like a Dryad doi');
         }
@@ -46,9 +51,19 @@ $(document).ready(function(){
         dimension_wrapper(height,width);
         evt.preventDefault();
    });
-   function dimension_wrapper(h,w) {
+    function dimension_wrapper(h,w) {
         $('#' + height_id).val(h);
         $('#' + width_id).val(w);
         $('#' + wrapper_id).height(h).width(w);
-   }
+    }
+    function add_stylesheet(url) {
+       
+    }
+    function remove_ids(ary) {
+        for (var i = 0; i < ary.length; i++) {
+            if ($('#' + ary[i]).length > 0) {
+                $('#' + ary[i]).remove();    
+            }
+        }
+    }
 });
