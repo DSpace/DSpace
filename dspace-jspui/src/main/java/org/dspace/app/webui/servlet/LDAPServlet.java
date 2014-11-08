@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -69,8 +69,8 @@ public class LDAPServlet extends DSpaceServlet
 	 	String jsp = null;
 		
 		// Locate the eperson
-        int status = AuthenticationManager.authenticate(context, netid, password,
-                        null, request);
+        int status = AuthenticationServiceImpl.authenticate(context, netid, password,
+                null, request);
 
 
         if (status == AuthenticationMethod.SUCCESS)

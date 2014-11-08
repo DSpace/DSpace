@@ -21,7 +21,7 @@ import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 import com.google.gson.Gson;
 
@@ -53,7 +53,7 @@ public class HandleJSONResolver extends JSONRequest
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-                String url = HandleManager.resolveToURL(context, handle);
+                String url = HandleServiceImpl.resolveToURL(context, handle);
                 // Only an array or an abject is valid JSON. A simple string
                 // isn't. An object always uses key value pairs, so we use an
                 // array.
@@ -69,7 +69,7 @@ public class HandleJSONResolver extends JSONRequest
             else if (reqPath.equals("listprefixes"))
             {
                 List<String> prefixes = new ArrayList<String>();
-                prefixes.add(HandleManager.getPrefix());
+                prefixes.add(HandleServiceImpl.getPrefix());
                 String additionalPrefixes = ConfigurationManager
                         .getProperty("handle.additional.prefixes");
                 if (StringUtils.isNotBlank(additionalPrefixes))
@@ -96,7 +96,7 @@ public class HandleJSONResolver extends JSONRequest
                     return;
                 }
 
-                List<String> handlelist = HandleManager.getHandlesForPrefix(
+                List<String> handlelist = HandleServiceImpl.getHandlesForPrefix(
                         context, prefix);
                 jsonString = gson.toJson(handlelist);
             }

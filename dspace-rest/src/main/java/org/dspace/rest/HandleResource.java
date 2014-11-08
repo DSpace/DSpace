@@ -8,10 +8,10 @@
 package org.dspace.rest;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.common.DSpaceObject;
@@ -45,13 +45,13 @@ public class HandleResource {
                 context.getDBConnection().setAutoCommit(true);
             }
 
-            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+            org.dspace.content.DSpaceObject dso = HandleServiceImpl.resolveToObject(context, prefix + "/" + suffix);
             if(dso == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
             log.info("DSO Lookup by handle: [" + prefix + "] / [" + suffix + "] got result of: " + dso.getTypeText() + "_" + dso.getID());
 
-            if(AuthorizeManager.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
+            if(AuthorizeServiceImpl.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
                 switch(dso.getType()) {
                     case Constants.COMMUNITY:
                         return new Community((org.dspace.content.Community) dso, expand, context);

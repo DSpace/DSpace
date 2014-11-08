@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!--<property name="hibernate.connection.driver_class">org.postgresql.Driver</property>-->
+        <!--<property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>-->
+        <!--<property name="hibernate.connection.url">jdbc:postgresql://localhost:5433/dspace-kevin-unit-test</property>-->
+        <!--<property name="hibernate.connection.username">dspace</property>-->
+        <!--<property name="hibernate.connection.password">dspace</property>-->
+
+
+        <property name="hibernate.connection.driver_class">org.h2.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+        <property name="hibernate.connection.url">jdbc:h2:mem:test;LOCK_TIMEOUT=10000;MVCC=true</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password"></property>
+
+
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+
+
+        <!--<property name="hibernate.default_schema"></property>-->
+        <property name="hibernate.connection.pool_size">10</property>
+        <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
+
+
+
+        <property name="show_sql">false</property>
+
+
+        <!--Second level cache configuration-->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+
+
+        <mapping class="org.dspace.app.util.WebApp"/>
+
+        <mapping class="org.dspace.authorize.ResourcePolicy"/>
+
+        <mapping class="org.dspace.checker.ChecksumHistory"/>
+        <mapping class="org.dspace.checker.ChecksumResult"/>
+        <mapping class="org.dspace.checker.MostRecentChecksum"/>
+
+        <mapping class="org.dspace.content.DSpaceObject"/>
+        <mapping class="org.dspace.content.Bitstream"/>
+        <mapping class="org.dspace.content.BitstreamFormat"/>
+        <mapping class="org.dspace.content.Bundle"/>
+        <mapping class="org.dspace.content.BundleBitstream"/>
+        <mapping class="org.dspace.content.Collection"/>
+        <mapping class="org.dspace.content.Community"/>
+        <mapping class="org.dspace.content.Item"/>
+        <mapping class="org.dspace.content.MetadataField"/>
+        <mapping class="org.dspace.content.MetadataSchema"/>
+        <mapping class="org.dspace.content.MetadataValue"/>
+        <mapping class="org.dspace.content.Site"/>
+        <mapping class="org.dspace.content.WorkspaceItem"/>
+
+        <mapping class="org.dspace.eperson.EPerson"/>
+        <mapping class="org.dspace.eperson.Group"/>
+        <mapping class="org.dspace.eperson.Group2GroupCache"/>
+        <!--<mapping class="org.dspace.eperson.Group2Group"/>-->
+        <mapping class="org.dspace.eperson.RegistrationData"/>
+        <mapping class="org.dspace.eperson.Subscription"/>
+
+        <mapping class="org.dspace.handle.Handle"/>
+
+        <mapping class="org.dspace.harvest.HarvestedCollection"/>
+        <mapping class="org.dspace.harvest.HarvestedItem"/>
+
+        <mapping class="org.dspace.identifier.DOI"/>
+
+        <mapping class="org.dspace.versioning.Version"/>
+        <mapping class="org.dspace.versioning.VersionHistory"/>
+
+        <mapping class="org.dspace.workflowbasic.BasicWorkflowItem"/>
+        <mapping class="org.dspace.workflowbasic.TaskListItem"/>
+
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.ClaimedTask"/>-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.CollectionRole"/>-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.InProgressUser"/>-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.PoolTask"/>-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>-->
+        <!--<mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>-->
+
+        <!--*********************-->
+        <!-- Cache configuration -->
+        <!--*********************-->
+        <class-cache class="org.dspace.content.MetadataSchema" usage="read-write" />
+        <class-cache class="org.dspace.content.MetadataField" usage="read-write" />
+    </session-factory>
+</hibernate-configuration>

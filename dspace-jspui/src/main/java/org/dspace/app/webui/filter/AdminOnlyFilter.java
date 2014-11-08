@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -65,7 +65,7 @@ public class AdminOnlyFilter implements Filter
                 Authenticate.startAuthentication(context, hrequest, hresponse))
             {
                 // User is authenticated
-                if (AuthorizeManager.isAdmin(context))
+                if (AuthorizeServiceImpl.isAdmin(context))
                 {
                     // User is an admin, allow request to proceed
                     chain.doFilter(hrequest, hresponse);

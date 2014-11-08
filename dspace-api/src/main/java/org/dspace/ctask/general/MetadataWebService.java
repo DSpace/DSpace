@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
+import org.dspace.content.MetadataValue;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,7 +46,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -137,27 +137,27 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     /** log4j category */
     private static final Logger log = Logger.getLogger(MetadataWebService.class);
     // transform token parsing pattern
-    private static Pattern ttPattern = Pattern.compile("\'([^\']*)\'|(\\S+)");
+	protected Pattern ttPattern = Pattern.compile("\'([^\']*)\'|(\\S+)");
     // URL of web service with template parameters
-    private String urlTemplate = null;
+	protected String urlTemplate = null;
     // template parameter
-    private String templateParam = null;
+	protected String templateParam = null;
     // Item metadata field to use in service call
-    private String lookupField = null;
+	protected String lookupField = null;
     // Optional transformation of lookupField
-    private String lookupTransform = null;
+	protected String lookupTransform = null;
     // response data to map/record
-    private List<DataInfo> dataList = null;
+	protected List<DataInfo> dataList = null;
     // response document parsing tools
-    private DocumentBuilder docBuilder = null;
+	protected DocumentBuilder docBuilder = null;
     // language for metadata fields assigned
-    private String lang = null;
+	protected String lang = null;
     // field separator in result string
-    private String fieldSeparator = null;
+	protected String fieldSeparator = null;
     // optional XML namespace map
-    private Map<String, String> nsMap = new HashMap<String, String>();
+	protected Map<String, String> nsMap = new HashMap<String, String>();
     // optional HTTP headers
-    private Map<String, String> headers = new HashMap<String, String>();
+	protected Map<String, String> headers = new HashMap<String, String>();
     
     /**
      * Initializes task
@@ -228,17 +228,17 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             String itemId = item.getHandle();
             if (itemId == null) {
             	// we are still in workflow - no handle assigned - try title
-            	Metadatum[] titleDc = item.getMetadata("dc", "title", null, Item.ANY);
-            	String title = (titleDc.length > 0) ? titleDc[0].value : "untitled - dbId: " + item.getID();
+            	List<MetadataValue> titleDc = itemService.getMetadata(item, "dc", "title", null, Item.ANY);
+            	String title = (titleDc.size() > 0) ? titleDc.get(0).getValue() : "untitled - dbId: " + item.getID();
             	itemId = "Workflow item: " + title;
             } else {
                 itemId = "handle: " + itemId;
             }
             resultSb.append(itemId);
             // Only proceed if item has a value for service template parameter
-            Metadatum[] dcVals = item.getMetadataByMetadataString(lookupField);
-            if (dcVals.length > 0 && dcVals[0].value.length() > 0) {
-            	String value = transform(dcVals[0].value, lookupTransform);
+			List<MetadataValue> dcVals = itemService.getMetadataByMetadataString(item, lookupField);
+            if (dcVals.size() > 0 && dcVals.get(0).getValue().length() > 0) {
+            	String value = transform(dcVals.get(0).getValue(), lookupTransform);
             	status = callService(value, item, resultSb);
             } else {
             	resultSb.append(" lacks metadata value required for service: ").append(lookupField);
@@ -252,7 +252,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return status;
     }
     
-    private int callService(String value, Item item, StringBuilder resultSb) throws IOException {
+	protected int callService(String value, Item item, StringBuilder resultSb) throws IOException {
     	
     	String callUrl = urlTemplate.replaceAll("\\{" + templateParam + "\\}", value);
     	HttpClient client = new DefaultHttpClient();
@@ -300,7 +300,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	return status;
     }
     
-    private int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {
+	protected int processResponse(Document doc, Item item, StringBuilder resultSb) throws IOException {
        	boolean update = false;
        	int status = Curator.CURATE_ERROR;
        	List<String> values = new ArrayList<String>();
@@ -312,15 +312,15 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
        			// if data found and we are mapping, check assignment policy
        			if (nodes.getLength() > 0 && info.mapping != null) {
        				if ("=>".equals(info.mapping)) {
-       					item.clearMetadata(info.schema, info.element, info.qualifier, Item.ANY);
+       					itemService.clearMetadata(Curator.curationContext(), item, info.schema, info.element, info.qualifier, Item.ANY);
        				} else if ("~>".equals(info.mapping)) {
-       					if (item.getMetadata(info.schema, info.element, info.qualifier, Item.ANY).length > 0) {
+       					if (itemService.getMetadata(item, info.schema, info.element, info.qualifier, Item.ANY).size() > 0) {
        						// there are values, so don't overwrite
        						continue;
        					}
        				} else {
-       					for (Metadatum dcVal : item.getMetadata(info.schema, info.element, info.qualifier, Item.ANY)) {
-       						values.add(dcVal.value);
+       					for (MetadataValue dcVal : itemService.getMetadata(item, info.schema, info.element, info.qualifier, Item.ANY)) {
+       						values.add(dcVal.getValue());
        					}
        				}
        			}
@@ -329,7 +329,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
        				String tvalue = transform(node.getFirstChild().getNodeValue(), info.transform);
        				// assign to metadata field if mapped && not present
        				if (info.mapping != null && ! values.contains(tvalue)) {
-       					item.addMetadata(info.schema, info.element, info.qualifier, lang, tvalue);
+       					itemService.addMetadata(Curator.curationContext(), item, info.schema, info.element, info.qualifier, lang, tvalue);
        					update = true;
        				}
        				// add to result string in any case
@@ -338,7 +338,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
        		}
        		// update Item if it has changed
        		if (update) {
-       			item.update();
+				itemService.update(Curator.curationContext(), item);
        		}
        		status = Curator.CURATE_SUCCESS;
        	} catch (AuthorizeException authE) {
@@ -355,7 +355,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return status;
     }
     
-    private String transform(String value, String transDef) {
+	protected String transform(String value, String transDef) {
     	if (transDef == null) {
     		return value;
     	}
@@ -392,7 +392,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	return retValue;
     }
     
-    private String[] tokenize(String text)  {
+	protected String[] tokenize(String text)  {
     	List<String> list = new ArrayList<String>();
     	Matcher m = ttPattern.matcher(text);
     	while (m.find()) {
@@ -405,7 +405,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return list.toArray(new String[0]);
     }
     
-    private int getMapIndex(String mapping) {
+	protected int getMapIndex(String mapping) {
     	int index = mapping.indexOf("->");
     	if (index == -1) {
     		index = mapping.indexOf("=>");
@@ -416,7 +416,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	return index;
     }
 
-    private String[] parseTransform(String field) {
+	protected String[] parseTransform(String field) {
     	String[] parsed = new String[2];
     	parsed[0] = field;
        	int txIdx = field.indexOf(":");
@@ -432,7 +432,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	return parsed;
     }
     
-    private void checkNamespaces(Document document) throws IOException {
+	protected void checkNamespaces(Document document) throws IOException {
     	// skip if already done
     	if (dataList.get(0).expr != null) {
     	    return;
@@ -470,7 +470,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     	}
     }
     
-    private String mangleExpr(String expr, String prefix) {
+    protected String mangleExpr(String expr, String prefix) {
     	if (prefix == null) {
     		return expr;
     	}
@@ -497,7 +497,8 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
     
     // ---- NamespaceContext methods ---- //
     
-    public String getNamespaceURI(String prefix) {
+    @Override
+	public String getNamespaceURI(String prefix) {
         if (prefix == null) {
         	throw new NullPointerException("Null prefix");
         } else if ("xml".equals(prefix)) {
@@ -507,11 +508,13 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         return (nsURI != null) ? nsURI : XMLConstants.NULL_NS_URI;
     }
 
-    public String getPrefix(String uri) {
+    @Override
+	public String getPrefix(String uri) {
         throw new UnsupportedOperationException();
     }
 
-    public Iterator getPrefixes(String uri) {
+    @Override
+	public Iterator getPrefixes(String uri) {
         throw new UnsupportedOperationException();
     }
     

@@ -22,6 +22,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.dspace.checker.factory.CheckerServiceFactory;
+import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -165,7 +167,7 @@ public class DailyReportEmailer
         }
 
         // create a new simple reporter
-        SimpleReporter reporter = new SimpleReporterImpl();
+        SimpleReporterService reporter = CheckerServiceFactory.getInstance().getSimpleReporterService();
 
         DailyReportEmailer emailer = new DailyReportEmailer();
 
@@ -185,6 +187,7 @@ public class DailyReportEmailer
         try
         {
             context = new Context();
+
             // the number of bitstreams in report
             int numBitstreams = 0;
 
@@ -209,19 +212,19 @@ public class DailyReportEmailer
             {
                 writer
                         .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                numBitstreams += reporter.getDeletedBitstreamReport(yesterday,
+                numBitstreams += reporter.getDeletedBitstreamReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getChangedChecksumReport(yesterday,
+                numBitstreams += reporter.getChangedChecksumReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getBitstreamNotFoundReport(yesterday,
+                numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(yesterday,
+                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday,
                         tomorrow, writer);
                 writer
                         .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
@@ -238,7 +241,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getDeletedBitstreamReport(
+                    numBitstreams += reporter.getDeletedBitstreamReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -249,7 +252,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getBitstreamNotFoundReport(
+                    numBitstreams += reporter.getBitstreamNotFoundReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -260,7 +263,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getChangedChecksumReport(
+                    numBitstreams += reporter.getChangedChecksumReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -271,7 +274,7 @@ public class DailyReportEmailer
                 {
                     writer
                             .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                    numBitstreams += reporter.getNotToBeProcessedReport(
+                    numBitstreams += reporter.getNotToBeProcessedReport(context,
                             yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
@@ -290,14 +293,8 @@ public class DailyReportEmailer
                 }
             }
         }
-        catch (MessagingException e)
+        catch (MessagingException | SQLException | IOException e)
         {
-            log.fatal(e);
-        }
-        catch (IOException e)
-        {
-            log.fatal(e);
-        } catch (SQLException e) {
             log.fatal(e);
         } finally
         {

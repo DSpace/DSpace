@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.ItemIterator;
@@ -858,7 +858,7 @@ public class ItemsResource extends Resource
                 log.warn("Bitstream(id=" + bitstreamId + ") was not found.");
                 return Response.status(Status.NOT_FOUND).build();
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
             {
                 context.abort();
                 log.error("User(" + getUser(headers).getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
@@ -1076,7 +1076,7 @@ public class ItemsResource extends Resource
                 log.warn("Item(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, item, action))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, item, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)

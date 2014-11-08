@@ -73,6 +73,12 @@ public class ProviderStackTest {
             }
             public void registerService(String name, Object service) {
             }
+
+            @Override
+            public void registerServiceNoAutowire(String name, Object service) {
+
+            }
+
             public <T> T registerServiceClass(String name, Class<T> type) {
                 return null;
             }

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
@@ -123,7 +123,7 @@ public class WorkspaceServlet extends DSpaceServlet
         
         // Ensure the user has authorisation
         Item item = wsItem.getItem();
-        AuthorizeManager.authorizeAction(context, item, Constants.READ);
+        AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
         
         log.info(LogManager.getHeader(context, 
             "View Workspace Item", 

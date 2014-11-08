@@ -27,11 +27,15 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -140,7 +144,10 @@ public class ReportGenerator
    /** the log file action to human readable action map */
    private static String map = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator + "dstat.map";
-   
+
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
    
     /**
      * main method to be run from command line.  See usage information for
@@ -785,7 +792,7 @@ public class ReportGenerator
         // ensure that the handle exists
         try 
         {
-            item = (Item) HandleManager.resolveToObject(context, handle);
+            item = (Item) handleService.resolveToObject(context, handle);
         } 
         catch (Exception e)
         {
@@ -801,24 +808,24 @@ public class ReportGenerator
         // build the referece
         // FIXME: here we have blurred the line between content and presentation
         // and it should probably be un-blurred
-        Metadatum[] title = item.getDC("title", null, Item.ANY);
-        Metadatum[] author = item.getDC("contributor", "author", Item.ANY);
+        List<MetadataValue> title = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> author = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", "author", Item.ANY);
         
         StringBuffer authors = new StringBuffer();
-        if (author.length > 0)
+        if (author.size() > 0)
         {
-            authors.append("(" + author[0].value);
+            authors.append("(" + author.get(0).getValue());
         }
-        if (author.length > 1)
+        if (author.size() > 1)
         {
             authors.append(" et al");
         }
-        if (author.length > 0)
+        if (author.size() > 0)
         {
            authors.append(")");
         }
         
-        String content = title[0].value + " " + authors.toString();
+        String content = title.get(0).getValue() + " " + authors.toString();
         
         return content;
     }

@@ -16,11 +16,11 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.WorkflowException;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 import javax.mail.MessagingException;
@@ -47,7 +47,7 @@ public class WorkflowTools
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
                 return XmlWorkflowItem.findByItem(context, item) != null;
             }else{
-                return WorkflowItem.findByItem(context, item) != null;
+                return BasicWorkflowItem.findByItem(context, item) != null;
             }
         }
         catch (SQLException e)
@@ -97,7 +97,7 @@ public class WorkflowTools
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
                 return XmlWorkflowItem.findByItem(context, item);
             }else{
-                return WorkflowItem.findByItem(context, item);
+                return BasicWorkflowItem.findByItem(context, item);
             }
         }
         catch (SQLException e)
@@ -147,15 +147,15 @@ public class WorkflowTools
             boolean notify = ConfigurationManager.getBooleanProperty("swordv2-server", "workflow.notify");
             if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
                 if (notify) {
-                    XmlWorkflowManager.start(context, wsi);
+                    XmlWorkflowServiceImpl.start(context, wsi);
                 } else {
-                    XmlWorkflowManager.startWithoutNotify(context, wsi);
+                    XmlWorkflowServiceImpl.startWithoutNotify(context, wsi);
                 }
             } else {
                 if (notify) {
-                    WorkflowManager.start(context, wsi);
+                    BasicWorkflowServiceImpl.start(context, wsi);
                 } else {
-                    WorkflowManager.startWithoutNotify(context, wsi);
+                    BasicWorkflowServiceImpl.startWithoutNotify(context, wsi);
                 }
             }
         }
@@ -196,11 +196,11 @@ public class WorkflowTools
             // abort the workflow
             if (wfi != null)
             {
-                if(wfi instanceof WorkflowItem)
+                if(wfi instanceof BasicWorkflowItem)
                 {
-                    WorkflowManager.abort(context, (WorkflowItem) wfi, context.getCurrentUser());
+                    BasicWorkflowServiceImpl.abort(context, (BasicWorkflowItem) wfi, context.getCurrentUser());
                 }else{
-                    XmlWorkflowManager.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
+                    XmlWorkflowServiceImpl.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
                 }
             }
         }

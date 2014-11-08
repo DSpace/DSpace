@@ -9,7 +9,7 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
@@ -17,7 +17,6 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowItem;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ContainerManager;
 import org.swordapp.server.Deposit;
@@ -101,7 +100,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
             }
 
             // we can't give back an entry unless the user is authorised to retrieve it
-            AuthorizeManager.authorizeAction(context, item, Constants.READ);
+            AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
 
 			ReceiptGenerator genny = new ReceiptGenerator();
 			DepositReceipt receipt = genny.createReceipt(context, item, config);

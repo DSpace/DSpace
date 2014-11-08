@@ -49,7 +49,7 @@ public class PubmedService
 
     private static final Logger log = Logger.getLogger(PubmedService.class);
 
-    private int timeout = 1000;
+    protected int timeout = 1000;
 
     public void setTimeout(int timeout)
     {

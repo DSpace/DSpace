@@ -26,7 +26,7 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -40,8 +40,8 @@ import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.Subscribe;
-import org.dspace.handle.HandleManager;
+import org.dspace.eperson.SubscribeServiceImpl;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.ItemHomeProcessor;
@@ -125,7 +125,7 @@ public class HandleServlet extends DSpaceServlet
         // Find out what the handle relates to
         if (handle != null)
         {
-            dso = HandleManager.resolveToObject(context, handle);
+            dso = HandleServiceImpl.resolveToObject(context, handle);
         }
 
         if (dso == null)
@@ -343,7 +343,7 @@ public class HandleServlet extends DSpaceServlet
         }
 
         // Ensure the user has authorisation
-        AuthorizeManager.authorizeAction(context, item, Constants.READ);
+        AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
 
         log
                 .info(LogManager.getHeader(context, "view_item", "handle="
@@ -519,7 +519,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // can they add to this community?
-            if (AuthorizeManager.authorizeActionBoolean(context, community,
+            if (AuthorizeServiceImpl.authorizeActionBoolean(context, community,
                     Constants.ADD))
             {
                 // set a variable to create an edit button
@@ -527,7 +527,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // can they remove from this community?
-            if (AuthorizeManager.authorizeActionBoolean(context, community,
+            if (AuthorizeServiceImpl.authorizeActionBoolean(context, community,
                     Constants.REMOVE))
             {
                 // set a variable to create an edit button
@@ -609,14 +609,14 @@ public class HandleServlet extends DSpaceServlet
                 }
                 else
                 {
-                    Subscribe.subscribe(context, context.getCurrentUser(),
+                    SubscribeServiceImpl.subscribe(context, context.getCurrentUser(),
                             collection);
                     updated = true;
                 }
             }
             else if (request.getParameter("submit_unsubscribe") != null)
             {
-                Subscribe.unsubscribe(context, context.getCurrentUser(),
+                SubscribeServiceImpl.unsubscribe(context, context.getCurrentUser(),
                         collection);
                 updated = true;
             }
@@ -634,7 +634,7 @@ public class HandleServlet extends DSpaceServlet
 
             if (e != null)
             {
-                subscribed = Subscribe.isSubscribed(context, e, collection);
+                subscribed = SubscribeServiceImpl.isSubscribed(context, e, collection);
 
                 // is the user a COLLECTION_EDITOR?
                 if (collection.canEditBoolean(true))
@@ -644,7 +644,7 @@ public class HandleServlet extends DSpaceServlet
                 }
 
                 // can they admin this collection?
-                if (AuthorizeManager.authorizeActionBoolean(context,
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context,
                         collection, Constants.COLLECTION_ADMIN))
                 {
                     request.setAttribute("admin_button", Boolean.TRUE);
@@ -660,7 +660,7 @@ public class HandleServlet extends DSpaceServlet
                 }
 
                 // can they submit to this collection?
-                if (AuthorizeManager.authorizeActionBoolean(context,
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context,
                         collection, Constants.ADD))
                 {
                     request

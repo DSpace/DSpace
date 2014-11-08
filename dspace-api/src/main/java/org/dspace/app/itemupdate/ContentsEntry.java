@@ -41,7 +41,7 @@ public class ContentsEntry
 	final int permissionsActionId;
 	final String description;
 	
-	private ContentsEntry(String filename, 
+	protected ContentsEntry(String filename,
 			             String bundlename,
 			             int permissionsActionId,
 			             String permissionsGroupName,

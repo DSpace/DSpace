@@ -8,7 +8,6 @@
 package org.dspace.app.bulkedit;
 
 import org.dspace.content.Item;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Collection;
 
 import java.util.ArrayList;
@@ -25,16 +24,16 @@ public class BulkEditChange
     private Item item;
 
     /** The List of hashtables with the new elements */
-    private List<Metadatum> adds;
+    private List<BulkEditMetadataValue> adds;
 
     /** The List of hashtables with the removed elements */
-    private List<Metadatum> removes;
+    private List<BulkEditMetadataValue> removes;
 
     /** The List of hashtables with the unchanged elements */
-    private List<Metadatum> constant;
+    private List<BulkEditMetadataValue> constant;
 
     /** The List of the complete set of new values (constant + adds) */
-    private List<Metadatum> complete;
+    private List<BulkEditMetadataValue> complete;
 
     /** The list of old collections the item used to be mapped to */
     private List<Collection> oldMappedCollections;
@@ -77,12 +76,12 @@ public class BulkEditChange
         newOwningCollection = null;
 
         // Initialise the arrays
-        adds = new ArrayList<Metadatum>();
-        removes = new ArrayList<Metadatum>();
-        constant = new ArrayList<Metadatum>();
-        complete = new ArrayList<Metadatum>();
-        oldMappedCollections = new ArrayList<Collection>();
-        newMappedCollections = new ArrayList<Collection>();
+        adds = new ArrayList<>();
+        removes = new ArrayList<>();
+        constant = new ArrayList<>();
+        complete = new ArrayList<>();
+        oldMappedCollections = new ArrayList<>();
+        newMappedCollections = new ArrayList<>();
     }
 
     /**
@@ -98,12 +97,12 @@ public class BulkEditChange
         empty = true;
 
         // Initialise the arrays
-        adds = new ArrayList<Metadatum>();
-        removes = new ArrayList<Metadatum>();
-        constant = new ArrayList<Metadatum>();
-        complete = new ArrayList<Metadatum>();
-        oldMappedCollections = new ArrayList<Collection>();
-        newMappedCollections = new ArrayList<Collection>();
+        adds = new ArrayList<>();
+        removes = new ArrayList<>();
+        constant = new ArrayList<>();
+        complete = new ArrayList<>();
+        oldMappedCollections = new ArrayList<>();
+        newMappedCollections = new ArrayList<>();
     }
 
     /**
@@ -122,7 +121,7 @@ public class BulkEditChange
      *
      * @param dcv The value to add
      */
-    public void registerAdd(Metadatum dcv)
+    public void registerAdd(BulkEditMetadataValue dcv)
     {
         // Add the added value
         adds.add(dcv);
@@ -135,7 +134,7 @@ public class BulkEditChange
      *
      * @param dcv The value to remove
      */
-    public void registerRemove(Metadatum dcv)
+    public void registerRemove(BulkEditMetadataValue dcv)
     {
         // Add the removed value
         removes.add(dcv);
@@ -147,7 +146,7 @@ public class BulkEditChange
      *
      * @param dcv The value to keep unchanged
      */
-    public void registerConstant(Metadatum dcv)
+    public void registerConstant(BulkEditMetadataValue dcv)
     {
         // Add the removed value
         constant.add(dcv);
@@ -241,7 +240,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been added.
      */
-    public List<Metadatum> getAdds()
+    public List<BulkEditMetadataValue> getAdds()
     {
         // Return the array
         return adds;
@@ -252,7 +251,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been removed.
      */
-    public List<Metadatum> getRemoves()
+    public List<BulkEditMetadataValue> getRemoves()
     {
         // Return the array
         return removes;
@@ -263,7 +262,7 @@ public class BulkEditChange
      *
      * @return the list of unchanged values
      */
-    public List<Metadatum> getConstant()
+    public List<BulkEditMetadataValue> getConstant()
     {
         // Return the array
         return constant;
@@ -274,7 +273,7 @@ public class BulkEditChange
      *
      * @return the list of all values
      */
-    public List<Metadatum> getComplete()
+    public List<BulkEditMetadataValue> getComplete()
     {
         // Return the array
         return complete;

@@ -7,20 +7,19 @@
  */
 package org.dspace.sword2;
 
+import org.dspace.authenticate.AuthenticationServiceImpl;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.core.Constants;
-import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.apache.log4j.Logger;
 import org.swordapp.server.AuthCredentials;
-import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.UriRegistry;
@@ -52,7 +51,7 @@ public class SwordAuthenticator
 	 */
 	public boolean authenticates(Context context, String un, String pw)
 	{
-		int auth = AuthenticationManager.authenticate(context, un, pw, null, null);
+		int auth = AuthenticationServiceImpl.authenticate(context, un, pw, null, null);
 		if (auth == AuthenticationMethod.SUCCESS)
 		{
 			return true;
@@ -194,7 +193,7 @@ public class SwordAuthenticator
 					authenticated = true;
 					sc.setAuthenticated(ep);
 					 // Set any special groups - invoke the authentication mgr.
-		            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, null);
+		            int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(context, null);
 
 		            for (int i = 0; i < groupIDs.length; i++)
 		            {
@@ -224,7 +223,7 @@ public class SwordAuthenticator
 						Context oboContext = this.constructContext();
 						oboContext.setCurrentUser(epObo);
 		                // Set any special groups - invoke the authentication mgr.
-	                    int[] groupIDs = AuthenticationManager.getSpecialGroups(oboContext, null);
+	                    int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(oboContext, null);
 
 	                    for (int i = 0; i < groupIDs.length; i++)
 	                    {
@@ -317,7 +316,7 @@ public class SwordAuthenticator
 			EPerson authenticated = swordContext.getAuthenticated();
 			if (authenticated != null)
 			{
-				return AuthorizeManager.isAdmin(swordContext.getAuthenticatorContext());
+				return AuthorizeServiceImpl.isAdmin(swordContext.getAuthenticatorContext());
 			}
 			return false;
 		}
@@ -345,7 +344,7 @@ public class SwordAuthenticator
 		{
 			if (onBehalfOf != null)
 			{
-				return AuthorizeManager.isAdmin(swordContext.getOnBehalfOfContext());
+				return AuthorizeServiceImpl.isAdmin(swordContext.getOnBehalfOfContext());
 			}
 			return false;
 		}
@@ -484,14 +483,14 @@ public class SwordAuthenticator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					authAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
+					authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
 				}
 
 				// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
+					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
 				}
 
 				// final check to see if we are allowed to READ
@@ -564,14 +563,14 @@ public class SwordAuthenticator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					authAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
+					authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
 				}
 
 				// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
+					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
 				}
 
 				// final check to see if we are allowed to READ
@@ -667,7 +666,7 @@ public class SwordAuthenticator
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), cols[i], Constants.ADD);
+					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), cols[i], Constants.ADD);
 				}
 
 				// final check to see if we are allowed to READ
@@ -744,18 +743,18 @@ public class SwordAuthenticator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					boolean write = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.WRITE);
+					boolean write = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.WRITE);
 					
 					boolean add = false;
 					if (bundles.length == 0)
                     {
-                        add = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
+                        add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
                     }
                     else
                     {
                         for (int i = 0; i < bundles.length; i++)
                         {
-                            add = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
+                            add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
                             if (!add)
                             {
                                 break;
@@ -770,18 +769,18 @@ public class SwordAuthenticator
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					boolean write = AuthorizeManager.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), item, Constants.WRITE);
+					boolean write = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), item, Constants.WRITE);
 
 					boolean add = false;
 					if (bundles.length == 0)
                     {
-                        add = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
+                        add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
                     }
                     else
                     {
                         for (int i = 0; i < bundles.length; i++)
                         {
-                            add = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
+                            add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
                             if (!add)
                             {
                                 break;
@@ -855,14 +854,14 @@ public class SwordAuthenticator
 			// so we do not need to check that separately
 			if (!authAllowed)
 			{
-				authAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getAuthenticatorContext(), collection, Constants.ADD);
+				authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), collection, Constants.ADD);
 			}
 
 			// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 			// community.  THis will include determining if the user is an administrator.
 			if (!oboAllowed)
 			{
-				oboAllowed = AuthorizeManager.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), collection, Constants.ADD);
+				oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), collection, Constants.ADD);
 			}
 
 			// final check to see if we are allowed to READ
@@ -909,19 +908,19 @@ public class SwordAuthenticator
 
             // we now need to check whether the selected context that we are authorising
             // has the appropriate permissions
-            boolean write = AuthorizeManager.authorizeActionBoolean(allowContext, item, Constants.WRITE);
+            boolean write = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, item, Constants.WRITE);
 
             Bundle[] bundles = item.getBundles("ORIGINAL");
             boolean add = false;
             if (bundles.length == 0)
             {
-                add = AuthorizeManager.authorizeActionBoolean(allowContext, item, Constants.ADD);
+                add = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, item, Constants.ADD);
             }
             else
             {
                 for (int i = 0; i < bundles.length; i++)
                 {
-                    add = AuthorizeManager.authorizeActionBoolean(allowContext, bundles[i], Constants.ADD);
+                    add = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, bundles[i], Constants.ADD);
                     if (!add)
                     {
                         break;

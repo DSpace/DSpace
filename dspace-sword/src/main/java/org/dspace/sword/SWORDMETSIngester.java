@@ -23,7 +23,7 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
@@ -130,7 +130,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleManager.findHandle(context, installedItem);
+			String handle = HandleServiceImpl.findHandle(context, installedItem);
 			
 			swordService.message("Ingest successful");
 			swordService.message("Item created with internal identifier: " + installedItem.getID());

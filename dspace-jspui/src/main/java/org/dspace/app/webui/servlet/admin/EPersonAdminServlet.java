@@ -23,14 +23,14 @@ import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.AccountManager;
+import org.dspace.eperson.AccountServiceImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
 import org.dspace.eperson.Group;
@@ -305,7 +305,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                 showMain(context, request, response);
             }
             // Only super administrators can login as someone else.
-            else if (!AuthorizeManager.isAdmin(context))
+            else if (!AuthorizeServiceImpl.isAdmin(context))
             {                
                 throw new AuthorizeException("Only site administrators may assume login as another user.");
             }
@@ -351,7 +351,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                         epersonLocale);
 
                 // Set any special groups - invoke the authentication mgr.
-                int[] groupIDs = AuthenticationManager.getSpecialGroups(
+                int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(
                         context, request);
 
                 for (int i = 0; i < groupIDs.length; i++)
@@ -377,7 +377,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             MessagingException
     {
         // Note, this may throw an error is the email is bad.
-        AccountManager.sendForgotPasswordInfo(context, e.getEmail());
+        AccountServiceImpl.sendForgotPasswordInfo(context, e.getEmail());
         request.setAttribute("reset_password", Boolean.TRUE);
     }
 

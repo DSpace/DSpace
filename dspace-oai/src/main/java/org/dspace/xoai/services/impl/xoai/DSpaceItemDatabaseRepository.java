@@ -22,7 +22,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.data.DSpaceDatabaseItem;
@@ -113,7 +113,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             String parts[] = id.split(Pattern.quote(":"));
             if (parts.length == 3)
             {
-                DSpaceObject obj = HandleManager.resolveToObject(context.getContext(),
+                DSpaceObject obj = HandleServiceImpl.resolveToObject(context.getContext(),
                         parts[2]);
                 if (obj == null)
                     throw new IdDoesNotExistException();

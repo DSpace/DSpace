@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -38,10 +39,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -117,7 +122,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     
     /** Cached validity object */
     private SourceValidity validity;
-    
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -174,7 +183,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            DSpaceValidity validity = new DSpaceValidity();
 	            
 	            DSpaceObject scope = getScope();
-	            validity.add(scope);
+	            validity.add(context, scope);
 	            
 	            performSearch();
 
@@ -185,8 +194,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            java.util.List<String> handles = queryResults.getHitHandles();
 	            for (String handle : handles)
 	            {
-	                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
-	                validity.add(resultDSO);
+	                DSpaceObject resultDSO = handleService.resolveToObject(context, handle);
+	                validity.add(context, resultDSO);
 	            }
 	            
 	            this.validity = validity.complete();
@@ -243,13 +252,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             if (searchScope instanceof Community)
             {
                 Community community = (Community) searchScope;
-                String communityName = community.getMetadata("name");
+                String communityName = community.getName();
                 results.setHead(T_head1_community.parameterize(communityName));
             }
             else if (searchScope instanceof Collection)
             {
                 Collection collection = (Collection) searchScope;
-                String collectionName = collection.getMetadata("name");
+                String collectionName = collection.getName();
                 results.setHead(T_head1_collection.parameterize(collectionName));
             }
             else
@@ -287,7 +296,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 java.util.List<String> containerHandles = queryResults.getHitHandles();
                 for (String handle : containerHandles)
                 {
-                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+                    DSpaceObject resultDSO = handleService.resolveToObject(
                             context, handle);
 
                     if (resultDSO instanceof Community
@@ -312,7 +321,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 java.util.List<String> itemHandles = queryResults.getHitHandles();
                 for (String handle : itemHandles)
                 {
-                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+                    DSpaceObject resultDSO = handleService.resolveToObject(
                             context, handle);
 
                     if (resultDSO instanceof Item)
@@ -365,9 +374,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // No scope, display all root level communities
             scope.addOption("/",T_all_of_dspace);
             scope.setOptionSelected("/");
-            for (Community community : Community.findAllTop(context))
+            for (Community community : communityService.findAllTop(context))
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getName());
             }
         }
         else if (scopeDSO instanceof Community)
@@ -376,12 +385,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(community.getHandle(),community.getMetadata("name"));
+            scope.addOption(community.getHandle(),community.getName());
             scope.setOptionSelected(community.getHandle());
 
             for (Collection collection : community.getCollections())
             {
-                scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+                scope.addOption(collection.getHandle(),collection.getName());
             }
         }
         else if (scopeDSO instanceof Collection)
@@ -389,14 +398,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+            scope.addOption(collection.getHandle(),collection.getName());
             scope.setOptionSelected(collection.getHandle());
             
-            Community[] communities = collection.getCommunities()[0]
-                    .getAllParents();
+            List<Community> communities = communityService.getAllParents(context, collection.getCommunities().get(0));
             for (Community community : communities)
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getName());
             }
         }
     }
@@ -478,7 +486,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;

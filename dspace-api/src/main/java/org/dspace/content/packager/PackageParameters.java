@@ -27,10 +27,10 @@ import javax.servlet.ServletRequest;
 public class PackageParameters extends Properties
 {
     // Use non-printing FS (file separator) as arg-sep token, like Perl $;
-    private static final String SEPARATOR = "\034";
+    protected static final String SEPARATOR = "\034";
 
     // Regular expression to match the separator token:
-    private static final String SEPARATOR_REGEX = "\\034";
+    protected static final String SEPARATOR_REGEX = "\\034";
 
     public PackageParameters()
     {

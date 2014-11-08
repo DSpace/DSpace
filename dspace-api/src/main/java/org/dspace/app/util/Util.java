@@ -12,17 +12,13 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
@@ -235,6 +231,32 @@ public class Util {
     }
 
     /**
+     * Obtain a parameter from the given request as a UUID. <code>null</code> is
+     * returned if the parameter is garbled or does not exist.
+     *
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     *
+     * @return the integer value of the parameter, or -1
+     */
+    public static UUID getUUIDParameter(HttpServletRequest request, String param)
+    {
+        String val = request.getParameter(param);
+
+        try
+        {
+            return UUID.fromString(val.trim());
+        }
+        catch (Exception e)
+        {
+            // Problem with parameter
+            return null;
+        }
+    }
+
+    /**
      * Obtain an array of int parameters from the given request as an int. null
      * is returned if parameter doesn't exist. <code>-1</code> is returned in
      * array locations if that particular value is garbled.
@@ -382,7 +404,7 @@ public class Util {
      */
 
     public static List<String> getControlledVocabulariesDisplayValueLocalized(
-            Item item, Metadatum[] values, String schema, String element,
+            Item item, List<MetadataValue> values, String schema, String element,
             String qualifier, Locale locale) throws SQLException,
             DCInputsReaderException
     {
@@ -452,16 +474,14 @@ public class Util {
         if (myInputsFound)
         {
 
-            for (int j = 0; j < values.length; j++)
-            {
+            for (MetadataValue value : values) {
 
                 String pairsName = myInputs.getPairsType();
-                String stored_value = values[j].value;
+                String stored_value = value.getValue();
                 String displayVal = myInputs.getDisplayString(pairsName,
                         stored_value);
 
-                if (displayVal != null && !"".equals(displayVal))
-                {
+                if (displayVal != null && !"".equals(displayVal)) {
 
                     toReturn.add(displayVal);
                 }

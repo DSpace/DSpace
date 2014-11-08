@@ -134,6 +134,7 @@ implements RDFStorage
         accessor.httpPut(graphNode, g);
     }
     
+    @Override
     public Model load(String uri)
     {
         Node graphNode = NodeFactory.createURI(uri);

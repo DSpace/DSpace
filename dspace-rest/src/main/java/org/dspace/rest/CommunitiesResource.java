@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
@@ -163,7 +163,7 @@ public class CommunitiesResource extends Resource
 
             for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.length; i++)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -245,7 +245,7 @@ public class CommunitiesResource extends Resource
 
             for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.length; i++)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -330,7 +330,7 @@ public class CommunitiesResource extends Resource
             org.dspace.content.Collection[] dspaceCollections = dspaceCommunity.getCollections();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCollections.length); i++)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
                 {
                     collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
                     writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -416,7 +416,7 @@ public class CommunitiesResource extends Resource
             org.dspace.content.Community[] dspaceCommunities = dspaceCommunity.getSubcommunities();
             for (int i = offset; (i < (offset + limit)) && (i < dspaceCommunities.length); i++)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
                     communities.add(new Community(dspaceCommunities[i], expand, context));
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
@@ -476,7 +476,7 @@ public class CommunitiesResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            if (!AuthorizeManager.isAdmin(context))
+            if (!AuthorizeServiceImpl.isAdmin(context))
             {
                 context.abort();
                 String user = "anonymous";
@@ -878,7 +878,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Collection(id=" + collectionId + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.REMOVE))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, collection, org.dspace.core.Constants.REMOVE))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
@@ -985,7 +985,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Subcommunity(id=" + subcommunityId + ") in community(id=" + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, subcommunity, org.dspace.core.Constants.REMOVE))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, subcommunity, org.dspace.core.Constants.REMOVE))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
@@ -1068,7 +1068,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Community(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, community, action))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, community, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)

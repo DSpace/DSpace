@@ -17,7 +17,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 /**
  * This class provides a single point of contact for
@@ -76,7 +76,7 @@ public class CollectionLocation
 				throw new DSpaceSWORDException("The deposit URL is incomplete");
 			}
 			
-			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
 			
 			if (!(dso instanceof Collection))
 			{

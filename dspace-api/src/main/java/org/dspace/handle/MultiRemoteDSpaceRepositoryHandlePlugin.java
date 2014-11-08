@@ -88,6 +88,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void init(StreamTable st) throws Exception
     {
         // Not implemented
@@ -133,6 +134,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void setHaveNA(byte[] theHandle, boolean haveit)
             throws HandleException
     {
@@ -146,6 +148,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void createHandle(byte[] theHandle, HandleValue[] values)
             throws HandleException
     {
@@ -159,6 +162,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public boolean deleteHandle(byte[] theHandle) throws HandleException
     {
         // Not implemented
@@ -173,6 +177,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void updateValue(byte[] theHandle, HandleValue[] values)
             throws HandleException
     {
@@ -186,6 +191,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void deleteAllRecords() throws HandleException
     {
         // Not implemented
@@ -198,6 +204,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void checkpointDatabase() throws HandleException
     {
         // Not implemented
@@ -210,6 +217,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void shutdown()
     {
         // Not implemented
@@ -222,6 +230,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void scanHandles(ScanCallback callback) throws HandleException
     {
         // Not implemented
@@ -234,6 +243,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
     /**
      * HandleStorage interface method - not implemented.
      */
+    @Override
     public void scanNAs(ScanCallback callback) throws HandleException
     {
         // Not implemented
@@ -262,6 +272,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public byte[][] getRawHandleValues(byte[] theHandle, int[] indexList,
             byte[][] typeList) throws HandleException
     {
@@ -390,6 +401,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public boolean haveNA(byte[] theHandle) throws HandleException
     {
         if (log.isInfoEnabled())
@@ -421,6 +433,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
      * @exception HandleException
      *                If an error occurs while calling the Handle API.
      */
+    @Override
     public Enumeration getHandlesForNA(byte[] theNAHandle)
             throws HandleException
     {

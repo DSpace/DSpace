@@ -23,7 +23,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
@@ -89,7 +89,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         if(handle != null)
         {
-                dso = HandleManager.resolveToObject(context, handle);
+                dso = HandleServiceImpl.resolveToObject(context, handle);
         }
 
         if(dso == null)

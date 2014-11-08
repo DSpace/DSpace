@@ -18,12 +18,12 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.SupervisedItem;
+import org.dspace.content.SupervisedItemServiceImpl;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.Supervisor;
+import org.dspace.eperson.SupervisorServiceImpl;
 
 /**
  * Servlet to handle administration of the supervisory system
@@ -183,7 +183,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // get all the supervised items
-        SupervisedItem[] si = SupervisedItem.getAll(context);
+        SupervisedItemServiceImpl[] si = SupervisedItemServiceImpl.getAll(context);
         
         // set the attributes for the JSP
         request.setAttribute("supervised",si);
@@ -212,7 +212,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         int wsItemID = UIUtil.getIntParameter(request,"TargetWSItem");
         int policyType = UIUtil.getIntParameter(request, "PolicyType");
         
-        Supervisor.add(context, groupID, wsItemID, policyType);
+        SupervisorServiceImpl.add(context, groupID, wsItemID, policyType);
         
         log.info(LogManager.getHeader(context, 
             "Supervision Order Set", 
@@ -234,7 +234,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // ditch any supervision orders that are no longer relevant
-        Supervisor.removeRedundant(context);
+        SupervisorServiceImpl.removeRedundant(context);
          
         context.complete();
     }
@@ -256,7 +256,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         int wsItemID = UIUtil.getIntParameter(request,"siID");
         int groupID = UIUtil.getIntParameter(request,"gID");
         
-        Supervisor.remove(context, wsItemID, groupID);
+        SupervisorServiceImpl.remove(context, wsItemID, groupID);
         
         log.info(LogManager.getHeader(context, 
             "Supervision Order Removed", 
@@ -290,7 +290,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
             return false;
         }
 
-        boolean invalid = Supervisor.isOrder(context, wsItemID, groupID);
+        boolean invalid = SupervisorServiceImpl.isOrder(context, wsItemID, groupID);
         
         if (invalid)
         {

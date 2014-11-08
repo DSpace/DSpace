@@ -11,12 +11,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import org.dspace.AbstractUnitTest;
 import org.junit.After;
 import org.junit.Before;
@@ -52,8 +46,7 @@ public class DCDateTest extends AbstractUnitTest
      */
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
         TimeZone.setDefault(TimeZone.getTimeZone("GMT-8"));
     }
@@ -67,8 +60,7 @@ public class DCDateTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy()  {
         dc = null;
         c = null;
         super.destroy();

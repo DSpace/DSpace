@@ -31,6 +31,7 @@ public class BasicDispatcher extends Dispatcher
     /** log4j category */
     private static Logger log = Logger.getLogger(BasicDispatcher.class);
 
+    @Override
     public void addConsumerProfile(ConsumerProfile cp)
             throws IllegalArgumentException
     {
@@ -66,6 +67,7 @@ public class BasicDispatcher extends Dispatcher
      * @param ctx
      *            the execution context
      */
+    @Override
     public void dispatch(Context ctx)
     {
         if (!consumers.isEmpty())

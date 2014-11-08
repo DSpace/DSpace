@@ -94,6 +94,11 @@ public class MockServiceManagerSystem implements ServiceManagerSystem {
         this.sms.registerService(name, service);
     }
 
+    @Override
+    public void registerServiceNoAutowire(String name, Object service) {
+        this.sms.registerServiceNoAutowire(name, service);
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.kernel.ServiceManager#registerServiceClass(java.lang.String, java.lang.Class)
      */

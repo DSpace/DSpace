@@ -44,14 +44,10 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.content.*;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
@@ -186,7 +182,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 
                 if (dso != null)
                 {
-                    newValidity.add(dso);
+                    newValidity.add(context, dso);
                 }
 
                 BrowseInfo info = getBrowseInfo();
@@ -194,9 +190,9 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
                 newValidity.add("start:"+info.getStart());
 
                     // Add the browse items to the validity
-                    for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                    for (Item item : info.getResults())
                     {
-                        newValidity.add(item);
+                        newValidity.add(context, item);
                 }
 
                 validity = newValidity.complete();
@@ -272,7 +268,7 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
 	        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type, ReferenceSet.TYPE_SUMMARY_LIST, type, null);
 
             // Add the items to the browse results
-            for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+            for (Item item : info.getResults())
             {
                 referenceSet.addReference(item);
             }

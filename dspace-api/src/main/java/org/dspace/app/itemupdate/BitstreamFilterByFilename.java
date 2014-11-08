@@ -17,8 +17,8 @@ import org.dspace.content.Bitstream;
  */
 public class BitstreamFilterByFilename extends BitstreamFilter {
 	
-	private Pattern pattern;
-	private String filenameRegex;
+	protected Pattern pattern;
+    protected String filenameRegex;
 	
 	public BitstreamFilterByFilename()
 	{
@@ -31,7 +31,8 @@ public class BitstreamFilterByFilename extends BitstreamFilter {
 	 * 
 	 *   @return whether bitstream name matches the regular expression
 	 */
-	public boolean accept(Bitstream bitstream) throws BitstreamFilterException
+	@Override
+    public boolean accept(Bitstream bitstream) throws BitstreamFilterException
 	{		
 		if (filenameRegex == null)
 		{

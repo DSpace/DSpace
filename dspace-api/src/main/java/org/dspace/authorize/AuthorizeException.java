@@ -46,6 +46,14 @@ public class AuthorizeException extends Exception
         myobject = null;
     }
 
+    public AuthorizeException(Throwable throwable)
+    {
+        super(throwable);
+
+        myaction = -1;
+        myobject = null;
+    }
+
     /**
      * Create an authorize exception with a message
      * 

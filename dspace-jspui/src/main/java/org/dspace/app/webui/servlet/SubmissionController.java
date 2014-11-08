@@ -16,8 +16,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,12 +38,10 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
 
 import com.google.gson.Gson;
-import java.util.Collections;
-import javax.servlet.http.HttpSession;
 import org.dspace.submit.step.UploadStep;
 
 /**
@@ -195,7 +191,7 @@ public class SubmissionController extends DSpaceServlet
             try
             {
                 // load the workflow item
-                WorkflowItem wi = WorkflowItem.find(context, Integer
+                BasicWorkflowItem wi = BasicWorkflowItem.find(context, Integer
                         .parseInt(workflowID));
 
                 //load submission information
@@ -1045,7 +1041,7 @@ public class SubmissionController extends DSpaceServlet
             {
                 int workflowID = UIUtil.getIntParameter(request, "workflow_id");
                 
-                info = SubmissionInfo.load(request, WorkflowItem.find(context, workflowID));
+                info = SubmissionInfo.load(request, BasicWorkflowItem.find(context, workflowID));
             }
             else if(request.getParameter("workspace_item_id") != null)
             {

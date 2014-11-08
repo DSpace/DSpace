@@ -52,11 +52,11 @@ public class V1_5_9__Drop_constraint_for_DSpace_1_6_schema
             throws IOException, SQLException
     {
         // Drop the constraint associated with "collection_id" column of "community2collection" table
-        int return1 = MigrationUtils.dropDBConstraint(connection, "community2collection", "collection_id");
+        int return1 = MigrationUtils.dropDBConstraint(connection, "community2collection", "collection_id", "pkey");
         // Drop the constraint associated with "child_comm_id" column of "community2community" table
-        int return2 = MigrationUtils.dropDBConstraint(connection, "community2community", "child_comm_id");
+        int return2 = MigrationUtils.dropDBConstraint(connection, "community2community", "child_comm_id", "pkey");
         // Drop the constraint associated with "item_id" column of "collection2item" table
-        int return3 = MigrationUtils.dropDBConstraint(connection, "collection2item", "item_id");
+        int return3 = MigrationUtils.dropDBConstraint(connection, "collection2item", "item_id", "pkey");
 
 	// Checksum will just be the sum of those three return values
 	checksum = return1 + return2 + return3;

@@ -82,7 +82,7 @@ public class ArXivService
         return search(query.toString(), "", 10);
     }
 
-    private List<Record> search(String query, String arxivid, int max_result)
+    protected List<Record> search(String query, String arxivid, int max_result)
     		throws IOException, HttpException
     		{
     	List<Record> results = new ArrayList<Record>();
