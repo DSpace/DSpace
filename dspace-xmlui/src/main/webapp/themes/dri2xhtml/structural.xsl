@@ -2568,7 +2568,7 @@
     
     
     
-    <!-- Help elementns are turning into tooltips. There might be a better way to do this -->
+    <!-- Help elements are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">
