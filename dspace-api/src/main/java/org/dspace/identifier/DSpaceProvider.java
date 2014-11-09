@@ -14,6 +14,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manipulate DSpace internal object Identifiers.
@@ -25,6 +27,8 @@ public class DSpaceProvider
 {
     /** Database table to hold DSpace object identifiers. */
     static final String ID_TABLE = "ObjectID";
+
+    private static final Logger log = LoggerFactory.getLogger(DSpaceProvider.class);
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
@@ -52,6 +56,7 @@ public class DSpaceProvider
             context.commit();
         } catch (SQLException ex)
         {
+            log.debug("Can't insert a new identifier:  ", ex);
             throw new IdentifierException("Unable to store a DSpace object identifier", ex);
         }
         return id;

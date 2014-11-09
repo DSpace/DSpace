@@ -18,6 +18,8 @@
 -- DS-1782 DSpace Needs Local Object Identifiers
 ------------------------------------------------------
 
+CREATE SEQUENCE objectid_seq;
+
 CREATE TABLE ObjectID
 (
  dspace_id CHAR(36) NOT NULL UNIQUE,
