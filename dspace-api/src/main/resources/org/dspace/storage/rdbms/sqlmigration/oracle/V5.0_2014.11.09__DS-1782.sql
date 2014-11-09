@@ -27,3 +27,5 @@ CREATE TABLE ObjectID
 );
 
 CREATE INDEX object_id_idx ON ObjectID(dspace_id);
+
+COMMIT;

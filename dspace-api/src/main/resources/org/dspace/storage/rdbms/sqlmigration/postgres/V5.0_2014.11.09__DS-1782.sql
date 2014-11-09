@@ -26,3 +26,5 @@ CREATE TABLE ObjectID
  CONSTRAINT objectid_pkey PRIMARY KEY (object_id, object_type)
 );
 CREATE INDEX object_id_idx ON ObjectID(dspace_id);
+
+COMMIT;
