@@ -331,19 +331,3 @@ CREATE VIEW dcvalue AS
   FROM MetadataValue, MetadataFieldRegistry
   WHERE MetadataValue.metadata_field_id = MetadataFieldRegistry.metadata_field_id
   AND MetadataFieldRegistry.metadata_schema_id = 1 AND MetadataValue.resource_type_id = 2;
-
--- --------
--- DSpace identifiers
--- --------
-
-CREATE SEQUENCE objectid_seq;
-
-CREATE TABLE ObjectID
-(
-    dspace_id VARCHAR2(36) NOT NULL UNIQUE,
-    object_id INTEGER NOT NULL,
-    object_type INTEGER NOT NULL,
-    CONSTRAINT objectid_pkey PRIMARY KEY (object_id, object_type)
-);
-
-CREATE INDEX object_id_idx ON ObjectID(dspace_id);
