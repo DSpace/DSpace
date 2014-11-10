@@ -19,7 +19,6 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.lang3.StringUtils;
@@ -182,23 +181,14 @@ public class BatchImportServlet extends DSpaceServlet
     			}
 
     			try {
-    				//Decide if it is a new upload or a resume one!
-    				if (uploadId != null){ //resume upload
-    					if (f==null){
-    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, uploadId, context);
-    					}
-    					else {
-    						ItemImport.processUIImport(f, owningCollection, reqCollections, uploadId, inputType, context);
-    					}
+    				String finalInputType = "saf";
+    				String filePath = zipurl;
+    				if (f!=null){
+    					finalInputType = inputType;
+        				filePath = f.getAbsolutePath();
     				}
-    				else { //New upload
-    					if (f==null){
-    						ItemImport.processUIImport(zipurl, owningCollection, reqCollections, null, context);
-    					}
-    					else {
-    						ItemImport.processUIImport(f, owningCollection, reqCollections, null, inputType, context);
-    					}
-    				}
+    				
+    				ItemImport.processUIImport(filePath, owningCollection, reqCollections, uploadId, finalInputType, context);
     				
     				request.setAttribute("has-error", "false");
     				request.setAttribute("uploadId", null);
