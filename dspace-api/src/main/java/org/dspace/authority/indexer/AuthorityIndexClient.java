@@ -10,7 +10,6 @@ package org.dspace.authority.indexer;
 import org.dspace.authority.AuthorityValue;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.content.authority.EditableAuthorityIndexingService;
 import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
@@ -73,7 +72,7 @@ public class AuthorityIndexClient {
     public static void indexItem(Context context, Item item){
         ServiceManager serviceManager = getServiceManager();
 
-        AuthorityIndexingService indexingService = serviceManager.getServiceByName(EditableAuthorityIndexingService.class.getName(),EditableAuthorityIndexingService.class);
+        AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
         List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
 
 
