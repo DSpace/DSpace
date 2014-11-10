@@ -9,6 +9,7 @@ package org.dspace.authority.indexer;
 
 import org.dspace.authority.AuthorityValue;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
@@ -43,6 +44,7 @@ public class AuthorityIndexClient {
         System.out.println("Cleaning the old index");
         indexingService.cleanIndex();
 
+        context.turnOffAuthorisationSystem();
         //Get all our values from the input forms
         Map<String, AuthorityValue> toIndexValues = new HashMap<String, AuthorityValue>();
         for (AuthorityIndexerInterface indexerInterface : indexers) {
@@ -65,6 +67,7 @@ public class AuthorityIndexClient {
 
         //In the end commit our server
         indexingService.commit();
+        context.restoreAuthSystemState();
         context.abort();
         System.out.println("All done !");
     }
