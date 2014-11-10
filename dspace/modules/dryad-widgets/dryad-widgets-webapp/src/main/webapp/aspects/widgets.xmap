@@ -247,7 +247,7 @@
         <!-- data-file content handler -->
         <map:pipeline type="caching">
             <map:match pattern="v1/display/preview">
-                <map:generate type="file" src="../static/html/preview.html"/>
+                <map:generate type="file" src="../static/html/widgets/display/preview.html"/>
                 <map:serialize type="html"/>
             </map:match>
             <map:handle-errors>
@@ -261,8 +261,6 @@
             </map:handle-errors>
 
         </map:pipeline>
-
-
 
     </map:pipelines>
 </map:sitemap>

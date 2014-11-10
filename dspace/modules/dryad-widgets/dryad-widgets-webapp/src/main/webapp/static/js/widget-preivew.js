@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    var height_default  = 800
+    var height_default  = 600
       , width_default   = 800
       , height          = height_default 
       , width           = width_default
@@ -10,7 +10,6 @@ $(document).ready(function(){
       , script_id       = 'dryad-ddw-script'
       , css_id          = 'dryad-ddw-css'
       , path            = 'widgets/v1/display'
-      , wrapper_id      = 'dryad-ddw-wrapper'
       , js_file         = 'loader.js?referrer=JDryadDev&wrapper=' + target_id
       , doi_regex       = new RegExp('^doi:10.5061');
     $('#update-preview').on('click', function(evt) {
@@ -24,8 +23,8 @@ $(document).ready(function(){
           , $css = $('<link type="text/css" rel="stylesheet" id="' + css_id + '" href="' + base + '/static/css/widgets/display/dryad-ddw.min.css">');
         doi.trim();
         if (doi.match(doi_regex)) {
-            dimension_wrapper(height,width);
-            remove_ids([script_id, css_id]);
+            dimension_target(height,width);
+            $('#' + target_id).children().remove();
             try {
                 $('body').append($css);
                 $('body').append($script);
@@ -48,22 +47,13 @@ $(document).ready(function(){
                 : width !== undefined
                     ? width
                     : width_default;
-        dimension_wrapper(height,width);
+        dimension_target(height,width);
+        $('#update-preview').click();
         evt.preventDefault();
    });
-    function dimension_wrapper(h,w) {
+    function dimension_target(h,w) {
         $('#' + height_id).val(h);
         $('#' + width_id).val(w);
-        $('#' + wrapper_id).height(h).width(w);
-    }
-    function add_stylesheet(url) {
-       
-    }
-    function remove_ids(ary) {
-        for (var i = 0; i < ary.length; i++) {
-            if ($('#' + ary[i]).length > 0) {
-                $('#' + ary[i]).remove();    
-            }
-        }
+        $('#' + target_id).height(h).width(w);
     }
 });
