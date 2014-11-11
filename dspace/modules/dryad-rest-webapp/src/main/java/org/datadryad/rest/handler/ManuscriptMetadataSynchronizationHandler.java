@@ -97,6 +97,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
             Context context = getContext();
             DryadDataPackage dataPackage = findDataPackage(manuscript, context);
             if(dataPackage == null) {
+                abortContext(context);
                 throw new HandlerException("Data package not found for manuscript: " + manuscript.manuscriptId);
             }
             // Check if rejected or accepted
