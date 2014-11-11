@@ -458,6 +458,21 @@
         </profile>
 
         <!--
+           Builds XMLUI Mirage2 WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-xmlui-mirage2</id>
+            <activation>
+                <file>
+                    <exists>dspace-xmlui-mirage2/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-xmlui-mirage2</module>
+            </modules>
+        </profile>
+
+        <!--
            Builds XMLUI WAR for DSpace
         -->
         <profile>
@@ -503,12 +518,13 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-rest</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
+            <module>dspace-xmlui-mirage2</module>
+            <module>dspace-xmlui</module>
          </modules>
       </profile>
 

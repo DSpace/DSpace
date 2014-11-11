@@ -39,7 +39,9 @@
         <profile>
             <id>dspace-xmlui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>xmlui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>xmlui</module>
@@ -48,7 +50,9 @@
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>lni/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>lni</module>
@@ -57,7 +61,9 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>jspui/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>jspui</module>
@@ -66,7 +72,9 @@
         <profile>
             <id>dspace-rest</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>rest/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>rest</module>
@@ -75,7 +83,9 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>sword/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>sword</module>
@@ -84,7 +94,9 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>swordv2/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>swordv2</module>
@@ -93,7 +105,9 @@
         <profile>
             <id>dspace-solr</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <file>
+                    <exists>solr/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>solr</module>
@@ -102,11 +116,26 @@
         <profile>
             <id>dspace-oai</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file>
+                    <exists>oai/pom.xml</exists>
+                </file>
             </activation>
             <modules>
                 <module>oai</module>
             </modules>
         </profile>
+
+        <profile>
+            <id>mirage2</id>
+            <activation>
+                <property>
+                    <name>mirage2.on</name>
+                </property>
+            </activation>
+            <modules>
+                <module>xmlui-mirage2</module>
+            </modules>
+        </profile>
+        
     </profiles>
 </project>

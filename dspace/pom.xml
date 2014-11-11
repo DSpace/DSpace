@@ -62,7 +62,7 @@
         <profile>
             <id>default</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file><exists>modules/pom.xml</exists></file>
             </activation>
             <!--
                 Builds Overlay Modules for DSpace
