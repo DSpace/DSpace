@@ -33,7 +33,7 @@
     <!-- New editable Authority Indexing Service -->
     <bean id="org.dspace.content.authority.EditableAuthorityIndexingService" class="org.dspace.content.authority.SolrAuthorityServiceImpl" />
 
-    <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
+    <!--<bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>    -->
 
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
 
