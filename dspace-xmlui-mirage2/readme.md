@@ -12,16 +12,20 @@ These new technologies are put in place to make it easier for the theme develope
 
 # Installation #
 
-Mirage 2 has been integrated into the standard maven build as an optional feature. It has to be explicitly enabled by setting the `mirage2.on` to `true`.
-
+Mirage 2 has been integrated into the standard maven build. Mirage2 is the default theme for DRUM XMLUI. The maven package command complies the Mirage2 theme and copies it to the XMLUI's themes directory. 
 ```bash
-    mvn package -Dmirage2.on=true
+    mvn package -Denv=local
 ```
 
 All extra tools in the Mirage 2 build process run on either Node js or Ruby, so you'll need both to be able to build the theme. By default, the maven build will assume you don't have either installed and install them in a temporary sandbox every time you build the project. That's convenient, but also quite a bit slower than installing them natively. So we recommend you only use that feature to try out the theme. Afterwards, install the prerequisites and build DSpace with the `mirage2.deps.included` property set to `false`:
 
 ```bash
-    mvn package -Dmirage2.on=true -Dmirage2.deps.included=false
+    mvn package -Dmirage2.deps.included=false
+```
+
+To skip building Mirage2
+```bash
+    mvn package -Denv=local -Dmirage2.off=true
 ```
 
 ## Prerequisites for OSX / Linux ##
@@ -167,15 +171,14 @@ Afterwards the command `compass` should show a help message.
 
 # Enabling the theme #
 
-Add the following to the `<themes>` section of  `src/dspace/config/xmlui.xconf`, replacing the currently active theme.
+Mirage2 is the default theme of DRUM XMLUI. It is configured in the `<themes>` section of  `src/dspace/config/xmlui.xconf`.
 
 ```xml
     <theme name="Mirage 2" regex=".*" path="Mirage2/" /> 
 ```
+When you run `mvn package -Denv=local` in the dspace project root, bower will download all Mirage 2 dependencies, and grunt will trigger a number of plugins to preprocess, concatenate and minify all the theme's resources. 
 
-
-
-Now, if you run `mvn package -Dmirage2.on=true` in the dspace project root, bower will download all Mirage 2 dependencies, and grunt will trigger a number of plugins to preprocess, concatenate and minify all the theme's resources. 
+You can disable Mirage2 by changing the configuration in xmlui.xconf, and by running `mvn package -Dmirage2.off=true` in the dspace project root.
 
 
 # Customizing the theme #
