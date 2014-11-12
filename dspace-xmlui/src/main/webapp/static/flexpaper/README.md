@@ -1,4 +1,11 @@
-## Background
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+ ## Background
 Institution has a need for a document viewer with page turning capabilities (Example: display of rare books and other special collections materials).
 
 After researching non-flash based document viewer solutions (with page turning), FlexPaper Zine seemed to offer the most attractive viewer. 
