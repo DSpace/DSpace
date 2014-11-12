@@ -45,7 +45,7 @@ https://github.com/Georgetown-University-Libraries/Georgetown-University-Librari
     pdftk link.pdf burst output link_%02d.pdf compress
     if [ $? -ne 0 ];then
         echo pdftk: cannot split pdf
-       exit
+        exit
     fi
     
     echo pdf2json link.pdf -enc UTF-8 -compress -split 10 link.pdf_%.js
