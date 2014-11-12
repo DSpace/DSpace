@@ -12,6 +12,10 @@ http://flexpaper.devaldi.com/Convert-PDF-documents-to-HTML5.jsp
 
 This solution requires the purchase of a license from FlexPaper. 
 
+## Sample Screen Shots 
+_Replace with live viewer links once solution is live_
+https://github.com/Georgetown-University-Libraries/Georgetown-University-Libraries-Code/releases/tag/v1.0.8
+
 ## Pre-requisities
 * Purchase a FlexPaper Zine Commercial License and download assets http://flexpaper.devaldi.com/download/
 * Copy css, js, and locale data into /dspace/modules/xmlui/src/main/webapp/static/flexpaper
@@ -31,4 +35,3 @@ This solution requires the purchase of a license from FlexPaper.
 * Is /static/flexpaper acceptable as a path for the solution?
 * Do the comments on pre-compilation make sense?
 * Should template.html be generated from an XMLUI template?
-* Include sample book view icon
