@@ -30,3 +30,5 @@ This solution requires the purchase of a license from FlexPaper.
 * Neet to internationalize the language around the link (and add a header row)
 * Is /static/flexpaper acceptable as a path for the solution?
 * Do the comments on pre-compilation make sense?
+* Should template.html be generated from an XMLUI template?
+* Include sample book view icon
