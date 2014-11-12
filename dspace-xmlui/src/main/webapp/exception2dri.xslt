@@ -34,7 +34,7 @@ Created by Tim Donohue
   <xsl:template match="ex:exception-report">
     <document version="1.1">
       <body>
-        <div id="exception">
+        <div id="exception" rend="exception">
           <head><xsl:value-of select="$pageTitle"/></head>
           <p>
             <xref><xsl:attribute name="target"><xsl:value-of select="$contextPath"/>/</xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></xref>

@@ -311,31 +311,22 @@
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
 
-            <!-- Add MathJAX CDN, can do a local install, or possibly get SSL enabled-->
+            <!-- Add MathJAX JS library to render scientific formulas-->
             <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
-                    tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    ignoreClass: "detail-field-data|detailtable"
-                    },
-                    TeX: {
-                    Macros: {
-                    AA: '{\\mathring A}'
-                    }
-                    }
+                      tex2jax: {
+                        inlineMath: [['$','$'], ['\\(','\\)']],
+                        ignoreClass: "detail-field-data|detailtable|exception"
+                      },
+                      TeX: {
+                        Macros: {
+                          AA: '{\\mathring A}'
+                        }
+                      }
                     });
                 </script>
-
-                <xsl:choose>
-
-                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='scheme']='https'">
-                        <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
             </xsl:if>
 
         </head>
