@@ -35,3 +35,52 @@ https://github.com/Georgetown-University-Libraries/Georgetown-University-Librari
 * Is /static/flexpaper acceptable as a path for the solution?
 * Do the comments on pre-compilation make sense?
 * Should template.html be generated from an XMLUI template?
+
+## Notes about pre-compilation (for eventual filter-media/curation task)
+* Create bookview folder
+* cd to bookview folder
+* symlink pdf file as link.pdf
+
+    echo pdftk link.pdf burst output link_%02d.pdf compress
+    pdftk link.pdf burst output link_%02d.pdf compress
+    if [ $? -ne 0 ];then
+        echo pdftk: cannot split pdf
+       exit
+    fi
+    
+    echo pdf2json link.pdf -enc UTF-8 -compress -split 10 link.pdf_%.js
+    pdf2json link.pdf -enc UTF-8 -compress -split 10 link.pdf_%.js
+    if [ $? -ne 0 ];then
+       echo pdf2json: cannot index pdf for searching
+       exit
+    fi
+
+    echo convert -thumbnail 184x283 link.pdf link-%d.jpg
+    convert -thumbnail 184x283 link.pdf link-%d.jpg
+    if [ $? -ne 0 ];then
+       echo convert: cannot convert pdf to thumbnails
+       exit
+    fi
+
+    sed -e "s|HANDLESEQ|${HANDLESEQ}|g" $$PATH$$/precompile.template > index.html
+    if [ $? -ne 0 ];then
+        echo convert: cannot create index.html file
+       exit
+    fi
+
+    unlink link.pdf
+    if [ $? -ne 0 ];then
+        echo convert: cannot unlink pdf file
+        exit
+    fi
+    
+## Code to invoke pre-compiled html5 viewer
+    $('#documentViewer').FlexPaperViewer(
+        { config : {
+            JSONFile : '/bookview/HANDLESEQ/link.pdf_{page}.js',
+            PDFFile : '/bookview/HANDLESEQ/link_[*,2].pdf',
+            ThumbIMGFiles : '/bookview/HANDLESEQ/link-{page}.jpg',
+            RenderingOrder : 'html5',
+            key : '$$YOUR_KEY$$',
+        }}
+    );
