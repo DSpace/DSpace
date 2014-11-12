@@ -50,9 +50,7 @@
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <file>
-                    <exists>lni/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>lni</module>
@@ -83,9 +81,7 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <file>
-                    <exists>sword/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>sword</module>
@@ -94,9 +90,7 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <file>
-                    <exists>swordv2/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>swordv2</module>
@@ -105,9 +99,7 @@
         <profile>
             <id>dspace-solr</id>
             <activation>
-                <file>
-                    <exists>solr/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>solr</module>

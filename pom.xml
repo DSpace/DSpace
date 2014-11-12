@@ -417,9 +417,7 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
-                <file>
-                    <exists>dspace-sword/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>dspace-sword</module>
@@ -448,9 +446,7 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
-                <file>
-                    <exists>dspace-swordv2/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>dspace-swordv2</module>
@@ -493,9 +489,7 @@
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <file>
-                    <exists>dspace-lni/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>dspace-lni</module>
@@ -518,11 +512,8 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-rest</module>
-            <module>dspace-sword</module>
-            <module>dspace-swordv2</module>
             <module>dspace-xmlui-mirage2</module>
             <module>dspace-xmlui</module>
          </modules>
