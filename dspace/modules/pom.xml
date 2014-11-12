@@ -121,7 +121,7 @@
             <id>mirage2</id>
             <activation>
                 <property>
-                    <name>mirage2.on</name>
+                    <name>!mirage2.off</name>
                 </property>
             </activation>
             <modules>
