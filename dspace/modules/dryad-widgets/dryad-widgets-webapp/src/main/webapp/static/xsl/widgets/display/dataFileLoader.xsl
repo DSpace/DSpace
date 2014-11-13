@@ -113,13 +113,23 @@ function noConflictHandler() {
 function open_popup(content) {
     if (jQuery === undefined || !jQuery.hasOwnProperty('magnificPopup')) return;
     jQuery.magnificPopup.open({
-        removalDelay: pudel
+          type:'inline'
+        , src: content
+        , removalDelay: pudel
         , mainClass: pucls
         , items: {
             src: content,
             type: 'inline'
         }
         , closeBtnInside: false
+        , enableEscapeKey: true
+        , fixedContentPos: 'auto'
+        , callbacks: {
+            open: function() {
+                console.log('Popup is opened');
+            }
+        }
+        , verticalFit: true
     });
 }
 // download a URL using a hidden iframe element

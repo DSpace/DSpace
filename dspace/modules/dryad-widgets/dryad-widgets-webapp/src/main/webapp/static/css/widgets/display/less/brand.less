@@ -1,7 +1,5 @@
 // color/border settings ----------------------------
 
-background-color: @background-color;
-
 // center the widget horizontally
 margin-left:  auto;
 margin-right: auto;
@@ -23,15 +21,18 @@ iframe {
 .dryad-ddw-header {
     border-top-left-radius:     @large-radius;
     border-top-right-radius:    @large-radius;
-    border-bottom-left-radius:  @large-radius;
-    border-bottom-right-radius: @large-radius;
     color:                      @font-color;
+    background-color:           @background-color;
+    padding-bottom:             @header-padding-bottom;
 
     .dryad-ddw-title {
         h1 {
             margin: 0;
         }
+    }
+    .dryad-ddw-stats {
         ul {
+            vertical-align: bottom;
             list-style-type: none;
             margin: 0;
             padding: 0;
@@ -45,6 +46,7 @@ iframe {
         ul {
             list-style-type: none;
             margin: 0;
+            padding-left: 0;
 
             img {
                 width:      @banner-img-width;
@@ -56,42 +58,44 @@ iframe {
 }
 
 .dryad-ddw-body {
-    border-left:                @outer-border;
-    border-right:               @outer-border;
-    border-bottom-left-radius:  @large-radius;
-    border-bottom-right-radius: @large-radius;
-    
+    border-left:    @outer-border;
+    border-right:   @outer-border;
+
     .dryad-ddw-frame {
         background-color: @frame-background;
+        overflow-y: scroll;
     }
-    .dryad-ddw-frame-full {
-        height: 100%;
-    }
+    .dryad-ddw-control {
+        background-color: @background-color;
+    }        
 }
 
 .dryad-ddw-footer {
     background-color:           @footer-background;
     border-right:               @outer-border;
     border-left:                @outer-border;
+    border-top:                 @inner-border;
     border-bottom:              @outer-border;
     border-bottom-left-radius:  @large-radius;
     border-bottom-right-radius: @large-radius;
-    border-top:                 @inner-border;
 
     .dryad-ddw-control {
         ul {
             padding: 0;
             background-color: @footer-background;
+            margin-bottom: 12px;
         }
     }
     p {
-        background-color: @footer-background;    
+        background-color: @footer-background;
+        overflow-y: scroll;
     }
 }
 
 .dryad-ddw-control {
     ul {
         list-style-type: none;
+        margin-top: 0;
         
         li {
             background-color:           @button-background;

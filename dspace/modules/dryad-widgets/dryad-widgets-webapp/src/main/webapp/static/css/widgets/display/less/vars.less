@@ -25,12 +25,16 @@
 @border-width-outer:     3px;
 @border-width-inner:     5px;
 
-@outer-border: @border-width-outer @background-color solid;
-@inner-border: @border-width-inner @background-color solid;
+@header-padding-bottom: 6px;
+
+@outer-border: @border-width-outer solid @background-color;
+@inner-border: @border-width-inner solid @background-color;
 @box-shadow:   -5px 5px 5px @box-shadow-color;
 
 // iframe width cutoffs
+// NOTE: these values must correspond to window width values in
+// dataFileFrame.xsl
 @lg-max: 1000px; // NOTE: !!! see note above
-@md-max: 850px; // NOTE: !!! see note above
+@md-max: 700px; // NOTE: !!! see note above
 @sm-max: 425px; // NOTE: !!! see note above
 @xs-max: 300px; // NOTE: !!! see note above

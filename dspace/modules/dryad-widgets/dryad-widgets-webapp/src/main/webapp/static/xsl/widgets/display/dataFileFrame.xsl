@@ -5,10 +5,7 @@
     xmlns:d1="http://ns.dataone.org/service/types/v1" xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:ddf="http://purl.org/dryad/schema/terms/v3.1" xmlns:dri="http://di.tamu.edu/DRI/1.0/"
     xmlns:dwc="http://rs.tdwg.org/dwc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:java="http://xml.apache.org/xalan/java"
-    xmlns:sc="http://xml.apache.org/xalan/java/java.util.Scanner"
-    xmlns:u="http://xml.apache.org/xalan/java/java.net.URL"
-    exclude-result-prefixes="bibo d1 dcterms ddf dri dwc xsi java"
+    exclude-result-prefixes="bibo d1 dcterms ddf dri dwc xsi i18n"
     version="1.0">
 
     <xsl:output method="html" indent="yes"/>
@@ -62,7 +59,7 @@
         select="concat($author-date, $package-title, ' Dryad Digital Repository.')"/>
 
     <xsl:template match="/">
-        <html>
+        <html class="dryad-ddw">
             <head>
                 <xsl:call-template name="head-content"/>
             </head>
@@ -81,7 +78,7 @@
     </xsl:template>
 
     <xsl:template name="body-content">
-        <div class="dryad-ddw">
+        <div id="dryad-size-target">
             <div class="dryad-ddw-header" id="ddw-header">
                 <div class="dryad-ddw-banner">
                     <ul>
@@ -101,6 +98,8 @@
                     <h1>
                         <xsl:value-of select="$title"/>
                     </h1>
+                </div>
+                <div class="dryad-ddw-stats">
                     <ul>
                         <li><b><xsl:value-of select="$view-count"/></b> views</li>
                         <li><b><xsl:value-of select="$download-count"/></b> downloads</li>
@@ -108,9 +107,6 @@
                 </div>
             </div>
             <div class="dryad-ddw-body" id="ddw-body">
-                <div class="dryad-ddw-frame" id="ddw-body-frame">
-                    <xsl:call-template name="data-content"/>
-                </div>
                 <div class="dryad-ddw-control">
                     <ul>
                         <li>
@@ -134,6 +130,9 @@
                             </a>
                         </li>
                     </ul>
+                </div>
+                <div class="dryad-ddw-frame" id="ddw-body-frame">
+                    <xsl:call-template name="data-content"/>
                 </div>
             </div>
             <div class="dryad-ddw-footer" id="ddw-footer">
@@ -272,22 +271,37 @@
     <xsl:template name="script-content">
 
         <!-- set widget body size to expand to all space between header and footer -->
-        <script type="text/javascript"><![CDATA[
-            var wh = window.innerHeight;
-            var h = document.getElementById('ddw-header');
-            var hh = h.clientHeight + parseInt(window.getComputedStyle(h, null).paddingTop);
-            var f = document.getElementById('ddw-footer');
-            var fh = f.clientHeight + parseInt(window.getComputedStyle(f, null).borderTopWidth) + parseInt(window.getComputedStyle(f, null).borderBottomWidth);
-            var b = document.getElementById('ddw-body');
-            var bf = document.getElementById('ddw-body-frame');
-            b.style.height = (wh - hh - fh).toString() + 'px';
-            bf.style.height = '100%';//]]></script>
+        <xsl:variable name="script-id1" select="generate-id(.)"/>
+        <script type="text/javascript" id="{$script-id1}"><![CDATA[
+            (function (w, d) {//]]>
+                var sid = '<xsl:value-of select="$script-id1"/>';
+                <![CDATA[
+                var ww = window.innerWidth;
+                var szt = document.getElementById('dryad-size-target');
+                if      (ww >= 1000) szt.classList.add('dryad-ddw-lg')
+                else if (ww >=  700) szt.classList.add('dryad-ddw-md')
+                else if (ww >=  425) szt.classList.add('dryad-ddw-sm')
+                else if (ww >=  300) szt.classList.add('dryad-ddw-xs');
+                var wh = window.innerHeight;
+                var h = document.getElementById('ddw-header');
+                var hh = h.offsetHeight;
+                var f = document.getElementById('ddw-footer');
+                var fh = f.offsetHeight;
+                var b = document.getElementById('ddw-body');
+                var bf = document.getElementById('ddw-body-frame');
+                var margin = b.offsetWidth - b.clientWidth;
+                b.style.height = bf.style.height = (wh - hh - fh - 2*margin).toString() + 'px';
+                document.getElementById(sid).parentNode.removeChild(document.getElementById(sid));
+            })(window, document);
+        //]]></script>
 
         <!-- click handlers for buttons -->
-        <script type="text/javascript"><![CDATA[
+        <xsl:variable name="script-id2" select="generate-id(.)"/>
+        <script type="text/javascript" id="{$script-id2}"><![CDATA[
             (function (w, d) {
                 'use strict';//]]>
-var origin = '<xsl:value-of select="$request-origin"/>'            
+var origin = '<xsl:value-of select="$request-origin"/>'
+, sid = '<xsl:value-of select="$script-id2"/>'
 <![CDATA[
 , downloads = d.getElementsByClassName('dryad-ddw-download'), cites = d.getElementsByClassName('dryad-ddw-cite'), shares = d.getElementsByClassName('dryad-ddw-share'), zooms = d.getElementsByClassName('dryad-ddw-zoom'), elt, i;
             function set_onclick(elts, data) {
@@ -307,16 +321,14 @@ var origin = '<xsl:value-of select="$request-origin"/>'
             set_onclick(downloads, {
                 "action": "download", "data": downloads[0].getAttribute('href')
             });
-            var zoomc = d.getElementsByClassName("dryad-ddw")[0].cloneNode(true);
-            var controls = zoomc.getElementsByClassName('dryad-ddw-control');
-            for (i = 0; i < controls.length; i++) {
-                controls[i].parentNode.removeChild(controls[i]);
-            }
-            zoomc.getElementsByClassName('dryad-ddw-frame')[0].classList.add('dryad-ddw-frame-full');
+            var zoom_data = d.getElementById('ddw-body-frame').cloneNode(true);
+            zoom_data.removeAttribute('style');
+            zoom_data.classList.add('dryad-ddw-frame-full');
             set_onclick(zooms, {
-                "action": "zoom", "data": zoomc.outerHTML
+                'action': 'zoom', 'data': zoom_data.outerHTML
             });
-        })(window, document);//]]></script>
+        })(window, document);
+        //]]></script>
     </xsl:template>
 
     <xsl:template name="data-content">

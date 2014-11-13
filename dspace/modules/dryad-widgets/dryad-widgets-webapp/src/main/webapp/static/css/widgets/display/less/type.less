@@ -12,11 +12,15 @@ h1 {
     font-style:  normal;
 }
 
-@media(max-width: @sm-max - 1) {
-    h1 {
-        font-size:   20px;
-        font-weight: 200;
-        font-style:  normal;
+.dryad-ddw-sm {
+    .dryad-ddw-header { 
+        .dryad-ddw-title {
+            h1 {
+                font-size:   20px;
+                font-weight: 200;
+                font-style:  normal;
+            }
+        }
     }
 }
 
@@ -30,18 +34,22 @@ b {
     }
 }
 
-@media(min-width: @md-max) {
-    .dryad-ddw-control {
-        ul li a i:before {
-            font-size: 24pt;
+.dryad-ddw-lg, .dryad-ddw-md {
+    .dryad-ddw-body {
+        .dryad-ddw-control {
+            ul li a i:before {
+                font-size: 24pt;
+            }
         }
     }
 }
 
-@media(max-width: @md-max) {
-    .dryad-ddw-control {
-        ul li a i:before {
-            font-size: 20pt;
+.dryad-ddw-sm {
+    .dryad-ddw-footer {
+        .dryad-ddw-control {
+            ul li a i:before {
+                font-size: 20pt;
+            }
         }
     }
 }

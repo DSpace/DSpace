@@ -25,6 +25,8 @@ $(document).ready(function(){
         if (doi.match(doi_regex)) {
             dimension_target(height,width);
             $('#' + target_id).children().remove();
+            $('#' + script_id).remove();
+            $('#' + css_id).remove();
             try {
                 $('body').append($css);
                 $('body').append($script);
