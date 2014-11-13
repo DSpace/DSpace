@@ -10,6 +10,8 @@ import org.datadryad.rest.models.Manuscript;
  */
 public class ManuscriptHandlerGroup extends AbstractHandlerGroup<Manuscript> {
     public ManuscriptHandlerGroup() {
+        // Log incoming create/update/delete requests
+        addHandler(new LoggingHandler<Manuscript>());
         // Save manuscripts as XML files for submission system
         addHandler(new ManuscriptXMLConverterHandler());
         // If publication date present, update package metadata
