@@ -42,6 +42,6 @@ public class StoragePath extends ArrayList<StoragePathElement> {
 
     @Override
     public String toString() {
-        return StringUtils.join(getValuePath().toArray(), "/");
+        return "/" + StringUtils.join(getValuePath().toArray(), "/");
     }
 }

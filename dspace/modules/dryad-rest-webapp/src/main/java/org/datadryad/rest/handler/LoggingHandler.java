@@ -30,7 +30,7 @@ public class LoggingHandler<T> implements HandlerInterface<T>{
         try {
             objectString = writer.writeValueAsString(object);
         } catch (IOException ex) {
-            log.error("IO Exception writing logging json object");
+            log.error("IO Exception writing logging json object", ex);
         }
         String message = String.format("%s\n%s", method, objectString);
         log.info(message);
