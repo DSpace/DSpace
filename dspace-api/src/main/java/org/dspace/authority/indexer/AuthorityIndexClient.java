@@ -33,18 +33,19 @@ public class AuthorityIndexClient {
 
         //Populate our solr
         Context context = new Context();
+        //Ensure that we can update items if we are altering our authority control
+        context.turnOffAuthorisationSystem();
         ServiceManager serviceManager = getServiceManager();
 
 
         AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
         List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
 
-        log.info("Cleaning the old index");
-        System.out.println("Cleaning the old index");
-        indexingService.cleanIndex();
+        System.out.println("Retrieving all data");
+        log.info("Retrieving all data");
 
         //Get all our values from the input forms
-        Map<String, AuthorityValue> toIndexValues = new HashMap<String, AuthorityValue>();
+        Map<String, AuthorityValue> toIndexValues = new HashMap<>();
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
@@ -59,14 +60,22 @@ public class AuthorityIndexClient {
             indexerInterface.close();
         }
 
+
+        log.info("Cleaning the old index");
+        System.out.println("Cleaning the old index");
+        indexingService.cleanIndex();
+        log.info("Writing new data");
+        System.out.println("Writing new data");
         for(String id : toIndexValues.keySet()){
             indexingService.indexContent(toIndexValues.get(id), true);
         }
 
+        context.commit();
         //In the end commit our server
         indexingService.commit();
         context.abort();
         System.out.println("All done !");
+        log.info("All done !");
     }
 
     public static void indexItem(Context context, Item item){
