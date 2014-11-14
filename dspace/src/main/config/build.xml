@@ -94,6 +94,11 @@ Common usage:
 
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
     <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
+    
+    <!-- Default location of lucene-core JAR to download (for update-solr-indexes). This may be overridden, if URL path changes. -->
+    <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
+    <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
+    
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -180,7 +185,7 @@ Common usage:
     <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_configs,update_code,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -938,6 +943,166 @@ You may manually install this file by following these steps:
 
     <target name="init_geolite" depends="check_geolite" if="need.geolite">
         <antcall target="update_geolite" />
+    </target>
+    
+    <!-- Check if any Solr indexes need updating to the version of Solr/Lucene we are using. -->
+    <target name="update_solr_indexes">
+        <echo>Checking if any Solr indexes (${dspace.dir}/solr/*) need upgrading...</echo>
+
+        <!-- 
+            For each index, this is currently a two step process:
+             (1) Ensure the index is upgraded to Solr/Lucene 3.5.0
+                 (really old indexes need upgrading to this version first)
+             (2) Then, we can upgrade from 3.5.0 to 4.9.1 (our current Lucene version)
+                 (NOTE: we can only upgrade to the latest version of LUCENE used, 
+                  as we use the Lucene API to do so)
+        -->
+
+        <!-- First, let's do the Solr Statistics index -->
+        <property name="stats.index" value="${dspace.dir}/solr/statistics/data/index/"/>
+        <if>
+            <available file="${stats.index}" type="dir"/>
+            <then>
+                <!-- Ensure Statistics index is >= 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${stats.index}"/>
+                    <param name="version" value="3.5.0"/>
+                </antcall>
+                <!-- Ensure Statistics index is upgraded to 4.9.1 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${stats.index}"/>
+                    <param name="version" value="4.9.1"/>
+                </antcall>
+            </then>
+        </if>
+        
+        <!-- Next, let's do the OAI-PMH Solr index -->
+        <property name="oai.index" value="${dspace.dir}/solr/oai/data/index/"/>
+        <if>
+            <available file="${oai.index}" type="dir"/>
+            <then>
+                <!-- Ensure OAI index is >= 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${oai.index}"/>
+                    <param name="version" value="3.5.0"/>
+                </antcall>
+                <!-- Ensure OAI index is upgraded to 4.9.1 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${oai.index}"/>
+                    <param name="version" value="4.9.1"/>
+                </antcall>
+            </then>
+        </if>
+        
+        <!-- Finally, cleanup any Lucene JARs that were downloaded into the Ant build directory -->
+        <!-- (These JARs are automatically downloaded when an index needs an upgrade). -->
+        <echo>Cleanup any downloaded lucene-core-*.jar files. We don't need them anymore.</echo>
+        <delete>
+            <fileset dir="." includes="lucene-core-*.jar"/>
+        </delete>
+    </target>
+    
+    <!-- Target to check an existing Solr index to see if it -->
+    <!-- meets a particular version requirement.             -->
+    <!-- If the index is outdated, "upgrade_solr_index" is   -->
+    <!-- called to upgrade it to the specified version.      -->
+    <!-- REQUIRES these params:                              -->
+    <!--   * indexDir  = Full path to Index directory        -->
+    <!--   * version   = Version of Solr to check against.   -->
+    <target name="check_solr_index">       
+        <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
+        <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
+        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" failonerror="yes" outputproperty="version_compare">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <arg value="${indexDir}" />
+            <arg value="${version}" />
+        </java>
+        
+        <!-- If the above java command returned -1, that means this index is NOT yet
+             upgraded to the specified Solr version. So, let's upgrade it! -->
+        <if>
+            <equals arg1="${version_compare}" arg2="-1"/>
+            <then>
+                <echo message="The Solr index in ${indexDir} needs an upgrade to Solr ${version}"/>
+                <!-- Call 'upgrade_solr_index' to actually upgrade the index-->
+                <antcall target="upgrade_solr_index">
+                    <param name="indexDir" value="${indexDir}"/>
+                    <param name="version" value="${version}"/>
+                </antcall>
+            </then>
+            <else>
+                <echo message="The Solr index in ${indexDir} IS >= Solr ${version}. Looks good!"/>
+            </else>
+        </if>
+    </target>
+    
+    <!-- Target to actually *upgrade* an existing Solr index -->
+    <!-- REQUIRES these params:                              -->
+    <!--   * indexDir   = Full path to Index directory       -->
+    <!--   * version    = Version of Solr to upgrade to      -->
+    <target name="upgrade_solr_index">
+        <echo>Upgrading Solr/Lucene Index at ${indexDir} to Solr/Lucene ${version}.</echo>
+
+        <!-- Replace the "[version]" placeholders in ${lucene-core} with the actual ${version}-->
+        <propertyregex property="lucene-core.jar" input="${lucene-core}" regexp="\[version\]" replace="${version}" global="true"/>
+        
+        <!-- Download the appropriate version of the lucene-core.jar, if we haven't already. -->
+        <if>
+            <not>
+                <available file="./lucene-core-${version}.jar"/>
+            </not>
+            <then>
+                <echo>Downloading ${lucene-core.jar}</echo>
+                <trycatch property="lucene.download.error">
+                    <try>
+                        <get src="${lucene-core.jar}" dest="./lucene-core-${version}.jar" verbose="true"/>
+                    </try>
+                    <catch>
+                        <echo>
+====================================================================
+WARNING : FAILED TO DOWNLOAD LUCENE-CORE.JAR
+          (Needed to upgrade your existing Solr indexes)
+
+Underlying Error: ${lucene.download.error}
+
+In order to upgrade your Solr indexes to the latest version,
+you will need to do the following:
+
+(1) Manually download the lucene-core-${version}.jar at:
+
+    ${lucene-core.jar}
+
+(2) Place the JAR in the "[src]/dspace/target/dspace-installer" directory.
+
+    [src]/dspace/target/dspace-installer/${lucene-core}.jar
+
+(3) Manually re-run the following 'ant' upgrade command:
+
+    ant update_solr_indexes
+
+For more information, please see the Upgrade Instructions.
+====================================================================
+                        </echo>
+                    </catch>
+                </trycatch>
+            </then>
+        </if>
+  
+        <!-- At this point, we need the Lucene-core JAR to continue -->
+        <!-- NEXT, we'll actually upgrade the Solr index! -->
+        <if>
+            <available file="./lucene-core-${version}.jar"/>
+            <then>
+                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
+                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
+                <java classname="org.apache.lucene.index.IndexUpgrader" classpath="./lucene-core-${version}.jar" fork="yes" failonerror="yes">
+                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <arg value="${indexDir}" />
+                </java>
+            </then>
+        </if>        
     </target>
 
 </project>
