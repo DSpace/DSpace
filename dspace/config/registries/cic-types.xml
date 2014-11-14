@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+
+<!--
+  - cic-types.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - CIC-DIGITAL registry used as internal metadata in http://digital.cic.gba.gob.ar/
+  - 
+  - <dc-type>
+  -   <schema></schema>
+  -   <element></element>
+  -   
+  -   <scope_note></scope_note>
+  - </dc-type>
+  -->
+
+<!-- start of XML -->
+
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>CIC-DIGITAL Registry</title>
+    <contributor.author>Ariel Lira</contributor.author>
+    <contributor.author>Facundo Adorno</contributor.author>
+    <contributor.editor>$Author$</contributor.editor>
+    <date.created>$Date$</date.created>
+    <description>$Log$</description>
+    <description.version>$Revision$</description.version>
+  </dspace-header>
+
+  <dc-schema>
+          <name>cic</name>
+          <namespace>http://digital.cic.gba.gob.ar/cic/terms</namespace>
+  </dc-schema>
+
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>type</element>
+		<qualifier>subtype</qualifier>
+		<scope_note>Subtipo de documento (comunicación, tesis de maestría, capítulo de libro, etc.).</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>cic</schema>
+		<element>version</element>
+		<scope_note>Versión</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>title</element>
+		<qualifier>investigacion</qualifier>
+		<scope_note>Título/tema de una  investigacion según se indica en los informes de investigación CIC, en el punto 2.</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>creator</element>
+		<qualifier>corporate</qualifier>
+		<scope_note>Institución creadora del contenido intelectual de la obra.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>creator</element>
+		<qualifier>author</qualifier>
+		<scope_note>Persona física creadora del contenido intelectual de la obra.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>creator</element>
+		<qualifier>compilator</qualifier>
+		<scope_note>Persona física responsable de compilar, reunir o antologar materiales de la obra.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>creator</element>
+		<qualifier>editor</qualifier>
+		<scope_note>Persona física o institucional responsable de realizar tareas de edición sobre los contenidos de la obra. No es la editorial.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>contributor</element>
+		<qualifier>director</qualifier>
+		<scope_note>Persona que dirige la realización de la tesis o quien dirige a un investigador, personal de apoyo o becario.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>abstract</element>
+		<qualifier>trabajo_realizado</qualifier>
+		<scope_note>Todo el texto incluido en el punto 6 del informe de investigación.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>cic</schema>
+		<element>lugar_desarrollo</element>
+		<scope_note>Institucion, departamento y/o unidad en la cual se desarrollo el trabajo. En el caso de informes de investigación, corresponde al punto 4.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>subject</element>
+		<qualifier>materia</qualifier>
+		<scope_note>Materia (en sentido amplio) a que se refiere el item (ejemplo: Física).</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>subject</element>
+		<qualifier>area</qualifier>
+		<scope_note>Area de investigación dentro de CIC.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>rights</element>
+		<qualifier>embargo_period</qualifier>
+		<scope_note>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares. El dato es informativo, el embargo efectivo se pone en el step de upload.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>identifier</element>
+		<qualifier>url</qualifier>
+		<scope_note>Dirección del recurso en la web (puede ser otro repositorio, página, sitio, revista, etc.).</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>identifier</element>
+		<qualifier>isbn</qualifier>
+		<scope_note>ISBN correspondiente al libro.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>identifier</element>
+		<qualifier>other</qualifier>
+		<scope_note>Incluye otros identificadores del recurso como DOI, handle, etc.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>cic</schema>
+		<element>thesis</element>
+		<qualifier>degree</qualifier>
+		<scope_note>Grado al que se aspira con el trabajo de tesis realizado.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>cic</schema>
+		<element>thesis</element>
+		<qualifier>grantor</qualifier>
+		<scope_note>Insitución que otorga el título.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>isPartOf</element>
+		<qualifier>item</qualifier>
+		<scope_note>Informe o libro del cual el documento actual es parte.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>isPartOf</element>
+		<qualifier>issue</qualifier>
+		<scope_note>1) Identificacion del issue (con vol+nro+tomo y link) que contiene el artículo de revista) o 2) Nombre del evento (congreso, seminario, jornada, etc.) en el que este item fue presentado con link.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>isPartOf</element>
+		<qualifier>series</qualifier>
+		<scope_note>Título de la revista o evento en la que este ítem fue publicado/presentado. Si en DSpace se tiene la comunidad que la contiene, se puede poner el link a ella, caso contrario, usar un link externo.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>cic</schema>
+		<element>isPeerReviewed</element>
+		<scope_note>Indica si la obra pasó por una etapa de revisión por pares. En caso que sean tesis o informes de investigación siempre es SI.</scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>cic</schema>
+		<element>isFulltext</element>
+		<scope_note>Indica si el recurso está disponible a texto completo en uno o más de los archivos que tiene asociados en el repositorio. En general será SI, aunque pueden suceder casos particulares que no lo sean, como cuando se tiene sólo el ppt de una tesis, un resumen, etc.</scope_note>
+	</dc-type>
+	
+</dspace-dc-types>
