@@ -24,4 +24,3 @@ script: mvn package -DskipTests=false -Ddefault.dspace.dir=/opt/dryad-test
 notifications:
   slack:
     secure: EqYW7e3FhVxoZzVS4FR52ajePoDbyeOsYcXA9b2BjUWDNc5WNFxRDwNfkxmD09BOAI1g7fKH+Fj5VrtnsUwh7kYosNBj9anjl9CleJ8xGQR35avoaXMJQ3BcULIBfSsUUEwaT+M8uHnM1PNC9DW1uq5w+Hd/9wASwJR5g5BU49I=
-  email: false
