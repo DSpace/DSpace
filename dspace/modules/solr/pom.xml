@@ -54,6 +54,27 @@
          </plugin>
       </plugins>
    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-common</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
    <dependencies>
        <dependency>
            <groupId>org.dspace</groupId>
@@ -123,6 +144,7 @@
                    <artifactId>jetty-xml</artifactId>
                    <groupId>org.eclipse.jetty</groupId>
                </exclusion>
+
            </exclusions>
        </dependency>
 
@@ -131,11 +153,14 @@
            <artifactId>icu4j</artifactId>
        </dependency>
 
+
        <dependency>
            <groupId>org.apache.lucene</groupId>
            <artifactId>lucene-analyzers-icu</artifactId>
            <version>${solr.version}</version>
+
        </dependency>
+
 		
        <dependency>
            <groupId>org.apache.lucene</groupId>
