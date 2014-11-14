@@ -115,7 +115,7 @@ public class DSIndexer
 
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
-    static final Version luceneVersion = Version.LUCENE_44;
+    static final Version luceneVersion = Version.LUCENE_4_9;
 
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
