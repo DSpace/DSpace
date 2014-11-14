@@ -212,23 +212,19 @@ public class DryadReviewAction extends ProcessingAction {
         email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?doi=" + doi);
 
 	// add journal's manuscript number
-	String manuScriptIdentifier = "";
+	String manuScriptIdentifier = "none available";
 	DCValue[] manuScripIdentifiers = wf.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
 	if(0 < manuScripIdentifiers.length){
 	    manuScriptIdentifier = manuScripIdentifiers[0].value;
 	}
 	
-	if(manuScriptIdentifier.length() == 0) {
-	    manuScriptIdentifier = "none available";
-	}
-	
 	email.addArgument(manuScriptIdentifier);
 
 	// Add journal name
-	String journalName = "";
+	String journalName = "not available";
 	DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
 	if(0 < journalNames.length){
-	    journalName = "not available";
+	    journalName = journalNames[0].value;
 	}
         
         email.addArgument(journalName);

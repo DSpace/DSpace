@@ -78,6 +78,8 @@ public class AuthorityValue {
 
     private Map<String, List<String>> otherMetadata = new HashMap<String, List<String>>();
 
+    private String source = "LOCAL";
+
     public AuthorityValue() {
     }
 
@@ -208,7 +210,7 @@ public class AuthorityValue {
         doc.addField("value", getValue());
         doc.addField("display-value", getValue());
         doc.addField("full-text", getFullText());
-        doc.addField("source", "LOCAL");
+        doc.addField("source", getSource());
         doc.addField("deleted", isDeleted());
         doc.addField("creation_date", dateToString(getCreationDate()));
         doc.addField("last_modified_date", dateToString(getLastModified()));
@@ -539,5 +541,13 @@ public class AuthorityValue {
         return true;
     }
 
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSource() {
+        return source;
+    }
 
 }
