@@ -641,6 +641,7 @@ public class ObjectManager implements Constants {
         // and text_value::timestamp > to_timestamp('2009-06-01','YYYY-MM-DD') 
         // and text_value::timestamp < to_timestamp('2009-07-01','YYYY-MM-DD')
         // limit 10;
+        log.debug ("Query files is " + queryBuilder.toString() + " with params " + bindParameters.toString());
         return DatabaseManager.query(myContext, queryBuilder.toString(), bindParameters.toArray());
     }
 
@@ -695,6 +696,7 @@ public class ObjectManager implements Constants {
             queryBuilder.append("OFFSET ? "); 
             bindParameters.add(start);
         }
+        log.debug ("Query packages is " + queryBuilder.toString() + " with params " + bindParameters.toString());
         return DatabaseManager.query(myContext, queryBuilder.toString(), bindParameters.toArray());
         
     }
