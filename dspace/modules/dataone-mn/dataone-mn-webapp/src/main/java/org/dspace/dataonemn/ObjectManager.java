@@ -598,16 +598,14 @@ public class ObjectManager implements Constants {
             queryBuilder.append("  bfr.mimetype AS format, "); 
             queryBuilder.append("  bit.checksum, "); 
             queryBuilder.append("  bit.checksum_algorithm, "); 
-            queryBuilder.append("  mv.text_value::timestamp AS date_available,  ");
-	    queryBuilder.append("  it.last_modified::timestamp AS last_modified, ");
+    	    queryBuilder.append("  it.last_modified::timestamp AS last_modified, ");
             queryBuilder.append("  bit.size_bytes "); 
         }
         queryBuilder.append("FROM  "); 
         queryBuilder.append("  item AS it ");
         queryBuilder.append("  JOIN collection2item as c2i using (item_id) ");
         queryBuilder.append("  JOIN collection as col using (collection_id) ");
-        queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) "); 
-        queryBuilder.append("  JOIN metadatavalue AS md using (item_id) "); 
+        queryBuilder.append("  JOIN metadatavalue AS md using (item_id) ");
         queryBuilder.append("  JOIN item2bundle AS i2b using (item_id) "); 
         queryBuilder.append("  JOIN bundle AS bun using (bundle_id) "); 
         queryBuilder.append("  JOIN bundle2bitstream as b2b using (bundle_id) "); 
@@ -616,9 +614,7 @@ public class ObjectManager implements Constants {
         queryBuilder.append("WHERE ");
         queryBuilder.append("  NOT it.withdrawn = true AND");
         queryBuilder.append("  it.in_archive = true AND ");
-        queryBuilder.append("  mv.metadata_field_id = ? AND "); 
-        bindParameters.add(dateAvailableFieldId);
-        queryBuilder.append("  md.metadata_field_id = ? AND "); 
+        queryBuilder.append("  md.metadata_field_id = ? AND ");
         bindParameters.add(dcIdentifierFieldId);
         queryBuilder.append("  md.place = 1 AND "); 
         queryBuilder.append("  bun.name = ? AND ");
@@ -635,7 +631,7 @@ public class ObjectManager implements Constants {
             Timestamp fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
             log.info("queryDataFilesDatabase: Requested fromDate: " + fromTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
-            queryBuilder.append("  mv.text_value::timestamp > ? AND ");
+            queryBuilder.append("  last_modified::timestamp > ? AND ");
             bindParameters.add(fromTimestamp);
         }
 
@@ -643,14 +639,14 @@ public class ObjectManager implements Constants {
             Timestamp toTimestamp = new java.sql.Timestamp(toDate.getTime());
             log.info("queryDataFilesDatabase: Requested toDate: " + toTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
-            queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
+            queryBuilder.append("  last_modified::timestamp < ? AND "); // bind to toDate
             bindParameters.add(toTimestamp);
         }
         queryBuilder.append("  col.collection_id = ? "); 
         bindParameters.add(c.getID()); 
 
         if(!countTotal) {
-            queryBuilder.append("ORDER BY date_available ASC, doi ASC ");
+            queryBuilder.append("ORDER BY last_modified ASC, doi ASC ");
             queryBuilder.append("LIMIT ? "); 
             bindParameters.add(count);
             queryBuilder.append("OFFSET ? "); 
@@ -684,13 +680,10 @@ public class ObjectManager implements Constants {
         queryBuilder.append("  item AS it ");
         queryBuilder.append("  JOIN collection2item as c2i using (item_id) ");
         queryBuilder.append("  JOIN collection as col using (collection_id) ");
-        queryBuilder.append("  JOIN metadatavalue AS mv using (item_id) ");
         queryBuilder.append("  JOIN metadatavalue AS md using (item_id) ");
         queryBuilder.append("WHERE ");
         queryBuilder.append("  NOT it.withdrawn = true AND ");
         queryBuilder.append("  it.in_archive = true AND ");
-        queryBuilder.append("  mv.metadata_field_id = ? AND ");
-        bindParameters.add(dateAvailableFieldId);
         queryBuilder.append("  md.metadata_field_id = ? AND ");
         bindParameters.add(dcIdentifierFieldId);
         queryBuilder.append("  md.place = 1 AND ");
@@ -698,7 +691,7 @@ public class ObjectManager implements Constants {
             Timestamp fromTimestamp = new java.sql.Timestamp(fromDate.getTime());
             log.info("queryDataPackagesDatabase: Requested fromDate: " + fromTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
-            queryBuilder.append("  mv.text_value::timestamp > ? AND ");
+            queryBuilder.append("  last_modified::timestamp > ? AND ");
             bindParameters.add(fromTimestamp);
         }
 
@@ -706,14 +699,14 @@ public class ObjectManager implements Constants {
             Timestamp toTimestamp = new java.sql.Timestamp(toDate.getTime());
             log.info("queryDataPackagesDatabase: Requested toDate: " + toTimestamp.toString());
             // Postgres-specific, casts text_value to a timestamp
-            queryBuilder.append("  mv.text_value::timestamp < ? AND "); // bind to toDate
+            queryBuilder.append("  last_modified::timestamp < ? AND "); // bind to toDate
             bindParameters.add(toTimestamp);
         }
         queryBuilder.append("  col.collection_id = ? "); 
         bindParameters.add(c.getID()); 
 
         if(!countTotal) {
-            queryBuilder.append("ORDER BY date_available ASC, doi ASC ");
+            queryBuilder.append("ORDER BY last_modified ASC, doi ASC ");
             queryBuilder.append("LIMIT ? "); 
             bindParameters.add(count);
             queryBuilder.append("OFFSET ? "); 
