@@ -4,7 +4,7 @@
     Document   : DIM2DataCite.xsl
     Created on : January 23, 2013, 1:26 PM
     Author     : pbecker, ffuerste
-    Description: Converts metadata from DSpace Intermediat Format (DIM) into
+    Description: Converts metadata from DSpace Intermediate Format (DIM) into
                  metadata following the DataCite Schema for the Publication and
                  Citation of Research Data, Version 2.2
 -->

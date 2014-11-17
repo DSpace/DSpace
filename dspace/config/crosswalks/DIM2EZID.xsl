@@ -2,7 +2,7 @@
 
 <!--
     Author     : pbecker, ffuerste
-    Description: Converts metadata from DSpace Intermediat Format (DIM) into
+    Description: Converts metadata from DSpace Intermediate Format (DIM) into
                  metadata following the DataCite Schema for the Publication and
                  Citation of Research Data, Version 2.2, for use with EZID.
                  Copied from DIM2DataCite.xsl, with small changes.
