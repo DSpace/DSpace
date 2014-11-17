@@ -550,22 +550,7 @@ public class ObjectManager implements Constants {
     throws SQLException {
         return queryDataPackagesDatabase(false, start, count, fromDate, toDate);
     }
-    
-    private int getDateAvailableFieldID() 
-    throws SQLException {
-        String dateMetadataFieldIDquery = "SELECT f.metadata_field_id FROM "
-                + "metadatafieldregistry f, metadataschemaregistry s "
-                + "WHERE f.metadata_schema_id = s.metadata_schema_id "
-                + "AND s.short_id = ? "
-                + "AND f.element = ? "
-                + "AND f.qualifier = ?";
-        TableRow tr = DatabaseManager.querySingle(myContext, dateMetadataFieldIDquery, "dc", "date", "available");
-        int dateAvailableFieldId = tr.getIntColumn("metadata_field_id");
 
-        log.info("dc.date.available: metadata_field_id " + dateAvailableFieldId); // should be 12
-        return dateAvailableFieldId;
-    }
-    
     private int getDCIdentifierFieldID()
     throws SQLException {
         String dcIdentifierFieldIDQuery = "SELECT f.metadata_field_id FROM "
@@ -584,7 +569,6 @@ public class ObjectManager implements Constants {
     private TableRowIterator queryDataFilesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate, String objFormat) 
     throws SQLException {
         Collection c = (Collection) HandleManager.resolveToObject(myContext, myFiles);
-        int dateAvailableFieldId = getDateAvailableFieldID();
         int dcIdentifierFieldId = getDCIdentifierFieldID();
 
         StringBuilder queryBuilder = new StringBuilder();
@@ -663,7 +647,6 @@ public class ObjectManager implements Constants {
     private TableRowIterator queryDataPackagesDatabase(boolean countTotal, int start, int count, Date fromDate, Date toDate)
             throws SQLException {
         Collection c = (Collection) HandleManager.resolveToObject(myContext, myPackages);
-        int dateAvailableFieldId = getDateAvailableFieldID();
         int dcIdentifierFieldId = getDCIdentifierFieldID();
         StringBuilder queryBuilder = new StringBuilder();
         // build up bind paramaters 
