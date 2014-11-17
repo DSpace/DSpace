@@ -253,8 +253,7 @@ public class ObjectManager implements Constants {
             String doi = tr.getStringColumn("doi");
 	    String idTimestamp = "";
 	    String idRemTimestamp = "";
-            Date dateAvailable = tr.getDateColumn("date_available");
-	    Date lastModifiedDate = tr.getDateColumn("last_modified");
+	        Date lastModifiedDate = tr.getDateColumn("last_modified");
             String lastModified = dateFormatter.format(lastModifiedDate);
 
 	    if(useTimestamps) {
@@ -411,8 +410,7 @@ public class ObjectManager implements Constants {
             String format = tr.getStringColumn("format");
             String checksum = tr.getStringColumn("checksum");
             String checksumAlgorithm = tr.getStringColumn("checksum_algorithm");
-            Date dateAvailable = tr.getDateColumn("date_available");
-	    Date lastModifiedDate = tr.getDateColumn("last_modified");
+    	    Date lastModifiedDate = tr.getDateColumn("last_modified");
             String lastModified = dateFormatter.format(lastModifiedDate);
 	    long size = tr.getLongColumn("size_bytes");
 
