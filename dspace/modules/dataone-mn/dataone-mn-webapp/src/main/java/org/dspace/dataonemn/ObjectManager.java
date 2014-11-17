@@ -657,7 +657,6 @@ public class ObjectManager implements Constants {
             queryBuilder.append("  count(*) AS total ");
         } else {
             queryBuilder.append("  md.text_value AS doi, ");
-            queryBuilder.append("  mv.text_value::timestamp AS date_available, ");
 	        queryBuilder.append("  it.last_modified::timestamp AS last_modified ");
         }        
         queryBuilder.append("FROM ");
