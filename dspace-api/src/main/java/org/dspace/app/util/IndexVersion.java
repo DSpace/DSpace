@@ -9,12 +9,12 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
+import java.text.ParseException;
 import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.StringHelper;
+import org.apache.lucene.util.Version;
 
 /**
  * This utility class simply determines the version of a given Solr/Lucene index,
@@ -44,9 +44,17 @@ public class IndexVersion
             System.out.println("       -1 if index dir version < version-to-compare");
             System.out.println("        0 if index dir version = version-to-compare");
             System.out.println("        1 if index dir version > version-to-compare");
+            System.out.println("\nOptionally, passing just '-v' will return the version of Solr/Lucene in use by DSpace.");
             System.exit(1);
         }
-        
+
+        // If "-v" passed on commandline, just return the current version of Solr/Lucene
+        if(argv[0].equalsIgnoreCase("-v"))
+        {
+            System.out.println(getLatestVersion());
+            System.exit(0);
+        }
+
         // First argument is the Index path. Determine its version
         String indexVersion = getIndexVersion(argv[0]);
         
@@ -66,6 +74,12 @@ public class IndexVersion
         // If a compare-to-version was passed in, print the result of this comparison
         else if(compareToVersion!=null && !compareToVersion.isEmpty())
         {
+            // If the string "LATEST" is passed, determine which version of Lucene API we are using.
+            if(compareToVersion.equalsIgnoreCase("LATEST"))
+            {
+                compareToVersion = getLatestVersion();
+            }
+
             System.out.println(compareSoftwareVersions(indexVersion,compareToVersion));
         }
         // Otherwise, we'll just print the version of this index directory
@@ -73,6 +87,7 @@ public class IndexVersion
         {
             System.out.println(indexVersion);
         }
+        System.exit(0);
     }
     
     /**
@@ -110,55 +125,53 @@ public class IndexVersion
             // created by different versions of Lucene. So, we just need
             // to find the oldest version of Lucene which created these
             // index segment files. 
-            // This logic borrowed from Lucene v.4.9 CheckIndex class:
-            // https://github.com/apache/lucene-solr/blob/lucene_solr_4_9/lucene/core/src/java/org/apache/lucene/index/CheckIndex.java#L407
+            // This logic borrowed from Lucene v.4.10 CheckIndex class:
+            // https://github.com/apache/lucene-solr/blob/lucene_solr_4_10/lucene/core/src/java/org/apache/lucene/index/CheckIndex.java#L426
             // WARNING: It MAY require updating whenever we upgrade the 
             // "lucene.version" in our DSpace Parent POM
-            String oldest = Integer.toString(Integer.MAX_VALUE);
-            String oldSegment = null;
-            Comparator<String> versionComparator = StringHelper.getVersionComparator();
+            Version oldest = null;
+            Version oldSegment = null;
             for (SegmentCommitInfo si : sis) 
             {
                 // Get the version of Lucene which created this segment file
-                String version = si.info.getVersion();
+                Version version = si.info.getVersion();
                 if(version == null)
                 {
                     // If null, then this is a pre-3.1 segment file.
                     // For our purposes, we will just assume it is "3.0", 
                     // This lets us know we will need to upgrade it to 3.5
                     // before upgrading to Solr/Lucene 4.x or above
-                    oldSegment = "3.0";
+                    try
+                    {
+                        oldSegment = Version.parse("3.0");
+                    }
+                    catch(ParseException pe)
+                    {
+                        throw new IOException(pe);
+                    }
                 }
                 // else if this segment is older than our oldest thus far
-                else if(versionComparator.compare(version, oldest) < 0)
+                else if(oldest == null || version.onOrAfter(oldest) == false)
                 {
                     // We have a new oldest segment version
                     oldest = version;
                 }
             }
 
-            // If we found a really old segment
-            if(oldSegment!=null)
+            // If we found a really old segment, compare it to the oldest
+            // to see which is actually older
+            if(oldSegment!=null && oldSegment.onOrAfter(oldest) == false)
             {
-                // See if it really is older than any others, just for safety
-                if(versionComparator.compare(oldSegment, oldest) < 0)
-                {
-                    oldest = oldSegment;
-                }
+                oldest = oldSegment;
             }
 
-            // Verify we only have *one* decimal point. We want sub-minor
-            // versions to be dropped, so 4.10.2 becomes simply 4.10
-            String[] parts = oldest.split(".");
-            if(parts.length>2)
-            {
-                oldest = parts[0] + "." + parts[1];
-            }
-
-            // At this point, we know what version of Lucene created our
+            // At this point, we should know what version of Lucene created our
             // oldest segment file. We will return this as the Index version
             // as it's the oldest segment we will need to upgrade.
-            indexVersion = oldest;
+            if(oldest!=null)
+            {
+                indexVersion = oldest.toString();
+            }
         }
         
         return indexVersion;
@@ -242,5 +255,17 @@ public class IndexVersion
             // This 'else' should never be triggered since we've checked for equality above already
             return EQUAL;
         }
+    }
+
+    /**
+     * Determine the version of Solr/Lucene which DSpace is currently running.
+     * This is the latest version of Solr/Lucene which we can upgrade the index to.
+     *
+     * @return version as a string (e.g. "4.4")
+     */
+    public static String getLatestVersion()
+    {
+        // The current version of lucene is in the "LATEST" constant
+        return org.apache.lucene.util.Version.LATEST.toString();
     }
 }
