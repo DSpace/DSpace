@@ -954,10 +954,16 @@ You may manually install this file by following these steps:
             For each index, this is currently a two step process:
              (1) Ensure the index is upgraded to Solr/Lucene 3.5.0
                  (really old indexes need upgrading to this version first)
-             (2) Then, we can upgrade from 3.5.0 to 4.9.1 (our current Lucene version)
-                 (NOTE: we can only upgrade to the latest version of LUCENE used, 
-                  as we use the Lucene API to do so)
+             (2) Then, we can upgrade from 3.5.0 to latest version of Lucene
         -->
+
+        <!-- Determine what version of Solr/Lucene is being used in DSpace. -->
+        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" outputproperty="latest_version">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <arg value="-v" />
+        </java>
+        <echo>Current version of Solr/Lucene: ${latest_version}</echo>
 
         <!-- First, let's do the Solr Statistics index -->
         <property name="stats.index" value="${dspace.dir}/solr/statistics/data/index/"/>
@@ -968,11 +974,13 @@ You may manually install this file by following these steps:
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${stats.index}"/>
                     <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
                 </antcall>
-                <!-- Ensure Statistics index is upgraded to 4.9.1 -->
+                <!-- Ensure Statistics index is upgraded to latest version (included in DSpace) -->
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${stats.index}"/>
-                    <param name="version" value="4.9.1"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
                 </antcall>
             </then>
         </if>
@@ -986,11 +994,13 @@ You may manually install this file by following these steps:
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${oai.index}"/>
                     <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
                 </antcall>
-                <!-- Ensure OAI index is upgraded to 4.9.1 -->
+                <!-- Ensure OAI index is upgraded to latest version (included in DSpace) -->
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${oai.index}"/>
-                    <param name="version" value="4.9.1"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
                 </antcall>
             </then>
         </if>
@@ -1003,13 +1013,15 @@ You may manually install this file by following these steps:
         </delete>
     </target>
     
-    <!-- Target to check an existing Solr index to see if it -->
-    <!-- meets a particular version requirement.             -->
-    <!-- If the index is outdated, "upgrade_solr_index" is   -->
-    <!-- called to upgrade it to the specified version.      -->
-    <!-- REQUIRES these params:                              -->
-    <!--   * indexDir  = Full path to Index directory        -->
-    <!--   * version   = Version of Solr to check against.   -->
+    <!-- Target to check an existing Solr index to see if it            -->
+    <!-- meets a particular version requirement.                        -->
+    <!-- If the index is outdated, "upgrade_solr_index" is              -->
+    <!-- called to upgrade it to the specified version.                 -->
+    <!-- REQUIRES these params:                                         -->
+    <!--   * indexDir  = Full path to Index directory                   -->
+    <!--   * version   = Version of Solr to check against.              -->
+    <!--   * included  = Whether this version of Solr/Lucene is already -->
+    <!--                 included in DSpace classpath.                  -->
     <target name="check_solr_index">       
         <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
         <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
@@ -1044,6 +1056,7 @@ ${version_compare}
                 <antcall target="upgrade_solr_index">
                     <param name="indexDir" value="${indexDir}"/>
                     <param name="version" value="${version}"/>
+                    <param name="included" value="${included}"/>
                 </antcall>
             </then>
             <else>
@@ -1052,21 +1065,28 @@ ${version_compare}
         </if>
     </target>
     
-    <!-- Target to actually *upgrade* an existing Solr index -->
-    <!-- REQUIRES these params:                              -->
-    <!--   * indexDir   = Full path to Index directory       -->
-    <!--   * version    = Version of Solr to upgrade to      -->
+    <!-- Target to actually *upgrade* an existing Solr index            -->
+    <!-- REQUIRES these params:                                         -->
+    <!--   * indexDir  = Full path to Index directory                   -->
+    <!--   * version   = Version of Solr to upgrade to                  -->
+    <!--   * included  = Whether this version of Solr/Lucene is already -->
+    <!--                 included in DSpace classpath. If 'false', then -->
+    <!--                 the appropriate Lucene JAR will be downloaded. -->
     <target name="upgrade_solr_index">
         <echo>Upgrading Solr/Lucene Index at ${indexDir} to Solr/Lucene ${version}.</echo>
 
         <!-- Replace the "[version]" placeholders in ${lucene-core} with the actual ${version}-->
         <propertyregex property="lucene-core.jar" input="${lucene-core}" regexp="\[version\]" replace="${version}" global="true"/>
         
-        <!-- Download the appropriate version of the lucene-core.jar, if we haven't already. -->
+        <!-- Download the appropriate version of the lucene-core.jar, if we
+             haven't already AND it's not included on our DSpace classpath. -->
         <if>
-            <not>
-                <available file="./lucene-core-${version}.jar"/>
-            </not>
+            <and>
+                <not>
+                    <available file="./lucene-core-${version}.jar"/>
+                </not>
+                <equals arg1="${included}" arg2="false" casesensitive="false"/>
+            </and>
             <then>
                 <echo>Downloading ${lucene-core.jar}</echo>
                 <trycatch property="lucene.download.error">
@@ -1104,10 +1124,13 @@ For more information, please see the Upgrade Instructions.
             </then>
         </if>
   
-        <!-- At this point, we need the Lucene-core JAR to continue -->
-        <!-- NEXT, we'll actually upgrade the Solr index! -->
+        <!-- If we downloaded a "lucene-core-*.jar" in the previous step,
+             then use that downloaded JAR to upgrade the Solr/Lucene Index -->
         <if>
-            <available file="./lucene-core-${version}.jar"/>
+            <and>
+                <available file="./lucene-core-${version}.jar"/>
+                <equals arg1="${included}" arg2="false" casesensitive="false"/>
+            </and>
             <then>
                 <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
                 <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
@@ -1117,7 +1140,22 @@ For more information, please see the Upgrade Instructions.
                     <arg value="${indexDir}" />
                 </java>
             </then>
-        </if>        
+        </if>
+
+        <!-- Otherwise, if "included=true" then use the Lucene JAR included
+             in the DSpace classpath to upgrade the Solr/Lucene Index -->
+        <if>
+            <equals arg1="${included}" arg2="true" casesensitive="false"/>
+            <then>
+                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
+                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
+                <java classname="org.apache.lucene.index.IndexUpgrader" classpathref="class.path" fork="yes" failonerror="yes">
+                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <arg value="${indexDir}" />
+                </java>
+            </then>
+        </if>
     </target>
 
 </project>
