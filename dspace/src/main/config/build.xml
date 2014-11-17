@@ -95,7 +95,7 @@ Common usage:
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
     <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
     
-    <!-- Default location of lucene-core JAR to download (for update-solr-indexes). This may be overridden, if URL path changes. -->
+    <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
     <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
     <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
     
@@ -137,6 +137,7 @@ Common usage:
     	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
+        <echo message="update_solr_indexes --> Checks if any Solr indexes need upgrading (to latest Solr), and if so, upgrades them." />
         <echo message="" />
         <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
         <echo message="install_code    --> Install compiled code into ${dspace.dir}" />
@@ -1012,12 +1013,26 @@ You may manually install this file by following these steps:
     <target name="check_solr_index">       
         <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
         <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
-        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" failonerror="yes" outputproperty="version_compare">
+        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" resultproperty="version_returncode" outputproperty="version_compare">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <arg value="${indexDir}" />
             <arg value="${version}" />
         </java>
+
+        <!-- Fail if the previous command returns a non-zero result, as this
+             means we couldn't determine the Solr index version.
+             We need this special error handling, since we are capturing the
+             output in ${version_compare}. -->
+        <fail>
+          <condition>
+              <not>
+                <equals arg1="${version_returncode}" arg2="0"/>
+              </not>
+          </condition>
+ERROR occurred while checking Solr index version:
+${version_compare}
+        </fail>
         
         <!-- If the above java command returned -1, that means this index is NOT yet
              upgraded to the specified Solr version. So, let's upgrade it! -->
