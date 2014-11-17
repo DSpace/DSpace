@@ -37,7 +37,7 @@ public class IndexVersion
         if (argv.length < 1)
         {
             System.out.println("\nRequired Solr/Lucene index directory is missing.");
-            System.out.println("Mimimally, pass in the full path of the Solr/Lucene Index directory to analyze");
+            System.out.println("Minimally, pass in the full path of the Solr/Lucene Index directory to analyze");
             System.out.println("Usage: IndexVersion [full-path-to-solr-index] ([version-to-compare])");
             System.out.println("  - [full-path-to-index] is REQUIRED (e.g. [dspace.dir]/solr/statistics/data/index/)");
             System.out.println("  - [version-to-compare] is optional. When specified, this command will return:");
