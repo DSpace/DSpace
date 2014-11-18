@@ -1069,13 +1069,13 @@ public class DatabaseUtils
                         log.info("Post database migration, reindexing all content in Discovery search and browse engine");
 
                         // Reindex Discovery completely
+                        // Force clean all content
+                        this.indexer.cleanIndex(true);
                         // Recreate the entire index (overwriting existing one)
                         this.indexer.createIndex(context);
                         // Rebuild spell checker (which is based on index)
                         this.indexer.buildSpellCheck();
 
-                        // Reset our indexing flag. Indexing is done.
-                        DatabaseUtils.setReindexDiscovery(false);
                         log.info("Reindexing is complete");
                     }
                     catch(SearchServiceException sse)
@@ -1088,6 +1088,10 @@ public class DatabaseUtils
                     }
                     finally
                     {
+                        // Reset our indexing flag. Indexing is done or it threw an error,
+                        // Either way, we shouldn't try again.
+                        DatabaseUtils.setReindexDiscovery(false);
+
                         // Clean up our context, if it still exists
                         if(context!=null && context.isValid())
                             context.abort();
