@@ -38,7 +38,11 @@ public class AuthorityValueGenerator {
 
 
         if (nextValue != null) {
-            nextValue.setId(UUID.randomUUID().toString());
+            //Only generate a new UUID if there isn't one offered OR if the identifier needs to be generated
+            if(StringUtils.isBlank(uid) || StringUtils.startsWith(uid, AuthorityValueGenerator.GENERATE)){
+                uid = UUID.randomUUID().toString();
+            }
+            nextValue.setId(uid);
             nextValue.updateLastModifiedDate();
             nextValue.setCreationDate(new Date());
             nextValue.setField(field);

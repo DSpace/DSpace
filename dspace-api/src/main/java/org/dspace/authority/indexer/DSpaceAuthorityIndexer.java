@@ -162,6 +162,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
 
         String content = value.value;
         String uid = value.authority;
+        //We only want to update our item IF our UUID is not present or if we need to generate one.
+        boolean requiresItemUpdate = StringUtils.isBlank(uid) || StringUtils.startsWith(uid, AuthorityValueGenerator.GENERATE);
 
         if (StringUtils.isNotBlank(uid) && !uid.startsWith(AuthorityValueGenerator.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly necessary here but it prevents exceptions in solr
@@ -170,16 +172,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         if (nextValue == null) {
             nextValue = AuthorityValueGenerator.generate(uid, content, metadataField.replaceAll("\\.", "_"));
         }
-        if (nextValue != null) {
+        if (nextValue != null && requiresItemUpdate) {
             nextValue.updateItem(currentItem, value);
+            try {
+                currentItem.update();
+            } catch (Exception e) {
+                log.error("Error creating a metadatavalue's authority", e);
+            }
         }
-
-        try {
-            currentItem.update();
-        } catch (Exception e) {
-            log.error("Error creating a metadatavalue's authority", e);
-        }
-
     }
 
     public void close() {
