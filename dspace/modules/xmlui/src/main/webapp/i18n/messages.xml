@@ -2902,6 +2902,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
             Fields marked with an asterisk (*) are required. For more information on expected contents for a field, hold your mouse over the field in question.
         </div>
 	</message>
+    <message key="xmlui.submit.publication.describe.nodetails">
+        <div><strong>We don't have any details about your article, so you will have to provide its description.</strong></div>
+	</message>
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
 	<message key="xmlui.submit.dataset.describe.head">Add and Describe Data File</message>

@@ -492,6 +492,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         addEmailsAndEmbargoSettings(journalID, item);
 
                         item.update();
+                    } else if(pBean.getMessage().equals("Invalid manuscript number")) {
+                        // We do not have metadata for this manuscript number
+                        // Store the manuscriptNumber & journal title and continue as in-review
+                        addEmailsAndEmbargoSettings(journalID, item);
+                        title = journalNames.get(journalVals.indexOf(journalID));
+                        addSingleMetadataValueFromJournal(context, item, "journalName", title);
+                        addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", manuscriptNumber);
+                        item.update();
                     }else{
                         request.getSession().setAttribute("submit_error", pBean.getMessage());
                         return false;
