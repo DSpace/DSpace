@@ -14,6 +14,7 @@ import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class AuthorityIndexClient {
     public static void main(String[] args) throws Exception {
 
         //Populate our solr
-        Context context = new Context();
+        Context context = new ContextNoCaching();
         //Ensure that we can update items if we are altering our authority control
         context.turnOffAuthorisationSystem();
         ServiceManager serviceManager = getServiceManager();
@@ -104,6 +105,19 @@ public class AuthorityIndexClient {
         //Retrieve our service
         DSpace dspace = new DSpace();
         return dspace.getServiceManager();
+    }
+
+    private static class ContextNoCaching extends Context
+    {
+
+        public ContextNoCaching() throws SQLException {
+            super();
+        }
+
+        @Override
+        public void cache(Object o, int id) {
+            //Do not cache any object
+        }
     }
 
 }
