@@ -1068,9 +1068,11 @@ public class DatabaseUtils
 
                         log.info("Post database migration, reindexing all content in Discovery search and browse engine");
 
-                        // Reindex Discovery (just clean & update index)
-                        this.indexer.cleanIndex(true);
-                        this.indexer.updateIndex(context, true);
+                        // Reindex Discovery completely
+                        // Recreate the entire index (overwriting existing one)
+                        this.indexer.createIndex(context);
+                        // Rebuild spell checker (which is based on index)
+                        this.indexer.buildSpellCheck();
 
                         // Reset our indexing flag. Indexing is done.
                         DatabaseUtils.setReindexDiscovery(false);

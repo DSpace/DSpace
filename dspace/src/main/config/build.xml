@@ -970,7 +970,7 @@ You may manually install this file by following these steps:
         <if>
             <available file="${stats.index}" type="dir"/>
             <then>
-                <!-- Ensure Statistics index is >= 3.5.0 -->
+                <!-- Ensure Statistics index is >= Solr/Lucene 3.5.0 -->
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${stats.index}"/>
                     <param name="version" value="3.5.0"/>
@@ -984,13 +984,35 @@ You may manually install this file by following these steps:
                 </antcall>
             </then>
         </if>
-        
+
+        <!-- Next, let's do the Discovery Solr index.
+             NOTE: Discovery will be reindexed post database migration, but this
+             is here as a safety measure for older versions of Solr/Lucene -->
+        <property name="discovery.index" value="${dspace.dir}/solr/search/data/index/"/>
+        <if>
+            <available file="${discovery.index}" type="dir"/>
+            <then>
+                <!-- Ensure Discovery index is >= Solr/Lucene 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${discovery.index}"/>
+                    <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
+                </antcall>
+                <!-- Ensure Discovery index is upgraded to latest version (included in DSpace) -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${discovery.index}"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
+                </antcall>
+            </then>
+        </if>
+
         <!-- Next, let's do the OAI-PMH Solr index -->
         <property name="oai.index" value="${dspace.dir}/solr/oai/data/index/"/>
         <if>
             <available file="${oai.index}" type="dir"/>
             <then>
-                <!-- Ensure OAI index is >= 3.5.0 -->
+                <!-- Ensure OAI index is >= Solr/Lucene 3.5.0 -->
                 <antcall target="check_solr_index">
                     <param name="indexDir" value="${oai.index}"/>
                     <param name="version" value="3.5.0"/>
@@ -1004,7 +1026,22 @@ You may manually install this file by following these steps:
                 </antcall>
             </then>
         </if>
-        
+
+        <!-- Next, let's do the Authority Solr index. This index first appeared
+             in DSpace 5, so it will never be < Solr 3.5.0 -->
+        <property name="authority.index" value="${dspace.dir}/solr/authority/data/index/"/>
+        <if>
+            <available file="${authority.index}" type="dir"/>
+            <then>
+                <!-- Ensure Authority index is upgraded to latest version (included in DSpace) -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${authority.index}"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
+                </antcall>
+            </then>
+        </if>
+
         <!-- Finally, cleanup any Lucene JARs that were downloaded into the Ant build directory -->
         <!-- (These JARs are automatically downloaded when an index needs an upgrade). -->
         <echo>Cleanup any downloaded lucene-core-*.jar files. We don't need them anymore.</echo>
