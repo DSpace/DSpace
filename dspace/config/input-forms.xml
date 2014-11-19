@@ -660,6 +660,18 @@
                     <hint>Ingrese la cita estándar para la publicación previa de este ítem. (Favor NO diligenciar este campo)</hint>
                     <required></required>
                 </field>
+                
+                <!-- Ingreso de campo para metadato youtube  -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>youtube</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Identificador youtube</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el codigo del video que desea insertar </hint>
+                    <required>Debe ingresar el codigo del video youtube</required>
+                </field>
             </page>
         </form>
         
