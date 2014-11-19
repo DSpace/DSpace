@@ -42,10 +42,10 @@ import java.util.*;
 public class Community extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Community.class);
+    private static final Logger log = Logger.getLogger(Community.class);
 
     /** The table row corresponding to this item */
-    private TableRow communityRow;
+    private final TableRow communityRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -76,6 +76,11 @@ public class Community extends DSpaceObject
     Community(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("community");
+
         communityRow = row;
 
         // Get the logo bitstream

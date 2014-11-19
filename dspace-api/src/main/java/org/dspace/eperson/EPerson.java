@@ -77,6 +77,11 @@ public class EPerson extends DSpaceObject
      */
     EPerson(Context context, TableRow row) throws SQLException {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("eperson");
+
         myRow = row;
 
         // Cache ourselves

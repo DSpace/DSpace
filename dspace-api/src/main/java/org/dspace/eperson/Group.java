@@ -82,6 +82,11 @@ public class Group extends DSpaceObject
     Group(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("epersongroup");
+
         myRow = row;
 
         // Cache ourselves

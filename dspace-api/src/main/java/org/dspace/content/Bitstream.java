@@ -39,11 +39,11 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Bitstream extends DSpaceObject
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Bitstream.class);
+    private static final Logger log = Logger.getLogger(Bitstream.class);
 
 
     /** The row in the table representing this bitstream */
-    private TableRow bRow;
+    private final TableRow bRow;
 
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
@@ -64,6 +64,11 @@ public class Bitstream extends DSpaceObject
     Bitstream(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("bitstream");
+
         bRow = row;
 
         // Get the bitstream format

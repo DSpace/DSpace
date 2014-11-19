@@ -40,10 +40,10 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class Bundle extends DSpaceObject
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Bundle.class);
+    private static final Logger log = Logger.getLogger(Bundle.class);
 
     /** The table row corresponding to this bundle */
-    private TableRow bundleRow;
+    private final TableRow bundleRow;
 
     /** The bitstreams in this bundle */
     private List<Bitstream> bitstreams;
@@ -62,6 +62,11 @@ public class Bundle extends DSpaceObject
     Bundle(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("bundle");
+
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
         String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
