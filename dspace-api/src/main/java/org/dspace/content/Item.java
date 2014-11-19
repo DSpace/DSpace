@@ -66,7 +66,7 @@ public class Item extends DSpaceObject
     private static final Logger log = Logger.getLogger(Item.class);
 
     /** The table row corresponding to this item */
-    private TableRow itemRow;
+    private final TableRow itemRow;
 
     /** The e-person who submitted this item */
     private EPerson submitter;
@@ -96,6 +96,11 @@ public class Item extends DSpaceObject
     Item(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("item");
+
         itemRow = row;
         modified = false;
         clearDetails();
