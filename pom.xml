@@ -1131,7 +1131,7 @@
              <artifactId>slf4j-log4j12</artifactId>
              <version>${slf4j.version}</version>
          </dependency>
-         <!-- JMockit and JUnit are used for Unit/Integration tests -->
+         <!-- JMockit, JUnit and Hamcrest are used for Unit/Integration tests -->
          <dependency> <!-- Keep jmockit before junit -->
             <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
@@ -1142,6 +1142,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
             <scope>test</scope>
          </dependency>
          <!-- H2 is an in-memory database used for Unit/Integration tests -->
