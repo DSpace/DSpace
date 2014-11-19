@@ -154,8 +154,8 @@ public class ViewItem extends AbstractDSpaceTransformer {
 			pageMeta.addMetadata("title", "package").addContent(
 					pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle + ". ");
 
-			if (pkg.getMetadata("dryad.curatorNote") != null) {
-				pageMeta.addMetadata("curatorNote", "package").addContent(pkg.getMetadata("dryad.curatorNote").toString());
+			if (pkg.getMetadata("dryad.curatorNotePublic") != null) {
+				pageMeta.addMetadata("curatorNotePublic", "package").addContent(pkg.getMetadata("dryad.curatorNotePublic").toString());
 			}
 			if ((values = pkg.getMetadata("dc.date.issued")).length > 0) {
 				pageMeta.addMetadata("dateIssued", "package").addContent(

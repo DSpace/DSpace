@@ -113,10 +113,10 @@
                   <xsl:value-of select="$title"/>
               </p>
         </div>
-        <xsl:if test=".//dim:field[@element='curatorNote']">
+        <xsl:if test=".//dim:field[@element='curatorNotePublic']">
         <div class="ds-static-div primary">
             <p class="ds-paragraph">
-                <xsl:value-of select=".//dim:field[@element='curatorNote']"/>
+                <xsl:value-of select=".//dim:field[@element='curatorNotePublic']"/>
             </p>
         </div>
         </xsl:if>
