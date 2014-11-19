@@ -112,6 +112,7 @@ public class ItemExport
                 "sequence number to begin exporting items with");
         options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
+        options.addOption("s", "skip-bitstreams", false, "do not export bitstreams (export only metadata)");
 
         CommandLine line = parser.parse(options, argv);
 
@@ -177,6 +178,12 @@ public class ItemExport
         {
             zip = true;
             zipFileName = line.getOptionValue('z');
+        }
+
+        boolean skipBitstreams = false;
+        if (line.hasOption('s'))
+        {
+            skipBitstreams = true;
         }
 
         // now validate the args
@@ -276,14 +283,14 @@ public class ItemExport
                 System.out.println("Exporting from collection: " + myIDString);
                 items = mycollection.getItems();
             }
-            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate, skipBitstreams);
         }
         else
         {
             if (myItem != null)
             {
                 // it's only a single item
-                exportItem(c, myItem, destDirName, seqStart, migrate);
+                exportItem(c, myItem, destDirName, seqStart, migrate, skipBitstreams);
             }
             else
             {
@@ -293,7 +300,7 @@ public class ItemExport
                 ItemIterator i = mycollection.getItems();
                 try
                 {
-                    exportItem(c, i, destDirName, seqStart, migrate);
+                    exportItem(c, i, destDirName, seqStart, migrate, skipBitstreams);
                 }
                 finally
                 {
@@ -309,7 +316,8 @@ public class ItemExport
     }
 
     private static void exportItem(Context c, ItemIterator i,
-            String destDirName, int seqStart, boolean migrate) throws Exception
+            String destDirName, int seqStart, boolean migrate,
+            boolean skipBitstreams) throws Exception
     {
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -344,13 +352,13 @@ public class ItemExport
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate);
+            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate, skipBitstreams);
             mySequenceNumber++;
         }
     }
 
     private static void exportItem(Context c, Item myItem, String destDirName,
-            int seqStart, boolean migrate) throws Exception
+            int seqStart, boolean migrate, boolean skipBitstreams) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -372,7 +380,7 @@ public class ItemExport
             {
                 // make it this far, now start exporting
                 writeMetadata(c, myItem, itemDir, migrate);
-                writeBitstreams(c, myItem, itemDir);
+                writeBitstreams(c, myItem, itemDir, skipBitstreams);
                 if (!migrate)
                 {
                     writeHandle(c, myItem, itemDir);
@@ -574,8 +582,8 @@ public class ItemExport
      * @throws Exception
      *             if there is any problem writing to the export directory
      */
-    private static void writeBitstreams(Context c, Item i, File destDir)
-            throws Exception
+    private static void writeBitstreams(Context c, Item i, File destDir,
+            boolean skipBitstreams) throws Exception
     {
         File outFile = new File(destDir, "contents");
 
@@ -615,12 +623,10 @@ public class ItemExport
 
                     int myPrefix = 1; // only used with name conflict
 
-                    InputStream is = b.retrieve();
-
                     boolean isDone = false; // done when bitstream is finally
                     // written
 
-                    while (!isDone)
+                    while (!skipBitstreams && !isDone)
                     {
                         if (myName.contains(File.separator))
                         {
@@ -638,25 +644,12 @@ public class ItemExport
 
                         if (fout.createNewFile())
                         {
+                            InputStream is = b.retrieve();
                             FileOutputStream fos = new FileOutputStream(fout);
                             Utils.bufferedCopy(is, fos);
                             // close streams
                             is.close();
                             fos.close();
-
-                            // write the manifest file entry
-                            if (b.isRegisteredBitstream())
-                            {
-                                out.println("-r -s " + b.getStoreNumber()
-                                        + " -f " + myName +
-                                        "\tbundle:" + bundleName +
-                                        primary + description);
-                            }
-                            else
-                            {
-                                out.println(myName + "\tbundle:" + bundleName +
-                                            primary + description);
-                            }
 
                             isDone = true;
                         }
@@ -670,6 +663,21 @@ public class ItemExport
                             myPrefix++;
                         }
                     }
+
+                    // write the manifest file entry
+                    if (b.isRegisteredBitstream())
+                    {
+                        out.println("-r -s " + b.getStoreNumber()
+                                + " -f " + myName +
+                                "\tbundle:" + bundleName +
+                                primary + description);
+                    }
+                    else
+                    {
+                        out.println(myName + "\tbundle:" + bundleName +
+                                    primary + description);
+                    }
+
                 }
             }
 
@@ -695,7 +703,8 @@ public class ItemExport
      */
     public static void exportAsZip(Context context, ItemIterator items,
                                    String destDirName, String zipFileName,
-                                   int seqStart, boolean migrate) throws Exception
+                                   int seqStart, boolean migrate,
+                                   boolean skipBitstreams) throws Exception
     {
         String workDir = getExportWorkDirectory() +
                          System.getProperty("file.separator") +
