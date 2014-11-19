@@ -662,16 +662,17 @@
                 </field>
                 
                 <!-- Ingreso de campo para metadato youtube  -->
+                <!--
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
-                    <dc-qualifier>youtube</dc-qualifier>
+                    <dc-qualifier>youtubeedu</dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Identificador youtube</label>
                     <input-type>onebox</input-type>
                     <hint>Ingrese el codigo del video que desea insertar </hint>
                     <required>Debe ingresar el codigo del video youtube</required>
-                </field>
+                </field>-->
             </page>
         </form>
         
@@ -2407,6 +2408,10 @@
             <pair>
                 <displayed-value>Otro</displayed-value>
                 <stored-value>other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Identificador Youtube </displayed-value> 
+                <stored-value>youtubeedu</stored-value>
             </pair>
         </value-pairs>
 
