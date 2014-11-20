@@ -7,6 +7,8 @@
  */
 package org.dspace.authority.indexer;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authority.AuthorityValueGenerator;
@@ -18,6 +20,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,5 +188,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
     public void close() {
         itemIterator.close();
         itemIterator = null;
+    }
+
+    public boolean isConfiguredProperly() {
+        boolean isConfiguredProperly = true;
+        if(CollectionUtils.isEmpty(metadataFields)){
+            log.warn("Authority indexer not properly configured, no metadata fields configured for indexing. Check the \"authority.author.indexer.field\" properties.");
+            isConfiguredProperly = false;
+        }
+        return isConfiguredProperly;
     }
 }
