@@ -481,7 +481,7 @@
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
     <xsl:template name="buildTrail">
-        <div class="trail-wrapper">
+        <div class="trail-wrapper hidden-print">
             <div class="container">
                 <div class="row">
                     <!--TODO-->
@@ -698,7 +698,7 @@
                         <div>
                             <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
                         </div>
-                        <div>
+                        <div class="hidden-print">
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
@@ -718,7 +718,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-5 col-sm-4">
+                    <div class="col-xs-5 col-sm-4 hidden-print">
                         <div class="pull-right">
                             <span class="theme-by">Theme by&#160;</span>
                             <br/>
