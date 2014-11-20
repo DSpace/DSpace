@@ -30,4 +30,6 @@ public interface AuthorityIndexerInterface {
     public boolean hasMore();
 
     public void close();
+
+    public boolean isConfiguredProperly();
 }

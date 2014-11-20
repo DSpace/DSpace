@@ -86,6 +86,17 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
         }
     }
 
+    @Override
+    public boolean isConfiguredProperly() {
+        boolean solrReturn = false;
+        try {
+            solrReturn = (getSolr()!=null);
+        } catch (Exception e) {
+            log.error("Authority solr is not correctly configured, check \"solr.authority.server\" property in the dspace.cfg", e);
+        }
+        return solrReturn;
+    }
+
     /**
      * Write the document to the solr index
      * @param doc the solr document
