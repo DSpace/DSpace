@@ -52,10 +52,10 @@ import java.util.*;
 public class Collection extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Collection.class);
+    private static final Logger log = Logger.getLogger(Collection.class);
 
     /** The table row corresponding to this item */
-    private TableRow collectionRow;
+    private final TableRow collectionRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -73,7 +73,7 @@ public class Collection extends DSpaceObject
      * Groups corresponding to workflow steps - NOTE these start from one, so
      * workflowGroups[0] corresponds to workflow_step_1.
      */
-    private Group[] workflowGroup;
+    private final Group[] workflowGroup;
 
     /** The default group of submitters */
     private Group submitters;
@@ -100,6 +100,11 @@ public class Collection extends DSpaceObject
     Collection(Context context, TableRow row) throws SQLException
     {
         super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("collection");
+
         collectionRow = row;
 
         // Get the logo bitstream
@@ -1083,6 +1088,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      * @throws AuthorizeException
      */
+    @Override
     public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
@@ -1168,9 +1174,6 @@ public class Collection extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, 
                 getID(), getHandle(), getIdentifiers(ourContext)));
-
-        // Remove from cache
-        ourContext.removeCached(this, getID());
 
         // remove subscriptions - hmm, should this be in Subscription.java?
         DatabaseManager.updateQuery(ourContext,
@@ -1289,6 +1292,9 @@ public class Collection extends DSpaceObject
                 collectionRole.delete();
             }
         }
+
+        // Remove from cache
+        ourContext.removeCached(this, getID());
 
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
