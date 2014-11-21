@@ -75,6 +75,8 @@ public class ApproveBlackoutItem {
                 c.setCurrentUser(getSystemCurator(c));
                 if(approveBlackoutItem(c, wfItemId)) {
                     System.out.println("Successfully approved workflowitem " + wfItemId + " from blackout");
+                } else {
+                    System.out.println("Did not lift blackout on " + wfItemId + ", check logs for details");
                 }
             } catch (ApproveBlackoutItemException ex) {
                 System.err.println("Exception approving blackout item: " + ex);
