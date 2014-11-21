@@ -10,12 +10,13 @@ import javax.mail.MessagingException;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.actions.WorkflowActionConfig;
 
 /**
- * Class to approve an item in Publication Blackout
+ * Class to approve an item in Publication Blackout, without user interaction.
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class ApproveBlackoutItem {
@@ -27,13 +28,34 @@ public class ApproveBlackoutItem {
         return !claimedTasks.isEmpty();
     }
 
-    private static EPerson getSystemEPerson(Context c) {
-        return null;
+    private static EPerson getSystemCurator(Context c)  throws ApproveBlackoutItemException, SQLException {
+        try {
+            String email = ConfigurationManager.getProperty("workflow", "system.curator.email");
+            if(email == null) {
+                throw new ApproveBlackoutItemException("system.curator.email is not present in config/workflow.cfg, cannot process batches");
+            }
+            EPerson systemCurator = EPerson.findByEmail(c, email);
+            return systemCurator;
+        } catch (AuthorizeException ex) {
+            throw new ApproveBlackoutItemException("Authorize exception finding system curator", ex);
+        }
     }
 
     // Make it testable!
-    public static void approveBlackoutItemDOI(Context c, String doi) {
+    public static Boolean approveBlackoutItem(Context c, Integer itemId) throws ApproveBlackoutItemException, SQLException, ItemIsNotInBlackoutException {
         // look up the workflow item by DOI and approve it from blackout
+        try {
+            WorkflowItem wfi = WorkflowItem.findByItemId(c, itemId);
+            if(wfi == null) {
+                throw new ApproveBlackoutItemException("Item ID: " + itemId + " not found in workflow");
+            } else {
+                return approveBlackoutItem(c, wfi);
+            } 
+        } catch (AuthorizeException ex) {
+            throw new ApproveBlackoutItemException("Authorize exception finding item " + itemId + " in workflow", ex);
+        } catch (IOException ex) {
+            throw new ApproveBlackoutItemException("IO exception finding item " + itemId + " in workflow", ex);
+        }
     }
 
     private static Boolean isBlackoutApproveTask(ClaimedTask t) {
@@ -73,14 +95,14 @@ public class ApproveBlackoutItem {
         }
 
         // Must have a task in the pool for this user
-        EPerson eperson = getSystemEPerson(c);
+        EPerson eperson = getSystemCurator(c);
         if(eperson == null) {
-            throw new ApproveBlackoutItemException("Cannot get system eperson to approve blackout item");
+            throw new ApproveBlackoutItemException("Cannot get system curator to approve blackout item");
         }
         PoolTask poolTask = PoolTask.findByWorkflowIdAndEPerson(c, wfi.getID(), eperson.getID());
         if(poolTask == null) {
             // Task
-            throw new ApproveBlackoutItemException("Cannot find task to claim for wfi: " + wfi.getID() + " ePersonID:" + eperson.getID());
+            throw new ApproveBlackoutItemException("Cannot find task to claim for wfi: " + wfi.getID() + " ePersonID:" + eperson.getID() + ". Verify the item is ready to be claimed and that the eperson has a row in tasklistitem");
         }
 
         // Before claiming, make sure the task is a blackout approval
@@ -88,7 +110,7 @@ public class ApproveBlackoutItem {
 
         if(!isBlackoutApproveStep(poolTask)) {
             // the step to claim is not blackout, abort
-            throw new ItemIsNotInBlackoutException("Task for wfi: " + wfi.getID() + " ePersonID: " + eperson.getID() + " is not a blackout task - item is not in blackout, returning");
+            throw new ItemIsNotInBlackoutException("Task for wfi: " + wfi.getID() + " ePersonID: " + eperson.getID() + " is not a blackout task - item is not in blackout, not claiming");
         }
 
         Workflow workflow = null;
@@ -159,7 +181,6 @@ public class ApproveBlackoutItem {
             throw new ApproveBlackoutItemException("WorkflowException approving out of blackout", ex);
         }
 
-        // TODO: Implement the system user
         // TODO: task to find eligible items in the workflow and approve them
         return Boolean.TRUE;
     }
