@@ -34,7 +34,7 @@ public class ApproveBlackoutItem {
         return !claimedTasks.isEmpty();
     }
 
-    private static EPerson getSystemCurator(Context c)  throws ApproveBlackoutItemException, SQLException {
+    static EPerson getSystemCurator(Context c)  throws ApproveBlackoutItemException, SQLException {
         try {
             String email = ConfigurationManager.getProperty("workflow", "system.curator.email");
             if(email == null) {
@@ -136,9 +136,7 @@ public class ApproveBlackoutItem {
         }
     }
 
-    // TODO: Implement a caller
-    // Should create the context and close it at the end
-    private static Boolean approveBlackoutItem(Context c, WorkflowItem wfi) throws SQLException, ApproveBlackoutItemException, ItemIsNotInBlackoutException {
+    public static Boolean approveBlackoutItem(Context c, WorkflowItem wfi) throws SQLException, ApproveBlackoutItemException, ItemIsNotInBlackoutException {
         if(wfi == null) {
             throw new ApproveBlackoutItemException("Cannot approve null item");
         } else if(c == null) {
@@ -245,7 +243,6 @@ public class ApproveBlackoutItem {
             throw new ApproveBlackoutItemException("WorkflowException approving out of blackout", ex);
         }
 
-        // TODO: task to find eligible items in the workflow and approve them
         return Boolean.TRUE;
     }
 }
