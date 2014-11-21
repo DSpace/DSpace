@@ -229,7 +229,10 @@ public class ApproveBlackoutItem {
 
         try {
             // WorkflowManager.doState: "Executes an action and returns the next."
-            WorkflowManager.doState(c, eperson, null, claimedTask.getWorkflowItemID(), workflow, action);
+            // AfterPublicationAction actually requires an HttpServletRequest with parameters for the page and the selected button
+            // Since we don't have a real request, DummyBlackoutRequest provides the necessary parameters
+            DummyBlackoutRequest request = new DummyBlackoutRequest();
+            WorkflowManager.doState(c, eperson, request, claimedTask.getWorkflowItemID(), workflow, action);
         } catch (IOException ex) {
             throw new ApproveBlackoutItemException("IOException approving out of blackout", ex);
         } catch (WorkflowConfigurationException ex) {
