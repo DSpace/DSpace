@@ -7,6 +7,12 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import javax.mail.MessagingException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.authorize.AuthorizeException;
@@ -38,6 +44,70 @@ public class ApproveBlackoutItem {
             return systemCurator;
         } catch (AuthorizeException ex) {
             throw new ApproveBlackoutItemException("Authorize exception finding system curator", ex);
+        }
+    }
+
+    public static void main(String args[]) throws ParseException {
+        // create an options object and populate it
+        CommandLineParser parser = new PosixParser();
+
+        Options options = new Options();
+
+	options.addOption("i", "wfitemid", true, "workflowitem id for an unclaimed item in "
+                + "'pendingPublicationStep' or 'pendingPublicationReauthorizationPaymentStep'.\n"
+                + "Item must have a dc.date.blackoutUntil metadata value in the past.");
+        options.addOption("h", "help", false, "help");
+
+        CommandLine line = parser.parse(options, args);
+        if (line.hasOption('h'))
+        {
+            HelpFormatter myhelp = new HelpFormatter();
+            myhelp.printHelp("ApproveItemBlackout\n", options);
+        }
+        Boolean approved;
+
+        if(line.hasOption('a')){
+            approved = Boolean.valueOf(line.getOptionValue('a'));
+        }else{
+            System.out.println("No result (approved true or false) was given");
+            System.exit(1);
+            return;
+        }
+
+        if(line.hasOption('i')) {
+	    // get a WorkflowItem using a workflow ID
+	    Integer wfItemId = Integer.parseInt(line.getOptionValue('i'));
+            Context c = null;
+            int result = 0;
+            try {
+                c = new Context();
+                c.setCurrentUser(getSystemCurator(c));
+                if(approveBlackoutItem(c, wfItemId)) {
+                    System.out.println("Successfully approved workflowitem " + wfItemId + " from blackout");
+                }
+                c.complete();
+            } catch (ApproveBlackoutItemException ex) {
+                System.err.println("Exception approving blackout item: " + ex);
+                result = 1;
+            } catch (ItemIsNotInBlackoutException ex) {
+                System.err.println("Item is not in blackout: " + ex);
+                result = 1;
+            } catch (SQLException ex) {
+                System.err.println("Exception approving blackout item: " + ex);
+                result = 1;
+            } finally {
+                if(c != null) {
+                    try {
+                        c.complete();
+                    } catch (SQLException ex) {
+
+                    }
+                }
+            }
+            System.exit(result);
+	} else {
+            System.out.println("No workflow ID was given. This must be provided to identify the item in the workflow");
+            System.exit(1);
         }
     }
 
