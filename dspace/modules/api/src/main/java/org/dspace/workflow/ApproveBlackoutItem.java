@@ -180,7 +180,7 @@ public class ApproveBlackoutItem {
         try {
             workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
             step = workflow.getStep(poolTask.getStepID());
-            action = step.getActionConfig(poolTask.getActionID());
+            action = step.getActionConfig("afterPublicationAction");
             // This method does not return the created task, so it must be fetched separately
             WorkflowManager.createOwnedTask(c, wfi, step, action, eperson);
         } catch (IOException ex) {
