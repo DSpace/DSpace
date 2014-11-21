@@ -64,15 +64,6 @@ public class ApproveBlackoutItem {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ApproveItemBlackout\n", options);
         }
-        Boolean approved;
-
-        if(line.hasOption('a')){
-            approved = Boolean.valueOf(line.getOptionValue('a'));
-        }else{
-            System.out.println("No result (approved true or false) was given");
-            System.exit(1);
-            return;
-        }
 
         if(line.hasOption('i')) {
 	    // get a WorkflowItem using a workflow ID
