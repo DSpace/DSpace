@@ -76,7 +76,6 @@ public class ApproveBlackoutItem {
                 if(approveBlackoutItem(c, wfItemId)) {
                     System.out.println("Successfully approved workflowitem " + wfItemId + " from blackout");
                 }
-                c.complete();
             } catch (ApproveBlackoutItemException ex) {
                 System.err.println("Exception approving blackout item: " + ex);
                 result = 1;
