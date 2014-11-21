@@ -42,19 +42,18 @@ public class ApproveBlackoutItem {
     }
 
     // Make it testable!
-    public static Boolean approveBlackoutItem(Context c, Integer itemId) throws ApproveBlackoutItemException, SQLException, ItemIsNotInBlackoutException {
-        // look up the workflow item by DOI and approve it from blackout
+    public static Boolean approveBlackoutItem(Context c, Integer wfItemId) throws ApproveBlackoutItemException, SQLException, ItemIsNotInBlackoutException {
         try {
-            WorkflowItem wfi = WorkflowItem.findByItemId(c, itemId);
+            WorkflowItem wfi = WorkflowItem.find(c, wfItemId);
             if(wfi == null) {
-                throw new ApproveBlackoutItemException("Item ID: " + itemId + " not found in workflow");
+                throw new ApproveBlackoutItemException("Workflow item ID: " + wfItemId + " not found in workflow");
             } else {
                 return approveBlackoutItem(c, wfi);
             } 
         } catch (AuthorizeException ex) {
-            throw new ApproveBlackoutItemException("Authorize exception finding item " + itemId + " in workflow", ex);
+            throw new ApproveBlackoutItemException("Authorize exception finding workflowitem " + wfItemId + " in workflow", ex);
         } catch (IOException ex) {
-            throw new ApproveBlackoutItemException("IO exception finding item " + itemId + " in workflow", ex);
+            throw new ApproveBlackoutItemException("IO exception finding workflowitem " + wfItemId + " in workflow", ex);
         }
     }
 
