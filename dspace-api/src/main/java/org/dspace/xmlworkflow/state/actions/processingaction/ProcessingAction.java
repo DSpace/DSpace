@@ -32,7 +32,8 @@ public abstract class ProcessingAction extends Action {
             task = ClaimedTask.findByWorkflowIdAndEPerson(context, wfi.getID(), context.getCurrentUser().getID());
         //Check if we have claimed the current task
         return task != null &&
-                task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&
+// TASK #2946: Comentamos esta condición para poder seleccionar una colección al comienzo del workflow de autoarchivo 
+//                task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&
                 task.getStepID().equals(getParent().getStep().getId()) &&
                 task.getActionID().equals(getParent().getId());
     }

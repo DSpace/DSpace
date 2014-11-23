@@ -609,6 +609,8 @@
 <message key="xmlui.Submission.submit.SelectCollection.collection">Colección</message>
 <message key="xmlui.Submission.submit.SelectCollection.collection_help">Seleccione la colección a la que quiere enviar un ítem.</message>
 <message key="xmlui.Submission.submit.SelectCollection.collection_default">Seleccione una colección...</message>
+<message key="cic.Submission.submit.SelectCollection.paragraph">Cambie la colección actual relacionada al ítem en cuestión.</message>
+<message key="cic.Submission.submit.SelectCollection.collection_help">Seleccione la colección a la que quiere enviar el ítem.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
 <message key="xmlui.Submission.submit.SaveOrRemoveStep.head">¿Guardar o cancelar el envío?</message>
@@ -829,6 +831,7 @@
 <message key="xmlui.XMLWorkflow.autoarchive.CIC-ADMIN_review.claimaction">Revisón CIC-Digital</message>
 <message key="xmlui.XMLWorkflow.default.CIC-ADMIN_review.editaction">Edición CIC-Digital</message>
 <message key="xmlui.XMLWorkflow.autoarchive.CIC-ADMIN_review.editaction">Edición CIC-Digital</message>
+<message key="xmlui.XMLWorkflow.autoarchive.CIC-ADMIN_review.changecollection">Selección de colección destino CIC-Digital</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             Administrative Aspect
