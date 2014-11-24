@@ -970,6 +970,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     toProjectionFields.add(projectionFieldsString);
                 }
             }
+            
+            List<String> toIgnoreMetadataFields = new ArrayList<String>();
+            String ignoreFieldsString = new DSpace().getConfigurationService().getProperty("discovery.index.ignore");
+            if (ignoreFieldsString != null) {
+                if (ignoreFieldsString.indexOf(",") != -1) {
+                    for (int i = 0; i < ignoreFieldsString.split(",").length; i++) {
+                        toIgnoreMetadataFields.add(ignoreFieldsString.split(",")[i].trim());
+                    }
+                } else {
+                    toIgnoreMetadataFields.add(ignoreFieldsString);
+                }
+            }
 
             Metadatum[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (Metadatum meta : mydc)
@@ -989,7 +1001,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     field += "." + meta.qualifier;
                 }
 
-                List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
                 //We are not indexing provenance, this is useless
                 if (toIgnoreMetadataFields != null && (toIgnoreMetadataFields.contains(field) || toIgnoreMetadataFields.contains(unqualifiedField + "." + Item.ANY)))
                 {
