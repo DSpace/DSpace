@@ -5,7 +5,6 @@ package org.dspace.workflow;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.authorize.AuthorizeException;
@@ -30,24 +29,24 @@ public class ApproveBlackoutItems {
             }
         } catch (SQLException ex) {
             log.error("SQLException approving blackout items", ex);
-        } catch (ApproveBlackoutItemException ex) {
+        } catch (AutoWorkflowProcessorException ex) {
             log.error("Exception approving blackout items", ex);
         }
 
     }
 
 
-    public static void approveBlackoutItems(Context c) throws SQLException, ApproveBlackoutItemException {
+    public static void approveBlackoutItems(Context c) throws SQLException, AutoWorkflowProcessorException {
         // get all items in workflow
         WorkflowItem items[];
         try {
             items = WorkflowItem.findAll(c);
         } catch (AuthorizeException ex) {
-            throw new ApproveBlackoutItemException("Authorize Exception finding workflow items", ex);
+            throw new AutoWorkflowProcessorException("Authorize Exception finding workflow items", ex);
         } catch (IOException ex) {
-            throw new ApproveBlackoutItemException("IO Exception finding workflow items", ex);
+            throw new AutoWorkflowProcessorException("IO Exception finding workflow items", ex);
         }
-        c.setCurrentUser(ApproveBlackoutItem.getSystemCurator(c));
+        c.setCurrentUser(AutoWorkflowProcessor.getSystemCurator(c));
 
         for(WorkflowItem wfi : items) {
             if(checkAndApproveItem(c, wfi)) {
@@ -63,11 +62,12 @@ public class ApproveBlackoutItems {
             if(itemIsInBlackout(c, wfi) && publicationDateHasPassed(c, wfi)) {
                 // item is in blackout and date has passed
                 try {
-                    return ApproveBlackoutItem.approveBlackoutItem(c, wfi);
-                } catch (ApproveBlackoutItemException ex) {
+                    AutoApproveBlackoutProcessor processor = new AutoApproveBlackoutProcessor(c);
+                    return processor.processWorkflowItem(wfi);
+                } catch (AutoWorkflowProcessorException ex) {
                     log.error("Unable to approve Workflow item: " + wfi.getID() + " in blackout", ex);
                     return Boolean.FALSE;
-                } catch (ItemIsNotInBlackoutException ex) {
+                } catch (ItemIsNotEligibleForStepException ex) {
                     log.error("Item: " + wfi.getID() + " is not in blackout", ex);
                     return Boolean.FALSE;
                 }

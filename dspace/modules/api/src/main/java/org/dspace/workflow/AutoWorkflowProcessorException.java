@@ -8,13 +8,13 @@ import java.io.IOException;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-class ApproveBlackoutItemException extends Exception {
+class AutoWorkflowProcessorException extends Exception {
 
-    public ApproveBlackoutItemException(String message) {
+    public AutoWorkflowProcessorException(String message) {
         super(message);
     }
 
-    ApproveBlackoutItemException(String message, Throwable cause) {
+    AutoWorkflowProcessorException(String message, Throwable cause) {
         super(message, cause);
     }
 
