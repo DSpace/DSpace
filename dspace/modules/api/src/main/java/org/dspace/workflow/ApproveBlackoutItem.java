@@ -36,7 +36,7 @@ public class ApproveBlackoutItem {
 
     static EPerson getSystemCurator(Context c)  throws ApproveBlackoutItemException, SQLException {
         try {
-            String email = ConfigurationManager.getProperty("workflow", "system.curator.email");
+            String email = ConfigurationManager.getProperty("workflow", "system.curator.account");
             if(email == null) {
                 throw new ApproveBlackoutItemException("system.curator.email is not present in config/workflow.cfg, cannot process batches");
             }
