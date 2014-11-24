@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
@@ -16,34 +15,31 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.dspace.workflow.actions.processingaction.EditMetadataAction;
 
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class DummyBlackoutRequest implements HttpServletRequest {
-    private static Map<String, String> PARAMETERS = new HashMap<String, String>() {{
-        put("page", String.valueOf(EditMetadataAction.MAIN_PAGE));
-        put("after_blackout_submit", String.valueOf(Boolean.TRUE));
-        put("submit_approve", String.valueOf(Boolean.TRUE));
-    }};
+public abstract class DummyHttpRequest implements HttpServletRequest {
+
+    // Subclasses must override
+    protected abstract Map<String, String> getParameters();
 
     @Override
     public String getParameter(String string) {
-        return PARAMETERS.get(string);
+        return getParameters().get(string);
     }
 
     @Override
     public Enumeration getParameterNames() {
-        return new Vector(PARAMETERS.keySet()).elements();
+        return new Vector(getParameters().keySet()).elements();
     }
 
     @Override
     public String[] getParameterValues(String string) {
-        if(PARAMETERS.containsKey(string)) {
+        if(getParameters().containsKey(string)) {
             String values[] = new String[1];
-            values[0] = PARAMETERS.get(string);
+            values[0] = getParameters().get(string);
             return values;
         } else {
             return new String[0];
@@ -52,7 +48,7 @@ public class DummyBlackoutRequest implements HttpServletRequest {
 
     @Override
     public Map getParameterMap() {
-        return PARAMETERS;
+        return getParameters();
     }
 
     // The rest of these methods are required by the compiler to implement the 

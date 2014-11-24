@@ -57,7 +57,10 @@ public abstract class AutoWorkflowProcessor {
         }
     }
 
-    abstract Boolean isMyTask();
+    private Boolean isMyTask() {
+        return getClaimedTask().getActionID().equals(getActionID());
+    }
+    
     abstract Boolean isMyStep() throws SQLException;
     abstract String getActionID();
     // After claimed, look at whatever is needed to determine if the task should be processed

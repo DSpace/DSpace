@@ -3,7 +3,6 @@
 package org.dspace.workflow;
 
 import java.sql.SQLException;
-import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -18,8 +17,8 @@ import org.dspace.core.Context;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class AutoApproveBlackoutProcessor extends AutoWorkflowProcessor {
-    private static final Logger log = Logger.getLogger(AutoApproveBlackoutProcessor.class);
+public class AutoCurateToBlackoutProcessor extends AutoWorkflowProcessor {
+    private static final Logger log = Logger.getLogger(AutoCurateToBlackoutProcessor.class);
 
     public static void main(String args[]) throws ParseException {
         // create an options object and populate it
@@ -28,15 +27,15 @@ public class AutoApproveBlackoutProcessor extends AutoWorkflowProcessor {
         Options options = new Options();
 
 	options.addOption("i", "wfitemid", true, "workflowitem id for an unclaimed item in "
-                + "'pendingPublicationStep' or 'pendingPublicationReauthorizationPaymentStep'.\n"
-                + "Item must have a dc.date.blackoutUntil metadata value in the past.");
+                + "'dryadAcceptEditReject'.\n"
+                + "Item will be approved and sent to publication blackout");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, args);
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("AutoApproveBlackoutProcessor\n", options);
+            myhelp.printHelp("AutoCurateToBlackoutProcessor\n", options);
         }
 
         if(line.hasOption('i')) {
@@ -46,20 +45,20 @@ public class AutoApproveBlackoutProcessor extends AutoWorkflowProcessor {
             int result = 0;
             try {
                 c = new Context();
-                AutoApproveBlackoutProcessor processor = new AutoApproveBlackoutProcessor(c);
+                AutoCurateToBlackoutProcessor processor = new AutoCurateToBlackoutProcessor(c);
                 if(processor.processWorkflowItem(wfItemId)) {
-                    System.out.println("Successfully approved workflowitem " + wfItemId + " from blackout");
+                    System.out.println("Successfully curated workflowitem " + wfItemId + " into blackout");
                 } else {
-                    System.out.println("Did not lift blackout on " + wfItemId + ", check logs for details");
+                    System.out.println("Did not approve " + wfItemId + ", check logs for details");
                 }
             } catch (AutoWorkflowProcessorException ex) {
-                System.err.println("Exception approving blackout item: " + ex);
+                System.err.println("Exception approving item: " + ex);
                 result = 1;
             } catch (ItemIsNotEligibleForStepException ex) {
-                System.err.println("Item is not in blackout: " + ex);
+                System.err.println("Item is not in step: " + ex);
                 result = 1;
             } catch (SQLException ex) {
-                System.err.println("Exception approving blackout item: " + ex);
+                System.err.println("Exception curating item: " + ex);
                 result = 1;
             } finally {
                 if(c != null) {
@@ -77,44 +76,30 @@ public class AutoApproveBlackoutProcessor extends AutoWorkflowProcessor {
         }
     }
 
-    public AutoApproveBlackoutProcessor(Context c) {
+    public AutoCurateToBlackoutProcessor(Context c) {
         super(c);
     }
 
     @Override
-    Boolean isMyStep() throws SQLException {
-        return (getPoolTask().getStepID().equals("pendingPublicationStep") ||
-                getPoolTask().getStepID().equals("pendingPublicationReAuthorizationPaymentStep"));
-    }
-
-    @Override
     Boolean canProcessClaimedTask() throws SQLException {
-        // Verify date is in the past
-        Date now = new Date();
-        Date blackoutUntilDate = getDataPackage().getBlackoutUntilDate();
-        if(blackoutUntilDate == null) {
-            log.error("Attempted to lift blackout on item: " + getDataPackage().getItem().getID() + " but no blackoutUntilDate present");
-            return Boolean.FALSE;
-        }
-
-        if(now.before(blackoutUntilDate)) {
-            // current date is before the blackout until date
-            log.error("Attempted to lift blackout early on item " + getWfi().getItem().getID() +
-                    ". Current date: " + now + " blackoutUntilDate: " + blackoutUntilDate);
-            return Boolean.FALSE;
-        }
+        // We can process any claimed tasks, we're just approving them to blackout
         return Boolean.TRUE;
     }
 
     @Override
     String getActionID() {
         // returns the action ID we can process
-        return "afterPublicationAction";
+        return "dryadAcceptEditRejectAction";
     }
 
     @Override
     HttpServletRequest getRequest() {
-        return new DummyApproveFromBlackoutRequest();
+        return new DummyCurateToBlackoutRequest();
+    }
+
+    @Override
+    Boolean isMyStep() throws SQLException {
+        return (getPoolTask().getStepID().equals("dryadAcceptEditReject"));
     }
 
 }
