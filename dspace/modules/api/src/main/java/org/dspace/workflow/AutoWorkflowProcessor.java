@@ -4,7 +4,6 @@ package org.dspace.workflow;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ import org.dspace.workflow.actions.WorkflowActionConfig;
  */
 public abstract class AutoWorkflowProcessor {
     private static final Logger log = Logger.getLogger(AutoWorkflowProcessor.class);
-    private Context context;
+    private final Context context;
     private WorkflowItem wfi;
     private DryadDataPackage dataPackage;
     private PoolTask poolTask;
@@ -31,6 +30,14 @@ public abstract class AutoWorkflowProcessor {
         this.context = context;
     }
 
+    // read-only accessors for subclasses
+    protected Context getContext() { return context; }
+    protected WorkflowItem getWfi() { return wfi; }
+    protected DryadDataPackage getDataPackage() { return dataPackage; }
+    protected PoolTask getPoolTask() { return poolTask; }
+    protected ClaimedTask getClaimedTask() { return claimedTask; }
+
+    // Utility methods
     private static Boolean isClaimed(Context c, WorkflowItem wfi) throws SQLException {
         List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
         // If there are claimed tasks for this workflow item, it is claimed
@@ -70,7 +77,7 @@ public abstract class AutoWorkflowProcessor {
         }
     }
 
-    public Boolean processWorkflowItem(Integer wfItemId) throws AutoWorkflowProcessorException, SQLException, ItemIsNotEligibleForStepException {
+    public final Boolean processWorkflowItem(Integer wfItemId) throws AutoWorkflowProcessorException, SQLException, ItemIsNotEligibleForStepException {
         try {
             WorkflowItem workflowItem = WorkflowItem.find(this.context, wfItemId);
             if(workflowItem == null) {
@@ -85,7 +92,7 @@ public abstract class AutoWorkflowProcessor {
         }
     }
 
-    public Boolean processWorkflowItem(WorkflowItem wfi) throws SQLException, AutoWorkflowProcessorException, ItemIsNotEligibleForStepException {
+    public final Boolean processWorkflowItem(WorkflowItem wfi) throws SQLException, AutoWorkflowProcessorException, ItemIsNotEligibleForStepException {
         this.context.setCurrentUser(getSystemCurator(this.context));
         if(wfi == null) {
             throw new AutoWorkflowProcessorException("Cannot process null item");
@@ -180,12 +187,4 @@ public abstract class AutoWorkflowProcessor {
 
         return Boolean.TRUE;
     }
-
-    // read-only accessors for subclasses
-    protected Context getContext() { return context; }
-    protected WorkflowItem getWfi() { return wfi; }
-    protected DryadDataPackage getDataPackage() { return dataPackage; }
-    protected PoolTask getPoolTask() { return poolTask; }
-    protected ClaimedTask getClaimedTask() { return claimedTask; }
-
 }
