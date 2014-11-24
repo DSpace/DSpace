@@ -25,7 +25,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -41,7 +40,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
-import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
@@ -56,8 +54,6 @@ import org.dspace.search.DSIndexer;
  */
 public class MediaFilterManager
 {
-    private static final Logger log = Logger.getLogger(MediaFilterManager.class);
-
 	//key (in dspace.cfg) which lists all enabled filters by name
     public static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
 	
@@ -66,6 +62,8 @@ public class MediaFilterManager
     
     //suffix (in dspace.cfg) for input formats supported by each filter
     public static final String INPUT_FORMATS_SUFFIX = "inputFormats";
+    
+    static boolean updateIndex = true; // default to updating index
 
     static boolean isVerbose = false; // default to not verbose
 
@@ -83,25 +81,13 @@ public class MediaFilterManager
     
     private static FormatFilter[] filterClasses = null;
     
-    private static final Map<String, List<String>> filterFormats = new HashMap<>();
-
+    private static Map<String, List<String>> filterFormats = new HashMap<String, List<String>>();
+    
     private static List<String> skipList = null; //list of identifiers to skip during processing
-
-    private static final List<String> publicFiltersClasses = new ArrayList<>();
-
+    
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static final String FILTER_PLUGIN_SEPARATOR = "\034";
-
-    static {
-        String publicPermissionFilters = ConfigurationManager.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
-        if(publicPermissionFilters != null) {
-            String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
-            for(String filter : publicPermisionFiltersArray) {
-                publicFiltersClasses.add(filter.trim());
-            }
-        }
-    }
     
     public static void main(String[] argv) throws Exception
     {
@@ -121,6 +107,8 @@ public class MediaFilterManager
                 "do not print anything except in the event of errors.");
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
+        options.addOption("n", "noindex", false,
+                "do NOT update the search index after filtering bitstreams");
         options.addOption("i", "identifier", true,
         		"ONLY process bitstreams belonging to identifier");
         options.addOption("m", "maximum", true,
@@ -177,6 +165,11 @@ public class MediaFilterManager
         }
 
         isQuiet = line.hasOption('q');
+
+        if (line.hasOption('n'))
+        {
+            updateIndex = false;
+        }
 
         if (line.hasOption('f'))
         {
@@ -360,6 +353,24 @@ public class MediaFilterManager
             						applyFiltersItem(c, (Item)dso);
             						break;
             	}
+            }
+          
+            // update search index?
+            if (updateIndex)
+            {
+                if (!isQuiet)
+                {
+                    System.out.println("Updating search index:");
+                }
+                DSIndexer.setBatchProcessingMode(true);
+                try
+                {
+                    DSIndexer.updateIndex(c);
+                }
+                finally
+                {
+                    DSIndexer.setBatchProcessingMode(false);
+                }
             }
 
             c.complete();
@@ -723,20 +734,24 @@ public class MediaFilterManager
             return false;
         }
         
-        if(isVerbose) {
-            System.out.println("PROCESSING: bitstream " + source.getID()
-                + " (item: " + item.getHandle() + ")");
-        }
-
-        InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
-        if (destStream == null)
-        {
-            if (!isQuiet)
+        InputStream destStream;
+        try {
+            System.out.println("File: " + newName);
+            destStream = formatFilter.getDestinationStream(source.retrieve());
+            if (destStream == null)
             {
-                System.out.println("SKIPPED: bitstream " + source.getID()
+                if (!isQuiet)
+                {
+                    System.out.println("SKIPPED: bitstream " + source.getID()
                         + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
-            }
+                }
 
+                return false;
+            }
+        }
+        catch (OutOfMemoryError oome)
+        {
+            System.out.println("!!! OutOfMemoryError !!!");
             return false;
         }
 
@@ -765,19 +780,10 @@ public class MediaFilterManager
         b.setFormat(bf);
         b.update();
         
-        //Set permissions on the derivative bitstream
-        //- First remove any existing policies
+        //Inherit policies from the source bitstream
+        //(first remove any existing policies)
         AuthorizeManager.removeAllPolicies(c, b);
-
-        //- Determine if this is a public-derivative format
-        if(publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-            //- Set derivative bitstream to be publicly accessible
-            Group anonymous = Group.find(c, 0);
-            AuthorizeManager.addPolicy(c, b, Constants.READ, anonymous);
-        } else {
-            //- Inherit policies from the source bitstream
-            AuthorizeManager.inheritPolicies(c, source, b);
-        }
+        AuthorizeManager.inheritPolicies(c, source, b);
 
         // fixme - set date?
         // we are overwriting, so remove old bitstream
