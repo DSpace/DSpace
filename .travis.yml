@@ -16,6 +16,7 @@ before_install:
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_dryad_groups_collections.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_dryad_registries.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/dryad-rest-webapp.sql
+- psql dryad_test -U dryad_test_user < ./test/etc/postgres/test-system-curator.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/update-sequences.sql
 - export PATH="$TRAVIS_BUILD_DIR/apache-maven-2.2.1/bin:$PATH"
 install:
