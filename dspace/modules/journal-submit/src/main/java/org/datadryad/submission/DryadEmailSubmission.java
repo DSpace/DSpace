@@ -97,6 +97,9 @@ public class DryadEmailSubmission extends HttpServlet {
         LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
 
         try {
+            PrintWriter toBrowser = getWriter(aResponse);
+            InputStream postBody = aRequest.getInputStream();
+            Session session = Session.getInstance(new Properties());
             MimeMessage mime = new MimeMessage(session, postBody);
             String xml = processMimeMessage(mime);
             // Nice to return our result in case we are debugging output
