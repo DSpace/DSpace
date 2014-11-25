@@ -46,6 +46,8 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
     public void testApproveFromBlackoutWithPastDate() throws Exception {
         DryadDataPackage dataPackage = DryadDataPackage.createInWorkspace(context);
         WorkspaceItem wsi = dataPackage.getWorkspaceItem(context);
+        // ReviewStep email fails if no submitter, so we need to set one.
+        dataPackage.getItem().setSubmitter(AutoWorkflowProcessor.getSystemCurator(context));
 
         // Uses WorkflowManager.start(), which invokes the entire workflow process
         // Other tests using DryadDataPackage simply createInWorkflow, as they do not
