@@ -305,7 +305,7 @@ public class ItemVideoPreviewTag extends TagSupport{
         JspWriter out = pageContext.getOut();
         StringBuffer sb = new StringBuffer();
         sb.append("<div class=\"item-video-youtube-player\">");
-        sb.append("<iframe class=\"center-block\" width=\"560\" height=\"315\" src=\"//www.youtube.com/embed/");
+        sb.append("<iframe class=\"center-block\" width=\"100%\" height=\"360px\" src=\"//www.youtube.com/embed/");
         sb.append(youtubekey);
         sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
         sb.append("</div>");
