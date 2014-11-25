@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
+import org.dspace.content.WorkspaceItem;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
-    private static Logger log = Logger.getLogger(AutoApproveBlackoutProcessorTest.class);
+    private static final Logger log = Logger.getLogger(AutoApproveBlackoutProcessorTest.class);
     private Calendar calendar;
     private Date pastDate;
     private Date nowDate;
@@ -35,10 +36,22 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         futureDate = calendar.getTime();
     }
 
+    /**
+     * Tests that an item in blackout can be approved.
+     * Creates a bare item in the workspace and invokes two processors to
+     * send it to blackout then archive
+     * @throws Exception
+     */
     @Test
     public void testApproveFromBlackoutWithPastDate() throws Exception {
-        // test that an item in blackout can be approved
-        DryadDataPackage dataPackage = DryadDataPackage.createInWorkflow(context);
+        DryadDataPackage dataPackage = DryadDataPackage.createInWorkspace(context);
+        WorkspaceItem wsi = dataPackage.getWorkspaceItem(context);
+
+        // Uses WorkflowManager.start(), which invokes the entire workflow process
+        // Other tests using DryadDataPackage simply createInWorkflow, as they do not
+        // need the entire set of tasks/steps.
+        WorkflowManager.start(context, wsi);
+
         AutoCurateToBlackoutProcessor curateToBlackoutProcessor = new AutoCurateToBlackoutProcessor(context);
         Boolean curatedToBlackout = curateToBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
         assertTrue("Could not curate new item to blackout", curatedToBlackout);
