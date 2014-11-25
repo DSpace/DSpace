@@ -59,11 +59,17 @@ public class ItemVideoPreviewTag extends TagSupport{
     	}
         try
         {
-        	if("swfobject".equalsIgnoreCase(this.player)){
+            String youtubekey=existYoutubeIdentifier();
+            if(youtubekey!= null){
+                showYoutubePlayerPreview(youtubekey);
+            }else{
+                if("swfobject".equalsIgnoreCase(this.player)){
                     showSWFObjectPreview();
                 }else{
                     showJPlayerPreview();
                 }
+            }
+            
         }
         catch (SQLException sqle)
         {
@@ -292,6 +298,31 @@ public class ItemVideoPreviewTag extends TagSupport{
                 //out.println(sb.toString());
             }
         }
+    }
+    
+    private void showYoutubePlayerPreview(String youtubekey) throws SQLException, IOException
+    {
+        JspWriter out = pageContext.getOut();
+        StringBuffer sb = new StringBuffer();
+        sb.append("<div class=\"item-video-youtube-player\">");
+        sb.append("<iframe class=\"center-block\" width=\"100%\" height=\"360px\" src=\"//www.youtube.com/embed/");
+        sb.append(youtubekey);
+        sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
+        sb.append("</div>");
+
+        out.println(sb.toString());
+    }
+    
+    private String existYoutubeIdentifier() 
+    {
+        DCValue[] youtubeIdentifiers;
+        youtubeIdentifiers=item.getMetadata("dc", "identifier", "youtubeedu", Item.ANY);
+        String youtubekey= null;
+        if(youtubeIdentifiers != null && youtubeIdentifiers.length > 0)
+        {
+            youtubekey= youtubeIdentifiers[0].value;
+        }
+        return youtubekey; 
     }
     
     public void release()
