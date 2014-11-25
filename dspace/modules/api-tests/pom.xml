@@ -50,16 +50,29 @@
     </build>
     <dependencies>
       <dependency>
+         <!-- This is required to get the classes in the Dryad API -->
          <groupId>org.dspace.modules</groupId>
          <artifactId>api</artifactId>
-          <version>${project.version}</version>
-          <type>test-jar</type>
-          <scope>test</scope>
+         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <!-- payment api classes are referenced in workflow -->
+         <!-- This is required to get the base classes for tests -->
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>api</artifactId>
+         <version>${project.version}</version>
+         <type>test-jar</type>
+         <scope>test</scope>
+      </dependency>
+      <!-- payment api classes are referenced in workflow -->
+      <dependency>
         <groupId>org.dspace.modules</groupId>
         <artifactId>payment-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>2.3</version>
+         <scope>provided</scope>
       </dependency>
     </dependencies>
 </project>
