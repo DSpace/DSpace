@@ -44,6 +44,8 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.*;
@@ -70,6 +72,9 @@ public class DryadEmailSubmission extends HttpServlet {
 
     // map of Journal Names to Journal Codes (in case code is not preent in submission)
     private static Map<String, String> myJournalNames;
+
+    // Timer for scheduled harvesting of emails
+    private Timer myEmailHarvester;
 
     private static DryadGmailService dryadGmailService;
 
@@ -275,6 +280,11 @@ public class DryadEmailSubmission extends HttpServlet {
         myJournals = validate(journals);
         // Returns a mapping of Journal Names to Journal Codes
         myJournalNames = mapJournalNamesToCodes(journals);
+
+        LOGGER.debug("scheduling email harvesting");
+        myEmailHarvester = new Timer();
+        // schedule email harvesting to happen once a day
+        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * 60 * 60 * 24);
     }
 
     /**
@@ -547,5 +557,37 @@ public class DryadEmailSubmission extends HttpServlet {
             throws IOException {
         aResponse.setContentType("xml/application; charset=UTF-8");
         return aResponse.getWriter();
+    }
+
+    private class DryadEmailSubmissionHarvester extends TimerTask {
+        @Override
+        public void run() {
+            ArrayList<String> labels = new ArrayList<String>();
+            labels.add("journal-submit");
+            try {
+                List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
+                // Print ID of each Thread.
+                if (messages != null) {
+                    ArrayList<String> processedMessageIDs = new ArrayList<String>();
+                    LOGGER.info("got " + messages.size() + " messages");
+                    for (Message message : messages) {
+                        LOGGER.info("Message: "+ message.getId() + ", " + message.getSnippet());
+                        ByteArrayInputStream postBody = new java.io.ByteArrayInputStream(Base64.decodeBase64(message.getRaw()));
+                        Session session = Session.getInstance(new Properties());
+                        try {
+                            processMimeMessage(new MimeMessage(session, postBody));
+                        } catch (Exception details) {
+                            LOGGER.info("Exception thrown: " + details.getMessage() + ", " + details.getClass().getName());
+//                            sendEmailIfConfigured(details);
+                        }
+                        LOGGER.info ("removing label from "+message.getId());
+                        dryadGmailService.modifyMessage(message.getId(), new ArrayList<String>(), labels);
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.info(e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
+        }
     }
 }
