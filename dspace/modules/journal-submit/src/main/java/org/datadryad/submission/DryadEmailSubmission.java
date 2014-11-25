@@ -25,8 +25,8 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -55,14 +55,13 @@ import java.util.regex.Pattern;
 
 /**
  * Email processing servlet.
- * 
+ *
  * @author Kevin S. Clarke <ksclarke@gmail.com>
  */
 @SuppressWarnings("serial")
 public class DryadEmailSubmission extends HttpServlet {
 
-    private static Logger LOGGER = LoggerFactory
-    .getLogger(DryadEmailSubmission.class);
+    private static final Logger LOGGER = Logger.getLogger(DryadEmailSubmission.class);
 
     private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
@@ -70,15 +69,15 @@ public class DryadEmailSubmission extends HttpServlet {
 
     // Maps not concurrent but we only access, don't write to except at init()
     // map of Journal Codes to Journals
-    private static Map<String, PartnerJournal> myJournals; 
-    
+    private static Map<String, PartnerJournal> myJournals;
+
     // map of Journal Names to Journal Codes (in case code is not preent in submission)
     private static Map<String, String> myJournalNames;
 
     /**
      * Handles the HTTP <code>GET</code> method by informing the caller that
      * <code>GET</code> is not supported, only <code>POST</code>.
-     * 
+     *
      * @param aRequest A servlet request
      * @param aResponse A servlet response
      * @throws ServletException If a servlet-specific error occurs
@@ -93,7 +92,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
     /**
      * Handles the HTTP <code>POST</code> method.
-     * 
+     *
      * @param aRequest A servlet request
      * @param aResponse A servlet response
      * @throws ServletException If a servlet-specific error occurs
@@ -106,9 +105,7 @@ public class DryadEmailSubmission extends HttpServlet {
         InputStream postBody = aRequest.getInputStream();
         Session session = Session.getInstance(new Properties());
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
-        }
+        LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
 
         try {
             MimeMessage mime = new MimeMessage(session, postBody);
@@ -116,14 +113,12 @@ public class DryadEmailSubmission extends HttpServlet {
             String encoding = mime.getEncoding();
             String contentID = mime.getContentID();
 
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("MIME contentType/ID/encoding: " + contentType
+            LOGGER.info("MIME contentType/ID/encoding: " + contentType
                         + " " + contentID + " " + encoding);
-            }
 
             Part part = getTextPart(mime);
             if (part == null){
-                throw new SubmissionException("Unexpected email type: " 
+                throw new SubmissionException("Unexpected email type: "
                         + mime.getContent().getClass().getName() + " reported content-type was " + contentType);
             }
 
@@ -187,9 +182,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 Document doc = saxBuilder.build(xmlReader);
                 String journalCode = result.getJournalCode();
 
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Getting metadata dir for " + journalCode);
-                }
+                LOGGER.debug("Getting metadata dir for " + journalCode);
 
                 PartnerJournal journal = myJournals.get(journalCode);
 
@@ -208,9 +201,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 toFile.output(doc, new BufferedWriter(writer));
             }
             catch (JDOMException details) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.debug(xml);
-                }
+                LOGGER.debug(xml);
 
                 throw new SubmissionRuntimeException(details);
             }
@@ -245,7 +236,7 @@ public class DryadEmailSubmission extends HttpServlet {
         if (contentType != null && contentType.startsWith("text/plain")){
             return part;   //
         }
-        else if (contentType != null && 
+        else if (contentType != null &&
                 contentType.startsWith("multipart/alternative") ||
                 contentType.startsWith("multipart/mixed")){    //could just use multipart as prefix, but what does this cover?
             Multipart mp = (Multipart)part.getContent();
@@ -276,10 +267,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException(details);
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Using {} properties from {}", new Object[] {
-                        props.size(), propFileName });
-            }
         }
         // Otherwise, we're running in the standard DSpace Tomcat
         else {
@@ -289,7 +276,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 String config = getServletContext().getInitParameter("dspace.config");
 
                 // Load in DSpace config
-                ConfigurationManager.loadConfig(config);                
+                ConfigurationManager.loadConfig(config);
             }
 
             String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
@@ -307,9 +294,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException(details);
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Using properties from {}",propFile);
-            }
         }
 
         // Next, turn those properties into something we can use
@@ -351,9 +335,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Checking that all journals are correctly registered");
-        }
+        LOGGER.debug("Checking that all journals are correctly registered");
 
         // Returns validated map or throws an exception if there are problems
         myJournals = validate(journals);
@@ -364,7 +346,7 @@ public class DryadEmailSubmission extends HttpServlet {
     /**
      * If we're running within DSpace (and not the Maven/Jetty test instance),
      * we can send email through there using their template system.
-     * 
+     *
      * @param aException An exception that was thrown in the process of
      *        receiving a journal submission
      * @throws SubmissionException
@@ -418,10 +400,6 @@ public class DryadEmailSubmission extends HttpServlet {
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine();
 
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("line=" + line);
-            }
-
             if (StringUtils.stripToEmpty(line).equals("")) {
                 continue;
             }
@@ -436,7 +414,7 @@ public class DryadEmailSubmission extends HttpServlet {
                         journalCode = journalCode.substring(1);
                     }
                 }
-                
+
                 Pattern journalNamePattern = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
                 Matcher journalNameMatcher = journalNamePattern.matcher(line);
 
@@ -468,7 +446,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Code");
             }
         }
-        
+
         if (journalCode != null) {
             PartnerJournal journal = myJournals.get(journalCode);
             if (journal != null){
@@ -504,11 +482,9 @@ public class DryadEmailSubmission extends HttpServlet {
                 results.put(journalCode, journal);
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Registered journal: " + journal.toString());
-            }
+            LOGGER.debug("Registered journal: " + journal.toString());
         }
-        
+
         return results;
     }
 
@@ -525,7 +501,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
     /**
      * Returns a short description of the servlet.
-     * 
+     *
      * @return a String containing servlet description
      */
     @Override
@@ -535,7 +511,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
     /**
      * Returns a PrintWriter with the correct character encoding set.
-     * 
+     *
      * @param aResponse In which to set the character encoding
      * @return A <code>PrintWriter</code> to send text through
      * @throws IOException If there is trouble getting a writer
