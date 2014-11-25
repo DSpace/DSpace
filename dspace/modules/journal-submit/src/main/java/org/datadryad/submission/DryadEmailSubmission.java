@@ -95,7 +95,6 @@ public class DryadEmailSubmission extends HttpServlet {
                           HttpServletResponse aResponse) throws ServletException, IOException {
 
         LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
-        }
 
         try {
             MimeMessage mime = new MimeMessage(session, postBody);
