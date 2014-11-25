@@ -45,6 +45,11 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.*;
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
+import com.google.api.client.googleapis.auth.oauth2.*;
+
 /**
  * Email processing servlet.
  *
@@ -66,7 +71,10 @@ public class DryadEmailSubmission extends HttpServlet {
     // map of Journal Names to Journal Codes (in case code is not preent in submission)
     private static Map<String, String> myJournalNames;
 
+    private static DryadGmailService dryadGmailService;
+
     /**
+     * UPDATE: GET only works for authorization and testing Gmail API.
      * Handles the HTTP <code>GET</code> method by informing the caller that
      * <code>GET</code> is not supported, only <code>POST</code>.
      *
@@ -78,9 +86,45 @@ public class DryadEmailSubmission extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest aRequest,
                          HttpServletResponse aResponse) throws ServletException, IOException {
+        String requestURI = aRequest.getRequestURI();
+        if (requestURI.contains("authorize")) {
+            String queryString = aRequest.getQueryString();
+            if (aRequest.getQueryString() == null) {
+                // If we've never gotten a credential from here before, do this.
+                String urlString = dryadGmailService.getAuthorizationURLString();
+                LOGGER.info("userID "+dryadGmailService.getMyUserID());
+                aResponse.sendRedirect(urlString);
+            }
+            else if (queryString.contains("code=")) {
+                String code = queryString.substring(queryString.indexOf("=")+1);
+                LOGGER.info("authorizing with code "+ code);
+                // Generate Credential using retrieved code.
+                dryadGmailService.authorize(code);
+            }
+            return;
+        } else if (requestURI.contains("test")) {
+            try {
+                dryadGmailService = new DryadGmailService();
+                ArrayList<String> labels = new ArrayList<String>();
+                labels.add("test_gmail_api");
+                List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
+                // Print ID of each Thread.
+                if (messages != null) {
+                    ArrayList<String> processedMessageIDs = new ArrayList<String>();
+                    LOGGER.info("got " + messages.size() + " test messages");
+                    for (Message message : messages) {
+                        LOGGER.info("Message: " + message.getId() + ", " + message.getSnippet());
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.info(e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
+        } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     "GET is not supported, you must POST to this service");
         }
+    }
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -186,6 +230,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException(details);
             }
 
+            dryadGmailService = new DryadGmailService();
         }
 
         // Next, turn those properties into something we can use
