@@ -75,8 +75,9 @@ public class ApproveRejectReviewItem {
 
     public static void reviewItemDOI(Boolean approved, String dataPackageDOI) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
+        Context c = null;
         try {
-            Context c = new Context();
+            c = new Context();
             c.turnOffAuthorisationSystem();
             IdentifierService identifierService = getIdentifierService();
             DSpaceObject object = identifierService.resolve(c, dataPackageDOI);
@@ -104,13 +105,24 @@ public class ApproveRejectReviewItem {
             throw new ApproveRejectReviewItemException(ex);
         } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
+        } finally {
+            if(c != null) {
+                try {
+                    c.complete();
+                } catch (SQLException ex) {
+                    // Swallow it
+                } finally {
+                    c = null;
+                }
+            }
         }
     }
 
     public static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
+        Context c = null;
         try {
-            Context c = new Context();
+            c = new Context();
             c.turnOffAuthorisationSystem();
             List<DSpaceObject> manuscriptItems =
                     getSearchService().search(c, "dc.identifier.manuscriptNumber: " + manuscriptNumber, 0, 2, false);
@@ -132,12 +144,23 @@ public class ApproveRejectReviewItem {
             throw new ApproveRejectReviewItemException(ex);
         } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
+        } finally {
+            if(c != null) {
+                try {
+                    c.complete();
+                } catch (SQLException ex) {
+                    // Swallow it
+                } finally {
+                    c = null;
+                }
+            }
         }
     }
 
     public static void reviewItem(Boolean approved, Integer workflowItemId) throws ApproveRejectReviewItemException {
+        Context c = null;
         try {
-            Context c = new Context();
+            c = new Context();
             c.turnOffAuthorisationSystem();
             WorkflowItem wfi = WorkflowItem.find(c, workflowItemId);
             reviewItem(c, approved, wfi);
@@ -153,6 +176,16 @@ public class ApproveRejectReviewItem {
             throw new ApproveRejectReviewItemException(ex);
         } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
+        } finally {
+            if(c != null) {
+                try {
+                    c.complete();
+                } catch (SQLException ex) {
+                    // Swallow it
+                } finally {
+                    c = null;
+                }
+            }
         }
     }
 
@@ -178,8 +211,6 @@ public class ApproveRejectReviewItem {
             WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
 
         }
-        c.commit();
-        c.complete();
     }
 
     private static IdentifierService getIdentifierService() {
