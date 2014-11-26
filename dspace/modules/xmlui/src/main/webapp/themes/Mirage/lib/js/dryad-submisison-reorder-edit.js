@@ -60,7 +60,7 @@ jQuery(document).ready(function(){
                 // request parameters by the DescribePublicationStep.java code; added here manually
                 form_data.push({ name: input_name, value: $input.val() });
                 prevent_default = true;
-                $form.find('input').prop('disabled',true);
+                $form.find('input').attr('disabled','disabled');
                 try {
                     jQuery.ajax({
                           url     : $form.attr('action')
@@ -103,16 +103,25 @@ jQuery(document).ready(function(){
         $row.remove();
         var rows = $table.find('tr.ds-edit-reorder-input-row').remove();
         rows.splice(to-1, 0, $row[0]);
+        var max = rows.length;
         // update the row's inputs and select/option data
         jQuery.each(rows, function(i,elt) {
             var $tr = jQuery(elt)
               , ind = (i+1).toString()
-              , $input;
+              , $input, name;
             $tr.find('select').val(ind);
+            $tr.find('option').each(function(j,option){
+                $input = jQuery(option);
+                if (parseInt($input.text()) > max){
+                    $input.remove();
+                }
+            });
             $tr.find('input').each(function(j,input) {
                 $input = jQuery(input);
-                if ($input.attr('name').substr(0,3) === 'dc_') {
-                    $input.attr('name').replace(new RegExp('_[0-9]+$'), '_'.concat(ind));
+                name = $input.attr('name');
+                if (name.match(new RegExp('^dc_|^dwc_'))) {
+                    name = $input.attr('name').replace(new RegExp('_[0-9]+$'), '_'.concat(ind));
+                    $input.attr('name', name);
                 }
             });
         });
@@ -135,12 +144,13 @@ jQuery(document).ready(function(){
         var $row    = jQuery(event.target).closest('tr')
           , $table  = $row.closest('table')
           , $update = $table.next('.ds-update-button')
-          , $hidden = $row.find('td.ds-reorder-edit-input-col input[type="hidden"]')
+          , $hidden = $row.find('td.ds-reorder-edit-input-col input[type="hidden"]').not('.ds-authority-confidence-input')
           , $shown  = $row.find('span.ds-interpreted-field');
+        // todo: handle this more cleanly; don't unhide the 'interpreted'
+        // input for composite controls (e.g., an author name)
+        if ($hidden.length === 4) $hidden.splice(2,1);
         // disable edit button
         jQuery(event.target).attr('disabled','disabled');
-        // enable the order input and add event handler
-        $row.find('select.ds-edit-reorder-order-select').removeAttr('disabled');
         // show lastname/firstname input fields
         $hidden.attr('type','text');
         // enable Update button on a change event
@@ -152,12 +162,14 @@ jQuery(document).ready(function(){
         event.preventDefault();
     };
     // event handler for the author's Delete button click event
-    // this reorders on the page but suppresses a form resubmit
     var handleDelete = function(event) {
         var $row = jQuery(event.target).closest('tr')
           , $next = $row.next()
           , $table  = $row.closest('table')
+          , max = $table.find('tr').length - 1  // number of rows after delete
           , $select;
+        // set this value for the form submission handler
+        clicked_btn_name = jQuery(event.target).closest('.ds-form-content').find('.ds-delete-button').attr('name');
         $row.remove();
         // reorder the $next row
         if ($next.length > 0) {
@@ -165,7 +177,24 @@ jQuery(document).ready(function(){
             var ind = parseInt($select.find('option[selected]').text());
             reorderOptions($select, $next, $table, ind-1);
         }
+        $table.find('select.ds-edit-reorder-order-select option').each(function(j,option){
+            var $option = jQuery(option);
+            if (parseInt($option.text()) > max) {
+                $option.remove();
+            }
+        });
+
+        var e = jQuery.Event('click');
+        e.target = jQuery(form_selector);
+        submit_describe_publication_onsubmit(e);
+        submit_describe_publication_binders();
         event.preventDefault();
+    };
+    var disableEditAuthority = function() {
+        jQuery(form_selector + ' input.ds-authority-confidence-input').each(function(i,elt){
+            debugger;
+            console.log(elt);
+        });
     };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified
     var submit_describe_publication_binders = function() {

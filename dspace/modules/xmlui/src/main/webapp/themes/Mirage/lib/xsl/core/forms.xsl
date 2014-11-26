@@ -327,7 +327,7 @@
                         </xsl:for-each>
                     </select>
                 </td>
-                <!-- AUTHOR -->
+                <!-- FIELD -->
                 <td class="ds-reorder-edit-input-col">
                     <!-- First check to see if the composite itself has a non-empty instance value in that
                     position. In that case there is no need to go into the individual fields. -->
@@ -341,6 +341,7 @@
                     <xsl:choose>
                         <xsl:when test="@type='composite'">
                             <xsl:apply-templates select="dri:field/dri:instance[$position]" mode="hiddenInterpreter"/>
+                            <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
@@ -354,7 +355,7 @@
                             <xsl:if test="dri:params/@authorityControlled = 'yes'">
                                 <xsl:choose>
                                     <xsl:when test="@type='composite'">
-                                        <xsl:if test="dri:field/dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
+                                        <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
                                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                                         </xsl:if>
                                     </xsl:when>
