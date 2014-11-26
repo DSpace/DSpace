@@ -109,9 +109,10 @@ public class ApproveRejectReviewItem {
             if(c != null) {
                 try {
                     c.complete();
-                    c = null;
                 } catch (SQLException ex) {
                     // Swallow it
+                } finally {
+                    c = null;
                 }
             }
         }
@@ -147,9 +148,10 @@ public class ApproveRejectReviewItem {
             if(c != null) {
                 try {
                     c.complete();
-                    c = null;
                 } catch (SQLException ex) {
                     // Swallow it
+                } finally {
+                    c = null;
                 }
             }
         }
@@ -178,9 +180,10 @@ public class ApproveRejectReviewItem {
             if(c != null) {
                 try {
                     c.complete();
-                    c = null;
                 } catch (SQLException ex) {
                     // Swallow it
+                } finally {
+                    c = null;
                 }
             }
         }
