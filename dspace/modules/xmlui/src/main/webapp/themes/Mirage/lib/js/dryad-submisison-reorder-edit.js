@@ -6,8 +6,10 @@
 //  The redirect buttons ("Save & Exit" and "Continue to Describe Data")
 //  still trigger a full page reload.
 jQuery(document).ready(function(){
-    var pub_form = '#aspect_submission_StepTransformer_div_submit-describe-publication';
-    var dat_form = '#aspect_submission_StepTransformer_list_submit-describe-dataset';
+    var form_ids = [
+        'aspect_submission_StepTransformer_div_submit-describe-publication'
+      , 'aspect_submission_StepTransformer_div_submit-describe-dataset'
+    ];
     // update the part of the form associated with the input button that was clicked
     // selector: string, jQuery selector to identify the li.ds-form-item element
     //      to be replaced by the update
@@ -55,6 +57,9 @@ jQuery(document).ready(function(){
             // continue with full page reload for these two button click events
             if (input_name === 'submit_cancel' || input_name === 'submit_next') {
                 return;
+            // don't submit if the dataset-file input
+            } else if (input_name === 'dataset-file' || input_name === 'dc_readme') {
+                prevent_default = true;
             // do page-fragment reload for other form submission clicks
             } else if (form_data.length > 0) {
                 // jQuery does not add the submission button, which is expected in the
@@ -171,7 +176,7 @@ jQuery(document).ready(function(){
           , $event = jQuery(event)
           , $select;
         // set this value for the form submission handler
-        clicked_btn_name = jQuery(event.target).closest('.ds-form-content').find('.ds-delete-button').attr('name');
+        jQuery(event.target).closest('.ds-form-content').find('input.ds-delete-button').attr('name');
         $row.remove();
         // reorder the $next row
         if ($next.length > 0) {
@@ -185,19 +190,15 @@ jQuery(document).ready(function(){
                 $option.remove();
             }
         });
-
-        var e = jQuery.Event('click');
-        e.target = jQuery($event.closest('form'));
-        submit_describe_publication_onsubmit(e);
-        submit_describe_publication_binders();
         event.preventDefault();
     };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified
     var submit_describe_publication_binders = function() {
-        jQuery(pub_form + ' input.ds-button-field').bind('click', watch_clicked);
-        jQuery(pub_form).bind('submit', submit_describe_publication_onsubmit);
-        jQuery(dat_form + ' input.ds-button-field').bind('click', watch_clicked);
-        jQuery(dat_form).bind('submit', submit_describe_publication_onsubmit);
+        for (var i = 0; i < form_ids.length; i++) {
+            jQuery('#' + form_ids[i] + ' input.ds-button-field').bind('click', watch_clicked);
+            jQuery('#' + form_ids[i] + ' input.ds-file-field'  ).bind('click', watch_clicked);  
+            jQuery('#' + form_ids[i]).bind('submit', submit_describe_publication_onsubmit);
+        }
         jQuery('input.ds-edit-button').bind('click',handleEdit);
         jQuery('input.ds-delete-button').bind('click',handleDelete);
         // bind the onchange event to this function, and also store the current value of

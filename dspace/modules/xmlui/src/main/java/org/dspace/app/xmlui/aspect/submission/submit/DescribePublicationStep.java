@@ -50,6 +50,7 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
 //            pageMeta.addMetadata("stylesheet", "screen", null, true).addContent("../../themes/AtmireModules/lib/css/datatables-overrides.css");
         pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("lib/css/person-lookup.css");
         pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("lib/js/person-lookup.js");
+        pageMeta.addMetadata("javascript", null, "dryad-submisison-reorder-edit", true).addContent("/lib/js/dryad-submisison-reorder-edit.js");
     }
 
     @Override

@@ -951,19 +951,6 @@ references to stylesheets pulled directly from the pageMeta element. -->
             &#160;
         </script>
 
-        <!-- Include all on-document-ready JS, incl. some for specific pages -->
-        <script type="text/javascript">
-            <xsl:attribute name="src">
-                <xsl:value-of
-                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                <xsl:text>/themes/</xsl:text>
-                <xsl:value-of
-                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/dryad-submisison-reorder-edit.js</xsl:text>
-            </xsl:attribute>
-            &#160;
-        </script>
-
         <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
