@@ -431,7 +431,7 @@
     </xsl:template>
 
 
-    <!-- Help elementns are turning into tooltips. There might be a better way tot do this -->
+    <!-- Help elements are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">
@@ -493,7 +493,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>
@@ -512,7 +512,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>
@@ -523,7 +523,7 @@
                     <xsl:call-template name="standardAttributes">
                         <xsl:with-param name="class">
                             <xsl:text>ds-form-item row </xsl:text>
-                            <xsl:if test="contains('aspect.submission.StepTransformer',@id)">
+                            <xsl:if test="contains(@id, 'aspect.submission.StepTransformer')">
                                 <xsl:text>table </xsl:text>
                             </xsl:if>
                         </xsl:with-param>

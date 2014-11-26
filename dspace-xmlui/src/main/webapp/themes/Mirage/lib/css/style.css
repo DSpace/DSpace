@@ -1457,3 +1457,12 @@ table.discovery-filters th.new-filter-header
     border: 1px solid #cccccc;
     margin-right: 3px;
 }
+
+#impact-altmetric {
+    float:right;
+    margin:0 30px 0 30px;
+}
+
+#impact-plumx {
+    float:right;
+}

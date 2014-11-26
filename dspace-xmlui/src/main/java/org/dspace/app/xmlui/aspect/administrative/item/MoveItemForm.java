@@ -67,7 +67,7 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         Division main = body.addInteractiveDivision("move-item", contextPath+"/admin/item", Division.METHOD_POST, "primary administrative item");
         main.setHead(T_head1.parameterize(item.getHandle()));
 
-        Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+        Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
 
         List list = main.addList("select-collection", List.TYPE_FORM);
         Select select = list.addItem().addSelect("collectionID");

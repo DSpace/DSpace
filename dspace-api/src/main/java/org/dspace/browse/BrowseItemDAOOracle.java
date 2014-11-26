@@ -12,7 +12,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.core.Context;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
 import java.sql.SQLException;
@@ -95,10 +95,10 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
         return items.toArray(bis);
     }
 
-    public DCValue[] queryMetadata(int itemId, String schema, String element, String qualifier, String lang)
+    public Metadatum[] queryMetadata(int itemId, String schema, String element, String qualifier, String lang)
     	throws SQLException
     {
-        List<DCValue> values = new ArrayList<DCValue>();
+        List<Metadatum> values = new ArrayList<Metadatum>();
         TableRowIterator tri = null;
 
         try
@@ -121,13 +121,13 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
 
             if (!tri.hasNext())
             {
-                return new DCValue[0];
+                return new Metadatum[0];
             }
 
             while (tri.hasNext())
             {
                 TableRow tr = tri.next();
-                DCValue dcv = new DCValue();
+                Metadatum dcv = new Metadatum();
                 dcv.schema = schema;
                 dcv.element = tr.getStringColumn("element");
                 dcv.qualifier = tr.getStringColumn("qualifier");
@@ -146,7 +146,7 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
             }
         }
 
-        DCValue[] dcvs = new DCValue[values.size()];
+        Metadatum[] dcvs = new Metadatum[values.size()];
         return values.toArray(dcvs);
     }
 }

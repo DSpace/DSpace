@@ -41,7 +41,7 @@ public class BrowseItem extends DSpaceObject
     private static Logger log = Logger.getLogger(BrowseItem.class);
     
 	/** a List of all the metadata */
-	private List<DCValue> metadata = new ArrayList<DCValue>();
+	private List<Metadatum> metadata = new ArrayList<Metadatum>();
 	
 	/** database id of the item */
 	private int id = -1;
@@ -84,7 +84,7 @@ public class BrowseItem extends DSpaceObject
 	 * @return			array of matching values
 	 * @throws SQLException
 	 */
-	public DCValue[] getMetadata(String schema, String element, String qualifier, String lang) {
+	public Metadatum[] getMetadata(String schema, String element, String qualifier, String lang) {
         try
         {
             BrowseItemDAO dao = BrowseDAOFactory.getItemInstance(ourContext);
@@ -102,12 +102,12 @@ public class BrowseItem extends DSpaceObject
 
             if (!metadata.isEmpty())
             {
-                List<DCValue> values = new ArrayList<DCValue>();
-                Iterator<DCValue> i = metadata.iterator();
+                List<Metadatum> values = new ArrayList<Metadatum>();
+                Iterator<Metadatum> i = metadata.iterator();
 
                 while (i.hasNext())
                 {
-                    DCValue dcv = i.next();
+                    Metadatum dcv = i.next();
 
                     if (match(schema, element, qualifier, lang, dcv))
                     {
@@ -117,7 +117,7 @@ public class BrowseItem extends DSpaceObject
 
                 if (values.isEmpty())
                 {
-                    DCValue[] dcvs = new DCValue[0];
+                    Metadatum[] dcvs = new Metadatum[0];
                     try {
                         dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
                     } catch (SQLException e) {
@@ -131,14 +131,14 @@ public class BrowseItem extends DSpaceObject
                 }
 
                 // else, Create an array of matching values
-                DCValue[] valueArray = new DCValue[values.size()];
-                valueArray = (DCValue[]) values.toArray(valueArray);
+                Metadatum[] valueArray = new Metadatum[values.size()];
+                valueArray = (Metadatum[]) values.toArray(valueArray);
 
                 return valueArray;
             }
             else
             {
-                DCValue[] dcvs = new DCValue[0];
+                Metadatum[] dcvs = new Metadatum[0];
                 try {
                     dcvs = dao.queryMetadata(id, schema, element, qualifier, lang);
                 } catch (SQLException e) {
@@ -209,7 +209,7 @@ public class BrowseItem extends DSpaceObject
      * Utility method for pattern-matching metadata elements.  This
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
-     * qualifier and language of the <code>DCValue</code> object passed
+     * qualifier and language of the <code>Metadatum</code> object passed
      * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
@@ -227,7 +227,7 @@ public class BrowseItem extends DSpaceObject
      * @return <code>true</code> if there is a match
      */
     private boolean match(String schema, String element, String qualifier,
-            String language, DCValue dcv)
+            String language, Metadatum dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
         if (!element.equals(Item.ANY) && !element.equals(dcv.element))

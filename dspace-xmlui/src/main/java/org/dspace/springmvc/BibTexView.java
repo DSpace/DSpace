@@ -8,7 +8,7 @@
 package org.dspace.springmvc;
 
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -131,7 +131,7 @@ public class BibTexView implements View {
 
     private String getMetadataValue(Item item, String metadatafield)
     {
-        for (DCValue value : item.getMetadataByMetadataString(metadatafield))
+        for (Metadatum value : item.getMetadataByMetadataString(metadatafield))
         {
             return value.value;
         }
@@ -152,7 +152,7 @@ public class BibTexView implements View {
 
     private String getYear(Item aItem)
     {
-        for (DCValue date : aItem.getMetadataByMetadataString("dc.date.issued"))
+        for (Metadatum date : aItem.getMetadataByMetadataString("dc.date.issued"))
         {
             return date.value.substring(0, 4);
         }
@@ -160,12 +160,12 @@ public class BibTexView implements View {
         return null;
     }
 
-    private List<String> getAuthors(DCValue[] aMetadata)
+    private List<String> getAuthors(Metadatum[] aMetadata)
     {
         ArrayList<String> authors = new ArrayList<String>();
         StringTokenizer tokenizer;
 
-        for (DCValue metadata : aMetadata)
+        for (Metadatum metadata : aMetadata)
         {
             StringBuilder builder = new StringBuilder();
 

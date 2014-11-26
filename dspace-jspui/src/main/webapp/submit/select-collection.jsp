@@ -72,17 +72,7 @@
 					<label for="tcollection" class="input-group-addon">
 						<fmt:message key="jsp.submit.select-collection.collection"/>
 					</label>
-                    <select class="form-control" name="collection" id="tcollection">
-                    	<option value="-1"></option>
-<%
-        for (int i = 0; i < collections.length; i++)
-        {
-%>
-                            <option value="<%= collections[i].getID() %>"><%= collections[i].getMetadata("name") %></option>
-<%
-        }
-%>
-                        </select>
+          <dspace:selectcollection klass="form-control" id="tcollection" collection="-1" name="collection"/>
 					</div><br/>
             <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
             <%= SubmissionController.getSubmissionParameters(context, request) %>

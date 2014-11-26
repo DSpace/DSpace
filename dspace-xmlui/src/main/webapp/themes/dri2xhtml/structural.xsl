@@ -1740,6 +1740,10 @@
                 <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
             </xsl:if>
 
+            <xsl:if test="@onclick">
+                <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>
@@ -2568,7 +2572,7 @@
     
     
     
-    <!-- Help elementns are turning into tooltips. There might be a better way to do this -->
+    <!-- Help elements are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">

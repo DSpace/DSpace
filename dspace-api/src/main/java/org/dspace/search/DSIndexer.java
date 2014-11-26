@@ -55,7 +55,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -94,10 +94,10 @@ import org.dspace.app.util.Util;
  * @author Graham Triggs
  * 
  * @deprecated Since DSpace 4 the system use an abstraction layer named
- *             Discovery to provide access to different search provider. The
- *             legacy system build upon Apache Lucene is likely to be removed in
- *             a future version. If you are interested in use Lucene as backend
- *             for the DSpace search system please consider to build a Lucene
+ *             Discovery to provide access to different search providers. The
+ *             legacy system built upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in using Lucene as backend
+ *             for the DSpace search system, please consider to build a Lucene
  *             implementation of the Discovery interfaces
  */
 @Deprecated
@@ -1080,7 +1080,7 @@ public class DSIndexer
         int j;
         if (indexConfigArr.length > 0)
         {
-            DCValue[] mydc;
+            Metadatum[] mydc;
 
             for (int i = 0; i < indexConfigArr.length; i++)
             {
@@ -1246,7 +1246,7 @@ public class DSIndexer
             for (SortOption so : SortOption.getSortOptions())
             {
                 String[] somd = so.getMdBits();
-                DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
+                Metadatum[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
                 if (dcv.length > 0)
                 {
                     String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());

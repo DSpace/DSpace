@@ -75,6 +75,8 @@ public class AuthorityConsumer implements Consumer {
             for (Integer id : itemsToReindex) {
                 Item item = Item.find(ctx, id);
                 AuthorityIndexClient.indexItem(ctx, item);
+                //Commit our DB connection in case new UUID were generated.
+                ctx.getDBConnection().commit();
 
             }
         } catch (Exception e){

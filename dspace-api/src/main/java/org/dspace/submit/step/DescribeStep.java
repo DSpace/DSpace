@@ -29,7 +29,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -324,7 +324,7 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                     qualifier = Item.ANY;
                 }
-                DCValue[] values = item.getMetadata(inputs[i].getSchema(),
+                Metadatum[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), qualifier, Item.ANY);
 
                 if ((inputs[i].isRequired() && values.length == 0) &&

@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -185,7 +185,7 @@ public class AIPTechMDCrosswalk
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
     {
-        List<DCValue> dc = new ArrayList<DCValue>();
+        List<Metadatum> dc = new ArrayList<Metadatum>();
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item)dso;
@@ -295,13 +295,13 @@ public class AIPTechMDCrosswalk
             dc.add(makeDC("identifier", "uri", site.getURL()));
         }
 
-        DCValue result[] = (DCValue[])dc.toArray(new DCValue[dc.size()]);
+        Metadatum result[] = (Metadatum[])dc.toArray(new Metadatum[dc.size()]);
         return XSLTDisseminationCrosswalk.createDIM(dso, result);
     }
 
-    private static DCValue makeDC(String element, String qualifier, String value)
+    private static Metadatum makeDC(String element, String qualifier, String value)
     {
-        DCValue dcv = new DCValue();
+        Metadatum dcv = new Metadatum();
         dcv.schema = "dc";
         dcv.language = null;
         dcv.element = element;

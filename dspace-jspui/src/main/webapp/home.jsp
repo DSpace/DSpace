@@ -34,7 +34,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.NewsManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 
 <%
@@ -109,7 +109,7 @@ if (submissions != null && submissions.count() > 0)
 		    boolean first = true;
 		    for (Item item : submissions.getRecentSubmissions())
 		    {
-		        DCValue[] dcv = item.getMetadata("dc", "title", null, Item.ANY);
+		        Metadatum[] dcv = item.getMetadata("dc", "title", null, Item.ANY);
 		        String displayTitle = "Untitled";
 		        if (dcv != null & dcv.length > 0)
 		        {
@@ -207,5 +207,11 @@ if (communities != null && communities.length != 0)
     	int discovery_facet_cols = 4;
     %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+</div>
+
+<div class="row">
+	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
+</div>
+	
 </div>
 </dspace:layout>

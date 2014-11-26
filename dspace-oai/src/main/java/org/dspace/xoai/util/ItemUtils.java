@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
@@ -69,8 +69,8 @@ public class ItemUtils
         
         // read all metadata into Metadata Object
         metadata = new Metadata();
-        DCValue[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue val : vals)
+        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum val : vals)
         {
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), val.schema);
@@ -200,6 +200,7 @@ public class ItemUtils
                     String cka = bit.getChecksumAlgorithm();
                     String oname = bit.getSource();
                     String name = bit.getName();
+                    String description = bit.getDescription();
 
                     if (name != null)
                         bitstream.getField().add(
@@ -207,6 +208,9 @@ public class ItemUtils
                     if (oname != null)
                         bitstream.getField().add(
                                 createValue("originalName", name));
+                    if (description != null)
+                        bitstream.getField().add(
+                                createValue("description", description));
                     bitstream.getField().add(
                             createValue("format", bit.getFormat()
                                     .getMIMEType()));

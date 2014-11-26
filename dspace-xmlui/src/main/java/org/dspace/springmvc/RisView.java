@@ -9,7 +9,7 @@
 package org.dspace.springmvc;
 
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -166,7 +166,7 @@ public class RisView implements View {
     {
         ArrayList<String> keywordList = new ArrayList<String>();
 
-        for (DCValue keyword : aItem.getMetadataByMetadataString("dc.subject"))
+        for (Metadatum keyword : aItem.getMetadataByMetadataString("dc.subject"))
         {
             if (keyword.value.length() < 255)
             {
@@ -174,7 +174,7 @@ public class RisView implements View {
             }
         }
 
-        for (DCValue keyword : aItem.getMetadataByMetadataString("dwc.ScientificName"))
+        for (Metadatum keyword : aItem.getMetadataByMetadataString("dwc.ScientificName"))
         {
             if (keyword.value.length() < 255)
             {
@@ -189,7 +189,7 @@ public class RisView implements View {
     {
         StringTokenizer tokenizer;
 
-        for (DCValue date : item.getMetadataByMetadataString("dc.date.issued"))
+        for (Metadatum date : item.getMetadataByMetadataString("dc.date.issued"))
         {
             tokenizer = new StringTokenizer(date.value, "-/ T");
             String[] dateParts = new String[tokenizer.countTokens()];
@@ -207,19 +207,19 @@ public class RisView implements View {
 
     private String getMetadataValue(Item item, String metadatafield)
     {
-        for (DCValue value : item.getMetadataByMetadataString(metadatafield))
+        for (Metadatum value : item.getMetadataByMetadataString(metadatafield))
         {
             return value.value;
         }
         return null;
     }
 
-    private List<String> getAuthors(DCValue[] aMetadata)
+    private List<String> getAuthors(Metadatum[] aMetadata)
     {
         ArrayList<String> authors = new ArrayList<String>();
         StringTokenizer tokenizer;
 
-        for (DCValue metadata : aMetadata)
+        for (Metadatum metadata : aMetadata)
         {
             StringBuilder builder = new StringBuilder();
 

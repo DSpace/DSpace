@@ -8,8 +8,6 @@
 package org.dspace.app.xmlui.aspect.administrative.batchimport;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -18,19 +16,10 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.DCValue;
 import org.xml.sax.SAXException;
 
-import org.dspace.app.bulkedit.BulkEditChange;
 
 /**
  * Web interface to Batch Import app.
@@ -48,6 +37,7 @@ public class BatchImportUpload extends AbstractDSpaceTransformer {
     private static final Message T_title = message("xmlui.administrative.batchimport.general.title");
     private static final Message T_head1 = message("xmlui.administrative.batchimport.general.head1");
 
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -57,6 +47,7 @@ public class BatchImportUpload extends AbstractDSpaceTransformer {
     }
 
 
+    @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException
     {
         // Get list of changes

@@ -12,7 +12,7 @@ import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
@@ -107,7 +107,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         // 1. iterate over the metadata values
 
         String metadataField = metadataFields.get(currentFieldIndex);
-        DCValue[] values = currentItem.getMetadataByMetadataString(metadataField);
+        Metadatum[] values = currentItem.getMetadataByMetadataString(metadataField);
         if (currentMetadataIndex < values.length) {
             prepareNextValue(metadataField, values[currentMetadataIndex]);
 
@@ -156,12 +156,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
      * @param metadataField Is one of the fields defined in dspace.cfg to be indexed.
      * @param value         Is one of the values of the given metadataField in one of the items being indexed.
      */
-    private void prepareNextValue(String metadataField, DCValue value) {
+    private void prepareNextValue(String metadataField, Metadatum value) {
 
         nextValue = null;
 
         String content = value.value;
         String uid = value.authority;
+        //We only want to update our item IF our UUID is not present or if we need to generate one.
+        boolean requiresItemUpdate = StringUtils.isBlank(uid) || StringUtils.startsWith(uid, AuthorityValueGenerator.GENERATE);
 
         if (StringUtils.isNotBlank(uid) && !uid.startsWith(AuthorityValueGenerator.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly necessary here but it prevents exceptions in solr
@@ -170,16 +172,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         if (nextValue == null) {
             nextValue = AuthorityValueGenerator.generate(uid, content, metadataField.replaceAll("\\.", "_"));
         }
-        if (nextValue != null) {
+        if (nextValue != null && requiresItemUpdate) {
             nextValue.updateItem(currentItem, value);
+            try {
+                currentItem.update();
+            } catch (Exception e) {
+                log.error("Error creating a metadatavalue's authority", e);
+            }
         }
-
-        try {
-            currentItem.update();
-        } catch (Exception e) {
-            log.error("Error creating a metadatavalue's authority", e);
-        }
-
     }
 
     public void close() {

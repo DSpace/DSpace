@@ -21,7 +21,7 @@
     prefix="fmt" %>
 
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.SupervisedItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -74,7 +74,7 @@
     {
         // get title (or "untitled" if not set), author, and supervisors of 
         // the supervised item
-        DCValue[] titleArray = supervisedItems[i].getItem().getDC("title", null, Item.ANY);
+        Metadatum[] titleArray = supervisedItems[i].getItem().getDC("title", null, Item.ANY);
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = supervisedItems[i].getItem().getSubmitter();
         Group[] supervisors = supervisedItems[i].getSupervisorGroups();

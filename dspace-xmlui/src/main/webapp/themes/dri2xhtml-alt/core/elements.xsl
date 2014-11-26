@@ -646,6 +646,10 @@
                 <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
             </xsl:if>
 
+            <xsl:if test="@onclick">
+                <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>

@@ -38,7 +38,8 @@ public class AuthorityValueFinder {
      * Item.ANY does not work here.
      */
     public AuthorityValue findByUID(Context context, String authorityID) {
-        String queryString = "id:" + authorityID;
+        //Ensure that if we use the full identifier to match on
+        String queryString = "id:\"" + authorityID + "\"";
         List<AuthorityValue> findings = find(context, queryString);
         return findings.size() > 0 ? findings.get(0) : null;
     }

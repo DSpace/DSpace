@@ -99,7 +99,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			String xml = "<fragment>" + fragment + "</fragment>";
 
 			ByteArrayInputStream inputStream = new ByteArrayInputStream(xml
-					.getBytes());
+					.getBytes("UTF-8"));
 
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(inputStream);
