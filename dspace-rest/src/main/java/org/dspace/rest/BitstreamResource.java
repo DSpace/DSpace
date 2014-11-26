@@ -101,7 +101,7 @@ public class BitstreamResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
-                    request);
+                    request, context);
 
             bitstream = new Bitstream(dspaceBitstream, expand);
             context.complete();
@@ -241,7 +241,7 @@ public class BitstreamResource extends Resource
                       // reading under administrator permissions
                         bitstreams.add(new Bitstream(dspaceBitstreams[i], expand));
                         writeStats(dspaceBitstreams[i], UsageEvent.Action.VIEW, user_ip, user_agent,
-                                xforwarderfor, headers, request);
+                                xforwarderfor, headers, request, context);
                     }
                 }
             }
@@ -308,7 +308,7 @@ public class BitstreamResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
-                    request);
+                    request, context);
 
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = dspaceBitstream.retrieve();
@@ -463,7 +463,7 @@ public class BitstreamResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
-                    headers, request);
+                    headers, request, context);
 
             log.trace("Updating bitstream metadata.");
             dspaceBitstream.setDescription(bitstream.getDescription());
@@ -594,7 +594,7 @@ public class BitstreamResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
-                    headers, request);
+                    headers, request, context);
 
             log.trace("Creating new bitstream.");
             int newBitstreamId = BitstreamStorageManager.store(context, is);
@@ -678,7 +678,7 @@ public class BitstreamResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.DELETE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor,
-                    headers, request);
+                    headers, request, context);
 
             log.trace("Deleting bitstream from all bundles.");
             for (org.dspace.content.Bundle bundle : dspaceBitstream.getBundles())

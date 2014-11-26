@@ -65,7 +65,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -90,6 +90,7 @@ import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
@@ -141,7 +142,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-            if (urlValidator.isValid(solrService))
+            if (urlValidator.isValid(solrService)||ConfigurationManager.getBooleanProperty("discovery","solr.url.validation.enabled",true))
             {
                 try {
                     log.debug("Solr URL: " + solrService);
@@ -152,9 +153,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-                    solr.query(solrQuery);                
+                    solr.query(solrQuery);
+
+                    // As long as Solr initialized, check with DatabaseUtils to see
+                    // if a reindex is in order. If so, reindex everything
+                    DatabaseUtils.checkReindexDiscovery(this);
                 } catch (SolrServerException e) {
-                    log.error("Error while initialinging solr server", e);
+                    log.error("Error while initializing solr server", e);
                 }
             }
             else
@@ -966,8 +971,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-            DCValue[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue meta : mydc)
+            Metadatum[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (Metadatum meta : mydc)
             {
                 String field = meta.schema + "." + meta.element;
                 String unqualifiedField = field;
@@ -1320,7 +1325,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
 
-            DCValue[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
+            Metadatum[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
 
             if(values != null && values.length > 0 && values[0] != null && values[0].value != null)
             {

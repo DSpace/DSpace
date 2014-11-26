@@ -8,8 +8,8 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
@@ -90,7 +90,8 @@ public class Collection extends DSpaceObject {
             items = new ArrayList<Item>();
             while(childItems.hasNext()) {
                 org.dspace.content.Item item = childItems.next();
-                if(AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.READ)) {
+
+                if(ItemService.isItemListedForUser(context, item)) {
                     items.add(new Item(item, null, context));
                 }
             }

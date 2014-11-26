@@ -31,7 +31,7 @@
 <%@ page import="java.util.Map"                  %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.content.Collection"  %>
-<%@ page import="org.dspace.content.DCValue"    %>
+<%@ page import="org.dspace.content.Metadatum"    %>
 <%@ page import="org.dspace.content.Item"        %>
 
 <%
@@ -122,7 +122,7 @@
         Item item = (Item)items.get(i.next());
         // get the metadata or placeholders to display for date, contributor and title
         String date = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.without-date");
-        DCValue[] dates = item.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] dates = item.getMetadata("dc", "date", "issued", Item.ANY);
         if (dates.length >= 1)
         {
             date = dates[0].value;
@@ -132,7 +132,7 @@
          // do nothing the date is already set to "without date"
         }
         String contributor = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.without-contributor");
-        DCValue[] contributors = item.getMetadata("dc", "contributor", Item.ANY, Item.ANY);
+        Metadatum[] contributors = item.getMetadata("dc", "contributor", Item.ANY, Item.ANY);
         if (contributors.length >= 1)
         {
             contributor = contributors[0].value;
@@ -143,7 +143,7 @@
          // do nothing the contributor is already set to anonymous
         }
         String title = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.untitled");
-        DCValue[] titles = item.getMetadata("dc", "title", null, Item.ANY);
+        Metadatum[] titles = item.getMetadata("dc", "title", null, Item.ANY);
         if (titles.length >= 1)
         {
             title = titles[0].value;

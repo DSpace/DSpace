@@ -28,9 +28,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFUtil;
@@ -134,8 +134,8 @@ public class MetadataConverterPlugin implements ConverterPlugin
         }
         
         Item item = (Item) dso;
-        DCValue[] metadata_values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue value : metadata_values)
+        Metadatum[] metadata_values = item.getDC(Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum value : metadata_values)
         {
             String fieldname = value.schema + "." + value.element;
             if (value.qualifier != null) 

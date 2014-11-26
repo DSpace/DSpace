@@ -709,7 +709,7 @@
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
-	<message key="batch">Select a collection</message>
+	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection you wish to submit an item to.</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
@@ -1014,6 +1014,7 @@
 	<message key="xmlui.administrative.Navigation.administrative_registries">Registries</message>
 	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
 	<message key="xmlui.administrative.Navigation.administrative_format">Format</message>
+    <message key="xmlui.administrative.Navigation.administrative_content">Content Administration</message>
 	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
     <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
     <message key="xmlui.administrative.Navigation.administrative_private">Private Items</message>

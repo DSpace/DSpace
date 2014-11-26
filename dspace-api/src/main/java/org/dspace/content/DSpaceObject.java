@@ -94,7 +94,7 @@ public abstract class DSpaceObject
         // Work out the place numbers for the in memory DC
         for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
         {
-            DCValue dcv = getMetadata().get(dcIdx);
+            Metadatum dcv = getMetadata().get(dcIdx);
 
             // Work out the place number for ordering
             int current = 0;
@@ -143,7 +143,7 @@ public abstract class DSpaceObject
                         if (!storedDC[dcIdx])
                         {
                             boolean matched = true;
-                            DCValue dcv   = getMetadata().get(dcIdx);
+                            Metadatum dcv   = getMetadata().get(dcIdx);
 
                             // Check the metadata field is the same
                             if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
@@ -241,9 +241,9 @@ public abstract class DSpaceObject
             // Only write values that are not already in the db
             if (!storedDC[dcIdx])
             {
-                DCValue dcv = getMetadata().get(dcIdx);
+                Metadatum dcv = getMetadata().get(dcIdx);
 
-                // Write DCValue
+                // Write Metadatum
                 MetadataValue metadata = new MetadataValue();
                 metadata.setResourceId(getID());
                 metadata.setResourceTypeId(getType());
@@ -526,7 +526,7 @@ public abstract class DSpaceObject
      * @return Dublin Core fields that match the parameters
      */
     @Deprecated
-    public DCValue[] getDC(String element, String qualifier, String lang)
+    public Metadatum[] getDC(String element, String qualifier, String lang)
     {
         return getMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
     }
@@ -577,17 +577,17 @@ public abstract class DSpaceObject
      *            no country code are returned.
      * @return metadata fields that match the parameters
      */
-    public DCValue[] getMetadata(String schema, String element, String qualifier,
+    public Metadatum[] getMetadata(String schema, String element, String qualifier,
                                  String lang)
     {
         // Build up list of matching values
-        List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : getMetadata())
+        List<Metadatum> values = new ArrayList<Metadatum>();
+        for (Metadatum dcv : getMetadata())
         {
             if (match(schema, element, qualifier, lang, dcv))
             {
                 // We will return a copy of the object in case it is altered
-                DCValue copy = new DCValue();
+                Metadatum copy = new Metadatum();
                 copy.element = dcv.element;
                 copy.qualifier = dcv.qualifier;
                 copy.value = dcv.value;
@@ -600,8 +600,8 @@ public abstract class DSpaceObject
         }
 
         // Create an array of matching values
-        DCValue[] valueArray = new DCValue[values.size()];
-        valueArray = (DCValue[]) values.toArray(valueArray);
+        Metadatum[] valueArray = new Metadatum[values.size()];
+        valueArray = (Metadatum[]) values.toArray(valueArray);
 
         return valueArray;
     }
@@ -614,7 +614,7 @@ public abstract class DSpaceObject
      *            The metadata string of the form
      *            <schema prefix>.<element>[.<qualifier>|.*]
      */
-    public DCValue[] getMetadataByMetadataString(String mdString)
+    public Metadatum[] getMetadataByMetadataString(String mdString)
     {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
 
@@ -629,7 +629,7 @@ public abstract class DSpaceObject
         String element = tokens[1];
         String qualifier = tokens[2];
 
-        DCValue[] values;
+        Metadatum[] values;
         if ("*".equals(qualifier))
         {
             values = getMetadata(schema, element, Item.ANY, Item.ANY);
@@ -650,7 +650,7 @@ public abstract class DSpaceObject
      * Retrieve first metadata field value
      */
     protected String getMetadataFirstValue(String schema, String element, String qualifier, String language){
-        DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+        Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
         if(dcvalues.length>0){
             return dcvalues[0].value;
         }
@@ -669,7 +669,7 @@ public abstract class DSpaceObject
         }
     }
 
-    protected List<DCValue> getMetadata()
+    protected List<Metadatum> getMetadata()
     {
         try
         {
@@ -680,7 +680,7 @@ public abstract class DSpaceObject
             log.error("Loading item - cannot load metadata");
         }
 
-        return new ArrayList<DCValue>();
+        return new ArrayList<Metadatum>();
     }
 
     /**
@@ -695,26 +695,26 @@ public abstract class DSpaceObject
      *                if the requested metadata field doesn't exist
      */
     public String getMetadata(String value){
-        DCValue[] dcvalues = getMetadataByMetadataString(value);
+        Metadatum[] dcvalues = getMetadataByMetadataString(value);
 
         if(dcvalues.length>0) {
-            return dcvalues[0].toString();
+            return dcvalues[0].value;
         }
         return null;
     }
 
-    public List<DCValue> getMetadata(String mdString, String authority) {
+    public List<Metadatum> getMetadata(String mdString, String authority) {
         String[] elements = getElements(mdString);
         return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
     }
 
-    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
-        DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
-        List<DCValue> dcValues = Arrays.asList(metadata);
+    public List<Metadatum> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+        Metadatum[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<Metadatum> dcValues = Arrays.asList(metadata);
         if (!authority.equals(Item.ANY)) {
-            Iterator<DCValue> iterator = dcValues.iterator();
+            Iterator<Metadatum> iterator = dcValues.iterator();
             while (iterator.hasNext()) {
-                DCValue dcValue = iterator.next();
+                Metadatum dcValue = iterator.next();
                 if (!authority.equals(dcValue.authority)) {
                     iterator.remove();
                 }
@@ -759,7 +759,7 @@ public abstract class DSpaceObject
         return elements;
     }
 
-    public void replaceMetadataValue(DCValue oldValue, DCValue newValue)
+    public void replaceMetadataValue(Metadatum oldValue, Metadatum newValue)
     {
         // check both dcvalues are for the same field
         if (oldValue.hasSameFieldAs(newValue)) {
@@ -769,9 +769,9 @@ public abstract class DSpaceObject
             String qualifier = oldValue.qualifier;
 
             // Save all metadata for this field
-            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
             clearMetadata(schema, element, qualifier, Item.ANY);
-            for (DCValue dcvalue : dcvalues) {
+            for (Metadatum dcvalue : dcvalues) {
                 if (dcvalue.equals(oldValue)) {
                     addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
                 } else {
@@ -906,7 +906,7 @@ public abstract class DSpaceObject
     public void addMetadata(String schema, String element, String qualifier, String lang,
                             String[] values, String authorities[], int confidences[])
     {
-        List<DCValue> dublinCore = getMetadata();
+        List<Metadatum> dublinCore = getMetadata();
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
@@ -916,7 +916,7 @@ public abstract class DSpaceObject
         // until update() is called.
         for (int i = 0; i < values.length; i++)
         {
-            DCValue dcv = new DCValue();
+            Metadatum dcv = new Metadatum();
             dcv.schema = schema;
             dcv.element = element;
             dcv.qualifier = qualifier;
@@ -1097,8 +1097,8 @@ public abstract class DSpaceObject
                               String lang)
     {
         // We will build a list of values NOT matching the values to clear
-        List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : getMetadata())
+        List<Metadatum> values = new ArrayList<Metadatum>();
+        for (Metadatum dcv : getMetadata())
         {
             if (!match(schema, element, qualifier, lang, dcv))
             {
@@ -1115,7 +1115,7 @@ public abstract class DSpaceObject
      * Utility method for pattern-matching metadata elements.  This
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
-     * qualifier and language of the <code>DCValue</code> object passed
+     * qualifier and language of the <code>Metadatum</code> object passed
      * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
@@ -1133,7 +1133,7 @@ public abstract class DSpaceObject
      * @return <code>true</code> if there is a match
      */
     private boolean match(String schema, String element, String qualifier,
-                          String language, DCValue dcv)
+                          String language, Metadatum dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
         if (!element.equals(Item.ANY) && !element.equals(dcv.element))
@@ -1192,7 +1192,7 @@ public abstract class DSpaceObject
     }
 
     protected transient MetadataField[] allMetadataFields = null;
-    protected MetadataField getMetadataField(DCValue dcv) throws SQLException, AuthorizeException
+    protected MetadataField getMetadataField(Metadatum dcv) throws SQLException, AuthorizeException
     {
         if (allMetadataFields == null)
         {
@@ -1216,7 +1216,7 @@ public abstract class DSpaceObject
         return null;
     }
 
-    private int getMetadataSchemaID(DCValue dcv) throws SQLException
+    private int getMetadataSchemaID(Metadatum dcv) throws SQLException
     {
         int schemaID;
         MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
@@ -1245,7 +1245,7 @@ public abstract class DSpaceObject
                 getType());
     }
 
-    private void setMetadata(List<DCValue> metadata)
+    private void setMetadata(List<Metadatum> metadata)
     {
         metadataCache.set(metadata);
         modifiedMetadata = true;
@@ -1253,13 +1253,13 @@ public abstract class DSpaceObject
 
     class MetadataCache
     {
-        List<DCValue> metadata = null;
+        List<Metadatum> metadata = null;
 
-        List<DCValue> get(Context c, int resourceId, int resourceTypeId, Logger log) throws SQLException
+        List<Metadatum> get(Context c, int resourceId, int resourceTypeId, Logger log) throws SQLException
         {
             if (metadata == null)
             {
-                metadata = new ArrayList<DCValue>();
+                metadata = new ArrayList<Metadatum>();
 
                 // Get Dublin Core metadata
                 TableRowIterator tri = retrieveMetadata(resourceId, resourceTypeId);
@@ -1278,7 +1278,7 @@ public abstract class DSpaceObject
 
                             if (field == null)
                             {
-                                log.error("Loading item - cannot find metadata field " + fieldID);
+                                log.error("Loading item - cannot find metadata field " + fieldID + " for resourceType=" + resourceTypeId + " and resourceId=" + resourceId);
                             }
                             else
                             {
@@ -1289,8 +1289,8 @@ public abstract class DSpaceObject
                                 }
                                 else
                                 {
-                                    // Make a DCValue object
-                                    DCValue dcv = new DCValue();
+                                    // Make a Metadatum object
+                                    Metadatum dcv = new Metadatum();
                                     dcv.element = field.getElement();
                                     dcv.qualifier = field.getQualifier();
                                     dcv.value = resultRow.getStringColumn("text_value");
@@ -1320,7 +1320,7 @@ public abstract class DSpaceObject
             return metadata;
         }
 
-        void set(List<DCValue> m)
+        void set(List<Metadatum> m)
         {
             metadata = m;
         }

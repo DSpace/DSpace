@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>5.0-SNAPSHOT</version>
+   <version>5.0-rc3-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -31,8 +31,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
-        <lucene.version>4.4.0</lucene.version>
-        <solr.version>4.4.0</solr.version>
+        <lucene.version>4.10.2</lucene.version>
+        <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
@@ -99,6 +99,24 @@
                     <debugForkedProcess>true</debugForkedProcess>
                     -->
                 </configuration>
+             </plugin>
+             <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>findbugs-maven-plugin</artifactId>
+                  <version>3.0.0</version>
+                  <configuration>
+                      <effort>Max</effort>
+                      <threshold>Low</threshold>
+                      <xmlOutput>true</xmlOutput>
+                  </configuration>
+                  <executions>
+                      <execution>
+                          <phase>compile</phase>
+                          <goals>
+                              <goal>check</goal>
+                          </goals>
+                      </execution>
+                  </executions>
              </plugin>
              <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -590,14 +608,16 @@
          <modules>
              <module>dspace-api</module>
              <module>dspace-jspui</module>
-             <module>dspace-xmlui-mirage2</module>
-             <module>dspace-xmlui</module>
              <module>dspace-lni</module>
              <module>dspace-oai</module>
              <module>dspace-rdf</module>
              <module>dspace-rest</module>
+             <module>dspace-services</module>
+             <module>dspace-solr</module>
              <module>dspace-sword</module>
              <module>dspace-swordv2</module>
+             <module>dspace-xmlui-mirage2</module>
+             <module>dspace-xmlui</module>
          </modules>
       </profile>
 
@@ -616,131 +636,131 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
              <artifactId>dspace-rdf</artifactId>
-             <version>5.0-SNAPSHOT</version>
+             <version>5.0-rc3-SNAPSHOT</version>
              <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0-rc3-SNAPSHOT</version>
             <type>war</type>
             <classifier>skinny</classifier>
          </dependency>
@@ -749,12 +769,12 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[4.0.0,5.0.0)</version>
+            <version>[5.0.0,6.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[4.0.0,5.0.0)</version>
+            <version>[5.0.0,6.0.0)</version>
             <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
@@ -956,17 +976,17 @@
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>1.6.0</version>
+            <version>1.8.7</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>1.6.0</version>
+            <version>1.8.7</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jempbox</artifactId>
-            <version>1.6.0</version>
+            <version>1.8.7</version>
          </dependency>
          <dependency>
 	        <groupId>org.bouncycastle</groupId>
@@ -1064,7 +1084,7 @@
          <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.2.0</version>
+            <version>11.2.0.4.0</version>
          </dependency>
          <dependency>
             <groupId>com.sun.media</groupId>
@@ -1111,7 +1131,7 @@
              <artifactId>slf4j-log4j12</artifactId>
              <version>${slf4j.version}</version>
          </dependency>
-         <!-- JMockit and JUnit are used for Unit/Integration tests -->
+         <!-- JMockit, JUnit and Hamcrest are used for Unit/Integration tests -->
          <dependency> <!-- Keep jmockit before junit -->
             <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
@@ -1122,6 +1142,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
             <scope>test</scope>
          </dependency>
          <!-- H2 is an in-memory database used for Unit/Integration tests -->
@@ -1159,6 +1185,19 @@
               <groupId>com.google.oauth-client</groupId>
               <artifactId>google-oauth-client-jetty</artifactId>
               <version>1.19.0</version>
+          </dependency>
+          <!-- Findbugs annotations -->
+          <dependency>
+              <groupId>com.google.code.findbugs</groupId>
+              <artifactId>jsr305</artifactId>
+              <version>3.0.0</version>
+              <scope>provided</scope>
+          </dependency>
+          <dependency>
+              <groupId>com.google.code.findbugs</groupId>
+              <artifactId>annotations</artifactId>
+              <version>3.0.0</version>
+              <scope>provided</scope>
           </dependency>
       </dependencies>
    </dependencyManagement>

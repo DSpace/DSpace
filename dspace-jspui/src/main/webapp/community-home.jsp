@@ -34,7 +34,6 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-
 <%
     // Retrieve attributes
     Community community = (Community) request.getAttribute( "community" );
@@ -152,7 +151,7 @@
 		  <div class="carousel-inner">
 	<%	for (int i = 0; i < items.length; i++)
 		{
-			DCValue[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
+			Metadatum[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
 			String displayTitle = "Untitled";
 			if (dcv != null)
 			{
@@ -231,6 +230,11 @@
     %>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
 </div>
+
+<div class="row">
+	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
+</div>
+	
 <div class="row">
 <%
 	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-home.logos", true);

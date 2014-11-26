@@ -295,31 +295,22 @@
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
 
-            <!-- Add MathJAX CDN to render scientific formulas -->
+            <!-- Add MathJAX JS library to render scientific formulas-->
             <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
-                    tex2jax: {
-                    inlineMath: [['$','$'], ['\\(','\\)']],
-                    ignoreClass: "detail-field-data|detailtable"
-                    },
-                    TeX: {
-                    Macros: {
-                    AA: '{\\mathring A}'
-                    }
-                    }
+                      tex2jax: {
+                        inlineMath: [['$','$'], ['\\(','\\)']],
+                        ignoreClass: "detail-field-data|detailtable|exception"
+                      },
+                      TeX: {
+                        Macros: {
+                          AA: '{\\mathring A}'
+                        }
+                      }
                     });
                 </script>
-
-                <xsl:choose>
-
-                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='scheme']='https'">
-                        <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
             </xsl:if>
 
         </head>
@@ -490,7 +481,7 @@
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
     <xsl:template name="buildTrail">
-        <div class="trail-wrapper">
+        <div class="trail-wrapper hidden-print">
             <div class="container">
                 <div class="row">
                     <!--TODO-->
@@ -707,7 +698,7 @@
                         <div>
                             <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
                         </div>
-                        <div>
+                        <div class="hidden-print">
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
@@ -727,7 +718,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-5 col-sm-4">
+                    <div class="col-xs-5 col-sm-4 hidden-print">
                         <div class="pull-right">
                             <span class="theme-by">Theme by&#160;</span>
                             <br/>

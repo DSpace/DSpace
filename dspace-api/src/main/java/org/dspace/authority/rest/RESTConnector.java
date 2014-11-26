@@ -7,12 +7,12 @@
  */
 package org.dspace.authority.rest;
 
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.dspace.authority.util.XMLUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 
 import java.io.InputStream;
@@ -47,8 +47,7 @@ public class RESTConnector {
         String fullPath = url + '/' + path;
         HttpGet httpGet = new HttpGet(fullPath);
         try {
-            boolean ignoreSSL = ConfigurationManager.getBooleanProperty("orcid", "httpclient.ignoressl");
-            HttpClient httpClient = HttpClientFactory.getNewHttpClient(ignoreSSL);
+            HttpClient httpClient = HttpClientBuilder.create().build();
             HttpResponse getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();

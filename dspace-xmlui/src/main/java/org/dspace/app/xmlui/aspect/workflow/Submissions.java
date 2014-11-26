@@ -175,7 +175,7 @@ public class Submissions extends AbstractDSpaceTransformer
         		int workflowItemID = owned.getID();
         		String collectionUrl = contextPath + "/handle/" + owned.getCollection().getHandle();
         		String ownedWorkflowItemUrl = contextPath + "/handle/" + owned.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
-        		DCValue[] titles = owned.getItem().getDC("title", null, Item.ANY);
+        		Metadatum[] titles = owned.getItem().getDC("title", null, Item.ANY);
         		String collectionName = owned.getCollection().getMetadata("name");
         		EPerson submitter = owned.getSubmitter();
         		String submitterName = submitter.getFullName();
@@ -248,7 +248,7 @@ public class Submissions extends AbstractDSpaceTransformer
         		int workflowItemID = pooled.getID();
         		String collectionUrl = contextPath + "/handle/" + pooled.getCollection().getHandle();
         		String pooledItemUrl = contextPath + "/handle/" + pooled.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
-        		DCValue[] titles = pooled.getItem().getDC("title", null, Item.ANY);
+        		Metadatum[] titles = pooled.getItem().getDC("title", null, Item.ANY);
         		String collectionName = pooled.getCollection().getMetadata("name");
         		EPerson submitter = pooled.getSubmitter();
         		String submitterName = submitter.getFullName();
@@ -347,7 +347,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
         for (WorkflowItem workflowItem : inprogressItems)
         {
-        	DCValue[] titles = workflowItem.getItem().getDC("title", null, Item.ANY);
+        	Metadatum[] titles = workflowItem.getItem().getDC("title", null, Item.ANY);
         	String collectionName = workflowItem.getCollection().getMetadata("name");
         	Message state = getWorkflowStateMessage(workflowItem);
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -330,7 +330,7 @@ public class VersionUtil
         String[] result = null;
         String itemHandle = version.getItem().getHandle();
 
-        DCValue[] identifiers = version.getItem().getMetadata(
+        Metadatum[] identifiers = version.getItem().getMetadata(
                 MetadataSchema.DC_SCHEMA, "identifier", null, Item.ANY);
         String itemIdentifier = null;
         if (identifiers != null && identifiers.length > 0)

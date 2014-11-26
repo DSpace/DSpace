@@ -31,7 +31,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.content.DCLanguage" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
@@ -113,7 +113,7 @@
           String inputType = inputs[z].getInputType();
           String pairsName = inputs[z].getPairsType();
           String value;
-          DCValue[] values;
+          Metadatum[] values;
           StringBuffer row = new StringBuffer();
           
           row.append("<div class=\"row\">");

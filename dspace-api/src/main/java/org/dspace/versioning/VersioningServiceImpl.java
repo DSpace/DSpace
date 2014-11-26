@@ -9,7 +9,7 @@ package org.dspace.versioning;
 
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Required;
@@ -46,7 +46,7 @@ public class VersioningServiceImpl implements VersioningService{
                 vh=versionHistoryDAO.create(c);
 
                 // get dc:date.accessioned to be set as first version date...
-                DCValue[] values = item.getMetadata("dc", "date", "accessioned", Item.ANY);
+                Metadatum[] values = item.getMetadata("dc", "date", "accessioned", Item.ANY);
                 Date versionDate = new Date();
                 if(values!=null && values.length > 0){
                     String date = values[0].value;

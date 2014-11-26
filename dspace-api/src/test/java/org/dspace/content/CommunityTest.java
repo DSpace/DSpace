@@ -11,17 +11,17 @@ package org.dspace.content;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
 import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Constants;
 
 /**
  * Unit Tests for class Community
@@ -1123,6 +1123,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     @Test
     public void testDeleteHierachyAuth() throws Exception
     {
+        System.out.println("testDeleteHierarchyAuth");
         new NonStrictExpectations(AuthorizeManager.class, AuthorizeUtil.class)
         {{
             // Allow current Community ADD perms (to create content to be deleted)
@@ -1140,19 +1141,24 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             // Allow Collection ManageTemplateItem perms (needed to delete a collection)
             AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
                     result = null;
+            // Allow current Collection DELETE perms (needed to delete a Collection)
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.DELETE, true); result = null;
         }};
 
         // Create a dummy Community hierarchy to test delete with
-        // Turn off authorization temporarily to create a new top-level community
+        // Turn off authorization temporarily to create some test objects.
         context.turnOffAuthorisationSystem();
         Community parent = Community.create(null,context);
-        context.restoreAuthSystemState();
 
-        // Create a hierachy of sub-communities and collections
+        // Create a hierachy of sub-Communities and Collections and Items.
         Community child = parent.createSubcommunity();
         Community grandchild = child.createSubcommunity();
         Collection childCol = child.createCollection();
         Collection grandchildCol = grandchild.createCollection();
+        WorkspaceItem wsItem = WorkspaceItem.create(context, childCol, false);
+        Item item = InstallItem.installItem(context, wsItem);
+
         // Commit these changes to our DB
         context.commit();
 
@@ -1162,16 +1168,28 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         int grandchildId = grandchild.getID();
         int childColId = childCol.getID();
         int grandchildColId = grandchildCol.getID();
+        int itemId = item.getID();
 
         // Delete the parent of this entire hierarchy
         parent.delete();
+        context.commit();
 
-        // Test that everything else is deleted
-        assertThat("testDeleteHierachyAuth 0",Community.find(context, parentId), nullValue());
-        assertThat("testDeleteHierachyAuth 1",Community.find(context, childId), nullValue());
-        assertThat("testDeleteHierachyAuth 2",Community.find(context, grandchildId), nullValue());
-        assertThat("testDeleteHierachyAuth 3",Collection.find(context, childColId), nullValue());
-        assertThat("testDeleteHierachyAuth 4",Collection.find(context, grandchildColId), nullValue());
+        // Done altering the objects.
+        context.restoreAuthSystemState();
+
+        // Test that everything created here is deleted.
+        assertThat("top-level Community not deleted",
+                Community.find(context, parentId), nullValue());
+        assertThat("child Community not deleted",
+                Community.find(context, childId), nullValue());
+        assertThat("grandchild Community not deleted",
+                Community.find(context, grandchildId), nullValue());
+        assertThat("Collection of child Community not deleted",
+                Collection.find(context, childColId), nullValue());
+        assertThat("Collection of grandchild Community not deleted",
+                Collection.find(context, grandchildColId), nullValue());
+        assertThat("Item not deleted",
+                Item.find(context, itemId), nullValue());
     }
 
     /**

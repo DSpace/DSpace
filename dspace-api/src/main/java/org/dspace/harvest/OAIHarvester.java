@@ -38,7 +38,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -615,14 +615,14 @@ public class OAIHarvester {
             rejectedHandlePrefixString = "123456789";
         }
 
-    	DCValue[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
+    	Metadatum[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
 
     	if (values.length > 0 && !acceptedHandleServersString.equals(""))
     	{
     		String[] acceptedHandleServers = acceptedHandleServersString.split(",");
     		String[] rejectedHandlePrefixes = rejectedHandlePrefixString.split(",");
 
-    		for (DCValue value : values)
+    		for (Metadatum value : values)
     		{
     			//     0   1       2         3   4
     			//   http://hdl.handle.net/1234/12
@@ -672,8 +672,8 @@ public class OAIHarvester {
 
     	List<String> clearList = new ArrayList<String>();
 
-    	DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-    	for (DCValue value : values)
+    	Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    	for (Metadatum value : values)
     	{
     		// Verify that the schema exists
     		MetadataSchema mdSchema = MetadataSchema.find(ourContext, value.schema);
@@ -1188,22 +1188,22 @@ public class OAIHarvester {
                 try
                 {
                     synchronized (HarvestScheduler.class) {
-                        switch (interrupt)
-                        {
-                        case HARVESTER_INTERRUPT_NONE:
-                            break;
-                        case HARVESTER_INTERRUPT_INSERT_THREAD:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            addThread(interruptValue);
-                            interruptValue = 0;
-                            break;
-                        case HARVESTER_INTERRUPT_PAUSE:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_PAUSED;
-                        case HARVESTER_INTERRUPT_STOP:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_STOPPED;
-                            return;
+                        switch (interrupt) {
+                            case HARVESTER_INTERRUPT_NONE:
+                                break;
+                            case HARVESTER_INTERRUPT_INSERT_THREAD:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                addThread(interruptValue);
+                                interruptValue = 0;
+                                break;
+                            case HARVESTER_INTERRUPT_PAUSE:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_PAUSED;
+                                break;
+                            case HARVESTER_INTERRUPT_STOP:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_STOPPED;
+                                return;
                         }
                     }
 
@@ -1211,8 +1211,8 @@ public class OAIHarvester {
                         while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
                             Thread.sleep(1000);
                         }
-                        if (interrupt != HARVESTER_INTERRUPT_STOP)
-                        {
+
+                        if (interrupt != HARVESTER_INTERRUPT_STOP) {
                             break;
                         }
                     }
