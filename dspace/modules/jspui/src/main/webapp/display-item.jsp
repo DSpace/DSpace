@@ -189,6 +189,7 @@
 <%  } %>
     <dspace:item-preview item="<%= item %>" />
     <dspace:item-video-preview item="<%= item %>" title="<%= title %>" player="jplayer"/>
+    <dspace:item-soundcloud-preview item="<%= item %>" title="<%= title %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <br/>

@@ -2409,9 +2409,14 @@
                 <displayed-value>Otro</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
+            
             <pair>
                 <displayed-value>Identificador Youtube </displayed-value> 
                 <stored-value>youtubeedu</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Url Sound Cloud </displayed-value> 
+                <stored-value>soundcloud</stored-value>
             </pair>
         </value-pairs>
 

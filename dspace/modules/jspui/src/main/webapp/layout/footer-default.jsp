@@ -22,6 +22,7 @@
     String sidebar = (String) request.getAttribute("dspace.layout.sidebar");
     String itemVideoPreview = (String)request.getAttribute("item.video.preview.script");
     String extraHeadDataLast = (String)request.getAttribute("dspace.layout.head.last");
+    String itemAudioPreview=(String)request.getAttribute("item.audio.preview.script");
 %>
 
 <%-- Right-hand side bar if appropriate --%>
@@ -100,9 +101,18 @@
         <script src="<%= request.getContextPath() %>/static/js/app.js"></script>
 <% 
     if (itemVideoPreview!=null ){
-%>
+%> 
         <%= itemVideoPreview %>
 <%
+    }
+    
+    if(itemAudioPreview != null)
+    {
+  %> 
+    <!-- Load Soundcloud SDK -->
+    <script src="//connect.soundcloud.com/sdk.js"></script>
+    <%= itemAudioPreview %>
+  <% 
     }
 
     if (extraHeadDataLast != null)

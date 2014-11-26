@@ -238,7 +238,28 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
-
+  
+  <!-- Tag para reproducir audios de sound cloud  -->
+  
+  <tag>
+    <name>item-soundcloud-preview</name>
+    <tagclass>org.dspace.app.webui.jsptag.ItemSoundCloudPreviewTag</tagclass>
+    <info>
+      Tag for displaying an item preview soundcloud "item" must always be an
+      org.dspace.content.Item
+    </info>
+    <attribute>
+      <name>item</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>title</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+  <!-- fin tag sound cloud -->
   <tag>
     <name>itemlist</name>
     <tagclass>org.dspace.app.webui.jsptag.ItemListTag</tagclass>
