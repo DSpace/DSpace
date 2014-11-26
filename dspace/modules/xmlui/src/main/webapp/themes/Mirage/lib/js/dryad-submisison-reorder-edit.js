@@ -6,7 +6,8 @@
 //  The redirect buttons ("Save & Exit" and "Continue to Describe Data")
 //  still trigger a full page reload.
 jQuery(document).ready(function(){
-    var form_selector = '#aspect_submission_StepTransformer_div_submit-describe-publication';
+    var pub_form = '#aspect_submission_StepTransformer_div_submit-describe-publication';
+    var dat_form = '#aspect_submission_StepTransformer_list_submit-describe-dataset';
     // update the part of the form associated with the input button that was clicked
     // selector: string, jQuery selector to identify the li.ds-form-item element
     //      to be replaced by the update
@@ -80,7 +81,7 @@ jQuery(document).ready(function(){
                         , complete : function(jqXHR,textStatus) {
                             // update the page using data associated with the input the user selected
                             if (success === true) {
-                                update_form_fragment(form_selector,ajax_data);
+                                update_form_fragment('#' + $form.attr('id'),ajax_data);
                             }
                         }
                     });
@@ -167,6 +168,7 @@ jQuery(document).ready(function(){
           , $next = $row.next()
           , $table  = $row.closest('table')
           , max = $table.find('tr').length - 1  // number of rows after delete
+          , $event = jQuery(event)
           , $select;
         // set this value for the form submission handler
         clicked_btn_name = jQuery(event.target).closest('.ds-form-content').find('.ds-delete-button').attr('name');
@@ -185,21 +187,17 @@ jQuery(document).ready(function(){
         });
 
         var e = jQuery.Event('click');
-        e.target = jQuery(form_selector);
+        e.target = jQuery($event.closest('form'));
         submit_describe_publication_onsubmit(e);
         submit_describe_publication_binders();
         event.preventDefault();
     };
-    var disableEditAuthority = function() {
-        jQuery(form_selector + ' input.ds-authority-confidence-input').each(function(i,elt){
-            debugger;
-            console.log(elt);
-        });
-    };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified
     var submit_describe_publication_binders = function() {
-        jQuery(form_selector + ' input.ds-button-field').bind('click', watch_clicked);
-        jQuery(form_selector).bind('submit', submit_describe_publication_onsubmit);
+        jQuery(pub_form + ' input.ds-button-field').bind('click', watch_clicked);
+        jQuery(pub_form).bind('submit', submit_describe_publication_onsubmit);
+        jQuery(dat_form + ' input.ds-button-field').bind('click', watch_clicked);
+        jQuery(dat_form).bind('submit', submit_describe_publication_onsubmit);
         jQuery('input.ds-edit-button').bind('click',handleEdit);
         jQuery('input.ds-delete-button').bind('click',handleDelete);
         // bind the onchange event to this function, and also store the current value of
