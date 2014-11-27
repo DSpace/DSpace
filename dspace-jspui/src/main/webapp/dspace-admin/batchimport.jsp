@@ -63,7 +63,12 @@
 	}
 	else {
 %>
-		<div class="alert alert-info"><fmt:message key="jsp.dspace-admin.batchmetadataimport.success"/></div>
+		<div class="alert alert-info">
+			<fmt:message key="jsp.dspace-admin.batchimport.info.success">
+				<% String link = "<a href=\""+request.getContextPath()+"/mydspace\">My DSpace</a>"; %>
+				<fmt:param value="<%= link %>"/>
+			</fmt:message>
+		</div>
 <%  
 	}
 %>
