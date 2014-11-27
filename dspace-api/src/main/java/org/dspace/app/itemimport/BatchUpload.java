@@ -12,9 +12,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * @author kstamatis
@@ -27,6 +29,7 @@ public class BatchUpload {
 	private boolean successful;
 	private int itemsImported;
 	private int totalItems = 0;
+	private List<String> handlesImported = new ArrayList<String>();
 	
 	/**
 	 * 
@@ -55,7 +58,7 @@ public class BatchUpload {
 		this.date = calendar.getTime();
 		
 		try {
-			this.itemsImported = BatchUpload.countLines(dir + File.separator + "mapfile");
+			this.itemsImported = countLines(dir + File.separator + "mapfile");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,11 +73,17 @@ public class BatchUpload {
 		
 	}
 	
-	static private int countLines(String filename) throws IOException {
+	private int countLines(String filename) throws IOException {
 	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
 	    int cnt = 0;
 	    String lineRead = "";
-	    while ((lineRead = reader.readLine()) != null) {}
+	    while ((lineRead = reader.readLine()) != null) {
+	    	String[] parts = lineRead.split(" ");
+	    	if (parts.length > 1)
+	    		handlesImported.add(parts[1].trim());
+	    	else 
+	    		handlesImported.add(lineRead);
+	    }
 
 	    cnt = reader.getLineNumber(); 
 	    reader.close();
@@ -105,5 +114,9 @@ public class BatchUpload {
 		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy - HH:mm");
 		
 		return df.format(date);
+	}
+
+	public List<String> getHandlesImported() {
+		return handlesImported;
 	}
 }
