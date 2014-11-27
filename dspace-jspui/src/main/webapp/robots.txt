@@ -1,7 +1,7 @@
 User-agent: *
 # Disable access to Discovery search and filters
 Disallow: /discover 
-Disallow: /search-filter
+Disallow: /simple-search
 
 # The FULL URL to your DSpace sitemaps
 # The ${dspace.url} will be auto-filled with the value in dspace.cfg
