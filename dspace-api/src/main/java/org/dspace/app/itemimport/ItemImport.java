@@ -2187,8 +2187,13 @@ public class ItemImport
 					String dataPath = null;
 					String dataDir = null;
 					
-					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+					if (theInputType.equals("saf")){ //In case of Simple Archive Format import (from remote url)
 						dataPath = importDirFile + File.separator + "data.zip";
+						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
+					}
+					else if (theInputType.equals("safupload")){ //In case of Simple Archive Format import (from upload file)
+						FileUtils.copyFileToDirectory(new File(theFilePath), importDirFile);
+						dataPath = importDirFile + File.separator + (new File(theFilePath)).getName();
 						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
 					}
 					else { // For all other imports
@@ -2225,6 +2230,13 @@ public class ItemImport
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
 						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					}
+					else if (theInputType.equals("safupload")){ 
+						sourcePath = unzip(new File(dataPath), dataDir);
+						//Move files to the required folder
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+					}
 					
 					//Create mapfile path
 					String mapFilePath = importDirFile + File.separator + "mapfile";
@@ -2241,7 +2253,7 @@ public class ItemImport
 					ItemImport myloader = new ItemImport();
 					myloader.isResume = isResume;
 					
-					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+					if (theInputType.equals("saf") || theInputType.equals("safupload")){ //In case of Simple Archive Format import
 						myloader.addItems(context, finalCollections, dataDir, mapFilePath, template);
 					}
 					else { // For all other imports (via BTE)
