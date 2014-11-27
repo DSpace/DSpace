@@ -78,8 +78,8 @@
 		<div class="form-group">
 			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
 	        <select class="form-control" name="inputType" id="import-type">
-	        	<option value="saf">Simple Archive Format (zip file via remote URL)</option>
-				<option value="safupload">Simple Archive Format (zip file via upload)</option>
+	        	<option value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
+				<option value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
 	<% 
 	 		for (String inputType : inputTypes){
 	%> 			
