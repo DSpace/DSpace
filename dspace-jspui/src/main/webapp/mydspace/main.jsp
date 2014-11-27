@@ -465,6 +465,14 @@
 			$('#a1_'+index).toggle();
 			$('#a2_'+index).toggle();
 		}
+		
+		function showItemsClicked(index){
+			$('#iteminfo_'+index).toggle( "slow", function() {
+				// Animation complete.
+			  });
+			$('#a3_'+index).toggle();
+			$('#a4_'+index).toggle();
+		}
 	</script>
 	
 	</div>
