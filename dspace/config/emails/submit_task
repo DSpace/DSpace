@@ -6,19 +6,24 @@
 # {3}  Description of task
 # {4}  link to 'my DSpace' page 
 #
-Subject: DSpace: You have a new task
+Subject: Você tem uma nova tarefa
 
-A new item has been submitted:
+Um novo documento foi depositado:
 
-Title:        {0}
-Collection:   {1}
-Submitted by: {2}
+Título:        {0}
+Coleção:   {1}
+Depositado por: {2}
 
 {3}
 
-To claim this task, please visit your "My DSpace"
-page:  {4}
+Para executar essa tarefa, por favor visite o "Meu espaço" na
+página:  {4}
 
-Many thanks!
+Agradecemos sua colaboração!
 
-DSpace
+Deposita - Repositório Comum do Brasil
+deposita@ibict.br
++55 61 3217-6449
+
+Instituto Brasileiro de Informação em Ciência e Tencologia (IBICT)
+Ministério da Ciência, Tecnologia e Inovação (MCTI)
