@@ -422,7 +422,21 @@
 				</div><br/>
 				<div id="moreinfo_<%= i%>" style="clear:both; display:none; margin-top:15px; padding:10px; border:1px solid; border-radius:4px; border-color:#bbb">
 					<div><fmt:message key="jsp.dspace-admin.batchimport.itemstobeimported"/>: <b><%= batchUpload.getTotalItems() %></b></div>
-					<div><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="float:left"><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="float:left; padding-left:20px">
+					<a id="a4_<%= i%>" style="display:none; font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(hide items)</i></a>
+					<a id="a3_<%= i%>" style="font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(show items)</i></a>
+				</div>
+				<br/>
+					<div id="iteminfo_<%= i%>" style="clear:both; display:none; border:1px solid; background-color:#eeeeee; margin:30px 20px">
+						<%
+							for(String handle : batchUpload.getHandlesImported()){
+						%>
+							<div style="padding-left:10px"><a href="<%= request.getContextPath() %>/handle/<%= handle %>"><%= handle %></a></div>
+						<%
+							}
+						%>
+					</div>
 					<div style="margin-top:10px">
 						<form action="<%= request.getContextPath() %>/mydspace" method="post">
 							<input type="hidden" name="step" value="7">
