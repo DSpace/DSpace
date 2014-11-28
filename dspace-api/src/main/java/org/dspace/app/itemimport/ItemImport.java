@@ -2397,7 +2397,7 @@ public class ItemImport
             return null;
         }
 
-        List<BatchUpload> fileNames = new ArrayList<BatchUpload>();
+        Map<String, BatchUpload> fileNames = new TreeMap<String, BatchUpload>();
 
         for (String fileName : uploadDir.list())
         {
@@ -2406,13 +2406,13 @@ public class ItemImport
             	
             	BatchUpload upload = new BatchUpload(file);
             	
-            	fileNames.add(upload);
+            	fileNames.put(upload.getDir().getName(), upload);
             }
         }
 
         if (fileNames.size() > 0)
         {
-            return fileNames;
+            return new ArrayList<BatchUpload>(fileNames.values());
         }
 
         return null;
