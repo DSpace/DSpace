@@ -448,6 +448,16 @@
 							<input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.batchimport.deleteitems"/>">
 						</form>
 					<div>
+					<% if (batchUpload.getErrorMsg()!=null){ %>
+						<div style="margin-top:20px; background-color:#eee">
+							<div style="padding-top:10px; font-weight:bold">
+								<fmt:message key="jsp.dspace-admin.batchimport.errormsg"/>
+							</div>
+							<div style="padding-top:20px">
+								<%= batchUpload.getErrorMsg() %>
+							</div>
+						</div>
+					<% } %>
 				</div>
 				<br/>
 			</li> 
