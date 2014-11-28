@@ -39,6 +39,7 @@ import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
@@ -2137,7 +2138,7 @@ public class ItemImport
      */
     public static void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context) throws Exception
 	{
-		final EPerson eperson = context.getCurrentUser();
+		final EPerson oldEPerson = context.getCurrentUser();
 		final String[] theOtherCollections = otherCollections;
 		final Collection theOwningCollection = owningCollection;
 		final String theFilePath = filepath;
@@ -2150,14 +2151,17 @@ public class ItemImport
 			{
 				Context context = null;
 
+				String importDir = null;
+				EPerson eperson = null;
+				
 				try {
 					
 					// create a new dspace context
 					context = new Context();
+					eperson = EPerson.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
 					
-					String importDir = null;
 					boolean isResume = theResumeDir!=null;
 					
 					List<Collection> collectionList = new ArrayList<Collection>();
@@ -2269,6 +2273,7 @@ public class ItemImport
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					String exceptionString = ExceptionUtils.getStackTrace(e);
 					
 					// abort all operations
 	                if (mapOut != null)
@@ -2280,7 +2285,12 @@ public class ItemImport
 	                
 					try
                     {
-                        emailErrorMessage(eperson, e.getMessage());
+						File importDirFile = new File(importDir+File.separator+"error.txt");
+						PrintWriter errorWriter = new PrintWriter(importDirFile);
+						errorWriter.print(exceptionString);
+						errorWriter.close();
+						
+                        emailErrorMessage(eperson, exceptionString);
                         throw new Exception(e.getMessage());
                     }
                     catch (Exception e2)
@@ -2341,7 +2351,7 @@ public class ItemImport
         }
         catch (Exception e)
         {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 
@@ -2360,7 +2370,7 @@ public class ItemImport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item export, the user will be notified. " + error);
+        log.warn("An error occured during item import, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
@@ -2373,7 +2383,7 @@ public class ItemImport
         }
         catch (Exception e)
         {
-            log.warn("error during item export error notification", e);
+            log.warn("error during item import error notification", e);
         }
     }
     

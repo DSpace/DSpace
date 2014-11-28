@@ -7,7 +7,9 @@
  */
 package org.dspace.app.itemimport;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -17,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author kstamatis
@@ -30,6 +33,7 @@ public class BatchUpload {
 	private int itemsImported;
 	private int totalItems = 0;
 	private List<String> handlesImported = new ArrayList<String>();
+	private String errorMsg = null;
 	
 	/**
 	 * 
@@ -71,6 +75,17 @@ public class BatchUpload {
 		
 		this.successful = this.totalItems == this.itemsImported;
 		
+		//Parse possible error message
+		
+		File errorFile = new File(dir + File.separator + "error.txt");
+		if (errorFile.exists()){
+			try {
+				this.errorMsg = readFile(dir + File.separator + "error.txt");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private int countLines(String filename) throws IOException {
@@ -88,6 +103,17 @@ public class BatchUpload {
 	    cnt = reader.getLineNumber(); 
 	    reader.close();
 	    return cnt;
+	}
+	
+	private String readFile(String filename) throws IOException {
+	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
+	    String result = "";
+	    String lineRead = "";
+	    while ((lineRead = reader.readLine()) != null) {
+	    	result += lineRead + "\n";
+	    }
+	    reader.close();
+	    return result;
 	}
 
 	public Date getDate() {
@@ -118,5 +144,15 @@ public class BatchUpload {
 
 	public List<String> getHandlesImported() {
 		return handlesImported;
+	}
+
+	public String getErrorMsg() {
+		if (errorMsg!=null) {
+			String str  = errorMsg.replaceAll("(\r\n)", "<br />");
+			str  = str.replaceAll("(\n)", "<br />");
+			return str;
+		}
+		else 
+			return errorMsg;
 	}
 }
