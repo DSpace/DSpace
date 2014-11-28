@@ -2207,8 +2207,12 @@ public class ItemImport
 					
 					//Clear these files, if a resume
 					if (isResume){
-						(new File(dataPath)).delete();
+						if (!theInputType.equals("safupload")) {
+							(new File(dataPath)).delete();
+						}
+						(new File(importDirFile + File.separator + "error.txt")).delete();
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						FileDeleteStrategy.FORCE.delete(new File(importDirFile + File.separator + "data_unzipped" + File.separator));
 					}
 
 					//In case of Simple Archive Format import we need an extra effort to download the zip file and unzip it
