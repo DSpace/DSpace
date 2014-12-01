@@ -18,6 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.List"            %>
+<%@ page import="java.util.ArrayList"            %>
 <%@ page import="org.dspace.content.Collection"            %>
 
 <%
@@ -31,6 +32,20 @@
 	
     String message = (String)request.getAttribute("message");
     
+	List<String> otherCollections = new ArrayList<String>();
+	if (request.getAttribute("otherCollections")!=null) {
+		otherCollections = (List<String>)request.getAttribute("otherCollections");
+	}
+		
+	Integer owningCollectionID = null;
+	if (request.getAttribute("owningCollection")!=null){
+		owningCollectionID = (Integer)request.getAttribute("owningCollection");
+	}
+	
+	String selectedInputType = null;
+	if (request.getAttribute("inputType")!=null){
+		selectedInputType = (String)request.getAttribute("inputType");
+	}
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.batchimport.title"
@@ -77,12 +92,17 @@
 		<div class="form-group">
 			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
 	        <select class="form-control" name="inputType" id="import-type">
-	        	<option value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
-				<option value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
+			<%
+				String safuploadSelected = selectedInputType.equals("safupload") ? "selected" : "";
+				String safSelected = selectedInputType.equals("saf") ? "selected" : "";
+			%>
+	        	<option <%= safuploadSelected %> value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
+				<option <%= safSelected %> value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
 	<% 
 	 		for (String inputType : inputTypes){
+				String selected = selectedInputType.equals(inputType) ? "selected" : "";
 	%> 			
-	 				<option value="<%= inputType %>"><%= inputType %></option>	
+	 			<option <%= selected %> value="<%= inputType %>"><%= inputType %></option>	
 	<%
 	 		}
 	%>      </select>
@@ -112,21 +132,24 @@
 				<option value="-1"><fmt:message key="jsp.dspace-admin.batchmetadataimport.select"/></option>
  <% 
  		for (Collection collection : collections){
+				String selected = ((owningCollectionID != null) && (owningCollectionID == collection.getID())) ? "selected" : "";
 %> 			
- 				<option value="<%= collection.getID() %>"><%= collection.getName() %></option>	
+ 				<option <%= selected %> value="<%= collection.getID() %>"><%= collection.getName() %></option>	
  <%
  		}
  %>           	
             </select>
         </div>
         
-        <div class="form-group" id="other-collections-div" style="display:none">
+		<% String displayValue = owningCollectionID != null ? "display:block" : "display:none"; %>
+        <div class="form-group" id="other-collections-div" style="<%= displayValue %>">
 			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectothercollections"/></label>
             <select class="form-control" name="collections" multiple style="height:150px" id="other-collections-select">
  <% 
  		for (Collection collection : collections){
-%> 			
- 				<option value="<%= collection.getID() %>"><%= collection.getName() %></option>	
+			String selected = ((otherCollections != null) && (otherCollections.contains(""+collection.getID()))) ? "selected" : "";
+%> 				
+ 			<option <%= selected %> value="<%= collection.getID() %>"><%= collection.getName() %></option>	
  <%
  		}
  %>           	
