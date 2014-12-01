@@ -93,14 +93,14 @@
 			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
 	        <select class="form-control" name="inputType" id="import-type">
 			<%
-				String safuploadSelected = selectedInputType.equals("safupload") ? "selected" : "";
-				String safSelected = selectedInputType.equals("saf") ? "selected" : "";
+				String safuploadSelected = ("safupload".equals(selectedInputType)) ? "selected" : "";
+				String safSelected = ("saf".equals(selectedInputType)) ? "selected" : "";
 			%>
 	        	<option <%= safuploadSelected %> value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
 				<option <%= safSelected %> value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
 	<% 
 	 		for (String inputType : inputTypes){
-				String selected = selectedInputType.equals(inputType) ? "selected" : "";
+				String selected = (inputType.equals(selectedInputType)) ? "selected" : "";
 	%> 			
 	 			<option <%= selected %> value="<%= inputType %>"><%= inputType %></option>	
 	<%
