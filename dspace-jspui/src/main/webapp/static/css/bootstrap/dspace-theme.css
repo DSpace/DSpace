@@ -89,3 +89,12 @@ div.tagcloud .tagcloud_3{
 	font-weight: normal; 
 	margin-right: 5px;
 }
+
+div.batchimport-info {
+	color: gray;
+}
+
+div.batchimport-info  a {
+	color:#47a447; 
+	font-weight: bold;
+}
