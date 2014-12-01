@@ -98,3 +98,11 @@ div.batchimport-info  a {
 	color:#47a447; 
 	font-weight: bold;
 }
+
+span.batchimport-error-tab {
+	padding-left:10px;
+}
+
+span.batchimport-error-caused {
+	font-weight:bold;
+}

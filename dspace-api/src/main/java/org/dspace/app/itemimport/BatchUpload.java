@@ -33,7 +33,8 @@ public class BatchUpload {
 	private int itemsImported;
 	private int totalItems = 0;
 	private List<String> handlesImported = new ArrayList<String>();
-	private String errorMsg = null;
+	private String errorMsg = "";
+	private String errorMsgHTML = "";
 	
 	/**
 	 * 
@@ -80,7 +81,7 @@ public class BatchUpload {
 		File errorFile = new File(dir + File.separator + "error.txt");
 		if (errorFile.exists()){
 			try {
-				this.errorMsg = readFile(dir + File.separator + "error.txt");
+				readFile(dir + File.separator + "error.txt");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -105,15 +106,23 @@ public class BatchUpload {
 	    return cnt;
 	}
 	
-	private String readFile(String filename) throws IOException {
+	private void readFile(String filename) throws IOException {
 	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
-	    String result = "";
 	    String lineRead = "";
 	    while ((lineRead = reader.readLine()) != null) {
-	    	result += lineRead + "\n";
+	    	this.errorMsg += lineRead + "\n";
+	    	
+	    	if (lineRead.startsWith("\tat ")){
+	    		this.errorMsgHTML += "<span class=\"batchimport-error-tab\">" + lineRead + "</span><br/>";
+	    	}
+	    	else if (lineRead.startsWith("Caused by")){
+	    		this.errorMsgHTML += "<span class=\"batchimport-error-caused\">" + lineRead + "</span><br/>";
+	    	}
+	    	else {
+	    		this.errorMsgHTML += lineRead + "<br/>";
+	    	}
 	    }
 	    reader.close();
-	    return result;
 	}
 
 	public Date getDate() {
@@ -147,12 +156,10 @@ public class BatchUpload {
 	}
 
 	public String getErrorMsg() {
-		if (errorMsg!=null) {
-			String str  = errorMsg.replaceAll("(\r\n)", "<br />");
-			str  = str.replaceAll("(\n)", "<br />");
-			return str;
-		}
-		else 
-			return errorMsg;
+		return errorMsg;
+	}
+
+	public String getErrorMsgHTML() {
+		return errorMsgHTML;
 	}
 }
