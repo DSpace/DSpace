@@ -15,7 +15,7 @@ jQuery(document).ready(function(){
     //      to be replaced by the update
     // data: string, HTML reponse from server (entire page)
     var update_form_fragment = function(selector,data) {
-        var $result_doc;
+        var $result_doc, $src, $target, i, file_input;
         try {
             $result_doc = jQuery(document.createElement('div')).append(jQuery(data));
         } catch (e) {
@@ -25,7 +25,6 @@ jQuery(document).ready(function(){
         // update DOM with fragment selected from response document
         if ($result_doc.length > 0 && $result_doc.find(selector).length > 0) {
             jQuery(selector).replaceWith($result_doc.find(selector));
-            // refresh event bindings on updated page
             submit_describe_publication_binders();
         // on failure to isolate form, load entire response page, which is
         // likely to contain an error message
@@ -44,12 +43,12 @@ jQuery(document).ready(function(){
     // function to handle the submit event for the form
     var submit_describe_publication_onsubmit = function(e) {
         var $input      = jQuery('input[name="' + clicked_btn_name +'"]')   // the <input> triggering the submit
-          , input_name  = clicked_btn_name                                  // input name: localize to this scope for the ajax call
+          , input_name  = clicked_btn_name          // input name: localize to this scope for the ajax call
           , $form       = jQuery(e.target)          // the entire describe-publication form
-          , form_data   = $form.serializeArray()    // the form's data
           , success     = false                     // unsuccessful ajax call until we receive a 200
+          , prevent_default = false                 // whether to continue with form submission/reload
           , ajax_data                               // ajax data, for passing to the updater function
-          , prevent_default = false;                // whether to continue with form submission/reload
+          , form_data;
         // undefine this variable, due to the flurry of onclick events raised by a button
         // click. TODO: determine why multiple button onclick events are raised
         clicked_btn_name = undefined;
@@ -57,11 +56,26 @@ jQuery(document).ready(function(){
             // continue with full page reload for these two button click events
             if (input_name === 'submit_cancel' || input_name === 'submit_next') {
                 return;
-            // don't submit if the dataset-file input
-            } else if (input_name === 'dataset-file' || input_name === 'dc_readme') {
-                prevent_default = true;
+            // File submission is a NON-AJAX form submission (i.e., not a change from previous behavior)
+            } else if ( input_name === 'dataset-file' || input_name === 'dc_readme'
+                     || input_name === 'submit_remove_dataset' || input_name.match(new RegExp('^submit_dc_readme_remove_'))
+            ) {
+                // start: from utils.js
+                var dataFileIdenTxt = jQuery('input#aspect_submission_StepTransformer_field_datafile_identifier');
+                if (dataFileIdenTxt.val() == dataFileIdenTxt.attr('title')) {
+                    dataFileIdenTxt.val('');
+                }
+                var repoNameTxt = jQuery('input#aspect_submission_StepTransformer_field_other_repo_name');
+                if (repoNameTxt.val() == repoNameTxt.attr('title')) {
+                    repoNameTxt.val('');
+                }        
+                jQuery('select#aspect_submission_StepTransformer_field_dc_type_embargo').removeAttr('disabled');
+                // end: from utils.js
+                prevent_default = false;
+
             // do page-fragment reload for other form submission clicks
-            } else if (form_data.length > 0) {
+            } else {
+                form_data = $form.serializeArray();
                 // jQuery does not add the submission button, which is expected in the
                 // request parameters by the DescribePublicationStep.java code; added here manually
                 form_data.push({ name: input_name, value: $input.val() });
@@ -69,10 +83,10 @@ jQuery(document).ready(function(){
                 $form.find('input').attr('disabled','disabled');
                 try {
                     jQuery.ajax({
-                          url     : $form.attr('action')
-                        , data    : jQuery.param(form_data)
-                        , method  : "POST"
-                        , success : function(data,textStatus,jqXHR) {
+                          url         : $form.attr('action')
+                        , data        : form_data
+                        , type        : "POST"
+                        , success     : function(data,textStatus,jqXHR) {
                             if (jqXHR.status === 200) {
                                 success   = true;
                                 ajax_data = data;
@@ -93,8 +107,6 @@ jQuery(document).ready(function(){
                 } catch (e) {
                     console.log('Error: Form "submit-describe-publication" encountered AJAX error: ' + e.toString());
                 }
-            } else {
-                console.log('Error: Form "submit-describe-publication" submitted with empty data.');
             }
         }
         // prevent default form-submit action (which triggers page reload)
@@ -192,11 +204,77 @@ jQuery(document).ready(function(){
         });
         event.preventDefault();
     };
+    var describe_dataset_click = function() {
+        jQuery("input[type=radio][name='datafile_type'][value='file']").click();
+        enableEmbargo();
+    };
+    var file_onchange = function(e) {
+        jQuery('#aspect_submission_StepTransformer_field_dataset-file-error').remove();
+        if (this.id == 'aspect_submission_StepTransformer_field_dataset-file') {
+            //Make sure the title gets set with the filename
+            var fileName = jQuery(this).val().substr(0, jQuery(this).val().lastIndexOf('.'));
+            fileName = fileName.substr(fileName.lastIndexOf('\\') + 1, fileName.length);
+            var title_t = jQuery('input#aspect_submission_StepTransformer_field_dc_title').val();
+            if (title_t == null || title_t == '')
+                jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(fileName);
+        }
+
+        // Check the file size.  If greater than 1.3 GB, display a warning and do not
+        // auto-submit the form
+        var fileSize = getUploadFileSize(this);
+        if(fileSize > 1.3 * 1024 * 1024 * 1024) { // 1.3 GB
+            console.error("File " + fileSize + " is too big");
+            var errorText = jQuery("<span>")
+                .attr("id", "aspect_submission_StepTransformer_field_dataset-file-error")
+                .text("This data file is too large to upload.  For assistance, please visit ")
+                .addClass("error");
+            var helpLink = jQuery("<a></a>")
+                .attr("href", "http://wiki.datadryad.org/Large_File_Transfer")
+                .text("Large file transfer.");
+            errorText.append(helpLink);
+            jQuery(this).after(errorText);
+        } else {
+            clicked_btn_name = jQuery(e.target).attr('name');
+            //Now find our form
+            var form = jQuery(this).closest("form");
+            //Now that we have our, indicate that I want it processed BUT NOT TO CONTINUE, just upload
+            //We do this by adding a param to the form action
+            form.attr('action', form.attr('action') + '?processonly=true');
+            //Now we submit our form
+            form.submit();
+        }
+    };
+    var datafile_type_radio_change = function(e) {
+        //If an external reference is selected we need to disable our embargo
+        if (jQuery(this).val() == 'identifier') {
+            disableEmbargo();
+        } else {
+            enableEmbargo();
+        }
+    };
+    var datafile_repo_change = function() {
+        if (jQuery(this).val() == 'other') {
+            jQuery("input[name='other_repo_name']").show();
+        } else {
+            jQuery("input[name='other_repo_name']").hide();
+        }       
+    };
+    var init_identifier_hints = function() {
+        //For our identifier a hint needs to be created
+        var dataFileIdenTxt = jQuery('input#aspect_submission_StepTransformer_field_datafile_identifier');
+        dataFileIdenTxt.inputHints();
+        var repoNameTxt = jQuery('input#aspect_submission_StepTransformer_field_other_repo_name');
+        repoNameTxt.inputHints();
+        dataFileIdenTxt.blur(function() {
+            if (jQuery(this).attr('title') != jQuery(this).val())
+                jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(jQuery(this).val());
+        });
+    };
     // these event handlers need to be registered any time the form is submitted, since the DOM is modified
     var submit_describe_publication_binders = function() {
         for (var i = 0; i < form_ids.length; i++) {
             jQuery('#' + form_ids[i] + ' input.ds-button-field').bind('click', watch_clicked);
-            jQuery('#' + form_ids[i] + ' input.ds-file-field'  ).bind('click', watch_clicked);  
+            jQuery('#' + form_ids[i] + ' input.ds-file-field'  ).bind('click', watch_clicked);
             jQuery('#' + form_ids[i]).bind('submit', submit_describe_publication_onsubmit);
         }
         jQuery('input.ds-edit-button').bind('click',handleEdit);
@@ -206,6 +284,18 @@ jQuery(document).ready(function(){
         jQuery('select.ds-edit-reorder-order-select').each(function(i,elt) {
             jQuery(this).on('change', handleAuthorReorderEvent).data('prev',parseInt(this.value));
         });
+        // here to end of function: from Mirage/../utils.js
+        jQuery('input#aspect_submission_StepTransformer_field_dataset-file').bind('click', describe_dataset_click);
+        jQuery('#aspect_submission_StepTransformer_div_submit-describe-dataset').find(":input[type=file]").bind('change', file_onchange);
+        jQuery("input[type='radio'][name='datafile_type']").change(datafile_type_radio_change);
+        //Should we have a data file with an external repo then disable the embargo
+        if (jQuery("input[name='disabled-embargo']").val()) {
+            disableEmbargo();
+        }
+        jQuery('select#aspect_submission_StepTransformer_field_datafile_repo').bind('change', datafile_repo_change);
+        // Hide the other repo name initially
+        jQuery("input[name='other_repo_name']").hide();
+        init_identifier_hints();
     };
     submit_describe_publication_binders();
 });
