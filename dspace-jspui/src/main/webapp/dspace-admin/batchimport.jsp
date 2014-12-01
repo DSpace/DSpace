@@ -63,7 +63,7 @@
 	}
 	else {
 %>
-		<div class="alert alert-info">
+		<div class="batchimport-info alert alert-info">
 			<fmt:message key="jsp.dspace-admin.batchimport.info.success">
 				<fmt:param><%= request.getContextPath() %>/mydspace</fmt:param>
 			</fmt:message>
