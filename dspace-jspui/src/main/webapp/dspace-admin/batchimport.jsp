@@ -77,8 +77,8 @@
 		<div class="form-group">
 			<label for="inputType"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectinputfile"/></label>
 	        <select class="form-control" name="inputType" id="import-type">
-	        	<option value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
-				<option value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
+	        	<option value="safupload"><fmt:message key="jsp.dspace-admin.batchimport.saf.upload"/></option>
+				<option value="saf"><fmt:message key="jsp.dspace-admin.batchimport.saf.remote"/></option>
 	<% 
 	 		for (String inputType : inputTypes){
 	%> 			
@@ -92,12 +92,12 @@
 			<input type="hidden" name=uploadId value="<%= uploadId %>"/>
 		<% } %>
 		
-		<div class="form-group" id="input-url">
+		<div class="form-group" id="input-url" style="display:none">
 			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selecturl"/></label><br/>
 			<input type="text" name="zipurl" class="form-control"/>
         </div>
         
-        <div class="form-group" id="input-file" style="display:none">
+        <div class="form-group" id="input-file">
 			<label for="file"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectfile"/></label>
             <input class="form-control" type="file" size="40" name="file"/>
         </div>
@@ -140,7 +140,7 @@
     <script>
 	    $( "#import-type" ).change(function() {
 	    	var index = $("#import-type").prop("selectedIndex");
-	    	if (index == 0){
+	    	if (index == 1){
 	    		$( "#input-file" ).hide();
 	    		$( "#input-url" ).show();
 	    		$( "#owning-collection-info" ).show();
