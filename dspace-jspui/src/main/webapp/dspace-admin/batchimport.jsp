@@ -108,7 +108,7 @@
 				<span id="owning-collection-optional">&nbsp;<fmt:message key="jsp.dspace-admin.batchmetadataimport.selectowningcollection.optional"/></span>
 			</label>
 			<div id="owning-collection-info"><i for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectowningcollection.info"/></i></div>
-            <select class="form-control" name="collection">
+            <select class="form-control" name="collection" id="owning-collection-select">
 				<option value="-1"><fmt:message key="jsp.dspace-admin.batchmetadataimport.select"/></option>
  <% 
  		for (Collection collection : collections){
@@ -120,9 +120,9 @@
             </select>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="other-collections-div" style="display:none">
 			<label for="collection"><fmt:message key="jsp.dspace-admin.batchmetadataimport.selectothercollections"/></label>
-            <select class="form-control" name="collections" multiple style="height:150px">
+            <select class="form-control" name="collections" multiple style="height:150px" id="other-collections-select">
  <% 
  		for (Collection collection : collections){
 %> 			
@@ -151,6 +151,17 @@
 	    		$( "#input-url" ).hide();
 	    		$( "#owning-collection-info" ).hide();
 	    		$( "#owning-collection-optional" ).hide();
+	    	}
+	    });
+		
+		$( "#owning-collection-select" ).change(function() {
+	    	var index = $("#owning-collection-select").prop("selectedIndex");
+	    	if (index == 0){
+	    		$( "#other-collections-div" ).hide();
+				$( "#other-collections-select > option" ).attr("selected",false);
+	    	}
+	    	else {
+	    		$( "#other-collections-div" ).show();
 	    	}
 	    });
     </script>
