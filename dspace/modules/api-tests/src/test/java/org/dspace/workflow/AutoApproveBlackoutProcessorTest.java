@@ -48,14 +48,13 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
     }
 
     /**
-     * Tests that an item in blackout can be approved.
-     * Creates a bare item in the workspace and invokes two processors to
-     * send it to blackout then archive. Works around payment system by
-     * setting all shopping carts with journal subscription = true
-     * @throws Exception
+     * Creates a bare data package in the workspace and updates its shopping
+     * cart record to suppress payment processing.
+     * @return A data package, with submitter set to the 'system curator'
+     * (see {@link AutoWorkflowProcessor#getSystemCurator(org.dspace.core.Context) })
+     * @throws Exception 
      */
-    @Test
-    public void testApproveFromBlackoutWithPastDate() throws Exception {
+    private DryadDataPackage createDataPackage() throws Exception {
         // Payment system cannot create a shopping cart unless
         // context.currentUser is set
         EPerson systemCurator = AutoWorkflowProcessor.getSystemCurator(context);
@@ -69,7 +68,19 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         // To prevent the item from requiring real payment processing, we update
         // its shopping cart record as soon as it exists.
         enableJournalSubscription(dataPackage);
+        return dataPackage;
+    }
 
+    /**
+     * Tests that an item in blackout can be approved.
+     * Creates a bare item in the workspace and invokes two processors to
+     * send it to blackout then archive. Works around payment system by
+     * setting all shopping carts with journal subscription = true
+     * @throws Exception
+     */
+    @Test
+    public void testApproveFromBlackoutWithPastDate() throws Exception {
+        DryadDataPackage dataPackage = createDataPackage();
         // Uses WorkflowManager.start(), which invokes the entire workflow process
         // Other tests that use DryadDataPackage simply createInWorkflow, as
         // they do not need the entire set of tasks/steps.
@@ -88,6 +99,33 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
 
         Boolean archived = dataPackage.getItem().isArchived();
         assertTrue("Item should be archived", archived);
+    }
+
+    
+
+    /**
+     * Tests that an item in blackout will not be approved when its blackoutUntil
+     * date is in the future.
+     * @throws Exception
+     */
+    @Test
+    public void testApproveFromBlackoutFailsWithFutureDate() throws Exception {
+        DryadDataPackage dataPackage = createDataPackage();
+        WorkspaceItem wsi = dataPackage.getWorkspaceItem(context);
+        WorkflowManager.start(context, wsi);
+
+        AutoCurateToBlackoutProcessor curateToBlackoutProcessor = new AutoCurateToBlackoutProcessor(context);
+        Boolean curatedToBlackout = curateToBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
+        assertTrue("Could not curate new item to blackout", curatedToBlackout);
+
+        // Now, item is in blackout, verify it will not be approved
+        dataPackage.setBlackoutUntilDate(futureDate); // Set the blackoutUntil date to be the past
+        AutoApproveBlackoutProcessor approveBlackoutProcessor = new AutoApproveBlackoutProcessor(context);
+        Boolean approvedFromBlackout = approveBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
+        assertFalse("Incorrectly approved item with future blackoutUntil date", approvedFromBlackout);
+
+        Boolean archived = dataPackage.getItem().isArchived();
+        assertFalse("Item should not be archived", archived);
     }
 
     /**
