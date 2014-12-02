@@ -417,18 +417,17 @@
               <h1 class="ds-div-head">Recently integrated journals</h1>
               <div id="recently_integrated_journals" class="ds-static-div primary">
                 <div class="container">
-                  <!-- Proceedings of the Royal Society B -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
-                  <!-- BMC Evolutionary Biology -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
-                  <!-- Ecological Applications -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecological%5C+applications%5C%7C%5C%7C%5C%7CEcological%5C+Applications">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EcoApp.png" alt="Ecological Applications" /></a>
-                  <!-- Royal Society Open Science -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aroyal%5C+society%5C+open%5C+science%5C%7C%5C%7C%5C%7CRoyal%5C+Society%5C+Open%5C+Science">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-rsos.png" alt="Royal Society Open Science" /></a>
+                  <!-- Oikos -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
+                  <!-- Papers in Palaeontology -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apapers%5C+in%5C+palaeontology%5C%7C%5C%7C%5C%7CPapers%5C+in%5C+Palaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-pp.png" alt="Papers in Palaeontology" /></a>
+                  <!-- Systematic Botany -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Asystematic%5C+botany%5C%7C%5C%7C%5C%7CSystematic%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-sysbot.png" alt="Systematic Botany" /></a>
+                  <!-- PLOS -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aplos%2A"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-plos.png" alt="PLOS" /></a>
                 </div>
               </div>
             </div>
-
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
                 <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
