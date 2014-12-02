@@ -435,7 +435,7 @@
        <field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>description</dc-element>
-         <repeatable>true</repeatable>
+         <repeatable>false</repeatable>
          <label>Notas</label>
          <input-type>textarea</input-type>
          <hint>Toda otra aclaración que resulte pertinente para la mejor catalogación y recuperación de la obra. En este campo se puede  indicar por ejemplo: - si la fecha de publicación indicada es aproximada, - si el documento no fue publicado aún y esta en etapa de revisión o pre-publicación, etc.</hint>
@@ -675,7 +675,7 @@
        <field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>description</dc-element>
-         <repeatable>true</repeatable>
+         <repeatable>false</repeatable>
          <label>Notas</label>
          <input-type>textarea</input-type>
          <hint>Toda otra aclaración que resulte pertinente para la mejor catalogación y recuperación de la obra. En este campo se puede  indicar por ejemplo: - si la fecha de publicación indicada es aproximada, - si el documento no fue publicado aún y esta en etapa de revisión o pre-publicación, etc.</hint>
