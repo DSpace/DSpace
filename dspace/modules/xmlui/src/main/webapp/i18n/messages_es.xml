@@ -114,6 +114,8 @@
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Tipo de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Buscar por</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Autor</message>
+<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subtype">Tipo de Documento</message>
+<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Fecha de Publicación</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Título</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Materia</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Resumen</message>
@@ -267,6 +269,11 @@
 <message key="xmlui.ArtifactBrowser.SimpleSearch.head">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Ámbito de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Búsqueda a texto completo</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtype">Tipo de documento</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Materia</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Fecha de Publicación</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword">Palabra clave</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 <message key="xmlui.ArtifactBrowser.RestrictedItem.title">Este recurso está restringido</message>
