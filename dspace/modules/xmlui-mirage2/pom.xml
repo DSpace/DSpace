@@ -186,7 +186,18 @@
                     </execution>
                 </executions>
             </plugin>
-
+			<plugin>
+				<groupId>com.googlecode.mavenfilesync</groupId>
+				<artifactId>maven-filesync-plugin</artifactId>
+				<configuration>
+					<mappings>
+						<mapping>
+							<sourceFolder>src/main/webapp/themes/Mirage2</sourceFolder>
+							<destinationFolder>/apps/drum/webapps/xmlui/themes/Mirage2</destinationFolder>
+						</mapping>
+					</mappings>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 
