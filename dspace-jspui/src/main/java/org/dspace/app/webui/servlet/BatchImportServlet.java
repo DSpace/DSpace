@@ -101,6 +101,12 @@ public class BatchImportServlet extends DSpaceServlet
         		List<String> inputTypes =dls.getFileDataLoaders();
         		request.setAttribute("input-types", inputTypes);
         		
+        		if (reqCollectionsTmp!=null)
+        			request.setAttribute("otherCollections", reqCollectionsTmp);
+        		if (owningCollection!=null)
+        			request.setAttribute("owningCollection", owningCollection.getID());
+        		request.setAttribute("inputType", inputType);
+        		
         		File f = null;
     			String zipurl = null;
 

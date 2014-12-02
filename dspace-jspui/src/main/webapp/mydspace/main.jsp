@@ -417,12 +417,26 @@
 					<div style= "float:left;">&nbsp;&nbsp;--> <span style="color:red"><fmt:message key="jsp.dspace-admin.batchimport.failure"/></span></div>
 				<% } %>
 				<div style="float:left; padding-left:20px">
-					<a id="a2_<%= i%>" style="display:none; font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(hide)</i></a>
-					<a id="a1_<%= i%>" style="font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(show more)</i></a>
+					<a id="a2_<%= i%>" style="display:none; font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.hide"/>)</i></a>
+					<a id="a1_<%= i%>" style="font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.show"/>)</i></a>
 				</div><br/>
 				<div id="moreinfo_<%= i%>" style="clear:both; display:none; margin-top:15px; padding:10px; border:1px solid; border-radius:4px; border-color:#bbb">
 					<div><fmt:message key="jsp.dspace-admin.batchimport.itemstobeimported"/>: <b><%= batchUpload.getTotalItems() %></b></div>
-					<div><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="float:left"><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="float:left; padding-left:20px">
+					<a id="a4_<%= i%>" style="display:none; font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.hideitems"/>)</i></a>
+					<a id="a3_<%= i%>" style="font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.showitems"/>)</i></a>
+				</div>
+				<br/>
+					<div id="iteminfo_<%= i%>" style="clear:both; display:none; border:1px solid; background-color:#eeeeee; margin:30px 20px">
+						<%
+							for(String handle : batchUpload.getHandlesImported()){
+						%>
+							<div style="padding-left:10px"><a href="<%= request.getContextPath() %>/handle/<%= handle %>"><%= handle %></a></div>
+						<%
+							}
+						%>
+					</div>
 					<div style="margin-top:10px">
 						<form action="<%= request.getContextPath() %>/mydspace" method="post">
 							<input type="hidden" name="step" value="7">
@@ -434,6 +448,16 @@
 							<input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.batchimport.deleteitems"/>">
 						</form>
 					<div>
+					<% if (!batchUpload.getErrorMsgHTML().equals("")){ %>
+						<div style="margin-top:20px; padding-left:20px; background-color:#eee">
+							<div style="padding-top:10px; font-weight:bold">
+								<fmt:message key="jsp.dspace-admin.batchimport.errormsg"/>
+							</div>
+							<div style="padding-top:20px">
+								<%= batchUpload.getErrorMsgHTML() %>
+							</div>
+						</div>
+					<% } %>
 				</div>
 				<br/>
 			</li> 
@@ -450,6 +474,14 @@
 			  });
 			$('#a1_'+index).toggle();
 			$('#a2_'+index).toggle();
+		}
+		
+		function showItemsClicked(index){
+			$('#iteminfo_'+index).toggle( "slow", function() {
+				// Animation complete.
+			  });
+			$('#a3_'+index).toggle();
+			$('#a4_'+index).toggle();
 		}
 	</script>
 	
