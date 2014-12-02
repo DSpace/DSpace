@@ -77,12 +77,12 @@
                 <map:parameter name="stylesheet.screen#7" value="lib/css/style-cicba.css"/>
             </map:transform>
             <map:transform type="IncludePageMeta">
-                <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
-                <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
+                <map:parameter name="stylesheet.handheld" value="../Mirage/lib/css/handheld.css"/>
+                <map:parameter name="stylesheet.print" value="../Mirage/lib/css/print.css"/>
             </map:transform>
             <map:transform type="IncludePageMeta">
-                <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
-                <map:parameter name="javascript" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+                <map:parameter name="stylesheet.all" value="../Mirage/lib/css/media.css"/>
+                <map:parameter name="javascript" value="../Mirage/lib/js/jquery-ui-1.8.15.custom.min.js"/>
                 <map:parameter name="theme.path" value="{global:theme-path}"/>
                 <map:parameter name="theme.name" value="{global:theme-path}"/>
             </map:transform>
@@ -131,6 +131,52 @@
             <!-- Allow the browser to cache static content for an hour -->
             <map:parameter name="expires" value="0"/>
 
+            <!-- Redirigimos las solicitudes a js de Mirage -->
+			<map:match pattern="themes/cicba/lib/js/*.js">
+                    <map:read type="ConcatenationReader" src="../Mirage/lib/js/{1}.js">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match> 
+
+            <!-- handle static js-->
+			<!-- Redirigimos las solicitudes a images de Mirage -->
+			<map:match pattern="themes/cicba/lib/js/*.js">
+                    <map:read type="ConcatenationReader" src="../Mirage/lib/js/{1}.js">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match> 
+
+			<map:match pattern="themes/cicba/images/*">
+				<map:read type="ConcatenationReader" src="../Mirage/images/{1}">
+                   <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                </map:read>
+			</map:match>
+			
+
+            <map:match pattern="themes/cicba/images/authority_control/*">
+                    <map:read type="ConcatenationReader" src="../Mirage/images/authority_control/{1}">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            
+            <map:match pattern="themes/cicba/images/controlledvocabulary/*">
+                    <map:read type="ConcatenationReader" src="../Mirage/images/controlledvocabulary/{1}">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            
+            <map:match pattern="themes/cicba/images/creativecommons/*">
+                    <map:read type="ConcatenationReader" src="../Mirage/images/creativecommons/{1}">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            
+            <map:match pattern="themes/cicba/images/jquery_ui/*">
+                    <map:read type="ConcatenationReader" src="../Mirage/images/jquery_ui/{1}">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match>
+            
             <!-- handle static js and css -->
             <map:match pattern="themes/*/**.js">
                 <map:read type="ConcatenationReader" src="{2}.js">
