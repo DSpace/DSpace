@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.doi.DryadDOIRegistrationHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
@@ -16,6 +17,7 @@ import org.dspace.utils.DSpace;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.experimental.theories.Theory;
 
 /**
  *
@@ -93,6 +95,10 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
 
         // Now, item is in blackout, test that it can be approved
         dataPackage.setBlackoutUntilDate(pastDate); // Set the blackoutUntil date to be the past
+
+        Boolean inBlackout = DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(dataPackage.getItem());
+        assertTrue("Item should be in blackout", inBlackout);
+
         AutoApproveBlackoutProcessor approveBlackoutProcessor = new AutoApproveBlackoutProcessor(context);
         Boolean approvedFromBlackout = approveBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
         assertTrue("Could not approve item from blackout to archive", approvedFromBlackout);
@@ -100,8 +106,6 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         Boolean archived = dataPackage.getItem().isArchived();
         assertTrue("Item should be archived", archived);
     }
-
-    
 
     /**
      * Tests that an item in blackout will not be approved when its blackoutUntil
@@ -118,11 +122,65 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         Boolean curatedToBlackout = curateToBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
         assertTrue("Could not curate new item to blackout", curatedToBlackout);
 
-        // Now, item is in blackout, verify it will not be approved
         dataPackage.setBlackoutUntilDate(futureDate); // Set the blackoutUntil date to be the past
+
+        // Now, item is in blackout, verify it will not be approved
+        Boolean inBlackout = DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(dataPackage.getItem());
+        assertTrue("Item should be in blackout", inBlackout);
+
         AutoApproveBlackoutProcessor approveBlackoutProcessor = new AutoApproveBlackoutProcessor(context);
         Boolean approvedFromBlackout = approveBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
         assertFalse("Incorrectly approved item with future blackoutUntil date", approvedFromBlackout);
+
+        Boolean archived = dataPackage.getItem().isArchived();
+        assertFalse("Item should not be archived", archived);
+    }
+
+    /**
+     * Tests that an item in blackout will not be approved when it has no
+     * blackoutUntil date
+     * @throws Exception
+     */
+    @Test
+    public void testApproveFromBlackoutFailsWithNoDate() throws Exception {
+        DryadDataPackage dataPackage = createDataPackage();
+        WorkspaceItem wsi = dataPackage.getWorkspaceItem(context);
+        WorkflowManager.start(context, wsi);
+
+        AutoCurateToBlackoutProcessor curateToBlackoutProcessor = new AutoCurateToBlackoutProcessor(context);
+        Boolean curatedToBlackout = curateToBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
+        assertTrue("Could not curate new item to blackout", curatedToBlackout);
+
+        Boolean inBlackout = DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(dataPackage.getItem());
+        assertTrue("Item should be in blackout", inBlackout);
+
+        // Now, item is in blackout, make sure it has no blackoutUntil date and verify it will not be approved
+        Date blackoutUntilDate = dataPackage.getBlackoutUntilDate();
+        assertNull("Item should have no blackoutUntil Date", blackoutUntilDate);
+
+        AutoApproveBlackoutProcessor approveBlackoutProcessor = new AutoApproveBlackoutProcessor(context);
+        Boolean approvedFromBlackout = approveBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
+        assertFalse("Incorrectly approved item with no blackoutUntil date", approvedFromBlackout);
+
+        Boolean archived = dataPackage.getItem().isArchived();
+        assertFalse("Item should not be archived", archived);
+    }
+
+    /**
+     * Tests that an item in blackout will not be approved when the item is not
+     * actually in blackout.
+     * @throws Exception
+     */
+    @Test(expected = ItemIsNotEligibleForStepException.class)
+    public void testApproveFromBlackoutFailsNotInBlackout() throws Exception {
+        DryadDataPackage dataPackage = createDataPackage();
+        WorkspaceItem wsi = dataPackage.getWorkspaceItem(context);
+        WorkflowManager.start(context, wsi);
+        Boolean inBlackout = DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(dataPackage.getItem());
+        assertFalse("Item should not be in blackout", inBlackout);
+        AutoApproveBlackoutProcessor approveBlackoutProcessor = new AutoApproveBlackoutProcessor(context);
+        Boolean approvedFromBlackout = approveBlackoutProcessor.processWorkflowItem(dataPackage.getWorkflowItem(context));
+        assertFalse("ApproveBlackoutProcessor was able to approve an item not in blackout", approvedFromBlackout);
 
         Boolean archived = dataPackage.getItem().isArchived();
         assertFalse("Item should not be archived", archived);
