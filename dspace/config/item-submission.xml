@@ -239,14 +239,15 @@
 		<workflow-editable>false</workflow-editable>
       </step>
 
+	  <!-- TO DO. Ticekt #2979 :queda pendiente definir el texto de la licencia -->
       <!--Step 7 will be to Sign off on the License-->
-      <step>
-        <heading>submit.progressbar.license</heading>
-        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
-      </step>
+<!--       <step> -->
+<!--         <heading>submit.progressbar.license</heading> -->
+<!--         <processing-class>org.dspace.submit.step.LicenseStep</processing-class> -->
+<!--         <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding> -->
+<!-- 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding> -->
+<!-- 		<workflow-editable>false</workflow-editable> -->
+<!--       </step> -->
      
    </submission-process>
    
