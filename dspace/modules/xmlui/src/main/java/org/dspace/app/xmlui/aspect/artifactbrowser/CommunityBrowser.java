@@ -47,33 +47,30 @@ import org.xml.sax.SAXException;
 /**
  * Display a list of Communities and collections.
  * 
- * This item may be configured so that it will only display up to a specific depth,
- * and may include or exclude collections from the tree.
+ * This item may be configured so that it will only display up to a specific
+ * depth, and may include or exclude collections from the tree.
  * 
- * The configuration option available: <depth exclude-collections="true">999</depth>
+ * The configuration option available: <depth
+ * exclude-collections="true">999</depth>
  * 
  * @author Scott Phillips
  */
-public class CommunityBrowser extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class CommunityBrowser extends AbstractDSpaceTransformer implements
+        CacheableProcessingComponent
 {
     private static Logger log = Logger.getLogger(CommunityBrowser.class);
 
     /** Language Strings */
-    public static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-    
-    public static final Message T_title =
-        message("xmlui.ArtifactBrowser.CommunityBrowser.title");
-    
-    public static final Message T_trail =
-        message("xmlui.ArtifactBrowser.CommunityBrowser.trail");
-    
-    public static final Message T_head =
-        message("xmlui.ArtifactBrowser.CommunityBrowser.head");
-    
-    public static final Message T_select =
-        message("xmlui.ArtifactBrowser.CommunityBrowser.select");
-    
+    public static final Message T_dspace_home = message("xmlui.general.dspace_home");
+
+    public static final Message T_title = message("xmlui.ArtifactBrowser.CommunityBrowser.title");
+
+    public static final Message T_trail = message("xmlui.ArtifactBrowser.CommunityBrowser.trail");
+
+    public static final Message T_head = message("xmlui.ArtifactBrowser.CommunityBrowser.head");
+
+    public static final Message T_select = message("xmlui.ArtifactBrowser.CommunityBrowser.select");
+
     /** Should collections be excluded from the list */
     protected boolean excludeCollections = false;
 
@@ -85,14 +82,15 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /** Cached version the community / collection hierarchy */
     protected TreeNode root;
-    
+
     /** cached validity object */
     private SourceValidity validity;
-    
+
     /**
      * Set the component up, pulling any configuration values from the sitemap
      * parameters.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters parameters) throws ProcessingException, SAXException,
             IOException
@@ -105,80 +103,91 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Generate the unique caching key.
-     * This key must be unique within the space of this component.
+     * Generate the unique caching key. This key must be unique within the space
+     * of this component.
      */
+    @Override
     public Serializable getKey()
     {
-    	boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
-        return HashUtil.hash(depth + "-" + excludeCollections + "-" + (full ? "true" : "false"));
+        boolean full = ConfigurationManager.getBooleanProperty(
+                "xmlui.community-list.render.full", true);
+        return HashUtil.hash(depth + "-" + excludeCollections + "-"
+                + (full ? "true" : "false"));
     }
 
     /**
      * Generate the cache validity object.
      * 
-     * The validity object will include a list of all communities 
-     * and collections being browsed along with their logo bitstreams.
+     * The validity object will include a list of all communities and
+     * collections being browsed along with their logo bitstreams.
      */
+    @Override
     public SourceValidity getValidity()
     {
-    	if (validity == null)
-    	{
-	        try {
-	            DSpaceValidity validity = new DSpaceValidity();
-	            
-	            TreeNode root = buildTree(Community.findAllTop(context));
-	            
-	            Stack<TreeNode> stack = new Stack<TreeNode>();
-	            stack.push(root);
-	            
-	            while (!stack.empty())
-	            {
-	                TreeNode node = stack.pop();
-	                
-	                validity.add(node.getDSO());
-	                
-	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
-	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
-	                if (showCount)
-	        		{
-	                    try
-	                    {	//try to determine Collection size (i.e. # of items)
-	                    	
-	                    	int size = new ItemCounter(context).getCount(node.getDSO());
-	                    	validity.add("size:"+size);
-	                    }
-	                    catch(ItemCountException e) { /* ignore */ }
-	        		}
-	                
-	                
-	                for (TreeNode child : node.getChildren())
-	                {
-	                    stack.push(child);
-	                }
-	            }
-	            
-	            // Check if we are configured to assume validity.
-	            String assumeCacheValidity = ConfigurationManager.getProperty("xmlui.community-list.cache");
-	            if (assumeCacheValidity != null)
+        if (validity == null)
+        {
+            try
+            {
+                DSpaceValidity validity = new DSpaceValidity();
+
+                TreeNode root = buildTree(Community.findAllTop(context));
+
+                Stack<TreeNode> stack = new Stack<TreeNode>();
+                stack.push(root);
+
+                while (!stack.empty())
+                {
+                    TreeNode node = stack.pop();
+
+                    validity.add(node.getDSO());
+
+                    // If we are configured to use collection strengths (i.e.
+                    // item counts) then include that number in the validity.
+                    boolean showCount = ConfigurationManager
+                            .getBooleanProperty("webui.strengths.show");
+                    if (showCount)
+                    {
+                        try
+                        { // try to determine Collection size (i.e. # of items)
+
+                            int size = new ItemCounter(context).getCount(node
+                                    .getDSO());
+                            validity.add("size:" + size);
+                        }
+                        catch (ItemCountException e)
+                        { /* ignore */
+                        }
+                    }
+
+                    for (TreeNode child : node.getChildren())
+                    {
+                        stack.push(child);
+                    }
+                }
+
+                // Check if we are configured to assume validity.
+                String assumeCacheValidity = ConfigurationManager
+                        .getProperty("xmlui.community-list.cache");
+                if (assumeCacheValidity != null)
                 {
                     validity.setAssumedValidityDelay(assumeCacheValidity);
                 }
-	            
-	            this.validity = validity.complete();
-	        } 
-	        catch (SQLException sqle) 
-	        {
-	            // ignore all errors and return an invalid cache.
-	        }
+
+                this.validity = validity.complete();
+            }
+            catch (SQLException sqle)
+            {
+                // ignore all errors and return an invalid cache.
+            }
             log.info(LogManager.getHeader(context, "view_community_list", ""));
-    	}
-    	return this.validity;
+        }
+        return this.validity;
     }
 
     /**
      * Add a page title and trail links.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -186,14 +195,15 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         // Set the page title
         pageMeta.addMetadata("title").addContent(T_title);
 
-        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
     }
 
     /**
-     * Add a community-browser division that includes references to community and
-     * collection metadata.
+     * Add a community-browser division that includes references to community
+     * and collection metadata.
      */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -202,84 +212,97 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         division.addPara(T_select);
 
         TreeNode root = buildTree(Community.findAllTop(context));
-        
-        boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
-        
+
+        boolean full = ConfigurationManager.getBooleanProperty(
+                "xmlui.community-list.render.full", true);
+
         if (full)
         {
-	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
-	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
-	        
-	        java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
-	        
-	        for (TreeNode node : rootNodes)
-	        {
-	            buildReferenceSet(referenceSet,node);   
-	        }
+            ReferenceSet referenceSet = division.addReferenceSet(
+                    "community-browser", ReferenceSet.TYPE_SUMMARY_LIST, null,
+                    "hierarchy");
+
+            java.util.List<TreeNode> rootNodes = root
+                    .getChildrenOfType(Constants.COMMUNITY);
+
+            for (TreeNode node : rootNodes)
+            {
+                buildReferenceSet(referenceSet, node);
+            }
         }
         else
         {
-        	List list = division.addList("comunity-browser");
-        	
-        	java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
- 	        
- 	        for (TreeNode node : rootNodes)
- 	        {
- 	            buildList(list,node);   
- 	        }
-        	
+            List list = division.addList("comunity-browser");
+
+            java.util.List<TreeNode> rootNodes = root
+                    .getChildrenOfType(Constants.COMMUNITY);
+
+            for (TreeNode node : rootNodes)
+            {
+                buildList(list, node);
+            }
+
         }
-    } 
-    
+    }
+
     /**
-     * Recursively build an includeset of the community / collection hierarchy based upon
-     * the given NodeTree.
+     * Recursively build an includeset of the community / collection hierarchy
+     * based upon the given NodeTree.
      * 
-     * @param referenceSet The include set
-     * @param node The current node of the hierarchy.
+     * @param referenceSet
+     *            The include set
+     * @param node
+     *            The current node of the hierarchy.
      */
-    public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node) throws WingException
+    public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node)
+            throws WingException
     {
         DSpaceObject dso = node.getDSO();
-        
+
         Reference objectInclude = referenceSet.addReference(dso);
-        
+
         // Add all the sub-collections;
-        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node
+                .getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
-            ReferenceSet collectionSet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
-            
+            ReferenceSet collectionSet = objectInclude
+                    .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
+
             for (TreeNode collectionNode : collectionNodes)
             {
                 collectionSet.addReference(collectionNode.getDSO());
             }
         }
-        
+
         // Add all the sub-communities
-        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node
+                .getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
-            ReferenceSet communitySet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
-            
+            ReferenceSet communitySet = objectInclude
+                    .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
+
             for (TreeNode communityNode : communityNodes)
             {
-                buildReferenceSet(communitySet,communityNode);
+                buildReferenceSet(communitySet, communityNode);
             }
         }
     }
-    
+
     /**
-     * Recursively build a list of the community / collection hierarchy based upon
-     * the given NodeTree.
+     * Recursively build a list of the community / collection hierarchy based
+     * upon the given NodeTree.
      * 
-     * @param list The parent list
-     * @param node The current node of the hierarchy.
+     * @param list
+     *            The parent list
+     * @param node
+     *            The current node of the hierarchy.
      */
     public void buildList(List list, TreeNode node) throws WingException
     {
         DSpaceObject dso = node.getDSO();
-        
+
         String name = null;
         if (dso instanceof Community)
         {
@@ -289,47 +312,51 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
             name = ((Collection) dso).getMetadata("name");
         }
-        
-        String url = contextPath + "/handle/"+dso.getHandle();
+
+        String url = contextPath + "/handle/" + dso.getHandle();
         list.addItem().addHighlight("bold").addXref(url, name);
-        
+
         List subList = null;
-        
+
         // Add all the sub-collections;
-        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node
+                .getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
-        	subList = list.addList("sub-list-"+dso.getID());
-        
+            subList = list.addList("sub-list-" + dso.getID());
+
             for (TreeNode collectionNode : collectionNodes)
             {
-                String collectionName = ((Collection) collectionNode.getDSO()).getMetadata("name");
-                String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
+                String collectionName = ((Collection) collectionNode.getDSO())
+                        .getMetadata("name");
+                String collectionUrl = contextPath + "/handle/"
+                        + collectionNode.getDSO().getHandle();
                 subList.addItemXref(collectionUrl, collectionName);
             }
         }
-        
-        
+
         // Add all the sub-communities
-        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node
+                .getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
-        	if (subList == null)
+            if (subList == null)
             {
                 subList = list.addList("sub-list-" + dso.getID());
             }
-            
+
             for (TreeNode communityNode : communityNodes)
             {
-                buildList(subList,communityNode);
+                buildList(subList, communityNode);
             }
         }
     }
-    
+
     /**
      * recycle
      */
-    public void recycle() 
+    @Override
+    public void recycle()
     {
         this.root = null;
         this.validity = null;
@@ -337,10 +364,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * construct a tree structure of communities and collections. The results 
-     * of this hierarchy are cached so calling it multiple times is acceptable.
+     * construct a tree structure of communities and collections. The results of
+     * this hierarchy are cached so calling it multiple times is acceptable.
      * 
-     * @param communities The root level communities
+     * @param communities
+     *            The root level communities
      * @return A root level node.
      */
     private TreeNode buildTree(Community[] communities) throws SQLException
@@ -349,7 +377,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
             return root;
         }
-        
+
         TreeNode newRoot = new TreeNode();
 
         // Setup for breadth-first traversal
@@ -387,13 +415,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
                 }
             }
         }
-        
+
         this.root = newRoot;
         return root;
     }
 
     /**
-     * Private class to represent the tree structure of communities & collections. 
+     * Private class to represent the tree structure of communities &
+     * collections.
      */
     protected static class TreeNode
     {
@@ -404,10 +433,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         private int level;
 
         /** All children of this node */
-        private java.util.List<TreeNode> children = new ArrayList<TreeNode>();
+        private final java.util.List<TreeNode> children = new ArrayList<TreeNode>();
 
-        /** 
-         * Construct a new root level node 
+        /**
+         * Construct a new root level node
          */
         public TreeNode()
         {
@@ -426,7 +455,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /**
          * Add a child DSpaceObject
          * 
-         * @param dso The child
+         * @param dso
+         *            The child
          * @return A new TreeNode object attached to the tree structure.
          */
         public TreeNode addChild(DSpaceObject dso)
