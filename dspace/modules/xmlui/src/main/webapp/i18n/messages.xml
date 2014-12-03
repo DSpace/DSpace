@@ -198,6 +198,8 @@
 	<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Community List</message>
 	<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Communities in DSpace</message>
 	<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Select a community to browse its collections.</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.dept_head">Collections Organized by Department</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.umd_head">UM Community-managed Collections</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Search Scope</message>

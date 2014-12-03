@@ -37,11 +37,11 @@ import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -71,6 +71,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
 
     public static final Message T_select = message("xmlui.ArtifactBrowser.CommunityBrowser.select");
 
+    public static final Message T_dept_head = message("xmlui.ArtifactBrowser.CommunityBrowser.dept_head");
+
+    public static final Message T_umd_head = message("xmlui.ArtifactBrowser.CommunityBrowser.umd_head");
+
     /** Should collections be excluded from the list */
     protected boolean excludeCollections = false;
 
@@ -79,6 +83,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
 
     /** What depth is the maximum depth of the tree */
     protected int depth = DEFAULT_DEPTH;
+
+    /** Community Group ID values */
+    private static int FACULTY_GROUP_ID = 0;
+
+    private static int UM_GROUP_ID = 2;
 
     /** Cached version the community / collection hierarchy */
     protected TreeNode root;
@@ -211,35 +220,84 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
         division.setHead(T_head);
         division.addPara(T_select);
 
-        TreeNode root = buildTree(Community.findAllTop(context));
+        CommunityGroup deptGroup = null;
+        CommunityGroup umdGroup = null;
+
+        CommunityGroup[] groups = CommunityGroup.findAll(context);
+
+        for (int i = 0; i < groups.length; i++)
+        {
+            if (groups[i].getID() == FACULTY_GROUP_ID)
+            {
+                deptGroup = groups[i];
+            }
+            if (groups[i].getID() == UM_GROUP_ID)
+            {
+                umdGroup = groups[i];
+            }
+        }
+
+        TreeNode deptRoot = null;
+        TreeNode umdRoot = null;
+
+        if (deptGroup == null || umdGroup == null)
+        {
+            // throw exception
+        }
+        else
+        {
+            deptRoot = buildTreeCore(deptGroup.getCommunities());
+            umdRoot = buildTreeCore(umdGroup.getCommunities());
+        }
 
         boolean full = ConfigurationManager.getBooleanProperty(
                 "xmlui.community-list.render.full", true);
 
+        java.util.List<TreeNode> deptRootNodes = deptRoot
+                .getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> umdRootNodes = umdRoot
+                .getChildrenOfType(Constants.COMMUNITY);
+
         if (full)
         {
-            ReferenceSet referenceSet = division.addReferenceSet(
-                    "community-browser", ReferenceSet.TYPE_SUMMARY_LIST, null,
-                    "hierarchy");
+            Division deptDivision = division
+                    .addDivision("commuity-browser-dept");
+            deptDivision.setHead(T_dept_head);
+            ReferenceSet referenceSetDept = deptDivision.addReferenceSet(
+                    "community-browser-dept", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "hierarchy");
+            Division umdDivision = division.addDivision("commuity-browser-umd");
+            umdDivision.setHead(T_umd_head);
+            ReferenceSet referenceSetUmd = umdDivision.addReferenceSet(
+                    "community-browser-umd", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "hierarchy");
 
-            java.util.List<TreeNode> rootNodes = root
-                    .getChildrenOfType(Constants.COMMUNITY);
-
-            for (TreeNode node : rootNodes)
+            for (TreeNode node : deptRootNodes)
             {
-                buildReferenceSet(referenceSet, node);
+                buildReferenceSet(referenceSetDept, node);
+            }
+            for (TreeNode node : umdRootNodes)
+            {
+                buildReferenceSet(referenceSetUmd, node);
             }
         }
         else
         {
-            List list = division.addList("comunity-browser");
+            Division deptDivision = division
+                    .addDivision("commuity-browser-dept");
+            deptDivision.setHead(T_dept_head);
+            List listDept = deptDivision.addList("community-browser-dept");
+            Division umdDivision = division.addDivision("commuity-browser-umd");
+            umdDivision.setHead(T_umd_head);
+            List listUmd = umdDivision.addList("community-browser-umd");
 
-            java.util.List<TreeNode> rootNodes = root
-                    .getChildrenOfType(Constants.COMMUNITY);
-
-            for (TreeNode node : rootNodes)
+            for (TreeNode node : deptRootNodes)
             {
-                buildList(list, node);
+                buildList(listDept, node);
+            }
+            for (TreeNode node : umdRootNodes)
+            {
+                buildList(listUmd, node);
             }
 
         }
@@ -378,6 +436,14 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
             return root;
         }
 
+        TreeNode newRoot = buildTreeCore(communities);
+
+        this.root = newRoot;
+        return root;
+    }
+
+    private TreeNode buildTreeCore(Community[] communities) throws SQLException
+    {
         TreeNode newRoot = new TreeNode();
 
         // Setup for breadth-first traversal
@@ -416,8 +482,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
             }
         }
 
-        this.root = newRoot;
-        return root;
+        return newRoot;
     }
 
     /**
@@ -500,5 +565,4 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
             return results;
         }
     }
-
 }
