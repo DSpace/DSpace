@@ -4,8 +4,8 @@
 # Parameters: {0} is the details of the new collections and items
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: CIC-Digital Subscription
-New items are available in the collections you have subscribed to:
+Subject: CIC-Digital - Suscripción
+Nuevos items están disponibles en las colecciones a las que se ha suscripto:
 
 {0}
 

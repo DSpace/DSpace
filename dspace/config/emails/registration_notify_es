@@ -8,10 +8,10 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: CIC-Digital: Registration Notification
+Subject: CIC-Digital: Notificación de registro
 
-A new user has registered on {0} at {1}:
+Un nuevo usuario ha sido registrado en {0} como {1}:
 
-Name:                   {2}
+Nombre:                   {2}
 Email:                  {3}
-Date:                   {4}
+Fecha de registro:                   {4}

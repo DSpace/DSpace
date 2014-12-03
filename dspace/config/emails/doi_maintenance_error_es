@@ -1,0 +1,18 @@
+# E-mail sent to designated address when a metadata update, registration
+# or reserveration of a doi fails
+#
+# Parameters: {0} action (updating metadata of, registering or reserving)
+#             {1} Date & Time
+#             {2} resource type text
+#             {3} resource id
+#             {4} doi
+#             {5} reason
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: CIC-Digital: Error {0} DOI {3}
+
+Fecha:    {1}
+
+{0} DOI {4} for {2} con ID {3} ha fallado:
+{5}

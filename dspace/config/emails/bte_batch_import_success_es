@@ -5,11 +5,10 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: CIC-Digital - Batch import successfully completed
-The batch item import you initiated from the CIC-Digital UI has completed successfully.
+Subject: CIC-Digital - Importación batch completada exitosamente
+TLa importación batch que ha iniciado desde la interfaz de CIC-Digital ha sido completada exitosamente.
 
-You may find the mapfile for the import in the following path: {0}
-
+Puedes encontrar el mapfile de la importación en la siguiente ruta: {0}
 
 CIC-Digital
 

@@ -1,0 +1,23 @@
+# Workflow curation task notification email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  Submitter's name
+# {3}  Name of task operating
+# {4}  Task result
+# {5}  Workflow action taken
+#
+Subject: CIC-Digital: Reporte de la Tarea de Curación
+
+Título:         {0}
+Colección:    {1}
+Enviado por:  {2}
+
+La tarea de curación {3} ha sido realizada
+con el siguiente resultado:
+
+{4}
+
+Acción tomada durante el envío(submission): {5}
+
+CIC-Digital

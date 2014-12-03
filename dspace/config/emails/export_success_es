@@ -1,0 +1,18 @@
+# Email sent to DSpace users when they successfully export an item or collection.
+#
+# Parameters: {0} is expanded to a special URL
+#             {1} configurable time (hours) an export file will be kept
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: CIC-Digital - Exportación del Item solicitado está lista para descargar
+La exportación del item que ha solicitado desde el repositorio está lista para descargar.
+
+Puede descargar el archivo comprimido usando el siguiente link:
+{0}
+
+Este archivo permancerá disponible para su descarga por al menos {1} horas.
+
+
+CIC-Digital
+

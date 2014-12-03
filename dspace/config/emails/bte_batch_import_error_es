@@ -6,12 +6,13 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: CIC-Digital - The batch import was not completed.
-The batch import you initiated from the CIC-Digital UI was not completed, due to the following reason:
+Subject: DSpace - The batch import was not completed.
+La importación batch que ha iniciado desde la interfaz de CIC-Digital, no ha sido completada debido a las siguientes razones: 
  {0}
 
-For more information you may contact the CIC-Digital administrator:
+Para más información puede contactarse con los administradores de CIC-Digital
  {1}
 
 
 CIC-Digital
+

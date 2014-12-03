@@ -11,14 +11,14 @@
 # See org.dspace.core.Email for information on the format of this file.
 #
 Subject: CIC-Digital: Internal Server Error
-An internal server error occurred on {0}:
+Un error interno al servidor ocurrión sobre {0}:
 
-Date:       {1}
+Fecha:       {1}
 Session ID: {2}
-User:       {5}
-IP address: {6}
+Usuario:       {5}
+Dirección IP: {6}
 
 {3}
 
-Exception:
+Excepción:
 {4}

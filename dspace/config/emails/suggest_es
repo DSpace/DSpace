@@ -10,18 +10,18 @@
 #             {7} sender message 
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: An item of interest from CIC-Digital
+Subject: Un item de interés de CIC-Digital
 
-Hello {0}:
+Hola {0}:
 
-{1} requested we send you this email regarding an item available in {2}.
+{1} ha solicitado que le enviemos este email respecto a un item disponible en {2}. 
 
-Title: {3}
-Location: {5}
-In Collection: {6}
-Personal Message: {7}
+Título: {3}
+Locación: {5}
+En Colección: {6}
+Mensaje personal: {7}
 
-The CIC-Digital digital repository system captures, stores, indexes, preserves, and distributes digital material.
-For more information, visit:
+El sistema del repositorio digital CIC-Digital captura, almacena, indexa, preserva y distribuye material digital.
+Para más información sobre el sistema usado, visite:
 - www.dspace.org
 - https://github.com/CICBA/DSpace
