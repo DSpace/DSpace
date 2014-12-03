@@ -45,7 +45,7 @@
          <repeatable>true</repeatable>
          <label>Authors</label>
          <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item below.</hint>
+         <hint>Enter the names of the authors of this item.</hint>
          <required></required>
        </field>
 
@@ -67,7 +67,7 @@
          <repeatable>true</repeatable>
          <label>Other Titles</label>
          <input-type>onebox</input-type>
-         <hint>If the item has any alternative titles, please enter them below.</hint>
+         <hint>If the item has any alternative titles, please enter them here.</hint>
          <required></required>
        </field>
 
@@ -78,8 +78,8 @@
          <repeatable>false</repeatable>
          <label>Date of Issue</label>
          <input-type>date</input-type>
-         <hint>Please give the date of previous publication or public distribution
-                        below.  You can leave out the day and/or month if they aren't
+         <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't
                         applicable.</hint>
          <required>You must enter at least the year.</required>
        </field>
@@ -126,7 +126,7 @@
          <label>Identifiers</label>
          <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
          <hint>If the item has any identification numbers or codes associated with
-it, please enter the types and the actual numbers or codes below.</hint>
+it, please enter the types and the actual numbers or codes.</hint>
          <required></required>
        </field>
 
@@ -148,7 +148,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>false</repeatable>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+         <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
          <required></required>
        </field>
      </page>
@@ -162,7 +162,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
          <input-type>twobox</input-type>
-         <hint>Enter appropriate subject keywords or phrases below. </hint>
+         <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
        </field>
@@ -174,7 +174,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>false</repeatable>
          <label>Abstract</label>
          <input-type>textarea</input-type>
-         <hint>Enter the abstract of the item below. </hint>
+         <hint>Enter the abstract of the item. </hint>
          <required></required>
        </field>
 
@@ -185,7 +185,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>false</repeatable>
          <label>Sponsors</label>
          <input-type>textarea</input-type>
-         <hint>Enter the names of any sponsors and/or funding codes in the box below. </hint>
+         <hint>Enter the names of any sponsors and/or funding codes in the box. </hint>
          <required></required>
        </field>
 
@@ -211,7 +211,7 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <repeatable>true</repeatable>
          <label>One: Authors</label>
          <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item below.</hint>
+         <hint>Enter the names of the authors of this item.</hint>
          <required></required>
        </field>
       </page>
