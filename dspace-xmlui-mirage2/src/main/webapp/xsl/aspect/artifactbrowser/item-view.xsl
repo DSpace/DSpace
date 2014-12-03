@@ -233,28 +233,17 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
                         <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
-                            <div>
-                                <xsl:if test="@authority">
-                                    <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-                                </xsl:if>
-                                <xsl:copy-of select="node()"/>
-                            </div>
+                            <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:when test="dim:field[@element='creator']">
                         <xsl:for-each select="dim:field[@element='creator']">
-                            <xsl:copy-of select="node()"/>
-                            <xsl:if test="count(following-sibling::dim:field[@element='creator']) != 0">
-                                <xsl:text>; </xsl:text>
-                            </xsl:if>
+                            <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:when test="dim:field[@element='contributor']">
                         <xsl:for-each select="dim:field[@element='contributor']">
-                            <div>
-                                <xsl:copy-of select="node()"/>
-                            </div>
-
+                            <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
@@ -263,6 +252,15 @@
                 </xsl:choose>
             </div>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-authors-entry">
+        <div>
+            <xsl:if test="@authority">
+                <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+            </xsl:if>
+            <xsl:copy-of select="node()"/>
+        </div>
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-URI">
