@@ -457,7 +457,18 @@ public class ItemsResource extends Resource
             log.trace("Creating bitstream in item.");
             org.dspace.content.Bundle bundle = null;
             org.dspace.content.Bitstream dspaceBitstream = null;
-            if ((dspaceItem.getBundles().length == 0) || (dspaceItem.getBundles() == null))
+            if(dspaceItem.getBundles() != null)
+            {
+				for(Bundle itemBundle : dspaceItem.getBundles())
+				{
+					if(itemBundle.getName().equals("ORIGINAL"))
+					{
+						bundle = itemBundle;
+						break;
+					}
+				}
+			}
+            if (bundle == null) {
             {
                 log.trace("Creating bundle in item.");
                 dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
@@ -465,7 +476,6 @@ public class ItemsResource extends Resource
             else
             {
                 log.trace("Getting bundle from item.");
-                bundle = dspaceItem.getBundles()[0];
                 dspaceBitstream = bundle.createBitstream(inputStream);
             }
 
