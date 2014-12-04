@@ -107,6 +107,7 @@
                             </xsl:choose>
 
                         </xsl:attribute>
+                        <xsl:apply-templates select="document($externalMetadataURL)" mode="community-browser-dept"/>
                     </div>
                 </xsl:otherwise>
             </xsl:choose>
@@ -208,6 +209,7 @@
                             </xsl:choose>
 
                         </xsl:attribute>
+                        <xsl:apply-templates select="document($externalMetadataURL)" mode="community-browser-dept"/>
                     </div>
                 </xsl:otherwise>
             </xsl:choose>
