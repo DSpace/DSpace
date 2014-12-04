@@ -743,6 +743,7 @@
             <artifactId>dspace-rest</artifactId>
             <version>5.0-rc3-SNAPSHOT</version>
             <type>jar</type>
+             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
