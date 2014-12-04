@@ -34,10 +34,10 @@
         <profile>
             <id>default</id>
             <activation>
-		      <activeByDefault>true</activeByDefault>
-		    </activation>
+               <activeByDefault>true</activeByDefault>
+            </activation>
             <modules>
-        		<module>additions</module>
+            	<module>additions</module>
             	<module>jspui</module>
                 <module>rest</module>
                 <module>oai</module>
@@ -55,7 +55,7 @@
         <profile>
             <id>all-modules</id>
             <modules>
-        		<module>additions</module>
+            	<module>additions</module>
                 <module>lni</module>
             	<module>jspui</module>
                 <module>rest</module>

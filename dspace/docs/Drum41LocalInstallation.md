@@ -458,7 +458,7 @@ identifier.doi.ezid.publisher = a publisher
 The ```-Denv=local``` arguement will specify maven to use local.properties file instead of the default build.properties file while building dspace.
 
 #####Full build
-The first build has be done for the project root. This will build and deploy the dspace artifacts to the local maven repository. A full build would be necessary after every project version change.
+The first build has be done from the project root. This will build and deploy the dspace artifacts to the local maven repository. A full build would be necessary after every project version change.
 
 ```
 $ cd /apps/git/drum
