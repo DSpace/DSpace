@@ -457,10 +457,30 @@ identifier.doi.ezid.publisher = a publisher
 
 The ```-Denv=local``` arguement will specify maven to use local.properties file instead of the default build.properties file while building dspace.
 
+#####Full build
+The first build has be done from the project root. This will build and deploy the dspace artifacts to the local maven repository. A full build would be necessary after every project version change.
+
 ```
 $ cd /apps/git/drum
+$ mvn -U -Denv=local clean install -Dlicense.skip=true
+```
+Note: The ```-Dlicense.skip=true``` is added to avoid build failure due to missing license texts in the files added by umd customization.
+
+#####Quick build
+After the initial build, the project can be rebuilt from the dspace directory. This will rebuild the modules and reapply overlays to the dspace artifacts.
+
+```
+$ cd /apps/git/drum/dspace
 $ mvn -U -Denv=local clean package
 ```
+
+Also, to only rebuild specific modules, use the corresponding profile. Example profiles:
+
+```
+$ mvn -U -Denv=local clean package -P dspace-xmlui
+$ mvn -U -Denv=local clean package -P xmlui-and-mirage2
+```
+See [dspace/modules/pom.xml](../modules/pom.xml) for all available profiles.
 
 ####Install DRUM code
 
