@@ -468,7 +468,7 @@ public class ItemsResource extends Resource
 					}
 				}
 			}
-            if (bundle == null) {
+            if (bundle == null)
             {
                 log.trace("Creating bundle in item.");
                 dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
