@@ -18,11 +18,6 @@
         <root.basedir>${basedir}/../..</root.basedir>
     </properties>
 
-    <!-- The 'additions' module must *always* be built, as it is included
-         as a dependency in most other modules in [src]/dspace/modules -->
-    <modules>
-        <module>additions</module>
-    </modules>
 
     <!-- 
          List of enabled DSpace "addon" / local customization Modules to build/install.
@@ -37,93 +32,91 @@
     -->
     <profiles>
         <profile>
-            <id>dspace-xmlui</id>
+            <id>default</id>
             <activation>
-                <file>
-                    <exists>xmlui/pom.xml</exists>
-                </file>
-            </activation>
+		      <activeByDefault>true</activeByDefault>
+		    </activation>
+            <modules>
+        		<module>additions</module>
+            	<module>jspui</module>
+                <module>rest</module>
+                <module>oai</module>
+                <module>xmlui-mirage2</module>
+                <module>xmlui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>xmlui-and-mirage2</id>
+            <modules>
+                <module>xmlui-mirage2</module>
+                <module>xmlui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>all-modules</id>
+            <modules>
+        		<module>additions</module>
+                <module>lni</module>
+            	<module>jspui</module>
+                <module>rest</module>
+                <module>sword</module>
+                <module>swordv2</module>
+                <module>solr</module>
+                <module>oai</module>
+                <module>xmlui-mirage2</module>
+                <module>xmlui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-xmlui</id>
             <modules>
                 <module>xmlui</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-lni</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <modules>
                 <module>lni</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>jspui/pom.xml</exists>
-                </file>
-            </activation>
             <modules>
                 <module>jspui</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-rest</id>
-            <activation>
-                <file>
-                    <exists>rest/pom.xml</exists>
-                </file>
-            </activation>
             <modules>
                 <module>rest</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-sword</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <modules>
                 <module>sword</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-swordv2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <modules>
                 <module>swordv2</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-solr</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <modules>
                 <module>solr</module>
             </modules>
         </profile>
         <profile>
             <id>dspace-oai</id>
-            <activation>
-                <file>
-                    <exists>oai/pom.xml</exists>
-                </file>
-            </activation>
             <modules>
                 <module>oai</module>
             </modules>
         </profile>
-
         <profile>
-            <id>mirage2</id>
-            <activation>
-                <property>
-                    <name>!mirage2.off</name>
-                </property>
-            </activation>
+            <id>dspace-xmlui-mirage2</id>
             <modules>
                 <module>xmlui-mirage2</module>
             </modules>

@@ -23,11 +23,6 @@ All extra tools in the Mirage 2 build process run on either Node js or Ruby, so 
     mvn package -Dmirage2.deps.included=false
 ```
 
-To skip building Mirage2
-```bash
-    mvn package -Denv=local -Dmirage2.off=true
-```
-
 ## Prerequisites for OSX / Linux ##
 
 ### Node ###
