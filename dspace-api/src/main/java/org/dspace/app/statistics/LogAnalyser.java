@@ -9,6 +9,7 @@ package org.dspace.app.statistics;
 
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -1156,10 +1157,10 @@ public class LogAnalyser
         
         if (type != null)
         {
-            typeQuery = "SELECT item_id " +
+            typeQuery = "SELECT resource_id " +
                         "FROM metadatavalue " +
-                        "WHERE text_value LIKE '%" + type + "%' " +
-                        "AND metadata_field_id = (" +
+                        "WHERE text_value LIKE '%" + type + "%' " + " AND resource_type="+ Constants.ITEM +
+                        " AND metadata_field_id = (" +
                         " SELECT metadata_field_id " +
                         " FROM metadatafieldregistry " +
                         " WHERE metadata_schema_id = (" +
@@ -1174,15 +1175,15 @@ public class LogAnalyser
         StringBuffer dateQuery = new StringBuffer();
         if (oracle)
         {
-            dateQuery.append("SELECT /*+ ORDERED_PREDICATES */ item_id ");
+            dateQuery.append("SELECT /*+ ORDERED_PREDICATES */ resource_id ");
         }
         else
         {
-            dateQuery.append("SELECT item_id ");
+            dateQuery.append("SELECT resource_id ");
         }
 
         dateQuery.append("FROM metadatavalue " +
-                          "WHERE metadata_field_id = (" +
+                          "WHERE " + "resource_type="+ Constants.ITEM +  " AND metadata_field_id = (" +
                           " SELECT metadata_field_id " +
                           " FROM metadatafieldregistry " +
                           " WHERE metadata_schema_id = (" +
@@ -1243,13 +1244,13 @@ public class LogAnalyser
         
         if (startDate != null || endDate != null)
         {
-            query.append(" AND item_id IN ( " +
+            query.append(" AND resource_id IN ( " +
                          dateQuery.toString() + ") ");
         }
 
         if (type != null)
         {
-            query.append(" AND item_id IN ( " +
+            query.append(" AND resource_id IN ( " +
                          typeQuery + ") ");
         }
         
