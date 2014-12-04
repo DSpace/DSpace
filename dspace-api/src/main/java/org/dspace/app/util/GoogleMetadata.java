@@ -9,6 +9,8 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 
@@ -37,7 +39,7 @@ import org.dspace.handle.HandleManager;
 import org.jdom.Element;
 
 /**
- * 
+ * Configuration and mapping for Google Scholar output metadata
  * @author Sands Fish
  * 
  */
@@ -59,7 +61,7 @@ public class GoogleMetadata
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
-    private Map<String, String> metadataMappings = new HashMap<String, String>();
+    private ListMultimap<String, String> metadataMappings = ArrayListMultimap.create();
 
     public static final String TITLE = "citation_title";
 
@@ -67,7 +69,7 @@ public class GoogleMetadata
 
     public static final String PUBLISHER = "citation_publisher";
 
-    public static final String AUTHORS = "citation_authors";
+    public static final String AUTHORS = "citation_author";
 
     public static final String DATE = "citation_date";
 
@@ -222,9 +224,6 @@ public class GoogleMetadata
      * first-encountered instance of the field for this Item.
      * 
      * @param fieldName
-     * @param schema
-     * @param element
-     * @param qualifier
      * @return
      */
     private boolean addSingleField(String fieldName)
@@ -323,7 +322,8 @@ public class GoogleMetadata
      * Aggregate an array of DCValues present on the current item that pass the
      * configuration filter.
      * 
-     * @param configValue
+     * @param configFilter
+     * @param returnType
      * @return Array of configuration -> item-field matches
      */
     private ArrayList<Metadatum> resolveMetadata(String configFilter,
@@ -388,10 +388,8 @@ public class GoogleMetadata
                         {
                             if (!resolvedFields.isEmpty())
                             {
-                                if (log.isDebugEnabled())
-                                {
-                                    log
-                                            .debug("Resolved Field Value For This Item:");
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Resolved Field Value For This Item:");
                                     for (Metadatum r : resolvedFields)
                                     {
                                         log.debug("{" + r.value + "}");
@@ -553,8 +551,8 @@ public class GoogleMetadata
     /**
      * Pull apart an individual field structure.
      * 
-     * @param The
-     *            configured field for one metadata field map
+     * @param field
+     *            The configured field for one metadata field map
      * @return Schema, Element, Qualifier of metadata field
      */
     private String[] parseComponents(String field)
@@ -661,7 +659,7 @@ public class GoogleMetadata
         addSingleField(TITLE);
 
         // AUTHORS (multi)
-        addAggregateValues(AUTHORS, ";");
+        addMultipleValues(AUTHORS);
 
         // DATE
         addSingleField(DATE);
@@ -768,8 +766,7 @@ public class GoogleMetadata
      */
     public Set<Entry<String, String>> getMappings()
     {
-
-        return new HashSet<Entry<String, String>>(metadataMappings.entrySet());
+        return new HashSet<>(metadataMappings.entries());
     }
 
     /**
@@ -795,7 +792,7 @@ public class GoogleMetadata
     /**
      * @return the citation_title
      */
-    public String getTitle()
+    public List<String> getTitle()
     {
         return metadataMappings.get(TITLE);
     }
@@ -803,7 +800,7 @@ public class GoogleMetadata
     /**
      * @return the citation_journal_title
      */
-    public String getJournalTitle()
+    public List<String> getJournalTitle()
     {
         return metadataMappings.get(JOURNAL_TITLE);
     }
@@ -811,7 +808,7 @@ public class GoogleMetadata
     /**
      * @return the citation_publisher
      */
-    public String getPublisher()
+    public List<String> getPublisher()
     {
         return metadataMappings.get(PUBLISHER);
     }
@@ -819,7 +816,7 @@ public class GoogleMetadata
     /**
      * @return the citation_authors
      */
-    public String getAuthors()
+    public List<String> getAuthors()
     {
         return metadataMappings.get(AUTHORS);
     }
@@ -827,7 +824,7 @@ public class GoogleMetadata
     /**
      * @return the citation_date
      */
-    public String getDate()
+    public List<String> getDate()
     {
         return metadataMappings.get(DATE);
     }
@@ -835,7 +832,7 @@ public class GoogleMetadata
     /**
      * @return the citation_volume
      */
-    public String getVolume()
+    public List<String> getVolume()
     {
         return metadataMappings.get(VOLUME);
     }
@@ -843,7 +840,7 @@ public class GoogleMetadata
     /**
      * @return the citation_issue
      */
-    public String getIssue()
+    public List<String> getIssue()
     {
         return metadataMappings.get(ISSUE);
     }
@@ -851,7 +848,7 @@ public class GoogleMetadata
     /**
      * @return the citation_firstpage
      */
-    public String getFirstpage()
+    public List<String> getFirstpage()
     {
         return metadataMappings.get(FIRSTPAGE);
     }
@@ -859,7 +856,7 @@ public class GoogleMetadata
     /**
      * @return the citation_lastpage
      */
-    public String getLastpage()
+    public List<String> getLastpage()
     {
         return metadataMappings.get(LASTPAGE);
     }
@@ -867,7 +864,7 @@ public class GoogleMetadata
     /**
      * @return the citation_doi
      */
-    public String getDOI()
+    public List<String> getDOI()
     {
         return metadataMappings.get(DOI);
     }
@@ -875,7 +872,7 @@ public class GoogleMetadata
     /**
      * @return the citation_pmid
      */
-    public String getPmid()
+    public List<String> getPmid()
     {
         return metadataMappings.get(PMID);
     }
@@ -883,7 +880,7 @@ public class GoogleMetadata
     /**
      * @return the citation_abstract_html_url
      */
-    public String getAbstractHTMLURL()
+    public List<String> getAbstractHTMLURL()
     {
         return metadataMappings.get(ABSTRACT);
     }
@@ -891,7 +888,7 @@ public class GoogleMetadata
     /**
      * @return the citation_fulltext_html_url
      */
-    public String getFulltextHTMLURL()
+    public List<String> getFulltextHTMLURL()
     {
         return metadataMappings.get(FULLTEXT);
     }
@@ -899,7 +896,7 @@ public class GoogleMetadata
     /**
      * @return the citation_pdf_url
      */
-    public String getPDFURL()
+    public List<String> getPDFURL()
     {
         return metadataMappings.get(PDF);
     }
@@ -907,7 +904,7 @@ public class GoogleMetadata
     /**
      * @return the citation_issn
      */
-    public String getISSN()
+    public List<String> getISSN()
     {
         return metadataMappings.get(ISSN);
     }
@@ -915,7 +912,7 @@ public class GoogleMetadata
     /**
      * @return the citation_isbn
      */
-    public String getISBN()
+    public List<String> getISBN()
     {
         return metadataMappings.get(ISBN);
     }
@@ -923,7 +920,7 @@ public class GoogleMetadata
     /**
      * @return the citation_language
      */
-    public String getLanguage()
+    public List<String> getLanguage()
     {
         return metadataMappings.get(LANGUAGE);
     }
@@ -931,7 +928,7 @@ public class GoogleMetadata
     /**
      * @return the citation_keywords
      */
-    public String getKeywords()
+    public List<String> getKeywords()
     {
         return metadataMappings.get(KEYWORDS);
     }
@@ -939,7 +936,7 @@ public class GoogleMetadata
     /**
      * @return the citation_conference
      */
-    public String getConference()
+    public List<String> getConference()
     {
         return metadataMappings.get(CONFERENCE);
     }
@@ -947,7 +944,7 @@ public class GoogleMetadata
     /**
      * @return the citation_dissertation_name
      */
-    public String getDissertationName()
+    public List<String> getDissertationName()
     {
         return metadataMappings.get(DISSERTATION_NAME);
     }
@@ -955,7 +952,7 @@ public class GoogleMetadata
     /**
      * @return the citation_dissertation_institution
      */
-    public String getDissertationInstitution()
+    public List<String> getDissertationInstitution()
     {
         return metadataMappings.get(DISSERTATION_INSTITUTION);
     }
@@ -963,7 +960,7 @@ public class GoogleMetadata
     /**
      * @return the citation_patent_number
      */
-    public String getPatentNumber()
+    public List<String> getPatentNumber()
     {
         return metadataMappings.get(PATENT_NUMBER);
     }
@@ -971,7 +968,7 @@ public class GoogleMetadata
     /**
      * @return the citation_patent_country
      */
-    public String getPatentCountry()
+    public List<String> getPatentCountry()
     {
         return metadataMappings.get(PATENT_COUNTRY);
     }
@@ -979,7 +976,7 @@ public class GoogleMetadata
     /**
      * @return the citation_technical_report_number
      */
-    public String getTechnicalReportNumber()
+    public List<String> getTechnicalReportNumber()
     {
         return metadataMappings.get(TECH_REPORT_NUMBER);
     }
@@ -987,7 +984,7 @@ public class GoogleMetadata
     /**
      * @return the citation_technical_report_institution
      */
-    public String getTechnicalReportInstitution()
+    public List<String> getTechnicalReportInstitution()
     {
         return metadataMappings.get(TECH_REPORT_INSTITUTION);
     }
@@ -1089,9 +1086,9 @@ public class GoogleMetadata
 	/**
      * 
      * 
-     * @param Field
+     * @param FIELD
      *            to aggregate all values of in a matching option
-     * @param delimiter
+     * @param delim
      *            to delimit field values with
      */
     private void addAggregateValues(String FIELD, String delim)
@@ -1116,6 +1113,25 @@ public class GoogleMetadata
                 }
             }
             metadataMappings.put(FIELD, fieldMetadata.toString());
+        }
+    }
+
+    /**
+     * If metadata field contains multiple values, then add each value to the map separately
+     * @param FIELD
+     */
+    private void addMultipleValues(String FIELD)
+    {
+        String fieldConfig = configuredFields.get(FIELD);
+        ArrayList<Metadatum> fields = resolveMetadataFields(fieldConfig);
+
+        if (null != fields && !fields.isEmpty())
+        {
+            for (Metadatum field : fields)
+            {
+                //TODO if this is author field, first-name first
+                metadataMappings.put(FIELD, field.value);
+            }
         }
     }
 
