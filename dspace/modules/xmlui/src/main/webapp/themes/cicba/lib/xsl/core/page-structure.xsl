@@ -372,26 +372,8 @@
                     <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                         <div id="ds-user-box">
                             <p>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='url']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='lastName']"/>
-                                </a>
-                                <xsl:text> | </xsl:text>
-                                <a>
-                                    <xsl:attribute name="href">
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='logoutURL']"/>
-                                    </xsl:attribute>
-                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                </a>
+								<!-- Replace the dri:options/dri:list of the user account in the header  -->
+								<xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']"/>
                             </p>
                         </div>
                     </xsl:when>
@@ -468,6 +450,27 @@
                 </xsl:otherwise>
             </xsl:choose>
         </li>
+    </xsl:template>
+    
+    <!-- Display language selection if more than 1 language is supported -->
+    <xsl:template name="languageSelection">
+        <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
+            <div id="ds-language-selection">
+                <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
+                    <xsl:variable name="locale" select="."/>
+                    	<xsl:call-template name="build-anchor">
+                    		<xsl:with-param name="a.href">
+                    			<xsl:value-of select="$current-uri"/>
+                            	<xsl:text>?locale-attribute=</xsl:text>
+                            	<xsl:value-of select="$locale"/>
+                    		</xsl:with-param>
+							<xsl:with-param name="a.value">
+								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+							</xsl:with-param>
+                    	</xsl:call-template>                    
+                </xsl:for-each>
+            </div>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="cc-license">

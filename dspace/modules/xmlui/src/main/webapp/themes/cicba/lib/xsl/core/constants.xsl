@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     The contents of this file are subject to the license and copyright
@@ -9,7 +8,12 @@
 
 -->
 <!--
-    TODO: Describe this XSL file
+    Templates to cover the common dri elements.
+
+    Author: art.lowel at atmire.com
+    Author: lieven.droogmans at atmire.com
+    Author: ben at atmire.com
+    Author: Alexey Maslov
 
 -->
 
@@ -25,12 +29,9 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-    <xsl:import href="../Mirage/Mirage.xsl"/>
-    <xsl:import href="lib/xsl/core/page-structure.xsl"/>
-    <xsl:import href="lib/xsl/core/navigation.xsl"/>
-    <xsl:import href="lib/xsl/core/utilsCIC.xsl"/>
-    <xsl:import href="lib/xsl/core/constants.xsl"/>
     <xsl:output indent="yes"/>
     
+    <xsl:variable name="misc_imagedir">images/miscellaneous/</xsl:variable>
+    
 
-</xsl:stylesheet>
+    </xsl:stylesheet>
