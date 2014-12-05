@@ -11,6 +11,7 @@
 		</roles>
 		<step id="CIC-ADMIN_review" role="Administrador_CIC" userSelectionMethod="claimaction">
 			<actions>
+				<action id="changecollection"/>
 				<action id="editaction"/>
 			</actions>
 		</step>
