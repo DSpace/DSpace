@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -19,6 +20,7 @@ import org.dspace.eperson.Group;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
@@ -999,7 +1001,20 @@ public class ShibAuthentication implements AuthenticationMethod
         {
             log.error("Schema eperson is not registered and does not exist.");
         } else {
-            new MetadataField(schemaObj,metadataName,null,null);
+            MetadataField metadataField = new MetadataField(schemaObj, metadataName, null, null);
+            try {
+                metadataField.create(context);
+            } catch (IOException e) {
+                log.error("Unable to auto-create the eperson MetadataField with MetadataName " + metadataName ,e);
+                return false;
+            } catch (AuthorizeException e) {
+                log.error("Unauthorized to auto-create the eperson MetadataField with MetadataName " + metadataName + " MetadataField", e);
+                return false;
+            } catch (NonUniqueMetadataException e) {
+                log.error("The eperson MetadataField with MetadataName " + metadataName +" already exists",e);
+                return false;
+            }
+
 
             log.info("Auto created the eperson metadataField: '" + metadataName + "'");
             return true;
