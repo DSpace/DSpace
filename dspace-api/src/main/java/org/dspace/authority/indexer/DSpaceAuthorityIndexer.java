@@ -19,6 +19,9 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
@@ -42,7 +45,7 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
+public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, InitializingBean {
 
     private static final Logger log = Logger.getLogger(DSpaceAuthorityIndexer.class);
 
@@ -57,6 +60,20 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
     private AuthorityValue nextValue;
     private Context context;
     private AuthorityValueFinder authorityValueFinder;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        int counter = 1;
+        String field;
+        metadataFields = new ArrayList<String>();
+        while ((field = configurationService.getProperty("authority.author.indexer.field." + counter)) != null) {
+            metadataFields.add(field);
+            counter++;
+        }
+    }
 
 
     public void init(Context context, Item item) {
@@ -87,14 +104,6 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
 
         currentFieldIndex = 0;
         currentMetadataIndex = 0;
-
-        int counter = 1;
-        String field;
-        metadataFields = new ArrayList<String>();
-        while ((field = ConfigurationManager.getProperty("authority.author.indexer.field." + counter)) != null) {
-            metadataFields.add(field);
-            counter++;
-        }
     }
 
     public AuthorityValue nextValue() {
