@@ -88,6 +88,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public final static int  UNKNOWN_DOI=5;
     public final static int  MANU_ACC=6;
 
+    public final static String crossRefApiRoot = "http://api.crossref.org/works/";
+    public final static String crossRefApiFormat = "/transform/application/vnd.crossref.unixref+xml";
+    
     static {
         journalVals.add("other");
         journalNames.add("(please select a journal)");
@@ -96,7 +99,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 	// initialize settings from journal properties file
         String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-	log.info("initializing journal settings from property file " + journalPropFile);
+        log.info("initializing journal settings from property file " + journalPropFile);
         Properties properties = new Properties();
 	
         try {
@@ -296,7 +299,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 	}
 	
         try{
-            Element jElement = retrieveXML("http://api.labs.crossref.org/" + identifier + ".xml");
+            Element jElement = retrieveXML(crossRefApiRoot + identifier + crossRefApiFormat);
             if(jElement != null){
 
                 List<Element> children = jElement.getChildren();
