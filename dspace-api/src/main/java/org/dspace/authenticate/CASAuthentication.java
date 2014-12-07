@@ -194,10 +194,8 @@ public class CASAuthentication
                 {
                   if (canSelfRegister(context, request, netid) )
                     {
-                        //org.jasig.cas.client.validation.Saml11TicketValidationFilter filter;
                         // TEMPORARILY turn off authorisation
                         // Register the new user automatically
-                        //context.setIgnoreAuthorization(true);
                         context.turnOffAuthorisationSystem();
                         
                         eperson = EPerson.create(context);
@@ -227,7 +225,6 @@ public class CASAuthentication
                         AuthenticationManager.initEPerson(context, request, eperson);
                         eperson.update();
                         context.commit();
-                        //context.setIgnoreAuthorization(false);
                         context.restoreAuthSystemState();
                         context.setCurrentUser(eperson);
                         log.warn(LogManager.getHeader(context, "authenticate",
