@@ -458,7 +458,7 @@ public class ItemsResource extends Resource
             org.dspace.content.Bundle bundle = null;
             org.dspace.content.Bitstream dspaceBitstream = null;
             Bundle[] bundles = dspaceItem.getBundles("ORIGINAL");
-			if(bundles.length != 0
+			if(bundles.length != 0)
 			{
 				bundle = bundles[0];
 			}
