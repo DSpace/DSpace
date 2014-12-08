@@ -242,7 +242,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements
 
         if (deptGroup == null || umdGroup == null)
         {
-            // throw exception
+            log.error("Cannot initialize CommunityGroup! Community list display will not be rendered correctly!");
         }
         else
         {
