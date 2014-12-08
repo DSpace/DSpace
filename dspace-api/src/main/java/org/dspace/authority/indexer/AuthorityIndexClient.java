@@ -42,6 +42,13 @@ public class AuthorityIndexClient {
         AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
         List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
 
+        if(!isConfigurationValid(indexingService, indexers)){
+                    //Cannot index, configuration not valid
+            System.out.println("Cannot index authority values since the configuration isn't valid. Check dspace logs for more information.");
+
+            return;
+        }
+        
         System.out.println("Retrieving all data");
         log.info("Retrieving all data");
 
@@ -85,6 +92,10 @@ public class AuthorityIndexClient {
         AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
         List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
 
+        if(!isConfigurationValid(indexingService, indexers)){
+            //Cannot index, configuration not valid
+            return;
+        }
 
         for (AuthorityIndexerInterface indexerInterface : indexers) {
 
@@ -118,6 +129,19 @@ public class AuthorityIndexClient {
         public void cache(Object o, int id) {
             //Do not cache any object
         }
+    }
+
+    private static boolean isConfigurationValid(AuthorityIndexingService indexingService, List<AuthorityIndexerInterface> indexers){
+        if(!indexingService.isConfiguredProperly()){
+            return false;
+        }
+
+        for (AuthorityIndexerInterface indexerInterface : indexers) {
+            if(!indexerInterface.isConfiguredProperly()){
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -96,6 +96,12 @@
             <artifactId>dspace-rest</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rest</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>

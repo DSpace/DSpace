@@ -39,6 +39,7 @@ import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
@@ -2137,7 +2138,7 @@ public class ItemImport
      */
     public static void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context) throws Exception
 	{
-		final EPerson eperson = context.getCurrentUser();
+		final EPerson oldEPerson = context.getCurrentUser();
 		final String[] theOtherCollections = otherCollections;
 		final Collection theOwningCollection = owningCollection;
 		final String theFilePath = filepath;
@@ -2150,14 +2151,17 @@ public class ItemImport
 			{
 				Context context = null;
 
+				String importDir = null;
+				EPerson eperson = null;
+				
 				try {
 					
 					// create a new dspace context
 					context = new Context();
+					eperson = EPerson.find(context, oldEPerson.getID());
 					context.setCurrentUser(eperson);
 					context.setIgnoreAuthorization(true);
 					
-					String importDir = null;
 					boolean isResume = theResumeDir!=null;
 					
 					List<Collection> collectionList = new ArrayList<Collection>();
@@ -2187,8 +2191,13 @@ public class ItemImport
 					String dataPath = null;
 					String dataDir = null;
 					
-					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+					if (theInputType.equals("saf")){ //In case of Simple Archive Format import (from remote url)
 						dataPath = importDirFile + File.separator + "data.zip";
+						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
+					}
+					else if (theInputType.equals("safupload")){ //In case of Simple Archive Format import (from upload file)
+						FileUtils.copyFileToDirectory(new File(theFilePath), importDirFile);
+						dataPath = importDirFile + File.separator + (new File(theFilePath)).getName();
 						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
 					}
 					else { // For all other imports
@@ -2198,8 +2207,12 @@ public class ItemImport
 					
 					//Clear these files, if a resume
 					if (isResume){
-						(new File(dataPath)).delete();
+						if (!theInputType.equals("safupload")) {
+							(new File(dataPath)).delete();
+						}
+						(new File(importDirFile + File.separator + "error.txt")).delete();
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						FileDeleteStrategy.FORCE.delete(new File(importDirFile + File.separator + "data_unzipped" + File.separator));
 					}
 
 					//In case of Simple Archive Format import we need an extra effort to download the zip file and unzip it
@@ -2225,6 +2238,13 @@ public class ItemImport
 						FileDeleteStrategy.FORCE.delete(new File(dataDir));
 						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
 					}
+					else if (theInputType.equals("safupload")){ 
+						sourcePath = unzip(new File(dataPath), dataDir);
+						//Move files to the required folder
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+					}
 					
 					//Create mapfile path
 					String mapFilePath = importDirFile + File.separator + "mapfile";
@@ -2241,7 +2261,7 @@ public class ItemImport
 					ItemImport myloader = new ItemImport();
 					myloader.isResume = isResume;
 					
-					if (theInputType.equals("saf")){ //In case of Simple Archive Format import
+					if (theInputType.equals("saf") || theInputType.equals("safupload")){ //In case of Simple Archive Format import
 						myloader.addItems(context, finalCollections, dataDir, mapFilePath, template);
 					}
 					else { // For all other imports (via BTE)
@@ -2257,6 +2277,7 @@ public class ItemImport
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					String exceptionString = ExceptionUtils.getStackTrace(e);
 					
 					// abort all operations
 	                if (mapOut != null)
@@ -2268,7 +2289,12 @@ public class ItemImport
 	                
 					try
                     {
-                        emailErrorMessage(eperson, e.getMessage());
+						File importDirFile = new File(importDir+File.separator+"error.txt");
+						PrintWriter errorWriter = new PrintWriter(importDirFile);
+						errorWriter.print(exceptionString);
+						errorWriter.close();
+						
+                        emailErrorMessage(eperson, exceptionString);
                         throw new Exception(e.getMessage());
                     }
                     catch (Exception e2)
@@ -2329,7 +2355,7 @@ public class ItemImport
         }
         catch (Exception e)
         {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 
@@ -2348,7 +2374,7 @@ public class ItemImport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item export, the user will be notified. " + error);
+        log.warn("An error occured during item import, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
@@ -2361,7 +2387,7 @@ public class ItemImport
         }
         catch (Exception e)
         {
-            log.warn("error during item export error notification", e);
+            log.warn("error during item import error notification", e);
         }
     }
     
@@ -2375,7 +2401,7 @@ public class ItemImport
             return null;
         }
 
-        List<BatchUpload> fileNames = new ArrayList<BatchUpload>();
+        Map<String, BatchUpload> fileNames = new TreeMap<String, BatchUpload>();
 
         for (String fileName : uploadDir.list())
         {
@@ -2384,13 +2410,13 @@ public class ItemImport
             	
             	BatchUpload upload = new BatchUpload(file);
             	
-            	fileNames.add(upload);
+            	fileNames.put(upload.getDir().getName(), upload);
             }
         }
 
         if (fileNames.size() > 0)
         {
-            return fileNames;
+            return new ArrayList<BatchUpload>(fileNames.values());
         }
 
         return null;

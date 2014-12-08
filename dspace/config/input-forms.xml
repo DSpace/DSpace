@@ -297,7 +297,7 @@
          <repeatable>false</repeatable>
          <label>Fecha de publicación</label>
          <input-type>date</input-type>
-         <hint>Fecha de publicación, distribución o exposición. En caso de no haber difundido nunca su obra por ningún medio, indique la fecha de hoy como fecha de publicación.</hint>
+         <hint>Fecha de publicación, distribución pública o exposición. En caso de no haber difundido nunca su obra por ningún medio, indique la fecha de hoy como fecha de publicación. Puede omitir el día y mes si no lo sabe. </hint>
        </field>
      
      	<!-- TODO: Este debe ofrecer una materia dentro del vocabulario FOS!!-->
@@ -689,7 +689,7 @@
          <label>Volumen/Instancia de Evento</label>
 		 <type-bind>Articulo,Objeto de conferencia</type-bind>
          <input-type>onebox</input-type>
-         <hint>1) Identificación del issue (con vol+nro+tomo y link) que contiene el artículo de revista) o 2) Nombre del evento (congreso, seminario, jornada, etc.) en el que este item fue presentado con link.</hint>
+         <hint>1) Identificación de la edición (con vol+nro+tomo y link) que contiene el artículo de revista) o 2) Nombre del evento (congreso, seminario, jornada, etc.) en el que este item fue presentado con link.</hint>
        </field>
        
        <!-- TODO: debe ofrecer un conjunto de series (revistas o eventos) a seleccionar (cic:series) -->
