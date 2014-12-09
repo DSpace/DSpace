@@ -61,7 +61,8 @@ public class IndexVersion
         // Second argumet is an optional version number to compare to
         String compareToVersion = argv.length > 1 ? argv[1] : null;
         
-        // If indexVersion comes back as null, then this is likely not a valid directory
+        // If indexVersion comes back as null, then it is not a valid index directory.
+        // So, exit immediately.
         if(indexVersion==null)
         {
             System.out.println("\nRequired Solr/Lucene index directory is invalid.");
@@ -71,8 +72,16 @@ public class IndexVersion
             System.out.println("(e.g. [dspace.dir]/solr/statistics/data/index/)\n");
             System.exit(1);
         }
+
+        // If empty string is returned as the indexVersion, this means it's an
+        // empty index directory. So, it's technically "compatible" with any version of Lucene.
+        if (indexVersion.equals(""))
+        {
+            indexVersion = getLatestVersion();
+        }
+
         // If a compare-to-version was passed in, print the result of this comparison
-        else if(compareToVersion!=null && !compareToVersion.isEmpty())
+        if(compareToVersion!=null && !compareToVersion.isEmpty())
         {
             // If the string "LATEST" is passed, determine which version of Lucene API we are using.
             if(compareToVersion.equalsIgnoreCase("LATEST"))
@@ -95,7 +104,8 @@ public class IndexVersion
      * 
      * @param indexDirPath
      *          Full path of the Solr/Lucene index directory
-     * @return version as a string (e.g. "4.4"), or null if directory doesn't exist
+     * @return version as a string (e.g. "4.4"), empty string ("") if index directory is empty,
+     *         or null if directory doesn't exist.
      * @throws IOException 
      */
     public static String getIndexVersion(String indexDirPath)
@@ -107,17 +117,28 @@ public class IndexVersion
         File dir = new File(indexDirPath);
         if(dir.exists() && dir.isDirectory())
         {
+            // Check if this index directory has any contents
+            String[] dirContents = dir.list();
+            // If this directory is empty, return an empty string.
+            // It is a valid directory, but it's an empty index.
+            if (dirContents!=null && dirContents.length==0)
+            {
+                return "";
+            }
+
+            // Open this index directory in Lucene
             Directory indexDir = FSDirectory.open(dir);
 
-            // Get info on the Lucene segment file(s) in Solr index directory
+            // Get info on the Lucene segment file(s) in index directory
             SegmentInfos sis = new SegmentInfos();
             try
             {
                 sis.read(indexDir);
             }
-            catch(Throwable t)
+            catch(IOException ie)
             {
-                throw new IOException("Could not read Lucene segments files in " + dir.getAbsolutePath(), t);
+                // Wrap default IOException, providing more info about which directory cannot be read
+                throw new IOException("Could not read Lucene segments files in " + dir.getAbsolutePath(), ie);
             }
 
             // Loop through our Lucene segment files to locate the OLDEST
