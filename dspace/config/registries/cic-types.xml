@@ -100,7 +100,7 @@
 	
 	<dc-type>
 		<schema>cic</schema>
-		<element>lugar_desarrollo</element>
+		<element>lugarDesarrollo</element>
 		<scope_note>Institucion, departamento y/o unidad en la cual se desarrollo el trabajo. En el caso de informes de investigación, corresponde al punto 4.</scope_note>
 	</dc-type>
 	
@@ -121,7 +121,7 @@
 	<dc-type>
 		<schema>dcterms</schema>
 		<element>rights</element>
-		<qualifier>embargo_period</qualifier>
+		<qualifier>embargoPeriod</qualifier>
 		<scope_note>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares. El dato es informativo, el embargo efectivo se pone en el step de upload.</scope_note>
 	</dc-type>
 	
