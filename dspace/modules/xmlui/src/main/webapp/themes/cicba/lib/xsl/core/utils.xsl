@@ -27,7 +27,7 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:output indent="yes"/>
-    
+    	<xsl:variable name="context-path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']" />
     <xsl:template name="build-anchor">
 		<xsl:param name="a.href">/</xsl:param>
 		<xsl:param name="a.value" select="$a.href"/>
@@ -71,10 +71,10 @@
 	<!-- Imprime la ruta absoluta al recurso indicado con el parámetro path -->
    	<xsl:template name="print-path">
    		<xsl:param name="path">/</xsl:param>
-		<xsl:variable name="context-path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']" />
+	
 		<xsl:if test="not(starts-with($path, $context-path))">
 			<!-- Imprimo el context path si la URL no es absolta -->
-			<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']" />
+			<xsl:value-of select="$context-path" />
 			
 		</xsl:if>
 		<xsl:if test="not(starts-with($path, '/'))">

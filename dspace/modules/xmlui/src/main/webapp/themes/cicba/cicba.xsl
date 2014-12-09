@@ -25,11 +25,12 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
+    
+    <xsl:import href="lib/xsl/core/constants.xsl"/>
+    <xsl:import href="lib/xsl/core/utils.xsl"/>
     <xsl:import href="../Mirage/Mirage.xsl"/>
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
     <xsl:import href="lib/xsl/core/navigation.xsl"/>
-    <xsl:import href="lib/xsl/core/utilsCIC.xsl"/>
-    <xsl:import href="lib/xsl/core/constants.xsl"/>
     <xsl:output indent="yes"/>
     
 

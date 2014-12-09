@@ -1,2 +1,31 @@
 /* Estilo personalizado de CIC-DIGITAL */
 /* Extiende el tema de Mirage */
+.container{
+	/*width: 970px !important;*/
+}
+
+
+ul {
+margin-left: 0px;
+}
+
+#cic-header{
+/* 	background-color:#33A075; */
+	padding:5px;
+}
+.page-header{
+ border-bottom: none !important;
+}
+li.ds-artifact-item{
+	list-style:none;
+}
+
+li.ds-artifact-item ul{
+	margin-left:20px;
+}
+li.ds-artifact-item.community{
+	font-weight: bold;
+}
+.navbar-nav > li > a {padding-top:10px !important; padding-bottom:10px !important;}
+.navbar {min-height:40px !important}
+	

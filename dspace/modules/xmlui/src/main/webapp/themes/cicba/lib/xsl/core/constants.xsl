@@ -7,15 +7,6 @@
     http://www.dspace.org/license/
 
 -->
-<!--
-    Templates to cover the common dri elements.
-
-    Author: art.lowel at atmire.com
-    Author: lieven.droogmans at atmire.com
-    Author: ben at atmire.com
-    Author: Alexey Maslov
-
--->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
 	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
@@ -30,7 +21,16 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:output indent="yes"/>
-    
+    <!--
+        Requested Page URI. Some functions may alter behavior of processing depending if URI matches a pattern.
+        Specifically, adding a static page will need to override the DRI, to directly add content.
+    -->
+    <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+    <xsl:variable name="home-path">
+	    <xsl:value-of
+    		select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+        <xsl:text>/</xsl:text>
+    </xsl:variable>                    
     <xsl:variable name="misc_imagedir">images/miscellaneous/</xsl:variable>
     
 
