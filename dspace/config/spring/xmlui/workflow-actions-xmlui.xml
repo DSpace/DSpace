@@ -16,5 +16,6 @@
     <bean id="singleuserreviewaction_xmlui" class="org.dspace.app.xmlui.aspect.xmlworkflow.actions.processingaction.SingleUserReviewAction" scope="singleton"/>
 
     <bean id="scorereviewaction_xmlui" class="org.dspace.app.xmlui.aspect.xmlworkflow.actions.processingaction.ScoreReviewAction" scope="singleton"/>
+	<bean id="changecollection_xmlui" class="org.dspace.app.xmlui.aspect.xmlworkflow.actions.processingaction.ChangeCollectionAction"/>
 
 </beans>
