@@ -94,7 +94,7 @@
 	<dc-type>
 		<schema>dcterms</schema>
 		<element>abstract</element>
-		<qualifier>trabajo_realizado</qualifier>
+		<qualifier>trabajoRealizado</qualifier>
 		<scope_note>Todo el texto incluido en el punto 6 del informe de investigación.</scope_note>
 	</dc-type>
 	

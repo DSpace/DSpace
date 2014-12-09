@@ -273,7 +273,7 @@
      	<field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>abstract</dc-element>
-         <dc-qualifier>trabajo_realizado</dc-qualifier>
+         <dc-qualifier>trabajoRealizado</dc-qualifier>
          <repeatable>false</repeatable>
          <label>Labor desarrollada</label>
 		 <type-bind>Informe cientifico</type-bind>
