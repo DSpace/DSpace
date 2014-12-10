@@ -84,6 +84,11 @@ public class Util {
          */
         public static String encodeBitstreamName(String stringIn, String encoding) throws java.io.UnsupportedEncodingException {
             // FIXME: This should be moved elsewhere, as it is used outside the UI
+            if (stringIn == null)
+            {
+                return "";
+            }
+
             StringBuffer out = new StringBuffer();
         
             final String[] pctEncoding = { "%00", "%01", "%02", "%03", "%04",
