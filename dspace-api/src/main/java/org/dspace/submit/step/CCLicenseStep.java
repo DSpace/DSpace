@@ -239,6 +239,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     	String licenseclass = (request.getParameter("licenseclass_chooser") != null) ? request.getParameter("licenseclass_chooser") : "";
     	String jurisdiction = (ConfigurationManager.getProperty("cc.license.jurisdiction") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction") : "";
     	if (licenseclass.equals("standard")) {
+    		map.put("version", request.getParameter("version_chooser"));
     		map.put("commercial", request.getParameter("commercial_chooser"));
     		map.put("derivatives", request.getParameter("derivatives_chooser"));
     	} else if (licenseclass.equals("recombo")) {
