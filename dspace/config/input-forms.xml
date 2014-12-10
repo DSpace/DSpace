@@ -49,7 +49,7 @@
          <label>Tipo</label>
          <input-type value-pairs-name="cic_common_types">dropdown</input-type>
          <hint>Tipo de documento (artículo, tesis, libro, etc.).</hint>
-         <required>true</required>
+         <required>Debe seleccionar una tipología documental</required>
        </field>
      
      	<!-- Hacer un field de subtipos por cada tipología que existe -->
@@ -549,7 +549,7 @@
          <label>Tipo</label>
          <input-type value-pairs-name="cic_common_types">dropdown</input-type>
          <hint>Tipo de documento (artículo, tesis, libro, etc.).</hint>
-         <required>true</required>
+         <required>Debe seleccionar una tipología documental</required>
        </field>
      
      	<field>
@@ -726,6 +726,10 @@
  <form-value-pairs>
    
    <value-pairs value-pairs-name="cic_common_types" dc-term="type">
+     <pair>
+     	<displayed-value>-Seleccione una tipología documental-</displayed-value>
+     	<stored-value></stored-value>
+     </pair>
      <pair>
        <displayed-value>Artículo</displayed-value>
        <stored-value>Articulo</stored-value>
