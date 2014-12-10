@@ -263,21 +263,20 @@ public class CCLookup {
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
-
-		// jurisdiction before version
+		
 		String jurisdiction = "";
 		while(keys.hasNext()) {
     		String key = (String)keys.next();
     		String value = (String)answers.get(key);
     		if(key.equals("version")) {
     			if(value.equals("CC3"))
-    				answer_doc += "<jurisdiction>" + jurisdiction + "</jurisdiction>\n";
-    			else
-    				answer_doc += "<jurisdiction></jurisdiction>\n";
+    				answer_doc = answer_doc.replace("<jurisdiction></jurisdiction>\n","<jurisdiction>" + jurisdiction + "</jurisdiction>\n");
     		}
     		else {
-    			if(key.equals("jurisdiction"))
+    			if(key.equals("jurisdiction")) {
     				jurisdiction = value;
+    				answer_doc += "<jurisdiction></jurisdiction>\n";
+    			}	
     			else
     				answer_doc += "<" + key + ">" + value + "</" + key + ">\n";
     		}

@@ -151,8 +151,10 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    	else {
 	    		Iterator outerIterator = cclookup.getLicenseFields(selectedLicense, ccLocale).iterator();
 	    		while (outerIterator.hasNext()) {
-	    			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();
+	    			CCLicenseField cclicensefield = (CCLicenseField)outerIterator.next();	    			
 	    			if (cclicensefield.getId().equals("jurisdiction")) {
+	    				if(this.ccJurisdiction == "")
+		    				continue;
 	    				List licenseList = div.addList("licenselist", List.TYPE_SIMPLE, "horizontalVanilla");
 	    				licenseList.addItem("Jurisdiction: ");
 	    				licenseList.addItem().addFigure(contextPath + "/themes/Reference/images/information.png", "javascript:void(0)", cclicensefield.getDescription(), "information");	    				
@@ -160,7 +162,8 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    				Radio licenseRadio = licenseList.addItem().addRadio("version_chooser");
 	    				licenseRadio.setRequired();
 	    				licenseRadio.addOption("CC3", "CC 3.0 " + this.ccJurisdiction);
-	    				licenseRadio.addOption("CC4", "CC 4.0 international");	    				
+	    				licenseRadio.addOption("CC4", "CC 4.0 international");	
+	    				div.addSimpleHTMLFragment(true, "&#160;");
 	    				continue;
 	    			}
 	    			
