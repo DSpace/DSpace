@@ -27,22 +27,28 @@
 				<xsl:when test="not(string($request-uri))">
 					<xsl:call-template name="buildHome" />
 				</xsl:when>
-				<xsl:when test="starts-with($request-uri, 'page/about')">
-					<div>
-						<h1>About This Repository</h1>
-						<p>To add your own content to this page, edit
-							webapps/xmlui/themes/Mirage/lib/xsl/core/page-structure.xsl and
-							add your own content to the title, trail, and body. If you wish
-							to add additional pages, you
-							will need to create an additional
-							xsl:when block and match the
-							request-uri to whatever page
-							you are
-							adding. Currently, static pages created through altering XSL
-							are
-							only available
-							under the URI prefix of page/.
-						</p>
+<!-- 				<xsl:when test="starts-with($request-uri, 'page/about')"> -->
+<!-- 					<div> -->
+<!-- 						<h1>About This Repository</h1> -->
+<!-- 						<p>To add your own content to this page, edit -->
+<!-- 							webapps/xmlui/themes/Mirage/lib/xsl/core/page-structure.xsl and -->
+<!-- 							add your own content to the title, trail, and body. If you wish -->
+<!-- 							to add additional pages, you -->
+<!-- 							will need to create an additional -->
+<!-- 							xsl:when block and match the -->
+<!-- 							request-uri to whatever page -->
+<!-- 							you are -->
+<!-- 							adding. Currently, static pages created through altering XSL -->
+<!-- 							are -->
+<!-- 							only available -->
+<!-- 							under the URI prefix of page/. -->
+<!-- 						</p> -->
+<!-- 					</div> -->
+<!-- 				</xsl:when> -->
+				<!-- Handler for Static pages -->
+				<xsl:when test="starts-with($request-uri, 'page/')">
+					<div class="static-page">
+						<xsl:copy-of select="document(concat('../../../',$request-uri,'.xhtml') )" />
 					</div>
 				</xsl:when>
 				<!-- Otherwise use default handling of body -->

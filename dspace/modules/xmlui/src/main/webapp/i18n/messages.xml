@@ -75,8 +75,14 @@
 	 	-->
 	<message key="xmlui.general.notice.default_head">Notice</message>
 
-
-
+	<!-- Static pages titles -->
+<message key="xmlui.cicdigital.title.como-aportar-material">¿How to contribute material?</message>
+<message key="xmlui.cicdigital.title.que-es-cic-digital">¿What is CIC-Digital?</message>
+<message key="xmlui.cicdigital.title.politicas-del-repositorio">Repository policies</message>
+	<!-- Static pages trail -->
+<message key="xmlui.cicdigital.trail.como-aportar-material">¿How to contribute material?</message>
+<message key="xmlui.cicdigital.trail.que-es-cic-digital">¿What is CIC-Digital?</message>
+<message key="xmlui.cicdigital.trail.politicas-del-repositorio">Repository policies</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             ArtifactBrowser Aspect

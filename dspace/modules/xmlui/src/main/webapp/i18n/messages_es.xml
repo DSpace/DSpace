@@ -70,6 +70,15 @@
 	 	-->
 <message key="xmlui.general.notice.default_head">Aviso</message>
 
+	<!-- Static pages titles -->
+<message key="xmlui.cicdigital.title.como-aportar-material">¿Cómo aportar material?</message>
+<message key="xmlui.cicdigital.title.que-es-cic-digital">¿Qué es CIC-Digital?</message>
+<message key="xmlui.cicdigital.title.politicas-del-repositorio">Políticas del repositorio</message>
+	<!-- Static pages trail -->
+<message key="xmlui.cicdigital.trail.como-aportar-material">¿Cómo aportar material?</message>
+<message key="xmlui.cicdigital.trail.que-es-cic-digital">¿Qué es CIC-Digital?</message>
+<message key="xmlui.cicdigital.trail.politicas-del-repositorio">Políticas del repositorio</message>
+
 
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

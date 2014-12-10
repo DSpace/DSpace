@@ -177,23 +177,7 @@
                 </xsl:attribute>&#160;</script>
 
             <!-- Add the title in -->
-            <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
-            <title>
-                <xsl:choose>
-                        <xsl:when test="starts-with($request-uri, 'page/about')">
-                                <xsl:text>About This Repository</xsl:text>
-                        </xsl:when>
-                        <xsl:when test="not($page_title)">
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="$page_title = ''">
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                                <xsl:copy-of select="$page_title/node()" />
-                        </xsl:otherwise>
-                </xsl:choose>
-            </title>
+			<xsl:call-template name="addPageTitle"/>            
 
             <!-- Head metadata in item pages -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
@@ -236,5 +220,27 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"><xsl:text> </xsl:text><!-- coment --></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"><xsl:text> </xsl:text><!-- coment --></script>
         </head>
+	</xsl:template>
+	
+	<xsl:template name="addPageTitle">
+		<xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
+            <title>
+                <xsl:choose>
+                        <xsl:when test="starts-with($request-uri, 'page/')">
+                                <i18n:text>
+                                	<xsl:value-of select="concat('xmlui.cicdigital.title.',substring-after($request-uri,'/'))"/>
+                                </i18n:text>
+                        </xsl:when>
+                        <xsl:when test="not($page_title)">
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="$page_title = ''">
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                                <xsl:copy-of select="$page_title/node()" />
+                        </xsl:otherwise>
+                </xsl:choose>
+            </title>
 	</xsl:template>
 </xsl:stylesheet>

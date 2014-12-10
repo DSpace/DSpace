@@ -111,18 +111,34 @@
 								<ul class="dropdown-menu" role="menu">
 									<li class="dropdown-header">Sobre el repositorio</li>
 									<li>
-										<a href="#">Qué es CIC-DIGITAL?</a>
+										<a>
+											<xsl:attribute name="href">
+												<xsl:value-of select="concat($context-path,'/page/que-es-cic-digital')"></xsl:value-of>
+											</xsl:attribute>
+											¿Qué es CIC-DIGITAL?</a>
 									</li>
 									<li>
-										<a href="#">Políticas del repositorio</a>
+										<a>
+											<xsl:attribute name="href">
+												<xsl:value-of select="concat($context-path,'/page/politicas-del-repositorio')"></xsl:value-of>
+											</xsl:attribute>
+											Políticas del repositorio</a>
 									</li>
 									<li class="divider"></li>
 									<li class="dropdown-header">Información para autores</li>
 									<li>
-										<a href="#">Como aportar Material</a>
+										<a>
+											<xsl:attribute name="href">
+												<xsl:value-of select="concat($context-path,'/page/como-aportar-material')"></xsl:value-of>
+											</xsl:attribute>
+											Como aportar Material</a>
 									</li>
 									<li>
-										<a href="#">Registrarse</a>
+										<a>
+											<xsl:attribute name="href">
+												<xsl:value-of select="concat($context-path,'/register')"></xsl:value-of>
+											</xsl:attribute>
+											Registrarse</a>
 									</li>
 								</ul>
 							</li>
@@ -215,9 +231,12 @@
 		<ol class="breadcrumb row">
 
 			<xsl:choose>
-				<xsl:when test="starts-with($request-uri, 'page/about')">
+				<!-- Static pages trail -->
+				<xsl:when test="starts-with($request-uri, 'page/')">
 					<li class="active">
-						<xsl:text>About This Repository</xsl:text>
+						<i18n:text>
+                        	<xsl:value-of select="concat('xmlui.cicdigital.trail.',substring-after($request-uri,'/'))"/>
+                         </i18n:text>
 					</li>
 				</xsl:when>
 				<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) > 0">
