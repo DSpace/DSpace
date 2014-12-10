@@ -260,28 +260,20 @@
 				$(this).data("submitted", true);
 				});
 
-				// Variable que guarda el valor
-				del select para chequear si hay que
-				disparar el alert() o no
-				var
-				dcTypeElement = $('form.submission select[name="dc_type"]');
-				var
-				oldTypeValue = dcTypeElement.val();
-				$('form.submission
-				select[name="dc_type"]').change(function() {
-				var permitirSubmit =
-				false;
+				/* Variable que guarda el valor del select para chequear si hay que
+				disparar el alert() o no */
+				var dcTypeElement = $('form.submission select[name="dc_type"]');
+				var oldTypeValue = dcTypeElement.val();
+				$('form.submission select[name="dc_type"]').change(function() {
+				var permitirSubmit = false;
 				if(oldTypeValue == "")
 				permitirSubmit = true;
 				else
-				permitirSubmit = confirm("¿Está seguro que desea cambiar el tipo de
-				documento?");
+				permitirSubmit = confirm("¿Está seguro que desea cambiar el tipo de documento?");
 
 				if(permitirSubmit) {
-				//Limpiamos el subtype para evitar
-				que quede inconsistente
-				$('form.submission
-				select[name="sedici_subtype"]').val("");
+				/* Limpiamos el subtype para evitar que quede inconsistente */
+				$('form.submission select[name="sedici_subtype"]').val("");
 				$('form.submission').submit();
 				} else {
 				dcTypeElement.val(oldTypeValue);
