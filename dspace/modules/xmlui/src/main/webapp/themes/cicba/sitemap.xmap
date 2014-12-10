@@ -74,7 +74,9 @@
                 <map:parameter name="stylesheet.screen#4" value="../Mirage/lib/css/jquery-ui-1.8.15.custom.css"/>
                 <map:parameter name="stylesheet.screen#5" value="../Mirage/lib/css/style.css"/>
                 <map:parameter name="stylesheet.screen#6" value="../Mirage/lib/css/authority-control.css"/>
-                <map:parameter name="stylesheet.screen#7" value="lib/css/style-cicba.css"/>
+                <map:parameter name="stylesheet.screen#7" value="lib/css/bootstrap.min.css"/>
+                <map:parameter name="stylesheet.screen#8" value="lib/css/bootstrap-theme.min.css"/>
+                <map:parameter name="stylesheet.screen#9" value="lib/css/style-cicba.css"/>
             </map:transform>
             <map:transform type="IncludePageMeta">
                 <map:parameter name="stylesheet.handheld" value="../Mirage/lib/css/handheld.css"/>
@@ -153,7 +155,7 @@
 			</map:match>
 
 			<map:match pattern="themes/cicba/images/*">
-				<map:read type="ConcatenationReader" src="../Mirage/images/{1}">
+				<map:read type="ConcatenationReader" src="../cicba/images/{1}">
                    <map:parameter name="requestQueryString" value="{request:queryString}"/>
                 </map:read>
 			</map:match>

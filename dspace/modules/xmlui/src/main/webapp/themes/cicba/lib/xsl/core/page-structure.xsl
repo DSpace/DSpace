@@ -53,8 +53,6 @@
 							<!--The header div, complete with title, subtitle and other junk -->
 							<xsl:call-template name="buildHeader" />
 
-
-
 							<!--ds-content is a groups ds-body and the navigation together and 
 								used to put the clearfix on, center, etc. ds-content-wrapper is necessary 
 								for IE6 to allow it to center the page content -->

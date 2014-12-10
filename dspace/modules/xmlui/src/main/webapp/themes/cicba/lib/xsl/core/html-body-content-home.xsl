@@ -9,14 +9,38 @@
 	<xsl:template name="buildHome">
 
 		<div class="row">
-			<xsl:for-each select="dri:div[@n='news']">
-				<div id="welcome-panel">
-					<h3>
+			<div class="col-md-8" id="welcome-panel">
+				<xsl:for-each select="dri:div[@n='news']">
+					<h1>
 						<xsl:copy-of select="dri:head" />
-					</h3>
+					</h1>
 					<xsl:value-of select="dri:p" />
-				</div>
-			</xsl:for-each>
+				</xsl:for-each>
+			</div>
+			<div class="col-md-4">
+				<xsl:call-template name="build-img">
+					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
+				</xsl:call-template>
+			</div>
+		</div>
+		<div class="row" id="home-highlight">
+<!-- 			<div class="col-md-12" > -->
+				CONTENT
+					
+<!-- 			</div> -->
+		</div>
+		<div class="row">
+			<div class="col-md-1 col-md-offset-1" >
+				<xsl:call-template name="build-img">
+					<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
+				</xsl:call-template>
+			</div>
+			<div class="col-md-4" style="font-size:23pt" >
+				SUBIR MATERIAL (i18N)
+			</div>
+			<div class="col-md-6" >
+A través del proceso de  AUTOARCHIVO vitae commodo turpis, eget mollis eros. Praesent id lectus ut nibh fermentum efficitur sit amet in urna. Donec vel lobortis nuncu.
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-7">
@@ -38,7 +62,9 @@
 			</xsl:for-each>
 			</div>
 			<div class="col-md-5">
-				TUbo de ensayo
+				<xsl:call-template name="build-img">
+					<xsl:with-param name="img.src">images/generica_72.png</xsl:with-param>
+				</xsl:call-template>
 			</div>
 		</div>
 		

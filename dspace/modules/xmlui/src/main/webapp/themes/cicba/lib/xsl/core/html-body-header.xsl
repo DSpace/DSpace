@@ -51,11 +51,18 @@
 					<!-- Collect the nav links, forms, and other content for toggling -->
 					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
+							<li class="link-ba">
+							    <xsl:call-template name="build-anchor">
+									<xsl:with-param name="a.href">http://www.gba.gob.ar</xsl:with-param>
+									<xsl:with-param name="img.src">images/header_ba-10.png</xsl:with-param>
+									<xsl:with-param name="img.alt">BA</xsl:with-param>
+								</xsl:call-template>
+							</li>
 							<li class="active">
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/</xsl:with-param>
 									<xsl:with-param name="a.value">
-										Inicio
+										Inicio(i18n)
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
@@ -63,9 +70,36 @@
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/submissions</xsl:with-param>
 									<xsl:with-param name="a.value">
-										Aportar Material
+										Aportar Material (i18n)
 									</xsl:with-param>
 								</xsl:call-template>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"
+									role="button" aria-expanded="false">
+									<i18n:text catalogue="default">xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text>
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu" role="menu">
+									<li class="dropdown-header">Todo el repositorio</li>
+									<xsl:for-each select="/dri:document/dri:options/dri:list[@n='browse']/dri:list[@n='global']/dri:item/dri:xref">
+										<li>
+											<xsl:call-template name="build-anchor">
+												<xsl:with-param name="a.href" select="@target"/>
+												<xsl:with-param name="a.value" select="."/>
+											</xsl:call-template>
+										</li>
+									</xsl:for-each>
+									
+									<li class="divider"></li>
+									<li class="dropdown-header">XXX</li>
+									<li>
+										<a href="#">Como aportar Material</a>
+									</li>
+									<li>
+										<a href="#">Registrarse</a>
+									</li>
+								</ul>
 							</li>
 							
 							<li class="dropdown">
@@ -162,10 +196,11 @@
 	<xsl:template name="buildHeader">
 		<xsl:call-template name="buildTopSidebar" />
 		<div id="cic-header" class="row">
-			<div class="page-header">
-				<h1>
-					<i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
-				</h1>
+			<div class="col-md-offset-1 col-md-6">
+				<xsl:call-template name="build-anchor">
+					<xsl:with-param name="img.src">images/logo_72.png</xsl:with-param>
+					<xsl:with-param name="img.alt">CIC-DIGITAL</xsl:with-param>
+				</xsl:call-template>
 			</div>
 		</div>
 		<!--The trail is built by applying a template over pageMeta's trail children. -->

@@ -23,7 +23,7 @@
 		the options div, and is instead built from metadata available under pageMeta. -->
 	<xsl:template match="dri:options">
 		<div class="col-md-3">
-			<xsl:for-each select="dri:list[@n!='account'] ">
+			<xsl:for-each select="dri:list[@n!='account' and @n!='browse'] ">
 				<xsl:if test="dri:item or dri:list">
 					<div class="panel panel-primary">
 						<xsl:if test="dri:head">

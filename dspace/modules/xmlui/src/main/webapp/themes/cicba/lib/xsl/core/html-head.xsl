@@ -56,21 +56,27 @@
                 </xsl:if>
               </xsl:attribute>
             </meta>
+            
+			
+			            
             <!-- Add stylesheets -->
-            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
-                <link rel="stylesheet" type="text/css">
-                    <xsl:attribute name="media">
-                        <xsl:value-of select="@qualifier"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                        <xsl:text>/themes/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                        <xsl:text>/</xsl:text>
-                        <xsl:value-of select="."/>
-                    </xsl:attribute>
-                </link>
-            </xsl:for-each>
+
+
+			<xsl:for-each
+				select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
+				<link rel="stylesheet" type="text/css">
+					<xsl:attribute name="media">
+		            	<xsl:value-of select="@qualifier" />
+		            </xsl:attribute>
+					<xsl:attribute name="href">
+		                <xsl:call-template name="print-theme-path" >
+		                	<xsl:with-param name="path"><xsl:value-of select="." /></xsl:with-param>
+		                </xsl:call-template>
+		            </xsl:attribute>
+				</link>
+			</xsl:for-each>
+			
+            
 
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
@@ -226,12 +232,6 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:if>
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
-
-<!-- Optional theme 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css"/>
--->
 <!-- Latest compiled and minified JavaScript -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"><xsl:text> </xsl:text><!-- coment --></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"><xsl:text> </xsl:text><!-- coment --></script>
