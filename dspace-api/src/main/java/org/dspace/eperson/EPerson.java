@@ -1783,14 +1783,14 @@ public class EPerson extends DSpaceObject
     * (not archived items).
     */
     private void deleteFromItemTable() throws IOException, AuthorizeException, SQLException {
-        TableRowIterator tri = null;
+        ItemIterator itemIter = null;
         try
         {
-            // don't use Item.findBySubmitter here, as it finds items in the archive only and ignores unsubmitted items.
-            tri = DatabaseManager.query(ourContext, "SELECT * from item where submitter_id= ? ", getID());
-            while (tri.hasNext())
+            itemIter = Item.findBySubmitter(ourContext, this, false);
+
+            while (itemIter.hasNext())
             {
-                Item item = Item.find(ourContext, tri.next().getIntColumn("item_id"));
+                Item item = itemIter.next();
                 WorkspaceItem wsi = WorkspaceItem.findByItem(ourContext, item);
                 if (null != wsi)
                 {
@@ -1805,9 +1805,9 @@ public class EPerson extends DSpaceObject
         }
         finally
         {
-            if (tri != null)
+            if (itemIter != null)
             {
-                tri.close();
+                itemIter.close();
             }
         }
     }

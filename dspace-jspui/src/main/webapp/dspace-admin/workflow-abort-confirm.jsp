@@ -51,10 +51,12 @@
         </fmt:message></span>
         </div>
         <div class="row">
-        <%-- <li>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></li> --%>
-        <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
-            <fmt:param><%= WorkflowManager.getSubmitterName(workflow) %></fmt:param>
-        </fmt:message></span>
+        <% if (WorkflowManager.getSubmitterName(workflow) != null) { %>
+            <%-- <li>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></li> --%>
+            <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
+                <fmt:param><%= WorkflowManager.getSubmitterName(workflow) %></fmt:param>
+            </fmt:message></span>
+        <%}%>
         </div>
         <div class="row">
         <%-- <li>Title: <%= WorkflowManager.getItemTitle(workflow) %></li> --%>

@@ -1105,10 +1105,15 @@ public class WorkflowManager
      * get the name of the eperson who started this workflow
      *
      * @param wi  the workflow item
+     * @return The submitter name or null if the submitter was deleted.
      */
     public static String getSubmitterName(WorkflowItem wi) throws SQLException
     {
         EPerson e = wi.getSubmitter();
+        if (e == null)
+        {
+            return null;
+        }
 
         return getEPersonName(e);
     }

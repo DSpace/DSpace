@@ -1114,13 +1114,6 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete E-Person</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Login as E-Person</message>
 
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">This eperson is unable to be deleted because of the following constraint(s):</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction">and</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item">eperson has submitted one or more items</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem">eperson has an active submission workflow</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.tasklistitem">eperson has a workflow task awaiting their attention</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.unknown">eperson has an unidentified constraint within the system</message>
-
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_head">Groups this E-Person is a member of:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.indirect_member">(via group: {0})</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_none">none</message>
@@ -1136,7 +1129,14 @@
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_name">Name</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_email">Email</message>
 
-	<!-- general items for all of the group classes -->
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint">This eperson</message>
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.last_conjunction">and</message>
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.item">has submitted one or more items which will be kept</message>
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.workspaceitem">has unsubmitted workspace items which will be deleted</message>
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.workflowitem">has an active submission workflow which will be put back into the pool</message>
+    <message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.unknown">eperson has an unidentified constraint within the system which may prevent us to delete it</message>
+
+    <!-- general items for all of the group classes -->
 	<message key="xmlui.administrative.group.general.group_trail">Manage Groups</message>
 
 	<!-- org.dspace.app.xmlui.administrative.group.ManageGroupsMain -->

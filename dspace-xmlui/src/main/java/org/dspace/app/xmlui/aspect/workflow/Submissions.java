@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.workflow;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -15,6 +16,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -177,9 +179,14 @@ public class Submissions extends AbstractDSpaceTransformer
         		String ownedWorkflowItemUrl = contextPath + "/handle/" + owned.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
         		Metadatum[] titles = owned.getItem().getDC("title", null, Item.ANY);
         		String collectionName = owned.getCollection().getMetadata("name");
-        		EPerson submitter = owned.getSubmitter();
-        		String submitterName = submitter.getFullName();
-        		String submitterEmail = submitter.getEmail();
+                EPerson submitter = owned.getSubmitter();
+                String submitterName = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.deleted-submitter");
+                String submitterEmail = "";
+                if (submitter != null)
+                {
+                    submitterName = submitter.getFullName();
+                    submitterEmail = submitter.getEmail();
+                }
 
         		Message state = getWorkflowStateMessage(owned);
 
@@ -212,9 +219,14 @@ public class Submissions extends AbstractDSpaceTransformer
 
         		// Submitted by
 	        	Cell cell = row.addCell();
-	        	cell.addContent(T_email);
-	        	cell.addXref("mailto:"+submitterEmail,submitterName);
-        	}
+                if (StringUtils.isNotEmpty(submitterEmail))
+                {
+                    cell.addContent(T_email);
+                    cell.addXref("mailto:" + submitterEmail, submitterName);
+                } else {
+                    cell.addContent(submitterName);
+                }
+            }
 
         	Row row = table.addRow();
  	    	row.addCell(0,5).addButton("submit_return_tasks").setValue(T_w_submit_return);
@@ -287,8 +299,13 @@ public class Submissions extends AbstractDSpaceTransformer
 
         		// Submitted by
         		Cell cell = row.addCell();
-	        	cell.addContent(T_email);
-	        	cell.addXref("mailto:"+submitterEmail,submitterName);
+                if (StringUtils.isNotEmpty(submitterEmail))
+                {
+                    cell.addContent(T_email);
+                    cell.addXref("mailto:" + submitterEmail, submitterName);
+                } else {
+                    cell.addContent(submitterName);
+                }
 
         	}
         	Row row = table.addRow();

@@ -291,7 +291,7 @@ public class FlowEPersonUtils {
     	{
     		EPerson personDeleted = EPerson.find(context, Integer.valueOf(id));
     		try {
-                    personDeleted.delete();
+                    personDeleted.delete(true);
     		} 
     		catch (EPersonDeletionException | IOException ex)
     		{

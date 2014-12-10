@@ -227,6 +227,7 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
 	}
 
+
     /**
      * Find all the items in the archive by a given submitter. The order is
      * indeterminate. Only items with the "in archive" flag set are included.
@@ -241,8 +242,31 @@ public class Item extends DSpaceObject
     public static ItemIterator findBySubmitter(Context context, EPerson eperson)
             throws SQLException
     {
-        String myQuery = "SELECT * FROM item WHERE in_archive='1' AND submitter_id="
-                + eperson.getID();
+        return findBySubmitter(context, eperson, true);
+    }
+
+    /**
+     * Find all the items by a given submitter. The order is indeterminate.
+     * Only items with the "in archive" flag set are included.
+     *
+     * @param context
+     *            DSpace context object
+     * @param eperson
+     *            the submitter
+     * @param excludeUnarchived If set true, items with the "in archive" flag are included only.
+     *                          Set false to include all items.
+     * @return an iterator over the items submitted by eperson
+     * @throws SQLException
+     */
+    public static ItemIterator findBySubmitter(Context context, EPerson eperson, boolean excludeUnarchived)
+            throws SQLException
+    {
+        String myQuery = "SELECT * FROM item WHERE ";
+        if (excludeUnarchived)
+        {
+            myQuery += "in_archive='1' AND ";
+        }
+        myQuery += "submitter_id=" + eperson.getID();
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 

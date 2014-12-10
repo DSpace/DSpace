@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.xmlworkflow;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
@@ -16,6 +17,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -176,10 +178,13 @@ public class Submissions extends AbstractDSpaceTransformer
                     Metadatum[] titles = item.getItem().getDC("title", null, Item.ANY);
                     String collectionName = item.getCollection().getMetadata("name");
                     EPerson submitter = item.getSubmitter();
-                    String submitterName = submitter.getFullName();
-                    String submitterEmail = submitter.getEmail();
-
-    //        		Message state = getWorkflowStateMessage(owned);
+                    String submitterName = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.deleted-submitter");
+                    String submitterEmail = "";
+                    if (submitter != null)
+                    {
+                        submitterName = submitter.getFullName();
+                        submitterEmail = submitter.getEmail();
+                    }
 
                     boolean taskHasPool = step.getUserSelectionMethod().getProcessingAction().usesTaskPool();
                     if(taskHasPool){
@@ -215,8 +220,13 @@ public class Submissions extends AbstractDSpaceTransformer
 
                     // Submitted by
                     Cell cell = row.addCell();
-                    cell.addContent(T_email);
-                    cell.addXref("mailto:"+submitterEmail,submitterName);
+                    if (StringUtils.isNotEmpty(submitterEmail))
+                    {
+                        cell.addContent(T_email);
+                        cell.addXref("mailto:" + submitterEmail, submitterName);
+                    } else {
+                        cell.addContent(submitterName);
+                    }
                 } catch (WorkflowConfigurationException e) {
                     Row row = table.addRow();
                     row.addCell().addContent("Error: Configuration error in workflow.");
@@ -269,8 +279,13 @@ public class Submissions extends AbstractDSpaceTransformer
                     Metadatum[] titles = item.getItem().getDC("title", null, Item.ANY);
                     String collectionName = item.getCollection().getMetadata("name");
                     EPerson submitter = item.getSubmitter();
-                    String submitterName = submitter.getFullName();
-                    String submitterEmail = submitter.getEmail();
+                    String submitterName = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.deleted-submitter");
+                    String submitterEmail = "";
+                    if (submitter != null)
+                    {
+                        submitterName = submitter.getFullName();
+                        submitterEmail = submitter.getEmail();
+                    }
 
     //        		Message state = getWorkflowStateMessage(pooled);
 
@@ -302,8 +317,13 @@ public class Submissions extends AbstractDSpaceTransformer
 
                     // Submitted by
                     Cell cell = row.addCell();
-                    cell.addContent(T_email);
-                    cell.addXref("mailto:"+submitterEmail,submitterName);
+                    if (StringUtils.isNotEmpty(submitterEmail))
+                    {
+                        cell.addContent(T_email);
+                        cell.addXref("mailto:" + submitterEmail, submitterName);
+                    } else {
+                        cell.addContent(submitterName);
+                    }
                 } catch (WorkflowConfigurationException e) {
                     Row row = table.addRow();
                     row.addCell().addContent("Error: Configuration error in workflow.");
