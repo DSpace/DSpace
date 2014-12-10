@@ -159,7 +159,7 @@
 
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateissued">fecha de publicación</message>
-<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateaccessioned">fecha de envío</message>
+<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateaccessioned">fecha de carga</message>
 
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc">ascendente</message>
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc">descendente</message>
@@ -179,8 +179,8 @@
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.dateissued">Listar {0} por fecha de publicación {1}</message>
 <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateissued">Listar {0} fecha de publicación</message>
 
-<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.dateaccessioned">Listar {0} por fecha de envío {1}</message>
-<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Listar {0} por fecha de envío</message>
+<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.dateaccessioned">Listar {0} por fecha de carga {1}</message>
+<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Listar {0} por fecha de carga</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
@@ -259,7 +259,7 @@
 <message key="xmlui.ArtifactBrowser.Navigation.browse_author">Autores</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Materias</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">Por fecha de publicación</message>
-<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Por fecha de envío</message>
+<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Por fecha de carga</message>
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">Esta colección</message>
 <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Esta comunidad</message>
 
