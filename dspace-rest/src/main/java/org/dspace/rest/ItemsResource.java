@@ -457,7 +457,12 @@ public class ItemsResource extends Resource
             log.trace("Creating bitstream in item.");
             org.dspace.content.Bundle bundle = null;
             org.dspace.content.Bitstream dspaceBitstream = null;
-            if ((dspaceItem.getBundles().length == 0) || (dspaceItem.getBundles() == null))
+            Bundle[] bundles = dspaceItem.getBundles("ORIGINAL");
+			if(bundles != null && bundles.length != 0)
+			{
+				bundle = bundles[0]; // There should be only one bundle ORIGINAL.
+			}
+            if (bundle == null)
             {
                 log.trace("Creating bundle in item.");
                 dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
@@ -465,7 +470,6 @@ public class ItemsResource extends Resource
             else
             {
                 log.trace("Getting bundle from item.");
-                bundle = dspaceItem.getBundles()[0];
                 dspaceBitstream = bundle.createBitstream(inputStream);
             }
 
@@ -494,7 +498,7 @@ public class ItemsResource extends Resource
             // Create policy for bitstream
             if (groupId != null)
             {
-                Bundle[] bundles = dspaceBitstream.getBundles();
+                bundles = dspaceBitstream.getBundles();
                 for (Bundle dspaceBundle : bundles)
                 {
                     List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = dspaceBundle.getBitstreamPolicies();
