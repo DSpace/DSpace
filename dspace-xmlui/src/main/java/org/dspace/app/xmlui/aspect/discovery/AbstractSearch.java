@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -28,6 +30,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
@@ -58,6 +62,9 @@ import java.util.List;
 public abstract class AbstractSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent{
 
     private static final Logger log = Logger.getLogger(AbstractSearch.class);
+        
+    private static DSpaceCSV csv = null;    
+    private static String filename = null;
 
     /**
      * Language strings
@@ -723,7 +730,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             return;
         }
         
-
         String query = getQuery();
 
         //DSpaceObject scope = getScope();
@@ -739,7 +745,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             filterQueries.addAll(Arrays.asList(fqs));
         }
 
-
         this.queryArgs = new DiscoverQuery();
 
         //Add the configured default filter queries
@@ -750,7 +755,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         if (filterQueries.size() > 0) {
             queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         }
-
 
         queryArgs.setMaxResults(getParameterRpp());
 
@@ -826,10 +830,68 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
 
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
+        
+        Item[] resultsItems;
+        
+        // Get a list of found items
+        ArrayList<Item> items = new ArrayList<Item>();
+        for (DSpaceObject resultDSO : this.queryResults.getDspaceObjects())
+        {
+            if (resultDSO instanceof Item)
+            {
+                items.add((Item) resultDSO);
+            }
+        }
+        
+        resultsItems = new Item[items.size()];
+        resultsItems = items.toArray(resultsItems);
+                
+        try {
+        	exportMetadata(context, resultsItems);
+        } catch(IOException e) { }
+    }
+    
+    /**
+     * Export the search results as a csv file
+     * 
+     * @param context
+     *            The DSpace context
+     * @param items
+     *            The result items
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected void exportMetadata(Context context, Item[] items) throws IOException
+    {
+        // Log the attempt
+        log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
+
+        // Export a search view
+        ArrayList iids = new ArrayList();
+        for (Item item : items)
+        {
+            iids.add(item.getID());
+        }
+        ItemIterator ii = new ItemIterator(context, iids);
+        MetadataExport exporter = new MetadataExport(context, ii, false);
+
+        // Perform the export
+        csv = exporter.export();
+        
+        filename = "search-results.csv";
+        
+        log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
+        return;
+    }
+        
+    public static DSpaceCSV getCSV() {
+    	return csv;
     }
 
-
-
+    public static String getFileName() {
+    	return filename;
+    }
+    
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
      * @return an array containing the filter queries
