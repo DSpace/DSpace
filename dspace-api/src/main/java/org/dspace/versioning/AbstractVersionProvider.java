@@ -65,11 +65,10 @@ public abstract class AbstractVersionProvider {
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException {
         int idNew = BitstreamStorageManager.clone(context, nativeBitstream.getID());
 	    Bitstream newBitstream = Bitstream.find(context, idNew);
-	    newBitstream.setDescription(nativeBitstream.getDescription());
-	    newBitstream.setFormat(nativeBitstream.getFormat());
-	    newBitstream.setName(nativeBitstream.getName());
-	    newBitstream.setSource(nativeBitstream.getSource());
-	    newBitstream.setUserFormatDescription(nativeBitstream.getUserFormatDescription());
+	    Metadatum[] bitstreamMeta = nativeBitstream.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+	    for (Metadatum value : bitstreamMeta) {
+		    newBitstream.addMetadata(value.schema, value.element, value.qualifier, value.language, value.value, value.authority, value.confidence);
+	    }
 	    newBitstream.updateMetadata();
 	    return newBitstream;
     }
