@@ -200,7 +200,7 @@ jQuery(document).ready(function() {
         jQuery($hidden).each(function(i,elt) {
             jQuery(elt).blur(function() {
                 window.setTimeout(function() {
-                    if ($row.find('input:focus').length === 0) {
+                    if ($row.find('input:focus[type="text"]').length === 0) {
                         reinterpret_inputs($shown,$hidden,sep);
                         $button.removeAttr('disabled');
                     }
