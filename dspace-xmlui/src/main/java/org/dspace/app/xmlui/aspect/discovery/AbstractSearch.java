@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
+import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.bulkedit.MetadataExport;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -28,6 +30,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
@@ -58,7 +62,7 @@ import java.util.List;
 public abstract class AbstractSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent{
 
     private static final Logger log = Logger.getLogger(AbstractSearch.class);
-
+    
     /**
      * Language strings
      */
@@ -90,7 +94,16 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Cached query results
      */
     protected DiscoverResult queryResults;
-
+    
+    /**
+     * Static query results for exporting metadata
+     */
+    private static DiscoverResult staticQueryResults;
+    
+    public void setStaticQueryResults(DiscoverResult qResults) {
+    	staticQueryResults = qResults;
+    }
+    
     /**
      * Cached query arguments
      */
@@ -616,8 +629,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         }
                         break;
                     default:
-                        //Partial match allowed, only render the highlighted part
-                        if(value.contains(highlight.replaceAll("</?em>", "")))
+                        //Partial match allowed, only render the highlighted part (will also remove \r since this char is not indexed in solr & will cause issues
+                        if(value.replace("\r", "").contains(highlight.replaceAll("</?em>", "")))
                         {
                             value = highlight;
                         }
@@ -723,7 +736,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             return;
         }
         
-
         String query = getQuery();
 
         //DSpaceObject scope = getScope();
@@ -739,7 +751,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             filterQueries.addAll(Arrays.asList(fqs));
         }
 
-
         this.queryArgs = new DiscoverQuery();
 
         //Add the configured default filter queries
@@ -750,7 +761,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         if (filterQueries.size() > 0) {
             queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         }
-
 
         queryArgs.setMaxResults(getParameterRpp());
 
@@ -826,10 +836,49 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
 
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
+        setStaticQueryResults(this.queryResults);
     }
+    
+    /**
+     * Export the search results as a csv file
+     * 
+     * @throws IOException
+     */
+    public static DSpaceCSV exportMetadata(Context context) throws IOException
+    {
+    	Item[] resultsItems;
+        // Get a list of found items
+        ArrayList<Item> items = new ArrayList<Item>();
+        for (DSpaceObject resultDSO : staticQueryResults.getDspaceObjects())        
+        {
+            if (resultDSO instanceof Item)
+            {
+                items.add((Item) resultDSO);
+            }
+        }
+        
+        resultsItems = new Item[items.size()];
+        resultsItems = items.toArray(resultsItems);
+        
+        // Log the attempt
+        log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
 
-
-
+        // Export a search view
+        ArrayList iids = new ArrayList();
+        for (Item item : items)
+        {
+            iids.add(item.getID());
+        }
+        ItemIterator ii = new ItemIterator(context, iids);
+        MetadataExport exporter = new MetadataExport(context, ii, false);
+        
+        // Perform the export
+        DSpaceCSV csv = exporter.export();
+        
+        log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
+        return csv;
+    }
+        
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
      * @return an array containing the filter queries
