@@ -304,9 +304,14 @@ public class Item extends DSpaceObject
 
         TableRowIterator rows;
 
-        //TODO Oracle doesn't have concept of limit
-        if(limit != null && limit > 0 && !DatabaseManager.isOracle()) {
-            querySorted += " limit ?";
+        if(limit != null && limit > 0) {
+            if(DatabaseManager.isOracle()) {
+                //Oracle syntax for limit
+                // select * from ( SUBQUERY ) where ROWNUM <= 5;
+                querySorted = "SELECT * FROM (" + querySorted + ") WHERE ROWNUM <= ?";
+            } else {
+                querySorted += " limit ?";
+            }
             rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID(), limit);
         } else {
             rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID());
