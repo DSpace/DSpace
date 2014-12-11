@@ -1,0 +1,223 @@
+/* Estilo personalizado de CIC-DIGITAL */
+/* Extiende el tema de Mirage */
+.container {
+	/*width: 970px !important;*/
+	
+}
+
+ul {
+	margin-left: 0px;
+}
+
+#welcome-panel h1 {
+	color: rgb(186, 223, 229);
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+#cic-header {
+	background-image: url('../images/header_72.png');
+	padding: 30px;
+}
+
+.page-header {
+	border-bottom: none !important;
+	/* 	background-image: url('../images/logo_72.png'); */
+	/* 	background-repeat: no-repeat; */
+}
+
+#cic-body {
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
+#cic-footer {
+	background-color: rgb(158, 196, 205);
+	/* 	padding:30px; */
+	color: black;
+}
+
+#cic-footer address {
+	background-image: url('../images/senalador_para_footer.png');
+	background-repeat: no-repeat;
+	background-position: -15px 0px;
+	padding-left: 50px;
+}
+
+#home-highlight {
+	height: 270px;
+	margin-bottom: 20px;
+}
+
+#home-highlight-img {
+	background-image: url('../images/imagen_highlight.jpg');
+	background-repeat: no-repeat;
+	background-position: center;
+	height: 270px;
+	margin-right: 0px;
+	padding-left: 0px;
+	margin-left: 0px;
+	position: absolute;
+	left: 0;
+	width: 100%;
+}
+
+#home-highlight-content {
+	opacity: 0.99;
+	/* fix for stacking context issue of self and home-highlight-img */
+	display: inline-block;
+	max-width: 550px;
+	margin: 20px auto;
+	padding: 10px;
+}
+
+#home-highlight-content form {
+	background-color: rgba(109, 175, 185, 0.6);
+	padding: 8px 15px;
+}
+
+#home-highlight-content form>div {
+	background-color: white;
+	display: inline-block;
+	padding: 6px;
+	margin-bottom: 5px;
+}
+
+#home-highlight-content form input {
+	border: none;
+	box-shadow: none;
+	border-radius: 0px;
+	font-size: 15pt;
+}
+
+#home-highlight-content .glyphicon-search {
+	color: rgba(109, 175, 185, 0.6);
+	font-weight: bold;
+	font-size: 22pt;
+	vertical-align: middle;
+}
+
+#home-highlight-content label {
+	font-size: 25pt;
+	font-weight: bold;
+	text-transform: uppercase;
+	color: white;
+}
+
+#home-highlight-content form .badge {
+	background-color: rgba(191, 191, 191, 0.6);
+	color: white;
+}
+
+#home-highlight-content .badge {
+	background-color: rgb(186, 223, 229);
+	color: black;
+}
+
+li.ds-artifact-item {
+	list-style: none;
+}
+
+li.ds-artifact-item ul {
+	margin-left: 20px;
+}
+
+li.ds-artifact-item.community {
+	font-weight: bold;
+}
+
+/* TopBar*/
+.navbar-nav>li>a {
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
+}
+
+.navbar {
+	min-height: 40px !important;
+	margin-bottom: 0px;
+	border-radius: 0px;
+}
+
+.navbar-nav>li.link-ba>a {
+	padding: 0px !important;
+	/* 	background-color: #EE7700; */
+}
+
+.navbar-nav>li.link-ba>a>img {
+	width: 40px;
+	height: 40px;
+}
+
+.dropdown-submenu {
+	position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+	top: 0;
+	left: 100%;
+	margin-top: -6px;
+	margin-left: -1px;
+	-webkit-border-radius: 0 6px 6px 6px;
+	-moz-border-radius: 0 6px 6px;
+	border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+	display: block;
+}
+
+.dropdown-submenu>a:after {
+	display: block;
+	content: " ";
+	float: right;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+	border-width: 5px 0 5px 5px;
+	border-left-color: #cccccc;
+	margin-top: 5px;
+	margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+	border-left-color: #ffffff;
+}
+
+.dropdown-submenu.pull-left {
+	float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+	left: -100%;
+	margin-left: 10px;
+	-webkit-border-radius: 6px 0 6px 6px;
+	-moz-border-radius: 6px 0 6px 6px;
+	border-radius: 6px 0 6px 6px;
+}
+
+
+/* PLACEHOLDERS */
+::-webkit-input-placeholder { /* WebKit browsers */
+	color: #EAEAEA;
+	font-style: italic;
+	opacity: 1;
+}
+
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+	color: #EAEAEA;
+	font-style: italic;
+	opacity: 1;
+}
+
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+	color: #EAEAEA;
+	font-style: italic;
+	opacity: 1;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+	color: #EAEAEA;
+	font-style: italic;
+	opacity: 1;
+}

@@ -10,47 +10,69 @@
 	<!-- Like the header, the footer contains various miscellaneous text, links, 
 		and image placeholders -->
 	<xsl:template name="buildFooter">
+		<div class="row" id="cic-footer">
+			<div class="col-md-2">
+				<xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">
+						http://www.gba.gob.ar
+					</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/marca_para_footer.png
+					</xsl:with-param>
+					<xsl:with-param name="img.alt">
+						BA
+					</xsl:with-param>
+				</xsl:call-template>
+			</div>
+			<div class="col-md-2 col-md-offset-1">
+				<ul>
+
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href">
+								/
+							</xsl:with-param>
+							<xsl:with-param name="a.value">
+								Inicio(i18n)
+							</xsl:with-param>
+						</xsl:call-template>
+					</li>
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href">
+								/community-list
+							</xsl:with-param>
+							<xsl:with-param name="a.value">
+								navegar (i18n)
+							</xsl:with-param>
+						</xsl:call-template>
+					</li>
+				</ul>
+			</div>
+			<div id="ds-footer-right">
+				<address>
+					<strong>Comisión de Investigaciones Científicas sbp</strong>
+					<br />
+					Calle 526 entre 10 y 11
+					<br />
+					CP: 1900 - La Plata - Buenos Aires - Argentina
+					<br />
+					<a href="mailto:#">info-cic@sedici.unlp.edu.ar</a>
+					<br />
+					<abbr title="Phone">Tel:</abbr>
+					+54 (0221) 421-7374 / 482-3795
+					<br />
+					482-9581 / 421-3376 / 421-6205
+					<br />
+					<abbr title="Phone">Fax:</abbr>
+					(0221) 425-8383 / 483-7999
+				</address>
+			</div>
+		</div>
 		<div class="row">
-			<div id="ds-footer">
-				<div id="ds-footer-left">
-					<a href="http://www.dspace.org/" target="_blank">DSpace software</a>
-					copyright&#160;&#169;&#160;2002-2012&#160;
-					<a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
-				</div>
-				<div id="ds-footer-right">
-					<span class="theme-by">Theme by&#160;</span>
-					<a title="@mire NV" target="_blank" href="http://atmire.com" id="ds-footer-logo-link">
-						<span id="ds-footer-logo">&#160;</span>
-					</a>
-				</div>
-				<div id="ds-footer-links">
-					<a>
-						<xsl:attribute name="href">
-                            <xsl:value-of
-							select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-                            <xsl:text>/contact</xsl:text>
-                        </xsl:attribute>
-						<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-					</a>
-					<xsl:text> | </xsl:text>
-					<a>
-						<xsl:attribute name="href">
-                            <xsl:value-of
-							select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-						<i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-					</a>
-				</div>
-				<!--Invisible link to HTML sitemap (for search engines) -->
-				<a class="hidden">
-					<xsl:attribute name="href">
-                        <xsl:value-of
-						select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-                        <xsl:text>/htmlmap</xsl:text>
-                    </xsl:attribute>
-					<xsl:text>&#160;</xsl:text>
-				</a>
+			<div>
+				Este repositorio esta soportado por el software
+				<a href="http://www.dspace.org/" target="_blank">DSpace</a>
 			</div>
 		</div>
 	</xsl:template>

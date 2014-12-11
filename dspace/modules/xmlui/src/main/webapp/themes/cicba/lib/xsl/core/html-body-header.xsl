@@ -58,7 +58,7 @@
 									<xsl:with-param name="img.alt">BA</xsl:with-param>
 								</xsl:call-template>
 							</li>
-							<li class="active">
+							<li>
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/</xsl:with-param>
 									<xsl:with-param name="a.value">
@@ -66,6 +66,10 @@
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
+							<xsl:for-each select="/dri:document/dri:options/dri:list[@n='browse']">
+								<xsl:call-template  name="buildMenuItemAsList"   />
+							</xsl:for-each>
+							
 							<li>
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/submissions</xsl:with-param>
@@ -73,33 +77,6 @@
 										Aportar Material (i18n)
 									</xsl:with-param>
 								</xsl:call-template>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown"
-									role="button" aria-expanded="false">
-									<i18n:text catalogue="default">xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text>
-									<span class="caret"></span>
-								</a>
-								<ul class="dropdown-menu" role="menu">
-									<li class="dropdown-header">Todo el repositorio</li>
-									<xsl:for-each select="/dri:document/dri:options/dri:list[@n='browse']/dri:list[@n='global']/dri:item/dri:xref">
-										<li>
-											<xsl:call-template name="build-anchor">
-												<xsl:with-param name="a.href" select="@target"/>
-												<xsl:with-param name="a.value" select="."/>
-											</xsl:call-template>
-										</li>
-									</xsl:for-each>
-									
-									<li class="divider"></li>
-									<li class="dropdown-header">XXX</li>
-									<li>
-										<a href="#">Como aportar Material</a>
-									</li>
-									<li>
-										<a href="#">Registrarse</a>
-									</li>
-								</ul>
 							</li>
 							
 							<li class="dropdown">
@@ -145,11 +122,12 @@
 							<li>
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/feedback</xsl:with-param>
-									<xsl:with-param name="a.value">
-										Contacto
+									<xsl:with-param name="a.value">s
+										<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
+							
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
@@ -158,53 +136,134 @@
 									<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 								</a>
 							</li>
-							<li>
-								<xsl:choose>
-									<xsl:when
-										test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-										<a class="dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-											<xsl:value-of
-												select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='firstName']" />
-											<xsl:text> </xsl:text>
-											<xsl:value-of
-												select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='lastName']" />
-											<span class="caret"></span>
-										</a>
-										<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-											<li role="presentation">
-												<xsl:for-each
-													select="//dri:options/dri:list[@n='account']/dri:item/dri:xref">
-													<a role="menuitem" tabindex="-1">
-														<xsl:attribute name="href"><xsl:value-of
-															select="@target" /></xsl:attribute>
-														<xsl:copy-of select="." />
-													</a>
-												</xsl:for-each>
-											</li>
-										</ul>
-									</xsl:when>
-									<xsl:otherwise>
-										<a>
-											<xsl:attribute name="href">
-	                        	<xsl:value-of
-												select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='loginURL']" />
-							</xsl:attribute>
-											<i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-										</a>
-									</xsl:otherwise>
-								</xsl:choose>
-							</li>
+							<xsl:for-each select="/dri:document/dri:options/dri:list[@n!='browse' and @n!='discovery']">
+								<xsl:if test="count(child::*) &gt; 0">
+									<xsl:call-template  name="buildMenuItemAsTree"   />
+								</xsl:if>
+							</xsl:for-each>
+<!-- 							<li> -->
+<!-- 								<xsl:choose> -->
+<!-- 									<xsl:when -->
+<!-- 										test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'"> -->
+<!-- 										<a class="dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown"> -->
+<!-- 											<xsl:value-of -->
+<!-- 												select="/dri:document/dri:meta/dri:userMeta/ -->
+<!--                                     dri:metadata[@element='identifier' and @qualifier='firstName']" /> -->
+<!-- 											<xsl:text> </xsl:text> -->
+<!-- 											<xsl:value-of -->
+<!-- 												select="/dri:document/dri:meta/dri:userMeta/ -->
+<!--                                     dri:metadata[@element='identifier' and @qualifier='lastName']" /> -->
+<!-- 											<span class="caret"></span> -->
+<!-- 										</a> -->
+<!-- 										<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1"> -->
+<!-- 											<li role="presentation"> -->
+<!-- 												<xsl:for-each -->
+<!-- 													select="//dri:options/dri:list[@n='account']/dri:item/dri:xref"> -->
+<!-- 													<a role="menuitem" tabindex="-1"> -->
+<!-- 														<xsl:attribute name="href"><xsl:value-of -->
+<!-- 															select="@target" /></xsl:attribute> -->
+<!-- 														<xsl:copy-of select="." /> -->
+<!-- 													</a> -->
+<!-- 												</xsl:for-each> -->
+<!-- 											</li> -->
+<!-- 										</ul> -->
+<!-- 									</xsl:when> -->
+<!-- 									<xsl:otherwise> -->
+<!-- 										<a> -->
+<!-- 											<xsl:attribute name="href"> -->
+<!-- 	                        	<xsl:value-of -->
+<!-- 												select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='loginURL']" /> -->
+<!-- 							</xsl:attribute> -->
+<!-- 											<i18n:text>xmlui.dri2xhtml.structural.login</i18n:text> -->
+<!-- 										</a> -->
+<!-- 									</xsl:otherwise> -->
+<!-- 								</xsl:choose> -->
+<!-- 							</li> -->
 							<li>
 								<xsl:call-template name="languageSelection" />
 
 							</li>
 						</ul>
+						
+						
 					</div><!-- /.navbar-collapse -->
 				</div><!-- /.container-fluid -->
 			</nav>
 		</div>
+	</xsl:template>
+
+	<xsl:template name="buildMenuItemAsList">
+								
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+				aria-expanded="false">
+				<xsl:copy-of select="dri:head/*" />
+				<span class="caret"></span>
+			</a>
+
+			<ul class="dropdown-menu" role="menu">
+				<xsl:for-each select="dri:item/dri:xref">
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href" select="@target" />
+							<xsl:with-param name="a.value" select="*" />
+						</xsl:call-template>
+					</li>
+				</xsl:for-each>
+				<xsl:for-each select="dri:list">
+					<xsl:if test="count(dri:item) &gt; 0">
+						<li class="dropdown-header"><xsl:copy-of select="dri:head/*" /></li>
+					</xsl:if>
+					<xsl:for-each select="dri:item/dri:xref">
+						<li>
+							<xsl:call-template name="build-anchor">
+								<xsl:with-param name="a.href" select="@target" />
+								<xsl:with-param name="a.value" select="node()" />
+							</xsl:call-template>
+						</li>
+					</xsl:for-each>
+				</xsl:for-each>
+			</ul>
+		</li>
+	</xsl:template>
+
+	<xsl:template name="buildMenuItemAsTree">
+								
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+				aria-expanded="false">
+				<xsl:copy-of select="dri:head/*" />
+				<span class="caret"></span>
+			</a>
+
+			<ul class="dropdown-menu" role="menu">
+				<xsl:for-each select="dri:item/dri:xref">
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href" select="@target" />
+							<xsl:with-param name="a.value" select="*" />
+						</xsl:call-template>
+					</li>
+				</xsl:for-each>
+				<xsl:for-each select="dri:list">
+					<xsl:if test="count(dri:item) &gt; 0">
+						<li class="dropdown-submenu">
+							<a tabindex="-1" href="#"><xsl:copy-of select="dri:head/*" /></a>
+							<ul class="dropdown-menu" role="menu">
+								<xsl:for-each select="dri:item/dri:xref">
+									<li>
+										<xsl:call-template name="build-anchor">
+											<xsl:with-param name="a.href" select="@target" />
+											<xsl:with-param name="a.value" select="node()" />
+										</xsl:call-template>
+									</li>
+								</xsl:for-each>
+							</ul>
+						</li>
+					</xsl:if>
+				</xsl:for-each>
+			</ul>
+		</li>
 	</xsl:template>
 
 	<!-- The header (distinct from the HTML head element) contains the title, 

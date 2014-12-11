@@ -101,5 +101,31 @@
 		<xsl:value-of select="$path" />
 	</xsl:template>
     
+    <xsl:template name="include-js">
+		<xsl:param name="path"></xsl:param>
+		<xsl:param name="defer">false</xsl:param>
+		<xsl:param name="async">false</xsl:param>
+		<script type="text/javascript">
+			<xsl:if test="$defer = 'true'">
+				<xsl:attribute name="defer">true</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="$async = 'true'">
+				<xsl:attribute name="defer">true</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="src">
+				<xsl:choose>
+					<xsl:when test="starts-with($path, 'http://')">
+						<xsl:value-of select="$path"/>
+					</xsl:when>
+					<xsl:otherwise>
+					<xsl:call-template name="print-theme-path">
+						<xsl:with-param name="path"><xsl:value-of select="$path" /></xsl:with-param></xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+			<xsl:text> </xsl:text> <!-- Fix for avoid broser errors -->
+		</script>
+		
+	</xsl:template>
  
  </xsl:stylesheet>

@@ -37,42 +37,29 @@
 	<xsl:template match="dri:document">
 		<html class="no-js">
 			<!-- First of all, build the HTML head element -->
-			<xsl:call-template name="buildHead" />
+			<head>
+				<xsl:call-template name="buildHead" />
+				<xsl:apply-templates select="dri:meta"/>
+			</head>
+			
 			<!-- Then proceed to the body -->
-
 			<body>
 
 				<xsl:choose>
 					<xsl:when
 						test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
-						<xsl:apply-templates select="dri:body/*" />
+								<xsl:apply-templates select="dri:body" />
 					</xsl:when>
 					<xsl:otherwise>
-						<div class="container">
-							<!-- <div id="ds-main"> -->
+						<div class="container-fluid">
 							<!--The header div, complete with title, subtitle and other junk -->
 							<xsl:call-template name="buildHeader" />
 
-							<!--ds-content is a groups ds-body and the navigation together and 
-								used to put the clearfix on, center, etc. ds-content-wrapper is necessary 
-								for IE6 to allow it to center the page content -->
 							<div class="row">
-								<!-- Goes over the document tag's children elements: body, options, 
-									meta. The body template generates the ds-body div that contains all the content. 
-									The options template generates the ds-options div that contains the navigation 
-									and action options available to the user. The meta element is ignored since 
-									its contents are not processed directly, but instead referenced from the 
-									different points in the document. -->
-								<xsl:apply-templates />
+								<xsl:apply-templates select="dri:body" />
 							</div>
 
-
-							<!-- The footer div, dropping whatever extra information is needed 
-								on the page. It will most likely be something similar in structure to the 
-								currently given example. -->
 							<xsl:call-template name="buildFooter" />
-
-							<!-- </div> -->
 						</div>
 					</xsl:otherwise>
 				</xsl:choose>
@@ -107,39 +94,6 @@
 		/> <xsl:template match="dri:repositoryMeta" /> -->
 
 	<xsl:template name="addJavascript">
-		<xsl:variable name="jqueryVersion">
-			<xsl:text>1.6.2</xsl:text>
-		</xsl:variable>
-
-		<xsl:variable name="protocol">
-			<xsl:choose>
-				<xsl:when
-					test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
-					<xsl:text>https://</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>http://</xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:variable>
-		<script type="text/javascript"
-			src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
-
-		<xsl:variable name="localJQuerySrc">
-			<xsl:value-of
-				select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-			<xsl:text>/static/js/jquery-</xsl:text>
-			<xsl:value-of select="$jqueryVersion" />
-			<xsl:text>.min.js</xsl:text>
-		</xsl:variable>
-
-		<script type="text/javascript">
-			<xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text>
-			<xsl:value-of select="$localJQuerySrc" />
-			<xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
-		</script>
-
-
 
 		<!-- Add theme javascipt -->
 		<xsl:for-each
