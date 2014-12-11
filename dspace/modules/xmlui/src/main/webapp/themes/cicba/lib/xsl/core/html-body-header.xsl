@@ -62,7 +62,7 @@
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/</xsl:with-param>
 									<xsl:with-param name="a.value">
-										Inicio(i18n)
+										<i18n:text>xmlui.cicdigital.home.inicio</i18n:text>
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
@@ -74,7 +74,7 @@
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/submissions</xsl:with-param>
 									<xsl:with-param name="a.value">
-										Aportar Material (i18n)
+										<i18n:text>xmlui.cicdigital.home.aportar-material</i18n:text>
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
@@ -82,47 +82,55 @@
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown"
 									role="button" aria-expanded="false">
-									Mas información
+									<i18n:text>xmlui.cicdigital.home.mas-informacion</i18n:text>
 									<span class="caret"></span>
 								</a>
 								<ul class="dropdown-menu" role="menu">
-									<li class="dropdown-header">Sobre el repositorio</li>
+									<li class="dropdown-header">
+										<i18n:text>xmlui.cicdigital.home.sobre-repositorio</i18n:text>
+									</li>
 									<li>
 										<a>
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/que-es-cic-digital')"></xsl:value-of>
 											</xsl:attribute>
-											¿Qué es CIC-DIGITAL?</a>
+											<i18n:text>xmlui.cicdigital.title.que-es-cic-digital</i18n:text>
+										</a>
 									</li>
 									<li>
 										<a>
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/politicas-del-repositorio')"></xsl:value-of>
 											</xsl:attribute>
-											Políticas del repositorio</a>
+											<i18n:text>xmlui.cicdigital.title.politicas-del-repositorio</i18n:text>	
+										</a>
 									</li>
 									<li class="divider"></li>
-									<li class="dropdown-header">Información para autores</li>
+									<li class="dropdown-header">
+										<i18n:text>xmlui.cicdigital.home.informacion-autores</i18n:text>
+									</li>
 									<li>
 										<a>
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/como-aportar-material')"></xsl:value-of>
 											</xsl:attribute>
-											Como aportar Material</a>
+											<i18n:text>xmlui.cicdigital.title.como-aportar-material</i18n:text>	
+										</a>
 									</li>
 									<li>
 										<a>
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/register')"></xsl:value-of>
 											</xsl:attribute>
-											Registrarse</a>
+											<i18n:text>xmlui.cic.Eperson.Register</i18n:text>
+										</a>
 									</li>
 								</ul>
 							</li>
 							<li>
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/feedback</xsl:with-param>
-									<xsl:with-param name="a.value">s
+									<xsl:with-param name="a.value">
 										<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
 									</xsl:with-param>
 								</xsl:call-template>

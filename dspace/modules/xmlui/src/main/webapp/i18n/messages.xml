@@ -79,10 +79,22 @@
 <message key="xmlui.cicdigital.title.como-aportar-material">¿How to contribute material?</message>
 <message key="xmlui.cicdigital.title.que-es-cic-digital">¿What is CIC-Digital?</message>
 <message key="xmlui.cicdigital.title.politicas-del-repositorio">Repository policies</message>
+<message key="xmlui.cic.Eperson.Register">Register</message>
 	<!-- Static pages trail -->
 <message key="xmlui.cicdigital.trail.como-aportar-material">¿How to contribute material?</message>
 <message key="xmlui.cicdigital.trail.que-es-cic-digital">¿What is CIC-Digital?</message>
 <message key="xmlui.cicdigital.trail.politicas-del-repositorio">Repository policies</message>
+	<!-- Home messages -->
+<message key="xmlui.cicdigital.home.subir-material">Upload material</message>
+<message key="xmlui.cicdigital.home.subir-material-descripcion">Through the process of auto-archive you can contribute with their own research and scientific developments to the content within the Institutional Repository of the Comisión de Investigaciones Científicas de la Provincia de Buenos Aires.</message>
+<message key="xmlui.cicdigital.home.explore">Explore the repository</message>
+<message key="xmlui.cicdigital.home.inicio">Index</message>
+<message key="xmlui.cicdigital.home.aportar-material">Contribute Material</message>
+<message key="xmlui.cicdigital.home.mas-informacion">More information</message>
+<message key="xmlui.cicdigital.home.sobre-repositorio">About the repository</message>
+<message key="xmlui.cicdigital.home.informacion-autores">Information for authors</message>
+<message key="xmlui.cicdigital.home.bienvenido">Welcome to CIC-Digital</message>
+<message key="xmlui.cicdigital.home.bienvenido-descripcion">CIC-Digital is the Institutional Repository of the Comisión de Investigaciones Científicas de la Provincia de Buenos Aires, created to preserve and leave in open access all the scientific-technological production generated in the scope of the CIC institutions.</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             ArtifactBrowser Aspect
@@ -237,7 +249,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for sharing your feedback about the DSpace system. Your comments are appreciated!</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Thanks for sharing your feedback about the CIC-Digital system. Your comments will be taken into account by the site administrators.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Your Email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">This address will be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comments</message>
@@ -258,8 +270,8 @@
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
-	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Browse</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of DSpace</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Explore</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of CIC-Digital</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Communities &amp; Collections</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_title">Titles</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_author">Authors</message>

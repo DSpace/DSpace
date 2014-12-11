@@ -68,7 +68,7 @@
 					<h1>
 						<xsl:copy-of select="dri:head" />
 					</h1>
-					<xsl:value-of select="dri:p" />
+					<xsl:copy-of select="dri:p" />
 				</xsl:for-each>
 			</div>
 			<div class="col-md-4">
@@ -83,7 +83,9 @@
 			</div>
 			<div id="home-highlight-content">
 				<form class="form-inline" role="form">
-				   <label for="q">Explore el repositorio </label>
+				   <label for="q">
+				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
+				   </label>
 				    <div><input type="text" class="form-control" id="q" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
 				    <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 				  </div>	
@@ -103,10 +105,10 @@
 				</xsl:call-template>
 			</div>
 			<div class="col-md-4" style="font-size:23pt" >
-				SUBIR MATERIAL (i18N)
+				<i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>				
 			</div>
 			<div class="col-md-6" >
-A través del proceso de  AUTOARCHIVO vitae commodo turpis, eget mollis eros. Praesent id lectus ut nibh fermentum efficitur sit amet in urna. Donec vel lobortis nuncu.
+				<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
 			</div>
 		</div>
 		<div class="row">
