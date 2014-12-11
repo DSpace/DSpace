@@ -64,7 +64,14 @@ public abstract class AbstractVersionProvider {
 
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException {
         int idNew = BitstreamStorageManager.clone(context, nativeBitstream.getID());
-        return Bitstream.find(context, idNew);
+	    Bitstream newBitstream = Bitstream.find(context, idNew);
+	    newBitstream.setDescription(nativeBitstream.getDescription());
+	    newBitstream.setFormat(nativeBitstream.getFormat());
+	    newBitstream.setName(nativeBitstream.getName());
+	    newBitstream.setSource(nativeBitstream.getSource());
+	    newBitstream.setUserFormatDescription(nativeBitstream.getUserFormatDescription());
+	    newBitstream.updateMetadata();
+	    return newBitstream;
     }
 
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
