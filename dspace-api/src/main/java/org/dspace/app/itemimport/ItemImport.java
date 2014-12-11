@@ -1130,18 +1130,6 @@ public class ItemImport
             qualifier = null;
         }
 
-        // if language isn't set, use the system's default value
-        if (StringUtils.isEmpty(language))
-        {
-            language = ConfigurationManager.getProperty("default.language");
-        }
-
-        // a goofy default, but there it is
-        if (language == null)
-        {
-            language = "en";
-        }
-
         if (!isTest)
         {
             i.addMetadata(schema, element, qualifier, language, value);
