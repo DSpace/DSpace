@@ -293,18 +293,22 @@ public class Item extends DSpaceObject
                 "  metadatavalue.resource_type_id = ? AND " +
                 "  metadatafieldregistry.element = 'date' AND " +
                 "  metadatafieldregistry.qualifier = 'accessioned' AND " +
-                "  item.submitter_id = ? AND \n" +
-                "  item.in_archive = true\n" +
-                "ORDER BY\n" +
-                "  metadatavalue.text_value desc";
+                "  item.submitter_id = ? AND ";
+        if(DatabaseManager.isOracle()) {
+            querySorted += " item.in_archive = 1 " +
+                    "ORDER BY cast(substr(metadatavalue.text_value,1,100) as varchar2(100)) desc";
+        } else {
+            querySorted += " item.in_archive = true " +
+                    "ORDER BY metadatavalue.text_value desc";
+        }
 
         TableRowIterator rows;
 
-        if(limit != null && limit > 0) {
-            querySorted += " limit ? ;";
+        //TODO Oracle doesn't have concept of limit
+        if(limit != null && limit > 0 && !DatabaseManager.isOracle()) {
+            querySorted += " limit ?";
             rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID(), limit);
         } else {
-            querySorted += ";";
             rows = DatabaseManager.query(context, querySorted, Constants.ITEM, eperson.getID());
         }
 
