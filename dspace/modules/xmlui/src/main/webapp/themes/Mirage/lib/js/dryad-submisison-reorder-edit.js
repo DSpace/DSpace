@@ -5,11 +5,12 @@
 //  #aspect_submission_StepTransformer_div_submit-describe-publication
 //  The redirect buttons ("Save & Exit" and "Continue to Describe Data")
 //  still trigger a full page reload.
-jQuery(document).ready(function(){
+jQuery(document).ready(function() {
     var form_ids = [
         'aspect_submission_StepTransformer_div_submit-describe-publication'
       , 'aspect_submission_StepTransformer_div_submit-describe-dataset'
-    ];
+    ]
+    , reinterp_timeout  = 500;  // ms, elapse to check for focus on related interp field
     // update the part of the form associated with the input button that was clicked
     // selector: string, jQuery selector to identify the li.ds-form-item element
     //      to be replaced by the update
@@ -68,7 +69,7 @@ jQuery(document).ready(function(){
                 var repoNameTxt = jQuery('input#aspect_submission_StepTransformer_field_other_repo_name');
                 if (repoNameTxt.val() == repoNameTxt.attr('title')) {
                     repoNameTxt.val('');
-                }        
+                }
                 jQuery('select#aspect_submission_StepTransformer_field_dc_type_embargo').removeAttr('disabled');
                 // end: from utils.js
                 prevent_default = false;
@@ -157,23 +158,54 @@ jQuery(document).ready(function(){
             submit_describe_publication_binders();
         }
     };
+    // update the value of the now-hidden "interp" element
+    // after an update of the text field
+    var reinterpret_inputs = function($hidden,$shown,sep) {
+        if ($shown.length === 1) {
+            $hidden.text($shown.val());
+        } else if ($shown.length === 2) {
+            $hidden.text($shown.map(function(i,elt) {
+                return elt.value;
+            }).toArray().join(sep));
+        }
+        // unhide and rehide editable fields
+        $hidden.css('display', '');         // <span>
+        $shown.attr('type', 'hidden');      // <input>
+    };
     // event handler for the author's Edit button click event
     var handleEdit = function(event) {
         var $row    = jQuery(event.target).closest('tr')
           , $table  = $row.closest('table')
-          , $update = $table.next('.ds-update-button')
-          , $hidden = $row.find('td.ds-reorder-edit-input-col input[type="hidden"]').not('.ds-authority-confidence-input')
-          , $shown  = $row.find('span.ds-interpreted-field');
+          , $hidden = $row.find('td.ds-reorder-edit-input-col input[type="hidden"]')
+                          .not('[class*="authority"]')
+                          .not('[name*="authority"]')
+                          .not('[value="blank"]')
+          , $shown  = $row.find('span.ds-interpreted-field')
+          , $button = jQuery(event.target)
+          , elt, sep = '';
         // todo: handle this more cleanly; don't unhide the 'interpreted'
         // input for composite controls (e.g., an author name)
-        if ($hidden.length === 4) $hidden.splice(2,1);
+        if ($hidden.length === 3) {
+            elt = $hidden.splice(2,1);
+            sep = elt[0].value.substring($hidden[0].value.length);
+            sep = sep.substring(0,sep.length-$hidden[1].value.length);
+        }
         // disable edit button
-        jQuery(event.target).attr('disabled','disabled');
+        $button.attr('disabled','disabled');
         // show lastname/firstname input fields
+        // and set focus to the first one
         $hidden.attr('type','text');
-        // enable Update button on a change event
-        $hidden.bind('change keyup', function(evt) {
-            $update.removeAttr('disabled');
+        jQuery($hidden[0]).focus();
+        // update the interpreted field whenever
+        jQuery($hidden).each(function(i,elt) {
+            jQuery(elt).blur(function() {
+                window.setTimeout(function() {
+                    if ($row.find('input:focus').length === 0) {
+                        reinterpret_inputs($shown,$hidden,sep);
+                        $button.removeAttr('disabled');
+                    }
+                }, reinterp_timeout);
+            });
         });
         // hide 'interpreted' span
         $shown.css('display', 'none');
@@ -257,7 +289,7 @@ jQuery(document).ready(function(){
             jQuery("input[name='other_repo_name']").show();
         } else {
             jQuery("input[name='other_repo_name']").hide();
-        }       
+        }
     };
     var init_identifier_hints = function() {
         //For our identifier a hint needs to be created
