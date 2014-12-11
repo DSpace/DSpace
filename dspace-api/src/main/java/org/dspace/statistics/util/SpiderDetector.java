@@ -233,11 +233,10 @@ public class SpiderDetector {
         // No.  See if any DNS names match
         if (null != hostname)
         {
-            synchronized(domains) {
-            if (domains.isEmpty())
-                {
+            synchronized(domains) 
+            {
+                if (domains.isEmpty())
                     loadPatterns("domains", domains);
-                }
             }
             for (Pattern candidate : domains)
             {
