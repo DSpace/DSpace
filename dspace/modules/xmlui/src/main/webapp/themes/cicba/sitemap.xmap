@@ -148,13 +148,19 @@
                     </map:read>
             </map:match>
             
+            <!-- Redirigimos las solicitudes a js de Mirage -->
+			<map:match pattern="themes/cicba/lib/images/*">
+                    <map:read type="ConcatenationReader" src="../Mirage/lib/images/{1}">
+                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                    </map:read>
+            </map:match> 
+            
 			<map:match pattern="themes/cicba/images/*">
-				<map:read type="ConcatenationReader" src="../cicba/images/{1}">
+				<map:read type="ConcatenationReader" src="images/{1}">
                    <map:parameter name="requestQueryString" value="{request:queryString}"/>
                 </map:read>
 			</map:match>
 			
-
             <map:match pattern="themes/cicba/images/authority_control/*">
                     <map:read type="ConcatenationReader" src="../Mirage/images/authority_control/{1}">
                         <map:parameter name="requestQueryString" value="{request:queryString}"/>

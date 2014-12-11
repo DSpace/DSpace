@@ -15,92 +15,71 @@
 
 	<xsl:output indent="yes" />
 
-	<!-- The template to handle dri:options. Since it contains only dri:list 
-		tags (which carry the actual information), the only things than need to be 
-		done is creating the ds-options div and applying the templates inside it. 
-		In fact, the only bit of real work this template does is add the search box, 
-		which has to be handled specially in that it is not actually included in 
-		the options div, and is instead built from metadata available under pageMeta. -->
-<!-- 	<xsl:template match="dri:options"> -->
-<!-- 		<div class="col-md-3"> -->
-<!-- 			<xsl:for-each select="dri:list[@n!='account' and @n!='browse'] "> -->
-<!-- 				<xsl:if test="dri:item or dri:list"> -->
-<!-- 					<div class="panel panel-primary"> -->
-<!-- 						<xsl:if test="dri:head"> -->
-<!-- 							<div class="panel-heading"> -->
-<!-- 								<h3 class="panel-title"> -->
-<!-- 									<xsl:copy-of select="dri:head" /> -->
-<!-- 								</h3> -->
-<!-- 							</div> -->
-<!-- 						</xsl:if> -->
-<!-- 						<xsl:if test="dri:list"> -->
-<!-- 							<div class="panel-body"> -->
-<!-- 								<xsl:for-each select="dri:list"> -->
-<!-- 									<xsl:if test="dri:item or dri:list"> -->
-<!-- 										<div class="panel panel-info"> -->
-<!-- 											<div class="panel-heading"> -->
-<!-- 												<h3 class="panel-title"> -->
-<!-- 													<xsl:copy-of select="dri:head" /> -->
-<!-- 												</h3> -->
-<!-- 											</div> -->
+	<xsl:template name="buildPanelFromList">
+		<!-- Solo imprimo el panel si tiene algun dato -->
+		
+			<div class="panel panel-primary">
+				<xsl:if test="dri:head">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<xsl:copy-of select="dri:head" />
+						</h3>
+					</div>
+				</xsl:if>
+				<xsl:if test="dri:list">
+					<div class="panel-body">
+						<xsl:for-each select="dri:list">
+							<xsl:if test="dri:item or dri:list">
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">
+											<xsl:copy-of select="dri:head" />
+										</h3>
+									</div>
 
-<!-- 											<ul class="list-group"> -->
-<!-- 												<xsl:for-each select="dri:item/dri:xref"> -->
-<!-- 													<li class="list-group-item"> -->
-<!-- 														<a> -->
-<!-- 															<xsl:attribute name="href"><xsl:value-of -->
-<!-- 																select="@target" /></xsl:attribute> -->
-<!-- 															<xsl:copy-of select="." /> -->
-<!-- 														</a> -->
-<!-- 													</li> -->
-<!-- 												</xsl:for-each> -->
-<!-- 											</ul> -->
-<!-- 										</div> -->
-<!-- 									</xsl:if> -->
+									<ul class="list-group">
+										<xsl:for-each select="dri:item">
+											<li class="list-group-item">
+												<xsl:for-each select="dri:xref">
+												<a>
+													<xsl:attribute name="href"><xsl:value-of
+														select="@target" /></xsl:attribute>
+													<xsl:copy-of select="text()" />
+												</a>
+												</xsl:for-each>
+												<xsl:value-of select="text()" />
+											</li>
+										</xsl:for-each>
+									</ul>
+								</div>
+							</xsl:if>
 
-<!-- 								</xsl:for-each> -->
-<!-- 							</div> -->
-<!-- 						</xsl:if> -->
+						</xsl:for-each>
+					</div>
+				</xsl:if>
 
-<!-- 						List group -->
-<!-- 						<ul class="list-group"> -->
-<!-- 							<xsl:for-each select="dri:item/dri:xref"> -->
-<!-- 								<li class="list-group-item"> -->
-<!-- 									<a> -->
-<!-- 										<xsl:attribute name="href"><xsl:value-of -->
-<!-- 											select="@target" /></xsl:attribute> -->
-<!-- 										<xsl:copy-of select="." /> -->
-<!-- 									</a> -->
-<!-- 								</li> -->
-<!-- 							</xsl:for-each> -->
-<!-- 						</ul> -->
-<!-- 					</div> -->
-<!-- 				</xsl:if> -->
-<!-- 			</xsl:for-each> -->
-<!-- 		</div> -->
-
-<!-- 	</xsl:template> -->
-
-	<!-- This template controls the display of the Discovery FACET'S box. Avoids 
-		to show the box in the "Homepage" -->
-	<xsl:template match="dri:list[@n='discovery']">
-	<div class="col-md-3"> 
-		<xsl:if
-			test="(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']/text())!= ''">
-			<xsl:apply-templates select="dri:head" />
-			<div id="aspect_discovery_Navigation_list_discovery" class="ds-option-set">
-				<ul class="ds-options-list">
-					<xsl:for-each select="dri:list">
-						<li>
-							<xsl:apply-templates select="." />
-						</li>
-					</xsl:for-each>
-				</ul>
+				<xsl:if test="count(dri:item) &gt; 0">
+					<ul class="list-group">
+										<xsl:for-each select="dri:item">
+											<li class="list-group-item">
+												<xsl:for-each select="dri:xref">
+												<a>
+													<xsl:attribute name="href"><xsl:value-of
+														select="@target" /></xsl:attribute>
+													<xsl:copy-of select="text()" />
+												</a>
+												</xsl:for-each>
+												<xsl:value-of select="text()" />
+											</li>
+										</xsl:for-each>
+					</ul>
+				</xsl:if>
 			</div>
-		</xsl:if>
-		</div>
 	</xsl:template>
-	<xsl:template match="dri:options/dri:list" >
+
+
+	<xsl:template match="dri:options/dri:list" priority="1">
+
 	</xsl:template>
 
 </xsl:stylesheet>

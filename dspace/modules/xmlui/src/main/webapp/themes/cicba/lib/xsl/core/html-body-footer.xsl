@@ -24,7 +24,7 @@
 					</xsl:with-param>
 				</xsl:call-template>
 			</div>
-			<div class="col-md-2 col-md-offset-1">
+			<div class="col-md-3 col-md-offset-1">
 				<ul>
 
 					<li>
@@ -49,23 +49,20 @@
 					</li>
 				</ul>
 			</div>
-			<div id="ds-footer-right">
+			<div class="col-md-5 col-md-offset-1">
 				<address>
-					<strong>Comisión de Investigaciones Científicas sbp</strong>
+					<strong>Comisión de Investigaciones Científicas</strong>
 					<br />
 					Calle 526 entre 10 y 11
 					<br />
 					CP: 1900 - La Plata - Buenos Aires - Argentina
 					<br />
-					<a href="mailto:#">info-cic@sedici.unlp.edu.ar</a>
+					<a href="mailto:#">cic-digital@sedici.unlp.edu.ar</a>
 					<br />
 					<abbr title="Phone">Tel:</abbr>
-					+54 (0221) 421-7374 / 482-3795
-					<br />
-					482-9581 / 421-3376 / 421-6205
-					<br />
-					<abbr title="Phone">Fax:</abbr>
-					(0221) 425-8383 / 483-7999
+					+54 (0221) 423 6696/6677 (int. 141) (CIC-DIGITAL)
+					<abbr title="Phone">Tel:</abbr>
+					+54 (0221) 421-7374 / 482-3795 (CIC-Central)
 				</address>
 			</div>
 		</div>

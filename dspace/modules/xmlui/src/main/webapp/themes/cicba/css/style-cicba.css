@@ -35,6 +35,8 @@ ul {
 	background-color: rgb(158, 196, 205);
 	/* 	padding:30px; */
 	color: black;
+	padding: 10px;
+	margin-top: 20px;
 }
 
 #cic-footer address {
