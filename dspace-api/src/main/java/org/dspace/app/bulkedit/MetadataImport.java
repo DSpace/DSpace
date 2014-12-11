@@ -166,7 +166,7 @@ public class MetadataImport
                             }
 
                             // Compare
-                            compare(item, fromCSV, change, md, whatHasChanged);
+                            compare(item, fromCSV, change, md, whatHasChanged, line);
                         }
                     }
 
@@ -412,11 +412,12 @@ public class MetadataImport
      * @param md The element to compare
      * @param changes The changes object to populate
      *
+     * @param line
      * @throws SQLException if there is a problem accessing a Collection from the database, from its handle
      * @throws AuthorizeException if there is an authorization problem with permissions
      */
     private void compare(Item item, String[] fromCSV, boolean change,
-                         String md, BulkEditChange changes) throws SQLException, AuthorizeException
+                         String md, BulkEditChange changes, DSpaceCSVLine line) throws SQLException, AuthorizeException
     {
         // Log what metadata element we're looking at
         String all = "";
@@ -473,25 +474,25 @@ public class MetadataImport
                                        ",looking_for_element=" + element +
                                        ",looking_for_qualifier=" + qualifier +
                                        ",looking_for_language=" + language));
-        Metadatum[] current = item.getMetadata(schema, element, qualifier, language);
-        
-        String[] dcvalues = new String[current.length];
-        int i = 0;
-        for (Metadatum dcv : current)
-        {
-            if (dcv.authority == null || !isAuthorityControlledField(md))
-            {
-                dcvalues[i]    = dcv.value;
+        String[] dcvalues = new String[0];
+        if(fromAuthority==null) {
+            Metadatum[] current = item.getMetadata(schema, element, qualifier, language);
+            dcvalues = new String[current.length];
+            int i = 0;
+            for (Metadatum dcv : current) {
+                if (dcv.authority == null || !isAuthorityControlledField(md)) {
+                    dcvalues[i] = dcv.value;
+                } else {
+                    dcvalues[i] = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority;
+                    dcvalues[i] += DSpaceCSV.authoritySeparator + (dcv.confidence != -1 ? dcv.confidence : Choices.CF_ACCEPTED);
+                }
+                i++;
+                log.debug(LogManager.getHeader(c, "metadata_import",
+                        "item_id=" + item.getID() + ",fromCSV=" + all +
+                                ",found=" + dcv.value));
             }
-            else
-            {
-                dcvalues[i]  = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority;
-                dcvalues[i] += DSpaceCSV.authoritySeparator + (dcv.confidence != -1 ? dcv.confidence : Choices.CF_ACCEPTED);
-            }
-            i++;
-            log.debug(LogManager.getHeader(c, "metadata_import",
-                                           "item_id=" + item.getID() + ",fromCSV=" + all +
-                                           ",found=" + dcv.value));
+        }else{
+            dcvalues = line.get(md).toArray(new String[line.get(md).size()]);
         }
 
         // Compare from current->csv
@@ -530,7 +531,9 @@ public class MetadataImport
                 dcv.confidence = (parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED);
             }
 
-            if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)))
+            if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)) && fromAuthority==null)
+            // fromAuthority==null: with the current implementation metadata values from external authority sources can only be used to add metadata, not to change or remove them
+            // because e.g. an author that is not in the column "ORCID:dc.contributor.author" could still be in the column "dc.contributor.author" so don't remove it
             {
                 // Remove it
                 log.debug(LogManager.getHeader(c, "metadata_import",
@@ -862,7 +865,8 @@ public class MetadataImport
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueFinder.findByValue(c, schema, element, qualifier, value);
+            AuthorityValue example = fromAuthority.newInstance(value);
+            List<AuthorityValue> byValue = authorityValueFinder.findByValue(c, schema, element, qualifier, example.getValue());
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
@@ -1167,6 +1171,8 @@ public class MetadataImport
     {
         int pos = md.indexOf("[");
         String mdf = (pos > -1 ? md.substring(0, pos) : md);
+        pos = md.indexOf(":");
+        mdf = (pos > -1 ? md.substring(pos+1) : md);
         return authorityControlled.contains(mdf);
     }
 
