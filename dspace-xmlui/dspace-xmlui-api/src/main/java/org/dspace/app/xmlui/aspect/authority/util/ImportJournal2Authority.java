@@ -39,13 +39,19 @@ public final class ImportJournal2Authority {
     /** DSpace Context object */
     private Context context;
     // Reading DryadJournalSubmission.properties
-    public static final String FULLNAME = "fullname";
-    public static final String METADATADIR = "metadataDir";
-    public static final String INTEGRATED = "integrated";
-    public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
-    public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
     public static final String JOURNAL_ID = "journalID";
+    public static final String ALLOW_REVIEW_WORKFLOW = "allowReviewWorkflow";
+    public static final String EMBARGO_ALLOWED = "embargoAllowed";
+    public static final String FULLNAME = "fullname";
+    public static final String INTEGRATED = "integrated";
+    public static final String MANUSCRIPT_NUMBER_IGNORE_PATTERN = "manuscriptNumberIgnorePattern";
+    public static final String METADATADIR = "metadataDir";
+    public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
+    public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
+    public static final String NOTIFY_WEEKLY = "notifyWeekly";
+    public static final String PARSING_SCHEME = "parsingScheme";
+    public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
+    public static final String SPONSOR_NAME = "sponsorName";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
 
     /**
@@ -188,10 +194,6 @@ public final class ImportJournal2Authority {
                                             {
                                                 aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
                                             }
-                                            if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
-                                            {
-                                                aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),authorityValue.getId(),0);
-                                            }
                                             if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                                             {
                                                 aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),authorityValue.getId(),0);
@@ -215,6 +217,10 @@ public final class ImportJournal2Authority {
                                             if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                                             {
                                                 aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),authorityValue.getId(),0);
+                                            }
+                                            if(val.get("manuscriptNumberIgnorePattern")!=null&&val.get("manuscriptNumberIgnorePattern").length()>0)
+                                            {
+                                                aConcept.addMetadata("journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),authorityValue.getId(),0);
                                             }
                                         }
                                     }
@@ -274,10 +280,6 @@ public final class ImportJournal2Authority {
                     {
                         aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
                     }
-                    if(val.get("allowReviewWorkflow")!=null&&val.get("allowReviewWorkflow").length()>0)
-                    {
-                        aConcept.addMetadata("journal","allowReviewWorkflow",null,"",val.get("allowReviewWorkflow"),aConcept.getIdentifier(),0);
-                    }
                     if(val.get("publicationBlackout")!=null&&val.get("publicationBlackout").length()>0)
                     {
                         aConcept.addMetadata("journal","publicationBlackout",null,"",val.get("publicationBlackout"),aConcept.getIdentifier(),0);
@@ -301,6 +303,10 @@ public final class ImportJournal2Authority {
                     if(val.get("notifyWeekly")!=null&&val.get("notifyWeekly").length()>0)
                     {
                         aConcept.addMetadata("journal","notifyWeekly",null,"",val.get("notifyWeekly"),aConcept.getIdentifier(),0);
+                    }
+                    if(val.get("manuscriptNumberIgnorePattern")!=null&&val.get("manuscriptNumberIgnorePattern").length()>0)
+                    {
+                        aConcept.addMetadata("journal","manuscriptNumberIgnorePattern",null,"",val.get("manuscriptNumberIgnorePattern"),aConcept.getIdentifier(),0);
                     }
                     aConcept.update();
 
@@ -339,14 +345,21 @@ public final class ImportJournal2Authority {
                 String str = "journal." + journalType + ".";
 
                 Map<String, String> map = new HashMap<String, String>();
-                map.put(FULLNAME, properties.getProperty(str + FULLNAME));
-                map.put(METADATADIR, properties.getProperty(str + METADATADIR));
-                map.put(INTEGRATED, properties.getProperty(str + INTEGRATED));
-                map.put(PUBLICATION_BLACKOUT, properties.getProperty(str + PUBLICATION_BLACKOUT, "false"));
-                map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
-                map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
                 map.put(JOURNAL_ID, journalType);
+                map.put(ALLOW_REVIEW_WORKFLOW, properties.getProperty(str + ALLOW_REVIEW_WORKFLOW));
+                map.put(EMBARGO_ALLOWED, properties.getProperty(str + EMBARGO_ALLOWED));
+                map.put(FULLNAME, properties.getProperty(str + FULLNAME));
+                map.put(INTEGRATED, properties.getProperty(str + INTEGRATED));
+                map.put(MANUSCRIPT_NUMBER_IGNORE_PATTERN, properties.getProperty(str + MANUSCRIPT_NUMBER_IGNORE_PATTERN));
+                map.put(METADATADIR, properties.getProperty(str + METADATADIR));
+                map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
+                map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
+                map.put(NOTIFY_WEEKLY, properties.getProperty(str + NOTIFY_WEEKLY));
+                map.put(PARSING_SCHEME, properties.getProperty(str + PARSING_SCHEME, "false"));
+                map.put(PUBLICATION_BLACKOUT, properties.getProperty(str + PUBLICATION_BLACKOUT, "false"));
+                map.put(SPONSOR_NAME, properties.getProperty(str + SPONSOR_NAME));
                 map.put(SUBSCRIPTION_PAID, properties.getProperty(str + SUBSCRIPTION_PAID));
+
 
                 String key = properties.getProperty(str + FULLNAME);
                 if(key!=null&&key.length()>0){

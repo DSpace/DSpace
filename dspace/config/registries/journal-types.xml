@@ -81,4 +81,9 @@
         <element>customerId</element>
     </dc-type>
 
+    <dc-type>
+        <schema>journal</schema>
+        <element>manuscriptNumberIgnorePattern</element>
+    </dc-type>
+
 </dspace-dc-types>
