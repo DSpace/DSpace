@@ -263,24 +263,27 @@ public class CCLookup {
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
-
-		try {
-			String current = (String)keys.next();
-
-			while (true) {
-				answer_doc += "<" + current + ">" + (String)answers.get(current) + "</" + current + ">\n";
-				current = (String)keys.next();
-			}
-
-
-		} catch (NoSuchElementException e) {
-			// exception indicates we've iterated through the
-			// entire collection; just swallow and continue
-		}
-		// answer_doc +=	"<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
-		answer_doc +=						"</license-" + licenseId + ">\n</answers>\n";
+		
+		String jurisdiction = "";
+		while(keys.hasNext()) {
+    		String key = (String)keys.next();
+    		String value = (String)answers.get(key);
+    		if(key.equals("version")) {
+    			if(value.equals("CC3"))
+    				answer_doc = answer_doc.replace("<jurisdiction></jurisdiction>\n","<jurisdiction>" + jurisdiction + "</jurisdiction>\n");
+    		}
+    		else {
+    			if(key.equals("jurisdiction")) {
+    				jurisdiction = value;
+    				answer_doc += "<jurisdiction></jurisdiction>\n";
+    			}	
+    			else
+    				answer_doc += "<" + key + ">" + value + "</" + key + ">\n";
+    		}
+		}		
+		answer_doc += "</license-" + licenseId + ">\n</answers>\n";		
+		
 		String post_data;
-
 		try {
 			post_data = URLEncoder.encode("answers", "UTF-8") + "=" + URLEncoder.encode(answer_doc, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
