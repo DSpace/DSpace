@@ -318,7 +318,7 @@ function initFirstSubmissionForm() {
 }
 
 function enableJournalPublished(){
-    console.log(jQuery('#unknown-doi-panel span.field-help'));
+    //console.log(jQuery('#unknown-doi-panel span.field-help'));
     if(jQuery('input[name|="article_doi"]').val()!="")
     {
         jQuery('input[name|="unknown_doi"]').attr("disabled", "disabled");
