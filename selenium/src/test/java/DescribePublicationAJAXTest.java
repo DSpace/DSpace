@@ -61,7 +61,6 @@ public class DescribePublicationAJAXTest {
     }
 
     // useful constant xpaths: update button, save/exit button, save-for-later, remove-submission
-    private final String update_btn_xpath      = "//input[@class='ds-button-field ds-update-button']";
     private final String save_exit_btn_xpath   = "//input[@id='aspect_submission_StepTransformer_field_submit_cancel']";
     private final String save_later_btn_xpath  = "//input[@id='aspect_submission_submit_SaveOrRemoveStep_field_submit_save']";
     private final String remove_subs_btn_xpath = "//input[@id='aspect_discovery_DiscoverySubmissions_field_submit_submissions_remove']";
@@ -153,7 +152,7 @@ public class DescribePublicationAJAXTest {
           String pred = by.equals("i")
                       ? "[" + author.index + "]"
                       : "[" + ".//span[@class='ds-interpreted-field']" + authpred(by) + "]";    // has a span descendant where name = ...
-          return "//tr[@class='ds-author-input-row']" + pred;
+          return "//tr[@class='ds-edit-reorder-input-row']" + pred;
         }
         public String span_interp(String by) throws Exception {
           return "(//span[@class='ds-interpreted-field'])" + authpred(by);
@@ -168,7 +167,7 @@ public class DescribePublicationAJAXTest {
             return row(by) + "//input[@class='ds-button-field ds-edit-button']";
         }
         public String order_select(String by) throws Exception {
-            return row(by) + "//select[@class='ds-author-order-select']";
+            return row(by) + "//select[@class='ds-edit-reorder-order-select']";
         }
         public String remove_btn(String by) throws Exception {
             return row(by) + "//input[@name='submit_dc_contributor_author_delete']";
@@ -264,7 +263,6 @@ public class DescribePublicationAJAXTest {
         driver.findElement(By.xpath(author.xpath.input_name_first("i"))).sendKeys(author.first);
 
         // update and wait for form submission to complete
-        driver.findElement(By.xpath(update_btn_xpath)).click();
         for (int second = 0;; second++) {
             if (second >= ajaxWaitSeconds) fail("timeout");
             try {
@@ -310,7 +308,6 @@ public class DescribePublicationAJAXTest {
             }
             paths.add(author.xpath.span_interp("a"));
         }
-        driver.findElement(By.xpath(update_btn_xpath)).click();
         waitOnXpathsPresent(paths);
     }
 
