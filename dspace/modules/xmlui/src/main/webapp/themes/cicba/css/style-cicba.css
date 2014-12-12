@@ -125,6 +125,17 @@ ul {
 	color: black;
 }
 
+#home-autoarchivo{
+	border-top: 2px solid #efefef;
+	padding: 25px;
+	border-bottom: 2px solid #efefef;
+}
+#home-autoarchivo a{
+	font-size: 25pt;
+	text-decoration: none;
+}
+
+
 li.ds-artifact-item {
 	list-style: none;
 }

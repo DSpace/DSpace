@@ -26,24 +26,27 @@
 			</div>
 			<div class="col-md-3 col-md-offset-1">
 				<ul>
-
 					<li>
 						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">
-								/
-							</xsl:with-param>
+							<xsl:with-param name="a.href">/</xsl:with-param>
 							<xsl:with-param name="a.value">
-								Inicio(i18n)
+								<i18n:text>xmlui.general.dspace_home</i18n:text>
 							</xsl:with-param>
 						</xsl:call-template>
 					</li>
 					<li>
 						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">
-								/community-list
-							</xsl:with-param>
+							<xsl:with-param name="a.href">/community-list</xsl:with-param>
 							<xsl:with-param name="a.value">
-								navegar (i18n)
+								<i18n:text catalogue="default">xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text>
+							</xsl:with-param>
+						</xsl:call-template>
+					</li>
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href">/feedback</xsl:with-param>
+							<xsl:with-param name="a.value">
+								<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
 							</xsl:with-param>
 						</xsl:call-template>
 					</li>

@@ -24,10 +24,10 @@
     <!--  V3.0 messages  by Emilio Lorenzo (elorenzo@arvo.es) at Arvo Consultores (http://www.arvo.es/dspace) -->
 
 	<!-- General keys -->
-<message key="xmlui.general.dspace_home">DSpace Principal</message>
+<message key="xmlui.general.dspace_home">Inicio</message>
 <message key="xmlui.general.search">Búsquedas</message>
 <message key="xmlui.general.go">Ir</message>
-<message key="xmlui.general.go_home">Ir a página principal DSpace</message>
+<message key="xmlui.general.go_home">Ir a página principal de inicio</message>
 <message key="xmlui.general.save">Guardar</message>
 <message key="xmlui.general.cancel">Cancelar</message>
 <message key="xmlui.general.return">Volver</message>
@@ -74,7 +74,7 @@
 <message key="xmlui.cicdigital.title.como-aportar-material">¿Cómo aportar material?</message>
 <message key="xmlui.cicdigital.title.que-es-cic-digital">¿Qué es CIC-Digital?</message>
 <message key="xmlui.cicdigital.title.politicas-del-repositorio">Políticas del repositorio</message>
-<message key="xmlui.cic.Eperson.Register">Registrarse</message>
+
 	<!-- Static pages trail -->
 <message key="xmlui.cicdigital.trail.como-aportar-material">¿Cómo aportar material?</message>
 <message key="xmlui.cicdigital.trail.que-es-cic-digital">¿Qué es CIC-Digital?</message>
@@ -83,7 +83,6 @@
 <message key="xmlui.cicdigital.home.subir-material">Subir Material</message>
 <message key="xmlui.cicdigital.home.subir-material-descripcion">A través del proceso de autoarchivo usted podrá contribuir con sus investigaciones y desarrollos científicos propios, al contenido dentro del Repositorio Institucional de la Comisión de Investigaciones Científicas de la Provincia de Buenos Aires.</message>
 <message key="xmlui.cicdigital.home.explore">Explore el repositorio</message>
-<message key="xmlui.cicdigital.home.inicio">Inicio</message>
 <message key="xmlui.cicdigital.home.aportar-material">Aportar Material</message>
 <message key="xmlui.cicdigital.home.mas-informacion">Mas información</message>
 <message key="xmlui.cicdigital.home.sobre-repositorio">Sobre el repositorio</message>
@@ -413,7 +412,7 @@
 <message key="xmlui.EPerson.Navigation.profile">Perfil</message>
 <message key="xmlui.EPerson.Navigation.logout">Salir</message>
 <message key="xmlui.EPerson.Navigation.login">Acceder</message>
-<message key="xmlui.EPerson.Navigation.register">Registro</message>
+<message key="xmlui.EPerson.Navigation.register">Registrarse</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 <message key="xmlui.EPerson.PasswordLogin.title">Acceder</message>
@@ -528,8 +527,8 @@
 
 
 	<!-- general submission aspect messages -->
-<message key="xmlui.Submission.general.mydspace_home">DSpace Principal</message>
-<message key="xmlui.Submission.general.go_mydspace">Mi DSpace</message>
+<message key="xmlui.Submission.general.mydspace_home">Mi sitio de usuario</message>
+<message key="xmlui.Submission.general.go_mydspace">Mi sitio de usuario</message>
 <message key="xmlui.Submission.general.submission.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.trail">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.head">Envío de ítems</message>

@@ -75,7 +75,7 @@
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/</xsl:with-param>
 									<xsl:with-param name="a.value">
-										<i18n:text>xmlui.cicdigital.home.inicio</i18n:text>
+										<i18n:text>xmlui.general.dspace_home</i18n:text>
 									</xsl:with-param>
 								</xsl:call-template>
 							</li>
@@ -135,7 +135,7 @@
 											<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/register')"></xsl:value-of>
 											</xsl:attribute>
-											<i18n:text>xmlui.cic.Eperson.Register</i18n:text>
+											<i18n:text>xmlui.EPerson.Navigation.register</i18n:text>
 										</a>
 									</li>
 								</ul>
@@ -315,6 +315,14 @@
 			<xsl:choose>
 				<!-- Static pages trail -->
 				<xsl:when test="starts-with($request-uri, 'page/')">
+					<li>
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href">/</xsl:with-param>
+							<xsl:with-param name="a.value">
+								<i18n:text>xmlui.general.dspace_home</i18n:text>
+							</xsl:with-param>
+						</xsl:call-template>
+					</li>
 					<li class="active">
 						<i18n:text>
                         	<xsl:value-of select="concat('xmlui.cicdigital.trail.',substring-after($request-uri,'/'))"/>

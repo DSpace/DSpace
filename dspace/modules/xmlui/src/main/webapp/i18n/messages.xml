@@ -79,7 +79,6 @@
 <message key="xmlui.cicdigital.title.como-aportar-material">¿How to contribute material?</message>
 <message key="xmlui.cicdigital.title.que-es-cic-digital">¿What is CIC-Digital?</message>
 <message key="xmlui.cicdigital.title.politicas-del-repositorio">Repository policies</message>
-<message key="xmlui.cic.Eperson.Register">Register</message>
 	<!-- Static pages trail -->
 <message key="xmlui.cicdigital.trail.como-aportar-material">¿How to contribute material?</message>
 <message key="xmlui.cicdigital.trail.que-es-cic-digital">¿What is CIC-Digital?</message>
@@ -88,7 +87,6 @@
 <message key="xmlui.cicdigital.home.subir-material">Upload material</message>
 <message key="xmlui.cicdigital.home.subir-material-descripcion">Through the process of auto-archive you can contribute with their own research and scientific developments to the content within the Institutional Repository of the Comisión de Investigaciones Científicas de la Provincia de Buenos Aires.</message>
 <message key="xmlui.cicdigital.home.explore">Explore the repository</message>
-<message key="xmlui.cicdigital.home.inicio">Index</message>
 <message key="xmlui.cicdigital.home.aportar-material">Contribute Material</message>
 <message key="xmlui.cicdigital.home.mas-informacion">More information</message>
 <message key="xmlui.cicdigital.home.sobre-repositorio">About the repository</message>

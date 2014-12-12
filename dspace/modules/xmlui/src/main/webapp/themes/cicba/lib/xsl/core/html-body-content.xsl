@@ -30,7 +30,7 @@
 				<!-- Handler for Static pages -->
 				
 				<xsl:when test="starts-with($request-uri, 'page/')">
-					<div class="row static-page">
+					<div class="static-page">
 						<xsl:copy-of select="document(concat('../../../',$request-uri,'.xhtml') )" />
 					</div>
 				</xsl:when>
@@ -93,16 +93,17 @@
 				</form>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-1 col-md-offset-1" >
-				<xsl:call-template name="build-img">
+		<div class="row" id="home-autoarchivo">
+			<div class="col-md-3" >
+				<xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">/submissions</xsl:with-param>
+					<xsl:with-param name="a.value">
+						 <xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
+					</xsl:with-param>
 					<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
 				</xsl:call-template>
 			</div>
-			<div class="col-md-4" style="font-size:23pt" >
-				<i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>				
-			</div>
-			<div class="col-md-6" >
+			<div class="col-md-9" >
 				<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
 			</div>
 		</div>
@@ -122,7 +123,6 @@
 						</xsl:with-param>
 					</xsl:call-template>
 					
-<!-- 					<xsl:apply-templates /> -->
 			</xsl:for-each>
 			</div>
 			<div class="col-md-5">
