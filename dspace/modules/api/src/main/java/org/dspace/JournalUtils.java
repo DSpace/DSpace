@@ -33,7 +33,7 @@ public class JournalUtils {
     }
 
     public static String getIntegrated(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -41,7 +41,7 @@ public class JournalUtils {
     }
 
     public static boolean getBooleanIntegrated(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.toLowerCase().equals("true");
 
@@ -49,7 +49,7 @@ public class JournalUtils {
     }
 
     public static String getSubscriptionPaid(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","subscriptionPaid","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","subscriptionPaid",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -57,7 +57,7 @@ public class JournalUtils {
     }
 
     public static String getMetadataDir(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","metadataDir","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","metadataDir",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -66,7 +66,7 @@ public class JournalUtils {
 
 
     public static String getFullName(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","fullname","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","fullname",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -74,7 +74,7 @@ public class JournalUtils {
     }
 
     public static String getPublicationBlackout(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","publicationBlackout","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","publicationBlackout",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -82,28 +82,28 @@ public class JournalUtils {
     }
 
     public static boolean getBooleanPublicationBlackout(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","publicationBlackout","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","publicationBlackout",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.toLowerCase().equals("true");
 
         return false;
     }
     public static String getNotifyOnReview(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnReview","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnReview",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
         return null;
     }
     public static String[] getListNotifyOnReview(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnReview","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnReview",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.split(",");
 
         return null;
     }
     public static String getNotifyOnArchive(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnArchive","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnArchive",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -111,28 +111,28 @@ public class JournalUtils {
     }
 
     public static String[] getListNotifyOnArchive(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnArchive","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyOnArchive",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.split(",");
 
         return null;
     }
     public static String getNotifyWeekly(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyWeekly","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyWeekly",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
         return null;
     }
     public static String[] getListNotifyWeekly(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyWeekly","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","notifyWeekly",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.split(",");
 
         return null;
     }
     public static String getParsingScheme(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","parsingScheme","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","parsingScheme",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -141,14 +141,14 @@ public class JournalUtils {
 
 
     public static String getEmbargoAllowed(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","embargoAllowed","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","embargoAllowed",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
         return null;
     }
     public static boolean getBooleanEmbargoAllowed(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","embargoAllowed","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","embargoAllowed",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.toLowerCase().equals("true");
 
@@ -156,7 +156,7 @@ public class JournalUtils {
     }
 
     public static String getAllowReviewWorkflow(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","allowReviewWorkflow","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","allowReviewWorkflow",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -164,7 +164,7 @@ public class JournalUtils {
     }
 
     public static boolean getBooleanAllowReviewWorkflow(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","allowReviewWorkflow","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","allowReviewWorkflow",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.toLowerCase().equals("true");
 
@@ -172,7 +172,7 @@ public class JournalUtils {
     }
 
     public static String getSponsorName(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","sponsorName","", Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","sponsorName",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
