@@ -58,6 +58,7 @@ public class DescribePublicationAJAXTest {
             }
         }
         baseUrl = System.getProperty("selenium_test_url");
+        assertTrue(baseUrl != null && !baseUrl.equals(""));
         driver.manage().timeouts().implicitlyWait(maxWaitSeconds, TimeUnit.SECONDS);
     }
 
@@ -77,7 +78,9 @@ public class DescribePublicationAJAXTest {
 
     @Test
     public void testDescribePublicationAJAX() throws Exception {
-        driver.get(baseUrl + "/");
+        String start = baseUrl + "/";
+        driver.get(start);
+        assertTrue(driver.getCurrentUrl().equals(start));
         openConsole();
         login();
         initSubmitData();
