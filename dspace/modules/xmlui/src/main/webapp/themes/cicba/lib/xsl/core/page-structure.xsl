@@ -51,14 +51,12 @@
 								<xsl:apply-templates select="dri:body" />
 					</xsl:when>
 					<xsl:otherwise>
-						<div class="container-fluid">
+						<div class="container-fluid" style="height:100vh">
 							<!--The header div, complete with title, subtitle and other junk -->
 							<xsl:call-template name="buildHeader" />
 
-							<div class="row">
-								<xsl:apply-templates select="dri:body" />
-							</div>
-
+							<xsl:apply-templates select="dri:body" />
+							
 							<xsl:call-template name="buildFooter" />
 						</div>
 					</xsl:otherwise>

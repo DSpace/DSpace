@@ -16,6 +16,8 @@
 		need to override the DRI, to directly add content. -->
 	<xsl:variable name="request-uri"
 		select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']" />
+	<xsl:variable name="search-url"
+		select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']" />
 
 	<xsl:variable name="theme-path">
 		<xsl:text>/themes/</xsl:text>

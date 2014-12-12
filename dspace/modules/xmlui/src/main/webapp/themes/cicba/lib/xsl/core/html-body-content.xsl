@@ -10,7 +10,8 @@
 		ds-body div and applies templates of the body's child elements (which consists 
 		entirely of dri:div tags). -->
 	<xsl:template match="dri:body">
-		<div id="cic-body">
+		<div id="cic-body" class="row">
+			<div>
 			<xsl:if
 				test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
 				<div id="ds-system-wide-alert">
@@ -49,6 +50,7 @@
 			</xsl:choose>
 
 		</div>
+		</div>
 	</xsl:template>
 	
 	
@@ -75,11 +77,12 @@
 			</div>
 			<div id="home-highlight-content">
 				<form class="form-inline" role="form">
+					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
 				   <label for="q">
 				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
 				   </label>
-				    <div><input type="text" class="form-control" id="q" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
-				    <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+				    <div><input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
+				    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 				  </div>	
 					<span class="badge">Ciencias Agrícolas</span>
 					<span class="badge">Ciencias Médicas y de la Salud</span>

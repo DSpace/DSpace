@@ -47,17 +47,30 @@
 		<div class="row">
 			<nav class="navbar navbar-inverse" role="navigation">
 				<div class="container-fluid">
-
+					<div class="navbar-header" id="navbar-brand-dspace">
+				      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				        <span class="sr-only">Toggle navigation</span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				        <span class="icon-bar"></span>
+				      </button>
+				      <a class="navbar-brand" href="#">
+					      <xsl:call-template name="build-img">
+					      	<xsl:with-param name="img.src">images/dspace-logo-only.png</xsl:with-param>
+					      	<xsl:with-param name="img.alt">DSpace</xsl:with-param>
+					      </xsl:call-template>
+					  </a>
+				    </div>
 					<!-- Collect the nav links, forms, and other content for toggling -->
-					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+ 					<div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse" >
 						<ul class="nav navbar-nav">
-							<li class="link-ba">
-							    <xsl:call-template name="build-anchor">
-									<xsl:with-param name="a.href">http://www.gba.gob.ar</xsl:with-param>
-									<xsl:with-param name="img.src">images/header_ba-10.png</xsl:with-param>
-									<xsl:with-param name="img.alt">BA</xsl:with-param>
-								</xsl:call-template>
-							</li>
+<!-- 							<li class="link-ba"> -->
+<!-- 							    <xsl:call-template name="build-anchor"> -->
+<!-- 									<xsl:with-param name="a.href">http://www.gba.gob.ar</xsl:with-param> -->
+<!-- 									<xsl:with-param name="img.src">images/header_ba-10.png</xsl:with-param> -->
+<!-- 									<xsl:with-param name="img.alt">BA</xsl:with-param> -->
+<!-- 								</xsl:call-template> -->
+<!-- 							</li> -->
 							<li>
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href">/</xsl:with-param>
@@ -137,6 +150,9 @@
 							</li>
 							
 						</ul>
+<!-- 					</div> -->
+						
+<!-- 					<div id="bs-example-navbar-collapse-2">class="collapse navbar-collapse"  -->
 
 						<ul class="nav navbar-nav navbar-right">
 							<li>
@@ -192,7 +208,6 @@
 
 							</li>
 						</ul>
-						
 						
 					</div><!-- /.navbar-collapse -->
 				</div><!-- /.container-fluid -->
@@ -295,8 +310,8 @@
 	<!-- The header (distinct from the HTML head element) contains the title, 
 		subtitle, login box and various placeholders for header images -->
 	<xsl:template name="buildTrail">
-		<ol class="breadcrumb row">
-
+		<div class="row" id="cic-trail">
+		<ol class="breadcrumb">
 			<xsl:choose>
 				<!-- Static pages trail -->
 				<xsl:when test="starts-with($request-uri, 'page/')">
@@ -306,7 +321,7 @@
                          </i18n:text>
 					</li>
 				</xsl:when>
-				<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) > 0">
+				<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail/@target) > 0">
 					<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:trail">
 						<li>
 							<a>
@@ -330,5 +345,6 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</ol>
+		</div>
 	</xsl:template>
 </xsl:stylesheet>
