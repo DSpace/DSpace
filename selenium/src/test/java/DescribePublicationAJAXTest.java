@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -75,6 +76,7 @@ public class DescribePublicationAJAXTest {
     private final String save_exit_btn_xpath   = "//input[@id='aspect_submission_StepTransformer_field_submit_cancel']";
     private final String save_later_btn_xpath  = "//input[@id='aspect_submission_submit_SaveOrRemoveStep_field_submit_save']";
     private final String remove_subs_btn_xpath = "//input[@id='aspect_discovery_DiscoverySubmissions_field_submit_submissions_remove']";
+    private final String legend_xpath          = "//legend[1]";
 
     @Test
     public void testDescribePublicationAJAX() throws Exception {
@@ -275,6 +277,9 @@ public class DescribePublicationAJAXTest {
         driver.findElement(By.xpath(author.xpath.input_name_first("i"))).clear();
         driver.findElement(By.xpath(author.xpath.input_name_first("i"))).sendKeys(author.first);
 
+        // click off of 
+        edit_random_target_click();
+        
         // update and wait for form submission to complete
         for (int second = 0;; second++) {
             if (second >= ajaxWaitSeconds) fail("timeout");
@@ -355,5 +360,14 @@ public class DescribePublicationAJAXTest {
         waitOnXpathsPresent(paths);
         // confirm that requested author was removed
         assertFalse(isElementPresent(By.xpath(author.xpath.span_interp("a"))));
+    }
+    
+    private void edit_random_target_click() {
+        driver.findElement(By.xpath(legend_xpath)).click();
+        try {
+            Thread.sleep(waitSleepInterval);
+        } catch (InterruptedException ex) {
+            // noop
+        }
     }
 }
