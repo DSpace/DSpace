@@ -1,5 +1,6 @@
 package test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.openqa.selenium.*;
 
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import org.openqa.selenium.logging.*;
@@ -45,7 +47,15 @@ public class DescribePublicationAJAXTest {
             logs.enable(LogType.BROWSER, Level.INFO);
             DesiredCapabilities capabilities = DesiredCapabilities.firefox();
             capabilities.setCapability(CapabilityType.LOGGING_PREFS, logs);
-            driver = new FirefoxDriver(capabilities);
+            String ffbin = System.getProperty("firefox_binary");
+            String ffdisp = System.getProperty("firefox_display");
+            if (ffbin != null && !ffbin.equals("")) {
+                FirefoxBinary binary = new FirefoxBinary(new File(ffbin));
+                binary.setEnvironmentProperty("DISPLAY",ffdisp);
+                driver = new FirefoxDriver(binary,null);
+            } else {
+                driver = new FirefoxDriver(capabilities);
+            }
         }
         baseUrl = System.getProperty("selenium_test_url");
         driver.manage().timeouts().implicitlyWait(maxWaitSeconds, TimeUnit.SECONDS);
