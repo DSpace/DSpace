@@ -160,14 +160,17 @@ jQuery(document).ready(function() {
     };
     // update the value of the now-hidden "interp" element
     // after an update of the text field
-    var reinterpret_inputs = function($hidden,$shown,sep) {
+    var reinterpret_inputs = function($hidden,$shown,interp_input,sep) {
+        var newval = '';
         if ($shown.length === 1) {
-            $hidden.text($shown.val());
+            newval = $shown.val();
         } else if ($shown.length === 2) {
-            $hidden.text($shown.map(function(i,elt) {
+            newval = $shown.map(function(i,elt) {
                 return elt.value;
-            }).toArray().join(sep));
+            }).toArray().join(sep);
+            interp_input.value = newval;
         }
+        $hidden.text(newval);
         // unhide and rehide editable fields
         $hidden.css('display', '');         // <span>
         $shown.attr('type', 'hidden');      // <input>
@@ -182,12 +185,11 @@ jQuery(document).ready(function() {
                           .not('[value="blank"]')
           , $shown  = $row.find('span.ds-interpreted-field')
           , $button = jQuery(event.target)
-          , elt, sep = '';
-        // todo: handle this more cleanly; don't unhide the 'interpreted'
-        // input for composite controls (e.g., an author name)
+          , interp_input, sep = '';
+        // don't unhide the 'interpreted' input for composite controls (e.g., an author name)
         if ($hidden.length === 3) {
-            elt = $hidden.splice(2,1);
-            sep = elt[0].value.substring($hidden[0].value.length);
+            interp_input = $hidden.splice(2,1)[0];
+            sep = interp_input.value.substring($hidden[0].value.length);
             sep = sep.substring(0,sep.length-$hidden[1].value.length);
         }
         // disable edit button
@@ -201,7 +203,7 @@ jQuery(document).ready(function() {
             jQuery(elt).blur(function() {
                 window.setTimeout(function() {
                     if ($row.find('input:focus[type="text"]').length === 0) {
-                        reinterpret_inputs($shown,$hidden,sep);
+                        reinterpret_inputs($shown,$hidden,interp_input,sep);
                         $button.removeAttr('disabled');
                     }
                 }, reinterp_timeout);
