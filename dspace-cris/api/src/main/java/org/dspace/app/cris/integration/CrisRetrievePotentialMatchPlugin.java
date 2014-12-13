@@ -36,14 +36,6 @@ public class CrisRetrievePotentialMatchPlugin implements
     private static Logger log = Logger
             .getLogger(CrisRetrievePotentialMatchPlugin.class);
 
-    /**
-     * the name of the browse index where lookup for potential matches.
-     * Configured in the dspace.cfg with the property
-     * <code>researcherpage.browseindex</code>
-     */
-    private static final String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
-            .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
-    
     @Override
     public Set<Integer> retrieve(Context context, Set<Integer> invalidIds,
             ResearcherPage researcher)
@@ -59,6 +51,8 @@ public class CrisRetrievePotentialMatchPlugin implements
         Set<Integer> result = new HashSet<Integer>();
         try
         {
+            String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
+                    .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
             BrowseIndex bi = BrowseIndex
                     .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
             // now start up a browse engine and get it to do the work for us
@@ -124,6 +118,8 @@ public class CrisRetrievePotentialMatchPlugin implements
             BrowseIndex bi;
             try
             {
+            	String researcherPotentialMatchLookupBrowserIndex = ConfigurationManager
+                        .getProperty(CrisConstants.CFG_MODULE, "researcherpage.browseindex");
                 bi = BrowseIndex
                         .getBrowseIndex(researcherPotentialMatchLookupBrowserIndex);
 
