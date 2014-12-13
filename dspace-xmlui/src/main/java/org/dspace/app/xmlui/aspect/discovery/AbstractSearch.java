@@ -68,27 +68,24 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
     private static final Message T_head1_community =
             message("xmlui.Discovery.AbstractSearch.head1_community");
-
     private static final Message T_head1_collection =
             message("xmlui.Discovery.AbstractSearch.head1_collection");
-
     private static final Message T_head1_none =
             message("xmlui.Discovery.AbstractSearch.head1_none");
-
     private static final Message T_no_results =
             message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
-
     private static final Message T_all_of_dspace =
             message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
-
     private static final Message T_sort_by_relevance =
             message("xmlui.Discovery.AbstractSearch.sort_by.relevance");
-
-    private static final Message T_sort_by = message("xmlui.Discovery.AbstractSearch.sort_by.head");
-
-    private static final Message T_rpp = message("xmlui.Discovery.AbstractSearch.rpp");
-    private static final Message T_result_head_3 = message("xmlui.Discovery.AbstractSearch.head3");
-    private static final Message T_result_head_2 = message("xmlui.Discovery.AbstractSearch.head2");
+    private static final Message T_sort_by = 
+    		message("xmlui.Discovery.AbstractSearch.sort_by.head");
+    private static final Message T_rpp = 
+    		message("xmlui.Discovery.AbstractSearch.rpp");
+    private static final Message T_result_head_3 = 
+    		message("xmlui.Discovery.AbstractSearch.head3");
+    private static final Message T_result_head_2 = 
+    		message("xmlui.Discovery.AbstractSearch.head2");
 
     /**
      * Cached query results
@@ -99,9 +96,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Static query results for exporting metadata
      */
     private static DiscoverResult staticQueryResults;
-    
+        
     public void setStaticQueryResults(DiscoverResult qResults) {
-    	staticQueryResults = qResults;
+    	staticQueryResults = qResults; 
+    }
+    
+    public static DiscoverResult getStaticQueryResults() {
+    	return staticQueryResults;
     }
     
     /**
@@ -300,7 +301,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         Division results = search.addDivision("search-results", "primary");
         buildSearchControls(results);
-
 
         DSpaceObject searchScope = getScope();
 
@@ -750,8 +750,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             filterQueries.addAll(Arrays.asList(fqs));
         }
-
+        
         this.queryArgs = new DiscoverQuery();
+        
+        queryArgs.setMaxResults(getParameterRpp());
 
         //Add the configured default filter queries
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
@@ -761,8 +763,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         if (filterQueries.size() > 0) {
             queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         }
-
-        queryArgs.setMaxResults(getParameterRpp());
 
         String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
         DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
@@ -811,8 +811,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             queryArgs.setSortField("dc.type", DiscoverQuery.SORT_ORDER.asc);
 
         }
-
-
+        
         queryArgs.setQuery(query != null && !query.trim().equals("") ? query : null);
 
         if (page > 1)
@@ -834,9 +833,20 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
 
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
-
+        
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
-        setStaticQueryResults(this.queryResults);
+        
+        if(page == 1) {        	        	
+        	queryArgs.setMaxResults(safeLongToInt(this.queryResults.getTotalSearchResults()));        	        	
+        	setStaticQueryResults(SearchUtils.getSearchService().search(context, scope, queryArgs));
+        }
+    }
+    
+    public static int safeLongToInt(long l) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(l + " cannot be cast to int.");
+        }
+        return (int) l;
     }
     
     /**
@@ -848,21 +858,18 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     {
     	Item[] resultsItems;
         // Get a list of found items
-        ArrayList<Item> items = new ArrayList<Item>();
-        for (DSpaceObject resultDSO : staticQueryResults.getDspaceObjects())        
+        ArrayList<Item> items = new ArrayList<Item>();        
+        for (DSpaceObject resultDSO : getStaticQueryResults().getDspaceObjects())        
         {
             if (resultDSO instanceof Item)
             {
                 items.add((Item) resultDSO);
             }
-        }
-        
+        }        
         resultsItems = new Item[items.size()];
-        resultsItems = items.toArray(resultsItems);
-        
+        resultsItems = items.toArray(resultsItems);        
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
-
         // Export a search view
         ArrayList iids = new ArrayList();
         for (Item item : items)
@@ -870,11 +877,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             iids.add(item.getID());
         }
         ItemIterator ii = new ItemIterator(context, iids);
-        MetadataExport exporter = new MetadataExport(context, ii, false);
-        
+        MetadataExport exporter = new MetadataExport(context, ii, false);        
         // Perform the export
-        DSpaceCSV csv = exporter.export();
-        
+        DSpaceCSV csv = exporter.export();        
         log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
         return csv;
     }
@@ -991,8 +996,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * @param parameters
      * @return The post URL
      */
-    protected abstract String generateURL(Map<String, String> parameters)
-            throws UIException;
+    protected abstract String generateURL(Map<String, String> parameters) throws UIException;
 
 
     /**
@@ -1005,16 +1009,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         super.recycle();
     }
 
-
-    protected void buildSearchControls(Division div)
-            throws WingException, SQLException {
-
-
+    protected void buildSearchControls(Division div) throws WingException, SQLException 
+    {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
 
         Division searchControlsGear = div.addDivision("masked-page-control").addDivision("search-controls-gear", "controls-gear-wrapper");
-
 
         /**
          * Add sort by options, the gear will be rendered by a combination of javascript & css

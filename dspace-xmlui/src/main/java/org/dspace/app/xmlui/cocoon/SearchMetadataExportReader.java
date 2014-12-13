@@ -45,6 +45,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -93,8 +94,8 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     private static Logger log = Logger.getLogger(MetadataExportReader.class);
 
     DSpaceCSV csv = null;
-    MetadataExport exporter = null;
     String filename = null;
+    
     /**
      * Set up the export reader.
      * 
@@ -108,30 +109,43 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
 
         try
         {
-            this.request = ObjectModelHelper.getRequest(objectModel);
-            this.response = ObjectModelHelper.getResponse(objectModel);
-
+        	this.request = ObjectModelHelper.getRequest(objectModel); 
+        	this.response = ObjectModelHelper.getResponse(objectModel); 
+        	 
             Context context = ContextUtil.obtainContext(objectModel);
-
-            if(AuthorizeManager.isAdmin(context))
-            {
-            	csv = AbstractSearch.exportMetadata(context);
-            	
-            	filename = "search-results.csv";
+            
+            String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
+            
+            if(search_export_config.equals("admin")) {            	
+            	if(AuthorizeManager.isAdmin(context)) {
+                	csv = AbstractSearch.exportMetadata(context);
+                    filename = "search-results.csv";
+                }
+                else {                	
+                    /*
+                     * Auth should be done by MetadataExport -- pass context through
+                     * we should just be catching exceptions and displaying errors here
+                     */
+                    if(AuthenticationUtil.isLoggedIn(request)) {
+                    	String redictURL = request.getContextPath() + "/restricted-resource";
+                        HttpServletResponse httpResponse = (HttpServletResponse)
+                		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                		httpResponse.sendRedirect(redictURL);
+                		return;
+                    }
+                    else {
+                    	String redictURL = request.getContextPath() + "/login";
+                        AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
+                        HttpServletResponse httpResponse = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                        httpResponse.sendRedirect(redictURL);
+                        return;
+                    }
+                }
             }
-            else {
-            	
-                /*
-                 * Auth should be done by MetadataExport -- pass context through
-                 * we should just be catching exceptions and displaying errors here
-                 */
-
-                if(AuthenticationUtil.isLoggedIn(request)) {
-                	String redictURL = request.getContextPath() + "/restricted-resource";
-                    HttpServletResponse httpResponse = (HttpServletResponse)
-            		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-            		httpResponse.sendRedirect(redictURL);
-            		return;
+            else if(search_export_config.equals("user")) {
+            	if(AuthenticationUtil.isLoggedIn(request)) {
+            		csv = AbstractSearch.exportMetadata(context);
+                    filename = "search-results.csv";
                 }
                 else {
                 	String redictURL = request.getContextPath() + "/login";
@@ -140,6 +154,10 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
                     httpResponse.sendRedirect(redictURL);
                     return;
                 }
+            }
+            else if(search_export_config.equals("anonymous")) {
+            	csv = AbstractSearch.exportMetadata(context);
+                filename = "search-results.csv";
             }
         }
         catch (RuntimeException e)

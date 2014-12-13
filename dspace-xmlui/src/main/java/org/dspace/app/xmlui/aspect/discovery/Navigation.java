@@ -27,6 +27,8 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
@@ -138,11 +140,24 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("administrative");
                 
         String uri = request.getSitemapURI(); 
+                         
+        String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
         
         if(uri.contains("discover")) {
-        	List results = options.addList("context");    		
-        	results.setHead(T_context_head);
-        	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+        	if(search_export_config != null) {
+        		if(search_export_config.equals("admin")) {
+        			if(AuthorizeManager.isAdmin(context)) {
+        				List results = options.addList("context");    		
+                    	results.setHead(T_context_head);
+                    	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+        			}
+        		}
+        		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
+        			List results = options.addList("context");    		
+                	results.setHead(T_context_head);
+                	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+        		}
+        	}
         }
     }
 
