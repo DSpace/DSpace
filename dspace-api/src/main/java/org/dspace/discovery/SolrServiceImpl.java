@@ -7,9 +7,9 @@
  */
 package org.dspace.discovery;
 
+import org.dspace.util.MultiFormatDateParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -35,7 +35,6 @@ import java.util.Vector;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -1100,7 +1099,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
                         {
                             //For our search filters that are dates we format them properly
-                            date = toDate(value);
+                            date = MultiFormatDateParser.parse(value);
                             if(date != null)
                             {
                                 //TODO: make this date format configurable !
@@ -1197,7 +1196,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 										// add the year to the autocomplete index
 										doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
 										doc.addField(indexField, yearUTC);
-                                    	
+
                                     	if (yearUTC.startsWith("0"))
                                         {
         									doc.addField(
@@ -1218,7 +1217,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         													+ "_keyword",
         													value.replaceFirst("0*", ""));
                                         }
-                                    	
+
                                     	//Also save a sort value of this year, this is required for determining the upper & lower bound year of our facet
                                         if(doc.getField(indexField + "_sort") == null)
                                         {
@@ -1950,7 +1949,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return null;
         }
         HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
-        
+
         HttpGet method = new HttpGet(hostURL.toHostString() + "");
         try
         {

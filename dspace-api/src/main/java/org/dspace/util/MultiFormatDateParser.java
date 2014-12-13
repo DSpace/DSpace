@@ -1,10 +1,11 @@
-/*
- * Copyright 2014 Indiana University.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Mark H. Wood, IUPUI University Library, Dec 12, 2014
+ * http://www.dspace.org/license/
  */
-
-package org.dspace.discovery;
+package org.dspace.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -72,7 +73,7 @@ public class MultiFormatDateParser
      * @param dateString the supposed date to be parsed.
      * @return the result of the first successful parse, or {@code null} if none.
      */
-    static Date parse(String dateString)
+    static public Date parse(String dateString)
     {
         for (Candidate candidate : candidates)
         {
