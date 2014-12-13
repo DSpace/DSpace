@@ -45,7 +45,7 @@
                 <module>xmlui</module>
             </modules>
         </profile>
-        <profile>
+     <!--    <profile>
             <id>dspace-lni</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -53,7 +53,7 @@
             <modules>
                 <module>lni</module>
             </modules>
-        </profile>
+        </profile> -->
         <profile>
             <id>dspace-jspui</id>
             <activation>

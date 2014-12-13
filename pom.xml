@@ -502,10 +502,7 @@
                 <module>dspace-xmlui</module>
             </modules>
         </profile> 
-
         <!--
-           Builds LNI WAR & Client for DSpace
-        -->
          <profile>
             <id>dspace-lni</id>
             <activation>
@@ -518,7 +515,7 @@
                 <module>dspace-lni/dspace-lni-client</module>
             </modules>
         </profile>
-
+	-->
 
     <!--
            Builds CRIS Module for DSpace
@@ -552,8 +549,8 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <!-- <module>dspace-xmlui</module> -->
-            <module>dspace-lni</module> 
+            <!-- <module>dspace-xmlui</module>
+            <module>dspace-lni</module>  -->
             <module>dspace-oai</module>
             <module>dspace-cris-ametrics</module>
             <module>dspace-cris</module>
