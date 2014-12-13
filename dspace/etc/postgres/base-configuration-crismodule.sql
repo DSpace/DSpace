@@ -321,14 +321,14 @@ INSERT INTO "public"."jdyna_widget_link" VALUES ('55', 'Insert here the label to
 -- ----------------------------
 -- Records of jdyna_widget_pointer
 -- ----------------------------
-INSERT INTO "public"."cris_rp_wpointer" VALUES ('950', '${displayObject.anagrafica4view[''preferredName''][0].value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."cris_rp_wpointer" VALUES ('951', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."cris_rp_wpointer" VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
-INSERT INTO "public"."cris_ou_wpointer" VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."cris_ou_wpointer" VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."cris_ou_wpointer" VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."cris_ou_wpointer" VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer');
-INSERT INTO "public"."cris_rp_wpointer" VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('950', '${displayObject.anagrafica4view[''preferredName''][0].value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('951', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_rp_wpointer" VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
 
 -- ----------------------------
 -- Records of jdyna_widget_text
