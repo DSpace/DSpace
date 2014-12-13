@@ -96,13 +96,21 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Static query results for exporting metadata
      */
     private static DiscoverResult staticQueryResults;
+    
+    public static boolean isStaticQueryResults = false;
         
     public void setStaticQueryResults(DiscoverResult qResults) {
-    	staticQueryResults = qResults; 
+    	staticQueryResults = qResults;
+    	isStaticQueryResults = true;
     }
     
     public static DiscoverResult getStaticQueryResults() {
     	return staticQueryResults;
+    }
+    
+    public static void freeStaticQueryResults() {
+    	staticQueryResults = null; 
+    	isStaticQueryResults = false;
     }
     
     /**
@@ -725,7 +733,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     /**
      * Query DSpace for a list of all items / collections / or communities that
      * match the given search query.
-     *
      *
      * @param scope the dspace object parent
      */

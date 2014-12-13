@@ -159,6 +159,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         		}
         	}
         }
+        else {
+        	if(AbstractSearch.isStaticQueryResults) {
+        		AbstractSearch.freeStaticQueryResults();
+        	}
+        }
+        	
     }
 
     /**
@@ -168,14 +174,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-
         // Add metadata for quick searches:
-        pageMeta.addMetadata("search", "simpleURL").addContent(
-                "/discover");
-        pageMeta.addMetadata("search", "advancedURL").addContent(
-                contextPath + "/discover");
+        pageMeta.addMetadata("search", "simpleURL").addContent("/discover");
+        pageMeta.addMetadata("search", "advancedURL").addContent(contextPath + "/discover");
         pageMeta.addMetadata("search", "queryField").addContent("query");
-        
     }
 
 }
