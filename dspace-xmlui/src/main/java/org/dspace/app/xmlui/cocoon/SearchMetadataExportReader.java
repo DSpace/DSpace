@@ -35,6 +35,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
+
 import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
 
 import org.apache.log4j.Logger;
@@ -52,7 +53,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
 
 
-
 /**
  *
  * AbstractReader that generates a CSV of search
@@ -62,6 +62,8 @@ import org.dspace.content.ItemIterator;
 
 public class SearchMetadataExportReader extends AbstractReader implements Recyclable
 {
+	private static Logger log = Logger.getLogger(MetadataExportReader.class);
+	
      /**
      * Messages to be sent when the user is not authorized to view 
      * a particular bitstream. They will be redirected to the login
@@ -91,8 +93,6 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     /** The Cocoon request */
     protected Request request;
 
-    private static Logger log = Logger.getLogger(MetadataExportReader.class);
-
     DSpaceCSV csv = null;
     String filename = null;
     
@@ -101,24 +101,27 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
      * 
      * See the class description for information on configuration options.
      */
-    public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters par) throws ProcessingException, SAXException,
-            IOException
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters par) throws ProcessingException, SAXException, IOException
     {
         super.setup(resolver, objectModel, src, par);
 
         try
         {
-        	this.request = ObjectModelHelper.getRequest(objectModel); 
-        	this.response = ObjectModelHelper.getResponse(objectModel); 
-        	 
+        	this.request = ObjectModelHelper.getRequest(objectModel);
+        	this.response = ObjectModelHelper.getResponse(objectModel);
+        	
+        	String query = par.getParameter("query");
+        	String filters = par.getParameter("filters");
+        	
+        	ExportSearch exportSearch = new ExportSearch();
+        	        	 
             Context context = ContextUtil.obtainContext(objectModel);
             
             String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export");
             
             if(search_export_config.equals("admin")) {            	
             	if(AuthorizeManager.isAdmin(context)) {
-                	csv = AbstractSearch.exportMetadata(context);
+                	csv = exportSearch.exportMetadata(objectModel, query, filters);
                     filename = "search-results.csv";
                 }
                 else {                	
@@ -144,7 +147,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             }
             else if(search_export_config.equals("user")) {
             	if(AuthenticationUtil.isLoggedIn(request)) {
-            		csv = AbstractSearch.exportMetadata(context);
+            		csv = exportSearch.exportMetadata(objectModel, query, filters);
                     filename = "search-results.csv";
                 }
                 else {
@@ -156,20 +159,17 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
                 }
             }
             else if(search_export_config.equals("anonymous")) {
-            	csv = AbstractSearch.exportMetadata(context);
+            	csv = exportSearch.exportMetadata(objectModel, query, filters);
                 filename = "search-results.csv";
             }
         }
-        catch (RuntimeException e)
-        {
+        catch (RuntimeException e) {
             throw e;    
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
         	throw new ProcessingException("Unable to export metadata.",e);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw new ProcessingException("Unable to read bitstream.",e);
         } 
     }
@@ -192,5 +192,14 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     public void recycle() {        
         this.response = null;
         this.request = null;
-    }
+    }       
+}
+
+class ExportSearch extends AbstractSearch 
+{ 	
+	public ExportSearch() {}	
+	protected String getQuery() throws UIException { return null; }
+	protected String getBasicUrl() throws SQLException { return null; }
+	protected String generateURL(Map<String, String> parameters) throws UIException { return null; }	
+	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {}
 }

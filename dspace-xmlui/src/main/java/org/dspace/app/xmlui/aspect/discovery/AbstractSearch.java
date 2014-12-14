@@ -23,6 +23,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
@@ -91,28 +92,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Cached query results
      */
     protected DiscoverResult queryResults;
-    
-    /**
-     * Static query results for exporting metadata
-     */
-    private static DiscoverResult staticQueryResults;
-    
-    public static boolean isStaticQueryResults = false;
         
-    public void setStaticQueryResults(DiscoverResult qResults) {
-    	staticQueryResults = qResults;
-    	isStaticQueryResults = true;
-    }
-    
-    public static DiscoverResult getStaticQueryResults() {
-    	return staticQueryResults;
-    }
-    
-    public static void freeStaticQueryResults() {
-    	staticQueryResults = null; 
-    	isStaticQueryResults = false;
-    }
-    
     /**
      * Cached query arguments
      */
@@ -736,28 +716,24 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      *
      * @param scope the dspace object parent
      */
-    public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException {
-
-        if (queryResults != null)
-        {
+    public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException 
+    {
+        if (queryResults != null) {
             return;
         }
         
         String query = getQuery();
-
-        //DSpaceObject scope = getScope();
-
+        
         int page = getParameterPage();
 
         List<String> filterQueries = new ArrayList<String>();
 
         String[] fqs = getFilterQueries();
 
-        if (fqs != null)
-        {
+        if (fqs != null) {
             filterQueries.addAll(Arrays.asList(fqs));
         }
-        
+                
         this.queryArgs = new DiscoverQuery();
         
         queryArgs.setMaxResults(getParameterRpp());
@@ -773,34 +749,31 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
         DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
-        if(sortBy == null){
+        if(sortBy == null) {
             //Attempt to find the default one, if none found we use SCORE
             sortBy = "score";
-            if(searchSortConfiguration != null){
+            if(searchSortConfiguration != null) {
                 for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields()) {
-                    if(sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())){
+                    if(sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) {
                         sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
                     }
                 }
             }
         }
+        
         String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
-        if(sortOrder == null && searchSortConfiguration != null){
+        if(sortOrder == null && searchSortConfiguration != null) {
             sortOrder = searchSortConfiguration.getDefaultSortOrder().toString();
         }
 
-        if (sortOrder == null || sortOrder.equalsIgnoreCase("DESC"))
-        {
+        if (sortOrder == null || sortOrder.equalsIgnoreCase("DESC")) {
             queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
         }
-        else
-        {
+        else {
             queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
         }
 
-
         String groupBy = ObjectModelHelper.getRequest(objectModel).getParameter("group_by");
-
 
         // Enable groupBy collapsing if designated
         if (groupBy != null && !groupBy.equalsIgnoreCase("none")) {
@@ -816,25 +789,20 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // TODO: I think that can be more transparently done in the solr solrconfig.xml with DISMAX and boosting
             /** sort in groups to get publications to top */
             queryArgs.setSortField("dc.type", DiscoverQuery.SORT_ORDER.asc);
-
         }
         
         queryArgs.setQuery(query != null && !query.trim().equals("") ? query : null);
 
-        if (page > 1)
-        {
+        if (page > 1) {
             queryArgs.setStart((page - 1) * queryArgs.getMaxResults());
         }
-        else
-        {
+        else {
             queryArgs.setStart(0);
         }
 
-        if(discoveryConfiguration.getHitHighlightingConfiguration() != null)
-        {
+        if(discoveryConfiguration.getHitHighlightingConfiguration() != null) {
             List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
-            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields)
-            {
+            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields) {
                 queryArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
             }
         }
@@ -842,18 +810,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
         
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
-        
-        if(page == 1) {        	        	
-        	queryArgs.setMaxResults(safeLongToInt(this.queryResults.getTotalSearchResults()));        	        	
-        	setStaticQueryResults(SearchUtils.getSearchService().search(context, scope, queryArgs));
-        }
-    }
-    
-    public static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(l + " cannot be cast to int.");
-        }
-        return (int) l;
     }
     
     /**
@@ -861,34 +817,134 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * 
      * @throws IOException
      */
-    public static DSpaceCSV exportMetadata(Context context) throws IOException
+    public DSpaceCSV exportMetadata(Map objectModel, String query, String filters) throws IOException, UIException, SearchServiceException, SQLException
     {
+    	DiscoverResult qResults = new DiscoverResult();
+    	DiscoverQuery qArgs = new DiscoverQuery();
+    	    	
+    	Context context = ContextUtil.obtainContext(objectModel);
+    	
+    	Request request = ObjectModelHelper.getRequest(objectModel);
+
+        DSpaceObject scope = HandleUtil.obtainHandle(objectModel);
+    	
+    	List<String> filterQueries = new ArrayList<String>();
+
+        String[] fqs = filters.split(",");
+        
+        if (fqs != null) {
+            filterQueries.addAll(Arrays.asList(fqs));   
+        }
+        
+        qArgs.setMaxResults(getParameterRpp());
+
+        //Add the configured default filter queries
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
+        List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
+        qArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
+
+        if (filterQueries.size() > 0) {
+        	qArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
+        }
+
+        String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
+        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
+        if(sortBy == null) {
+            //Attempt to find the default one, if none found we use SCORE
+            sortBy = "score";
+            if(searchSortConfiguration != null) {
+                for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields()) {
+                    if(sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) {
+                        sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+                    }
+                }
+            }
+        }
+        
+        String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
+        if(sortOrder == null && searchSortConfiguration != null) {
+            sortOrder = searchSortConfiguration.getDefaultSortOrder().toString();
+        }
+
+        if (sortOrder == null || sortOrder.equalsIgnoreCase("DESC")) {
+        	qArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
+        }
+        else {
+        	qArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
+        }
+
+        String groupBy = ObjectModelHelper.getRequest(objectModel).getParameter("group_by");
+
+        // Enable groupBy collapsing if designated
+        if (groupBy != null && !groupBy.equalsIgnoreCase("none")) {
+            /** Construct a Collapse Field Query */
+        	qArgs.addProperty("collapse.field", groupBy);
+        	qArgs.addProperty("collapse.threshold", "1");
+        	qArgs.addProperty("collapse.includeCollapsedDocs.fl", "handle");
+        	qArgs.addProperty("collapse.facet", "before");
+
+            //queryArgs.a  type:Article^2
+
+            // TODO: This is a hack to get Publications (Articles) to always be at the top of Groups.
+            // TODO: I think that can be more transparently done in the solr solrconfig.xml with DISMAX and boosting
+            /** sort in groups to get publications to top */
+        	qArgs.setSortField("dc.type", DiscoverQuery.SORT_ORDER.asc);
+        }
+        
+        qArgs.setQuery(query != null && !query.trim().equals("") ? query : null);
+
+        qArgs.setStart(0);
+
+        if(discoveryConfiguration.getHitHighlightingConfiguration() != null) {
+            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
+            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields) {
+            	qArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
+            }
+        }
+
+        qArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
+        
+        qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
+                	        	
+        qArgs.setMaxResults(safeLongToInt(qResults.getTotalSearchResults()));        	        	
+        
+        qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
+        
     	Item[] resultsItems;
-        // Get a list of found items
+        
+    	// Get a list of found items
         ArrayList<Item> items = new ArrayList<Item>();        
-        for (DSpaceObject resultDSO : getStaticQueryResults().getDspaceObjects())        
-        {
-            if (resultDSO instanceof Item)
-            {
+        for (DSpaceObject resultDSO : qResults.getDspaceObjects()) {
+            if (resultDSO instanceof Item) {
                 items.add((Item) resultDSO);
             }
         }        
         resultsItems = new Item[items.size()];
         resultsItems = items.toArray(resultsItems);        
+        
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
+        
         // Export a search view
         ArrayList iids = new ArrayList();
-        for (Item item : items)
-        {
+        for (Item item : items) {
             iids.add(item.getID());
         }
         ItemIterator ii = new ItemIterator(context, iids);
         MetadataExport exporter = new MetadataExport(context, ii, false);        
+        
         // Perform the export
         DSpaceCSV csv = exporter.export();        
         log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
+        
         return csv;
+    }
+    
+    public static int safeLongToInt(long l) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(l + " cannot be cast to int.");
+        }
+        return (int) l;
     }
         
     /**
@@ -1129,4 +1185,3 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 + countCollections + "," + countItems + ")"));
     }
 }
-

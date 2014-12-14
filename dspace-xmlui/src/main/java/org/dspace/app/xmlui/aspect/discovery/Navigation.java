@@ -34,6 +34,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -57,23 +58,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        try {
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
-            
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            if (dso != null)
-            {
-                key += "-" + dso.getHandle();
-            }
-
-            return HashUtil.hash(key);
-        } 
-        catch (SQLException sqle)
-        {
-            // Ignore all errors and just return that the component is not cachable.
-            return "0";
-        }
+    	return "0";
     }
 
     /**
@@ -143,28 +128,37 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                          
         String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
         
-        if(uri.contains("discover")) {
+        String query = decodeFromURL(request.getParameter("query"));
+    	
+    	String fqps = "";
+    	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
+                
+        if (fqs != null)
+        {
+        	for(int i = 0; i < fqs.length; i++) {
+            	if(i < fqs.length - 1)
+            		fqps += fqs[i] + ",";
+            	else
+            		fqps += fqs[i];
+            }
+        }
+                
+        if(uri.contains("discover")) {            
         	if(search_export_config != null) {
         		if(search_export_config.equals("admin")) {
         			if(AuthorizeManager.isAdmin(context)) {
         				List results = options.addList("context");    		
                     	results.setHead(T_context_head);
-                    	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + fqps, T_export_metadata);
         			}
         		}
         		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
         			List results = options.addList("context");    		
                 	results.setHead(T_context_head);
-                	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + fqps, T_export_metadata);
         		}
         	}
-        }
-        else {
-        	if(AbstractSearch.isStaticQueryResults) {
-        		AbstractSearch.freeStaticQueryResults();
-        	}
-        }
-        	
+        }	
     }
 
     /**
@@ -179,7 +173,4 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("search", "advancedURL").addContent(contextPath + "/discover");
         pageMeta.addMetadata("search", "queryField").addContent("query");
     }
-
 }
-
-
