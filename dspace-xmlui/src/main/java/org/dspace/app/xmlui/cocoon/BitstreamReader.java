@@ -333,7 +333,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             // Gather last modified timestamp if possible
-            if(item != null)
+            if(bitstream.getLastModified() != null)
+                this.lastModified = bitstream.getLastModified();
+            else if(item != null)
                 this.lastModified = item.getLastModified();
             else
                 this.lastModified = null;

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -269,6 +270,30 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
+     * Get the date the bitstream was created, cannot be null
+     *
+     * @return the date the item was created.
+     */
+    public Date getCreated()
+    {
+        Date myDate = bRow.getDateColumn("created");
+
+        return myDate;
+    }
+
+    /**
+     * Get the date the item was last modified, cannot be null
+     *
+     * @return the date the item was last modified.
+     */
+    public Date getLastModified()
+    {
+        Date myDate = bRow.getDateColumn("last_modified");
+
+        return myDate;
+    }
+
+    /**
      * Get the sequence ID of this bitstream
      * 
      * @return the sequence ID
@@ -494,11 +519,16 @@ public class Bitstream extends DSpaceObject
 
         if (modified)
         {
+            // Set the last modified date
+            bRow.setColumn("last_modified", new Date());
             ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
+            // Set the last modified date
+            bRow.setColumn("last_modified", new Date());
+
             updateMetadata();
             clearDetails();
         }

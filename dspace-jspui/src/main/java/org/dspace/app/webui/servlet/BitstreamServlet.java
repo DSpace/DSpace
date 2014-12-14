@@ -204,7 +204,9 @@ public class BitstreamServlet extends DSpaceServlet
         // Gather last modified timestamp if possible
         Date lastModified;
 
-        if(item != null)
+        if(bitstream.getLastModified() != null)
+            lastModified = bitstream.getLastModified();
+        else if(item != null)
             lastModified = item.getLastModified();
         else
             lastModified = null;

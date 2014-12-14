@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -263,6 +264,8 @@ public class BitstreamStorageManager
             bitstream = DatabaseManager.row("Bitstream");
             bitstream.setColumn("deleted", true);
             bitstream.setColumn("internal_id", id);
+            bitstream.setColumn("created", new Date());
+            bitstream.setColumn("last_modified", new Date());
 
             /*
              * Set the store number of the new bitstream If you want to use some
