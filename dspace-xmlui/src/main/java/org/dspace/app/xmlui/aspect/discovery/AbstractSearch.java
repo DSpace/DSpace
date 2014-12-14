@@ -817,17 +817,27 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * 
      * @throws IOException
      */
-    public DSpaceCSV exportMetadata(Map objectModel, String query, String filters) throws IOException, UIException, SearchServiceException, SQLException
+    public DSpaceCSV exportMetadata(Context context, Request request, Map objectModel, String query, String scopeString, String filters) throws IOException, UIException, SearchServiceException, SQLException
     {
     	DiscoverResult qResults = new DiscoverResult();
     	DiscoverQuery qArgs = new DiscoverQuery();
-    	    	
-    	Context context = ContextUtil.obtainContext(objectModel);
+        
+    	try {
+    		scopeString = scopeString.replace("~", "/");
+        }
+        catch(NullPointerException e) { }
     	
-    	Request request = ObjectModelHelper.getRequest(objectModel);
-
-        DSpaceObject scope = HandleUtil.obtainHandle(objectModel);
-    	
+        // Are we in a community or collection?
+        DSpaceObject scope;
+        if (scopeString == null || "".equals(scopeString)) {
+            // get the search scope from the url handle
+        	scope = HandleUtil.obtainHandle(objectModel);
+        }
+        else {
+            // Get the search scope from the location parameter
+        	scope = HandleManager.resolveToObject(context, scopeString);
+        }
+        
     	List<String> filterQueries = new ArrayList<String>();
 
         String[] fqs = filters.split(",");

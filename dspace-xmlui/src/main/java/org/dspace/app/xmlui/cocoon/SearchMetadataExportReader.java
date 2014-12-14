@@ -111,6 +111,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         	this.response = ObjectModelHelper.getResponse(objectModel);
         	
         	String query = par.getParameter("query");
+        	String scope = par.getParameter("scope");
         	String filters = par.getParameter("filters");
         	
         	ExportSearch exportSearch = new ExportSearch();
@@ -121,7 +122,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             
             if(search_export_config.equals("admin")) {            	
             	if(AuthorizeManager.isAdmin(context)) {
-                	csv = exportSearch.exportMetadata(objectModel, query, filters);
+                	csv = exportSearch.exportMetadata(context, this.request, objectModel, query, scope, filters);
                     filename = "search-results.csv";
                 }
                 else {                	
@@ -147,7 +148,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
             }
             else if(search_export_config.equals("user")) {
             	if(AuthenticationUtil.isLoggedIn(request)) {
-            		csv = exportSearch.exportMetadata(objectModel, query, filters);
+            		csv = exportSearch.exportMetadata(context, this.request, objectModel, query, scope, filters);
                     filename = "search-results.csv";
                 }
                 else {
@@ -159,7 +160,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
                 }
             }
             else if(search_export_config.equals("anonymous")) {
-            	csv = exportSearch.exportMetadata(objectModel, query, filters);
+            	csv = exportSearch.exportMetadata(context, this.request, objectModel, query, scope, filters);
                 filename = "search-results.csv";
             }
         }

@@ -129,7 +129,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
         
         String query = decodeFromURL(request.getParameter("query"));
-    	
+                
+        String scope= request.getParameter("scope");
+        
     	String fqps = "";
     	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
                 
@@ -143,19 +145,28 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
                 
-        if(uri.contains("discover")) {            
+        if(uri.contains("discover")) {
+        	if("".equals(query))
+        		query = "*";
+        	if(uri.contains("handle")) {
+        		scope = uri.replace("handle/", "").replace("/discover", "");
+            }
+        	try {
+            	scope = scope.replace("/", "~");
+            }
+            catch(NullPointerException e) { }        	
         	if(search_export_config != null) {
         		if(search_export_config.equals("admin")) {
         			if(AuthorizeManager.isAdmin(context)) {
         				List results = options.addList("context");    		
                     	results.setHead(T_context_head);
-                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + fqps, T_export_metadata);
+                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + fqps, T_export_metadata);
         			}
         		}
         		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
         			List results = options.addList("context");    		
                 	results.setHead(T_context_head);
-                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + fqps, T_export_metadata);
+                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + fqps, T_export_metadata);
         		}
         	}
         }	
