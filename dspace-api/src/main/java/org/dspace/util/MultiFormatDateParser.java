@@ -7,25 +7,30 @@
  */
 package org.dspace.util;
 
+import au.com.bytecode.opencsv.CSVReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.inject.Inject;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Attempt to parse date strings in a variety of formats.  This uses an external
- * list of regular expressions and associated SimpleDateFormat strings.  Inject
- * the list as pairs of strings using {@link setPatterns}.  {@link parse} walks
- * the provided list in the order provided and tries each entry against a String.
+ * list of regular expressions and associated SimpleDateFormat strings.  Supply
+ * such rules as the file {@code dateFormats.csv} on the class path.
+ * {@link parse} walks the provided list in order and tries each entry against a
+ * String.  The first complete match selects the format to be used.
  *
  * Dates are parsed as being in the UTC zone.
  *
@@ -35,58 +40,97 @@ public class MultiFormatDateParser
 {
     private static final Logger log = LoggerFactory.getLogger(MultiFormatDateParser.class);
 
-    private static final ArrayList<Candidate> candidates = new ArrayList<>();
+    private static final String DSPACE_DIR = "dspace.dir";
 
-    @Inject
-    private static void setPatterns(Map<String, String> patterns)
+    private static final String FORMATS_FILE = "config/dateFormats.csv";
+
+    private static ArrayList<Rule> rules;
+
+    /**
+     * Read pairs of [regex, format] strings from a CSV file on the class path
+     * into the rule table.
+     */
+    private static void loadPatterns()
     {
-        for (Entry<String, String> candidate : patterns.entrySet())
+        rules = new ArrayList<>();
+
+        String dspaceDir = new DSpace().getConfigurationService().getProperty(DSPACE_DIR);
+        File formatsFile = new File(dspaceDir, FORMATS_FILE);
+        if (!formatsFile.isFile())
         {
-            Pattern pattern;
-            try {
-                pattern = Pattern.compile(candidate.getKey());
-            } catch (PatternSyntaxException ex) {
-                log.error("Skipping format with unparseable pattern '{}'",
-                        candidate.getKey());
-                continue;
-            }
+            log.error("Date formats list {} not found",
+                    formatsFile.getAbsolutePath());
+            return;
+        }
 
-            SimpleDateFormat format;
-            try {
-            format = new SimpleDateFormat(candidate.getValue());
-            } catch (IllegalArgumentException ex) {
-                log.error("Skipping uninterpretable date format '{}'",
-                        candidate.getValue());
-                continue;
-            }
-            format.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-            format.setLenient(false);
+        try (CSVReader reader = new CSVReader(new FileReader(formatsFile)))
+        {
+            while (true)
+            {
+                String[] rule;
+                rule = reader.readNext();
+                if (null == rule) // if there is no more input
+                {
+                    break;
+                }
+                if (rule.length < 2)
+                {
+                    log.error("Skipping a rule with too few fields");
+                    continue;
+                }
 
-            candidates.add(new Candidate(pattern, format));
+                Pattern pattern;
+                try {
+                    pattern = Pattern.compile(rule[0]);
+                } catch (PatternSyntaxException ex) {
+                    log.error("Skipping format with unparseable regex pattern '{}'",
+                            rule[0]);
+                    continue;
+                }
+
+                SimpleDateFormat format;
+                try {
+                    format = new SimpleDateFormat(rule[1]);
+                } catch (IllegalArgumentException ex) {
+                    log.error("Skipping uninterpretable date format '{}'",
+                            rule[1]);
+                    continue;
+                }
+                format.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+                format.setLenient(false);
+
+                rules.add(new Rule(pattern, format));
+            }
+        } catch (IOException ex) {
+            log.error("Aborted rule loading", ex);
         }
     }
 
     /**
-     * Compare a string to each injected regular expression in entry order, and
-     * when it matches, attempt to parse it using the associated format.
+     * Compare a string to each configured regular expression in entry order,
+     * and when it matches, attempt to parse it using the associated format.
      *
      * @param dateString the supposed date to be parsed.
      * @return the result of the first successful parse, or {@code null} if none.
      */
     static public Date parse(String dateString)
     {
-        for (Candidate candidate : candidates)
+        if (null == rules)
+            loadPatterns();
+
+        for (Rule rule : rules)
         {
-            if (candidate.pattern.matcher(dateString).matches())
+            if (rule.pattern.matcher(dateString).matches())
             {
                 Date result;
                 try {
-                    synchronized(candidate.format) {
-                        result = candidate.format.parse(dateString);
+                    synchronized(rule.format) {
+                        result = rule.format.parse(dateString);
                     }
                 } catch (ParseException ex) {
                     log.info("Date string '{}' matched pattern '{}' but did not parse:  {}",
-                            new String[] {dateString, candidate.format.toPattern(), ex.getMessage()});
+                            new String[] {dateString, rule.format.toPattern(),
+                                ex.getMessage()});
                     continue;
                 }
                 return result;
@@ -96,11 +140,11 @@ public class MultiFormatDateParser
         return null;
     }
 
-    private static class Candidate
+    private static class Rule
     {
         final Pattern pattern;
         final SimpleDateFormat format;
-        public Candidate(Pattern pattern, SimpleDateFormat format)
+        public Rule(Pattern pattern, SimpleDateFormat format)
         {
             this.pattern = pattern;
             this.format = format;
