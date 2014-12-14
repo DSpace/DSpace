@@ -132,21 +132,23 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
                 
         String scope= request.getParameter("scope");
         
-    	String fqps = "";
+    	String filters = "";
     	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
                 
         if (fqs != null)
         {
         	for(int i = 0; i < fqs.length; i++) {
             	if(i < fqs.length - 1)
-            		fqps += fqs[i] + ",";
+            		filters += fqs[i] + ",";
             	else
-            		fqps += fqs[i];
+            		filters += fqs[i];
             }
         }
                 
         if(uri.contains("discover")) {
-        	if("".equals(query))
+        	if(scope == null || "".equals(scope))
+        		scope = "/";
+        	if(query == null || "".equals(query))
         		query = "*";
         	if(uri.contains("handle")) {
         		scope = uri.replace("handle/", "").replace("/discover", "");
@@ -154,19 +156,29 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         	try {
             	scope = scope.replace("/", "~");
             }
-            catch(NullPointerException e) { }        	
+            catch(NullPointerException e) { }
         	if(search_export_config != null) {
+        		
+        		if(false) {
+        			log.warn("**************************************");
+        			log.warn("uri: " + uri);
+        			log.warn("query: " + query);
+        			log.warn("scope: " + scope);
+        			log.warn("filters: " + filters);
+        			log.warn("**************************************");
+        		}
+        		
         		if(search_export_config.equals("admin")) {
         			if(AuthorizeManager.isAdmin(context)) {
         				List results = options.addList("context");    		
                     	results.setHead(T_context_head);
-                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + fqps, T_export_metadata);
+                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
         			}
         		}
         		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
         			List results = options.addList("context");    		
                 	results.setHead(T_context_head);
-                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + fqps, T_export_metadata);
+                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
         		}
         	}
         }	

@@ -1133,8 +1133,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
     protected DSpaceObject getScope() throws SQLException {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String scopeString = request.getParameter("scope");
-
+        String scopeString = request.getParameter("scope");        
         // Are we in a community or collection?
         DSpaceObject dso;
         if (scopeString == null || "".equals(scopeString))
@@ -1147,7 +1146,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // Get the search scope from the location parameter
             dso = HandleManager.resolveToObject(context, scopeString);
         }
-
         return dso;
     }
 
