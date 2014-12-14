@@ -201,10 +201,10 @@
                     <includes>
                         <include>src/**</include>
                     </includes>
-                    <!--Use all default exclusions for IDE files & Maven files, see: 
+                    <!--Use all default exclusions for IDE files & Maven files, see:
                         http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
                     <useDefaultExcludes>true</useDefaultExcludes>
-                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes>
                          Individual Maven projects may choose to override these defaults. -->
                     <excludes>
                         <exclude>**/src/test/resources/**</exclude>
@@ -219,8 +219,8 @@
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/build.properties*</exclude>
                     </excludes>
-                    <mapping> 
-                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
+                    <mapping>
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
                              *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
                         <xmap>XML_STYLE</xmap>
                         <xslt>XML_STYLE</xslt>
@@ -228,7 +228,7 @@
                         <wsdl>XML_STYLE</wsdl>
                         <ttl>SCRIPT_STYLE</ttl>
                         <LICENSE>TEXT</LICENSE>
-                    </mapping>  
+                    </mapping>
                     <encoding>UTF-8</encoding>
                     <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
                     <strictCheck>true</strictCheck>
@@ -245,7 +245,7 @@
          </plugin>
       </plugins>
    </build>
-   
+
    <profiles>
 
        <!-- By default the main dspace.cfg file will be filtered during the build
@@ -266,7 +266,7 @@
        </profile>
 
        <!-- Users can pass in an environment flag "-Denv" to tell DSpace to use
-            a different properties file during its build process. 
+            a different properties file during its build process.
             For example: "mvn package -Denv=test" would build DSpace using the
             settings in "test.properties" instead of those in "build.properties" -->
        <profile>
@@ -300,8 +300,8 @@
        </profile>
 
         <!-- Allow for passing extra memory to Unit tests (via maven-surefire-plugin).
-             By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dsurefire.argLine=-Xmx512m"). Since 
+             By default this gives unit tests 512MB of memory (when tests are enabled),
+             unless tweaked on commandline (e.g. "-Dsurefire.argLine=-Xmx512m"). Since
              m-surefire-p forks a new JVM for testing, it ignores MAVEN_OPTS. -->
         <profile>
             <id>surefire-argLine</id>
@@ -316,8 +316,8 @@
         </profile>
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment,
-             if the testEnvironment.xml file is found AND we are not skipping Unit 
-             Tests (see also skiptests profile). That way the Test Environment is 
+             if the testEnvironment.xml file is found AND we are not skipping Unit
+             Tests (see also skiptests profile). That way the Test Environment is
              also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
@@ -561,7 +561,7 @@
                <module>dspace-xmlui-mirage2</module>
            </modules>
         </profile>
-        
+
         <!--
            Builds XMLUI WAR for DSpace
         -->
@@ -1199,6 +1199,12 @@
               <artifactId>annotations</artifactId>
               <version>3.0.0</version>
               <scope>provided</scope>
+          </dependency>
+          <!-- File formats -->
+          <dependency>
+              <groupId>net.sf.opencsv</groupId>
+              <artifactId>opencsv</artifactId>
+              <version>2.0</version>
           </dependency>
       </dependencies>
    </dependencyManagement>
