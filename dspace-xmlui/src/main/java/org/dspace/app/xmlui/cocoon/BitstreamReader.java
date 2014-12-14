@@ -180,18 +180,20 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     {
         super.setup(resolver, objectModel, src, par);
 
+        // Check to see if a context already exists or not. We may
+        // have been aggregated into an http request by the XSL document
+        // pulling in an XML-based bitstream. In this case the context has
+        // already been created and we should leave it open because the
+        // normal processes will close it.
+        boolean BitstreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
+        Context context = null;
+
         try
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
 
-            // Check to see if a context already exists or not. We may
-            // have been aggregated into an http request by the XSL document
-            // pulling in an XML-based bitstream. In this case the context has
-            // already been created and we should leave it open because the
-            // normal processes will close it.
-            boolean BitstreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
-            Context context = ContextUtil.obtainContext(objectModel);
+            context = ContextUtil.obtainContext(objectModel);
             
             // Get our parameters that identify the bitstream
             int itemID = par.getParameterAsInteger("itemID", -1);
@@ -201,7 +203,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             int sequence = par.getParameterAsInteger("sequence", -1);
             String name = par.getParameter("name", null);
 
-            // Resolve the bitstream
+            // Resolve the bitstream and Item if possible.
+            // these are local fields to assure they can be easily abandoned and GC'd during bitstream download
             Bitstream bitstream = null;
             DSpaceObject dso = null;
             Item item = null;
@@ -331,7 +334,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
             // Gather last modified timestamp if possible
             if(item != null)
-                this.lastModified = ((Item)dso).getLastModified();
+                this.lastModified = item.getLastModified();
             else
                 this.lastModified = null;
 
@@ -431,19 +434,24 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     bitstreamName = "bitstream";
                 }
             }
-            
+
+            // Stop all processing, there is a critical issue with the bitstream being retrievable, do not log event.
+            if(this.bitstreamInputStream == null)
+            {
+                log.error("bitstreamInputStream = null");
+                throw new ProcessingException("Unable to read bitstream as bitstream not found in assetstore");
+            }
+
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
+            // TODO: Should view event happen if 304 or HEAD is returned with no actual content?
             new DSpace().getEventService().fireEvent(
                                 new UsageEvent(
                                                 UsageEvent.Action.VIEW,
                                                 ObjectModelHelper.getRequest(objectModel),
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
-            
-            // If we created the database connection close it, otherwise leave it open.
-            if (BitstreamReaderOpenedContext)
-            	context.complete();
+
         }
         catch (SQLException sqle)
         {
@@ -452,6 +460,20 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         catch (AuthorizeException ae)
         {
             throw new ProcessingException("Unable to read bitstream.",ae);
+        }
+        finally
+        {
+            // If we created the database connection close it, otherwise leave it open.
+            if (BitstreamReaderOpenedContext) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    if(log.isDebugEnabled())
+                        log.debug(e.getMessage(),e);
+                    else
+                        log.error(e.getMessage());
+                }
+            }
         }
     }
 
@@ -607,9 +629,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             // Set Last-Modified so client can send If-Modified-Since based on DSpace modified timestamps.
             if (lastModified != null)
             {
-                // TODO: Bitstream should have a create date timestamp to alleviate
-                // currently forces new timestamp on all metadata edit and resource policy changes.
-                // causes unnecessary re-downloading
                 response.setDateHeader("Last-Modified", lastModified.getTime());
             }
 
@@ -638,9 +657,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             throw new ProcessingException("failed to retrieve content of Bitstream");
         }
 
+        if(bitstreamMimeType != null) {
+            // Set the Content-Type header so that the file is rendered in browser if possible.
+            response.setHeader("Content-Type", bitstreamMimeType);
+        }
 
         // If this is a large bitstream then tell the browser it should treat it as a download.
-        int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
         if (bitstreamSize > threshold && threshold != 0)
         {
                 String name  = bitstreamName;
