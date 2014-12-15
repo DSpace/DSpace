@@ -51,7 +51,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 {
 	private static final Logger log = Logger.getLogger(Navigation.class);
 	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
-	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_export_metadata");
+	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_search_export_metadata");
 	
     /**
      * Generate the unique caching key.
