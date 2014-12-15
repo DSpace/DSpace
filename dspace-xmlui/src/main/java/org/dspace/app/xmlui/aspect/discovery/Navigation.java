@@ -79,7 +79,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * 
      * language FIXME: add languages
      * 
-     * context no context options are added.
+     * context - export metadata if in discover
      * 
      * action no action options are added.
      */
@@ -88,6 +88,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
     	Context context = ContextUtil.obtainContext(objectModel);
     	Request request = ObjectModelHelper.getRequest(objectModel);
+    	
+    	// code remnants left behind, probably can be deleted
     	
         //List test = options.addList("browse");
         //List discovery = options.addList("discovery-search");
@@ -124,18 +126,25 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("account");
         options.addList("administrative");
                 
-        String uri = request.getSitemapURI(); 
-                         
+        // get uri to see if using discovery and if under a specific handle
+        String uri = request.getSitemapURI();
+        
+        // check value in dspace.cfg
         String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
         
+        // get query
         String query = decodeFromURL(request.getParameter("query"));
                 
+        // get scope, if not under handle returns null
         String scope= request.getParameter("scope");
         
+        // used to serialize all query filters together
     	String filters = "";
+    	
+    	// get all query filters
     	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
-                
-        if (fqs != null)
+        
+    	if (fqs != null)
         {
         	for(int i = 0; i < fqs.length; i++) {
             	if(i < fqs.length - 1)
@@ -144,30 +153,31 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             		filters += fqs[i];
             }
         }
-                
+    	
         if(uri.contains("discover")) {
+        	// check scope
         	if(scope == null || "".equals(scope))
         		scope = "/";
+        	// check query
         	if(query == null || "".equals(query))
         		query = "*";
+        	// check if under a handle, already in discovery
         	if(uri.contains("handle")) {
         		scope = uri.replace("handle/", "").replace("/discover", "");
             }
+        	// replace forward slash to pass through sitemap
         	try {
             	scope = scope.replace("/", "~");
             }
             catch(NullPointerException e) { }
         	if(search_export_config != null) {
-        		
-        		if(false) {
-        			log.warn("**************************************");
-        			log.warn("uri: " + uri);
-        			log.warn("query: " + query);
-        			log.warn("scope: " + scope);
-        			log.warn("filters: " + filters);
-        			log.warn("**************************************");
-        		}
-        		
+        		// some logging
+        		if(true) {
+        			log.info("uri: " + uri);
+        			log.info("query: " + query);
+        			log.info("scope: " + scope);
+        			log.info("filters: " + filters);
+        		}        		
         		if(search_export_config.equals("admin")) {
         			if(AuthorizeManager.isAdmin(context)) {
         				List results = options.addList("context");    		
