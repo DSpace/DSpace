@@ -172,12 +172,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             catch(NullPointerException e) { }
         	if(search_export_config != null) {
         		// some logging
-        		if(true) {
+        		
         			log.info("uri: " + uri);
         			log.info("query: " + query);
         			log.info("scope: " + scope);
         			log.info("filters: " + filters);
-        		}        		
+        		        		
         		if(search_export_config.equals("admin")) {
         			if(AuthorizeManager.isAdmin(context)) {
         				List results = options.addList("context");    		
