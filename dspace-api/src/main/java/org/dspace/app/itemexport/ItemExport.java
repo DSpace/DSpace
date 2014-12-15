@@ -110,6 +110,7 @@ public class ItemExport
         options.addOption("m", "migrate", false, "export for migration (remove handle and metadata that will be re-created in new system)");
         options.addOption("n", "number", true,
                 "sequence number to begin exporting items with");
+        options.addOption("x", "exclude-bitstreams", false, "exclude bitstreams)");
         options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
 
@@ -170,6 +171,8 @@ public class ItemExport
         {
             migrate = true;
         }
+
+        boolean excludeBitstreams = line.hasOption('x');
 
         boolean zip = false;
         String zipFileName = "";
@@ -276,14 +279,14 @@ public class ItemExport
                 System.out.println("Exporting from collection: " + myIDString);
                 items = mycollection.getItems();
             }
-            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, excludeBitstreams, migrate);
         }
         else
         {
             if (myItem != null)
             {
                 // it's only a single item
-                exportItem(c, myItem, destDirName, seqStart, migrate);
+                exportItem(c, myItem, destDirName, seqStart, excludeBitstreams, migrate);
             }
             else
             {
@@ -293,7 +296,7 @@ public class ItemExport
                 ItemIterator i = mycollection.getItems();
                 try
                 {
-                    exportItem(c, i, destDirName, seqStart, migrate);
+                    exportItem(c, i, destDirName, seqStart, excludeBitstreams, migrate);
                 }
                 finally
                 {
@@ -309,7 +312,7 @@ public class ItemExport
     }
 
     private static void exportItem(Context c, ItemIterator i,
-            String destDirName, int seqStart, boolean migrate) throws Exception
+            String destDirName, int seqStart, boolean excludeBistreams, boolean migrate) throws Exception
     {
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -344,13 +347,13 @@ public class ItemExport
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate);
+            exportItem(c, i.next(), fullPath, mySequenceNumber, excludeBistreams, migrate);
             mySequenceNumber++;
         }
     }
 
     private static void exportItem(Context c, Item myItem, String destDirName,
-            int seqStart, boolean migrate) throws Exception
+            int seqStart, boolean excludeBistreams, boolean migrate) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -372,7 +375,8 @@ public class ItemExport
             {
                 // make it this far, now start exporting
                 writeMetadata(c, myItem, itemDir, migrate);
-                writeBitstreams(c, myItem, itemDir);
+                if (! excludeBistreams)
+                    writeBitstreams(c, myItem, itemDir);
                 if (!migrate)
                 {
                     writeHandle(c, myItem, itemDir);
@@ -695,7 +699,7 @@ public class ItemExport
      */
     public static void exportAsZip(Context context, ItemIterator items,
                                    String destDirName, String zipFileName,
-                                   int seqStart, boolean migrate) throws Exception
+                                   int seqStart, boolean excludeBitstreams, boolean migrate) throws Exception
     {
         String workDir = getExportWorkDirectory() +
                          System.getProperty("file.separator") +
@@ -714,7 +718,7 @@ public class ItemExport
         }
 
         // export the items using normal export method
-        exportItem(context, items, workDir, seqStart, migrate);
+        exportItem(context, items, workDir, seqStart, excludeBitstreams, migrate);
 
         // now zip up the export directory created above
         zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
@@ -1004,7 +1008,7 @@ public class ItemExport
 
 
                             // export the items using normal export method
-                            exportItem(context, iitems, workDir, 1, migrate);
+                            exportItem(context, iitems, workDir, 1, /* excludeBitstreams */ false, migrate);
                             iitems.close();
                         }
 
