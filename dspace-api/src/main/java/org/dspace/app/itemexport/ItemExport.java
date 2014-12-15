@@ -116,14 +116,12 @@ public class ItemExport
 
         CommandLine line = parser.parse(options, argv);
 
-        String typeString = null;
         String destDirName = null;
         String myIDString = null;
         int seqStart = -1;
         int myType = -1;
 
-        Item myItem = null;
-        Collection mycollection = null;
+        DSpaceObject myObj = null;
 
         if (line.hasOption('h'))
         {
@@ -139,15 +137,9 @@ public class ItemExport
 
         if (line.hasOption('t')) // type
         {
-            typeString = line.getOptionValue('t');
-
-            if ("ITEM".equals(typeString))
-            {
-                myType = Constants.ITEM;
-            }
-            else if ("COLLECTION".equals(typeString))
-            {
-                myType = Constants.COLLECTION;
+            myType = Constants.getTypeID(line.getOptionValue('t'));
+            if (myType != Constants.ITEM  && myType != Constants.COLLECTION) {
+                myType = -1;
             }
         }
 
@@ -214,86 +206,61 @@ public class ItemExport
         Context c = new Context();
         c.setIgnoreAuthorization(true);
 
-        if (myType == Constants.ITEM)
+        // first, is myIDString a handle?
+        if (myIDString.indexOf('/') != -1)
         {
-            // first, is myIDString a handle?
-            if (myIDString.indexOf('/') != -1)
-            {
-                myItem = (Item) HandleManager.resolveToObject(c, myIDString);
+            myObj = HandleManager.resolveToObject(c, myIDString);
 
-                if ((myItem == null) || (myItem.getType() != Constants.ITEM))
-                {
-                    myItem = null;
-                }
+            if ((myObj == null)) {
+                System.out.println("Error, no object with handle '" + myIDString + "'");
+                System.exit(1);
             }
-            else
-            {
-                myItem = Item.find(c, Integer.parseInt(myIDString));
+            if (myObj.getType() != myType) {
+                System.out.println("Error, '" + myIDString + "' is not a " + Constants.typeText[myType]);
+                System.exit(1);
             }
-
-            if (myItem == null)
-            {
-                System.out
-                        .println("Error, item cannot be found: " + myIDString);
+        } else {
+            if (myType == Constants.ITEM) {
+                myObj = Item.find(c, Integer.parseInt(myIDString));
+            } else {
+                myObj = Collection.find(c, Integer.parseInt(myIDString));
             }
-        }
-        else
-        {
-            if (myIDString.indexOf('/') != -1)
-            {
-                // has a / must be a handle
-                mycollection = (Collection) HandleManager.resolveToObject(c,
-                        myIDString);
-
-                // ensure it's a collection
-                if ((mycollection == null)
-                        || (mycollection.getType() != Constants.COLLECTION))
-                {
-                    mycollection = null;
-                }
-            }
-            else if (myIDString != null)
-            {
-                mycollection = Collection.find(c, Integer.parseInt(myIDString));
-            }
-
-            if (mycollection == null)
-            {
-                System.out.println("Error, collection cannot be found: "
+            if (myObj == null) {
+                System.out.println("Error, " + Constants.typeText[myType] + " cannot be found: "
                         + myIDString);
                 System.exit(1);
             }
         }
 
+
         if (zip)
         {
             ItemIterator items;
-            if (myItem != null)
+            if (myObj.getType() == Constants.ITEM)
             {
                 List<Integer> myItems = new ArrayList<Integer>();
-                myItems.add(myItem.getID());
+                myItems.add(myObj.getID());
                 items = new ItemIterator(c, myItems);
             }
             else
             {
                 System.out.println("Exporting from collection: " + myIDString);
-                items = mycollection.getItems();
+                items = ((Collection) myObj).getItems();
             }
             exportAsZip(c, items, destDirName, zipFileName, seqStart, excludeBitstreams, migrate);
         }
         else
         {
-            if (myItem != null)
-            {
+            if (myObj.getType() == Constants.ITEM) {
                 // it's only a single item
-                exportItem(c, myItem, destDirName, seqStart, excludeBitstreams, migrate);
+                exportItem(c, (Item) myObj, destDirName, seqStart, excludeBitstreams, migrate);
             }
             else
             {
                 System.out.println("Exporting from collection: " + myIDString);
 
                 // it's a collection, so do a bunch of items
-                ItemIterator i = mycollection.getItems();
+                ItemIterator i = ((Collection) myObj).getItems();
                 try
                 {
                     exportItem(c, i, destDirName, seqStart, excludeBitstreams, migrate);
