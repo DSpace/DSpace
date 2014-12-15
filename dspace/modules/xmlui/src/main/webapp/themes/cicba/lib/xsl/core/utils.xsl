@@ -127,5 +127,32 @@
 		</script>
 		
 	</xsl:template>
+	
+	<xsl:template name="renderDiscoveryField">
+		<xsl:param name="href"/>
+		<xsl:param name="value"/>
+		<xsl:param name="classname"/>
+		<span>
+			<xsl:if test="$classname">
+				<xsl:attribute name="class">
+					<xsl:value-of select="$classname"/>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:choose>
+				<xsl:when test="$href">
+					<xsl:call-template name="build-anchor">
+						<xsl:with-param name="a.href" select="$href"/>
+						<xsl:with-param name="a.value" select="$value"/>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="$value">
+					<xsl:value-of select="$value"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<i18n:text>xmlui.cicdigital.discoveryList.no-value</i18n:text>
+				</xsl:otherwise>
+			</xsl:choose>
+		</span>
+	</xsl:template>
  
  </xsl:stylesheet>

@@ -32,6 +32,7 @@
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
     <xsl:import href="lib/xsl/core/navigation.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/container-view.xsl"/>
+    <xsl:import href="lib/xsl/artifactbrowser/discovery.xsl"/>
     <xsl:output indent="yes"/>
     
 

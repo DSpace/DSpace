@@ -93,6 +93,13 @@
 <message key="xmlui.cicdigital.home.informacion-autores">Information for authors</message>
 <message key="xmlui.cicdigital.home.bienvenido">Welcome to CIC-Digital</message>
 <message key="xmlui.cicdigital.home.bienvenido-descripcion">CIC-Digital is the Institutional Repository of the Comisión de Investigaciones Científicas de la Provincia de Buenos Aires, created to preserve and leave in open access all the scientific-technological production generated in the scope of the CIC institutions.</message>
+	<!-- Discovery messages -->
+<message key="xmlui.cicdigital.discoveryList.no-value">No value assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.lugar-de-desarrollo">No place of development assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-issued">No issue date assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-creators">No authors assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-subtype">No subtype assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">No abstract assigned</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             ArtifactBrowser Aspect
