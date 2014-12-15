@@ -2214,6 +2214,44 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
+	
+		<!-- dcterms metadata -->
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.type-subtype">Subtype</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.alternative">Alternative title</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.title.investigacion">Investigation title</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.creator.corporate">Insitutional author</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.creator.author">Author</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.creator.compilator">Compilator</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.creator.editor">Editor</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.contributor.director">Director</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.abstract">Abstract</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.abstract.trabajoRealizado">Developed work</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.issued">Date issued</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.subject.materia">Subject</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.subject.area">Tematic area</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.subject">Keyword</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.spatial">Spatial coverage</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.language">Lenguage</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.extent">Extension</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.publisher">Publisher</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.rights.embargoPeriod">Embargo period</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.identifier.url">Electronic localization</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.identifier.isbn">ISBN</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.identifier.other">Others identifiers</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.description">Notes</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.isPartOf.item">Book/Report</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.isPartOf.issue">Volume/Issue</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.isPartOf.series">Journal or event</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.relation">Related resources</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.isVersionOf">Is version of</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms.license">Licence</message>
+	
+	<!-- cic metadata -->
+	<message key="xmlui.dri2xhtml.METS-1.0.item-cic.version">Vesion</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-cic.thesis.degree">Degree obtained</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-cic.thesis.grantor">Issuer title</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-cic.isPeerReviewed">Peer reviewed</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-cic.isFulltext">Fulltext</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
