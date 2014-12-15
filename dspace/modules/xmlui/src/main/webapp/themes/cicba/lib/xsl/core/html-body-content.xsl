@@ -40,7 +40,10 @@
 					<div class="col-md-9">
 						<xsl:apply-templates />
 					</div>
-					<div class="col-md-3">
+					<div class="col-md-3" id="cic-sidebar">
+						<h3>
+							<xsl:copy-of select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
+						</h3>
 						<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
 							<xsl:call-template name="buildPanelFromList" />
 						</xsl:for-each>

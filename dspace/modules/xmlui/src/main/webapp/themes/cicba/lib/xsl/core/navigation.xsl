@@ -18,7 +18,7 @@
 	<xsl:template name="buildPanelFromList">
 		<!-- Solo imprimo el panel si tiene algun dato -->
 		
-			<div class="panel panel-primary">
+			<div class="panel panel-info">
 				<xsl:if test="dri:head">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -60,23 +60,23 @@
 
 				<xsl:if test="count(dri:item) &gt; 0">
 					<ul class="list-group">
-										<xsl:for-each select="dri:item">
-											<li class="list-group-item">
-												<xsl:for-each select="dri:xref">
-												<a>
-													<xsl:attribute name="href"><xsl:value-of
-														select="@target" /></xsl:attribute>
-													<xsl:copy-of select="text()" />
-												</a>
-												</xsl:for-each>
-												<xsl:value-of select="text()" />
-											</li>
-										</xsl:for-each>
+						<xsl:for-each select="dri:item">
+							<li class="list-group-item">
+								<xsl:for-each select="dri:xref">
+									<a>
+										<xsl:attribute name="href"><xsl:value-of
+											select="@target" /></xsl:attribute>
+										<!-- <xsl:copy-of select="text()" /> -->
+										<xsl:copy-of select="node()" />
+									</a>
+								</xsl:for-each>
+								<xsl:value-of select="text()" />
+							</li>
+						</xsl:for-each>
 					</ul>
 				</xsl:if>
 			</div>
 	</xsl:template>
-
 
 	<xsl:template match="dri:options/dri:list" priority="1">
 
