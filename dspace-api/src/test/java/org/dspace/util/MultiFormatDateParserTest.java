@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 
 package org.dspace.util;
 
@@ -63,6 +70,5 @@ public class MultiFormatDateParserTest
         Date expResult = calendar.getTime();
         Date result = MultiFormatDateParser.parse(dateString);
         assertEquals(expResult, result);
-//        assertTrue("expected date not returned", result.equals(expResult));
     }
 }
