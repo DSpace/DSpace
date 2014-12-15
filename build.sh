@@ -4,14 +4,15 @@ set -e
 
 #JAVA_OPTS="JAVA_OPTS=-Xmx1024m"
 
-ANT_OPTS="-q"
-MVN_OPTS="-q"
+#ANT_OPTS="-q"
+#MVN_OPTS="-q"
 MVN_PROFILES=\!dspace-jspui,\!dspace-rdf,\!dspace-sword,\!dspace-swordv2,\!dspace-rest
 # -Dhttp.proxyHost=10.1.0.27 -Dhttp.proxyPort=3128 -Dhttps.proxyHost=10.1.0.27 -Dhttps.proxyPort=3128"
 
 cwd=`pwd`
 DSPACE_SRC=$(dirname $(readlink -f $0))
-DSPACE_DIR=$DSPACE_SRC/install
+DSPACE_DIR=/var/dspace/install
+DSPACE_USER=dspace
 TOMCAT="tomcat7"
 
 #/var/dspace/source
@@ -89,14 +90,14 @@ update()
 	#Limpiar cache XMLUI/Cocoon
 	#sudo rm /var/lib/$TOMCAT/work/Catalina/localhost/_/cache-dir/cocoon-ehcache.data
 	#sudo rm /var/lib/$TOMCAT/work/Catalina/localhost/_/cache-dir/cocoon-ehcache.index
-	
+
 	show_message "actualizamos los sources"
 	cd target/dspace-installer
 	#TODO reusar el /var/dspace/install/config/GeoLiteCity.dat
 	$JAVA_OPTS ant update $ANT_OPTS 
 	
 	show_message "eliminamos directorios de bkp viejos"
-	ant clean_backups -Ddspace.dir=$DSPACE_DIR
+	ant clean_backups -Ddspace.dir=$DSPACE_SRC
 	#rm -r $DSPACE_DIR/bin.bak-* $DSPACE_DIR/etc.bak-* $DSPACE_DIR/lib.bak-* $DSPACE_DIR/webapps.bak-*
 	cd $DSPACE_SRC
 	$JAVA_OPTS mvn clean
@@ -122,6 +123,10 @@ show_message()
 }
 
 
+if [ "`whoami`" != "$DSPACE_USER" ]; then
+    show_message "You must run this script using dspace user $DSPACE_USER"
+    exit 1
+fi
 
 case "$1" in
   install)
