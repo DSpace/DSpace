@@ -433,7 +433,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org" target="_blank">News and views</a>
+                                    <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
                                     <a href="/pages/whoWeAre">Who we are</a>
