@@ -174,15 +174,9 @@
             	<!-- dcterms-issued -->
                 <xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
-                    	<xsl:choose>
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.issued')) and descendant::text()]">
-	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text()" />
-	                        </xsl:when>
-	                        <xsl:otherwise>
-<!-- 	                        		Sin fecha -->
-								<i18n:text>xmlui.cicdigital.discoveryList.no-dcterms-issued</i18n:text>
-							</xsl:otherwise>
-	                    </xsl:choose>
+                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.issued')) and descendant::text()]">
+                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text()" />
+                        </xsl:if>
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'dcterms-issued'"/>
                 </xsl:call-template>
@@ -228,15 +222,9 @@
             <div class="col-md-2">
                 <xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
-                    	<xsl:choose>
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]">
-	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text()" />
-	                        </xsl:when>
-	                        <xsl:otherwise>
-<!-- 	                        		Sin lugar de desarrollo -->
-	                            <i18n:text>xmlui.cicdigital.discoveryList.no-value.lugar-de-desarrollo</i18n:text>
-	                        </xsl:otherwise>
-	                    </xsl:choose>
+                        <xsl:if test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]">
+                            <xsl:value-of select="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text()" />
+                        </xsl:if>
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'cic-lugarDeDesarrollo'"/>
                 </xsl:call-template>
@@ -249,35 +237,17 @@
             	<xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
                     	<xsl:choose>
-	            			<!-- dcterms.creator.corporate -->
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.creator.corporate')) and descendant::text()]">
-	                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dcterms.creator.corporate'))]/dri:item">
-	                            	<xsl:value-of select="concat(./text(), $separador)" />
-	                            </xsl:for-each>
-	                        </xsl:when>
-	                        <!-- dcterms.creator.author -->
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.creator.author')) and descendant::text()]">
-	                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dcterms.creator.author'))]/dri:item">
-	                            	<xsl:value-of select="concat(./text(), $separador)" />
-	                            </xsl:for-each>
-	                        </xsl:when>
-	                        <!-- dcterms.creator.compilator -->
-	                       <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.creator.compilator')) and descendant::text()]">
-	                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dcterms.creator.compilator'))]/dri:item">
-	                            	<xsl:value-of select="concat(./text(), $separador)" />
-	                            </xsl:for-each>
-	                        </xsl:when>
-	                        <!-- dcterms.creator.editor -->
-	                       <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.creator.editor')) and descendant::text()]">
-	                            <xsl:for-each select="dri:list[@n=(concat($handle, ':dcterms.creator.editor'))]/dri:item">
-	                            	<xsl:value-of select="concat(./text(), $separador)" />
-	                            </xsl:for-each>
-	                        </xsl:when>  
-	                        <xsl:otherwise>
-<!-- 	                        		Sin autores -->
-	                            <i18n:text>xmlui.cicdigital.discoveryList.no-value.dcterms-creators</i18n:text>
-	                        </xsl:otherwise>
-	                    </xsl:choose>
+                    		<xsl:when test="dri:list[(@n=(concat($handle, ':dcterms.creator.corporate')) or @n=(concat($handle, ':dcterms.creator.author')) or @n=(concat($handle, ':dcterms.creator.compilator')) or @n=(concat($handle, ':dcterms.creator.editor'))) and descendant::text()]">
+								<xsl:for-each select="dri:list[(@n=(concat($handle, ':dcterms.creator.corporate')) or @n=(concat($handle, ':dcterms.creator.author')) or @n=(concat($handle, ':dcterms.creator.compilator')) or @n=(concat($handle, ':dcterms.creator.editor'))) and descendant::text()]">	
+		                            <xsl:for-each select="./dri:item">
+		                            	<xsl:value-of select="concat(./text(), $separador)" />
+		                            </xsl:for-each>
+				                </xsl:for-each>                    		
+                    		</xsl:when>
+                    		<xsl:otherwise>
+                    			<i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
+                    		</xsl:otherwise>
+                    	</xsl:choose>
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'dcterms-creators'"/>
                 </xsl:call-template>
@@ -286,15 +256,9 @@
             	<!-- dcterms.type.subtype -->
             	<xsl:call-template name="renderDiscoveryField">
             		<xsl:with-param name="value">
-            			<xsl:choose>
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.type.subtype')) and descendant::text()]">
-	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.type.subtype'))]/dri:item[position()=1]/text()" />
-	                        </xsl:when>
-	                        <xsl:otherwise>
-<!-- 	                        		Sin subtipo -->
-	                            <i18n:text>xmlui.cicdigital.discoveryList.no-value.dcterms-type-subtype</i18n:text>
-	                        </xsl:otherwise>
-	                    </xsl:choose>
+                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.type.subtype')) and descendant::text()]">
+                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.type.subtype'))]/dri:item[position()=1]/text()" />
+                        </xsl:if>
             		</xsl:with-param>
             		<xsl:with-param name="classname" select="dcterms-type-subtype"></xsl:with-param>
             	</xsl:call-template>
@@ -305,15 +269,9 @@
         	<div class="col-md-11 col-md-offset-1">
         		<xsl:call-template name="renderDiscoveryField">
             		<xsl:with-param name="value">
-            			<xsl:choose>
-	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.abstract')) and descendant::text()]">
-	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[position()=1]/text()" />
-	                        </xsl:when>
-	                        <xsl:otherwise>
-<!-- 	                        		Sin Resumen -->
-	                            <i18n:text>xmlui.cicdigital.discoveryList.no-value.dcterms.abstract</i18n:text>
-	                        </xsl:otherwise>
-	                    </xsl:choose>
+                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.abstract')) and descendant::text()]">
+                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[position()=1]/text()" />
+                        </xsl:if>
             		</xsl:with-param>
             		<xsl:with-param name="classname" select="dcterms-abstract"></xsl:with-param>
             	</xsl:call-template>

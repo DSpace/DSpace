@@ -90,13 +90,6 @@
 <message key="xmlui.cicdigital.home.bienvenido">Bienvenido a CIC-Digital</message>
 <message key="xmlui.cicdigital.home.bienvenido-descripcion">CIC-Digital es el Repositorio Institucional de la  Comisión de Investigaciones Científicas de la Provincia de Buenos Aires, creado con el fin de preservar y dejar accesible en abierto toda la producción científico-tecnológica generada en el ámbito de las instituciones CIC.</message>
 
-<!-- Discovery messages -->
-<message key="xmlui.cicdigital.discoveryList.no-value">Sin valor asignado</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.lugar-de-desarrollo">sin lugar de desarrollo asignado</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-issued">Sin fecha</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-creators">No existen autores asignados</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-subtype">Sin subtipo asignado</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">Sin resumen asignado</message>
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
