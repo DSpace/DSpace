@@ -24,7 +24,7 @@
 					</xsl:with-param>
 				</xsl:call-template>
 			</div>
-			<div class="col-md-3 col-md-offset-1">
+			<div class="col-md-2 ">
 				<ul>
 					<li>
 						<xsl:call-template name="build-anchor">
@@ -52,6 +52,44 @@
 					</li>
 				</ul>
 			</div>
+			<ul class="col-md-2 cic-banners">
+				
+				<li><xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">
+						<xsl:text>http://www.cic.gba.gob.ar</xsl:text>
+					</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/logo_cic_footer.png
+					</xsl:with-param>
+					<xsl:with-param name="img.alt">
+						CIC
+					</xsl:with-param>
+				</xsl:call-template></li>
+				
+				<li><xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">
+						<xsl:text>http://sedici.unlp.edu.ar</xsl:text>
+					</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/logo_sedici_footer.png
+					</xsl:with-param>
+					<xsl:with-param name="img.alt">
+						SEDICI
+					</xsl:with-param>
+				</xsl:call-template></li>
+				
+				<li><xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">
+						<xsl:text>http://www.dspace.org</xsl:text>
+					</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/logo_dspace_footer.png
+					</xsl:with-param>
+					<xsl:with-param name="img.alt">
+						DSpace
+					</xsl:with-param>
+				</xsl:call-template></li>
+			</ul>
 			<div class="col-md-5 col-md-offset-1">
 				<address>
 					<strong>Comisión de Investigaciones Científicas</strong>
@@ -70,11 +108,11 @@
 				</address>
 			</div>
 		</div>
-		<div class="row">
-			<div>
-				Este repositorio esta soportado por el software
-				<a href="http://www.dspace.org/" target="_blank">DSpace</a>
-			</div>
-		</div>
+<!-- 		<div class="row" id="cic-footer"> -->
+<!-- 			<div> -->
+<!-- 				Este repositorio esta soportado por el software -->
+<!-- 				<a href="http://www.dspace.org/" target="_blank">DSpace</a> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
 	</xsl:template>
 </xsl:stylesheet>
