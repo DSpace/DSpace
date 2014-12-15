@@ -27,11 +27,14 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.*;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -48,30 +51,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 {
 	private static final Logger log = Logger.getLogger(Navigation.class);
 	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
-	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_export_metadata");
+	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_search_export_metadata");
 	
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        try {
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
-            
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            if (dso != null)
-            {
-                key += "-" + dso.getHandle();
-            }
-
-            return HashUtil.hash(key);
-        } 
-        catch (SQLException sqle)
-        {
-            // Ignore all errors and just return that the component is not cachable.
-            return "0";
-        }
+    	return "0";
     }
 
     /**
@@ -92,7 +79,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * 
      * language FIXME: add languages
      * 
-     * context no context options are added.
+     * context - export metadata if in discover
      * 
      * action no action options are added.
      */
@@ -101,6 +88,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     {
     	Context context = ContextUtil.obtainContext(objectModel);
     	Request request = ObjectModelHelper.getRequest(objectModel);
+    	
+    	// code remnants left behind, probably can be deleted
     	
         //List test = options.addList("browse");
         //List discovery = options.addList("discovery-search");
@@ -137,13 +126,72 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("account");
         options.addList("administrative");
                 
-        String uri = request.getSitemapURI(); 
+        // get uri to see if using discovery and if under a specific handle
+        String uri = request.getSitemapURI();
         
-        if(uri.contains("discover")) {
-        	List results = options.addList("context");    		
-        	results.setHead(T_context_head);
-        	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+        // check value in dspace.cfg
+        String search_export_config = ConfigurationManager.getProperty("xmlui.search.metadata_export"); 
+        
+        // get query
+        String query = decodeFromURL(request.getParameter("query"));
+                
+        // get scope, if not under handle returns null
+        String scope= request.getParameter("scope");
+        
+        // used to serialize all query filters together
+    	String filters = "";
+    	
+    	// get all query filters
+    	String[] fqs = DiscoveryUIUtils.getFilterQueries(ObjectModelHelper.getRequest(objectModel), context);
+        
+    	if (fqs != null)
+        {
+        	for(int i = 0; i < fqs.length; i++) {
+            	if(i < fqs.length - 1)
+            		filters += fqs[i] + ",";
+            	else
+            		filters += fqs[i];
+            }
         }
+    	
+        if(uri.contains("discover")) {
+        	// check scope
+        	if(scope == null || "".equals(scope))
+        		scope = "/";
+        	// check query
+        	if(query == null || "".equals(query))
+        		query = "*";
+        	// check if under a handle, already in discovery
+        	if(uri.contains("handle")) {
+        		scope = uri.replace("handle/", "").replace("/discover", "");
+            }
+        	// replace forward slash to pass through sitemap
+        	try {
+            	scope = scope.replace("/", "~");
+            }
+            catch(NullPointerException e) { }
+        	if(search_export_config != null) {
+        		// some logging
+        		if(true) {
+        			log.info("uri: " + uri);
+        			log.info("query: " + query);
+        			log.info("scope: " + scope);
+        			log.info("filters: " + filters);
+        		}        		
+        		if(search_export_config.equals("admin")) {
+        			if(AuthorizeManager.isAdmin(context)) {
+        				List results = options.addList("context");    		
+                    	results.setHead(T_context_head);
+                    	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
+        			}
+        		}
+        		else if(search_export_config.equals("user") || search_export_config.equals("anonymous")){
+        			List results = options.addList("context");    		
+                	results.setHead(T_context_head);
+                	results.addItem().addXref(contextPath + "/discover/csv/" + query + "/" + scope + "/" + filters, T_export_metadata);
+        		}
+        	}
+        }	
     }
 
     /**
@@ -153,15 +201,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-
         // Add metadata for quick searches:
-        pageMeta.addMetadata("search", "simpleURL").addContent(
-                "/discover");
-        pageMeta.addMetadata("search", "advancedURL").addContent(
-                contextPath + "/discover");
+        pageMeta.addMetadata("search", "simpleURL").addContent("/discover");
+        pageMeta.addMetadata("search", "advancedURL").addContent(contextPath + "/discover");
         pageMeta.addMetadata("search", "queryField").addContent("query");
-        
     }
-
 }
-

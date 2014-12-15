@@ -391,8 +391,12 @@
                                 </map:read>
                         </map:match>
                         
-                        <map:match pattern="discover/csv">
-                                <map:read type="SearchMetadataExportReader"/>
+                        <map:match pattern="discover/csv/*/*/*">
+                                <map:read type="SearchMetadataExportReader">
+                                	<map:parameter name="query" value="{1}"/>
+                                	<map:parameter name="scope" value="{2}"/>
+                                	<map:parameter name="filters" value="{3}"/>
+                                </map:read>
                         </map:match>
 						
                         <map:match pattern="handle/*/*/stats/csv">
