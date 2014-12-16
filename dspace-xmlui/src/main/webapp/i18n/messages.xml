@@ -1004,7 +1004,7 @@
     <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
     <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
     <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
-    <message key="xmlui.administrative.Navigation.context_search_export_metadata">Search Export Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_search_export_metadata">Export Search Metadata</message>
 
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
