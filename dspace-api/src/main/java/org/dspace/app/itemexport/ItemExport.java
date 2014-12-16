@@ -103,7 +103,7 @@ public class ItemExport
 
         Options options = new Options();
 
-        options.addOption("t", "type", true, "type: COLLECTION or ITEM");
+        options.addOption("t", "type", true, "type: COMMUNITY, COLLECTION or ITEM");
         options.addOption("i", "id", true, "ID or handle of thing to export");
         options.addOption("d", "dest", true,
                 "destination where you want items to go");
