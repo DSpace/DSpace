@@ -116,13 +116,6 @@ public class ItemExport
 
         CommandLine line = parser.parse(options, argv);
 
-        String destDirName = null;
-        String myIDString = null;
-        int seqStart = -1;
-        int myType = -1;
-
-        DSpaceObject myObj = null;
-
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
@@ -135,27 +128,52 @@ public class ItemExport
             System.exit(0);
         }
 
+        int myType = -1;
         if (line.hasOption('t')) // type
         {
             myType = Constants.getTypeID(line.getOptionValue('t'));
-            if (myType != Constants.ITEM  && myType != Constants.COLLECTION) {
-                myType = -1;
-            }
+        }
+        if (myType != Constants.COMMUNITY &&
+            myType != Constants.COLLECTION &&
+            myType != Constants.ITEM) {
+            System.out.println("type must be COMMUNITY, COLLECTION or ITEM (-h for help)");
+            System.exit(1);
         }
 
-        if (line.hasOption('i')) // id
+        String myIDString = null;
+        if (line.hasOption('i')) // id or handle
         {
             myIDString = line.getOptionValue('i');
         }
+        if (myIDString == null)
+        {
+            System.out
+                    .println("ID must be set to either a database ID or a handle (-h for help)");
+            System.exit(1);
+        }
 
+        String destDirName = null;
         if (line.hasOption('d')) // dest
         {
             destDirName = line.getOptionValue('d');
         }
+        if (destDirName == null)
+        {
+            System.out
+                    .println("destination directory must be set (-h for help)");
+            System.exit(1);
+        }
 
+        int seqStart = -1;
         if (line.hasOption('n')) // number
         {
             seqStart = Integer.parseInt(line.getOptionValue('n'));
+        }
+        if (seqStart == -1)
+        {
+            System.out
+                    .println("sequence start number must be set (-h for help)");
+            System.exit(1);
         }
 
         boolean migrate = false;
@@ -174,38 +192,11 @@ public class ItemExport
             zipFileName = line.getOptionValue('z');
         }
 
-        // now validate the args
-        if (myType == -1)
-        {
-            System.out
-                    .println("type must be either COLLECTION or ITEM (-h for help)");
-            System.exit(1);
-        }
-
-        if (destDirName == null)
-        {
-            System.out
-                    .println("destination directory must be set (-h for help)");
-            System.exit(1);
-        }
-
-        if (seqStart == -1)
-        {
-            System.out
-                    .println("sequence start number must be set (-h for help)");
-            System.exit(1);
-        }
-
-        if (myIDString == null)
-        {
-            System.out
-                    .println("ID must be set to either a database ID or a handle (-h for help)");
-            System.exit(1);
-        }
 
         Context c = new Context();
         c.setIgnoreAuthorization(true);
 
+        DSpaceObject myObj = null;
         // first, is myIDString a handle?
         if (myIDString.indexOf('/') != -1)
         {
@@ -215,64 +206,49 @@ public class ItemExport
                 System.out.println("Error, no object with handle '" + myIDString + "'");
                 System.exit(1);
             }
-            if (myObj.getType() != myType) {
-                System.out.println("Error, '" + myIDString + "' is not a " + Constants.typeText[myType]);
-                System.exit(1);
-            }
         } else {
-            if (myType == Constants.ITEM) {
-                myObj = Item.find(c, Integer.parseInt(myIDString));
-            } else {
-                myObj = Collection.find(c, Integer.parseInt(myIDString));
-            }
+            switch (myType) {
+                case Constants.ITEM:
+                    myObj = Item.find(c, Integer.parseInt(myIDString));
+                    break;
+                case Constants.COLLECTION:
+                    myObj = Collection.find(c, Integer.parseInt(myIDString));
+                    break;
+                case Constants.COMMUNITY:
+                    myObj = Community.find(c, Integer.parseInt(myIDString));
+                    break;
+                }
             if (myObj == null) {
                 System.out.println("Error, " + Constants.typeText[myType] + " cannot be found: "
-                        + myIDString);
+                                               + myIDString);
                 System.exit(1);
             }
         }
-
-
-        if (zip)
-        {
-            ItemIterator items;
-            if (myObj.getType() == Constants.ITEM)
-            {
-                List<Integer> myItems = new ArrayList<Integer>();
-                myItems.add(myObj.getID());
-                items = new ItemIterator(c, myItems);
-            }
-            else
-            {
-                System.out.println("Exporting from collection: " + myIDString);
-                items = ((Collection) myObj).getItems();
-            }
-            exportAsZip(c, items, destDirName, zipFileName, seqStart, excludeBitstreams, migrate);
+        if (myObj.getType() != myType) {
+            System.out.println("Error, '" + myIDString + "' is not a " + Constants.typeText[myType]);
+            System.exit(1);
         }
-        else
-        {
-            if (myObj.getType() == Constants.ITEM) {
-                // it's only a single item
-                exportItem(c, (Item) myObj, destDirName, seqStart, excludeBitstreams, migrate);
-            }
-            else
-            {
-                System.out.println("Exporting from collection: " + myIDString);
 
-                // it's a collection, so do a bunch of items
-                ItemIterator i = ((Collection) myObj).getItems();
-                try
-                {
-                    exportItem(c, i, destDirName, seqStart, excludeBitstreams, migrate);
-                }
-                finally
-                {
-                    if (i != null)
-                    {
-                        i.close();
-                    }
-                }
+        ItemIterator items;
+
+        if (myObj.getType() == Constants.ITEM) {
+            List<Integer> myItems = new ArrayList<Integer>();
+            myItems.add(myObj.getID());
+            items = new ItemIterator(c, myItems);
+        } else {
+            if (myType == Constants.COLLECTION) {
+                items = ((Collection) myObj).getItems();
+            } else {
+                items = ((Community) myObj).getItems();
             }
+        }
+
+        if (zip) {
+            System.out.println("Exporting to Zip from " + Constants.typeText[myType] + ": " + myIDString);
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, excludeBitstreams, migrate);
+        } else {
+            System.out.println("Exporting from " + Constants.typeText[myType] + ": " + myIDString);
+            exportItem(c, items, destDirName, seqStart, excludeBitstreams, migrate);
         }
 
         c.complete();
