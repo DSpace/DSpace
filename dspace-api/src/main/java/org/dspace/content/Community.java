@@ -646,13 +646,29 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Get the in_archive items in this community. The order is indeterminate.
+     *
+     * @return an iterator over the items in the community.
+     * @throws SQLException
+     */
+    public ItemIterator getItems() throws SQLException {
+        String myQuery ="SELECT item.* FROM item, communities2item WHERE " +
+                "item.item_id=communities2item.item_id AND " +
+                "communities2item.community_id= ? " +
+                "AND item.in_archive='1'";
+        System.out.println(myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item", myQuery, getID());
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+    /**
      * Get the collections in this community. Throws an SQLException because
      * creating a community object won't load in all collections.
-     * 
+     *
      * @return array of Collection objects
      */
-    public Collection[] getCollections() throws SQLException
-    {
+    public Collection[] getCollections() throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
 
         // Get the table rows
