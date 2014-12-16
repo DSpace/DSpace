@@ -2842,21 +2842,24 @@
 		to this item.</message>
 
 
-	<message key="xmlui.submit.select.pub.head">Initial Information About Your Submission</message>
+	<message key="xmlui.submit.select.pub.head">Submitting your data to Dryad</message>
     <message key="xmlui.submit.select.pub.trail">
         <ul class="navigation-link">
-            <li class="selected"><b>1. Describe Publication</b></li>
-            <li>2. Upload Data Files</li>
+            <li class="selected"><b>1. Describe publication</b></li>
+            <li>2. Upload data files</li>
             <li>3. Review</li>
-            <li>4. Checkout &amp; Submit</li>
+            <li>4. Check out &amp; submit</li>
         </ul>
     </message>
     <message key="xmlui.submit.select.pub.help">
-Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters. Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals">supporting journals, societies, and publishers</a>.  In the absence of a sponsoring organization, the submitter is required to pay the DPC.
+Thank you for archiving your data in the Dryad Digital Repository, where it can be easily discovered, cited and re-used. Follow the steps below to describe your publication, upload your data files, and finalize/pay for your submission. You may save your submission at any time and return to it later at <a href="/submissions" target="_blank">My Submissions</a>. For questions about and best practices for depositing your data, please see our <a href="/pages/faq#depositing" target="_blank">FAQ</a>.<br />
+<br />
+Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-term access</strong> to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of nationality or institutional affiliation. Dryad is able to provide free access to data due to financial support from members and data submitters.<br />
+<br />Dryad’s Data Publishing Charge (DPC) is designed to sustain its core functions by recovering the basic costs of curating and preserving data. In many cases, this charge is covered by <a href="/pages/integratedJournals" target="_blank">supporting journals, societies, and publishers</a>. In the absence of a sponsoring organization, the submitter is required to pay the DPC.
     </message>
     <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
-<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission. </span>
+<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
     </message>
     <message key="xmlui.submit.select.country.error">Please select a country</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
@@ -2866,10 +2869,10 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.select.pub.form.option.existing">Select existing data package</message>
 	<message key="xmlui.submit.select.pub.form.error">Please fill in a valid data package
 		identifier</message>
-	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
+	<message key="xmlui.submit.select.pub.form.license">&#160;By clicking this checkbox, I certify that I have read and agree to the Dryad  <a target="_blank" href="/pages/policies">Terms of Service</a>. I understand that by submitting data to Dryad,
 		I am agreeing to release it under the terms of the <div id="cc-label" style="display: inline;"><a
 			href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative Commons Zero
-			(CC0)</a> waiver. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
+			(CC0)</a> waiver and that I have the right to do so. All authors of the data have agreed to the terms of this waiver. <a href="/pages/faq#info-cc0" target="_blank">Why does Dryad require CC0?</a>
 			&#160;&#160;&#160;&#160;<a class="single-image-link" href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 logo"></img></a></div></message>
 	<message key="xmlui.submit.select.pub.form.license_error">You must accept the CC0 waiver to continue the submission.</message>
 
@@ -2889,17 +2892,17 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.publication.describe.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li class="selected"><b>1. Describe publication</b></li>
+                <li>2. Upload data files</li>
                 <li>3. Review</li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.submit.publication.describe.help">
-        <div>Please describe your publication in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. Please describe the publication only. Do not enter information specific to your data files on this page.
-
-            Fields marked with an asterisk (*) are required. For more information on expected contents for a field, hold your mouse over the field in question.
+        <div>Please describe your publication in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad.<br />
+<br />On this page, please describe the publication <strong>only</strong>. You will provide information specific to your data files on the next page.<br />
+<br />Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon.
         </div>
 	</message>
     <message key="xmlui.submit.publication.describe.nodetails">
@@ -2907,32 +2910,25 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	</message>
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
-	<message key="xmlui.submit.dataset.describe.head">Add and Describe Data File</message>
+	<message key="xmlui.submit.dataset.describe.head">Add and describe data file</message>
 	<message key="xmlui.submit.dataset.describe.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li class="selected"><b>2. Upload Data Files</b></li>
+                <li>1. Describe publication</li>
+                <li class="selected"><b>2. Upload data files</b></li>
                 <li>3. Review</li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.submit.dataset.describe.help">
         <div>
-            Please select a data file from your computer,
-            and describe the data file in as much detail as possible. Note that a data file will not
-            necessarily have the same authors and keywords as the publication, though for convenience some
-            of this information has been copied from the description of your publication. Providing a
-            detailed description will make it easier for others to find your data in Dryad. <br/>
-            <br/> Only one file may be uploaded and described on this page. Once this data file has been
-            saved, you may add additional files to the data package. If you have a large number of closely
-            related files, they may be submitted in an archive format such as tar or zip. If you have
+            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. (While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed).<br/>
+            <br/>Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package. If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip. Note that there will be additional charges if the total content submitted to Dryad for a given publication is more than 10GB. If you have
             trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
-                >help@datadryad.org</a>. Note that the total content submitted to Dryad for a given
-            publication must be less than 10GB.<br/>
-            <br/> Fields marked with an asterisk (*) are required. For more information on expected contents
-            for a field, hold your mouse over the field in question.
+                >help@datadryad.org</a>.<br/>
+				<br />Please remember that Dryad does not accept data submissions that contain personally identifiable human subject information or non-CC0 compatible licenses. <a href="/pages/faq#depositing" target="_blank">View guidance</a> about what types of data Dryad accepts and our preferred file formats.<br />
+            <br/>Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon.
         </div>
 	</message>
 	<message key="xmlui.submit.dataset.form.pub.head">Publication</message>
@@ -2950,7 +2946,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<!--<message key="xmlui.submit.complete.dataset.help">Thank you for submitting data to Dryad. The-->
 	<!--items you submitted have been given the following identifiers:</message>-->
 	<message key="xmlui.submit.complete.dataset.help">Thank you for submitting data to Dryad, the
-		items you have submitted will now go through the reviewing process.</message>
+		items you have submitted will now go through the review process.</message>
 	<message key="xmlui.submit.complete.dataset.label.pub">Publication you have submitted the data file(s) for</message>
 	<message key="xmlui.submit.complete.dataset.label.pub-only">Publication you have submitted</message>
 	<message key="xmlui.submit.complete.dataset.label.data">Data file</message>
@@ -2969,16 +2965,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 		</a></message>
 
 
-	<message key="xmlui.submit.dataset.complete.head">Data File completed</message>
+	<message key="xmlui.submit.dataset.complete.head">Data file completed</message>
 	<message key="xmlui.submit.dataset.complete.text">The data file has been submitted; do you wish to
-		submit another data file or finish up the submission?</message>
+		submit another data file or finish the submission?</message>
 	<message key="xmlui.submit.dataset.complete.trail">
         <div>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li class="selected"><b>3. Review</b></li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
     </message>
@@ -2999,23 +2995,22 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.trail">
         <div>                                                                                                                                                                                                 <br/>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li class="selected"><b>3. Review</b></li>
-                <li>4. Checkout &amp; Submit</li>
+                <li>4. Check out &amp; submit</li>
             </ul>
         </div>
 	</message>
     <message key="xmlui.Submission.submit.OverviewStep.help">
-        <div>                                                                                                                                                                                                 <br/>
-            Press a button to edit the description of
-            your publication, add or modify all attached data files, or finalize the submission.
+        <div>                                                                                                                                                
+            From this page, you can edit the description of your publication, add additional data files, modify attached files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Describe publication:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Add and describe data files:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Finalize your submission:</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
@@ -3025,21 +3020,19 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 		submission until all the data files are through the submission workflow.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.error.finalize.one-file">You cannot finish the
 		submission until at least one data file is attached to the publication.</message>
-	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you have added all data
-		files for this publication, press the button below to checkout and finish the submission. A Dryad curator
-		will review the submission to ensure the descriptions are complete and the files are not
-		corrupted. After this brief review, your data will be archived in Dryad.</message>
+	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
+	<br />A Dryad curator will review the submission to ensure the descriptions are complete, and that the files meet Dryad criteria for archiving and are not corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
-    <message key="xmlui.Submission.submit.Checkout.head">Checkout &amp; Submit</message>
+    <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
         <div><br/>
             <ul class="navigation-link">
-                <li>1. Describe Publication</li>
-                <li>2. Upload Data Files</li>
+                <li>1. Describe publication</li>
+                <li>2. Upload data files</li>
                 <li>3. Review</li>
-                <li class="selected"><b>4. Checkout &amp; Submit</b></li>
+                <li class="selected"><b>4. Check out &amp; submit</b></li>
             </ul>
         </div>
     </message>
