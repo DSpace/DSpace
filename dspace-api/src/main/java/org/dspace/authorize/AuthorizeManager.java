@@ -276,6 +276,7 @@ public class AuthorizeManager
         // is authorization disabled for this context?
         if (c.ignoreAuthorization())
         {
+            System.out.println("Ignore author");
             return true;
         }
 
@@ -294,7 +295,7 @@ public class AuthorizeManager
                 return true;
             }
         }
-
+        System.out.println("userid " + userid  + "obj: " + o.getHandle());
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
             // check policies for date validity

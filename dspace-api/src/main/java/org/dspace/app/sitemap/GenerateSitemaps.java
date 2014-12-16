@@ -30,11 +30,14 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.Bundle;
+import org.dspace.content.Bitstream;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
  * 
@@ -182,15 +185,15 @@ public class GenerateSitemaps
 
         for (int i = 0; i < comms.length; i++)
         {
-            String url = handleURLStem + comms[i].getHandle();
+            if (AuthorizeManager.authorizeActionBoolean(c, comms[i], org.dspace.core.Constants.READ)) {
+                String url = handleURLStem + comms[i].getHandle();
 
-            if (makeHTMLMap)
-            {
-                html.addURL(url, null);
-            }
-            if (makeSitemapOrg)
-            {
-                sitemapsOrg.addURL(url, null);
+                if (makeHTMLMap) {
+                    html.addURL(url, null);
+                }
+                if (makeSitemapOrg) {
+                    sitemapsOrg.addURL(url, null);
+                }
             }
         }
 
@@ -198,15 +201,15 @@ public class GenerateSitemaps
 
         for (int i = 0; i < colls.length; i++)
         {
-            String url = handleURLStem + colls[i].getHandle();
+            if (AuthorizeManager.authorizeActionBoolean(c, colls[i], org.dspace.core.Constants.READ)) {
+                String url = handleURLStem + colls[i].getHandle();
 
-            if (makeHTMLMap)
-            {
-                html.addURL(url, null);
-            }
-            if (makeSitemapOrg)
-            {
-                sitemapsOrg.addURL(url, null);
+                if (makeHTMLMap) {
+                    html.addURL(url, null);
+                }
+                if (makeSitemapOrg) {
+                    sitemapsOrg.addURL(url, null);
+                }
             }
         }
 
@@ -218,20 +221,22 @@ public class GenerateSitemaps
             while (allItems.hasNext())
             {
                 Item i = allItems.next();
-                String url = handleURLStem + i.getHandle();
-                Date lastMod = i.getLastModified();
+                if (AuthorizeManager.authorizeActionBoolean(c, i, org.dspace.core.Constants.READ)) {
+                    if (hasReadableBitstream(c, i)) {
+                        String url = handleURLStem + i.getHandle();
+                        Date lastMod = i.getLastModified();
 
-                if (makeHTMLMap)
-                {
-                    html.addURL(url, lastMod);
-                }
-                if (makeSitemapOrg)
-                {
-                    sitemapsOrg.addURL(url, lastMod);
-                }
-                i.decache();
+                        if (makeHTMLMap) {
+                            html.addURL(url, lastMod);
+                        }
+                        if (makeSitemapOrg) {
+                            sitemapsOrg.addURL(url, lastMod);
+                        }
+                        i.decache();
 
-                itemCount++;
+                        itemCount++;
+                    }
+                }
             }
 
             if (makeHTMLMap)
@@ -263,6 +268,17 @@ public class GenerateSitemaps
         c.abort();
     }
 
+    private static boolean hasReadableBitstream(Context c, Item item) throws SQLException {
+        Bundle bundles[] = item.getBundles();
+        for (int i = 0; i < bundles.length; i++) {
+            Bitstream bitstreams[] = bundles[i].getBitstreams();
+            for (int b = 0; b < bitstreams.length; b++) {
+                if (AuthorizeManager.authorizeActionBoolean(c, bitstreams[b], Constants.READ))
+                    return true;
+            }
+        }
+        return false;
+    }
     /**
      * Ping all search engines configured in {@code dspace.cfg}.
      * 
