@@ -447,7 +447,6 @@
          <dc-qualifier>item</dc-qualifier>
          <repeatable>false</repeatable>
          <label>Libro/Informe</label>
-		 <type-bind>Libro</type-bind>
          <input-type>onebox</input-type>
          <hint>1) Informe o libro del cual el documento actual es parte.</hint>
        </field>

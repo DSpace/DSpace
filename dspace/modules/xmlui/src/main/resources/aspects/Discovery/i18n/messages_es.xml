@@ -133,13 +133,13 @@
 
 	<message key="xmlui.discovery.SearchFacetFilter.no-results">Valores del Filtro no encontrados</message>
 
-	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Descubre</message>
-	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... más</message>
+	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Refine su búsqueda</message>
+	<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... ver más</message>
 
 
 	<message key="xmlui.Discovery.SimpleSearch.search_scope">Buscar</message>
 	<message key="xmlui.discovery.SimpleSearch.search_label">Buscar</message>
-	<message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>
+	<message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros Avanzados</message>
 	<message key="xmlui.Discovery.SimpleSearch.filter_help">Use filtros para refinar sus resultados.</message>
 
 	<message key="xmlui.Discovery.SimpleSearch.filter_apply">Actualizar filtros</message>

@@ -22,9 +22,10 @@
 				</div>
 			</xsl:if>
 			
+
 			<!-- Check for the custom pages -->
 			<xsl:choose>
-				<xsl:when test="not(string($request-uri))">
+				<xsl:when test="not(string($request-uri)) and ($is-error-page = 'false')">
 					<xsl:call-template name="buildHome" />
 				</xsl:when>
 				<!-- Handler for Static pages -->
@@ -34,21 +35,27 @@
 						<xsl:copy-of select="document(concat('../../../',$request-uri,'.xhtml') )" />
 					</div>
 				</xsl:when>
+				<!-- Si tenemos datos de discovery para mostrar, lo hacemos en un sidebar -->
+				<xsl:when test="/dri:document/dri:options/dri:list[@n='discovery']/child::node()">
+					<div class="row">
+						<div class="col-md-9">
+							<xsl:apply-templates />
+						</div>
+						<div class="col-md-3" id="cic-sidebar">
+							<h3>
+								<xsl:copy-of select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
+							</h3>
+							<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
+								<xsl:call-template name="buildPanelFromList" />
+							</xsl:for-each>
+						</div>
+					</div>
+				</xsl:when>
 				<!-- Otherwise use default handling of body -->
 				<xsl:otherwise>
-				<div class="row">
-					<div class="col-md-9">
+					<div class="container-fluid">
 						<xsl:apply-templates />
 					</div>
-					<div class="col-md-3" id="cic-sidebar">
-						<h3>
-							<xsl:copy-of select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
-						</h3>
-						<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
-							<xsl:call-template name="buildPanelFromList" />
-						</xsl:for-each>
-					</div>
-				</div>
 				</xsl:otherwise>
 			</xsl:choose>
 

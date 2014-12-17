@@ -1,5 +1,7 @@
-/* Estilo personalizado de CIC-DIGITAL */
-/* Extiende el tema de Mirage */
+@
+namespace xml "http: //www.w3.org /XML/1998/namespace"
+	/* Estilo personalizado de CIC-DIGITAL */
+	/* Extiende el tema de Mirage */ 
 .container {
 	/*width: 970px !important;*/
 	
@@ -26,19 +28,20 @@ ul {
 	/* 	background-repeat: no-repeat; */
 }
 
-#cic-body > div,#cic-trail>ol {
+#cic-body>div, #cic-trail>ol {
 	max-width: 1280px;
 	margin: 0 auto;
 	padding-left: 15px;
 	padding-right: 15px;
 }
-#cic-body{
+
+#cic-body {
 	min-height: 50%;
 }
-#cic-trail{
-	background-color: #f5f5f5;	
-}
 
+#cic-trail {
+	background-color: #f5f5f5;
+}
 
 #cic-footer {
 	background-color: rgb(158, 196, 205);
@@ -54,12 +57,12 @@ ul {
 	background-position: -15px 0px;
 	padding-left: 50px;
 }
-.cic-banners > li{
+
+.cic-banners>li {
 	list-style: none;
 	margin: 13px auto;
 	text-align: center;
-	}
-
+}
 
 #home-highlight {
 	height: 270px;
@@ -131,21 +134,20 @@ ul {
 	color: black;
 }
 
-#home-autoarchivo{
+#home-autoarchivo {
 	border-top: 2px solid #efefef;
 	padding: 25px;
 	border-bottom: 2px solid #efefef;
 }
-#home-autoarchivo a{
+
+#home-autoarchivo a {
 	font-size: 25pt;
 	text-decoration: none;
 }
 
-#cic-sidebar .list-group-item{
+#cic-sidebar .list-group-item {
 	padding: 6px 15px;
 }
-
-
 
 li.ds-artifact-item {
 	list-style: none;
@@ -261,4 +263,158 @@ li.ds-artifact-item.community {
 	color: #EAEAEA;
 	font-style: italic;
 	opacity: 1;
+}
+
+/* */
+#aspect_artifactbrowser_ItemViewer_div_item-view h3{
+	color:#509296;
+}
+
+.item-head {
+	/* border-bottom: 1px solid #efefef; */
+	margin-bottom: 20px;
+}
+
+.metadata-label {
+	font-weight: bold;
+/* 	display: inline-block; */
+}
+
+.metadata-values {
+/* 	display: inline-block; */
+	text-align: justify;
+}
+
+.metadata-dcterms_creator__ {
+	font-size: 120%;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.metadata-dcterms_type_subtype {
+	color: #31708f;
+	font-size: 95%;
+}
+
+.metadata-dc_title {
+	font-size: 150%;
+	margin-top: 10px;
+	font-weight: bold;
+}
+
+.metadata-dcterms_abstract {
+	background-color: #e7f1f4;
+	padding: 0px 10px 10px 20px;
+	margin-right: 20px;
+}
+
+.metadata-dcterms_abstract .metadata-label {
+	background-color: #509296;
+	color: white;
+	left: -20px;
+	position: relative;
+	padding: 5px 10px 5px 20px;
+	line-height: 2;
+}
+
+.metadata-values>span:nth-child(2n-2):BEFORE {
+	/* 	background-color: red; */
+	content: ' | ';
+	font-weight: bold;
+}
+
+.metadata-dcterms_abstract>.metadata-values>span {
+	display: block;
+	padding-bottom: 20px;
+}
+
+.metadata-dcterms_abstract>.metadata-values>span:BEFORE {
+	content: attr(xml\:lang);
+	padding: 3px 3px;
+	background-color: #509296;
+	right: 8px;
+	position: absolute;
+	text-transform: uppercase;
+	color: white;
+	font-weight: bold;
+	font-size: 9px;
+}
+
+.item-preview a.thumbnail {
+	height: 250px;
+	width: 200px;
+	background: #efefef;
+	background-clip: content-box;
+	margin: 0 auto;
+}
+
+ul.item-file-list{
+	margin-top: 20px;
+}
+.item-file-list a.thumbnail_file > img {
+	height: 54px;
+	width: 60px;
+}
+
+/* a { */
+/* 	display: inline-block; */
+/* } */
+.item-file-list a.thumbnail_file:hover {
+	background-image:url(../images/icono_descargar.png) ;
+	background-repeat:no-repeat;
+}
+.item-file-list a.thumbnail_file >  img:hover {
+	opacity:0.1;
+}
+
+
+p.intro-text > a {
+	font-weight: bold;
+}
+
+.discovery-list-results .metadata-cic_lugarDeDesarrollo ,
+.discovery-list-results .metadata-dcterms_type_subtype{
+/* float: right; */
+	background-color: #badfe5;
+	color: #509296;
+	padding: 5px;
+}
+
+.discovery-list-results > li{
+	cursor: pointer;
+}
+
+
+.icono-carpeta{
+	background-image: url('../images/carpeta.png');
+	background-repeat: no-repeat;
+	padding: 25px 5px 0px 5px;
+	/* height: 23px; */
+	background-position-x: center;
+}
+
+
+#aspect_discovery_SimpleSearch_div_search-filters > .ds-div-head:AFTER{
+	display: inline-block;
+	content: '';
+	width: 0;
+	height: 0;
+	margin-left: 10px;
+	vertical-align: middle;
+	border-top: 10px solid;
+	border-right: 10px solid transparent;
+	border-left: 10px solid transparent;
+}
+
+
+#aspect_discovery_SimpleSearch_list_primary-search .ds-form-item:FIRST-CHILD {
+	display: none;
+}
+
+input#aspect_discovery_SimpleSearch_field_query {
+height: 33px;
+}
+
+.searchTime{
+	display:none;
 }

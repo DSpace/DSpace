@@ -146,7 +146,7 @@
 					</xsl:call-template>
 				</xsl:when>
 				<xsl:when test="$value">
-					<xsl:value-of select="$value"/>
+					<xsl:copy-of select="$value"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<i18n:text>xmlui.cicdigital.discoveryList.no-value</i18n:text>

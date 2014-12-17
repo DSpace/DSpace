@@ -29,22 +29,22 @@
 
     <xsl:template match="dri:list[@type='dsolist']" priority="2">
         <xsl:apply-templates select="dri:head"/>
-        <ul class="discovery-list-results">
+        <ul class="discovery-list-results container-fluid">
             <xsl:apply-templates select="*[not(name()='head')]" mode="dsoList"/>
         </ul>
     </xsl:template>
 
 
     <xsl:template match="dri:list/dri:list" mode="dsoList" priority="7">
-        <xsl:apply-templates select="dri:head"/>
-        <ul>
+<!--         <xsl:apply-templates select="dri:head"/> -->
+<!--         <ul class="container-fluid"> -->
             <xsl:apply-templates select="*[not(name()='head')]" mode="dsoList"/>
-        </ul>
+<!--         </ul> -->
     </xsl:template>
 
 
     <xsl:template match="dri:list/dri:list/dri:list" mode="dsoList" priority="8">
-        <li>
+        <li class="row artifact-info" >
             <!--
                 Retrieve the type from our name, the name contains the following format:
                     {handle}:{metadata}
@@ -61,10 +61,6 @@
                 <xsl:text>/mets.xml</xsl:text>
                 <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
                 <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
-                <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
-                <xsl:if test="@type='DSpace Item'">
-                    <xsl:text>&amp;dmdTypes=DC</xsl:text>
-                </xsl:if>-->
             </xsl:variable>
 
 
@@ -108,8 +104,10 @@
         <xsl:param name="externalMetadataUrl"/>
 
         <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
-
-        <div class="artifact-title">
+  		<div class="col-md-1 icono-carpeta">
+  			<i18n:text>xmlui.ArtifactBrowser.AdvancedSearch.type_location.comm</i18n:text>
+		</div>
+        <div class="artifact-title col-md-11">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
                     <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
@@ -135,8 +133,10 @@
         <xsl:param name="externalMetadataUrl"/>
 
         <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
-
-        <div class="artifact-title">
+		<div class="col-md-1 icono-carpeta" >
+  			<i18n:text>xmlui.ArtifactBrowser.AdvancedSearch.type_location.coll</i18n:text>
+		</div>
+        <div class="artifact-title col-md-11">
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
                     <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
@@ -148,7 +148,6 @@
                 </xsl:choose>
             </a>
 
-        </div>
         <!--Display collection strengths (item counts) if they exist-->
         <xsl:if test="string-length($metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
             <xsl:text> [</xsl:text>
@@ -156,6 +155,7 @@
                     select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
             <xsl:text>]</xsl:text>
         </xsl:if>
+        </div>
 
 
     </xsl:template>
@@ -169,19 +169,28 @@
         <!-- Símbolo utilizado para separar (en la visualización) multiples instancias de un metadato -->
         <xsl:variable name="separador">; </xsl:variable>
         <!-- Primera fila -->
-        <div class="row">
-            <div class="col-md-1">
+           <div class="col-md-1" style="text-align:center">
             	<!-- dcterms-issued -->
+            	
                 <xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
-                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.issued')) and descendant::text()]">
-                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text()" />
-                        </xsl:if>
+                    	
+                    	<xsl:choose>
+	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.issued')) and descendant::text()]">
+	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text()" />
+	                        </xsl:when>
+	                        <xsl:otherwise>
+<!-- 	                        		Sin título -->
+	                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-date</i18n:text>
+	                        </xsl:otherwise>
+	                    </xsl:choose>
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'dcterms-issued'"/>
                 </xsl:call-template>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-10">
+            	<div class="row"><div class="col-md-12 artifact-title" >
+            
                 <!-- dc.title -->
                 <xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="href">
@@ -207,34 +216,12 @@
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'dc-title'"/>
                 </xsl:call-template>
-                <!-- Generate COinS with empty content per spec but force Cocoon to not create a minified tag  -->
-                <span class="Z3988">
-                    <xsl:attribute name="title">
-                        <xsl:for-each select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim">
-                            <xsl:call-template name="renderCOinS" />
-                        </xsl:for-each>
-                    </xsl:attribute>
-                    ﻿
-                    <!-- non-breaking space to force separating the end tag -->
-                </span>
-            </div>
-            <!-- cic.lugarDesarrollo -->
-            <div class="col-md-2">
+                </div></div>
+                <div class="row"><div class="col-md-12" >
+                
+	        	<!-- Segunda Fila -->
+	        	<!-- dcterms.creator.(corporate|author|compilator|editor) -->
                 <xsl:call-template name="renderDiscoveryField">
-                    <xsl:with-param name="value">
-                        <xsl:if test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]">
-                            <xsl:value-of select="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text()" />
-                        </xsl:if>
-                    </xsl:with-param>
-                    <xsl:with-param name="classname" select="'cic-lugarDeDesarrollo'"/>
-                </xsl:call-template>
-            </div>
-        </div>
-        <!-- Segunda Fila -->
-        <div class="row">
-        	<!-- dcterms.creator.(corporate|author|compilator|editor) -->
-            <div class="col-md-9 col-md-offset-1">
-            	<xsl:call-template name="renderDiscoveryField">
                     <xsl:with-param name="value">
                     	<xsl:choose>
                     		<xsl:when test="dri:list[(@n=(concat($handle, ':dcterms.creator.corporate')) or @n=(concat($handle, ':dcterms.creator.author')) or @n=(concat($handle, ':dcterms.creator.compilator')) or @n=(concat($handle, ':dcterms.creator.editor'))) and descendant::text()]">
@@ -251,8 +238,43 @@
                     </xsl:with-param>
                     <xsl:with-param name="classname" select="'dcterms-creators'"/>
                 </xsl:call-template>
+                </div></div>
+                <!-- dcterms.abstract -->
+<!-- 	        	<div class="row"><div class="col-md-12"> -->
+<!--                 	<xsl:call-template name="renderDiscoveryField"> -->
+<!-- 	            		<xsl:with-param name="value"> -->
+<!-- 	                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.abstract')) and descendant::text()]"> -->
+<!-- 	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[position()=1]/text()" /> -->
+<!-- 	                        </xsl:if> -->
+<!-- 	            		</xsl:with-param> -->
+<!-- 	            		<xsl:with-param name="classname" select="dcterms-abstract"></xsl:with-param> -->
+<!-- 	            	</xsl:call-template> -->
+<!-- 	        	</div> -->
+<!-- 	        	</div> -->
+                <!-- Generate COinS with empty content per spec but force Cocoon to not create a minified tag  -->
+                <span class="Z3988">
+                    <xsl:attribute name="title">
+                        <xsl:for-each select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim">
+                            <xsl:call-template name="renderCOinS" />
+                        </xsl:for-each>
+                    </xsl:attribute>
+                    ﻿
+                    <!-- non-breaking space to force separating the end tag -->
+                </span>
             </div>
-            <div class="col-md-2">
+            
+            <div class="col-md-1">
+            	<!-- cic.lugarDesarrollo -->
+<!--                 <xsl:if test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]"> -->
+                        
+<!--                     <xsl:call-template name="renderDiscoveryField"> -->
+<!--             	        <xsl:with-param name="value"> -->
+<!--                             <xsl:value-of select="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text()" /> -->
+<!--         	            </xsl:with-param> -->
+<!--     	                <xsl:with-param name="classname" select="'metadata-cic_lugarDeDesarrollo'"/> -->
+<!-- 	                </xsl:call-template> -->
+<!--                 </xsl:if> -->
+                    
             	<!-- dcterms.type.subtype -->
             	<xsl:call-template name="renderDiscoveryField">
             		<xsl:with-param name="value">
@@ -260,23 +282,12 @@
                             <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.type.subtype'))]/dri:item[position()=1]/text()" />
                         </xsl:if>
             		</xsl:with-param>
-            		<xsl:with-param name="classname" select="dcterms-type-subtype"></xsl:with-param>
+            		<xsl:with-param name="classname" select="'metadata-dcterms_type_subtype'"/>
             	</xsl:call-template>
             </div>
-        </div>
-        <div class="row">
-        	<!-- dcterms.abstract -->
-        	<div class="col-md-11 col-md-offset-1">
-        		<xsl:call-template name="renderDiscoveryField">
-            		<xsl:with-param name="value">
-                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.abstract')) and descendant::text()]">
-                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[position()=1]/text()" />
-                        </xsl:if>
-            		</xsl:with-param>
-            		<xsl:with-param name="classname" select="dcterms-abstract"></xsl:with-param>
-            	</xsl:call-template>
-        	</div>
-        </div>
+        
+        
+        	
     </xsl:template>
 
 </xsl:stylesheet>

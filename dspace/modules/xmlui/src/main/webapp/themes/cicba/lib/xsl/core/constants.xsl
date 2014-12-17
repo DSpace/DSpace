@@ -18,7 +18,18 @@
 		select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']" />
 	<xsl:variable name="search-url"
 		select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']" />
-
+	
+	<xsl:variable name="is-error-page">
+		<xsl:choose>
+		<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']) = 0">
+			<xsl:text>true</xsl:text>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:text>false</xsl:text>
+		</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>	
+	
 	<xsl:variable name="theme-path">
 		<xsl:text>/themes/</xsl:text>
 		<xsl:value-of

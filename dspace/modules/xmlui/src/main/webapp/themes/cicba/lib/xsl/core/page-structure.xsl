@@ -141,17 +141,7 @@
 						&#160;
 					</script>
 				</xsl:when>
-				<xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
-					<script type="text/javascript">
-						<xsl:attribute name="src">
-                            <xsl:value-of
-							select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-                            <xsl:text>/</xsl:text>
-                            <xsl:value-of select="." />
-                        </xsl:attribute>
-						&#160;
-					</script>
-				</xsl:when>
+				
 			</xsl:choose>
 		</xsl:for-each>
 
@@ -292,7 +282,38 @@
 
                                 var runAfterJSImports = new FnArray();
             </script>
-
+            
+			
+	        <script type="text/javascript">
+	        <xsl:text disable-output-escaping="yes">
+	        (function ($) {
+			    /**
+			     * When clicking an item li in a discovery context, openit
+			     */
+			    $(document).ready(function() {
+					$('.discovery-list-results > li').click(function(){
+						$(this).find('.artifact-title a')[0].click();
+					})
+			    });
+			})(jQuery);
+			
+			(function ($) {
+			    /**
+			     * Collapse Discovery filters
+			     */
+			    $(document).ready(function() {
+					
+					$('#aspect_discovery_SimpleSearch_div_discovery-filters-wrapper').hide();
+					$('#aspect_discovery_SimpleSearch_div_search-filters > .ds-div-head').click(function(){
+						$('#aspect_discovery_SimpleSearch_div_discovery-filters-wrapper').toggle();
+					});
+					
+			    });
+			})(jQuery);
+			
+			
+			</xsl:text>
+	        </script>
 	</xsl:template>
 
 
