@@ -13,6 +13,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: kevin
@@ -25,12 +27,29 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
         if(dso instanceof Item){
-            Metadatum[] dcValues = ((Item) dso).getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            Item item = (Item) dso;
+            Metadatum[] dcValues = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
             for (Metadatum dcValue : dcValues) {
-                document.addField("a_spell", dcValue.value);
+                String field = dcValue.schema + "." + dcValue.element;
+                String unqualifiedField = field;
 
+                String value = dcValue.value;
+
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (dcValue.qualifier != null && !dcValue.qualifier.trim().equals(""))
+                {
+                    field += "." + dcValue.qualifier;
+                }
+
+                if(!toIgnoreMetadataFields.contains(field)){
+                    document.addField("a_spell", dcValue.value);
+                }
             }
         }
-
     }
 }
