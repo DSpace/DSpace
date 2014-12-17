@@ -2859,7 +2859,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     </message>
     <message key="xmlui.submit.select.country.head"><span class="ds-form-label">Country-based Fee Waiver</span><br /><br /></message>
     <message key="xmlui.submit.select.country.help">
-<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researcher in residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
+<span class="country-help">Waivers are granted upon request for submissions by researchers employed by an institution in an Eligible Country or who are independent researchers-in-residence in an Eligible Country. Eligible countries are those listed by the World Bank as low-income or lower-middle-income economies. Select a country to request a waiver before you begin your submission.</span>
     </message>
     <message key="xmlui.submit.select.country.error">Please select a country</message>
 	<message key="xmlui.submit.select.pub.form_head">Submit new content</message>
@@ -2923,12 +2923,16 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	</message>
     <message key="xmlui.submit.dataset.describe.help">
         <div>
-            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad. (While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed).<br/>
-            <br/>Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package. If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip. Note that there will be additional charges if the total content submitted to Dryad for a given publication is more than 10GB. If you have
-            trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
-                >help@datadryad.org</a>.<br/>
-				<br />Please remember that Dryad does not accept data submissions that contain personally identifiable human subject information or non-CC0 compatible licenses. <a href="/pages/faq#depositing" target="_blank">View guidance</a> about what types of data Dryad accepts and our preferred file formats.<br />
-            <br/>Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon.
+            Please select and upload a data file from your computer, and describe the data file in as much detail as possible. Providing a detailed description will make it easier for others to find your data in Dryad.<br /><br />
+			<ul><li>While a data file may not have the same authors and keywords as the publication, for convenience, some of this information has been copied over. Please update as needed.</li>
+			<li>Only one file may be uploaded and described on this page. Once this data file has been saved, you may add additional files to the data package.</li>
+			<li>If you have a large number of related files, they may be submitted in an archive format such as .tar or .zip.</li>
+			<li>Note that there will be additional charges if the total content submitted to Dryad for a given publication is more than 10GB.
+			<li>Please remember that Dryad does <strong>not</strong> accept data submissions that contain personally identifiable human subject information or non-CC0 compatible licenses. <a href="/pages/faq#depositing" target="_blank">View guidance</a> about what types of data Dryad accepts and our preferred file formats.</li>
+			<li>Fields marked with an asterisk (*) are required. For more information on expected contents for a field, mouse over the ? icon.</li>
+			<li>If you have trouble submitting files, please contact us at <a href="mailto:help@datadryad.org"
+                >help@datadryad.org</a>.</li>
+		</ul>
         </div>
 	</message>
 	<message key="xmlui.submit.dataset.form.pub.head">Publication</message>
@@ -3004,7 +3008,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	</message>
     <message key="xmlui.Submission.submit.OverviewStep.help">
         <div>                                                                                                                                                
-            From this page, you can edit the description of your publication, add additional data files, modify attached files, and/or finalize your submission and proceed to checkout.
+            From this page, you can edit the description of your publication, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication:</message>
@@ -3293,8 +3297,8 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
     <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication</span><br/></message>
-    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.  
-    <strong>Did you receive an email from your journal with a link to Dryad?  Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
+    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
+    <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
 
 
     <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
@@ -3308,9 +3312,9 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
      <message key="xmlui.submit.publication.enter_article_doi">Enter publication's DOI or PubMed ID</message>
 
      <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
-     <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
-     <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
-     <message key="xmlui.submit.publication.journal.manu.label.review">Enter Your Manuscript Number (if available)</message>
+     <message key="xmlui.submit.publication.journal.select.label.new">Enter your journal title</message>
+     <message key="xmlui.submit.publication.journal.manu.label.new">Enter your manuscript number</message>
+     <message key="xmlui.submit.publication.journal.manu.label.review">Enter your manuscript number (if available)</message>
 
     <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript has been accepted before submitting data to Dryad.</message>
 
