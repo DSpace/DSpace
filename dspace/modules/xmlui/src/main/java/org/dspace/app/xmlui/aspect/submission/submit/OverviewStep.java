@@ -90,10 +90,6 @@ public class OverviewStep extends AbstractStep {
             if(!publication.isArchived()){
                 Para actionsPara = pubDiv.addPara();
                 actionsPara.addButton("submit_edit_publication").setValue(T_BUTTON_PUBLICATION_EDIT);
-                if((submission instanceof WorkspaceItem)){
-                    WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
-                    actionsPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
-                }
                 if(submission instanceof WorkflowItem){
                     //For a curator add an edit metadata button
                     actionsPara.addButton("submit_edit_metadata_" + submission.getID()).setValue(message("xmlui.Submission.Submissions.OverviewStep.edit-metadata-pub"));
@@ -228,10 +224,16 @@ public class OverviewStep extends AbstractStep {
 
             if(submission instanceof WorkspaceItem){
                 finDiv.addPara("data-label", "bold").addContent(T_STEPS_HEAD_4);
-
                 finDiv.addPara().addContent(T_FINALIZE_HELP);
 
-                Button finishButton = finDiv.addPara().addButton(AbstractProcessingStep.NEXT_BUTTON);
+                // add Delete and Continue to Checkout buttons
+                Para bottomButtonPara = finDiv.addPara();
+                if (!publication.isArchived() && submission instanceof WorkspaceItem) {
+                    WorkspaceItem pubWsItem = WorkspaceItem.findByItemId(context, publication.getID());
+                    bottomButtonPara.addButton("submit_delete_datapack_" + pubWsItem.getID()).setValue(T_BUTTON_PUBLICATION_DELETE);
+                }
+
+                Button finishButton = bottomButtonPara.addButton(AbstractProcessingStep.NEXT_BUTTON);
                 finishButton.setValue(T_FINALIZE_BUTTON);
                 if(submissionNotFinished || noDatasets){
                     finishButton.setDisabled(true);
