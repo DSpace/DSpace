@@ -351,20 +351,9 @@ li.ds-artifact-item.community {
 ul.item-file-list{
 	margin-top: 20px;
 }
-.item-file-list a.thumbnail_file > img {
+.item-file-list a.thumbnail_file > img:FIRST-CHILD {
 	height: 54px;
 	width: 60px;
-}
-
-/* a { */
-/* 	display: inline-block; */
-/* } */
-.item-file-list a.thumbnail_file:hover {
-	background-image:url(../images/icono_descargar.png) ;
-	background-repeat:no-repeat;
-}
-.item-file-list a.thumbnail_file >  img:hover {
-	opacity:0.1;
 }
 
 
