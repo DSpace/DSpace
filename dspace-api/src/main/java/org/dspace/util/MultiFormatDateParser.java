@@ -35,34 +35,34 @@ public class MultiFormatDateParser
 {
     private static final Logger log = LoggerFactory.getLogger(MultiFormatDateParser.class);
 
-    private static final ArrayList<Candidate> candidates = new ArrayList<>();
+    private static final ArrayList<Rule> rules = new ArrayList<>();
 
     @Inject
-    private static void setPatterns(Map<String, String> patterns)
+    public void setPatterns(Map<String, String> patterns)
     {
-        for (Entry<String, String> candidate : patterns.entrySet())
+        for (Entry<String, String> rule : patterns.entrySet())
         {
             Pattern pattern;
             try {
-                pattern = Pattern.compile(candidate.getKey());
+                pattern = Pattern.compile(rule.getKey());
             } catch (PatternSyntaxException ex) {
                 log.error("Skipping format with unparseable pattern '{}'",
-                        candidate.getKey());
+                        rule.getKey());
                 continue;
             }
 
             SimpleDateFormat format;
             try {
-            format = new SimpleDateFormat(candidate.getValue());
+            format = new SimpleDateFormat(rule.getValue());
             } catch (IllegalArgumentException ex) {
                 log.error("Skipping uninterpretable date format '{}'",
-                        candidate.getValue());
+                        rule.getValue());
                 continue;
             }
             format.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
             format.setLenient(false);
 
-            candidates.add(new Candidate(pattern, format));
+            rules.add(new Rule(pattern, format));
         }
     }
 
@@ -75,7 +75,7 @@ public class MultiFormatDateParser
      */
     static public Date parse(String dateString)
     {
-        for (Candidate candidate : candidates)
+        for (Rule candidate : rules)
         {
             if (candidate.pattern.matcher(dateString).matches())
             {
@@ -96,11 +96,11 @@ public class MultiFormatDateParser
         return null;
     }
 
-    private static class Candidate
+    private static class Rule
     {
         final Pattern pattern;
         final SimpleDateFormat format;
-        public Candidate(Pattern pattern, SimpleDateFormat format)
+        public Rule(Pattern pattern, SimpleDateFormat format)
         {
             this.pattern = pattern;
             this.format = format;
