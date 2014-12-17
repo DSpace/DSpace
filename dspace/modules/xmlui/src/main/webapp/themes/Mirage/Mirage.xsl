@@ -483,6 +483,8 @@
                 <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
                 <xsl:apply-templates select="dri:list[@n='Payment']"/>
                 <xsl:apply-templates select="dri:list[@n='need-help']"/>
+                <xsl:apply-templates select="dri:list[@n='human-subjects']"/>
+                <xsl:apply-templates select="dri:list[@n='large-data-packages']"/>
             </div>
         </div>
     </xsl:template>
@@ -574,6 +576,37 @@
         </div>      
 	  </div>
     </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='large-data-packages']" priority="3">
+        <div class="NOT-simple-box">
+            <h1 class="ds-div-head ds_large_data_package_head" id="ds_large_data_package_head">Large data packages</h1>
+            <div id="ds_large_data_package" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Note that for data packages over 10GB, submitters will
+                    be asked to pay an additional:
+                </p>
+                <ul>
+                    <li>$15 for the first GB beyond 10, and</li>
+                    <li>$10 for each GB thereafter.</li>
+                </ul> 
+            </div>      
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='human-subjects']" priority="3">
+        <!-- note margin space added to top here -->
+        <div class="NOT-simple-box ds-margin-top-20">
+            <h1 class="ds-div-head ds_human_subjects_head" id="ds_human_subjects_head">Got human subject data?</h1>
+            <div id="ds_human_subjects" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Dryad does not accept submissions that contain personally identifiable 
+                    human subject information. Human subject data must be properly anonymized. 
+                    <a href="/pages/faq#depositing-acceptable-data">Read more about the kinds of data Dryad accepts</a>.
+                </p> 
+            </div>      
+        </div>
+    </xsl:template>
+
 
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
       <div id="submit-data-sidebar-box" class="simple-box">
