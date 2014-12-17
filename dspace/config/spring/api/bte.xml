@@ -63,34 +63,34 @@
 		<property name="phase2TransformationEngine" ref="phase2TransformationEngine" />
 		<!-- Uncomment the following property if you want specific fields to appear in the detail presentation
 			 of a publication. Default values are the ones shown below -->
-		<!-- 
+		<!-- --> 
 		<property name="detailFields">
 	        <list>
-	        	<value>title</value>
-                <value>authors</value>
-                <value>editors</value>
-                <value>translators</value>
-                <value>chairs</value>
-                <value>issued</value>
-                <value>abstract</value>
-                <value>doi</value>
-                <value>journal</value>
-                <value>volume</value>
-                <value>issue</value>
-                <value>publisher</value>
-                <value>jissn</value>
-                <value>jeissn</value>
-                <value>pisbn</value>
-                <value>eisbn</value>
-                <value>arxivCategory</value>
-                <value>keywords</value>
-                <value>mesh</value>
-                <value>language</value>
-                <value>subtype</value>
-                <value>translators</value>
+                    <value>title</value>
+                    <value>authors</value>
+                    <value>editors</value>
+                    <value>translators</value>
+                    <value>chairs</value>
+                    <value>issued</value>
+                    <value>abstract</value>
+                    <value>doi</value>
+                    <value>journal</value>
+                    <value>volume</value>
+                    <value>issue</value>
+                    <value>publisher</value>
+                    <value>jissn</value>
+                    <value>jeissn</value>
+                    <value>pisbn</value>
+                    <value>eisbn</value>
+                    <value>arxivCategory</value>
+                    <value>keywords</value>
+                    <value>mesh</value>
+                    <value>language</value>
+                    <value>subtype</value>
+                    <value>translators</value>
 	        </list>
 	    </property>
-	    -->
+	    <!-- -->
 	</bean>
 
 	<!-- **************************************************************************************************** -->
@@ -204,14 +204,14 @@
 	        <map>
 	            <entry key="allauthors">
 	                <list>
-						<value>authors</value>
-					</list>
+			 <value>authors</value>
+			</list>
 	            </entry>
 	            <entry key="allkeywords">
 	                <list>
-						<value>keywords</value>
-						<value>mesh</value>
-					</list>
+			  <value>keywords</value>
+			  <value>mesh</value>
+			</list>
 	            </entry>
 	        </map>
 	    </property>
@@ -261,7 +261,17 @@
 				<entry key="journal" value="journal" />
 				<entry key="year" value="issued" />
 				<entry key="ISSN" value="jissn" />
+                                <entry key="publisher" value="publisher"/>
+                                <entry key="abstract" value="abstract"/>
+                                <entry key="editor" value="editors"/>
+                                <entry key="article" value="subtype" />
+                                <entry key="doi" value="doi"/>
+                                <entry key="keywords" value="allkeywords" />
+                                <entry key="language" value="language"/>
+                                <entry key="document_type" value="subtype"/>
+                                <entry key="volume" value="volume" />
 			</map>
+                        
 		</property>
 	</bean>
 
@@ -321,13 +331,24 @@
 	<bean id="risDataLoader" class="gr.ekt.bteio.loaders.RISDataLoader">
 		<property name="fieldMap">
 			<map>
-				<entry key="T1" value="title" />
+				<entry key="TI" value="title" />
+                                <entry key="T2" value="titleAlternative" />
 				<entry key="AU" value="authors" />
+                                <entry key="A1" value="authors" />
+                                <entry key="A2" value="editors"/>
 				<entry key="SO" value="journal" />
 				<entry key="PY" value="issued" />
 				<entry key="SN" value="jissn" />
 				<entry key="PT" value="subtype" />
 				<entry key="AB" value="abstract" />
+                                <entry key="N2" value="abstract" />
+                                <entry key="KW" value="allkeywords"/>
+                                <entry key="DO" value="doi"/> 
+                                <entry key="VL" value="volume"/> 
+                                <entry key="PB" value="publisher"/>     
+                                <entry key="TY" value="subtype"/>
+                                <entry key="LA" value="language"/> 
+                                <entry key="UR" value="url"/>                
 			</map>
 		</property>
 	</bean>
@@ -541,7 +562,8 @@
 				<entry value="issued" key="dc.date.issued" />
 				<entry value="language" key="dc.language.iso" />
 				<entry value="subtype" key="dc.type" />
-				<entry value="authors" key="dc.contributor.author" />
+				<!--<entry value="authors" key="dc.contributor.author" />-->
+                                <entry value="authors" key="dc.creator" />
 				<entry value="editors" key="dc.contributor.editor" />
 				<entry value="translators" key="dc.contributor.other" />
 				<entry value="chairs" key="dc.contributor.other" />
@@ -550,16 +572,18 @@
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
+                                <entry value="url" key="dc.identifier.other" />
+                                <entry value="volume" key="dc.citation.volume" />
+                                <entry value="titleAlternative" key="dc.title.alternative" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
-				<!-- 
-				<entry value="url" key="" />
-				<entry value="note" key="" />
+				 
+				
+				<!--<entry value="note" key="" />
 				<entry value="fulltextUrl" key="" />
 				<entry value="authorsWithAffiliation" key="" />
 				<entry value="pubmedID" key="" />
 				<entry value="publicationStatus" key="" />
 				<entry value="jeissn" key="" />
-				<entry value="volume" key="" />
 				<entry value="issue" key="" />
 				<entry value="firstpage" key="" />
 				<entry value="lastpage" key="" />
@@ -567,7 +591,6 @@
 				<entry value="editionnumber" key="" />
 				<entry value="seriestitle" key="" />
 				<entry value="volumetitle" key="" />
-				<entry value="titleAlternative" key="" />
 				<entry value="authorAlternative" key="" />
 				<entry value="ncid" key="" />
 				<entry value="naid" key="" />
