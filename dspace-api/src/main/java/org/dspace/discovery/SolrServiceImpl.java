@@ -983,6 +983,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
+            List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
             Metadatum[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (Metadatum meta : mydc)
             {
@@ -1001,7 +1002,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     field += "." + meta.qualifier;
                 }
 
-                List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
                 //We are not indexing provenance, this is useless
                 if (toIgnoreMetadataFields != null && (toIgnoreMetadataFields.contains(field) || toIgnoreMetadataFields.contains(unqualifiedField + "." + Item.ANY)))
                 {
