@@ -230,6 +230,12 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
     }
 
+    public void addOptions(Options options) throws SAXException, WingException,
+            SQLException, IOException, AuthorizeException
+    {
+        options.addList("human-subjects");
+        options.addList("large-data-packages");
+    }
 
 
     public List addReviewSection(List list) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
