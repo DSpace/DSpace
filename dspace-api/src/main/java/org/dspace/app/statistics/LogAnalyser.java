@@ -1159,7 +1159,7 @@ public class LogAnalyser
         {
             typeQuery = "SELECT resource_id " +
                         "FROM metadatavalue " +
-                        "WHERE text_value LIKE '%" + type + "%' " + " AND resource_type="+ Constants.ITEM +
+                        "WHERE text_value LIKE '%" + type + "%' " + " AND resource_type_id="+ Constants.ITEM +
                         " AND metadata_field_id = (" +
                         " SELECT metadata_field_id " +
                         " FROM metadatafieldregistry " +
@@ -1183,7 +1183,7 @@ public class LogAnalyser
         }
 
         dateQuery.append("FROM metadatavalue " +
-                          "WHERE " + "resource_type="+ Constants.ITEM +  " AND metadata_field_id = (" +
+                          "WHERE " + "resource_type_id="+ Constants.ITEM +  " AND metadata_field_id = (" +
                           " SELECT metadata_field_id " +
                           " FROM metadatafieldregistry " +
                           " WHERE metadata_schema_id = (" +
@@ -1244,13 +1244,13 @@ public class LogAnalyser
         
         if (startDate != null || endDate != null)
         {
-            query.append(" AND resource_id IN ( " +
+            query.append(" AND item_id IN ( " +
                          dateQuery.toString() + ") ");
         }
 
         if (type != null)
         {
-            query.append(" AND resource_id IN ( " +
+            query.append(" AND item_id IN ( " +
                          typeQuery + ") ");
         }
         
