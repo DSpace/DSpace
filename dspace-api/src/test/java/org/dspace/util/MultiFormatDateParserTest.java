@@ -8,29 +8,66 @@
 
 package org.dspace.util;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.dspace.AbstractUnitTest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import static org.junit.Assert.*;
 
 /**
  *
  * @author mhwood
  */
+@RunWith(Parameterized.class)
 public class MultiFormatDateParserTest
         extends AbstractUnitTest
 {
-    public MultiFormatDateParserTest()
+    private String testMessage;
+    private String toParseDate;
+    private String expectedFormat;
+    private boolean expectedResult;
+
+
+    public MultiFormatDateParserTest(String testMessage, String toParseDate, String expectedFormat, boolean expectedResult)
     {
+        this.testMessage = testMessage;
+        this.toParseDate = toParseDate;
+        this.expectedFormat = expectedFormat;
+        this.expectedResult = expectedResult;
     }
+
+    @Parameterized.Parameters
+    public static Collection dateFormatsToTest() {
+       return Arrays.asList(new Object[][]{
+               {"Should parse: yyyyMMdd", "19570127", "yyyyMMdd", true},
+               {"Should parse: dd-MM-yyyy", "27-01-1957", "dd-MM-yyyy", true},
+               {"Should parse: yyyy-MM-dd", "1957-01-27", "yyyy-MM-dd", true},
+               {"Should parse: MM/dd/yyyy", "01/27/1957", "MM/dd/yyyy", true},
+               {"Should parse: yyyy/MM/dd", "1957/01/27", "yyyy/MM/dd", true},
+               {"Should parse: yyyyMMddHHmm", "195701272006", "yyyyMMddHHmm", true},
+               {"Should parse: yyyyMMdd HHmm", "19570127 2006", "yyyyMMdd HHmm", true},
+               {"Should parse: dd-MM-yyyy HH:mm", "27-01-1957 20:06", "dd-MM-yyyy HH:mm", true},
+               {"Should parse: yyyy-MM-dd HH:mm", "1957-01-27 20:06", "yyyy-MM-dd HH:mm", true},
+               {"Should parse: MM/dd/yyyy HH:mm", "01/27/1957 20:06", "MM/dd/yyyy HH:mm", true},
+               {"Should parse: yyyy/MM/dd HH:mm", "1957/01/27 20:06", "yyyy/MM/dd HH:mm", true},
+               {"Should parse: yyyyMMddHHmmss", "19570127200620", "yyyyMMddHHmmss", true},
+               {"Should parse: yyyyMMdd HHmmss", "19570127 200620", "yyyyMMdd HHmmss", true},
+               {"Should parse: dd-MM-yyyy HH:mm:ss", "27-01-1957 20:06:20", "dd-MM-yyyy HH:mm:ss", true},
+               {"Should parse: MM/dd/yyyy HH:mm:ss", "01/27/1957 20:06:20", "MM/dd/yyyy HH:mm:ss", true},
+               {"Should parse: yyyy/MM/dd HH:mm:ss", "1957/01/27 20:06:20", "yyyy/MM/dd HH:mm:ss", true},
+               {"Shouldn't parse: yyyy/MM/ddHH:mm:ss", "1957/01/2720:06:20", "yyyy/MM/ddHH:mm:ss", false}
+       });
+    }
+
 
     @BeforeClass
     public static void setUpClass()
@@ -56,19 +93,10 @@ public class MultiFormatDateParserTest
      * Test of parse method, of class MultiFormatDateParser.
      */
     @Test
-    public void testParse()
+    public void testParse() throws ParseException
     {
-        System.out.println("parse");
-        Calendar calendar = GregorianCalendar.getInstance(
-                TimeZone.getTimeZone("UTC"),
-                Locale.ENGLISH);
-        String dateString;
-
-        dateString = "1957-01-27";
-        calendar.set(1957, Calendar.JANUARY, 27, 00, 00, 00);
-        calendar.clear(Calendar.MILLISECOND);
-        Date expResult = calendar.getTime();
-        Date result = MultiFormatDateParser.parse(dateString);
-        assertEquals(expResult, result);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(expectedFormat);
+        Date result = MultiFormatDateParser.parse(toParseDate);
+        assertEquals(testMessage, simpleDateFormat.parse(toParseDate).equals(result), expectedResult);
     }
 }
