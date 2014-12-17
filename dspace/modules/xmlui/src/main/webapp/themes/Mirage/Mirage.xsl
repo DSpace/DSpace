@@ -419,8 +419,8 @@
                 <div class="container">
                   <!-- Oikos -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
-                  <!-- Papers in Palaeontology -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apapers%5C+in%5C+palaeontology%5C%7C%5C%7C%5C%7CPapers%5C+in%5C+Palaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-pp.png" alt="Papers in Palaeontology" /></a>
+<!-- Papers in Palaeontology -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apapers%5C+in%5C+palaeontology%5C%7C%5C%7C%5C%7CPapers%5C+in%5C+Palaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-papersinpalacover.png" alt="Papers in Palaeontology" /></a>
                   <!-- Systematic Botany -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Asystematic%5C+botany%5C%7C%5C%7C%5C%7CSystematic%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-sysbot.png" alt="Systematic Botany" /></a>
                   <!-- PLOS -->
