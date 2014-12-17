@@ -788,6 +788,7 @@ li.ds-form-item label.ds-composite-component input.ds-text-field{
 
 li.ds-form-item .ds-select-field {
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .ds-add-button,
@@ -2489,7 +2490,7 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 
 .help-title{
     color:grey;
-    font-size: 0.5em;
+    font-size: 0.66em;
 }
 
 #aspect_submission_submit_OverviewStep_div_submit-completed-overview{
