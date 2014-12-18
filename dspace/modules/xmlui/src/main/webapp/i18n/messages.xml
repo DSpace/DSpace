@@ -3007,10 +3007,10 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
             From this page, you can edit the description of your publication, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Finalize your submission:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional)</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
