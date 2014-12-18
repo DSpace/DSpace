@@ -1,34 +1,39 @@
-User-agent: *
-# Disable access to Discovery search and filters
-Disallow: /discover 
-Disallow: /simple-search
-
-# The FULL URL to your DSpace sitemaps
+# The FULL URL to the DSpace sitemaps
 # The ${dspace.url} will be auto-filled with the value in dspace.cfg
 # XML sitemap is listed first as it is preferred by most search engines
 Sitemap: ${dspace.url}/sitemap
 Sitemap: ${dspace.url}/htmlmap
 
+##########################
+# Default Access Group
+# (NOTE: blank lines are not allowable in a group record)
+##########################
+User-agent: *
+# Disable access to Discovery search and filters
+Disallow: /discover 
+Disallow: /simple-search
+#
 # Optionally uncomment the following line ONLY if sitemaps are working
 # and you have verified that your site is being indexed correctly.
 # Disallow: /browse
-
+#
 # If you have configured DSpace (Solr-based) Statistics to be publicly 
 # accessible, then you may not want this content to be indexed
 # Disallow: /statistics
-
+#
 # You also may wish to disallow access to the following paths, in order
-# to stop web spiders from accessing user-based content:
+# to stop web spiders from accessing user-based content
 # Disallow: /contact
 # Disallow: /feedback
 # Disallow: /forgot
 # Disallow: /login
 # Disallow: /register
 
-##############
-# Section with misbehaving bots
-# The following directives to block specific robots was borrowed from Wikipedia's robots.txt
-##############
+
+##############################
+# Section for misbehaving bots
+# The following directives to block specific robots were borrowed from Wikipedia's robots.txt
+##############################
 
 # advertising-related bots:
 User-agent: Mediapartners-Google*
