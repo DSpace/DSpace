@@ -7,6 +7,10 @@
  */
 package org.dspace.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.inject.Inject;
+import org.dspace.kernel.DSpaceKernel;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +41,18 @@ public class MultiFormatDateParser
 {
     private static final Logger log = LoggerFactory.getLogger(MultiFormatDateParser.class);
 
+    /** A list of rules, each binding a regular expression to a date format. */
     private static final ArrayList<Rule> rules = new ArrayList<>();
+
+    private static final TimeZone UTC_ZONE = TimeZone.getTimeZone("UTC");
+
+    /** Format for displaying a result of testing. */
+    private static final DateFormat formatter;
+    static
+    {
+        formatter = SimpleDateFormat.getDateTimeInstance();
+        formatter.setTimeZone(UTC_ZONE);
+    }
 
     @Inject
     public void setPatterns(Map<String, String> patterns)
@@ -59,7 +76,7 @@ public class MultiFormatDateParser
                         rule.getValue());
                 continue;
             }
-            format.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+            format.setCalendar(Calendar.getInstance(UTC_ZONE));
             format.setLenient(false);
 
             rules.add(new Rule(pattern, format));
@@ -96,6 +113,56 @@ public class MultiFormatDateParser
         return null;
     }
 
+    public static void main(String[] args)
+            throws IOException
+    {
+        DSpaceKernel kernel = DSpaceKernelInit.getKernel(null); // Mainly to initialize Spring
+        // TODO direct log to stdout/stderr somehow
+
+        if (args.length > 0) // Test data supplied on the command line
+        {
+            for (String arg : args)
+            {
+                testDate(arg);
+            }
+        }
+        else // Get test data from the environment
+        {
+            String arg;
+            if (null == System.console()) // Possibly piped input
+            {
+                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                String line;
+                while (null != (line = input.readLine()))
+                    testDate(line.trim());
+            }
+            else // Loop, prompting for input
+                while(null != (arg = System.console().readLine("Enter a date-time:  ")))
+                {
+                    testDate(arg);
+                }
+        }
+    }
+
+    /**
+     * Try to parse a date, and report the outcome.
+     *
+     * @param arg date-time string to be tested.
+     */
+    private static void testDate(String arg)
+    {
+        Date result = parse(arg);
+        if (null == result)
+            System.out.println("Did not match any pattern.");
+        else
+        {
+            System.out.println(formatter.format(result));
+        }
+    }
+
+    /**
+     * Holder for a pair:  compiled regex, compiled SimpleDateFormat.
+     */
     private static class Rule
     {
         final Pattern pattern;
