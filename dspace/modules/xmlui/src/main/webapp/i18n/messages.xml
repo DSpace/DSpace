@@ -732,7 +732,7 @@
 	<message key="xmlui.Submission.general.submission.trail">Item submission</message>
 	<message key="xmlui.Submission.general.submission.head">Item submission</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
-	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
+	<message key="xmlui.Submission.general.submission.save">Save &amp; exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
 	<message key="xmlui.Submission.general.submission.complete">Save file and continue</message>
 	<message key="xmlui.Submission.general.workflow.title">Reviewing </message>
@@ -976,7 +976,7 @@
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to
 		complete your submission. If you are unable to grant this license at this time you may save your
-		work and return later or remove the submission by clicking the 'Save &amp; Exit' button
+		work and return later or remove the submission by clicking the 'Save &amp; exit' button
 		below.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
@@ -2956,7 +2956,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.submit.dataset.no-actions.2"> for the actions.</message>
 	<message key="xmlui.submit.dataset.no-actions.data-package">data package</message>
 
-	<message key="xmlui.Submission.general.submission.complete.datapackage">Continue to describe data file</message>
+	<message key="xmlui.Submission.general.submission.complete.datapackage">Continue to upload and describe data file</message>
 
 	<message key="xmlui.submit.dataset.license">By uploading data to Dryad, you agree to release it
 		under the terms of the <br/><a href="http://creativecommons.org/publicdomain/zero/1.0/"
@@ -3216,7 +3216,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 
     <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
 	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
-    <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
+    <message key="xmlui.general.cancel_delete">Cancel &amp; delete</message>
 
 
     <message key="xmlui.ArtifactBrowser.RestrictedItem.questions">If you have questions about the status of this item, please send them to the Dryad curation staff:</message>
@@ -3403,7 +3403,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.PaymentSystem.shoppingcart.order.customerName">Customer Name</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.apply">Apply</message>
     <message key="xmlui.PaymentSystem.shoppingcart.verified"><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Your payment information has been verified.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button below.</span></message>
-    <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need Help?</strong><br/>Email us at <a href="mailto:help@datadryad.org">help@datadryad.org</a> or send a message via our <a href="/feedback">contact form</a>.</message>
+    <message key="xmlui.PaymentSystem.shoppingcart.help"><strong>Need help?</strong><br/><a href="mailto:help@datadryad.org">Email us</a> or send a message via our <a href="/feedback">contact form</a>.</message>
 
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep">Payment information must be reauthorized</message>
     <message key="xmlui.Submission.Submissions.step.head.reAuthorizationPaymentStep_claimed">Reauthorize payment : claimed</message>
