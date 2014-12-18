@@ -81,10 +81,14 @@ public class OverviewStep extends AbstractStep {
         {
             Division pubDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-            pubDiv.addPara("pub-label", "bold").addContent(T_STEPS_HEAD_1);
+            pubDiv.setHead(T_STEPS_HEAD_1);
             //TODO: expand this !
 
             pubDiv.addPara().addXref(HandleManager.resolveToURL(context, publication.getHandle()), publication.getName());
+
+            // display a formatted reference
+            ReferenceSet refSet = pubDiv.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_LIST);
+            refSet.addReference(publication);
 
             //add an edit button for the publication (if we aren't archived)
             if(!publication.isArchived()){
@@ -107,7 +111,7 @@ public class OverviewStep extends AbstractStep {
             Division dataDiv = actionsDiv.addDivision("dataoverviewdivision", "even subdiv");
 
             //First of all add the current one !
-            dataDiv.addPara("data-label", "bold").addContent(T_STEPS_HEAD_2);
+            dataDiv.setHead(T_STEPS_HEAD_2);
 
             List dataSetList = dataDiv.addList("datasets");
 
@@ -223,7 +227,7 @@ public class OverviewStep extends AbstractStep {
             Division finDiv = actionsDiv.addDivision("finalizedivision", (submission instanceof WorkspaceItem ? "even" : "odd") + " subdiv");
 
             if(submission instanceof WorkspaceItem){
-                finDiv.addPara("data-label", "bold").addContent(T_STEPS_HEAD_4);
+                finDiv.setHead(T_STEPS_HEAD_4);
                 finDiv.addPara().addContent(T_FINALIZE_HELP);
 
                 // add Delete and Continue to Checkout buttons
