@@ -1997,6 +1997,7 @@ fieldset.ds-form-list ol {
     width: 100%;
     list-style-type: none;
 }
+
 fieldset.ds-form-list legend {
     color: #336699;
     background-color: inherit;
@@ -2505,6 +2506,18 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
     -webkit-box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
     box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
 }
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > div.ds-static-div.subdiv {
+    margin-bottom: 18px;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > h1.ds-div-head {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+}
+
 
 #aspect_submission_submit_OverviewStep_div_finalizedivision{
     padding-top: 6px;
