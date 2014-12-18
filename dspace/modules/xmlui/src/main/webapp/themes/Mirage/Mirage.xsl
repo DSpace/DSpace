@@ -652,7 +652,12 @@
            
     </xsl:template>
 
-
+    <!-- description of dataset for 'Submission overview' page -->
+    <xsl:template match="dri:hi[@rend='dataset-description']">
+        <p>
+            <xsl:value-of select="."/>
+        </p>
+    </xsl:template>
 
     <xsl:template match="dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
 

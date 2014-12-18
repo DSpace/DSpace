@@ -292,6 +292,12 @@ public class OverviewStep extends AbstractStep {
         }
 
         dataItem.addButton("submit_delete_dataset_" + wsDataset.getID()).setValue(T_BUTTON_DATAFILE_DELETE);
+        
+        // add dc_description text if available
+        DCValue[] descriptions = dataset.getMetadata("dc", "description", org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+        if (descriptions.length > 0)
+            dataItem.addHighlight("dataset-description").addContent(descriptions[0].value);
+        
         return submissionNotFinished;
     }
 }
