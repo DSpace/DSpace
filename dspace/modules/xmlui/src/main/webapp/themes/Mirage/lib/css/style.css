@@ -2518,6 +2518,16 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
     font-weight: bolder;
 }
 
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item {
+    padding: 0 !important;
+    margin-left: 0;
+    text-indent: 0 !important;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item div {
+    padding: 0 !important;
+    margin-bottom: 10px;
+}
 
 #aspect_submission_submit_OverviewStep_div_finalizedivision{
     padding-top: 6px;
