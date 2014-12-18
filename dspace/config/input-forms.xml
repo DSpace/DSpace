@@ -177,7 +177,7 @@
          <dc-element>title</dc-element>
          <repeatable>false</repeatable>
          <label>Título</label>
-         <input-type>onebox</input-type>
+         <input-type>textarea</input-type>
          <hint>Título del documento tal y como aparece en la obra</hint>
          <required>Debe indicar el título del documento</required>
        </field>
