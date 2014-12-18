@@ -58,7 +58,23 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-    	return "0";
+	 try {
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
+            
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            if (dso != null)
+            {
+                key += "-" + dso.getHandle();
+            }
+
+            return HashUtil.hash(key);
+        } 
+        catch (SQLException sqle)
+        {
+            // Ignore all errors and just return that the component is not cachable.
+            return "0";
+        }
     }
 
     /**
