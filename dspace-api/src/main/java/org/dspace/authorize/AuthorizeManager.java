@@ -295,7 +295,6 @@ public class AuthorizeManager
                 return true;
             }
         }
-        System.out.println("userid " + userid  + "obj: " + o.getHandle());
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
             // check policies for date validity
