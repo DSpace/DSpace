@@ -1384,4 +1384,54 @@ public abstract class DSpaceObject
         }
     }
     
+    /**
+     * expects a two part string as parameter:
+     *   * TYPE.ID, where TYPE is a DSpaceObject type and ID is the object id
+     *   * a handle
+     *   * GROUP.group name,
+     *   * or EPERSON.netid
+     *
+     * returns DSpaceObject that corresponds to string or null
+     * @param str    must have format TYPE.ID
+     * @return
+     */
+    public static DSpaceObject fromString(Context c, String str) throws SQLException {
+        if (str == null) {
+            return null;
+        }
+        String left= null, right = null;
+        int doti = str.indexOf('.');
+        if (doti != -1 && doti < str.length()-1) {
+            left = str.substring(0,doti);
+            right = str.substring(doti+1);
+        }
+
+        if (left == null) {
+            // this could be a handle
+            return HandleManager.resolveToObject(c, str);
+        } else {
+            int typeId = Constants.getTypeID(left.toUpperCase());
+            if (typeId == -1) {
+                // not one of the DSPaceObject types
+                return null;
+            }
+
+            try {
+                int id = Integer.parseInt(right);
+                return DSpaceObject.find(c, typeId, id);
+            } catch (NumberFormatException ne) {
+                switch (typeId) {
+                    case Constants.EPERSON: {
+                        DSpaceObject person = EPerson.findByNetid(c, right);
+                        if (person == null) {
+                            try {
+                                person = EPerson.findByEmail(c, right);
+                            } catch (AuthorizeException e) {
+                                person = null;
+                            }
+                        }
+                        return person;
+                    }
+                    case Constants.GROUP:
+                        return Group.findByName(c, right);
 }
