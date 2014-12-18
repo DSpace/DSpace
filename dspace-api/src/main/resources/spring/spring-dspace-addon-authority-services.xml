@@ -59,6 +59,7 @@
                              <entry key="first-name" value="person.givenName"/>
                              <entry key="last-name" value="person.familyName"/>
                              <entry key="orcid" value="person.orcid.id"/>
+                             <entry key="institution" value="person.instition"/>
                          </map>
                      </property>
                 </bean>
