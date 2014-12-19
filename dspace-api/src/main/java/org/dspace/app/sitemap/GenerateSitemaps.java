@@ -47,6 +47,10 @@ public class GenerateSitemaps {
      */
     private static Logger log = Logger.getLogger(GenerateSitemaps.class);
 
+    private static final int COMM = 1;
+    private static final int COLL = 2;
+    private static final int ITEM = 3;
+
     public static void main(String[] args) throws Exception {
         final String usage = GenerateSitemaps.class.getCanonicalName();
         CommandLineParser parser = new PosixParser();
@@ -65,9 +69,10 @@ public class GenerateSitemaps {
         Boolean error = false;
         Context c = new Context();
         try {
-            ArrayList<DSpaceObject> excludeComm = new ArrayList<DSpaceObject>();
-            ArrayList<DSpaceObject> excludeColl = new ArrayList<DSpaceObject>();
-            ArrayList<DSpaceObject> excludeItem = new ArrayList<DSpaceObject>();
+            ArrayList<DSpaceObject> excludeList[] = new ArrayList[Constants.NOBJECT_TYPES];
+            excludeList[Constants.COMMUNITY] = new ArrayList<DSpaceObject>();
+            excludeList[Constants.COLLECTION] = new ArrayList<DSpaceObject>();
+            excludeList[Constants.ITEM] = new ArrayList<DSpaceObject>();
             line = parser.parse(options, args);
 
             if (line.hasOption('h')) {
@@ -84,24 +89,21 @@ public class GenerateSitemaps {
                 }
                 for (String id : excludeIds) {
                     DSpaceObject obj = DSpaceObject.fromString(c, id);
-                    if (obj == null) {
-                        error = true;
-                    } else {
+                    if (obj != null) {
                         System.out.println("Will exclude " + obj.toString() + " " + obj.getHandle());
                         switch (obj.getType()) {
                             case Constants.COMMUNITY:
-                                excludeComm.add(obj);
-                                break;
                             case Constants.COLLECTION:
-                                excludeColl.add(obj);
-                                break;
                             case Constants.ITEM:
-                                excludeItem.add(obj);
+                                excludeList[obj.getType()].add(obj);
                                 break;
                             default:
-                                System.err.println("'" + id + " ' not a community, collection or item");
-                                error = true;
+                                obj = null;
                         }
+                    }
+                    if (obj == null) {
+                        System.err.println("'" + id + "' not a valid community, collection, or item");
+                        error = true;
                     }
                 }
             }
@@ -122,17 +124,7 @@ public class GenerateSitemaps {
 
             // Note the negation (CLI options indicate NOT to generate a sitemap)
             if (!line.hasOption('b') || !line.hasOption('s')) {
-                if (!line.hasOption('b')) {
-                    System.out.println("Generate HTLM map");
-                }
-                if (!line.hasOption('s')) {
-                    System.out.println("Generate Sitemap.org map");
-                }
-                if (line.hasOption('S')) {
-                    System.out.println("Exclude Items without READable Bitstreams");
-                }
-                generateSitemaps(!line.hasOption('b'), !line.hasOption('s'), !line.hasOption('S'),
-                        c, excludeComm, excludeColl, excludeItem);
+                generateSitemaps(!line.hasOption('b'), !line.hasOption('s'), !line.hasOption('S'), c, excludeList);
             }
 
             if (line.hasOption('a')) {
@@ -154,6 +146,7 @@ public class GenerateSitemaps {
         } finally {
             c.complete();
             if (error) {
+                System.err.println("");
                 hf.printHelp(usage, options);
                 System.exit(1);
             } else {
@@ -170,8 +163,7 @@ public class GenerateSitemaps {
      * @throws SQLException if a database error occurs.
      * @throws IOException  if IO error occurs.
      */
-    public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg, boolean doItemsWithoutBiistreams,
-                                        Context c, ArrayList<DSpaceObject> excludeComm, ArrayList<DSpaceObject> excludeColl, ArrayList<DSpaceObject> excludeItem) throws SQLException, IOException {
+    public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg, boolean doItemsWithoutBiistreams, Context c, ArrayList<DSpaceObject> excludeList[]) throws SQLException, IOException {
         String sitemapStem = ConfigurationManager.getProperty("dspace.url") + "/sitemap";
         String htmlMapStem = ConfigurationManager.getProperty("dspace.url") + "/htmlmap";
         String handleURLStem = ConfigurationManager.getProperty("dspace.url") + "/handle/";
@@ -179,6 +171,7 @@ public class GenerateSitemaps {
         File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.mkdir()) {
             log.error("Unable to create output directory");
+            return;
         }
 
         AbstractGenerator html = null;
@@ -186,59 +179,91 @@ public class GenerateSitemaps {
 
         if (makeHTMLMap) {
             html = new HTMLSitemapGenerator(outputDir, htmlMapStem + "?map=", null);
+            log.info("Generate HTLM map");
         }
 
         if (makeSitemapOrg) {
             sitemapsOrg = new SitemapsOrgGenerator(outputDir, sitemapStem + "?map=", null);
+            log.info("Generate Sitemap.org map");
         }
-
-
+        if (doItemsWithoutBiistreams) {
+            log.info("Exclude Items without READable Bitstreams");
+        }
         Community[] comms = Community.findAll(c);
         int commCount = 0;
         for (int i = 0; i < comms.length; i++) {
-            if (excludeComm.contains(comms[i])) {
-                System.out.println("Skipping Community " + comms[i].getHandle() + "\t" + ((Community) comms[i]).getName());
-            } else {
-                if (AuthorizeManager.authorizeActionBoolean(c, comms[i], org.dspace.core.Constants.READ)) {
-                    System.out.println("Doing    Community " + comms[i].getHandle() + "\t" + ((Community) comms[i]).getName());
-                    String url = handleURLStem + comms[i].getHandle();
-
-                    if (makeHTMLMap) {
-                        html.addURL(url, null);
-                    }
-                    if (makeSitemapOrg) {
-                        sitemapsOrg.addURL(url, null);
-                    }
-                }
-                commCount++;
+            String excludeReason = null;
+            if (excludeList[Constants.COMMUNITY].contains(comms[i])) {
+                excludeReason = "On Community Exclude List";
+            } else if (AuthorizeManager.authorizeActionBoolean(c, comms[i], org.dspace.core.Constants.READ)) {
+                excludeReason = "Not Readable by Anonymous";
             }
+            if (excludeReason != null) {
+                log.info("Excluding Community\t" + comms[i].getHandle() +
+                        "\t" + excludeReason +
+                        "\t" + ((Community) comms[i]).getName());
+            } else {
+                log.debug("Doing Community\t" + comms[i].getHandle() + "\t" + ((Community) comms[i]).getName());
+                String url = handleURLStem + comms[i].getHandle();
+
+                if (makeHTMLMap) {
+                    html.addURL(url, null);
+                }
+                if (makeSitemapOrg) {
+                    sitemapsOrg.addURL(url, null);
+                }
+            }
+            commCount++;
         }
 
         Collection[] colls = Collection.findAll(c);
         int itemCount = 0;
         int collCount = 0;
         for (int i = 0; i < colls.length; i++) {
-            if (excludeColl.contains(colls[i]) || excludeComm.contains(colls[i].getParentObject())) {
-                System.out.println("Skipping Collection " + colls[i].getHandle() + " in " + colls[i].getParentObject().getHandle() + "\t" + ((Collection) colls[i]).getName());
+            String excludeReason = null;
+            if (excludeList[Constants.COLLECTION].contains(colls[i])) {
+                excludeReason = "On Collection Exclude List";
+            } else if (excludeList[Constants.COMMUNITY].contains(colls[i].getParentObject())) {
+                excludeReason = "In Excluded " + Constants.typeText[colls[i].getParentObject().getType()] + " " + colls[i].getParentObject().getHandle();
+            } else if (!AuthorizeManager.authorizeActionBoolean(c, colls[i], org.dspace.core.Constants.READ)) {
+                excludeReason = "Not Readable by Anonymous";
+            }
+            if (excludeReason != null) {
+                log.info("Excluding Collection and its Items\t" + colls[i].getHandle() +
+                        "\tin\t" + colls[i].getParentObject().getHandle() +
+                        "\t" + excludeReason +
+                        "\t" + ((Collection) colls[i]).getName());
             } else {
-                if (AuthorizeManager.authorizeActionBoolean(c, colls[i], org.dspace.core.Constants.READ)) {
-                    System.out.println("Doing    Collection " + colls[i].getHandle() + " in " + colls[i].getParentObject().getHandle() + "\t" + ((Collection) colls[i]).getName());
-                    String url = handleURLStem + colls[i].getHandle();
+                log.debug("Doing Collection\t" + colls[i].getHandle() +
+                        "\t" + ((Collection) colls[i]).getName());
 
-                    if (makeHTMLMap) {
-                        html.addURL(url, null);
-                    }
-                    if (makeSitemapOrg) {
-                        sitemapsOrg.addURL(url, null);
-                    }
-                    collCount++;
-                    ItemIterator collItens = colls[i].getItems();
-                    while (collItens.hasNext()) {
-                        Item itm = collItens.next();
-                        if (itm.getOwningCollection() == colls[i] &&
-                                !excludeItem.contains(itm) &&
-                                AuthorizeManager.authorizeActionBoolean(c, itm, org.dspace.core.Constants.READ) &&
-                                (doItemsWithoutBiistreams || hasReadableBitstream(c, itm))) {
+                String url = handleURLStem + colls[i].getHandle();
+                if (makeHTMLMap) {
+                    html.addURL(url, null);
+                }
+                if (makeSitemapOrg) {
+                    sitemapsOrg.addURL(url, null);
+                }
+                collCount++;
+
+                ItemIterator collItems = colls[i].getItems();
+                while (collItems.hasNext()) {
+                    Item itm = collItems.next();
+                    if (itm.getOwningCollection() == colls[i]) {
+                        excludeReason = null;
+                        if (excludeList[Constants.ITEM].contains(itm)) {
+                            excludeReason = "On Item Exclude List";
+                        } else if (!AuthorizeManager.authorizeActionBoolean(c, itm, org.dspace.core.Constants.READ)) {
+                            excludeReason = "Not Readable by Anonymous";
+                        } else if (!doItemsWithoutBiistreams && !hasReadableBitstream(c, itm)) {
+                            excludeReason = "Has no Readable Bitstreams";
+                        }
+                        if (excludeReason != null) {
+                            log.info("Excluding Item\t" + itm.getHandle() +
+                                    "\tin\t" + itm.getOwningCollection().getHandle() +
+                                    "\t" + excludeReason +
+                                    "\t" + itm.getName());
+                        } else {
                             url = handleURLStem + itm.getHandle();
                             Date lastMod = itm.getLastModified();
 
@@ -249,11 +274,7 @@ public class GenerateSitemaps {
                                 sitemapsOrg.addURL(url, lastMod);
                             }
                             itm.decache();
-
                             itemCount++;
-
-                        } else {
-                            System.out.println("Skipping Item      " + itm.getHandle() + " in " + colls[i].getHandle() + "\t" + itm.getName());
                         }
                     }
                 }
