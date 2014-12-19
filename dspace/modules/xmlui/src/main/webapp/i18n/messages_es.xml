@@ -274,6 +274,10 @@
 <message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">Este ítem aparece en la(s) siguiente(s) colección(ones)</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Mostrar el registro sencillo del ítem</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Mostrar el registro completo del ítem</message>
+<!-- CIC-Digital -->
+<message key="xmlui.ArtifactBrowser.ItemViewer.general_info">Información General</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Información Específica</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Otros datos</message>
 
 <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">Este ítem ha sido retirado y no está disponible</message>
 
@@ -2012,6 +2016,8 @@ Para más infomación, visite
 
 <message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 <message key="xmlui.dri2xhtml.structural.link_original_license">Licencia original</message>
+<!-- CIC-Digital -->
+<message key="xmlui.dri2xhtml.structural.cc-item-view-text">Exceptuando que se explicite de otra forma, esta obra se publica con la licencia Creative Commons </message>
 
 
 	<!-- DS-METS-1.0-MODS.xsl -->

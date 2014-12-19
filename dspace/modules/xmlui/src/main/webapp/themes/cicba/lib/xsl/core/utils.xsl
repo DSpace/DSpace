@@ -35,10 +35,10 @@
 		<xsl:param name="img.alt"></xsl:param>
 		<a>
 			<xsl:attribute name="href">
-				<xsl:if test="starts-with($a.href, 'http://')">
+				<xsl:if test="starts-with($a.href, 'http://') or starts-with($a.href, 'https://')">
 					<xsl:value-of select="$a.href"/>
 				</xsl:if>
-				<xsl:if test="not(starts-with($a.href, 'http://'))">
+				<xsl:if test="not(starts-with($a.href, 'http://') or starts-with($a.href, 'https://'))">
 					<xsl:call-template name="print-path">
 						<xsl:with-param name="path" select="$a.href"/>
 					</xsl:call-template>
@@ -61,9 +61,16 @@
 		<xsl:param name="img.alt">image</xsl:param>
 		<img alt="{$img.alt}">
 			<xsl:attribute name="src">
-				<xsl:call-template name="print-theme-path">
-					<xsl:with-param name="path" select="$img.src"/>
-				</xsl:call-template>
+				<xsl:choose>
+					<xsl:when test="starts-with($img.src,'http') or starts-with($img.src,'https')">
+						<xsl:value-of select="$img.src"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="print-theme-path">
+							<xsl:with-param name="path" select="$img.src"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:attribute>
 		</img>
 	</xsl:template>
@@ -154,5 +161,25 @@
 			</xsl:choose>
 		</span>
 	</xsl:template>
- 
+	
+	<xsl:template name="generate-CC-Anchor-Logo">
+		<xsl:param name="cc-uri"/>
+		<xsl:param name="size-logo">88x31</xsl:param>
+		
+		<xsl:variable name="img_src">
+			<xsl:value-of select="concat('https://licensebuttons.net/l/',substring-after($cc-uri, 'http://creativecommons.org/licenses/'),'/',$size-logo,'.png')"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$cc-uri">
+				<xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href" select="$cc-uri"/>
+					<xsl:with-param name="img.src" select="$img_src"/>
+					<xsl:with-param name="img.alt" select="$cc-uri"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<i18n:text>xmlui.Submission.submit.CCLicenseStep.no_license</i18n:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template> 
  </xsl:stylesheet>

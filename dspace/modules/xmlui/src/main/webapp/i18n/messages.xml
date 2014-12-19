@@ -264,6 +264,10 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">This item appears in the following Collection(s)</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
+	<!-- CIC-Digital -->
+	<message key="xmlui.ArtifactBrowser.ItemViewer.general_info">General Information</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Specific Information</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Another data</message>
 
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 
@@ -2190,8 +2194,28 @@
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
-
-
+	<!-- CIC-Digital -->
+	<message key="xmlui.dri2xhtml.structural.cc-item-view-text">Except that explicite otherwise, this work is published under license Creative Commons </message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-4.0">Attribution 4.0 (BY 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-sa-4.0">Attribution-ShareAlike 4.0 (BY-SA 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nd-4.0">Attribution-NoDerivs  4.0 (BY-ND 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-4.0">Attribution-NonCommercial 4.0 (BY-NC 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-4.0">Attribution-NonCommercial-ShareAlike 4.0 (BY-NC-SA 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-4.0">Attribution-NonCommercial-NoDerivs 4.0 (BY-NC-ND 4.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-3.0">Attribution 3.0 (BY 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-sa-3.0">Attribution-ShareAlike 3.0 (BY-SA 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nd-3.0">Attribution-NoDerivs  3.0 (BY-ND 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-3.0">Attribution-NonCommercial 3.0 (BY-NC 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-3.0">Attribution-NonCommercial-ShareAlike 3.0 (BY-NC-SA 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-3.0">Attribution-NonCommercial-NoDerivs  3.0 (BY-NC-ND 3.0)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-2.5">Attribution 2.5 (BY 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-sa-2.5">Attribution-ShareAlike 2.5 (BY-SA 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nd-2.5">Attribution-NoDerivs  2.5 (BY-ND 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-2.5">Attribution-NonCommercial 2.5 (BY-NC 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-2.5">Attribution-NonCommercial-ShareAlike 2.5 (BY-NC-SA 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-2.5">Attribution-NonCommercial-NoDerivs  2.5 (BY-NC-ND 2.5 Argentina)</message>
+	
+	
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
 	<!-- DS-METS-1.0-QDC.xsl -->

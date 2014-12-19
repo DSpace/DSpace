@@ -27,13 +27,24 @@
 	<xsl:template name="render-metadata-values">
 		<xsl:param name="separator">;</xsl:param>
 		<xsl:param name="nodes"></xsl:param>
+		<xsl:param name="anchor"></xsl:param>
 
 		<xsl:for-each select="$nodes">
 			<span>
 				<xsl:if test="@language">
 					<xsl:attribute name="xml:lang" ><xsl:value-of select="@language"/></xsl:attribute>
 				</xsl:if>
-				<xsl:copy-of select="text()"/>
+				<xsl:choose>
+					<xsl:when test="$anchor">
+						<xsl:call-template name="build-anchor">
+							<xsl:with-param name="a.href" select="@authority"/>
+							<xsl:with-param name="a.value" select="text()"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="text()"/>
+					</xsl:otherwise>				
+				</xsl:choose>
 			</span>
 			<xsl:if test="not(position()=last())">
 	        	<xsl:value-of select="$separator" /> 
@@ -73,7 +84,7 @@
 		<xsl:param name="field"></xsl:param>
 		<xsl:param name="context" select="." />
 		<xsl:param name="separator">; </xsl:param>
-		<xsl:param name="filter"></xsl:param><!-- Si tiene filter es un link, sino no -->
+		<xsl:param name="is_linked_authority"></xsl:param><!-- Si viene en true, es un link, sino no -->
 		<xsl:param name="show_label">true</xsl:param>
 		<xsl:param name="container">div</xsl:param>
 		<xsl:param name="null_message"></xsl:param>
@@ -105,6 +116,7 @@
 							<xsl:call-template name="render-metadata-values">
 								<xsl:with-param name="separator" select="$separator"/>
 								<xsl:with-param name="nodes" select="$nodes"/>
+								<xsl:with-param name="anchor" select="$is_linked_authority"/>
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="$null_message">
@@ -202,11 +214,22 @@
 	    	</div>
     	</div>
 
-	    	
+	    <!-- Creative Commons Logo -->
         <div class="row">
-        
-	        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
-	        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
+        	<xsl:variable name="cc-uri">
+				<xsl:copy-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms' and @element='license']/text()"/>
+			</xsl:variable>
+        	<div class="col-md-1">
+		        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
+				<!-- <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/> -->
+				<xsl:call-template name="generate-CC-Anchor-Logo">
+					<xsl:with-param name="cc-uri" select="$cc-uri"/>
+				</xsl:call-template>
+			</div>
+			<div class="col-md-6">
+				<i18n:text>xmlui.dri2xhtml.structural.cc-item-view-text</i18n:text>
+				<i18n:text><xsl:value-of select="concat('xmlui.dri2xhtml.structural.cc-',xmlui:replaceAll(substring-after($cc-uri, 'http://creativecommons.org/licenses/'), '/', '-'))"/></i18n:text>
+			</div>
 	     </div>
     </xsl:template>
 	
@@ -286,7 +309,7 @@
 	    
 	
 		   	<div class="col-md-6">
-		   		<h3>Información General</h3>
+		   		<h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.general_info</i18n:text></h3>
 				<ul class="list-unstyled">
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.alternative'" />
@@ -325,7 +348,7 @@
 		   	</div>
 		   	
 		   	<div class="col-md-6">
-		   		<h3>Información Específica</h3>
+		   		<h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.specific_info</i18n:text></h3>
 				<ul class="list-unstyled">
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.title.investigacion'" />
@@ -353,10 +376,12 @@
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.isPartOf.item'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.isPartOf.issue'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.isPartOf.series'" />
@@ -370,14 +395,17 @@
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.relation'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.hasPart'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.isVersionOf'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 				</ul>
 		   	</div>
@@ -386,7 +414,7 @@
     	</div>
 			<div class="row">
 				<div class="col-md-12">
-					<h3>Otros datos</h3>
+					<h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.other_info</i18n:text></h3>
 					<ul class="list-unstyled">
 						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dcterms.description'" />
@@ -417,7 +445,15 @@
 				</div>
 			</div>
 			
-			
+			<!-- Show full link -->
+	        <div class="row ds-paragraph item-view-toggle item-view-toggle-bottom">
+	            <div class="col-md-12">
+	            	<a>
+	                	<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url"/></xsl:attribute>
+	                	<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
+	            	</a>
+	            </div>
+	        </div>
     	
     	
     	
@@ -427,6 +463,7 @@
             </xsl:attribute>
             &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
+        
     </xsl:template>
     
 </xsl:stylesheet>
