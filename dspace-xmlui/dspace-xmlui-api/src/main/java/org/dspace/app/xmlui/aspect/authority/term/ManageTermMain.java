@@ -139,7 +139,14 @@ public class ManageTermMain extends AbstractDSpaceTransformer
 
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
-        String query      = decodeFromURL(parameters.getParameter("query",null));
+        String query_1      = parameters.getParameter("query", null);
+        String query = "";
+        try{
+            query= URLDecoder.decode(query_1, Constants.DEFAULT_ENCODING);
+        }catch (UnsupportedEncodingException e)
+        {
+            log.error("decode error:"+e);
+        }
         String baseURL    = contextPath+"/admin/term?administrative-continue="+knot.getId();
 
         int resultCount = Term.searchResultCount(context, query, null);

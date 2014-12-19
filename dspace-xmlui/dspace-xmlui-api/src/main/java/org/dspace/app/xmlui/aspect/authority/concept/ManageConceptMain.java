@@ -140,7 +140,14 @@ public class ManageConceptMain extends AbstractDSpaceTransformer
         /* Get and setup our parameters */
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
-        String query      = decodeFromURL(parameters.getParameter("query",null));
+        String query_1      = parameters.getParameter("query", null);
+        String query = "";
+        try{
+            query= URLDecoder.decode(query_1, Constants.DEFAULT_ENCODING);
+        }catch (UnsupportedEncodingException e)
+        {
+            log.error("decode error:"+e);
+        }
         String schemeId = parameters.getParameter("scheme",null);
         Scheme scheme = null;
         if(schemeId!=null)
