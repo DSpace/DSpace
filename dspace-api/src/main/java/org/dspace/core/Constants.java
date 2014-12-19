@@ -40,6 +40,9 @@ public class Constants
     /** Type of individual eperson objects */
     public static final int EPERSON = 7;
 
+    /** number of DSPACE object Types  */
+    public static final int NOBJECT_TYPES = 8;
+
     /**
      * lets you look up type names from the type IDs
      */
