@@ -61,7 +61,7 @@ public class MultiFormatDateParser
         {
             Pattern pattern;
             try {
-                pattern = Pattern.compile(rule.getKey());
+                pattern = Pattern.compile(rule.getKey(),Pattern.CASE_INSENSITIVE);
             } catch (PatternSyntaxException ex) {
                 log.error("Skipping format with unparseable pattern '{}'",
                         rule.getKey());
