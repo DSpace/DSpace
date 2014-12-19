@@ -85,9 +85,9 @@ Install RVM and ruby:
 
 ### Compass ###
 
-:warning: **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
+> *WARNING:* **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
 
-:warning: At this time, _we do NOT recommend using SASS v3.4_. Mirage2 is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
+> *WARNING:* At this time, we do NOT recommend using SASS v3.4.x. The Mirage2 theme is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
 
 [Compass](http://compass-style.org/) is built on the [SASS CSS preprocessor](http://sass-lang.com/). At the time of writing, we recommend using SASS v3.3.14 with Compass v1.0.1 (see warnings above):
 
@@ -151,9 +151,9 @@ Add new variables `GEM_HOME` and `GEM_PATH` pointing to your Ruby gems directory
 
 ### Compass on Windows ###
 
-:warning: **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
+> *WARNING:* **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
 
-:warning: At this time, _we do NOT recommend using SASS v3.4_. Mirage2 is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
+> *WARNING:* At this time, we do NOT recommend using SASS v3.4.x. The Mirage2 theme is based on [bootstrap-sass](https://github.com/twbs/bootstrap-sass), which currently has a [minor Internet Explorer breadcrumb display bug when using SASS v3.4](https://github.com/twbs/bootstrap-sass/issues/803)
 
 [Compass](http://compass-style.org/) is built on the [SASS CSS preprocessor](http://sass-lang.com/). At the time of writing, we recommend using SASS v3.3.14 with Compass v1.0.1 (see warnings above):
 
