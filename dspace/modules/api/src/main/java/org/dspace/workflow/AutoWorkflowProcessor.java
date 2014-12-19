@@ -61,7 +61,7 @@ public abstract class AutoWorkflowProcessor {
         return getClaimedTask().getActionID().equals(getActionID());
     }
     
-    abstract Boolean isMyStep() throws SQLException;
+    abstract Boolean isMyStep(final String stepId) throws SQLException;
     abstract String getActionID();
     // After claimed, look at whatever is needed to determine if the task should be processed
     abstract Boolean canProcessClaimedTask() throws SQLException;
@@ -128,7 +128,7 @@ public abstract class AutoWorkflowProcessor {
         this.poolTask = aPoolTask;
         // Before claiming, make sure the task what we can process
 
-        if(!isMyStep()) {
+        if(!isMyStep(aPoolTask.getStepID())) {
             // the step to claim is not our step, abort
             throw new ItemIsNotEligibleForStepException("Task for wfi: " + wfi.getID() + " ePersonID: " + eperson.getID() + " is not in the correct step for this processor, not claiming");
         }

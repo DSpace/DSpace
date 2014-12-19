@@ -98,8 +98,8 @@ public class AutoCurateToBlackoutProcessor extends AutoWorkflowProcessor {
     }
 
     @Override
-    Boolean isMyStep() throws SQLException {
-        return (getPoolTask().getStepID().equals("dryadAcceptEditReject"));
+    Boolean isMyStep(final String stepId) throws SQLException {
+        return (stepId.equals("dryadAcceptEditReject"));
     }
 
 }

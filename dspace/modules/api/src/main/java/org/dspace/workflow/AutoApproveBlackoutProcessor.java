@@ -82,9 +82,9 @@ public class AutoApproveBlackoutProcessor extends AutoWorkflowProcessor {
     }
 
     @Override
-    Boolean isMyStep() throws SQLException {
-        return (getPoolTask().getStepID().equals("pendingPublicationStep") ||
-                getPoolTask().getStepID().equals("pendingPublicationReAuthorizationPaymentStep"));
+    Boolean isMyStep(final String stepId) throws SQLException {
+        return (stepId.equals("pendingPublicationStep") ||
+                stepId.equals("pendingPublicationReAuthorizationPaymentStep"));
     }
 
     @Override
