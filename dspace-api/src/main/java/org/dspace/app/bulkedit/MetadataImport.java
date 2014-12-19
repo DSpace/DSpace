@@ -871,7 +871,7 @@ public class MetadataImport
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
                 String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
-                authorityValue = AuthorityValueGenerator.generate(toGenerate, value, field);
+                authorityValue = AuthorityValueGenerator.generate(c, toGenerate, value, field);
                 dcv.authority = toGenerate;
             } else {
                 authorityValue = byValue.get(0);

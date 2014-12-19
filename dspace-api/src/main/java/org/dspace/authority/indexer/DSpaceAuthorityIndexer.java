@@ -173,16 +173,16 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
         nextValue = null;
 
         String content = value.value;
-        String uid = value.authority;
+        String authorityKey = value.authority;
         //We only want to update our item IF our UUID is not present or if we need to generate one.
-        boolean requiresItemUpdate = StringUtils.isBlank(uid) || StringUtils.startsWith(uid, AuthorityValueGenerator.GENERATE);
+        boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) || StringUtils.startsWith(authorityKey, AuthorityValueGenerator.GENERATE);
 
-        if (StringUtils.isNotBlank(uid) && !uid.startsWith(AuthorityValueGenerator.GENERATE)) {
+        if (StringUtils.isNotBlank(authorityKey) && !authorityKey.startsWith(AuthorityValueGenerator.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly necessary here but it prevents exceptions in solr
-            nextValue = authorityValueFinder.findByUID(context, uid);
+            nextValue = authorityValueFinder.findByUID(context, authorityKey);
         }
         if (nextValue == null) {
-            nextValue = AuthorityValueGenerator.generate(uid, content, metadataField.replaceAll("\\.", "_"));
+            nextValue = AuthorityValueGenerator.generate(context, authorityKey, content, metadataField.replaceAll("\\.", "_"));
         }
         if (nextValue != null && requiresItemUpdate) {
             nextValue.updateItem(currentItem, value);
