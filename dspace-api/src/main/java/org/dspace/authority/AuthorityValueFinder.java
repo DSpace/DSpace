@@ -44,10 +44,14 @@ public class AuthorityValueFinder {
         return findings.size() > 0 ? findings.get(0) : null;
     }
 
-    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier, String value) {
-        String field = fieldParameter(schema, element, qualifier);
+    public List<AuthorityValue> findByValue(Context context, String field, String value) {
         String queryString = "value:" + value + " AND field:" + field;
         return find(context, queryString);
+    }
+
+    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier, String value) {
+        String field = fieldParameter(schema, element, qualifier);
+        return findByValue(context, field, qualifier);
     }
 
     public AuthorityValue findByOrcidID(Context context, String orcid_id) {
