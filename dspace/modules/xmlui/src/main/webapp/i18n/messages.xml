@@ -3275,6 +3275,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
     <message key="xmlui.Submission.result-table.head.datafiles">Number of data files</message>
+    <message key="xmlui.Submission.result-table.head.lastupdated">Last updated</message>
     <message key="xmlui.Submission.result-table.head.owner">Task owner</message>
 
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_claimed">In Curation: Claimed</message>
