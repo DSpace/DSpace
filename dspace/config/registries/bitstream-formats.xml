@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 
 <!--
-  - bitstream-formats.xml
-  -
-  - Version:  $Revision$
-  -
-  - Date:     $Date$
-  -
   - Initial contents for bitstream format registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
   - registry must be read from the database.  Use

@@ -12,10 +12,6 @@
 
         This is only fit for a simple smoke test of the XSLT-based
         crosswalk plugin, do not use it for anthing more serious.
-
- Revision: $Revision$
- Date:     $Date$
-
  -->
 
         <xsl:template match="@* | node()">
