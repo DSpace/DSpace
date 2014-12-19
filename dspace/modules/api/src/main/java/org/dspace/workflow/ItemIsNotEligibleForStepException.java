@@ -9,6 +9,7 @@ package org.dspace.workflow;
 class ItemIsNotEligibleForStepException extends Exception {
 
     public ItemIsNotEligibleForStepException(String string) {
+        super(string);
     }
 
 }
