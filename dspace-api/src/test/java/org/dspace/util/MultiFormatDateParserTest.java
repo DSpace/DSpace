@@ -64,6 +64,12 @@ public class MultiFormatDateParserTest
                {"Should parse: dd-MM-yyyy HH:mm:ss", "27-01-1957 20:06:20", "dd-MM-yyyy HH:mm:ss", true},
                {"Should parse: MM/dd/yyyy HH:mm:ss", "01/27/1957 20:06:20", "MM/dd/yyyy HH:mm:ss", true},
                {"Should parse: yyyy/MM/dd HH:mm:ss", "1957/01/27 20:06:20", "yyyy/MM/dd HH:mm:ss", true},
+               {"Should parse: yyyy MMM dd", "1957 Jan 27", "yyyy MMM dd", true},
+               {"Should parse: yyyy-MM", "1957-01", "yyyy-MM", true},
+               {"Should parse: yyyyMM", "195701", "yyyyMM", true},
+               {"Should parse: yyyy", "1957", "yyyy", true},
+               {"Should parse: yyyy-MM-dd'T'HH:mm:ss'Z'", "1957-01-27T12:34:56Z", "yyyy-MM-dd'T'HH:mm:ss'Z'", true},
+               {"Should parse: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "1957-01-27T12:34:56.789Z", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", true},
                {"Shouldn't parse: yyyy/MM/ddHH:mm:ss", "1957/01/2720:06:20", "yyyy/MM/ddHH:mm:ss", false}
        });
     }
@@ -97,6 +103,6 @@ public class MultiFormatDateParserTest
     {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(expectedFormat);
         Date result = MultiFormatDateParser.parse(toParseDate);
-        assertEquals(testMessage, simpleDateFormat.parse(toParseDate).equals(result), expectedResult);
+        assertEquals(testMessage, expectedResult, simpleDateFormat.parse(toParseDate).equals(result));
     }
 }
