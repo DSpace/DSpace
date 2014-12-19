@@ -479,8 +479,22 @@
     <xsl:template match="dri:options">
         <div id="ds-options-wrapper">
             <div id="ds-options">
-                <!-- Once the search box is built, the other parts of the options are added -->
-                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                <xsl:variable name="uri" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
+                <xsl:choose>
+                    <!-- on the "My Submissions" page, have the "Submit data now" button at top of sidebar -->
+                    <xsl:when test="$uri = 'submissions'">
+                        <xsl:apply-templates select="dri:list[@n='DryadSubmitData']"/>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- on the "My Tasks" page, suppress "Submit data now" -->
+                    <xsl:when test="$uri = 'my-tasks'">
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- Once the search box is built, the other parts of the options are added -->
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:apply-templates select="dri:list[@n='Payment']"/>
                 <xsl:apply-templates select="dri:list[@n='need-help']"/>
                 <xsl:apply-templates select="dri:list[@n='human-subjects']"/>

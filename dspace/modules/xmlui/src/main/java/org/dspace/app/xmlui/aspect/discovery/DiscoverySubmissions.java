@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+import org.xml.sax.SAXException;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -74,6 +75,14 @@ public class DiscoverySubmissions extends SimpleSearch {
         }
     }
 
+    @Override
+    public void addOptions(Options options) throws SAXException, WingException,
+            UIException, SQLException, IOException, AuthorizeException
+    {
+        super.addOptions(options);
+        options.addList("DryadSubmitData");
+    }
+    
     @Override
     protected void buildSearchResultsDivision(Division search) throws IOException, SQLException, WingException, SearchServiceException {
         try {
