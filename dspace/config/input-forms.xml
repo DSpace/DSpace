@@ -71,9 +71,10 @@
                     <dc-element>readme</dc-element>
                     <label>ReadMe file</label>
                     <input-type>file</input-type>
-                    <hint>If available, please upload a file that provides additional description of your data file
-                        (e.g., description of collection methods, key to column abbreviations used in the data file).
-                        Only one ReadMe file may be uploaded.
+                    <hint>If additional user guidance is needed, please upload a ReadMe file. ReadMe files supplement 
+                        the file description and should provide any information needed to ensure that the data can be 
+                        correctly interpreted. If your ReadMe pertains to your data package as a whole, please upload 
+                        it with each individual data file. View additional ReadMe guidance.
                     </hint>
                 </field>
                 <field>
@@ -81,7 +82,7 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Author</label>
+                    <label>Author of data file</label>
                     <input-type>name</input-type>
                     <hint>Please include the entire first name, and a middle initial if appropriate. Do not use only
                         initials, as this makes the author more difficult to identify later.
@@ -91,13 +92,12 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
                     <dc-qualifier>embargo</dc-qualifier>
-                    <label>Embargo</label>
+                    <label>Set a data embargo</label>
                     <input-type>embargo</input-type>
                     <hint>If an embargo is set, this data file will not be available to Dryad users until the embargo
                         expires. Descriptive information (e.g., title, description, authors, and keywords) will be
-                        visible immediately, advertising the forthcoming availability of the data
-                        file.&gt;br/&lt;&gt;br/&lt;Longer embargoes are available at the request of the
-                        appropriate journal editor.
+                        visible immediately, advertising the forthcoming availability of the data file.&lt;br&gt;&lt;br&gt;
+                        Longer embargoes are available at the request of the appropriate journal editor.
                     </hint>
                 </field>
                 <field>
