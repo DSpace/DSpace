@@ -1352,7 +1352,7 @@ public class Concept extends AuthorityObject
     public static Concept[] findByPreferredLabel(Context context,String query,int schemeId){
         //make schemeId == -1 to get all match preferred label
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        String dbquery = "SELECT concept.* FROM concept,concept2term,term where concept.id=concept2term.concept_id and concept2term.term_id=term.id and term.literalform = ?";
+        String dbquery = "SELECT concept.* FROM concept,concept2term,term where concept.id=concept2term.concept_id and concept2term.term_id=term.id and term.literalform = ? order by term.literalform";
         try
         {
 
