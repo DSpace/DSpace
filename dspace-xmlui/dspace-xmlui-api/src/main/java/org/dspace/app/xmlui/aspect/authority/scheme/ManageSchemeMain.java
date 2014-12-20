@@ -7,6 +7,8 @@
  */
 package org.dspace.app.xmlui.aspect.authority.scheme;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.authority.Scheme;
+import org.dspace.core.Constants;
 
 /**
  * The manage scheme page is the starting point page for managing
