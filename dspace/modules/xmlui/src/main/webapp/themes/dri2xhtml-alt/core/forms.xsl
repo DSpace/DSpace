@@ -191,7 +191,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <xsl:variable name="help" select="dri:field/dri:help/text()"/>
+                <xsl:variable name="help" select="string(./dri:field/dri:help)"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -203,15 +203,34 @@
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:if test="string-length($help)>0">
-                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
-                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                        <xsl:variable name="n" select="string(./dri:field/@n)"/>
+                        <xsl:choose>
+                            <xsl:when test="$n = 'dc_subject'
+                                         or $n = 'dwc_ScientificName'
+                                         or $n = 'dc_coverage_spatial'
+                                         or $n = 'dc_coverage_temporal'
+                            ">
+                                <xsl:text> </xsl:text>
                                 <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                     <xsl:attribute name="title">
-                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                        <xsl:value-of select="$help"/>
                                     </xsl:attribute>
                                 </img>
-                            </xsl:if>
-                        </div>
+                            </xsl:when>
+                            <!-- for other fields, display subsequent sentences in hover text -->
+                            <xsl:otherwise>
+                                <div class="help-title">
+                                    <xsl:value-of select="substring-before($help,'.')"/>.
+                                    <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                            <xsl:attribute name="title">
+                                                <xsl:value-of select="substring-after($help,'.')"/>
+                                            </xsl:attribute>
+                                        </img>
+                                    </xsl:if>
+                                </div>                                
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:if>
                 </label>
             </xsl:when>
