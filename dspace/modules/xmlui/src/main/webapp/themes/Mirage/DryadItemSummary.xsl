@@ -2479,22 +2479,22 @@
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Papers in Palaeontology"'>
-                <a target="_blank">
-                    <xsl:attribute name="href">
-                        <xsl:choose>
-                            <xsl:when test="contains($article-doi,'doi:')">
-                                <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of
-                                        select="string('http://onlinelibrary.wiley.com/journal/10.1002/(ISSN)2056-2802')"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/pp.png"
-                         alt="Papers in Palaeontology cover"/>
-                </a>
+	            <a target="_blank">
+	                <xsl:attribute name="href">
+	                    <xsl:choose>
+	                        <xsl:when test="contains($article-doi,'doi:')">
+	                            <xsl:value-of
+	                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+	                        </xsl:when>
+	                        <xsl:otherwise>
+	                            <xsl:value-of
+	                                    select="string('http://onlinelibrary.wiley.com/journal/10.1002/%28ISSN%292056-2802')"/>
+	                        </xsl:otherwise>
+	                    </xsl:choose>
+	                </xsl:attribute>
+	                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/papersinpalacover.png"
+	                     alt="Papers in Palaeontology cover"/>
+	            </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Perspectives in Plant Ecology, Evolution and Systematics"'>
                 <a target="_blank">
