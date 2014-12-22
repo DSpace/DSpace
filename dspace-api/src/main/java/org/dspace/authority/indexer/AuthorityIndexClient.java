@@ -76,6 +76,7 @@ public class AuthorityIndexClient {
         System.out.println("Writing new data");
         for(String id : toIndexValues.keySet()){
             indexingService.indexContent(toIndexValues.get(id), true);
+            indexingService.commit();
         }
 
         context.commit();
