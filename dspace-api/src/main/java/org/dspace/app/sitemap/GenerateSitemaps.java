@@ -238,20 +238,14 @@ public class GenerateSitemaps
         int commCount = 0;
         for (int i = 0; i < comms.length; i++)
         {
-            String excludeReason = null;
             if (excludeList[Constants.COMMUNITY].contains(comms[i]))
             {
-                excludeReason = "On Community Exclude List";
-            } else if (false && AuthorizeManager.authorizeActionBoolean(c, comms[i], org.dspace.core.Constants.READ))
-            {
-                excludeReason = "Not Readable by Anonymous";
-            }
-            if (excludeReason != null)
-            {
+                String excludeReason = "On Community Exclude List";
                 log.info("Excluding Community\t" + comms[i].getHandle() +
                         "\t" + excludeReason +
                         "\t" + ((Community) comms[i]).getName());
-            } else
+            }
+            else
             {
                 log.debug("Doing Community\t" + comms[i].getHandle() + "\t" + ((Community) comms[i]).getName());
                 String url = handleURLStem + comms[i].getHandle();
@@ -280,9 +274,6 @@ public class GenerateSitemaps
             } else if (excludeList[Constants.COMMUNITY].contains(colls[i].getParentObject()))
             {
                 excludeReason = "In Excluded " + Constants.typeText[colls[i].getParentObject().getType()] + " " + colls[i].getParentObject().getHandle();
-            } else if (false && !AuthorizeManager.authorizeActionBoolean(c, colls[i], org.dspace.core.Constants.READ))
-            {
-                excludeReason = "Not Readable by Anonymous";
             }
             if (excludeReason != null)
             {
