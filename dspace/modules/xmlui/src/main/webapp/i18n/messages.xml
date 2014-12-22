@@ -499,7 +499,7 @@
 
 	<!-- General keys used by the EPerson aspect -->
 	<message key="xmlui.EPerson.trail_new_registration">New user registration</message>
-	<message key="xmlui.EPerson.trail_forgot_password">Forgot Password</message>
+	<message key="xmlui.EPerson.trail_forgot_password">Forgot password</message>
 
 	<!-- org.dspace.app.xmlui.eperson.CannotRegister.java -->
 	<message key="xmlui.EPerson.CannotRegister.title">Registration unavailable</message>
@@ -509,24 +509,24 @@
 		comments.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.EditProfile.java -->
-	<message key="xmlui.EPerson.EditProfile.title_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.title_create">Create Profile</message>
-	<message key="xmlui.EPerson.EditProfile.trail_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_update">Update Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_create">Create Profile</message>
-	<message key="xmlui.EPerson.EditProfile.head_identify">Profile Description</message>
+	<message key="xmlui.EPerson.EditProfile.title_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.title_create">Create profile</message>
+	<message key="xmlui.EPerson.EditProfile.trail_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_update">Update profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_create">Create profile</message>
+	<message key="xmlui.EPerson.EditProfile.head_identify">Profile description</message>
 	<message key="xmlui.EPerson.EditProfile.head_security">Password</message>
-	<message key="xmlui.EPerson.EditProfile.email_address">Email Address</message>
-	<message key="xmlui.EPerson.EditProfile.first_name">First Name</message>
-	<message key="xmlui.EPerson.EditProfile.last_name">Last Name</message>
-	<message key="xmlui.EPerson.EditProfile.telephone">Contact Telephone</message>
+	<message key="xmlui.EPerson.EditProfile.email_address">Email address</message>
+	<message key="xmlui.EPerson.EditProfile.first_name">First name</message>
+	<message key="xmlui.EPerson.EditProfile.last_name">Last name</message>
+	<message key="xmlui.EPerson.EditProfile.telephone">Contact telephone</message>
 	<message key="xmlui.EPerson.EditProfile.Language">Language</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions">Subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions_help">You may subscribe to collections to
 		receive daily e-mail alerts of new items added. You can subscribe to as many or as few
 		collections as you wish. Another alternative to daily e-mail alerts is to use the RSS feeds
 		available for all collections.</message>
-	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Email Subscriptions</message>
+	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Email subscriptions</message>
 	<message key="xmlui.EPerson.EditProfile.select_collection">( Select Collection )</message>
 	<message key="xmlui.EPerson.EditProfile.update_password_instructions">Optionally, you can enter a
 		new password in the box below, and confirm it by typing it again into the second box. It should
@@ -540,8 +540,8 @@
     <message key="xmlui.EPerson.EditProfile.terms_help">To use Dryad's data publishing services, you must agree to the <a target="_blank" href="/themes/Mirage/docs/TermsOfService-Letter-2013.08.22.pdf">Terms of Service</a>.</message>
     <message key="xmlui.EPerson.EditProfile.terms.checkbox">I agree to Dryad's Terms of Service.</message>
 
-    <message key="xmlui.EPerson.EditProfile.submit_update">Complete Registration</message>
-	<message key="xmlui.EPerson.EditProfile.submit_create">Update Profile</message>
+    <message key="xmlui.EPerson.EditProfile.submit_update">Complete tegistration</message>
+	<message key="xmlui.EPerson.EditProfile.submit_create">Update profile</message>
 	<message key="xmlui.EPerson.EditProfile.error_required">This field is required</message>
 	<message key="xmlui.EPerson.EditProfile.error_invalid_password">Choose a password at least 6
 		characters long</message>
@@ -552,11 +552,11 @@
 	<message key="xmlui.EPerson.EditProfile.head_security"><legend class="ds-head">Security</legend></message>
 
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
-	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify Email</message>
-	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Create Profile</message>
+	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify email</message>
+	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Create profile</message>
 	<message key="xmlui.EPerson.EPersonUtils.register_finished">Finished</message>
-	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Verify Email</message>
-	<message key="xmlui.EPerson.EPersonUtils.forgot_reset_password">Reset Password</message>
+	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Verify email</message>
+	<message key="xmlui.EPerson.EPersonUtils.forgot_reset_password">Reset password</message>
 	<message key="xmlui.EPerson.EPersonUtils.forgot_finished">Finished</message>
 
 	<!-- org.dspace.app.xmlui.eperson.ForgotPasswordFinished.java -->
@@ -577,17 +577,17 @@
 	<!-- org.dspace.app.xmlui.eperson.Navigation.java -->
 	<message key="xmlui.EPerson.Navigation.my_account">My Account</message>
 	<message key="xmlui.EPerson.Navigation.profile">Profile</message>
-	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
-	<message key="xmlui.EPerson.Navigation.login">Login or Register</message>
+	<message key="xmlui.EPerson.Navigation.logout">Log out</message>
+	<message key="xmlui.EPerson.Navigation.login">Log in or register</message>
 	<message key="xmlui.EPerson.Navigation.register">Register</message>
-    <message key="xmlui.EPerson.Navigation.paymentsystem">Payment System</message>
+    <message key="xmlui.EPerson.Navigation.paymentsystem">Payment system</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to login</message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to log in</message>
 	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
-	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-Mail Address: </nobr></message>
+	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>Email address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password: </message>
@@ -598,23 +598,23 @@
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Login</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Create a Dryad account.</message>
-	<message key="xmlui.EPerson.RegLogin.head">Login is required for data submission, but not for data use.</message>
+	<message key="xmlui.EPerson.RegLogin.head">You must have a Dryad account to submit data.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LDAPLogin.java -->
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.trail">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.head1">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
-	<message key="xmlui.EPerson.LDAPLogin.username">User Name</message>
-	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were
+	<message key="xmlui.EPerson.LDAPLogin.username">Username</message>
+	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The username and/or password supplied were
 		not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
 	<message key="xmlui.EPerson.LDAPLogin.submit">Sign in</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LoginChooser.java -->
-	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
-	<message key="xmlui.EPerson.LoginChooser.trail">Choose Login</message>
-	<message key="xmlui.EPerson.LoginChooser.head1">Choose a Login Method</message>
+	<message key="xmlui.EPerson.LoginChooser.title">Choose a login method</message>
+	<message key="xmlui.EPerson.LoginChooser.trail">Choose login</message>
+	<message key="xmlui.EPerson.LoginChooser.head1">Choose a login method</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth
 		Authentication</message>
@@ -633,15 +633,15 @@
 		arguments received.</message>
 	<message key="xmlui.EPerson.FailedAuthentication.NoSuchUser">A user was not found with the
 		credentials provided.</message>
-	<message key="xmlui.EPerson.FailedAuthentication.title">Authentication Failed</message>
-	<message key="xmlui.EPerson.FailedAuthentication.trail">Failed Authentication</message>
-	<message key="xmlui.EPerson.FailedAuthentication.h1">Authentication Failed</message>
+	<message key="xmlui.EPerson.FailedAuthentication.title">Authentication failed</message>
+	<message key="xmlui.EPerson.FailedAuthentication.trail">Failed authentication</message>
+	<message key="xmlui.EPerson.FailedAuthentication.h1">Authentication failed</message>
 
 	<!-- Login xml files -->
-	<message key="xmlui.eperson.noAuthMethod.head">No Authentication Method Found</message>
+	<message key="xmlui.eperson.noAuthMethod.head">No authentication method found</message>
 	<message key="xmlui.eperson.noAuthMethod.p1">No authentication method was found. Please contact
 		the site administrator.</message>
-	<message key="xmlui.eperson.shibbLoginFailure.head">Shibboleth Login Failed</message>
+	<message key="xmlui.eperson.shibbLoginFailure.head">Shibboleth login failed</message>
 	<message key="xmlui.eperson.shibbLoginFailure.p1">Shibboleth authentication not available at this
 		time. Please contact the site administrator.</message>
 
@@ -654,7 +654,7 @@
 
 	<!-- org.dspace.app.xmlui.eperson.RegistrationFinished.java -->
 	<message key="xmlui.EPerson.RegistrationFinished.title">Registration finished</message>
-	<message key="xmlui.EPerson.RegistrationFinished.head">Registration Finished</message>
+	<message key="xmlui.EPerson.RegistrationFinished.head">Registration finished</message>
 	<message key="xmlui.EPerson.RegistrationFinished.para1">You're now registered to use Dryad. You
 		can submit new data and subscribe to receive email updates about new items.</message>
 
@@ -664,9 +664,9 @@
 	<message key="xmlui.EPerson.ResetPassword.para1">Please enter a new password into the box below,
 		and confirm it by typing it again into the second box. It should be at least six characters
 		long.</message>
-	<message key="xmlui.EPerson.ResetPassword.email_address">Email Address</message>
+	<message key="xmlui.EPerson.ResetPassword.email_address">Email address</message>
 	<message key="xmlui.EPerson.ResetPassword.new_password">New password</message>
-	<message key="xmlui.EPerson.ResetPassword.confirm_password">Retype to Confirm</message>
+	<message key="xmlui.EPerson.ResetPassword.confirm_password">Retype to confirm</message>
 	<message key="xmlui.EPerson.ResetPassword.submit">Reset password</message>
 	<message key="xmlui.EPerson.ResetPassword.error_invalid_password">Choose a password at least 6
 		characters long</message>
@@ -674,12 +674,12 @@
 		to confirm</message>
 
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
-	<message key="xmlui.EPerson.StartForgotPassword.title">Forgot Password</message>
-	<message key="xmlui.EPerson.StartForgotPassword.head">Forgot Password</message>
+	<message key="xmlui.EPerson.StartForgotPassword.title">Forgot password</message>
+	<message key="xmlui.EPerson.StartForgotPassword.head">Forgot password</message>
 	<message key="xmlui.EPerson.StartForgotPassword.para1">Enter the email address you provided when
 		you registered with Dryad. An email will be sent to that address with further
 		instructions.</message>
-	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email Address</message>
+	<message key="xmlui.EPerson.StartForgotPassword.email_address">Email address</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Enter the same address used when registering.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">Email address not
 		found.</message>
@@ -696,7 +696,7 @@
 	<message key="xmlui.EPerson.StartRegistration.head2">New user registration</message>
 	<message key="xmlui.EPerson.StartRegistration.para2">Register an account to subscribe to
 		collections for email updates, and submit new items to Dryad.</message>
-	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
+	<message key="xmlui.EPerson.StartRegistration.email_address">Email address</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified	and used as your login name.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
