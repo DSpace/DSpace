@@ -18,6 +18,7 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.Xref;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.authority.Concept;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
@@ -343,7 +344,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
                 }
                 //update the journal and journal subscribtion
-                updateJournal(shoppingcart,journal);
+                updateJournal(context,shoppingcart,journal);
 
             }
         return shoppingcart.getJournalSub();
@@ -370,8 +371,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
         if(journal!=null)
         {
             try{
-                DryadJournalSubmissionUtils util = new DryadJournalSubmissionUtils();
-                Map<String, String> properties = util.journalProperties.get(journal);
+
+                Map<String, String> properties = DryadJournalSubmissionUtils.findJournalProperties(context,journal);
                 if(properties!=null){
                 String subscription = properties.get("integrated");
                 if(subscription==null || !subscription.equals(ShoppingCart.FREE))
@@ -471,12 +472,12 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return payerName;
     }
 
-    private void updateJournal(ShoppingCart shoppingCart,String journal){
+    private void updateJournal(Context c,ShoppingCart shoppingCart,String journal){
         if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
         {
             if(journal!=null&&journal.length()>0) {
                 //update shoppingcart journal
-                Map<String, String> properties = DryadJournalSubmissionUtils.journalProperties.get(journal);
+                Map<String, String> properties = DryadJournalSubmissionUtils.findJournalProperties(c,journal);
                 Boolean subscription = false;
                 if(properties!=null){
                     if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))

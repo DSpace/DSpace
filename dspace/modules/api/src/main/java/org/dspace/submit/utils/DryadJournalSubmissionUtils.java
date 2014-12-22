@@ -59,8 +59,13 @@ public class DryadJournalSubmissionUtils {
                 ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
                 Map<String, String> map = new HashMap<String, String>();
                 for(AuthorityMetadataValue metadataValue : metadataValues){
-
-                    map.put(metadataValue.qualifier,metadataValue.value);
+                    if(metadataValue.qualifier==null){
+                        map.put(metadataValue.element,metadataValue.value);
+                    }
+                    else
+                    {
+                        map.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
+                    }
                     if(key!=null&&key.length()>0){
                         journalProperties.put(key, map);
                     }
@@ -74,6 +79,38 @@ public class DryadJournalSubmissionUtils {
             }
             log.error("Error while loading journal properties", e);
         }
+    }
+
+    public static Map<String, String> findJournalProperties(Context c, String journal){
+        Map<String, String> journalProperties = new HashMap<String, String>();
+
+
+            try {
+                Scheme scheme = Scheme.findByIdentifier(c, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
+                Concept[] concepts = Concept.findByPreferredLabel(c,journal,scheme.getID());
+                //todo:add the journal order
+                Concept concept = concepts[0];
+
+                    String key = concept.getPreferredLabel();
+                    ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
+                    Map<String, String> map = new HashMap<String, String>();
+                    for(AuthorityMetadataValue metadataValue : metadataValues){
+
+                        if(metadataValue.qualifier!=null){
+                            journalProperties.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
+                        }
+                        else
+                        {
+                            journalProperties.put(metadataValue.element,metadataValue.value);
+                        }
+
+                    }
+
+            }catch (Exception e) {
+                log.error("Error while loading journal properties", e);
+            }
+        return journalProperties;
+
     }
 
     public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
