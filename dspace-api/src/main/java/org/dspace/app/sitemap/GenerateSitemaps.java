@@ -85,9 +85,10 @@ public class GenerateSitemaps
 
             line = parser.parse(options, args);
 
-            if (line.hasOption('h'))
-                return;  /* print help and exit in finally block
-
+            if (line.hasOption('h')) {
+                hf.printHelp(usage, options);
+                return;  /* print help and exit in finally block */
+            }
             /*
              * Sanity check -- if no sitemap generation or pinging to do, print
              * error message - print help and exit in finally block
@@ -182,7 +183,6 @@ public class GenerateSitemaps
                 System.exit(1);
             } else
             {
-                hf.printHelp(usage, options);
                 System.exit(0);
             }
         }
