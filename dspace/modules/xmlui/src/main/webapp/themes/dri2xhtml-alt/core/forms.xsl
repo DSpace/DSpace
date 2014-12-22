@@ -205,6 +205,9 @@
                     <xsl:if test="string-length($help)>0">
                         <xsl:variable name="n" select="string(./dri:field/@n)"/>
                         <xsl:choose>
+                            <!-- skip the first help on the forgot-email page -->
+                            <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
+                            <!-- put all help text in the hover-over field for these items -->
                             <xsl:when test="$n = 'dc_subject'
                                          or $n = 'dwc_ScientificName'
                                          or $n = 'dc_coverage_spatial'
@@ -1265,12 +1268,17 @@
     </xsl:template>
 
     <xsl:template match="dri:help" mode="help">
-        <!--Only create the <span> if there is content in the <dri:help> node-->
-        <xsl:if test="./text() or ./node()">
-            <span class="field-help">
-                <xsl:apply-templates />
-            </span>
-        </xsl:if>
+        <xsl:choose>
+            <!-- don't output the help text in this mode for the forgot-email page -->
+            <xsl:when test="(string(parent::dri:field/@id)='aspect.eperson.StartForgotPassword.field.email')"/>
+            
+            <!--Only create the <span> if there is content in the <dri:help> node-->
+            <xsl:when test="./text() or ./node()">
+                <span class="field-help">
+                    <xsl:apply-templates />
+                </span>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template name="addPropagateButton">
