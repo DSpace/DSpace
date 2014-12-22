@@ -45,7 +45,7 @@ public class AuthorityValueGenerator {
                 // An existing metadata without authority is being indexed
                 // If there is an exact match in the index, reuse it before adding a new one.
                 AuthorityValueFinder authorityValueFinder = new AuthorityValueFinder();
-                List<AuthorityValue> byValue = authorityValueFinder.findByValue(context, field, content);
+                List<AuthorityValue> byValue = authorityValueFinder.findByExactValue(context, field, content);
                 if (byValue != null && !byValue.isEmpty()) {
                     authorityKey = byValue.get(0).getId();
                 } else {
