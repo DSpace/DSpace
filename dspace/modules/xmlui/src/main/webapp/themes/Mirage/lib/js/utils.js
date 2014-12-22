@@ -254,10 +254,10 @@ function initFirstSubmissionForm() {
 
                 for (var i=0; i<journal_integrated_length; i++)
                 {
-                    var integrated = document.getElementById('aspect_submission_StepTransformer_field_journalIDStatusIntegrated').options[i].value;
+                    var integratedValue = document.getElementById('aspect_submission_StepTransformer_field_journalIDStatusIntegrated').options[i].value;
                     //alert(integrated);
 
-                    if(integrated == journal)
+                    if(integratedValue == journal)
                     {
                         //alert('found');
                         integrated = true;
