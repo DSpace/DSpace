@@ -795,7 +795,7 @@
 	<message key="xmlui.Submission.Submissions.submit_head3">Authoring:</message>
 	<message key="xmlui.Submission.Submissions.submit_info3">No submissions left unfinished.</message>
 	<message key="xmlui.Submission.Submissions.submit_head4">Supervising:</message>
-	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected submissions</message>
+	<message key="xmlui.Submission.Submissions.submit_submit_remove">Delete selected submissions</message>
 	<!-- Same transformer, inprogress section -->
 	<message key="xmlui.Submission.Submissions.progress_head1">Submissions being reviewed</message>
 	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed submissions
