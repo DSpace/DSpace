@@ -448,4 +448,12 @@
         </step>
     </command>
 
+    <command>
+        <name>validate-date</name>
+        <description>interactively validate date values against the multi-format date parser (good for testing custom regular expression configurations)</description>
+        <step>
+            <class>org.dspace.util.MultiFormatDateParser</class>
+        </step>
+    </command>
+
 </commands>
