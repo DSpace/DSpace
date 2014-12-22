@@ -1383,7 +1383,7 @@ public abstract class DSpaceObject
                 return new String[]{null, null, null};
         }
     }
-    
+
     /**
      * expects a two part string as parameter:
      *   * TYPE.ID, where TYPE is a DSpaceObject type and ID is the object id
@@ -1434,4 +1434,11 @@ public abstract class DSpaceObject
                     }
                     case Constants.GROUP:
                         return Group.findByName(c, right);
+                    default:
+                        return null;
+                }
+            }
+        }
+    }
+
 }
