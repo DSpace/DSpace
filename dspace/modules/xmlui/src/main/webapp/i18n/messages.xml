@@ -3109,7 +3109,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.DryadItemSummary.spatialCov">Spatial Coverage</message>
 	<message key="xmlui.DryadItemSummary.temporalCov">Temporal Coverage</message>
 	<message key="xmlui.DryadItemSummary.keywords">Keywords</message>
-	<message key="xmlui.DryadItemSummary.depDate">Date Submitted</message>
+	<message key="xmlui.DryadItemSummary.depDate">Date Published</message>
 	<message key="xmlui.DryadItemSummary.unknown">unknown</message>
 	<message key="xmlui.DryadItemSummary.downloads">Downloaded</message>
 	<message key="xmlui.DryadItemSummary.views">Pageviews</message>
