@@ -25,8 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * DSpaceAuthorityIndexer is used in IndexClient, which is called by the AuthorityConsumer and the indexing-script.
@@ -57,6 +56,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     private List<String> metadataFields;
     private int currentFieldIndex;
     private int currentMetadataIndex;
+    private boolean useCache;
+    private Map<String, AuthorityValue> cache;
     private AuthorityValue nextValue;
     private Context context;
     private AuthorityValueFinder authorityValueFinder;
@@ -89,6 +90,10 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     }
 
     public void init(Context context) {
+        init(context, false);
+    }
+
+    public void init(Context context, boolean useCache) {
         try {
             this.itemIterator = Item.findAll(context);
             currentItem = this.itemIterator.next();
@@ -96,6 +101,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             log.error("Error while retrieving all items in the metadata indexer");
         }
         initialize(context);
+        this.useCache = useCache;
     }
 
     private void initialize(Context context) {
@@ -104,6 +110,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
 
         currentFieldIndex = 0;
         currentMetadataIndex = 0;
+        useCache = false;
+        cache = new HashMap<>();
     }
 
     public AuthorityValue nextValue() {
@@ -181,6 +189,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly necessary here but it prevents exceptions in solr
             nextValue = authorityValueFinder.findByUID(context, authorityKey);
         }
+        if (nextValue == null && StringUtils.isBlank(authorityKey) && useCache) {
+            // A metadata without authority is being indexed
+            // If there is an exact match in the cache, reuse it rather than adding a new one.
+            AuthorityValue cachedAuthorityValue = cache.get(content);
+            if (cachedAuthorityValue != null) {
+                nextValue = cachedAuthorityValue;
+            }
+        }
         if (nextValue == null) {
             nextValue = AuthorityValueGenerator.generate(context, authorityKey, content, metadataField.replaceAll("\\.", "_"));
         }
@@ -192,11 +208,15 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 log.error("Error creating a metadatavalue's authority", e);
             }
         }
+        if (useCache) {
+            cache.put(content, nextValue);
+        }
     }
 
     public void close() {
         itemIterator.close();
         itemIterator = null;
+        cache.clear();
     }
 
     public boolean isConfiguredProperly() {
