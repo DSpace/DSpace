@@ -52,10 +52,6 @@ public class GenerateSitemaps
     /** Logger */
     private static Logger log = Logger.getLogger(GenerateSitemaps.class);
 
-    private static final int COMM = 1;
-    private static final int COLL = 2;
-    private static final int ITEM = 3;
-
     public static void main(String[] args) throws Exception
     {
         final String usage = GenerateSitemaps.class.getCanonicalName();
@@ -125,7 +121,7 @@ public class GenerateSitemaps
                     DSpaceObject obj = DSpaceObject.fromString(c, id);
                     if (obj != null)
                     {
-                        System.out.println("Will exclude " + obj.toString() + " " + obj.getHandle());
+                        System.out.println("Will exclude\t" + obj.toString() + "\t"  + obj.getHandle() + "\t" + obj.getName());
                         switch (obj.getType())
                         {
                             case Constants.COMMUNITY:
@@ -273,7 +269,8 @@ public class GenerateSitemaps
                 excludeReason = "On Collection Exclude List";
             } else if (excludeList[Constants.COMMUNITY].contains(colls[i].getParentObject()))
             {
-                excludeReason = "In Excluded " + Constants.typeText[colls[i].getParentObject().getType()] + " " + colls[i].getParentObject().getHandle();
+                excludeReason = "In Excluded " + Constants.typeText[colls[i].getParentObject().getType()] +
+                        " " + colls[i].getParentObject().getHandle();
             }
             if (excludeReason != null)
             {
