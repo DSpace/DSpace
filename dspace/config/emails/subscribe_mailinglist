@@ -5,3 +5,5 @@
 # See org.dspace.core.Email for information on the format of this file.
 #
 Subject: subscribe address={0}
+
+Please subscribe {0} to the dryad-announce mailing list. Thanks!
