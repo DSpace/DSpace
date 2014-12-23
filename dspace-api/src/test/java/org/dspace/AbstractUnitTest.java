@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -109,8 +110,11 @@ public class AbstractUnitTest
             // calls DatabaseUtils to initialize the entire DB via Flyway)
             new MockDatabaseManager();
             
-            // Initialize a mock indexer (which does nothing, since Solr isn't running)
+            // Initialize mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
+            
+            // Initialize mock Util class
+            new MockUtil();
         } 
         catch (IOException ex)
         {
