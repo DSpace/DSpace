@@ -136,6 +136,31 @@ public class DryadDataPackage extends DryadObject {
         return dataPackage;
     }
 
+    /**
+     * Creates a DryadDataPackage object in the workspace. Written for testing
+     * automatic workflow processors like approving from blackout
+     * @param context database context to use
+     * @return a DryadDataPackage with corresponding row in the workspaceitem table
+     * @throws SQLException
+     */
+    public static DryadDataPackage createInWorkspace(Context context) throws SQLException {
+        Collection collection = DryadDataPackage.getCollection(context);
+        DryadDataPackage dataPackage = null;
+        try {
+            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            Item item = wsi.getItem();
+            dataPackage = new DryadDataPackage(item);
+            dataPackage.createIdentifier(context);
+        } catch (IdentifierException ex) {
+            log.error("Identifier exception creating a Data Package", ex);
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception creating a Data Package", ex);
+        } catch (IOException ex) {
+            log.error("IO exception creating a Data Package", ex);
+        }
+        return dataPackage;
+    }
+
     public WorkflowItem getWorkflowItem(Context context) throws SQLException {
         try {
             return WorkflowItem.findByItemId(context, getItem().getID());
@@ -147,6 +172,9 @@ public class DryadDataPackage extends DryadObject {
         return null;
     }
 
+    public WorkspaceItem getWorkspaceItem(Context context) throws SQLException {
+        return WorkspaceItem.findByItemId(context, getItem().getID());
+    }
     /**
      * Find any data packages containing the file by identifier. Used to prevent
      * files from appearing in multiple packages

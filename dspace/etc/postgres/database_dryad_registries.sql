@@ -1,4 +1,4 @@
--- Database data for Dryad metadata and bitstream registries as of 2014-06-13
+-- Database data for Dryad metadata and bitstream registries as of 2014-12-02
 -- Captured statically for use in a test database, should not be used in production deployments
 -- instead, load metadata schemas using MetadataImporter and install bitstream registries
 -- using ant fresh_install
@@ -13,11 +13,12 @@
 --
 
 INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (1, 'http://dublincore.org/documents/dcmi-terms/', 'dc');
-INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (2, 'http://rs.tdwg.org/dwc/dwcore/', 'dwc');
-INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (3, 'http://purl.org/dryad/terms/', 'dryad');
-INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (4, 'http://www.dspace.org/workflow', 'workflow');
-INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (5, 'http://www.dspace.org/system', 'internal');
-INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (6, 'http://prismstandard.org/namespaces/basic/2.0/', 'prism');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (4, 'http://purl.org/dryad/terms/', 'dryad');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (5, 'http://prismstandard.org/namespaces/basic/2.0/', 'prism');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (6, 'http://www.dspace.org/workflow', 'workflow');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (7, 'http://www.dspace.org/system', 'internal');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (3, 'http://rs.tdwg.org/dwc/dwcore/', 'dwc');
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (8, 'http://purl.org/dspace/models/person', 'person');
 
 --
 -- Data for Name: metadatafieldregistry
@@ -98,37 +99,60 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (65, 1, 'title', 'alternative', 'Varying (or substitute) form of title proper appearing in item,
     e.g. abbreviation or translation');
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (66, 1, 'type', NULL, 'Nature or genre of content.');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (67, 1, 'date', 'embargoedUntil', 'Embargo');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (68, 1, 'contributor', 'correspondingAuthor', 'Primary Contact');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (69, 2, 'ScientificName', NULL, 'Taxonomic names');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (70, 1, 'workflow', 'submitted', 'Boolean used in the submission process only.');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (71, 1, 'workflow', 'selectjournal', 'Boolean used in the submission process only.');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (72, 1, 'type', 'embargo', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (73, 1, 'submit', 'showEmbargo', 'Boolean used in the submission process only.');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (74, 1, 'identifier', 'manuscriptNumber', 'Manuscript number');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (75, 1, 'identifier', 'externalresourceXml', 'External source xml value');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (76, 1, 'date', 'updated', 'The last time the item was updated via the SWORD interface');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (77, 1, 'description', 'version', 'The Peer Reviewed status of an item');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (78, 1, 'identifier', 'slug', 'a uri supplied via the sword slug header, as a suggested uri for the item');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (79, 1, 'language', 'rfc3066', 'the rfc3066 form of the language for the item');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (80, 1, 'rights', 'holder', 'The owner of the copyright');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (81, 3, 'externalIdentifier', NULL, NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (82, 3, 'status', NULL, NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (83, 3, 'citationTitle', NULL, NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (84, 4, 'step', 'inProgressUsers', 'Contains the userIds of the users who are performing a step');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (85, 4, 'step', 'finishedUsers', 'Contains the userIds of the users who are performed a step');
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (86, 4, 'step', 'reviewerKey', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (87, 4, 'step', 'approved', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (88, 4, 'step', 'rejectDate', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (89, 4, 'submit', 'toworkflow', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (90, 4, 'submit', 'skipReviewStage', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (91, 4, 'archive', 'mailUsers', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (92, 4, 'review', 'mailUsers', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (93, 4, 'genbank', 'token', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (94, 5, 'workflow', 'submitted', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (95, 5, 'workflow', 'selectjournal', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (96, 5, 'submit', 'showEmbargo', NULL);
-INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (97, 6, 'publicationName', NULL, 'Title of the magazine, or other publication, in which a resource was/will be published.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (67, 3, 'ScientificName', NULL, 'http://wiki.tdwg.org/twiki/bin/view/DarwinCore/ScientificName');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (68, 1, 'date', 'updated', 'The last time the item was updated via the SWORD interface');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (69, 1, 'description', 'version', 'The Peer Reviewed status of an item');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (70, 1, 'identifier', 'slug', 'a uri supplied via the sword slug header, as a suggested uri for the item');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (71, 1, 'language', 'rfc3066', 'the rfc3066 form of the language for the item');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (72, 1, 'rights', 'holder', 'The owner of the copyright');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (73, 1, 'date', 'embargoedUntil', 'Until this date, the item is under embargo and not visible to normal users.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (74, 1, 'contributor', 'correspondingAuthor', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (75, 4, 'status', NULL, '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (76, 1, 'identifier', 'manuscriptNumber', 'A number used for internal tracking by the publisher before the item''s publication has been finalized.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (77, 5, 'publicationName', NULL, 'Title of the magazine, or other publication, in which a resource was/will be published.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (82, 1, 'coverage', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (83, 1, 'submit', 'showEmbargo', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (79, 1, 'workflow', 'submitted', 'This field is used internally by the submission system.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (80, 1, 'type', 'embargo', 'This field is used internally to manage embargoes.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (78, 1, 'relation', 'external', 'Link to related content in an external repository. (deprecated, use dryad.external instead)');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (81, 4, 'external', NULL, 'Link to related content in an external repository. This is typically stored as an XML chunk containing the URL or other identifier as well as the repository name.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (84, 4, 'externalIdentifier', NULL, '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (85, 6, 'archive', 'mailUsers', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (86, 6, 'step', 'approved', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (87, 6, 'step', 'finishedUsers', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (88, 6, 'step', 'inProgressUsers', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (89, 6, 'step', 'rejectDate', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (90, 6, 'step', 'reviewerKey', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (91, 6, 'submit', 'skipReviewStage', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (92, 6, 'submit', 'toworkflow', '');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (93, 4, 'curatorNote', NULL, ' Free text note about the status of the item. Although this can only be edited by a curator, it is publicly visible.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (94, 7, 'workflow', 'submitted', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (95, 7, 'workflow', 'selectjournal', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (96, 7, 'submit', 'showEmbargo', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (97, 6, 'review', 'mailUsers', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (98, 1, 'audience', 'educationLevel', 'to describe educational modules in DryadLab');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (99, 4, 'learningOutcome', NULL, 'Used to store learning outcomes for DryadLab modules unless or until an externally defined field is selected for this purpose.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (100, 4, 'prerequisiteKnowledge', NULL, 'For DryadLab use only.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (101, 4, 'instructorBackground', NULL, 'For DryadLab use only.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (102, 4, 'descriptionOfActivity', NULL, 'For DryadLab use only.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (103, 4, 'citationTitle', NULL, 'A title to be used in citations, for cases where the main title refers to a subsection of the whole document.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (104, 1, 'workflow', 'selectjournal', 'Boolean used in the submission process only.');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (105, 1, 'identifier', 'externalresourceXml', 'External source xml value');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (106, 6, 'genbank', 'token', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (107, 8, 'orcid', 'id', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (108, 8, 'familyName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (109, 8, 'givenName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (110, 8, 'creditName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (111, 8, 'otherName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (112, 8, 'country', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (113, 8, 'keyword', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (114, 8, 'external', 'identifier', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (115, 8, 'researcher', 'url', NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (116, 8, 'biography', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (117, 8, 'email', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (118, 8, 'institution', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (119, 1, 'date', 'blackoutUntil', 'Date on which submission should be released from blackout');
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (120, 4, 'curatorNotePublic', NULL, NULL);
 
 --
 -- Data for Name: bitstreamformatregistry
@@ -137,13 +161,15 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (1, 'application/octet-stream', 'Unknown', 'Unknown data format', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (2, 'text/plain', 'License', 'Item-specific license agreed upon to submission', 1, true);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (5, 'text/plain', 'Text', 'Plain Text', 1, false);
-INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (57, 'application/gnutar', 'TGZ', 'UNIX Tar File Gzipped (TGZ)', 0, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (61, 'application/x-bzip2', 'Bzip2', 'Bzip2 archive', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (21, 'application/vnd.visio', 'Microsoft Visio', 'Microsoft Visio', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (22, 'application/x-filemaker', 'FMP3', 'Filemaker Pro', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (23, 'image/x-ms-bmp', 'BMP', 'Microsoft Windows bitmap', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (24, 'application/x-photoshop', 'Photoshop', 'Photoshop', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (47, 'audio/mpeg', 'MP3', 'MP3 audio', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (27, 'audio/x-mpeg', 'MPEG Audio', 'MPEG Audio', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (28, 'application/vnd.ms-project', 'Microsoft Project', 'Microsoft Project', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (55, 'application/x-tar', 'TAR archive', 'Tape Archive File (TAR)', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (31, 'application/x-tex', 'TeX', 'Tex/LateX document', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (32, 'application/x-dvi', 'TeX dvi', 'TeX dvi format', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (34, 'application/wordperfect5.1', 'WordPerfect', 'WordPerfect 5.1 document', 1, false);
@@ -182,15 +208,17 @@ INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_descri
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (30, 'application/x-latex', 'LaTeX', 'LaTeX document', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (39, 'text/csv', 'Comma-separated values', 'Comma-separated values (CSV)', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (43, 'application/zip', 'Zip', 'Zip archive', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (57, 'application/x-tar', 'TGZ', 'UNIX Tar File Gzipped (TGZ)', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (45, 'application/rdf+xml', 'OWL', 'Web Ontology Language (OWL)', 1, false);
-INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (47, 'audio/mpeg3', 'MP3', 'MP3 audio', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (48, 'application/x-gzip', 'GNU ZIP', 'GZip archive', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (49, 'text/plain', 'R script', 'R script', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (52, 'video/avi', 'AVI video', 'Audio Video Interleave (AVI)', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (53, 'video/mp4', 'MPEG-4', 'MPEG-4 video', 1, false);
-INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (55, 'application/tar', 'TAR archive', 'Tape Archive File (TAR)', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (58, 'text/plain', 'Phylip', 'Phylogeny Inference Package (Phylip)', 1, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (59, 'application/x-rar-compressed', 'RAR', 'Roshal ARchive (RAR)', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (60, 'application/vnd.ms-excel.sheet.binary.macroEnabled.12', 'Microsoft Excel Binary XML', 'Microsoft Excel Binary XML', 1, false);
-INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (61, 'application/bzip2', 'Bzip2', 'Bzip2 archive', 0, false);
 INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (44, 'application/x-fasta', 'FASTA', 'FASTA sequence file', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (62, 'application/vnd.oasis.opendocument.text', 'ODF Text', 'Open Document Format Text File', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (63, 'application/vnd.oasis.opendocument.spreadsheet', 'ODF Spreadsheet', 'Open Document Format Spreadsheet', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (64, 'application/vnd.oasis.opendocument.presentation', 'ODF Presentation', 'Open Document Format Presentation', 1, false);
+INSERT INTO bitstreamformatregistry (bitstream_format_id, mimetype, short_description, description, support_level, internal) VALUES (65, 'application/vnd.oasis.opendocument.database', 'ODF Database', 'Open Document Format Database', 1, false);
