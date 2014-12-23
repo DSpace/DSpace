@@ -304,7 +304,7 @@ public class GenerateSitemaps
                         if (excludeList[Constants.ITEM].contains(itm))
                         {
                             excludeReason = "On Item Exclude List";
-                        } else if (!AuthorizeManager.authorizeActionBoolean(c, itm, org.dspace.core.Constants.READ))
+                        } else if (!AuthorizeManager.authorizeActionBoolean(c, itm, Constants.READ))
                         {
                             excludeReason = "Not Readable by Anonymous";
                         } else if (!doItemsWithoutBiistreams && !hasReadableBitstream(c, itm))
@@ -316,7 +316,7 @@ public class GenerateSitemaps
                             log.info("Excluding Item\t" + itm.getHandle() +
                                     "\tin\t" + itm.getOwningCollection().getHandle() +
                                     "\t" + excludeReason +
-                                    "\t" + itm.getName());
+                                    "\t" + itm.getName().replaceAll("\\s+", " ").trim());
                         } else
                         {
                             url = handleURLStem + itm.getHandle();
