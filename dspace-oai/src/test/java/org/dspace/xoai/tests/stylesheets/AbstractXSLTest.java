@@ -1,13 +1,22 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.xoai.tests.stylesheets;
 
 import org.apache.commons.io.IOUtils;
-import org.dspace.xoai.tests.support.XmlMatcherBuilder;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
 
 public abstract class AbstractXSLTest {
     private static final TransformerFactory factory = TransformerFactory.newInstance();
