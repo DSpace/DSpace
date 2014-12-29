@@ -37,8 +37,9 @@
 # ########## STATS ######################
 0 1 * * * /var/dspace/bin/dspace stat-general
 0 1 * * * /var/dspace/bin/dspace stat-monthly
-0 2 * * * /var/dspace/bin/dspace stat-report-general
-0 2 * * * /var/dspace/bin/dspace stat-report-monthly
+# Los reportes son innecesarios para XMLUI
+#0 2 * * * /var/dspace/bin/dspace stat-report-general
+#0 2 * * * /var/dspace/bin/dspace stat-report-monthly
 
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am
