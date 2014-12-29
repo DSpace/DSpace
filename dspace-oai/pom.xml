@@ -220,6 +220,7 @@
             <groupId>org.xmlmatchers</groupId>
             <artifactId>xml-matchers</artifactId>
             <version>0.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
