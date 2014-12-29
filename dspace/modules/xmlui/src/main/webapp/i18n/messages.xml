@@ -3004,10 +3004,10 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	</message>
     <message key="xmlui.Submission.submit.OverviewStep.help">
         <div>                                                                                                                                                
-            From this page, you can edit the description of your publication, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
+            From this page, you can edit the description of your data package, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your data package</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional)</message>
 	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission</message>
@@ -3023,7 +3023,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
 	<br />A Dryad curator will review the submission to ensure the descriptions are complete, and that the files meet Dryad criteria for archiving and are not corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
     <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
