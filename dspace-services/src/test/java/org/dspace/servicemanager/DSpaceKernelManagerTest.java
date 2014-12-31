@@ -7,6 +7,7 @@
  */
 package org.dspace.servicemanager;
 
+import org.dspace.kernel.DSpaceKernelImpl;
 import static org.junit.Assert.*;
 
 import org.dspace.kernel.DSpaceKernel;
@@ -18,7 +19,7 @@ import org.junit.Test;
 
 /**
  * Testing the kernel manager
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelManagerTest {
@@ -28,7 +29,7 @@ public class DSpaceKernelManagerTest {
 
     @Before
     public void init() {
-        kernelImpl = DSpaceKernelInit.getKernel(null);
+        kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
         kernelImpl.start(); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
@@ -54,7 +55,7 @@ public class DSpaceKernelManagerTest {
         DSpaceKernel k2 = kernelManager.getKernel();
         assertNotNull(k2);
         assertEquals(kernel, k2);
-        
+
         kernel = k2 = null;
     }
 

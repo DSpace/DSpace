@@ -7,6 +7,7 @@
  */
 package org.dspace.servicemanager;
 
+import org.dspace.kernel.DSpaceKernelImpl;
 import static org.junit.Assert.*;
 
 import org.dspace.kernel.DSpaceKernel;
@@ -16,7 +17,7 @@ import org.junit.Test;
 
 /**
  * Make sure the DSpace static cover works
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceTest {
@@ -31,9 +32,9 @@ public class DSpaceTest {
             assertNotNull(e.getMessage());
         }
 
-        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
+        DSpaceKernelImpl kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
         kernelImpl.start(); // triggers the init
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
+        DSpaceKernel kernel = DSpaceKernelManager.getKernel();
         assertNotNull(kernel);
         assertEquals(kernel, kernelImpl);
 
@@ -79,7 +80,7 @@ public class DSpaceTest {
         dspace2 = null;
         o = null;
     }
-    
+
 /*********
     @Test
     public void testStaticCover() {

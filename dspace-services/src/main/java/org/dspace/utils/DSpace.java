@@ -18,16 +18,16 @@ import org.dspace.services.SessionService;
 
 /**
  * This is the DSpace helper services access object.
- * It allows access to all core DSpace services for those who cannot or 
+ * It allows access to all core DSpace services for those who cannot or
  * will not use the injection service to get services.
  * <p>
- * Note that this may not include every core service but should include 
+ * Note that this may not include every core service but should include
  * all the services that are useful to UI developers at least.
  * <p>
- * This should be initialized using the constructor and then can be used 
+ * This should be initialized using the constructor and then can be used
  * as long as the kernel is not shutdown.  Making multiple copies of
  * this is cheap and can be done without worry about the cost.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpace {
@@ -47,15 +47,15 @@ public final class DSpace {
     }
 
     /**
-     * Construct a DSpace helper object which uses the a specific named 
+     * Construct a DSpace helper object which uses the a specific named
      * instance of the kernel.
      *
      * @param kernelName the name of the kernel to use (null to use the default kernel)
      * @throws IllegalStateException if the kernel is not already running or no kernel exists with this name
      */
     public DSpace(String kernelName) {
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel(kernelName);
-        this.kernel = kernel;
+        DSpaceKernel aKernel = new DSpaceKernelManager().getKernel();
+        this.kernel = aKernel;
     }
 
     public ServiceManager getServiceManager() {
@@ -74,7 +74,7 @@ public final class DSpace {
     public EventService getEventService() {
         return getServiceManager().getServiceByName(EventService.class.getName(), EventService.class);
     }
-    
+
     public SessionService getSessionService() {
         return getServiceManager().getServiceByName(SessionService.class.getName(), SessionService.class);
     }
@@ -82,9 +82,9 @@ public final class DSpace {
     public RequestService getRequestService() {
         return getServiceManager().getServiceByName(RequestService.class.getName(), RequestService.class);
     }
-    
+
     public <T> T getSingletonService(Class<T> type) {
         return getServiceManager().getServiceByName(type.getName(), type);
     }
-    
+
 }
