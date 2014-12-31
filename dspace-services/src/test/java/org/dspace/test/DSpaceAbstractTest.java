@@ -9,13 +9,13 @@ package org.dspace.test;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.ServiceManager;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelImpl;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.services.RequestService;
 
 /**
  * This is an abstract class which makes it easier to test things that use the DSpace Kernel
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public abstract class DSpaceAbstractTest {
@@ -44,7 +44,7 @@ public abstract class DSpaceAbstractTest {
      * do not run this after each individual test
      */
     public static void _initializeKernel() {
-        kernelImpl = DSpaceKernelInit.getKernel(null);
+        kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
         kernelImpl.start(); // init the kernel
         kernel = kernelImpl.getManagedBean();
     }
@@ -72,7 +72,7 @@ public abstract class DSpaceAbstractTest {
     /**
      * Gets a service for testing, can be cast to the impl if desired,
      * only works if this is the only service of the given type
-     * 
+     *
      * @param <T>
      * @param type the type of the service desired
      * @return the service of the type requested

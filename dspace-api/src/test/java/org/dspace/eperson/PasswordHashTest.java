@@ -10,7 +10,8 @@ package org.dspace.eperson;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.DecoderException;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelImpl;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -29,7 +30,7 @@ public class PasswordHashTest
             throws Exception
     {
         // Make certain that a default DSpaceKernel is started.
-        DSpaceKernelInit.getKernel(null).start();
+        ((DSpaceKernelImpl)DSpaceKernelManager.getKernel()).start();
     }
 
     @AfterClass
@@ -37,12 +38,12 @@ public class PasswordHashTest
             throws Exception
     {
     }
-    
+
     @Before
     public void setUp()
     {
     }
-    
+
     @After
     public void tearDown()
     {

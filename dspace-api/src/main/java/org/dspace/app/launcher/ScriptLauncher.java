@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelImpl;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.services.RequestService;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -37,6 +37,7 @@ public class ScriptLauncher
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
+     * @throws java.io.FileNotFoundException
      */
     public static void main(String[] args)
             throws FileNotFoundException, IOException
@@ -51,7 +52,7 @@ public class ScriptLauncher
 
         // Initialise the service manager kernel
         try {
-            kernelImpl = DSpaceKernelInit.getKernel(null);
+            kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
             if (!kernelImpl.isRunning())
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));

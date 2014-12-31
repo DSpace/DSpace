@@ -23,8 +23,8 @@ import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelImpl;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.storage.rdbms.MockDatabaseManager;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -45,7 +45,7 @@ public class AbstractUnitTest
     private static final Logger log = Logger.getLogger(AbstractUnitTest.class);
 
     //Below there are static variables shared by all the instances of the class
-    
+
     /**
      * Test properties.
      */
@@ -65,7 +65,7 @@ public class AbstractUnitTest
 
     protected static DSpaceKernelImpl kernelImpl;
 
-    /** 
+    /**
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize resources required for the tests.
      *
@@ -76,11 +76,12 @@ public class AbstractUnitTest
      * built out of files from various modules -- see the dspace-parent POM.
      *
      * This method will load a few properties for derived test classes.
-     * 
+     *
      * The ConfigurationManager will be initialized to load the test
      * "dspace.cfg".
      */
     @BeforeClass
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public static void initOnce()
     {
         try
@@ -98,20 +99,20 @@ public class AbstractUnitTest
             ConfigurationManager.loadConfig(null);
 
             // Initialise the service manager kernel
-            kernelImpl = DSpaceKernelInit.getKernel(null);
+            kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
             if (!kernelImpl.isRunning())
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
-            
+
             // Applies/initializes our mock database by invoking its constructor
             // (NOTE: This also initializes the DatabaseManager, which in turn
             // calls DatabaseUtils to initialize the entire DB via Flyway)
             new MockDatabaseManager();
-            
+
             // Initialize a mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
-        } 
+        }
         catch (IOException ex)
         {
             log.error("Error initializing tests", ex);
@@ -128,7 +129,7 @@ public class AbstractUnitTest
      */
     @Before
     public void init()
-    {        
+    {
         try
         {
             //Start a new context
@@ -164,7 +165,7 @@ public class AbstractUnitTest
             log.error("Error creating initial eperson or default groups", ex);
             fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
         }
-        catch (SQLException ex) 
+        catch (SQLException ex)
         {
             log.error(ex.getMessage(),ex);
             fail("SQL Error on AbstractUnitTest init()");
@@ -196,7 +197,7 @@ public class AbstractUnitTest
         //we clear the properties
         testProps.clear();
         testProps = null;
-        
+
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl!=null)
             kernelImpl.destroy();
