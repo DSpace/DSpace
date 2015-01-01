@@ -587,7 +587,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to log in</message>
 	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
-	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>Email address: </nobr></message>
+	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-mail address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password: </message>
@@ -596,7 +596,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.para1">Create an account to submit data and/or
 	subscribe to email updates.</message>
 	<message key="xmlui.EPerson.PasswordLogin.submitReg">Register</message>
-	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Login</message>
+	<message key="xmlui.EPerson.PasswordLogin.submitLogin">Log in</message>
 	<message key="xmlui.EPerson.PasswordLogin.register_link">Create a Dryad account.</message>
 	<message key="xmlui.EPerson.RegLogin.head">You must have a Dryad account to submit data.</message>
 
@@ -795,7 +795,7 @@
 	<message key="xmlui.Submission.Submissions.submit_head3">Authoring:</message>
 	<message key="xmlui.Submission.Submissions.submit_info3">No submissions left unfinished.</message>
 	<message key="xmlui.Submission.Submissions.submit_head4">Supervising:</message>
-	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected submissions</message>
+	<message key="xmlui.Submission.Submissions.submit_submit_remove">Delete selected submissions</message>
 	<!-- Same transformer, inprogress section -->
 	<message key="xmlui.Submission.Submissions.progress_head1">Submissions being reviewed</message>
 	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed submissions
@@ -3004,13 +3004,13 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	</message>
     <message key="xmlui.Submission.submit.OverviewStep.help">
         <div>                                                                                                                                                
-            From this page, you can edit the description of your publication, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
+            From this page, you can edit the description of your data package, add additional data files, modify uploaded files, and/or finalize your submission and proceed to checkout.
         </div>
 	</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your publication:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files:</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional):</message>
-	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Finalize your submission:</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.1">Your data package</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.2">Your data files</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.3">Upload data files to partner repositories (optional)</message>
+	<message key="xmlui.Submission.submit.OverviewStep.steps.4">Checkout and finalize submission</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.add-datafile">Add new data file</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.finalize">Continue to checkout</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.datafile.edit">Edit</message>
@@ -3023,7 +3023,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
 	<message key="xmlui.Submission.submit.OverviewStep.finalize.help">When you are satisfied with your submission, click the button below to proceed to checkout.<br /> 
 	<br />A Dryad curator will review the submission to ensure the descriptions are complete, and that the files meet Dryad criteria for archiving and are not corrupted. After this brief review, your data will be archived in Dryad.</message>
 	<message key="xmlui.Submission.submit.OverviewStep.button.delete-datapackage">Delete entire submission</message>
-	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit publication description</message>
+	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
     <message key="xmlui.Submission.submit.Checkout.head">Check out &amp; submit</message>
     <message key="xmlui.Submission.submit.Checkout.trail">
@@ -3275,6 +3275,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.Submission.result-table.head.title">Title</message>
     <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
     <message key="xmlui.Submission.result-table.head.datafiles">Number of data files</message>
+    <message key="xmlui.Submission.result-table.head.lastupdated">Last updated</message>
     <message key="xmlui.Submission.result-table.head.owner">Task owner</message>
 
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_claimed">In Curation: Claimed</message>

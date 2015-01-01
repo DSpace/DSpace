@@ -479,10 +479,26 @@
     <xsl:template match="dri:options">
         <div id="ds-options-wrapper">
             <div id="ds-options">
-                <!-- Once the search box is built, the other parts of the options are added -->
-                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                <xsl:variable name="uri" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
+                <xsl:choose>
+                    <!-- on the "My Submissions" page, have the "Submit data now" button at top of sidebar -->
+                    <xsl:when test="$uri = 'submissions'">
+                        <xsl:apply-templates select="dri:list[@n='DryadSubmitData']"/>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- on the "My Tasks" page, suppress "Submit data now" -->
+                    <xsl:when test="$uri = 'my-tasks'">
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- Once the search box is built, the other parts of the options are added -->
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:apply-templates select="dri:list[@n='Payment']"/>
                 <xsl:apply-templates select="dri:list[@n='need-help']"/>
+                <xsl:apply-templates select="dri:list[@n='human-subjects']"/>
+                <xsl:apply-templates select="dri:list[@n='large-data-packages']"/>
             </div>
         </div>
     </xsl:template>
@@ -575,6 +591,37 @@
 	  </div>
     </xsl:template>
 
+    <xsl:template match="dri:options/dri:list[@n='large-data-packages']" priority="3">
+        <div class="NOT-simple-box">
+            <h1 class="ds-div-head ds_large_data_package_head" id="ds_large_data_package_head">Large data packages</h1>
+            <div id="ds_large_data_package" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Note that for data packages over 10GB, submitters will
+                    be asked to pay an additional:
+                </p>
+                <ul>
+                    <li>$15 for the first GB beyond 10, and</li>
+                    <li>$10 for each GB thereafter.</li>
+                </ul> 
+            </div>      
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='human-subjects']" priority="3">
+        <!-- note margin space added to top here -->
+        <div class="NOT-simple-box ds-margin-top-20">
+            <h1 class="ds-div-head ds_human_subjects_head" id="ds_human_subjects_head">Got human subject data?</h1>
+            <div id="ds_human_subjects" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Dryad does not accept submissions that contain personally identifiable 
+                    human subject information. Human subject data must be properly anonymized. 
+                    <a href="/pages/faq#depositing-acceptable-data">Read more about the kinds of data Dryad accepts</a>.
+                </p> 
+            </div>      
+        </div>
+    </xsl:template>
+
+
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
       <div id="submit-data-sidebar-box" class="simple-box">
         <!-- START DEPOSIT -->
@@ -619,7 +666,12 @@
            
     </xsl:template>
 
-
+    <!-- description of dataset for 'Submission overview' page -->
+    <xsl:template match="dri:hi[@rend='dataset-description']">
+        <p>
+            <xsl:value-of select="."/>
+        </p>
+    </xsl:template>
 
     <xsl:template match="dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
 
@@ -1115,7 +1167,7 @@ parameter that is being used (see variable defined above) -->
 
     <!-- Add Empty select option if no authors listed.  Prevents Subject Keywords from breaking -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_correspondingAuthor' and @type='select']">
-        <select>
+        <select class="ds-select-field">
             <xsl:apply-templates/>
             <xsl:if test="not(dri:option)">
                 <option value=""/>
