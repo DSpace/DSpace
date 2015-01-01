@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    
+    <map:components>
+
+        <map:transformers>
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.journal.Navigation"/>
+            <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.journal.Statistics"/>
+        </map:transformers>
+
+    </map:components>
+    
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+            
+            <map:match pattern="journal/*">
+                <map:transform type="Navigation"/>
+                <map:transform type="Statistics"/>
+            </map:match>
+
+            <map:match pattern="journal">
+                
+            </map:match>
+
+            <map:serialize/>
+
+        </map:pipeline>
+    </map:pipelines>
+    
+</map:sitemap>
