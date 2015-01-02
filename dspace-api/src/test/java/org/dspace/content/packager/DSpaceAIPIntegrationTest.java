@@ -8,6 +8,7 @@
 package org.dspace.content.packager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -55,9 +58,10 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     /** InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods) **/
     private static final String valueseparator = "::";
     
-    /** Test objects **/
+    /** Handles for Test objects initialized in setUpClass() and used in various tests below **/
     private static String topCommunityHandle = null;
     private static String testCollectionHandle = null;
+    private static String testCollection2Handle = null;
     private static String testItemHandle = null;
     
     /** Create a temporary folder which will be cleaned up automatically by JUnit **/
@@ -107,21 +111,31 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             grandchild.addMetadata(MetadataSchema.DC_SCHEMA, "title", null, null, "Grandchild Community");
             grandchild.update();
 
+            // Create our primary Test Collection
             Collection grandchildCol = child.createCollection();
             grandchildCol.addMetadata("dc", "title", null, null, "Grandchild Collection");
             grandchildCol.update();
             testCollectionHandle = grandchildCol.getHandle();
 
+            // Create an additional Test Collection
             Collection greatgrandchildCol = grandchild.createCollection();
             greatgrandchildCol.addMetadata("dc", "title", null, null, "GreatGrandchild Collection");
             greatgrandchildCol.update();
+            testCollection2Handle = greatgrandchildCol.getHandle();
 
+            // Create our primary Test Item
             WorkspaceItem wsItem = WorkspaceItem.create(context, grandchildCol, false);
             Item item = InstallItem.installItem(context, wsItem);
             item.addMetadata("dc", "title", null, null, "Grandchild Collection Item #1");
+            // For our primary test item, create a Bitstream in the ORIGINAL bundle
+            File f = new File(testProps.get("test.bitstream").toString());
+            Bitstream b = item.createSingleBitstream(new FileInputStream(f));
+            b.setName("Test Bitstream");
+            b.update();
             item.update();
             testItemHandle = item.getHandle();
 
+            // Create additional Test Items
             WorkspaceItem wsItem2 = WorkspaceItem.create(context, grandchildCol, false);
             Item item2 = InstallItem.installItem(context, wsItem2);
             item2.addMetadata("dc", "title", null, null, "Grandchild Collection Item #2");
@@ -532,7 +546,28 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Locate the item (from our test data)
         Item testItem = (Item) HandleManager.resolveToObject(context, testItemHandle);
         
-         // Export JUST Item (non-recursively) to AIPs
+        // Get information about the Item's Bitstreams
+        // (There should be one bitstream initialized above)
+        int bitstreamCount = 0;
+        String bitstreamName = null;
+        String bitstreamCheckSum = null;
+        Bundle[] bundles = testItem.getBundles(Constants.CONTENT_BUNDLE_NAME);
+        if(bundles.length>0)
+        {
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
+            bitstreamCount = bitstreams.length;
+            if(bitstreamCount>0)
+            {
+                bitstreamName = bitstreams[0].getName();
+                bitstreamCheckSum = bitstreams[0].getChecksum();
+            }
+        }
+
+        // We need a test bitstream to work with!
+        if(bitstreamCount<=0)
+            fail("No test bitstream found for Item in testRestoreItem()!");
+
+        // Export JUST Item (non-recursively) to AIP (this includes Item Bitstreams)
         log.info("testRestoreItem() - CREATE Item AIP");
         File aipFile = createAIP(testItem, null, false, false);
         
@@ -558,6 +593,12 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         DSpaceObject objRestored = HandleManager.resolveToObject(context, testItemHandle);
         assertThat("testRestoreItem() item " + testItemHandle + " exists", objRestored, notNullValue());
         
+        // Assert Bitstream exists again & is associated with restored item
+        Bundle[] restoredBund = ((Item) objRestored).getBundles(Constants.CONTENT_BUNDLE_NAME);
+        Bitstream restoredBitstream = restoredBund[0].getBitstreamByName(bitstreamName);
+        assertThat("testRestoreItem() bitstream exists", restoredBitstream, notNullValue());
+        assertEquals("testRestoreItem() bitstream checksum", restoredBitstream.getChecksum(), bitstreamCheckSum);
+
         log.info("testRestoreItem() - END");
     }
     
