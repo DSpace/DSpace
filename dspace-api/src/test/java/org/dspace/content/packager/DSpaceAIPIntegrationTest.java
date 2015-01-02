@@ -15,6 +15,7 @@ import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -25,6 +26,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
@@ -82,7 +84,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             log.info("setUpClass() - CREATE TEST HIERARCHY");
             // Create a hierachy of sub-Communities and Collections and Items, 
             // which looks like this:
-            //  "Parent Community"
+            //  "Top Community"
             //      - "Child Community"
             //          - "Grandchild Community"
             //              - "GreatGrandchild Collection"
@@ -118,6 +120,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             Item item = InstallItem.installItem(context, wsItem);
             item.addMetadata("dc", "title", null, null, "Grandchild Collection Item #1");
             item.update();
+            testItemHandle = item.getHandle();
 
             WorkspaceItem wsItem2 = WorkspaceItem.create(context, grandchildCol, false);
             Item item2 = InstallItem.installItem(context, wsItem2);
@@ -133,7 +136,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             Item item4 = InstallItem.installItem(context, wsItem4);
             item4.addMetadata("dc", "title", null, null, "GreatGrandchild Collection Item #2");
             item4.update();
-            testItemHandle = item4.getHandle();
 
             // Commit these changes to our DB
             context.restoreAuthSystemState();
@@ -167,7 +169,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             Context context = new Context();
             Community topCommunity = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
             
-            // Delete parent community and hierarchy under it
+            // Delete top level test community and test hierarchy under it
             if(topCommunity!=null)
             {
                 log.info("tearDownClass() - DESTROY TEST HIERARCHY");
@@ -182,7 +184,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         }
         catch (Exception ex)
         {
-            log.error("Error in destroyTestData", ex);
+            log.error("Error in tearDownClass()", ex);
         }
     }
     
@@ -192,6 +194,13 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     @Test
     public void testRestoreCommunityHierarchy() throws Exception
     {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy you really need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
         log.info("testRestoreCommunityHierarchy() - BEGIN");
 
         // Locate the top level community (from our test data)
@@ -210,7 +219,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
 
         // Delete everything from parent community on down
         log.info("testRestoreCommunityHierarchy() - DELETE Community Hierarchy");
-        context.turnOffAuthorisationSystem();
         topCommunity.delete();
         // Commit these changes to our DB
         context.commit();
@@ -223,8 +231,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         restoreFromAIP(parent, aipFile, null, true);
         // Commit these changes to our DB
         context.commit();
-        context.restoreAuthSystemState();
-        
+
         // Assert all objects in infoMap now exist again!
         assertObjectsExist(infoMap);
         
@@ -232,52 +239,70 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Test restoration from AIP of entire Community Hierarchy
+     * Test replacement from AIP of entire Community Hierarchy
      */
     @Test
     public void testReplaceCommunityHierarchy() throws Exception
     {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy you really need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
         log.info("testReplaceCommunityHierarchy() - BEGIN");
 
         // Locate the top level community (from our test data)
         Community topCommunity = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
 
-        // Get a list of all Collections under this Community or any Sub-Communities
-        Collection[] collections = topCommunity.getAllCollections();
-        
-        // Get the count of collections
-        int numberOfCollections = collections.length;
+        // Get the count of collections under our Community or any Sub-Communities
+        int numberOfCollections = topCommunity.getAllCollections().length;
         
         // Export this Community (recursively) to AIPs
         log.info("testReplaceCommunityHierarchy() - CREATE AIPs");
         File aipFile = createAIP(topCommunity, null, true, false);
         
         // Get some basic info about Collection to be deleted
-        Community parent = (Community) collections[0].getParentObject();
-        String deletedColHandle = collections[0].getHandle();
-        int numberOfItems = collections[0].countItems();
+        // In this scenario, we'll delete the test "Grandchild Collection" 
+        // (which is initialized as being under the Top Community)
+        String deletedCollectionHandle = testCollectionHandle;
+        Collection collectionToDelete = (Collection) HandleManager.resolveToObject(context, deletedCollectionHandle);
+        Community parent = (Community) collectionToDelete.getParentObject();
+         
+        // How many items are in this Collection we are about to delete?
+        int numberOfItems = collectionToDelete.countItems();
+        // Get an Item that should be deleted when we delete this Collection
+        // (NOTE: This Collection is initialized with at least one item)
+        String deletedItemHandle = collectionToDelete.getItems().next().getHandle();
         
         // Now, delete that one collection
         log.info("testReplaceCommunityHierarchy() - DELETE Collection");
-        context.turnOffAuthorisationSystem();
-        parent.removeCollection(collections[0]);
+        parent.removeCollection(collectionToDelete);
         context.commit();
         
         // Assert the deleted collection no longer exists
-        DSpaceObject obj = HandleManager.resolveToObject(context, deletedColHandle);
-        assertThat("testReplaceCommunityHierarchy() collection " + deletedColHandle + " doesn't exist", obj, nullValue());
+        DSpaceObject obj = HandleManager.resolveToObject(context, deletedCollectionHandle);
+        assertThat("testReplaceCommunityHierarchy() collection " + deletedCollectionHandle + " doesn't exist", obj, nullValue());
         
+        // Assert the child item no longer exists
+        DSpaceObject obj2 = HandleManager.resolveToObject(context, deletedItemHandle);
+        assertThat("testReplaceCommunityHierarchy() item " + deletedItemHandle + " doesn't exist", obj2, nullValue());
+
         // Replace Community (and all child objects, recursively) from AIPs
         log.info("testReplaceCommunityHierarchy() - REPLACE Community Hierarchy");
         replaceFromAIP(topCommunity, aipFile, null, true);
         // Commit these changes to our DB
         context.commit();
-        context.restoreAuthSystemState();
         
         // Assert the deleted collection is RESTORED
-        DSpaceObject objRestored = HandleManager.resolveToObject(context, deletedColHandle);
-        assertThat("testReplaceCommunityHierarchy() collection " + deletedColHandle + " exists", objRestored, notNullValue());
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, deletedCollectionHandle);
+        assertThat("testReplaceCommunityHierarchy() collection " + deletedCollectionHandle + " exists", objRestored, notNullValue());
         
+        // Assert the deleted item is also RESTORED
+        DSpaceObject obj2Restored = HandleManager.resolveToObject(context, deletedItemHandle);
+        assertThat("testReplaceCommunityHierarchy() item " + deletedItemHandle + " exists", obj2Restored, notNullValue());
+
         // Assert the Collection count and Item count are same as before
         assertEquals("testReplaceCommunityHierarchy() collection count", numberOfCollections, topCommunity.getAllCollections().length);
         assertEquals("testReplaceCommunityHierarchy() item count", numberOfItems, ((Collection)objRestored).countItems());
@@ -286,7 +311,303 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Create AIP(s) based on a given DSpaceObject.
+     * Test replacement from AIP of JUST a Community object
+     */
+    @Test
+    public void testReplaceCommunityOnly() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Community WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Community) any,
+                    Constants.WRITE,true); result = null;
+        }};
+        
+        log.info("testReplaceCommunityOnly() - BEGIN");
+
+        // Locate the top level community (from our test data)
+        Community topCommunity = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
+
+        // Get its current name / title
+        String oldName = topCommunity.getName();
+        
+        // Export JUST Community (non-recursively) to AIPs
+        log.info("testReplaceCommunityOnly() - CREATE Community AIP");
+        File aipFile = createAIP(topCommunity, null, false, false);
+        
+        // Change the Community name
+        String newName = "This is NOT my Community name!";
+        topCommunity.clearMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        topCommunity.addMetadata(MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Ensure name is changed
+        assertEquals("testReplaceCommunityOnly() new name", topCommunity.getName(), newName);
+        
+        // Now, replace our Community from AIP (non-recursive)
+        replaceFromAIP(topCommunity, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Check if name reverted to previous value
+        assertEquals("testReplaceCommunityOnly() old name", topCommunity.getName(), oldName);
+    }
+    
+    /**
+     * Test restoration from AIP of entire Collection Hierarchy
+     */
+    @Test
+    public void testRestoreCollectionHierarchy() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy you really need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreCollectionHierarchy() - BEGIN");
+
+        // Locate the collection (from our test data)
+        Collection testCollection = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
+        
+        // How many items are in this Collection?
+        int numberOfItems = testCollection.countItems();
+
+        // Get parent object, so that we can restore to same parent later
+        Community parent = (Community) testCollection.getParentObject();
+
+        // Save basic info about top community (and children) to an infoMap
+        HashMap<String,String> infoMap = new HashMap<String,String>();
+        saveObjectInfo(testCollection, infoMap);
+
+        // Export this Collection (recursively) to AIPs
+        log.info("testRestoreCollectionHierarchy() - CREATE AIPs");
+        File aipFile = createAIP(testCollection, null, true, false);
+
+        // Delete everything from collection on down
+        log.info("testRestoreCollectionHierarchy() - DELETE Collection Hierarchy");
+        parent.removeCollection(testCollection);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert all objects in infoMap no longer exist in DSpace
+        assertObjectsNotExist(infoMap);
+
+        // Restore this Collection (recursively) from AIPs
+        log.info("testRestoreCollectionHierarchy() - RESTORE Collection Hierarchy");
+        restoreFromAIP(parent, aipFile, null, true);
+        // Commit these changes to our DB
+        context.commit();
+
+        // Assert all objects in infoMap now exist again!
+        assertObjectsExist(infoMap);
+        
+        log.info("testRestoreCollectionHierarchy() - END");
+    }
+    
+    /**
+     * Test replacement from AIP of entire Collection (with Items)
+     */
+    @Test
+    public void testReplaceCollectionHierarchy() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy you really need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testReplaceCollectionHierarchy() - BEGIN");
+
+        // Locate the collection (from our test data)
+        Collection testCollection = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
+        
+        // How many items are in this Collection?
+        int numberOfItems = testCollection.countItems();
+        
+        // Export this Collection (recursively) to AIPs
+        log.info("testReplaceCollectionHierarchy() - CREATE AIPs");
+        File aipFile = createAIP(testCollection, null, true, false);
+        
+        // Get some basic info about Item to be deleted
+        // In this scenario, we'll delete the test "Grandchild Collection Item #1" 
+        // (which is initialized as being an Item within this Collection)
+        String deletedItemHandle = testItemHandle;
+        Item itemToDelete = (Item) HandleManager.resolveToObject(context, deletedItemHandle);
+        Collection parent = (Collection) itemToDelete.getParentObject();
+         
+        // Now, delete that one item
+        log.info("testReplaceCollectionHierarchy() - DELETE Item");
+        parent.removeItem(itemToDelete);
+        context.commit();
+        
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, deletedItemHandle);
+        assertThat("testReplaceCollectionHierarchy() item " + deletedItemHandle + " doesn't exist", obj, nullValue());
+        
+        // Assert the item count is one less
+        DSpaceObject obj2 = HandleManager.resolveToObject(context, deletedItemHandle);
+        assertEquals("testReplaceCollectionHierarchy() item count for collection " + testCollectionHandle, testCollection.countItems(), numberOfItems-1);
+
+        // Replace Collection (and all child objects, recursively) from AIPs
+        log.info("testReplaceCollectionHierarchy() - REPLACE Collection Hierarchy");
+        replaceFromAIP(testCollection, aipFile, null, true);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, deletedItemHandle);
+        assertThat("testReplaceCollectionHierarchy() item " + deletedItemHandle + " exists", objRestored, notNullValue());
+        
+        // Assert the Item count is same as before
+        assertEquals("testReplaceCollectionHierarchy() item count for collection " + testCollectionHandle, testCollection.countItems(), numberOfItems);
+
+        log.info("testReplaceCollectionHierarchy() - END");
+    }
+    
+    
+    /**
+     * Test replacement from AIP of JUST a Collection object
+     */
+    @Test
+    public void testReplaceCollectionOnly() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Collection WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Collection) any,
+                    Constants.WRITE,true); result = null;
+        }};
+        
+        log.info("testReplaceCollectionOnly() - BEGIN");
+
+        // Locate the collection (from our test data)
+        Collection testCollection = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
+        
+        // Get its current name / title
+        String oldName = testCollection.getName();
+        
+        // Export JUST Collection (non-recursively) to AIPs
+        log.info("testReplaceCollectionOnly() - CREATE Collection AIP");
+        File aipFile = createAIP(testCollection, null, false, false);
+        
+        // Change the Collection name
+        String newName = "This is NOT my Collection name!";
+        testCollection.clearMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        testCollection.addMetadata(MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Ensure name is changed
+        assertEquals("testReplaceCollectionOnly() new name", testCollection.getName(), newName);
+        
+        // Now, replace our Collection from AIP (non-recursive)
+        replaceFromAIP(testCollection, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Check if name reverted to previous value
+        assertEquals("testReplaceCollectionOnly() old name", testCollection.getName(), oldName);
+    }
+    
+    
+    /**
+     * Test restoration from AIP of an Item
+     */
+    @Test
+    public void testRestoreItem() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreItem() - BEGIN");
+
+        // Locate the item (from our test data)
+        Item testItem = (Item) HandleManager.resolveToObject(context, testItemHandle);
+        
+         // Export JUST Item (non-recursively) to AIPs
+        log.info("testRestoreItem() - CREATE Item AIP");
+        File aipFile = createAIP(testItem, null, false, false);
+        
+        // Get parent, so we can restore under the same parent
+        Collection parent = (Collection) testItem.getParentObject();
+         
+        // Now, delete that item
+        log.info("testRestoreItem() - DELETE Item");
+        parent.removeItem(testItem);
+        context.commit();
+        
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreItem() item " + testItemHandle + " doesn't exist", obj, nullValue());
+        
+        // Restore Item from AIP (non-recursive)
+        log.info("testRestoreItem() - RESTORE Item");
+        restoreFromAIP(parent, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Assert the deleted item is RESTORED
+        DSpaceObject objRestored = HandleManager.resolveToObject(context, testItemHandle);
+        assertThat("testRestoreItem() item " + testItemHandle + " exists", objRestored, notNullValue());
+        
+        log.info("testRestoreItem() - END");
+    }
+    
+    /**
+     * Test replacement from AIP of an Item object
+     */
+    @Test
+    public void testReplaceItem() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy (Items/Bundles/Bitstreams) you need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+        
+        log.info("testReplaceItem() - BEGIN");
+
+        // Locate the item (from our test data)
+        Item testItem = (Item) HandleManager.resolveToObject(context, testItemHandle);
+        
+        // Get its current name / title
+        String oldName = testItem.getName();
+        
+        // Export JUST Item (non-recursively) to AIPs
+        log.info("testReplaceItem() - CREATE Item AIP");
+        File aipFile = createAIP(testItem, null, false, false);
+        
+        // Change the Item name
+        String newName = "This is NOT my Item name!";
+        testItem.clearMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        testItem.addMetadata(MetadataSchema.DC_SCHEMA, "title", null, null, newName);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Ensure name is changed
+        assertEquals("testReplaceItem() new name", testItem.getName(), newName);
+        
+        // Now, replace our Item from AIP (non-recursive)
+        replaceFromAIP(testItem, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Check if name reverted to previous value
+        assertEquals("testReplaceItem() old name", testItem.getName(), oldName);
+    }
+    
+    /**
+     * Create AIP(s) based on a given DSpaceObject. This is a simple utility method
+     * to avoid having to rewrite this code into several tests.
      * @param dso DSpaceObject to create AIP(s) for
      * @param pkParams any special PackageParameters to pass (if any)
      * @param recursive whether to recursively create AIPs or just a single AIP
@@ -333,7 +654,8 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Restore DSpaceObject(s) from AIP(s).
+     * Restore DSpaceObject(s) from AIP(s). This is a simple utility method
+     * to avoid having to rewrite this code into several tests.
      * @param parent The DSpaceObject which will be the parent object of the newly restored object(s)
      * @param aipFile AIP file to start restoration from
      * @param pkParams any special PackageParameters to pass (if any)
@@ -365,7 +687,8 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Replace DSpaceObject(s) from AIP(s).
+     * Replace DSpaceObject(s) from AIP(s). This is a simple utility method
+     * to avoid having to rewrite this code into several tests.
      * @param dso The DSpaceObject to be replaced from AIP
      * @param aipFile AIP file to start replacement from
      * @param pkParams any special PackageParameters to pass (if any)
@@ -397,7 +720,9 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
-     * Save Object hierarchy info to the given HashMap. 
+     * Save Object hierarchy info to the given HashMap. This utility method can
+     * be used in conjunction with "assertObjectsExist" and "assertObjectsNotExist"
+     * methods below, in order to assert whether a restoration succeeded or not.
      * <P>
      * In HashMap, Key is the object handle, and Value is "[type-text]||[title]".
      * @param dso DSpaceObject
