@@ -291,7 +291,7 @@
                 <div class="panel-body">
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                     Sets
@@ -299,7 +299,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body list-group">
                                 <xsl:for-each select="oai:header/oai:setSpec">
                                     <div class="list-group-item">
@@ -317,7 +317,7 @@
                     </div>
                     <div class="panel panel-info">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                         Metadata
@@ -325,7 +325,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id"><xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body">
                                 <xsl:apply-templates select="oai:metadata/*" />
                             </div>
@@ -424,7 +424,7 @@
                 <div class="panel-body">
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
-                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-heading">
                                 <h5 class="panel-title">
                                     Sets
@@ -432,7 +432,7 @@
                             </div>
                         </a>
                         <div class="panel-collapse collapse">
-                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:identifier/text(), ':/', '')"></xsl:value-of></xsl:attribute>
+                            <xsl:attribute name="id">sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
                             <div class="panel-body list-group">
                                 <xsl:for-each select="oai:setSpec">
                                     <div class="list-group-item">
