@@ -76,7 +76,7 @@ public class SFXFileReader {
 
    /** Parses XML file and returns XML document.
     * @param fileName XML file to parse
-    * @return XML document or <B>null</B> if error occured. The error is caught and logged.
+    * @return XML document or <B>null</B> if error occurred. The error is caught and logged.
     */
 
    public static Document parseFile(String fileName) {

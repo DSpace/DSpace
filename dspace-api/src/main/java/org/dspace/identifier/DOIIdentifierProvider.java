@@ -613,7 +613,7 @@ public class DOIIdentifierProvider
         }
         catch (SQLException ex)
         {
-            log.error("SQLException occured while deleting a DOI out of an item: "
+            log.error("SQLException occurred while deleting a DOI out of an item: "
                     + ex.getMessage());
             throw new RuntimeException("Error while deleting a DOI out of the " +
                     "metadata of an Item " + dso.getID(), ex);

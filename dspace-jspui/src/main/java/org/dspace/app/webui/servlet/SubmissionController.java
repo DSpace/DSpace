@@ -1732,7 +1732,7 @@ public class SubmissionController extends DSpaceServlet
                     // try to delete destination file, as we got an exception while writing it.
                     if(!destFile.delete())
                     {
-                        log.warn("While writing an uploaded file an error occured. "
+                        log.warn("While writing an uploaded file an error occurred. "
                                 + "We were unable to delete the damaged file: " 
                                 + destFile.getAbsolutePath() + ".");
                     }

@@ -145,7 +145,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 	} catch (Exception e)
         {
 		log.error(
-                    "Error occured while creating statistics for dso with ID: "
+                    "Error occurred while creating statistics for dso with ID: "
                             + dso.getID() + " and type " + dso.getType()
                             + " and handle: " + dso.getHandle(), e);
 	}
@@ -189,7 +189,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 	} catch (Exception e)
         {
             log.error(
-                "Error occured while creating statistics for dso with ID: "
+                "Error occurred while creating statistics for dso with ID: "
                                 + dso.getID() + " and type " + dso.getType()
                                 + " and handle: " + dso.getHandle(), e);
 	}
@@ -233,7 +233,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             catch (Exception e)
             {
                 log.error(
-                    "Error occured while creating statistics for dso with ID: "
+                    "Error occurred while creating statistics for dso with ID: "
                                     + dso.getID() + " and type " + dso.getType()
                                     + " and handle: " + dso.getHandle(), e);
             }
@@ -276,7 +276,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             catch (Exception e)
             {
                 log.error(
-                    "Error occured while creating statistics for dso with ID: "
+                    "Error occurred while creating statistics for dso with ID: "
                                     + dso.getID() + " and type " + dso.getType()
                                     + " and handle: " + dso.getHandle(), e);
             }
@@ -318,7 +318,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             catch (Exception e)
             {
                 log.error(
-                    "Error occured while creating statistics for dso with ID: "
+                    "Error occurred while creating statistics for dso with ID: "
                                     + dso.getID() + " and type " + dso.getType()
                                     + " and handle: " + dso.getHandle(), e);
             }
