@@ -1,23 +1,18 @@
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInput;
-import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInputsReader;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.submit.AbstractProcessingStep;
 import org.xml.sax.SAXException;
 
-import javax.servlet.ServletException;
 import java.sql.SQLException;
 import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -30,9 +25,12 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
     private static final Message T_HEAD = message("xmlui.submit.publication.describe.head");
     private static final Message T_TRAIL = message("xmlui.submit.publication.describe.trail");
     private static final Message T_HELP = message("xmlui.submit.publication.describe.help");
+    private static final Message T_NO_DETAILS = message("xmlui.submit.publication.describe.nodetails");
     private static final Message T_FORM_HEAD = message("xmlui.submit.publication.describe.form.help");
     private static final Message T_complete_dataset = message("xmlui.Submission.general.submission.complete.datapackage");
     private static final Message T_complete_publication = message("xmlui.Submission.general.submission.complete.publication");
+
+    private static Logger log = Logger.getLogger(DescribePublicationStep.class);
 
     public List addReviewSection(List reviewList) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         //There is no review section.
@@ -64,6 +62,12 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
         Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_HEAD);
         helpDivision.addPara(T_HELP);
+
+        // If there is no manuscript number and no PMID / DOI, add 'nodetails' message
+        if(!hasDetails(item)) {
+            // Item does not have details, add help paragraph
+            helpDivision.addPara(T_NO_DETAILS);
+        }
 
         Division div = body.addInteractiveDivision("submit-describe-publication", actionURL, Division.METHOD_MULTIPART, "primary submission");
 
@@ -114,6 +118,29 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
         }
         else //otherwise, show "Next->"
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+    }
+
+    private static Boolean hasDetails(org.dspace.content.Item item) {
+        DryadDataPackage dataPackage = new DryadDataPackage(item);
+        try {
+            String manuscriptNumber = dataPackage.getManuscriptNumber();
+            String doiOrPMID = dataPackage.getPublicationDOI();
+            if(manuscriptNumber != null) {
+                if(!manuscriptNumber.trim().isEmpty()) {
+                    // manuscript number is present
+                    return true;
+                }
+            }
+            if(doiOrPMID != null) {
+                if(!doiOrPMID.trim().isEmpty()) {
+                    // DOI or PMID is present
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            log.error("SQL Exception checking for MSID/DOI in new submission", ex);
+        }
+        return false;
     }
 
 }

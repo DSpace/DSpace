@@ -387,17 +387,26 @@ public class DataOneMN extends HttpServlet implements Constants {
 	}
 	catch (IllegalArgumentException details) {}
 	// See http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
-	// for explanation of ZZ time zone formatting
+	// for explanation of ZZ and Z time zone formatting
 	try {  
-	    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZZ").parseDateTime(date).toDate();
+	    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZZ").withOffsetParsed().parseDateTime(date).toDate();
 	}
 	catch (IllegalArgumentException details) {}
 	
 	try {
-	    return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZZ").parseDateTime(date).toDate();
+	    return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZZ").withOffsetParsed().parseDateTime(date).toDate();
 	}
 	catch (IllegalArgumentException details) {}
-	
+	try {
+		return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSZ").withOffsetParsed().parseDateTime(date).toDate();
+	}
+	catch (IllegalArgumentException details) {}
+
+	try {
+		return DateTimeFormat.forPattern("yyyyMMdd'T'HHmmss.SSSSZ").withOffsetParsed().parseDateTime(date).toDate();
+	}
+	catch (IllegalArgumentException details) {}
+
 	return null;
     }
 

@@ -192,7 +192,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <xsl:variable name="help" select="dri:field/dri:help/text()"/>
+                <xsl:variable name="help" select="string(./dri:field/dri:help)"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -204,15 +204,37 @@
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:if test="string-length($help)>0">
-                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
-                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                        <xsl:variable name="n" select="string(./dri:field/@n)"/>
+                        <xsl:choose>
+                            <!-- skip the first help on the forgot-email page -->
+                            <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
+                            <!-- put all help text in the hover-over field for these items -->
+                            <xsl:when test="$n = 'dc_subject'
+                                         or $n = 'dwc_ScientificName'
+                                         or $n = 'dc_coverage_spatial'
+                                         or $n = 'dc_coverage_temporal'
+                            ">
+                                <xsl:text> </xsl:text>
                                 <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                     <xsl:attribute name="title">
-                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                        <xsl:value-of select="$help"/>
                                     </xsl:attribute>
                                 </img>
-                            </xsl:if>
-                        </div>
+                            </xsl:when>
+                            <!-- for other fields, display subsequent sentences in hover text -->
+                            <xsl:otherwise>
+                                <div class="help-title">
+                                    <xsl:value-of select="substring-before($help,'.')"/>.
+                                    <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                            <xsl:attribute name="title">
+                                                <xsl:value-of select="substring-after($help,'.')"/>
+                                            </xsl:attribute>
+                                        </img>
+                                    </xsl:if>
+                                </div>                                
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:if>
                 </label>
             </xsl:when>
@@ -1184,12 +1206,17 @@
     </xsl:template>
 
     <xsl:template match="dri:help" mode="help">
-        <!--Only create the <span> if there is content in the <dri:help> node-->
-        <xsl:if test="./text() or ./node()">
-            <span class="field-help">
-                <xsl:apply-templates />
-            </span>
-        </xsl:if>
+        <xsl:choose>
+            <!-- don't output the help text in this mode for the forgot-email page -->
+            <xsl:when test="(string(parent::dri:field/@id)='aspect.eperson.StartForgotPassword.field.email')"/>
+            
+            <!--Only create the <span> if there is content in the <dri:help> node-->
+            <xsl:when test="./text() or ./node()">
+                <span class="field-help">
+                    <xsl:apply-templates />
+                </span>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template name="addPropagateButton">

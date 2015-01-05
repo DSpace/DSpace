@@ -32,15 +32,17 @@
 			<excludes>
 				<exclude>src</exclude>
 				<exclude>config/dspace.cfg</exclude>
-                <exclude>config/modules/payment-system.cfg</exclude>
-                <exclude>config/modules/atmire-responselogging.cfg</exclude>
+				<exclude>config/modules/payment-system.cfg</exclude>
+				<exclude>config/modules/workflow.cfg</exclude>
+				<exclude>config/modules/atmire-responselogging.cfg</exclude>
+				<exclude>config/modules/authentication-oauth.cfg</exclude>
 			</excludes>
 		</fileSet>
 
 	</fileSets>
 
 	<files>
-        <!-- Copy over the payment-system.cfg & filter it -->
+        <!-- Copy over module configs & filter them -->
         <file>
             <source>config/modules/payment-system.cfg</source>
             <outputDirectory>config/modules</outputDirectory>
@@ -48,7 +50,19 @@
         </file>
 
         <file>
+            <source>config/modules/workflow.cfg</source>
+            <outputDirectory>config/modules</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+
+        <file>
             <source>config/modules/atmire-responselogging.cfg</source>
+            <outputDirectory>config/modules</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+
+        <file>
+            <source>config/modules/authentication-oauth.cfg</source>
             <outputDirectory>config/modules</outputDirectory>
             <filtered>true</filtered>
         </file>

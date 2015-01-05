@@ -433,7 +433,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="http://blog.datadryad.org" target="_blank">News and views</a>
+                                    <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
                                     <a href="/pages/whoWeAre">Who we are</a>
@@ -565,9 +565,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <xsl:otherwise>
                                 <li class="no-hover-highlight">
                                     <a href="/login">
-                                        <span id="login-item">Login</span>
+                                        <span id="login-item">Log in</span>
                                         <span class="accessibly-hidden"> or </span>
-                                        <span id="sign-up-item">Sign Up</span>
+                                        <span id="sign-up-item">Sign up</span>
                                     </a>
                                 </li>
                             </xsl:otherwise>

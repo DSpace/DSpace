@@ -100,10 +100,13 @@ public class DataPackageCountByDateTest extends ContextUnitTest{
     }
 
     @Test(expected=IllegalStateException.class)
-    public void testThrowsExceptionWithBadDateOrder() {
+    public void testThrowsExceptionWithBadDateOrder() throws SQLException {
         log.info("throwsExceptionWithBadDateOrder");
         DataPackageCount instance = new DataPackageCount(this.context);
         assert(futureDate.after(lastYearDate));
+        // Create a new data package so that there is something to extract
+        DryadDataPackage dataPackage = DryadDataPackage.create(context);
+        dataPackage.setPublicationName(journalName);
         instance.setBeginDate(futureDate);
         instance.setEndDate(lastYearDate);
         instance.extract(journalName);

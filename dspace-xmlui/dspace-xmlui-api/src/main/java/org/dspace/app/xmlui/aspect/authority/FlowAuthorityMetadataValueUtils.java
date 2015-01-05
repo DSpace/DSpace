@@ -12,6 +12,7 @@ import org.dspace.content.authority.AuthorityObject;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.event.Event;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -151,6 +152,7 @@ public class FlowAuthorityMetadataValueUtils {
         authorityMetadataValue.setFieldId(Integer.parseInt(fieldID));
         authorityMetadataValue.setParentId(id);
         authorityMetadataValue.create(context);
+        context.addEvent(new Event(Event.MODIFY_METADATA, type, id, null));
         context.commit();
 
         result.setContinue(true);

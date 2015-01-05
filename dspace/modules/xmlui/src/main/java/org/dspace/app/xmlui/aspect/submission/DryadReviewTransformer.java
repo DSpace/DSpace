@@ -20,7 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -32,6 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.dspace.workflow.ClaimedTask;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -54,29 +54,65 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
 
 
-    private String doi;
     private WorkflowItem wfItem;
     private boolean authorized;
+    private boolean currentlyInReview;
     List<Item> dataFiles = new ArrayList<Item>();
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
         authorized = false;
+        currentlyInReview = false;
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        int wfItemId;
+        // Reviewers may access with either
+        // 1. wfID + token
+        // 2. provisional DOI (since it is not yet public)
 
-        if ( (wfItem=getWFItem(request)) == null) return;
-
-
-        String token = request.getParameter("token");
-        if (token != null) {
+        String requestDoi = request.getParameter("doi");
+        if(requestDoi != null) {
+            loadWFItemByDOI(requestDoi);
+            if(wfItem == null) {
+                // Not found
+                return;
+            }
+            // DOI was found. Set authorized true and the reviewerToken for downloads
+            authorized = true;
             String reviewerKey = getItemToken();
-            authorized = token.equals(reviewerKey);
-            if (authorized)
-                request.getSession().setAttribute("reviewerToken", token);
+            request.getSession().setAttribute("reviewerToken", reviewerKey);
+        } else {
+            // DOI not present, require token
+            String token = request.getParameter("token");
+            if (token != null) {
+                loadWFItem(request); // Looks up by wfID or itemId
+                if(wfItem == null) {
+                    // item not found
+                    return;
+                }
+                // item lookup successful, make sure token matches
+                String reviewerKey = getItemToken();
+                authorized = token.equals(reviewerKey);
+                if (authorized) {
+                    request.getSession().setAttribute("reviewerToken", token);
+                }
+            }
+        }
+
+        // Check if the item is actually in review
+        // taskowner has step_id=reviewStep, action_id=reviewAction, owner_id=submitter's eperson ID
+        try {
+            List<ClaimedTask> tasks = ClaimedTask.findByWorkflowId(context, wfItem.getID());
+            // find a task with reviewStep
+            for(ClaimedTask task : tasks) {
+                if(task.getStepID().equals("reviewStep")) {
+                    currentlyInReview = true;
+                }
+            }
+        } catch (SQLException ex) {
+            log.error("Exception checking for claimed task with reviewStep", ex);
+            return;
         }
     }
 
@@ -114,6 +150,9 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         if (!authorized) {
             throw new AuthorizeException("You are not authorized to review the submission");
+        }
+        if (!currentlyInReview) {
+            throw new AuthorizeException("The submission is not currently in review");
         }
         Request request = ObjectModelHelper.getRequest(objectModel);
 
@@ -171,24 +210,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
     }
 
-    private WorkflowItem
-    getWFItem(Request request) throws IOException {
-        int wfItemId;
+    private void loadWFItemByDOI(String doi) throws IOException {
+        wfItem = null;
+        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         try {
-            if (request.getParameter("wfID") != null) {
-                wfItemId = Integer.parseInt(request.getParameter("wfID"));
-                wfItem = WorkflowItem.find(context, wfItemId);
-            }
-            else if (request.getParameter("doi") != null) {
-                DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                DSpaceObject obj = null;
-                obj = dis.resolve(context, request.getParameter("doi"));
-                if (obj instanceof Item)
-                    wfItem = WorkflowItem.findByItemId(context, obj.getID());
-            }
-            else if (request.getParameter("itemID") != null) {
-                Item item = Item.find(context, Integer.parseInt(request.getParameter("itemID")));
-                wfItem = WorkflowItem.findByItemId(context, item.getID());
+            DSpaceObject obj = dis.resolve(context, doi);
+            if (obj instanceof Item) {
+                wfItem = WorkflowItem.findByItemId(context, obj.getID());
             }
         } catch (IdentifierNotFoundException e) {
             log.error(e);
@@ -199,7 +227,26 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         } catch (AuthorizeException e) {
             log.error(e);
         }
-        return wfItem;
+    }
+
+    private void
+    loadWFItem(Request request) throws IOException {
+        int wfItemId;
+        wfItem = null;
+        try {
+            if (request.getParameter("wfID") != null) {
+                wfItemId = Integer.parseInt(request.getParameter("wfID"));
+                wfItem = WorkflowItem.find(context, wfItemId);
+            }
+            else if (request.getParameter("itemID") != null) {
+                Item item = Item.find(context, Integer.parseInt(request.getParameter("itemID")));
+                wfItem = WorkflowItem.findByItemId(context, item.getID());
+            }
+        } catch (SQLException e) {
+            log.error(e);
+        } catch (AuthorizeException e) {
+            log.error(e);
+        }
     }
 
     private String getItemToken() {
@@ -272,7 +319,6 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
      */
     public void recycle()
     {
-        this.doi = null;
         this.wfItem = null;
 	this.authorized = false;
 	this.dataFiles=new ArrayList<Item>();

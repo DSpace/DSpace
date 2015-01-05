@@ -7,10 +7,12 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -189,26 +191,74 @@ public abstract class DryadObject {
 
     public Date getDateAccessioned() {
         Date dateAccessioned = null;
-        DCValue[] metadata = item.getMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, Item.ANY);
-        if(metadata.length > 0) {
-            DCValue firstDate = metadata[0];
-            try {
-                dateAccessioned = parseDate(firstDate.value);
-            } catch (ParseException ex) {
-                log.error("Error parsing " + firstDate.value, ex);
-            }
+        String dateString = getSingleMetadataValue(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER);
+        try {
+            dateAccessioned = parseDate(dateString);
+        } catch (ParseException ex) {
+            log.error("Error parsing " + dateString, ex);
         }
         return dateAccessioned;
     }
 
     public void setDateAccessioned(Date dateAccessioned) throws SQLException {
         String dateAccessionedString = formatDate(dateAccessioned);
-        getItem().clearMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, null);
-        getItem().addMetadata(DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, null, dateAccessionedString);
+        addSingleMetadataValue(Boolean.TRUE, DATE_ACCESSIONED_SCHEMA, DATE_ACCESSIONED_ELEMENT, DATE_ACCESSIONED_QUALIFIER, dateAccessionedString);
+    }
+
+    /* Metadata access */
+    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String value) throws SQLException {
+        addSingleMetadataValue(clearFirst, schema, element, qualifier, null, value);
+    }
+
+    protected void addSingleMetadataValue(Boolean clearFirst, String schema, String element, String qualifier, String language, String value) throws SQLException {
+        if(clearFirst) {
+            getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
+        }
+        if(value != null) {
+            getItem().addMetadata(schema, element, qualifier, language, value);
+        }
         try {
             getItem().update();
         } catch (AuthorizeException ex) {
-            log.error("Authorize exception setting date accessioned", ex);
+            log.error("Authorize exception setting " + schema + "." + element + "." + qualifier, ex);
+        }
+    }
+
+    protected String getSingleMetadataValue(String schema, String element, String qualifier) {
+        String value = null;
+        DCValue[] metadata = item.getMetadata(schema, element, qualifier, Item.ANY);
+        if(metadata.length > 0) {
+            value = metadata[0].value;
+        }
+        return value;
+    }
+
+    protected List<String> getMultipleMetadataValues(String schema, String element, String qualifier) throws SQLException {
+        List<String> values = new ArrayList<String>();
+        DCValue[] metadata = item.getMetadata(schema, element, qualifier, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            values.add(dcValue.value);
+        }
+        return values;
+    }
+
+    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, List<String> values) throws SQLException {
+        addMultipleMetadataValues(clearFirst, schema, element, qualifier, null, values);
+    }
+
+    protected void addMultipleMetadataValues(Boolean clearFirst, String schema, String element, String qualifier, String language, List<String> values) throws SQLException {
+        if(clearFirst) {
+            getItem().clearMetadata(schema, element, qualifier, language == null ? Item.ANY : language);
+        }
+        if(values != null) {
+            for(String value : values) {
+                getItem().addMetadata(schema, element, qualifier, language, value);
+            }
+        }
+        try {
+            getItem().update();
+        } catch (AuthorizeException ex) {
+            log.error("Authorize exception setting " + schema + "." + element + "." + qualifier, ex);
         }
     }
 }

@@ -8,14 +8,12 @@ package org.dspace.workflow;
  */
 public class WorkflowConfigurationException extends Exception{
 
-    private String error;
-
-    public WorkflowConfigurationException(String error){
-        this.error = error;
+    public WorkflowConfigurationException(String message){
+        super(message);
     }
 
-    public String toString(){
-        return this.error;
+    public WorkflowConfigurationException(String error, Throwable cause) {
+        super(error, cause);
     }
 
 }
