@@ -207,6 +207,10 @@
                     	<xsl:choose>
 	                        <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
 	                            <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item" />
+	                            <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.title.subtitle')) and descendant::text()]">
+	                            	<xsl:text>: </xsl:text>
+	                            	<xsl:apply-templates select="dri:list[@n=(concat($handle, ':dcterms.title.subtitle'))]/dri:item" />
+	                            </xsl:if>
 	                        </xsl:when>
 	                        <xsl:otherwise>
 <!-- 	                        		Sin título -->

@@ -168,7 +168,7 @@
          <label>Versión</label>
          <type-bind>Articulo,Objeto de conferencia</type-bind>
          <input-type value-pairs-name="cic_versiones">dropdown</input-type>
-         <hint>Versión</hint>
+         <hint>Version de la obra en funcion del último estadío de revisión sufirda (Enviada,  aceptada y publicada)</hint>
          <required>Debe indicar la versión del documento</required>
        </field>
      
@@ -181,6 +181,16 @@
          <hint>Título del documento tal y como aparece en la obra</hint>
          <required>Debe indicar el título del documento</required>
        </field>
+     
+		<field>
+		 <dc-schema>dcterms</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier>subtitle</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Subtítulo</label>
+         <input-type>textarea</input-type>
+         <hint>Subtítulo del documento tal y como aparece en la obra</hint>
+		</field>     
      
      	<field>
          <dc-schema>dcterms</dc-schema>

@@ -145,7 +145,11 @@
 						<xsl:with-param name="container" select="'h1'" />
 		    			<xsl:with-param name="null_message"><i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text></xsl:with-param>
 		    		</xsl:call-template>
-			    		
+		    		<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.title.subtitle'"/>
+						<xsl:with-param name="show_label" select="false"/>
+						<xsl:with-param name="container" select="'h4'"/>
+		    		</xsl:call-template>
 			    	<xsl:call-template name="render-metadata">
 		    			<xsl:with-param name="field" select="'dcterms.creator.*'" />
 		    			<xsl:with-param name="separator" select="''" />

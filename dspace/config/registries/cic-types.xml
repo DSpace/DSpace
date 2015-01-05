@@ -52,6 +52,13 @@
 	<dc-type>
 		<schema>dcterms</schema>
 		<element>title</element>
+		<qualifier>subtitle</qualifier>
+		<scope_note>Subtítulo del documento tal y como aparece en la obra.</scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>dcterms</schema>
+		<element>title</element>
 		<qualifier>investigacion</qualifier>
 		<scope_note>Título/tema de una  investigacion según se indica en los informes de investigación CIC, en el punto 2.</scope_note>
 	</dc-type>
