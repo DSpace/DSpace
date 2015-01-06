@@ -313,7 +313,7 @@ public class Context
      * committed.
      * <p>
      * Calling complete() on a Context which is no longer valid (isValid()==false),
-     * is a no-op.
+     * is a database no-op (just performs some memory cleanup).
      * 
      * @exception SQLException
      *                if there was an error completing the database transaction
@@ -322,8 +322,8 @@ public class Context
     public void complete() throws SQLException
     {
         // If Context is no longer open/valid, just note that it has already been closed
-        if(!isValid())
-            log.info("complete() was called on a closed Context object. No changes to commit.");
+        if (!isValid())
+            log.debug("complete() was called on a closed Context object. No changes to commit.");
 
         // FIXME: Might be good not to do a commit() if nothing has actually
         // been written using this connection
@@ -338,11 +338,7 @@ public class Context
         }
         finally
         {
-            // Free the DB connection
-            // If connection is closed or null, this is a no-op
-            DatabaseManager.freeConnection(connection);
-            connection = null;
-            clearCache();
+            closeConnection();
         }
     }
 
@@ -481,13 +477,13 @@ public class Context
      * already been thrown.
      * <p>
      * Calling abort() on a Context which is no longer valid (isValid()==false),
-     * is a no-op.
+     * is a database no-op (just performs some memory cleanup).
      */
     public void abort()
     {
         // If Context is no longer open/valid, just note that it has already been closed
         if(!isValid())
-            log.info("abort() was called on a closed Context object. No changes to abort.");
+            log.debug("abort() was called on a closed Context object. No changes to abort.");
 
         try
         {
@@ -503,16 +499,23 @@ public class Context
         }
         finally
         {
-            try
-            {
-                // Free the DB connection
-                // If connection is closed or null, this is a no-op
-                DatabaseManager.freeConnection(connection);
-            }
-            catch (Exception ex)
-            {
-                log.error("Exception aborting context", ex);
-            }
+            closeConnection();
+        }
+    }
+
+    private void closeConnection() {
+        try
+        {
+            // Free the DB connection
+            // If connection is closed or null, this is a no-op
+            DatabaseManager.freeConnection(connection);
+        }
+        catch (Exception ex)
+        {
+            log.error("Exception releasing the database connection", ex);
+        }
+        finally
+        {
             connection = null;
             events = null;
             clearCache();
