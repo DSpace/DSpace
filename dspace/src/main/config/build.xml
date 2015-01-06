@@ -34,7 +34,7 @@ Common usage:
 
 ========================================================================
   </description>
-  
+
   	<!-- DS-1391: Ant 1.8.0+ is required, fail if not available. -->
 	<fail message="Ant 1.8.0+ is required, ${ant.version} is not supported">
         <condition>
@@ -116,7 +116,7 @@ Common usage:
     <!-- Load various Ant libraries which define extra tasks.          -->
     <!-- ============================================================= -->
      <!--Load/initialize all Ant-Contrib libraries from DSpace 'class.path' above.
-         For more info, see: 
+         For more info, see:
         http://ant-contrib.sourceforge.net/tasks/index.html -->
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="class.path"/>
 
@@ -805,7 +805,7 @@ Common usage:
     <!-- ============================================================= -->
     <!-- Install fresh code but do not touch the database              -->
     <!-- ============================================================= -->
-    
+
     <target name="install_code"
             depends="init_installation,init_configs"
             description="Do a fresh install of the code, preserving any data."
@@ -912,10 +912,10 @@ Common usage:
 ====================================================================
 WARNING : FAILED TO DOWNLOAD GEOLITE DATABASE FILE
           (Used for DSpace Solr Usage Statistics)
-          
+
 Underlying Error: ${geolite.error}
-     
-In order to use DSpace Solr Usage Statistics, you will need to 
+
+In order to use DSpace Solr Usage Statistics, you will need to
 manually re-run:
 
 ant update_geolite
@@ -926,12 +926,12 @@ You may manually install this file by following these steps:
 (1) Download the file from ${geolite}
 (2) Unzip it to create a file named 'GeoLiteCity.dat'
 (3) Copy that file to '${dspace.dir}/config/GeoLiteCity.dat'
-        
+
 ====================================================================
                 </echo>
             </catch>
-        </trycatch>    
-        
+        </trycatch>
+
     </target>
 
     <target name="check_geolite">
