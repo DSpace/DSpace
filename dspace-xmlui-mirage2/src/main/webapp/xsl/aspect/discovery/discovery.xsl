@@ -357,9 +357,7 @@
                 </p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-offset-3 col-sm-9" id="filters-overview-wrapper-squared"/>
-        </div>
+        <div id="filters-overview-wrapper-squared"/>
     </xsl:template>
 
     <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:head">
