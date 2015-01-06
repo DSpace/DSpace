@@ -21,6 +21,7 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.BadRequestException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -615,7 +616,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException {
+    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException, BadRequestException {
 
         if (this.userParams != null)
         {
@@ -660,9 +661,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
 
             BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
-            if (bi == null)
+            if (bi == null && type != null && !"".equals(type))
             {
+                //Not Found (404)
                 throw new ResourceNotFoundException("Browse index " + type + " not found");
+            }
+            else if(bi == null && type == null)
+            {
+                //Bad request (400)
+                throw new BadRequestException("The request is missing a mandatory parameter");
             }
             
             // If we don't have a sort column
@@ -778,7 +785,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseInfo getBrowseInfo() throws SQLException, UIException
+    private BrowseInfo getBrowseInfo() throws SQLException, UIException, ResourceNotFoundException, BadRequestException
     {
         if (this.browseInfo != null)
         {

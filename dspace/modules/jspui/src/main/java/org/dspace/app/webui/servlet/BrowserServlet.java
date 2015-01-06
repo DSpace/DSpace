@@ -65,9 +65,24 @@ public class BrowserServlet extends AbstractBrowserServlet
         // all browse requests currently come to GET.
         BrowserScope scope = getBrowserScopeForRequest(context, request, response);
 
+        // we don't have a browse scope, select the proper answer
         if (scope.getBrowseIndex() == null)
         {
-            throw new ServletException("There is no browse index for the request");
+            String type = request.getParameter("type");
+            if (type != null && !"".equals(type))
+            {
+                //couldn't find the given index
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                JSPManager.showJSP(request, response, "/error/404.jsp");
+            }
+            else
+            {
+                //no type was sent
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                JSPManager.showJSP(request, response, "/error/400.jsp");
+            }
+            // return the error code
+            return;
         }
 
         // Is this a request to export the metadata, or a normal browse request?

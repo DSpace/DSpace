@@ -153,7 +153,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     {
         if (this.bodyEmpty)
         {
-            Division notFound = body.addDivision("page-not-found","primary");
+            Division notFound = body.addDivision("bad-request","primary");
             
             notFound.setHead(T_head);
             
