@@ -114,7 +114,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
     public void addBody(Body body) throws WingException, SQLException, AuthorizeException
     {
         // Get all our parameters
-        boolean admin = AuthorizeManager.isAdmin(context);
+        boolean admin = AuthorizeManager.isCuratorOrAdmin(context);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 

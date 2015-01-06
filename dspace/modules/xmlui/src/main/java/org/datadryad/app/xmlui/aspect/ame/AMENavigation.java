@@ -10,8 +10,11 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -43,8 +46,19 @@ public class AMENavigation extends AbstractDSpaceTransformer implements Cacheabl
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
-                context.setHead(T_context_head);
-                context.addItem().addXref(contextPath+"/item/ame?itemID="+item.getID(), T_context_ame);
+                if(AuthorizeConfiguration.authorizeManage(this.context,"extract-meta",item))
+                {
+                    try
+                    {
+                        AuthorizeManager.authorizeAction(this.context, item.getCollections()[0].getCommunities()[0], Constants.ADMIN);
+
+                        context.setHead(T_context_head);
+                        context.addItem().addXref(contextPath+"/item/ame?itemID="+item.getID(), T_context_ame);
+                    }catch (AuthorizeException e)
+                    {
+
+                    }
+                }
             }
     	}
     }
