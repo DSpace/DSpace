@@ -20,6 +20,7 @@ public class OrderFormatTitleMarc21 extends AbstractTextFilterOFD
 	{
 		filters = new TextFilter[] { new MARC21InitialArticleWord(),
                                      new DecomposeDiactritics(),
+                                     new Unquote(),
                                      new StripLeadingNonAlphaNum(),
 									 new LowerCaseAndTrim() };
 	}
