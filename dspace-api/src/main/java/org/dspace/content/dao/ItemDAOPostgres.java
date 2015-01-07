@@ -14,43 +14,71 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.storage.rdbms.TableRow;
 
 import java.sql.SQLException;
+import org.dspace.content.MetadataSchema;
+import org.dspace.core.Constants;
 
 public class ItemDAOPostgres extends ItemDAO
 {
     private static final String selectPrimaryBitstreamID =
-            "SELECT bundle.primary_bitstream_id FROM item2bundle, bundle " +
-            "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? LIMIT 1";
+        "SELECT bundle.primary_bitstream_id"
+            + " FROM item2bundle"
+            + "  JOIN bundle USING (bundle_id)"
+            + "  JOIN metadatavalue MD1 ON (MD1.resource_type_id = " +  Constants.BUNDLE
+            + "   AND MD1.resource_id = bundle_id"
+            + "   AND MD1.metadata_field_id ="
+            + "   (SELECT metadata_field_id FROM MetadataFieldRegistry"
+            + "     WHERE metadata_schema_id = " + MetadataSchema.DC_SCHEMA_ID
+            + "      AND element = 'title' AND qualifier IS NULL)"
+            + "   )"
+            + " WHERE item2bundle.item_id=?"
+            + "  AND MD1.text_value=?"
+            + " LIMIT 1";
 
     private static final String selectFirstBitstreamID =
-        "SELECT bundle2bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream " +
-        "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
-        "AND bundle.bundle_id=bundle2bitstream.bundle_id LIMIT 1";
-
-//    private final String selectFirstBitstreamID =
-//        "SELECT bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream, bitstream " +
-//        "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
-//        "AND bundle.bundle_id=bundle2bitstream.bundle_id AND bundle2bitstream.bitstream_id=bitstream.bitstream_id " +
-//        " LIMIT 1";
-
-//    private final String selectFirstBitstreamID =
-//        "SELECT bitstream_id FROM (" +
-//        "SELECT bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream, bitstream " +
-//        "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
-//        "AND bundle.bundle_id=bundle2bitstream.bundle_id AND bundle2bitstream.bitstream_id=bitstream.bitstream_id " +
-//        "ORDER BY bitstream.sequence_id" +
-//        ") allstreams LIMIT 1";
+        "SELECT bundle2bitstream.bitstream_id"
+            + " FROM item2bundle"
+            + "  JOIN bundle USING (bundle_id)"
+            + "  JOIN bundle2bitstream USING (bundle_id)"
+            + "  JOIN metadatavalue MD1 ON (MD1.resource_type_id = " +  Constants.BUNDLE
+            + "   AND MD1.resource_id = bundle_id"
+            + "   AND MD1.metadata_field_id ="
+            + "   (SELECT metadata_field_id FROM MetadataFieldRegistry"
+            + "     WHERE metadata_schema_id = " + MetadataSchema.DC_SCHEMA_ID
+            + "      AND element = 'title' AND qualifier IS NULL)"
+            + "   )"
+            + " WHERE item2bundle.item_id=?"
+            + "  AND MD1.text_value=?"
+            + " LIMIT 1";
 
     private static final String selectNamedBitstreamID =
-        "SELECT bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream, bitstream " +
-        "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
-        "AND bundle.bundle_id=bundle2bitstream.bundle_id AND bundle2bitstream.bitstream_id=bitstream.bitstream_id " +
-        "AND bitstream.name=?";
+        "SELECT bitstream.bitstream_id"
+            + " FROM item2bundle JOIN bundle USING (bundle_id)"
+            + "  JOIN bundle2bitstream USING (bundle_id)"
+            + "  JOIN bitstream USING(bitstream_id)"
+            + "  JOIN metadatavalue MD1 ON (MD1.resource_type_id = " +  Constants.BUNDLE
+            + "   AND MD1.resource_id = bundle_id"
+            + "   AND MD1.metadata_field_id ="
+            + "   (SELECT metadata_field_id FROM MetadataFieldRegistry"
+            + "     WHERE metadata_schema_id = " + MetadataSchema.DC_SCHEMA_ID
+            + "      AND element = 'title' AND qualifier IS NULL)"
+            + "   )"
+            + "  JOIN metadatavalue MD2 ON (MD2.resource_type_id = " +  Constants.BITSTREAM
+            + "   AND MD2.resource_id = bitstream_id"
+            + "   AND MD2.metadata_field_id ="
+            + "   (SELECT metadata_field_id FROM MetadataFieldRegistry"
+            + "     WHERE metadata_schema_id = " + MetadataSchema.DC_SCHEMA_ID
+            + "      AND element = 'title' AND qualifier IS NULL)"
+            + "   )"
+            + " WHERE item2bundle.item_id=?"
+            + "  AND MD1.text_value=?"
+            + "  AND MD2.text_value=?";
 
     ItemDAOPostgres(Context ctx)
     {
         super(ctx);
     }
 
+    @Override
     public Bitstream getPrimaryBitstream(int itemId, String bundleName) throws SQLException
     {
         TableRowIterator tri = null;
@@ -77,6 +105,7 @@ public class ItemDAOPostgres extends ItemDAO
         return null;
     }
 
+    @Override
     public Bitstream getFirstBitstream(int itemId, String bundleName) throws SQLException
     {
         TableRowIterator tri = null;
@@ -102,6 +131,7 @@ public class ItemDAOPostgres extends ItemDAO
         return null;
     }
 
+    @Override
     public Bitstream getNamedBitstream(int itemId, String bundleName, String fileName) throws SQLException
     {
         TableRowIterator tri = null;
