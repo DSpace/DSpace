@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+        <map:matchers default="wildcard"/>
+        <map:actions>
+            <map:action name="WidgetBannerAction" src="org.dspace.app.xmlui.aspect.dryadwidgets.WidgetBannerAction"/>
+        </map:actions>
+        <map:selectors>
+            <map:selector name="WidgetBannerSelector" src="org.dspace.app.xmlui.aspect.dryadwidgets.WidgetBannerSelector"/>
+        </map:selectors>
+        <map:generators>
+            <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
+            <map:generator name="WidgetDisplayBitstreamGenerator" src="org.dspace.app.xmlui.aspect.dryadwidgets.display.WidgetDisplayBitstreamGenerator"/>
+        </map:generators>
+    </map:components>
+    <map:pipelines>
+        <map:pipeline>
+            <map:match pattern="bannerForPub">
+                <map:select type="WidgetBannerSelector">
+                    <map:parameter name="referrer" value="{request-param:referrer}"/>
+                    <map:when test="{request-param:pubId}">
+                        <!-- Return the Dryad banner image -->
+                        <map:read type="image" src="../static/img/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
+                    </map:when>
+                    <map:otherwise>
+                        <!-- Return 1px transparent gif -->
+                        <map:read type="image" src="../static/img/Transparent.gif" mime-type="image/gif"/>
+                    </map:otherwise>
+                </map:select>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="not-found">
+                        <map:generate type="exception"/>
+                        <map:transform src="../exception2html.xslt">
+                                <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                <map:parameter name="pageTitle" value="Resource not found"/>
+                        </map:transform>
+                        <map:act type="locale">
+                            <map:transform type="i18n">
+                                    <map:parameter name="locale" value="{locale}"/>
+                            </map:transform>
+                        </map:act>
+                        <map:serialize type="xhtml" status-code="404"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+        </map:pipeline>
+
+        <map:pipeline>
+            <map:match pattern="dataPackageForPub">
+                <!-- this should redirect the user to the resource specified by the identifier -->
+                <map:act type="WidgetBannerAction">
+                    <map:parameter name="referrer" value="{request-param:referrer}"/>
+                    <map:parameter name="pubId" value="{request-param:pubId}"/>
+                    <!-- select may not be necessary -->
+                    <map:redirect-to uri="/resource/{package}"/>
+                </map:act>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="not-found">
+                        <map:generate type="exception"/>
+                        <map:transform src="../exception2html.xslt">
+                                <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                <map:parameter name="pageTitle" value="Resource not found"/>
+                        </map:transform>
+                        <map:act type="locale">
+                            <map:transform type="i18n">
+                                    <map:parameter name="locale" value="{locale}"/>
+                            </map:transform>
+                        </map:act>
+                        <map:serialize type="xhtml" status-code="404"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+        </map:pipeline>
+
+        <!-- 
+            pipelines below match: /widgets/vN/display/{doi}/...
+            sitemap's @uri-prefix="widgets/"
+        -->
+        <map:pipeline type="caching">
+            <!-- do not cache this file request, as it is a dynamic JS resource -->
+            <map:parameter name="expires" value="now"/>
+
+            <!-- return javascript file used to inject data display widget 
+                 {1} : doi
+            -->
+            <map:match pattern="v1/display/debug/**/loader.js">
+                <!-- request a data file from the DataOne-MN service running on the local machine -->
+                <map:generate type="file" src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"/>
+
+                <map:serialize type="xml"/>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="404">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                        <map:serialize type="text" mime-type="application/javascript" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+        </map:pipeline>
+
+        <map:pipeline type="caching">
+            <!-- do not cache this file request, as it is a dynamic JS resource -->
+            <map:parameter name="expires" value="now"/>
+
+            <!-- return javascript file used to inject data display widget 
+                 {1} : doi
+            -->
+            <map:match pattern="v1/display/**/loader.js">
+                <!-- request a data file from the DataOne-MN service running on the local machine -->
+                <map:generate type="file"  src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"/>
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileLoader.xsl">
+
+                    <!-- cocoon-mapped values: url's for resources -->
+                    <map:parameter name="ddwcss"        value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
+                    <map:parameter name="jqlib"         value="{request:scheme}://{request:serverName}:{request:serverPort}/static/js/jquery-1.9.1.min.js"/>
+                    <map:parameter name="lblib"         value="{request:scheme}://{request:serverName}:{request:serverPort}/static/js/jquery.magnific-popup-0.9.9.js"/>
+                    <map:parameter name="frame-url"     value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/v1/display/{1}/frame?referrer={request-param:referrer}"/>
+
+                    <!-- request parameters -->
+                    <map:parameter name="referrer"      value="{request-param:referrer}"/>
+                    <map:parameter name="doi"           value="{1}"/>
+                    <map:parameter name="wrapper-id"    value="{request-param:wrapper}"/>
+                </map:transform>
+                <map:serialize type="text" mime-type="application/javascript"/>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="not-found">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileLoader.xsl"/>
+                        <map:transform type="i18n">
+                            <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                        <map:serialize type="text" mime-type="application/javascript" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+        </map:pipeline>
+
+        <map:pipeline type="caching">
+            <!-- {1} : doi -->
+            <map:match pattern="v1/display/debug/**/frame">
+                <map:aggregate element="parts">
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}"              element="meta"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}/bitstream"    element="meta-bitstream"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"            element="object"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}/DRI"            element="dri"/>
+                </map:aggregate>
+                <map:serialize type="xml"/>
+            </map:match>
+        </map:pipeline>
+
+        <!-- data-file content handler -->
+        <map:pipeline type="caching">
+            <map:match pattern="v1/display/**/frame">
+                <map:aggregate element="parts">
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}"              element="meta"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/meta/{1}/bitstream"    element="meta-bitstream"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}"            element="object"/>
+                    <map:part src="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}/DRI"            element="dri"/>
+                </map:aggregate>
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileFrame.xsl">
+                    <map:parameter name="bitstream-url"     value="{request:scheme}://{request:serverName}:{request:serverPort}/widgets/v1/display/{1}/bitstream?referrer={request-param:referrer}"/>
+                    <map:parameter name="download-url"      value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
+                    <map:parameter name="datapackage-url"   value="{request:scheme}://{request:serverName}:{request:serverPort}/resource/{1}"/>
+                    <map:parameter name="ddwcss"            value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
+                    <map:parameter name="datapackage-img"   value="{request:scheme}://{request:serverName}:{request:serverPort}/static/img/bannerForPub.png"/>
+                    <map:parameter name="link1"             value="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"/>
+                    <map:parameter name="link2"             value="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300italic,300,400italic,400,600italic,600,700italic,700,900italic,900"/>
+                    <map:parameter name="referrer"          value="{request-param:referrer}"/>
+                    <map:parameter name="request-origin"    value="{request-param:origin}"/>
+                </map:transform>
+                <map:transform type="i18n">
+                    <map:parameter name="locale" value="{locale}"/>
+                </map:transform>
+                <map:serialize type="html"/>
+            </map:match>
+
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="400">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/xsl/widgets/display/dataFileFrameException.xsl"/>
+                        <map:transform type="i18n">
+                                <map:parameter name="locale" value="{locale}"/>
+                        </map:transform>
+                        <map:serialize type="html" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+
+        </map:pipeline>
+
+        <map:pipeline type="caching">
+            <map:match pattern="v1/display/debug/**/bitstream">
+                <map:generate type="WidgetDisplayBitstreamGenerator">
+                    <map:parameter name="referrer"   value="{request-param:referrer}"/>
+                    <map:parameter name="doi"        value="{1}"/>
+                    <map:parameter name="bitstream"  value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
+                </map:generate>
+                <map:serialize/>
+            </map:match>
+        </map:pipeline>
+
+        <!-- data-file content handler -->
+        <map:pipeline type="caching">
+            <map:match pattern="v1/display/**/bitstream">
+
+                <map:generate type="WidgetDisplayBitstreamGenerator">
+                    <map:parameter name="referrer"   value="{request-param:referrer}"/>
+                    <map:parameter name="doi"        value="{1}"/>
+                    <map:parameter name="bitstream"  value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
+                </map:generate>
+
+                <map:transform type="xslt" src="../static/xsl/widgets/display/dataFileBitstream.xsl">
+                    <map:parameter name="doi"       value="{1}"/>
+                    <map:parameter name="ddwcss"    value="{request:scheme}://{request:serverName}:{request:serverPort}/static/css/widgets/display/dryad-ddw.min.css"/>
+                    <map:parameter name="bitstream" value="{request:scheme}://{request:serverName}:{request:serverPort}/mn/v1/object/{1}/bitstream"/>
+                </map:transform>
+                <map:transform type="i18n">
+                    <map:parameter name="locale" value="{locale}"/>
+                </map:transform>
+                <map:serialize type="html"/>
+            </map:match>
+
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="400">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/html/widgets/display/bitstreamException.xsl"/>
+                        <map:serialize type="html" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+
+        </map:pipeline>
+
+        <!-- data-file content handler -->
+        <map:pipeline type="caching">
+            <map:match pattern="v1/display/preview">
+                <map:generate type="file" src="../static/html/widgets/display/preview.html"/>
+                <map:serialize type="html"/>
+            </map:match>
+            <map:handle-errors>
+                <map:select type="exception">
+                    <map:when test="400">
+                        <map:generate type="exception"/>
+                        <map:transform src="../static/html/widgets/display/bitstreamException.xsl"/>
+                        <map:serialize type="html" status-code="200"/>
+                    </map:when>
+                </map:select>
+            </map:handle-errors>
+
+        </map:pipeline>
+
+    </map:pipelines>
+</map:sitemap>

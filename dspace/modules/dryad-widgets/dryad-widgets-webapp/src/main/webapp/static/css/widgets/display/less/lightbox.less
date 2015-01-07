@@ -1,0 +1,55 @@
+
+&.dryad-popup.dryad-ddw {
+
+    position:   relative;
+    background: @frame-background;
+    padding:    20px;
+    margin:     20px auto;
+    
+    border-top-left-radius:     @large-radius;
+    border-top-right-radius:    @large-radius;
+    border-bottom-left-radius:  @large-radius;
+    border-bottom-right-radius: @large-radius;
+    border-right:               @outer-border;
+    border-left:                @outer-border;
+    border-bottom:              @outer-border;
+    border-top:                 @inner-border;
+
+    .mfp-zoom-in {
+    
+        /* start state */
+        .mfp-with-anim {
+            opacity: 0;
+            transition: all 0.2s ease-in-out; 
+            transform: scale(0.8); 
+        }
+        
+        &.mfp-bg {
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+        
+        /* animate in */
+        &.mfp-ready {
+            .mfp-with-anim {
+                opacity: 1;
+                transform: scale(1); 
+            }
+            &.mfp-bg {
+                opacity: 0.8;
+            }
+        }
+        
+        /* animate out */
+        &.mfp-removing {
+        
+            .mfp-with-anim {
+                transform: scale(0.8); 
+                opacity: 0;
+            }
+            &.mfp-bg {
+                opacity: 0;
+            }
+        }
+    }
+}

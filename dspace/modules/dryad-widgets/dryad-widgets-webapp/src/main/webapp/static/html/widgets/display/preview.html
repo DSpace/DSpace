@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dryad Data Display Widget preview</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"></link>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css"></link>
+    </head>
+    <body>
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1>Dryad Data Display Widget Preview</h1>
+                </div>
+            </div>
+            <!-- FORM -->
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="doi" class="control-label">Dryad Data File DOI</label>
+                            <input id="doi" class="form-control" type="text" placeholder="e.g., doi:10.5061/dryad.781pv/6"></input>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <button id="update-preview" type="submit" class="btn btn-default">Preview</button>
+                            </div>
+                            <div class="col-sm-8">
+                                <select id="server-select" class="form-control">
+                                    <option value="http://datadryad.org" disabled="disabled">Prod</option>
+                                    <option value="http://staging.datadryad.org" disabled="disabled">Staging</option>
+                                    <option value="http://dev.datadryad.org" selected="selected">Dev</option>
+                                    <option value="http://localhost:9999">Local (vagrant)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <form class="form-inline" role="form">
+                        <div class="input-group col-sm-3">
+                            <button id="resize-preview" type="submit" class="btn btn-default">Resize</button>
+                        </div>
+                        <div class="input-group col-sm-4">
+                            <input id="resize-width" type="text" class="form-control" placeholder="width"></input>
+                            <div class="input-group-addon">px</div>
+                        </div>
+                        <span>&#x00D7;</span>
+                        <div class="input-group col-sm-4">
+                            <input id="resize-height" type="text" class="form-control" placeholder="height"></input>
+                            <div class="input-group-addon">px</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            <div class="row">
+                <hr/>
+            </div>
+            <!-- Widget -->
+            <div class="row">
+                <div class="container">
+                    <div id="dryad-ddw-target" class="center-block"></div>
+                </div>
+            </div>
+        </div>
+        <script src="/static/js/jquery-1.9.1.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <script src="/static/js/widget-preivew.js"></script>
+    </body>
+</html>
