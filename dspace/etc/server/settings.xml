@@ -82,6 +82,8 @@
 				<paypal.verbosity>HIGH</paypal.verbosity>
 				<paypal.slienttran>TRUE</paypal.slienttran>
 				<paypal.mode>test</paypal.mode>
+				<!-- System curator account -->
+				<default.system.curator.account>dryad.queue@gmail.com</default.system.curator.account>
 			</properties>
 		</profile>
 	</profiles>

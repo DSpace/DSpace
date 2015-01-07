@@ -814,6 +814,89 @@ public class Concept extends AuthorityObject
 
         return conceptArray;
     }
+
+
+
+    /**
+     * Return Concept members of a Concept.
+     */
+    public Concept[] getRelatedConcepts(String relation,String direction,String scheme) throws SQLException
+    {
+        List<Concept> concepts = new ArrayList<Concept>();
+        String query = "SELECT concept.* FROM concept, Concept2Concept, Scheme2Concept,concept2conceptrole,scheme WHERE concept.id = scheme2concept.concept_id ";
+        if(direction.equals(Concept2ConceptRole.relation_incoming))
+        {
+            query = query + " AND Concept2Concept.incoming_id=concept.id " +
+                    "AND Concept2Concept.outgoing_id= ? ";
+        }
+        else if(direction.equals(Concept2ConceptRole.relation_outgoing))
+        {
+            query = query+" AND Concept2Concept.outgoing_id=concept.id " +
+                    "AND Concept2Concept.incoming_id= ? ";
+        }
+        else
+        {
+            //find all relationships
+            query = query+" AND Concept2Concept.incoming_id = ? " +
+                    "OR Concept2Concept.outgoing_id= ? ";
+        }
+
+
+        if(relation!=null&&relation.length()>0)
+
+        {
+            query = query + " AND Concept2Concept.role_id=concept2conceptrole.id AND concept2conceptrole.role='" + relation + "' ";
+        }
+
+        if(scheme!=null&&scheme.length()>0)
+
+        {
+            query = query + " AND scheme.id=scheme2concept.scheme_id AND LOWER(scheme.identifier) = '" + scheme + "' ";
+        }
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager.queryTable(
+                myContext, "concept",
+                query,
+                getID());
+
+        // Make Collection objects
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Concept fromCache = (Concept) myContext.fromCache(
+                        Concept.class, row.getIntColumn("id"));
+
+                if (fromCache != null)
+                {
+                    concepts.add(fromCache);
+                }
+                else
+                {
+                    concepts.add(new Concept(myContext, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        // Put them in an array
+        Concept[] conceptArray = new Concept[concepts.size()];
+        conceptArray = (Concept[]) concepts.toArray(conceptArray);
+
+        return conceptArray;
+    }
+
     /**
      * Return Concept members of a Concept.
      */

@@ -26,8 +26,9 @@
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:xalan="http://xml.apache.org/xalan"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc xalan">
 
     <xsl:output indent="yes"/>
 
@@ -191,7 +192,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <xsl:variable name="help" select="dri:field/dri:help/text()"/>
+                <xsl:variable name="help" select="string(./dri:field/dri:help)"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -203,15 +204,37 @@
                         </xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:if test="string-length($help)>0">
-                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
-                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                        <xsl:variable name="n" select="string(./dri:field/@n)"/>
+                        <xsl:choose>
+                            <!-- skip the first help on the forgot-email page -->
+                            <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
+                            <!-- put all help text in the hover-over field for these items -->
+                            <xsl:when test="$n = 'dc_subject'
+                                         or $n = 'dwc_ScientificName'
+                                         or $n = 'dc_coverage_spatial'
+                                         or $n = 'dc_coverage_temporal'
+                            ">
+                                <xsl:text> </xsl:text>
                                 <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                     <xsl:attribute name="title">
-                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                        <xsl:value-of select="$help"/>
                                     </xsl:attribute>
                                 </img>
-                            </xsl:if>
-                        </div>
+                            </xsl:when>
+                            <!-- for other fields, display subsequent sentences in hover text -->
+                            <xsl:otherwise>
+                                <div class="help-title">
+                                    <xsl:value-of select="substring-before($help,'.')"/>.
+                                    <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                        <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                            <xsl:attribute name="title">
+                                                <xsl:value-of select="substring-after($help,'.')"/>
+                                            </xsl:attribute>
+                                        </img>
+                                    </xsl:if>
+                                </div>                                
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:if>
                 </label>
             </xsl:when>
@@ -366,7 +389,7 @@
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
                 <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-               <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
                   <!-- Make invisible if we have choice-lookup operation that provides its own Add. -->
                   <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
                     <xsl:attribute name="style">
@@ -418,24 +441,13 @@
             <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
             <xsl:if test="dri:instance or dri:field/dri:instance">
-                <div class="ds-previous-values">
-                    <xsl:call-template name="fieldIterator">
-                        <xsl:with-param name="position">1</xsl:with-param>
-                    </xsl:call-template>
-                    <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                        <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                        <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                    </xsl:if>
-                    <xsl:for-each select="dri:field">
-                        <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                    </xsl:for-each>
-                </div>
+                <xsl:call-template name="ds-previous-values">
+                    <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
+                    <xsl:with-param name="instance-data" select="xalan:nodeset(dri:field/dri:instance)"/>
+                </xsl:call-template>
             </xsl:if>
         </div>
     </xsl:template>
-
-
-
 
     <!-- TODO: The field section works but needs a lot of scrubbing. I would say a third of the
         templates involved are either bloated or superfluous. -->
@@ -456,7 +468,7 @@
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
             <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-            <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+            <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
               <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
               <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
                 <xsl:attribute name="style">
@@ -474,24 +486,10 @@
         <xsl:apply-templates select="dri:help" mode="help"/>
         <xsl:apply-templates select="dri:error" mode="error"/>
         <xsl:if test="dri:instance">
-            <div class="ds-previous-values">
-                <!-- Iterate over the dri:instance elements contained in this field. The instances contain
-                    stored values as either "interpreted", "raw", or "default" values. -->
-                <xsl:call-template name="simpleFieldIterator">
-                    <xsl:with-param name="position">1</xsl:with-param>
-                </xsl:call-template>
-                <!-- Conclude with a DELETE button if the delete operation is specified. This allows
-                    removing one or more values stored for this field. -->
-                <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
-                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                </xsl:if>
-                <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
-                    the form still submits the information in those instances, even though they are no
-                    longer encoded as HTML fields. The DRI Reference should contain the exact attributes
-                    the hidden fields should have in order for this to work properly. -->
-                <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-            </div>
+            <xsl:call-template name="ds-previous-values">
+                <xsl:with-param name="field-iterator" select="'simpleFieldIterator'"/>
+                <xsl:with-param name="instance-data" select="xalan:nodeset(dri:instance)"/>
+            </xsl:call-template>
         </xsl:if>
     </xsl:template>
 
@@ -520,8 +518,9 @@
     <!-- Authority: added fields for auth values as well. -->
     <!-- Common case: use the raw value of the instance to create the hidden field -->
     <xsl:template match="dri:instance" mode="hiddenInterpreter">
+        <xsl:variable name="position" select="count(preceding-sibling::dri:instance) + 1"/>
         <input type="hidden">
-            <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',position())"/></xsl:attribute>
+            <xsl:attribute name="name"><xsl:value-of select="concat(../@n,'_',$position)"/></xsl:attribute>
             <xsl:attribute name="value">
                 <xsl:value-of select="dri:value[@type='raw']"/>
             </xsl:attribute>
@@ -530,7 +529,7 @@
         <xsl:if test="dri:value[@type='authority']">
           <xsl:call-template name="authorityInputFields">
             <xsl:with-param name="name" select="../@n"/>
-            <xsl:with-param name="position" select="position()"/>
+            <xsl:with-param name="position" select="$position"/>
             <xsl:with-param name="authValue" select="dri:value[@type='authority']/text()"/>
             <xsl:with-param name="confValue" select="dri:value[@type='authority']/@confidence"/>
           </xsl:call-template>
@@ -539,11 +538,10 @@
 
     <!-- Select box case: use the selected options contained in the instance to create the hidden fields -->
     <xsl:template match="dri:field[@type='select']/dri:instance" mode="hiddenInterpreter">
-        <xsl:variable name="position" select="position()"/>
         <xsl:for-each select="dri:value[@type='option']">
             <input type="hidden">
                 <xsl:attribute name="name">
-                    <xsl:value-of select="concat(../../@n,'_',$position)"/>
+                    <xsl:value-of select="concat(../../@n,'_',position())"/>
                 </xsl:attribute>
                 <!-- Since the dri:option and dri:values inside a select field are related by the return
                     value, encoded in @returnValue and @option attributes respectively, the option
@@ -555,8 +553,6 @@
             </input>
         </xsl:for-each>
     </xsl:template>
-
-
 
     <!-- Composite instanced field stuff -->
     <!-- It is also the one that receives the special error and help handling -->
@@ -575,18 +571,13 @@
 
         <xsl:if test="contains(dri:params/@operations,'add')">
             <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-           <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
-              <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
-              <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
-                <xsl:attribute name="style">
-                  <xsl:text>display:none;</xsl:text>
-                </xsl:attribute>
-        </xsl:if>
-               <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
-                   <xsl:attribute name="style">
-                       <xsl:text>display:none;</xsl:text>
-                   </xsl:attribute>
-               </xsl:if>
+            <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+                <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
+                <xsl:if test="dri:params/@choicesPresentation = 'lookup' or dri:params/@choicesPresentation = 'authorLookup'">
+                    <xsl:attribute name="style">
+                        <xsl:text>display:none;</xsl:text>
+                    </xsl:attribute>
+                </xsl:if>
            </input>
         </xsl:if>
 
@@ -629,20 +620,10 @@
         </xsl:choose>
         <br/>
         <xsl:if test="dri:instance or dri:field/dri:instance">
-            <div class="ds-previous-values">
-                <xsl:call-template name="fieldIterator">
-                    <xsl:with-param name="position">1</xsl:with-param>
-                </xsl:call-template>
-                <!-- Conclude with a DELETE button if the delete operation is specified. This allows
-                    removing one or more values stored for this field. -->
-                <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
-                </xsl:if>
-                <xsl:for-each select="dri:field">
-                    <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                </xsl:for-each>
-            </div>
+            <xsl:call-template name="ds-previous-values">
+                <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
+                <xsl:with-param name="instance-data" select="xalan:nodeset(dri:field/dri:instance)"/>
+            </xsl:call-template>
         </xsl:if>
     </xsl:template>
 
@@ -757,15 +738,6 @@
         <span class="ds-interpreted-field">Checkbox</span>
     </xsl:template>
 
-
-
-
-
-
-
-
-
-
     <xsl:template match="dri:field[@type='select']/dri:instance" mode="interpreted">
         <span class="ds-interpreted-field">
             <xsl:for-each select="dri:value[@type='option']">
@@ -784,28 +756,25 @@
         </span>
     </xsl:template>
 
-
     <xsl:template match="dri:instance" mode="interpreted">
         <!--<input type="hidden" name="{concat(../@n,'_',position())}" value="dri:value[@type='raw']"/>-->
-        <xsl:choose>
-            <xsl:when test="dri:value[@type='interpreted']">
-                <span class="ds-interpreted-field"><xsl:apply-templates select="dri:value[@type='interpreted']" mode="interpreted"/></span>
-            </xsl:when>
-            <xsl:when test="dri:value[@type='raw']">
-                <span class="ds-interpreted-field"><xsl:apply-templates select="dri:value[@type='raw']" mode="interpreted"/></span>
-            </xsl:when>
-            <xsl:when test="dri:value[@type='default']">
-                <span class="ds-interpreted-field"><xsl:apply-templates select="dri:value[@type='default']" mode="interpreted"/></span>
-            </xsl:when>
-            <xsl:otherwise>
-                <span class="ds-interpreted-field">No value submitted.</span>
-            </xsl:otherwise>
-        </xsl:choose>
+        <span class="ds-interpreted-field">
+            <xsl:choose>
+                <xsl:when test="dri:value[@type='interpreted']">
+                    <xsl:apply-templates select="dri:value[@type='interpreted']" mode="interpreted"/>
+                </xsl:when>
+                <xsl:when test="dri:value[@type='raw']">
+                    <xsl:apply-templates select="dri:value[@type='raw']" mode="interpreted"/>
+                </xsl:when>
+                <xsl:when test="dri:value[@type='default']">
+                    <xsl:apply-templates select="dri:value[@type='default']" mode="interpreted"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>No value submitted.</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </span>
     </xsl:template>
-
-
-
-
 
     <xsl:template match="dri:value" mode="interpreted">
         <xsl:apply-templates />
@@ -834,8 +803,6 @@
             composite: A composite input control combines several input controls into a single field. The only fields that may be combined together are: checkbox, password, select, text, and textarea. When fields are combined together they can posses multiple combined values.
     </xsl:template>
         -->
-
-
 
     <!-- The handling of component fields, that is fields that are part of a composite field type -->
     <xsl:template match="dri:field" mode="compositeComponent">
@@ -896,8 +863,6 @@
         <span class="composite-help"><xsl:apply-templates /></span>
     </xsl:template>
 
-
-
     <!-- The handling of the field element is more complex. At the moment, the handling of input fields in the
         DRI schema is very similar to HTML, utilizing the same controlled vocabulary in most cases. This makes
         converting DRI fields to HTML inputs a straightforward, if a bit verbose, task. We are currently
@@ -920,45 +885,44 @@
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <xsl:choose>
             <!-- TODO: this has changed drammatically (see form3.xml) -->
-                        <xsl:when test="@type= 'select'">
-                                <select>
-                                    <xsl:call-template name="fieldAttributes"/>
-                                    <xsl:apply-templates/>
-                                </select>
-                        </xsl:when>
+            <xsl:when test="@type= 'select'">
+                    <select>
+                        <xsl:call-template name="fieldAttributes"/>
+                        <xsl:apply-templates/>
+                    </select>
+            </xsl:when>
             <xsl:when test="@type= 'textarea'">
-                                <textarea>
-                                    <xsl:call-template name="fieldAttributes"/>
+                <textarea>
+                    <xsl:call-template name="fieldAttributes"/>
 
-                                    <!--
-                                        if the cols and rows attributes are not defined we need to call
-                                        the tempaltes for them since they are required attributes in strict xhtml
-                                     -->
-                                    <xsl:choose>
-                                        <xsl:when test="not(./dri:params[@cols])">
-                                                        <xsl:call-template name="textAreaCols"/>
-                                        </xsl:when>
-                                    </xsl:choose>
-                                    <xsl:choose>
-                                        <xsl:when test="not(./dri:params[@rows])">
-                                                <xsl:call-template name="textAreaRows"/>
-                                        </xsl:when>
-                                    </xsl:choose>
+                    <!--
+                        if the cols and rows attributes are not defined we need to call
+                        the tempaltes for them since they are required attributes in strict xhtml
+                     -->
+                    <xsl:choose>
+                        <xsl:when test="not(./dri:params[@cols])">
+                                        <xsl:call-template name="textAreaCols"/>
+                        </xsl:when>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="not(./dri:params[@rows])">
+                                <xsl:call-template name="textAreaRows"/>
+                        </xsl:when>
+                    </xsl:choose>
 
-                                    <xsl:apply-templates />
-                                    <xsl:choose>
-                                        <xsl:when test="./dri:value[@type='raw']">
-                                            <xsl:copy-of select="./dri:value[@type='raw']/node()"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:copy-of select="./dri:value[@type='default']/node()"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                    <xsl:if  test="string-length(./dri:value) &lt; 1">
-                                       <i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>
-                                    </xsl:if>
-                                </textarea>
-
+                    <xsl:apply-templates />
+                    <xsl:choose>
+                        <xsl:when test="./dri:value[@type='raw']">
+                            <xsl:copy-of select="./dri:value[@type='raw']/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:copy-of select="./dri:value[@type='default']/node()"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:if  test="string-length(./dri:value) &lt; 1">
+                       <i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>
+                    </xsl:if>
+                </textarea>
 
               <!-- add place to store authority value -->
               <xsl:if test="dri:params/@authorityControlled">
@@ -1197,8 +1161,6 @@
         </label>
     </xsl:template>
 
-
-
     <!-- A special case for the value element under field of type 'select'. Instead of being used to create
         the value attribute of an HTML input tag, these are used to create selection options.
     <xsl:template match="dri:field[@type='select']/dri:value" priority="2">
@@ -1235,8 +1197,6 @@
         <span class="error">* <xsl:apply-templates/></span>
     </xsl:template>
 
-
-
     <!-- Help elementns are turning into tooltips. There might be a better way tot do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
@@ -1246,12 +1206,17 @@
     </xsl:template>
 
     <xsl:template match="dri:help" mode="help">
-        <!--Only create the <span> if there is content in the <dri:help> node-->
-        <xsl:if test="./text() or ./node()">
-            <span class="field-help">
-                <xsl:apply-templates />
-            </span>
-        </xsl:if>
+        <xsl:choose>
+            <!-- don't output the help text in this mode for the forgot-email page -->
+            <xsl:when test="(string(parent::dri:field/@id)='aspect.eperson.StartForgotPassword.field.email')"/>
+            
+            <!--Only create the <span> if there is content in the <dri:help> node-->
+            <xsl:when test="./text() or ./node()">
+                <span class="field-help">
+                    <xsl:apply-templates />
+                </span>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
     
     <xsl:template name="addPropagateButton">
@@ -1271,4 +1236,44 @@
       </input>
     </xsl:template>
 
+    <xsl:template name="ds-previous-values">
+        <!-- string template name: 'fieldIterator' or 'simpleFieldIterator' -->
+        <xsl:param name="field-iterator"/>
+        <!-- dri:instance element node-set as a xalan:nodeset -->
+        <xsl:param name="instance-data"/>
+        <div class="ds-previous-values">
+            <!-- Iterate over the dri:instance elements contained in this field. The instances contain
+                    stored values as either "interpreted", "raw", or "default" values. -->
+            <xsl:choose>
+                <xsl:when test="$field-iterator = 'fieldIterator'">
+                    <xsl:call-template name="fieldIterator">
+                        <xsl:with-param name="position" select="1"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$field-iterator = 'simpleFieldIterator'">
+                    <xsl:call-template name="simpleFieldIterator">
+                        <xsl:with-param name="position" select="1"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:message terminate="yes">Unsupported field iterator: <xsl:value-of select="$field-iterator"/></xsl:message>
+                </xsl:otherwise>
+            </xsl:choose>
+            <!-- Conclude with a DELETE button if the delete operation is specified. This allows
+                    removing one or more values stored for this field. -->
+            <xsl:if test="contains(dri:params/@operations,'delete')">
+                <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
+            </xsl:if>
+            <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
+                    the form still submits the information in those instances, even though they are no
+                    longer encoded as HTML fields. The DRI Reference should contain the exact attributes
+                    the hidden fields should have in order for this to work properly. -->
+            <xsl:for-each select="$instance-data">
+                <!-- the context node in the loop is a dri:instance element -->
+                <xsl:apply-templates select="." mode="hiddenInterpreter"/>    
+            </xsl:for-each>            
+        </div>
+    </xsl:template>
+   
 </xsl:stylesheet>

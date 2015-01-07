@@ -176,10 +176,14 @@ public class SolrLogger
             final String originalReferrer = request.getHeader(REFERRER_HTTP_HEADER);
             log.info("SolrLogger - referrer: " + originalReferrer);
             final Boolean reviewTokenPresent = SolrLoggerUtils.isReviewTokenPresent(originalReferrer);
+            final Boolean reviewDOIPresent = SolrLoggerUtils.isReviewDOIPresent(originalReferrer);
             if(originalReferrer!=null) {
                 String cleanedReferrer = originalReferrer;
                 if(reviewTokenPresent) {
-                    cleanedReferrer = SolrLoggerUtils.replaceReviewToken(originalReferrer, SolrLoggerUtils.DUMMY_TOKEN);
+                    cleanedReferrer = SolrLoggerUtils.replaceReviewToken(cleanedReferrer, SolrLoggerUtils.DUMMY_TOKEN);
+                }
+                if(reviewDOIPresent) {
+                    cleanedReferrer = SolrLoggerUtils.replaceReviewDOI(cleanedReferrer, SolrLoggerUtils.DUMMY_DOI);
                 }
                 doc1.addField(REFERRER_SOLR_FIELD, cleanedReferrer);
             }

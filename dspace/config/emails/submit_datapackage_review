@@ -9,11 +9,14 @@
 # {3}  Submitter name/email
 # {4}  Url for the review
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
+# {6}  The journal name (or "not available" if the metadata doesn't contain one)
+
 Subject: Dryad: Data package received for review {1}
 
 Dryad has received the following data package:
 Title:        {0}
 Journal manuscript number: {5}
+Journal: {6}
 Submitted by: {3}
 Data file(s):
 {2}

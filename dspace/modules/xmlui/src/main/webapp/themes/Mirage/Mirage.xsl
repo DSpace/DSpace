@@ -111,7 +111,8 @@
             #aspect_statistics_StatisticsTransformer_div_stats,
             #aspect_dryadinfo_DryadBlogFeed_div_blog-hook {
                 height: 300px;
-                overflow: visible;
+                overflow-x: visible;
+                overflow-y: scroll;
             }
 
         #aspect_statistics_StatisticsTransformer_div_stats table {
@@ -242,7 +243,7 @@
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
-                                    Data Publishing Charges to help sustain open data at Dryad
+                                    Data Publishing Charges help sustain open data at Dryad
                                 </p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
@@ -413,22 +414,20 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-                <h1 class="ds-div-head">Recently integrated journals</h1>
-                <div id="recently_integrated_journals" class="ds-static-div primary">
-		  <div class="container">
-<!-- Proceedings of the Royal Society B -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aproceedings%5C+of%5C+the%5C+royal%5C+society%5C+b%5C%7C%5C%7C%5C%7CProceedings%5C+of%5C+the%5C+Royal%5C+Society%5C+B">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ProceedingsB.png" alt="Proceedings of the Royal Society B" /></a>
-        <!-- Scientific Data -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ascientific%5C+data%5C%7C%5C%7C%5C%7CScientific%5C+Data">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ScientificData.png" alt="Scientific Data" /></a>
-        <!-- BMC Ecology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+ecology%5C%7C%5C%7C%5C%7CBMC%5C+Ecology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEcology.png" alt="BMC Ecology" /></a>
-        <!-- BMC Evolutionary Biology -->
-		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abmc%5C+evolutionary%5C+biology%5C%7C%5C%7C%5C%7CBMC%5C+Evolutionary%5C+Biology">    <img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BMCEvolBiology.png" alt="BMC Evolutionary Biology" /></a>
+              <h1 class="ds-div-head">Recently integrated journals</h1>
+              <div id="recently_integrated_journals" class="ds-static-div primary">
+                <div class="container">
+                  <!-- Oikos -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
+<!-- Papers in Palaeontology -->
+		  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Apapers%5C+in%5C+palaeontology%5C%7C%5C%7C%5C%7CPapers%5C+in%5C+Palaeontology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-papersinpalacover.png" alt="Papers in Palaeontology" /></a>
+                  <!-- Systematic Botany -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Asystematic%5C+botany%5C%7C%5C%7C%5C%7CSystematic%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-sysbot.png" alt="Systematic Botany" /></a>
+                  <!-- PLOS -->
+                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aplos%2A"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-plos.png" alt="PLOS" /></a>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
-
-
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
                 <div id="aspect_statistics_StatisticsTransformer_div_home" class="repository">
@@ -480,10 +479,26 @@
     <xsl:template match="dri:options">
         <div id="ds-options-wrapper">
             <div id="ds-options">
-                <!-- Once the search box is built, the other parts of the options are added -->
-                <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                <xsl:variable name="uri" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
+                <xsl:choose>
+                    <!-- on the "My Submissions" page, have the "Submit data now" button at top of sidebar -->
+                    <xsl:when test="$uri = 'submissions'">
+                        <xsl:apply-templates select="dri:list[@n='DryadSubmitData']"/>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- on the "My Tasks" page, suppress "Submit data now" -->
+                    <xsl:when test="$uri = 'my-tasks'">
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>                        
+                    </xsl:when>
+                    <!-- Once the search box is built, the other parts of the options are added -->
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="dri:list[@n='discovery']|dri:list[@n='DryadSubmitData']|dri:list[@n='DryadSearch']|dri:list[@n='DryadConnect']"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <xsl:apply-templates select="dri:list[@n='Payment']"/>
                 <xsl:apply-templates select="dri:list[@n='need-help']"/>
+                <xsl:apply-templates select="dri:list[@n='human-subjects']"/>
+                <xsl:apply-templates select="dri:list[@n='large-data-packages']"/>
             </div>
         </div>
     </xsl:template>
@@ -576,6 +591,37 @@
 	  </div>
     </xsl:template>
 
+    <xsl:template match="dri:options/dri:list[@n='large-data-packages']" priority="3">
+        <div class="NOT-simple-box">
+            <h1 class="ds-div-head ds_large_data_package_head" id="ds_large_data_package_head">Large data packages</h1>
+            <div id="ds_large_data_package" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Note that for data packages over 10GB, submitters will
+                    be asked to pay an additional:
+                </p>
+                <ul>
+                    <li>$15 for the first GB beyond 10, and</li>
+                    <li>$10 for each GB thereafter.</li>
+                </ul> 
+            </div>      
+        </div>
+    </xsl:template>
+
+    <xsl:template match="dri:options/dri:list[@n='human-subjects']" priority="3">
+        <!-- note margin space added to top here -->
+        <div class="NOT-simple-box ds-margin-top-20">
+            <h1 class="ds-div-head ds_human_subjects_head" id="ds_human_subjects_head">Got human subject data?</h1>
+            <div id="ds_human_subjects" class="ds-static-div primary" style="font-size: 14px;">
+                <p style="margin-bottom: 0;">
+                    Dryad does not accept submissions that contain personally identifiable 
+                    human subject information. Human subject data must be properly anonymized. 
+                    <a href="/pages/faq#depositing-acceptable-data">Read more about the kinds of data Dryad accepts</a>.
+                </p> 
+            </div>      
+        </div>
+    </xsl:template>
+
+
     <xsl:template match="dri:options/dri:list[@n='DryadSubmitData']" priority="3">
       <div id="submit-data-sidebar-box" class="simple-box">
         <!-- START DEPOSIT -->
@@ -620,7 +666,12 @@
            
     </xsl:template>
 
-
+    <!-- description of dataset for 'Submission overview' page -->
+    <xsl:template match="dri:hi[@rend='dataset-description']">
+        <p>
+            <xsl:value-of select="."/>
+        </p>
+    </xsl:template>
 
     <xsl:template match="dri:body/dri:div/dri:list[@id='aspect.submission.StepTransformer.list.submit-progress']"/>
 
@@ -1116,7 +1167,7 @@ parameter that is being used (see variable defined above) -->
 
     <!-- Add Empty select option if no authors listed.  Prevents Subject Keywords from breaking -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:list/dri:item/dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_correspondingAuthor' and @type='select']">
-        <select>
+        <select class="ds-select-field">
             <xsl:apply-templates/>
             <xsl:if test="not(dri:option)">
                 <option value=""/>

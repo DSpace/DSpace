@@ -1,105 +1,8 @@
 jQuery(document).ready(function() {
-    initdatasetsubmissionfile();
     //initjQueryTooltips();
     initCiteMe();
     initFirstSubmissionForm();
 });
-
-
-function initdatasetsubmissionfile() {
-    //For each file I find make sure that the form gets auto submitted
-    jQuery('input#aspect_submission_StepTransformer_field_dataset-file').bind('click', function() {
-        jQuery("input[type=radio][name='datafile_type'][value='file']").click();
-        enableEmbargo();
-    });
-
-    jQuery('#aspect_submission_StepTransformer_div_submit-describe-dataset').find(":input[type=file]").bind('change', function() {
-        jQuery('#aspect_submission_StepTransformer_field_dataset-file-error').remove();
-        if (this.id == 'aspect_submission_StepTransformer_field_dataset-file') {
-            //Make sure the title gets set with the filename
-            var fileName = jQuery(this).val().substr(0, jQuery(this).val().lastIndexOf('.'));
-            fileName = fileName.substr(fileName.lastIndexOf('\\') + 1, fileName.length);
-            var title_t = jQuery('input#aspect_submission_StepTransformer_field_dc_title').val();
-            if (title_t == null || title_t == '')
-                jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(fileName);
-        }
-
-        // Check the file size.  If greater than 1.3 GB, display a warning and do not
-        // auto-submit the form
-        var fileSize = getUploadFileSize(this);
-        if(fileSize > 1.3 * 1024 * 1024 * 1024) { // 1.3 GB
-            console.error("File " + fileSize + " is too big");
-            var errorText = jQuery("<span>")
-                .attr("id", "aspect_submission_StepTransformer_field_dataset-file-error")
-                .text("This data file is too large to upload.  For assistance, please visit ")
-                .addClass("error");
-            var helpLink = jQuery("<a></a>")
-                .attr("href", "http://wiki.datadryad.org/Large_File_Transfer")
-                .text("Large file transfer.");
-            errorText.append(helpLink);
-            jQuery(this).after(errorText);
-        } else {
-            //Now find our form
-            var form = jQuery(this).closest("form");
-            //Now that we have our, indicate that I want it processed BUT NOT TO CONTINUE, just upload
-            //We do this by adding a param to the form action
-            form.attr('action', form.attr('action') + '?processonly=true');
-            //Now we submit our form
-            form.submit();
-        }
-    });
-
-    jQuery("input[type='radio'][name='datafile_type']").change(function() {
-        //If an external reference is selected we need to disable our embargo
-        if (jQuery(this).val() == 'identifier') {
-            disableEmbargo();
-        } else {
-            enableEmbargo();
-        }
-
-    });
-
-    //Should we have a data file with an external repo then disable the embargo
-    if (jQuery("input[name='disabled-embargo']").val()) {
-        disableEmbargo();
-    }
-    jQuery('select#aspect_submission_StepTransformer_field_datafile_repo').bind('change', function() {
-        if (jQuery(this).val() == 'other') {
-            jQuery("input[name='other_repo_name']").show();
-        } else {
-            jQuery("input[name='other_repo_name']").hide();
-        }
-    });
-
-    // Hide the other repo name initially
-    jQuery("input[name='other_repo_name']").hide();
-
-    //For our identifier a hint needs to be created
-    var dataFileIdenTxt = jQuery('input#aspect_submission_StepTransformer_field_datafile_identifier');
-    dataFileIdenTxt.inputHints();
-    var repoNameTxt = jQuery('input#aspect_submission_StepTransformer_field_other_repo_name');
-    repoNameTxt.inputHints();
-    dataFileIdenTxt.blur(function() {
-        if (jQuery(this).attr('title') != jQuery(this).val())
-            jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(jQuery(this).val());
-    });
-
-    jQuery('form#aspect_submission_StepTransformer_div_submit-describe-dataset').submit(function() {
-        var dataFileIdenTxt = jQuery('input#aspect_submission_StepTransformer_field_datafile_identifier');
-        if (dataFileIdenTxt.val() == dataFileIdenTxt.attr('title'))
-            dataFileIdenTxt.val('');
-
-        var repoNameTxt = jQuery('input#aspect_submission_StepTransformer_field_other_repo_name');
-        if (repoNameTxt.val() == repoNameTxt.attr('title'))
-            repoNameTxt.val('');
-
-
-        jQuery('select#aspect_submission_StepTransformer_field_dc_type_embargo').removeAttr('disabled');
-
-        return true;
-    });
-
-}
 
 function disableEmbargo() {
     var embargoSelect = jQuery('select#aspect_submission_StepTransformer_field_dc_type_embargo');
@@ -415,7 +318,7 @@ function initFirstSubmissionForm() {
 }
 
 function enableJournalPublished(){
-    console.log(jQuery('#unknown-doi-panel span.field-help'));
+    //console.log(jQuery('#unknown-doi-panel span.field-help'));
     if(jQuery('input[name|="article_doi"]').val()!="")
     {
         jQuery('input[name|="unknown_doi"]').attr("disabled", "disabled");

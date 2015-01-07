@@ -536,6 +536,22 @@
 		</profile>
 
 		<!--
+           Builds Dryad REST WebApp
+        -->
+		<profile>
+			<id>dryad-rest-webapp</id>
+			<activation>
+				<file>
+					<exists>../dryad-rest-webapp/pom.xml</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>../dryad-rest-webapp</module>
+			</modules>
+		</profile>
+
+
+		<!--
            These profiles setup properties and build configuration
            appropriate to the database that DSpace will be installed
            against.

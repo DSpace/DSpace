@@ -55,8 +55,6 @@ public class AuthorityMetadataValue {
 
     private String tableName = "";
 
-    public static String parent = "Journal";
-    public static String child = "Journal";
 
     public static String generaltype = "Internal";
 

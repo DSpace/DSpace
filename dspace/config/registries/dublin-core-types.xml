@@ -657,4 +657,11 @@
         <scope_note>External source xml value</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <qualifier>blackoutUntil</qualifier>
+        <scope_note>Date on which submission should be released from blackout</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

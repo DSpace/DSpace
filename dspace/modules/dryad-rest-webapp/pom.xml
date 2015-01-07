@@ -1,0 +1,165 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>dryad-rest-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>Dryad REST API Webapp</name>
+    <description>Dryad REST API</description>
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>modules</artifactId>
+        <version>1.7.3-SNAPSHOT</version>
+    </parent>
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archiveClasses>false</archiveClasses>
+              <webResources>
+                <resource>
+                  <filtering>true</filtering>
+                  <directory>${basedir}/src/main/webapp</directory>
+                  <includes>
+                    <include>WEB-INF/web.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>prepare-package</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+<argLine>-Ddspace.configuration="${default.dspace.dir}/config/dspace.cfg"</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
+    <profiles>
+      <!-- when activated a dspace.config configuration file location passed 
+        on the commandline (-Ddspace.config=...) can be passed through to be used 
+        as a filter source by projects for tasks such as updating the ${dspace.dir} 
+        in web.xml etc. -->
+      <profile>
+        <activation>
+          <property>
+            <name>dspace.config</name>
+          </property>
+        </activation>
+        <build>
+          <filters>
+            <filter>${dspace.config}</filter>
+          </filters>
+        </build>
+      </profile>
+    </profiles>
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+          </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.extras</groupId>
+            <artifactId>glassfish-embedded-web</artifactId>
+            <version>${glassfish.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.common</artifactId>
+            <version>${oltu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+            <version>${oltu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+            <version>${oltu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Ensure slf4j api version 1.5.6.
+             oltu brings in 1.6.1, but rest of DSpace 1.7 expects 1.5.6 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <!-- DSpace dependencies -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api</artifactId>
+        </dependency>
+        <!-- These dependencies are required so that classes loaded by dspace
+          are present when changing items in review -->
+        <dependency>
+            <!-- payment api classes are referenced in workflow -->
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>payment-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- dspace.cfg choices.plugin specifies HIVESubjectAuthority, which is in xmlui -->
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>xmlui</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <properties>
+        <jersey.version>1.18.1</jersey.version>
+        <oltu.version>1.0.0</oltu.version>
+        <glassfish.version>3.1.1</glassfish.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+    </properties>
+</project>

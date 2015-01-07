@@ -788,6 +788,7 @@ li.ds-form-item label.ds-composite-component input.ds-text-field{
 
 li.ds-form-item .ds-select-field {
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .ds-add-button,
@@ -841,7 +842,14 @@ li.ds-form-item label.ds-composite-component.last{
 }
 .submission .ds-form-list .ds-previous-values {
     clear: left;
-    width: 500px;
+    width: 100%;
+}
+
+td.ds-reorder-edit-input-col {
+    width: 80%;
+}
+img.ds-authority-confidence.cf-blank {
+    display: none;
 }
 
 #aspect_submission_Submissions_div_submissions .ds-static-div,
@@ -1996,6 +2004,7 @@ fieldset.ds-form-list ol {
     width: 100%;
     list-style-type: none;
 }
+
 fieldset.ds-form-list legend {
     color: #336699;
     background-color: inherit;
@@ -2350,6 +2359,10 @@ li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
     padding:10px;
 }
 
+#aspect_paymentsystem_ShoppingCartTransformer_list_need-help {
+    margin-bottom: 20px;
+}
+
 ul.navigation-link{
     padding: 5px 0;
     list-style: none;
@@ -2474,7 +2487,9 @@ table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.a
     color:red
 }
 
-#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
     width:100% !important;
 }
 
@@ -2489,7 +2504,7 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 
 .help-title{
     color:grey;
-    font-size: 0.5em;
+    font-size: 0.66em;
 }
 
 #aspect_submission_submit_OverviewStep_div_submit-completed-overview{
@@ -2499,10 +2514,42 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
     box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
 }
 
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > div.ds-static-div.subdiv {
+    margin-bottom: 18px;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > h1.ds-div-head {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item {
+    padding: 0 !important;
+    margin-left: 0;
+    text-indent: 0 !important;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item div {
+    padding: 0 !important;
+    margin-bottom: 10px;
+}
+
 #aspect_submission_submit_OverviewStep_div_finalizedivision{
     padding-top: 6px;
 }
 
 #SpiderTrap p a{
     color: transparent;
+}
+
+input.ds-author-order-col {
+    width: 2em;
+}
+td.ds-author-input-col {
+    width: 80%;
+}
+td.ds-author-input-col input {
+    width: 45%;
 }

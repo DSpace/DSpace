@@ -114,7 +114,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
     public void addBody(Body body) throws WingException, SQLException, AuthorizeException
     {
         // Get all our parameters
-        boolean admin = AuthorizeManager.isAdmin(context);
+        boolean admin = AuthorizeManager.isCuratorOrAdmin(context);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
@@ -324,7 +324,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             Select countryField = identity.addItem().addSelect("country");
             countryField.setRequired();
             countryField.setLabel(T_name8);
-            countryField.addOption("","Select Your Country");
+            countryField.addOption("","Select your country");
             for(String countryTemp: countries.stringPropertyNames())
             {
                 if(country!=null&&country.length()>0&&country.equals(countryTemp))

@@ -20,4 +20,13 @@
         <schema>dryad</schema>
         <element>citationTitle</element>
     </dc-type>
+    <dc-type>
+    	<schema>dryad</schema>
+      	<element>curatorNote</element>
+    </dc-type>
+    <dc-type>
+        <schema>dryad</schema>
+        <element>curatorNotePublic</element>
+    </dc-type>
+
 </dspace-dc-types>

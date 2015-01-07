@@ -34,6 +34,8 @@ public class Bio {
 
     protected String biography;
 
+    protected String email;
+
     public Bio() {
         this.name = new BioName();
         keywords = new LinkedHashSet<String>();
@@ -64,6 +66,16 @@ public class Bio {
     public void setCountry(String country) {
         this.country = country;
     }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     public Set<String> getKeywords() {
         return keywords;
@@ -109,5 +121,6 @@ public class Bio {
                 ", biography='" + biography + '\'' +
                 '}';
     }
+
 }
 
