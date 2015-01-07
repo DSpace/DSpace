@@ -29,6 +29,10 @@
 		    <name>selenium_test_url</name>
 		    <value>${seleniumTestURL}</value>
 		  </property>
+		  <property>
+		    <name>selenium_test_browser</name>
+		    <value>${seleniumTestBrowser}</value>
+		  </property>
 		</systemProperties>
 	      </configuration>
 	    </plugin>
@@ -39,7 +43,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
-                <version>2.12.0</version>
+                <version>2.43.1</version>
             </dependency>
 	    <dependency>
 	      <groupId>junit</groupId>

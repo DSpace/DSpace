@@ -1,3 +1,4 @@
+
 /* JS behaviors for all Dryad pages */
 jQuery(document).ready(function() {
     var modal =jQuery("#aspect_eperson_TermsOfService_div_modal-content").val();
@@ -606,7 +607,7 @@ function shoeShoppingCartWaiver(obj){
 }
 
 function showEmptyCountry(){
-    console.log("show empty country");
+    //console.log("show empty country");
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list').show();
     jQuery(':input[name="country"]').show();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
@@ -615,7 +616,7 @@ function showEmptyCountry(){
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
 }
 function showEmptyVoucher(){
-    console.log("show empty voucher");
+    //console.log("show empty voucher");
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').show();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove voucher : ');
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();

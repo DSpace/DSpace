@@ -842,7 +842,14 @@ li.ds-form-item label.ds-composite-component.last{
 }
 .submission .ds-form-list .ds-previous-values {
     clear: left;
-    width: 500px;
+    width: 100%;
+}
+
+td.ds-reorder-edit-input-col {
+    width: 80%;
+}
+img.ds-authority-confidence.cf-blank {
+    display: none;
 }
 
 #aspect_submission_Submissions_div_submissions .ds-static-div,
@@ -2535,4 +2542,14 @@ ul#aspect_submission_submit_CheckoutStep_list_transaction{
 
 #SpiderTrap p a{
     color: transparent;
+}
+
+input.ds-author-order-col {
+    width: 2em;
+}
+td.ds-author-input-col {
+    width: 80%;
+}
+td.ds-author-input-col input {
+    width: 45%;
 }
