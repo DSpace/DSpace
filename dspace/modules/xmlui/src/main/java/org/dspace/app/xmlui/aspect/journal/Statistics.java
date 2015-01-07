@@ -26,24 +26,20 @@ public class Statistics extends AbstractDSpaceTransformer {
     
     // TODO: localize
     
+    // config?
+    private static final String requestURIPrefix = "/journal/";
+    
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        
         Request request = ObjectModelHelper.getRequest(this.objectModel);
-        String journalAbbr = request.getContextPath();
+        //String journalAbbr = request.getContextPath().substring(requestURIPrefix.length());
 
         // redirect to /journal if not found
         Division div = body.addDivision("journal-landing");
-        div.addPara().addContent("getSitemapPath "  + request.getSitemapPath());
-        div.addPara().addContent("getSitemapURI "   + request.getSitemapURI());
-        div.addPara().addContent("getSitemapURIPrefix " + request.getSitemapURIPrefix());
-        div.addPara().addContent("getRequestURI "   + request.getRequestURI());        
-        div.addPara().addContent("getContextPath "  + request.getContextPath());        
-        div.addPara().addContent("getQueryString "  + request.getQueryString());
-        div.addPara().addContent("getPathInfo "     + request.getPathInfo());
-        div.addPara().addContent("getServletPath "  + request.getServletPath());
+        //div.addPara("request-uri-prefix", "request-uri-prefix").addText(requestURIPrefix);
+        //div.addPara("context-path", "context-path").addText(request.getContextPath());
                 
         // ------------------
         // Journal X
