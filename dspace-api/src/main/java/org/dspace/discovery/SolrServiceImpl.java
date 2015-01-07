@@ -7,9 +7,9 @@
  */
 package org.dspace.discovery;
 
+import org.dspace.util.MultiFormatDateParser;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -35,7 +35,6 @@ import java.util.Vector;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -104,8 +103,8 @@ import org.springframework.stereotype.Service;
  * regularly, a failed attempt to index from the UI will be "caught" up on in
  * that cron.
  *
- * The SolrServiceImple is registered as a Service in the ServiceManager via
- * A spring configuration file located under
+ * The SolrServiceImpl is registered as a Service in the ServiceManager via
+ * a spring configuration file located under
  * classpath://spring/spring-dspace-applicationContext.xml
  *
  * Its configuration is Autowired by the ApplicationContext
@@ -181,6 +180,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void indexContent(Context context, DSpaceObject dso)
             throws SQLException {
         indexContent(context, dso, false);
@@ -197,6 +197,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void indexContent(Context context, DSpaceObject dso,
                              boolean force) throws SQLException {
 
@@ -262,6 +263,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException {
         unIndexContent(context, dso, false);
@@ -276,6 +278,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, DSpaceObject dso, boolean commit)
             throws SQLException, IOException {
         try {
@@ -302,6 +305,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws IOException
      * @throws SQLException
      */
+    @Override
     public void unIndexContent(Context context, String handle) throws IOException, SQLException {
         unIndexContent(context, handle, false);
     }
@@ -313,6 +317,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, String handle, boolean commit)
             throws SQLException, IOException {
 
@@ -336,6 +341,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context context object
      * @param dso     object to re-index
      */
+    @Override
     public void reIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException {
         try {
@@ -352,6 +358,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param c context to use
      */
+    @Override
     public void createIndex(Context c) throws SQLException, IOException {
 
         /* Reindex all content preemptively. */
@@ -367,6 +374,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context the dspace context
      */
+    @Override
     public void updateIndex(Context context)
     {
         updateIndex(context, false);
@@ -385,6 +393,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context the dspace context
      * @param force whether or not to force the reindexing
      */
+    @Override
     public void updateIndex(Context context, boolean force)
     {
         try {
@@ -438,6 +447,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException sql exception
      * @throws SearchServiceException occurs when something went wrong with querying the solr server
      */
+    @Override
     public void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException {
 
@@ -501,6 +511,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Maintenance to keep a SOLR index efficient.
      * Note: This might take a long time.
      */
+    @Override
     public void optimize()
     {
         try {
@@ -523,6 +534,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
+    @Override
     public void buildSpellCheck() throws SearchServiceException {
         try {
             if (getSolr() == null) {
@@ -1087,7 +1099,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
                         {
                             //For our search filters that are dates we format them properly
-                            date = toDate(value);
+                            date = MultiFormatDateParser.parse(value);
                             if(date != null)
                             {
                                 //TODO: make this date format configurable !
@@ -1184,7 +1196,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 										// add the year to the autocomplete index
 										doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
 										doc.addField(indexField, yearUTC);
-                                    	
+
                                     	if (yearUTC.startsWith("0"))
                                         {
         									doc.addField(
@@ -1205,7 +1217,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         													+ "_keyword",
         													value.replaceFirst("0*", ""));
                                         }
-                                    	
+
                                     	//Also save a sort value of this year, this is required for determining the upper & lower bound year of our facet
                                         if(doc.getField(indexField + "_sort") == null)
                                         {
@@ -1262,7 +1274,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     if(type.equals(DiscoveryConfigurationParameters.TYPE_DATE))
                     {
-                        Date date = toDate(value);
+                        Date date = MultiFormatDateParser.parse(value);
                         if(date != null)
                         {
                             doc.addField(field + "_dt", date);
@@ -1937,7 +1949,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return null;
         }
         HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
-        
+
         HttpGet method = new HttpGet(hostURL.toHostString() + "");
         try
         {
