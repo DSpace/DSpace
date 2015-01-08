@@ -28,9 +28,9 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.MockConfigurationManager;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -39,8 +39,9 @@ import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
@@ -61,12 +62,13 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     /** Handles for Test objects initialized in setUpClass() and used in various tests below **/
     private static String topCommunityHandle = null;
     private static String testCollectionHandle = null;
-    private static String testCollection2Handle = null;
     private static String testItemHandle = null;
+    private static String testMappedItemHandle = null;
     
-    /** Create a temporary folder which will be cleaned up automatically by JUnit **/
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    /** Create a temporary folder which will be cleaned up automatically by JUnit.
+        NOTE: A new temp folder is recreated & then deleted for EVERY test method below. **/
+    @ClassRule
+    public static final TemporaryFolder testFolder = new TemporaryFolder();
     
     /**
      * This method will be run before every test as per @Before. It will
@@ -78,6 +80,14 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     @BeforeClass
     public static void setUpClass()
     {      
+        // Initialize MockConfigurationManager, and tell it to load properties by default
+        new MockConfigurationManager(true);
+
+        // Override default value of configured temp directory to point at our
+        // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk 
+        // store their temp files in a place where JUnit can clean them up automatically.
+        MockConfigurationManager.setProperty("upload.temp.dir", testFolder.getRoot().getAbsolutePath());
+        
         try
         {
             Context context = new Context();
@@ -121,7 +131,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             Collection greatgrandchildCol = grandchild.createCollection();
             greatgrandchildCol.addMetadata("dc", "title", null, null, "GreatGrandchild Collection");
             greatgrandchildCol.update();
-            testCollection2Handle = greatgrandchildCol.getHandle();
 
             // Create our primary Test Item
             WorkspaceItem wsItem = WorkspaceItem.create(context, grandchildCol, false);
@@ -135,18 +144,20 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             item.update();
             testItemHandle = item.getHandle();
 
-            // Create additional Test Items
+            // Create a Mapped Test Item (mapped to multiple collections
             WorkspaceItem wsItem2 = WorkspaceItem.create(context, grandchildCol, false);
             Item item2 = InstallItem.installItem(context, wsItem2);
-            item2.addMetadata("dc", "title", null, null, "Grandchild Collection Item #2");
+            item2.addMetadata("dc", "title", null, null, "Mapped Item");
             item2.update();
+            greatgrandchildCol.addItem(item2);
+            testMappedItemHandle = item2.getHandle();
 
-            WorkspaceItem wsItem3 = WorkspaceItem.create(context, grandchildCol, false);
+            WorkspaceItem wsItem3 = WorkspaceItem.create(context, greatgrandchildCol, false);
             Item item3 = InstallItem.installItem(context, wsItem3);
             item3.addMetadata("dc", "title", null, null, "GreatGrandchild Collection Item #1");
             item3.update();
 
-            WorkspaceItem wsItem4 = WorkspaceItem.create(context, grandchildCol, false);
+            WorkspaceItem wsItem4 = WorkspaceItem.create(context, greatgrandchildCol, false);
             Item item4 = InstallItem.installItem(context, wsItem4);
             item4.addMetadata("dc", "title", null, null, "GreatGrandchild Collection Item #2");
             item4.update();
@@ -157,18 +168,18 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         }
         catch (AuthorizeException ex)
         {
-            log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init: " + ex.getMessage());
+            log.error("Authorization Error in setUpClass()", ex);
+            fail("Authorization Error in setUpClass(): " + ex.getMessage());
         }
         catch (IOException ex)
         {
-            log.error("IO Error in init", ex);
-            fail("IO Error in init: " + ex.getMessage());
+            log.error("IO Error in setUpClass()", ex);
+            fail("IO Error in setUpClass(): " + ex.getMessage());
         }
         catch (SQLException ex)
         {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
+            log.error("SQL Error in setUpClass()", ex);
+            fail("SQL Error in setUpClass(): " + ex.getMessage());
         }
     }
     
@@ -203,6 +214,50 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
+     * Create an initial set of AIPs for the test content generated in setUpClass() above.
+     */
+    @Before
+    @Override
+    public void init()
+    {
+        // call init() from AbstractUnitTest to initialize testing framework
+        super.init();
+        
+        try
+        {
+            // Locate the top level community (from our test data)
+            Community topCommunity = (Community) HandleManager.resolveToObject(context, topCommunityHandle);
+
+            log.info("init() - CREATE TEST AIPS");
+            // NOTE: This will not overwrite the AIPs if they already exist.
+            // But, it does ensure they are created PRIOR to running any of the below tests.
+            // (So, essentially, this runs ONCE...after that, it'll be ignored since AIPs already exist)
+            // While ideally, you don't want to share data between tests, generating AIPs is VERY timeconsuming.
+            createAIP(topCommunity, null, true, false);
+        }
+        catch(PackageException|CrosswalkException ex)
+        {
+            log.error("Packaging Error in init()", ex);
+            fail("Packaging Error in init(): " + ex.getMessage());
+        }
+        catch (AuthorizeException ex)
+        {
+            log.error("Authorization Error in init()", ex);
+            fail("Authorization Error in init(): " + ex.getMessage());
+        }
+        catch (IOException ex)
+        {
+            log.error("IO Error in init()", ex);
+            fail("IO Error in init(): " + ex.getMessage());
+        }
+        catch (SQLException ex)
+        {
+            log.error("SQL Error in init()", ex);
+            fail("SQL Error in init(): " + ex.getMessage());
+        }
+    }
+    
+    /**
      * Test restoration from AIP of entire Community Hierarchy
      */
     @Test
@@ -227,7 +282,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(topCommunity, infoMap);
 
-        // Export this Community (recursively) to AIPs
+        // Ensure community & child AIPs are exported (but don't overwrite)
         log.info("testRestoreCommunityHierarchy() - CREATE AIPs");
         File aipFile = createAIP(topCommunity, null, true, false);
 
@@ -242,12 +297,22 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
 
         // Restore this Community (recursively) from AIPs
         log.info("testRestoreCommunityHierarchy() - RESTORE Community Hierarchy");
-        restoreFromAIP(parent, aipFile, null, true);
+        // Ensure "skipIfParentMissing" flag is set to true. 
+        // As noted in the documentation, this is often needed for larger, hierarchical
+        // restores when you have Mapped Items (which we do in our test data)
+        PackageParameters pkgParams = new PackageParameters();
+        pkgParams.addProperty("skipIfParentMissing", "true");
+        restoreFromAIP(parent, aipFile, pkgParams, true);
         // Commit these changes to our DB
         context.commit();
 
         // Assert all objects in infoMap now exist again!
         assertObjectsExist(infoMap);
+        
+        // SPECIAL CASE: Test Item Mapping restoration
+        // In our community, we have one Item which should be in two Collections
+        Item mappedItem = (Item) HandleManager.resolveToObject(context, testMappedItemHandle);
+        assertEquals("testRestoreCommunityHierarchy() - Mapped Item's Collection mappings restored", 2, mappedItem.getCollections().length);
         
         log.info("testRestoreCommunityHierarchy() - END");
     }
@@ -273,7 +338,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get the count of collections under our Community or any Sub-Communities
         int numberOfCollections = topCommunity.getAllCollections().length;
         
-        // Export this Community (recursively) to AIPs
+        // Ensure community & child AIPs are exported (but don't overwrite)
         log.info("testReplaceCommunityHierarchy() - CREATE AIPs");
         File aipFile = createAIP(topCommunity, null, true, false);
         
@@ -287,8 +352,8 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // How many items are in this Collection we are about to delete?
         int numberOfItems = collectionToDelete.countItems();
         // Get an Item that should be deleted when we delete this Collection
-        // (NOTE: This Collection is initialized with at least one item)
-        String deletedItemHandle = collectionToDelete.getItems().next().getHandle();
+        // (NOTE: This item is initialized to be a member of the deleted Collection)
+        String deletedItemHandle = testItemHandle;
         
         // Now, delete that one collection
         log.info("testReplaceCommunityHierarchy() - DELETE Collection");
@@ -305,7 +370,12 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
 
         // Replace Community (and all child objects, recursively) from AIPs
         log.info("testReplaceCommunityHierarchy() - REPLACE Community Hierarchy");
-        replaceFromAIP(topCommunity, aipFile, null, true);
+        // Ensure "skipIfParentMissing" flag is set to true. 
+        // As noted in the documentation, this is often needed for larger, hierarchical
+        // replacements when you have Mapped Items (which we do in our test data)
+        PackageParameters pkgParams = new PackageParameters();
+        pkgParams.addProperty("skipIfParentMissing", "true");
+        replaceFromAIP(topCommunity, aipFile, pkgParams, true);
         // Commit these changes to our DB
         context.commit();
         
@@ -345,7 +415,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = topCommunity.getName();
         
-        // Export JUST Community (non-recursively) to AIPs
+        // Ensure only community AIP is exported (but don't overwrite)
         log.info("testReplaceCommunityOnly() - CREATE Community AIP");
         File aipFile = createAIP(topCommunity, null, false, false);
         
@@ -386,17 +456,14 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Locate the collection (from our test data)
         Collection testCollection = (Collection) HandleManager.resolveToObject(context, testCollectionHandle);
         
-        // How many items are in this Collection?
-        int numberOfItems = testCollection.countItems();
-
         // Get parent object, so that we can restore to same parent later
         Community parent = (Community) testCollection.getParentObject();
 
-        // Save basic info about top community (and children) to an infoMap
+        // Save basic info about collection (and children) to an infoMap
         HashMap<String,String> infoMap = new HashMap<String,String>();
         saveObjectInfo(testCollection, infoMap);
 
-        // Export this Collection (recursively) to AIPs
+        // Ensure collection & child AIPs are exported (but don't overwrite)
         log.info("testRestoreCollectionHierarchy() - CREATE AIPs");
         File aipFile = createAIP(testCollection, null, true, false);
 
@@ -442,7 +509,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // How many items are in this Collection?
         int numberOfItems = testCollection.countItems();
         
-        // Export this Collection (recursively) to AIPs
+        // Ensure collection & child AIPs are exported (but don't overwrite)
         log.info("testReplaceCollectionHierarchy() - CREATE AIPs");
         File aipFile = createAIP(testCollection, null, true, false);
         
@@ -463,8 +530,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         assertThat("testReplaceCollectionHierarchy() item " + deletedItemHandle + " doesn't exist", obj, nullValue());
         
         // Assert the item count is one less
-        DSpaceObject obj2 = HandleManager.resolveToObject(context, deletedItemHandle);
-        assertEquals("testReplaceCollectionHierarchy() item count for collection " + testCollectionHandle, testCollection.countItems(), numberOfItems-1);
+        assertEquals("testReplaceCollectionHierarchy() updated item count for collection " + testCollectionHandle, numberOfItems-1, testCollection.countItems());
 
         // Replace Collection (and all child objects, recursively) from AIPs
         log.info("testReplaceCollectionHierarchy() - REPLACE Collection Hierarchy");
@@ -477,7 +543,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         assertThat("testReplaceCollectionHierarchy() item " + deletedItemHandle + " exists", objRestored, notNullValue());
         
         // Assert the Item count is same as before
-        assertEquals("testReplaceCollectionHierarchy() item count for collection " + testCollectionHandle, testCollection.countItems(), numberOfItems);
+        assertEquals("testReplaceCollectionHierarchy() restored item count for collection " + testCollectionHandle, numberOfItems, testCollection.countItems());
 
         log.info("testReplaceCollectionHierarchy() - END");
     }
@@ -504,7 +570,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = testCollection.getName();
         
-        // Export JUST Collection (non-recursively) to AIPs
+        // Ensure only collection AIP is exported (but don't overwrite)
         log.info("testReplaceCollectionOnly() - CREATE Collection AIP");
         File aipFile = createAIP(testCollection, null, false, false);
         
@@ -567,7 +633,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         if(bitstreamCount<=0)
             fail("No test bitstream found for Item in testRestoreItem()!");
 
-        // Export JUST Item (non-recursively) to AIP (this includes Item Bitstreams)
+        // Ensure item AIP is exported (but don't overwrite)
         log.info("testRestoreItem() - CREATE Item AIP");
         File aipFile = createAIP(testItem, null, false, false);
         
@@ -623,7 +689,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get its current name / title
         String oldName = testItem.getName();
         
-        // Export JUST Item (non-recursively) to AIPs
+        // Ensure item AIP is exported (but don't overwrite)
         log.info("testReplaceItem() - CREATE Item AIP");
         File aipFile = createAIP(testItem, null, false, false);
         
@@ -647,6 +713,64 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     }
     
     /**
+     * Test restoration from AIP of an Item that is mapped to multiple Collections.
+     * This tests restoring the mapped Item FROM its own AIP
+     */
+    @Test
+    public void testRestoreMappedItem() throws Exception
+    {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Full Admin permissions. Since we are working with an object
+            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
+
+        log.info("testRestoreMappedItem() - BEGIN");
+
+        // Get a reference to our test mapped Item
+        Item item = (Item) HandleManager.resolveToObject(context, testMappedItemHandle);
+        // Get owning Collection
+        Collection owner = item.getOwningCollection();
+        
+        // Assert that it is in multiple collections
+        Collection[] mappedCollections = item.getCollections();
+        assertEquals("testRestoreMappedItem() item " + testMappedItemHandle + " is mapped to multiple collections", 2, mappedCollections.length);
+        
+        // Ensure mapped item AIP is exported (but don't overwrite)
+        log.info("testRestoreMappedItem() - CREATE Mapped Item AIP");
+        File aipFile = createAIP(item, null, false, false);
+        
+        // Now, delete that item (must be removed from BOTH collections to delete it)
+        log.info("testRestoreMappedItem() - DELETE Item");
+        for(Collection c : mappedCollections)
+        {
+            c.removeItem(item);
+        }
+        context.commit();
+        
+        // Assert the deleted item no longer exists
+        DSpaceObject obj = HandleManager.resolveToObject(context, testMappedItemHandle);
+        assertThat("testRestoreMappedItem() item " + testMappedItemHandle + " doesn't exist", obj, nullValue());
+        
+        // Restore Item from AIP (non-recursive) into its original parent collection
+        log.info("testRestoreMappedItem() - RESTORE Item");
+        restoreFromAIP(owner, aipFile, null, false);
+        // Commit these changes to our DB
+        context.commit();
+        
+        // Assert the deleted item is RESTORED
+        Item itemRestored = (Item) HandleManager.resolveToObject(context, testMappedItemHandle);
+        assertThat("testRestoreMappedItem() item " + testMappedItemHandle + " exists", itemRestored, notNullValue());
+        
+        // Test that this restored Item exists in multiple Collections
+        Collection[] restoredMappings = itemRestored.getCollections();
+        assertEquals("testRestoreMappedItem() collection count", 2, restoredMappings.length);
+        
+        log.info("testRestoreMappedItem() - END");
+    }
+    
+    /**
      * Create AIP(s) based on a given DSpaceObject. This is a simple utility method
      * to avoid having to rewrite this code into several tests.
      * @param dso DSpaceObject to create AIP(s) for
@@ -658,14 +782,6 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     private File createAIP(DSpaceObject dso, PackageParameters pkgParams, boolean recursive, boolean overwrite)
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
-        new NonStrictExpectations(ConfigurationManager.class)
-        {{
-            // Override default value of configured temp directory to point at our
-            // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk 
-            // store their temp files in a place where JUnit can clean them up automatically.
-            ConfigurationManager.getProperty("upload.temp.dir"); result = testFolder.getRoot().getAbsolutePath();
-        }};
-        
         // Get a reference to the configured "AIP" package disseminator
         PackageDisseminator dip = (PackageDisseminator) PluginManager
                     .getNamedPlugin(PackageDisseminator.class, "AIP");
@@ -708,19 +824,24 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Get a reference to the configured "AIP" package ingestor
         PackageIngester sip = (PackageIngester) PluginManager
                     .getNamedPlugin(PackageIngester.class, "AIP");
-        if (sip == null)
+        if(sip == null)
         {
             fail("Could not find a ingestor for type 'AIP'");
         }
         
+        if(!aipFile.exists())
+        {
+            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+        }
+        
         // If unspecified, set default PackageParameters
-        if (pkgParams==null)
+        if(pkgParams==null)
             pkgParams = new PackageParameters();
         
         // Ensure restore mode is enabled
         pkgParams.setRestoreModeEnabled(true);
         
-        // Actually disseminate the object(s) to AIPs
+        // Actually ingest the object(s) from AIPs
         if(recursive)
             sip.ingestAll(context, parent, aipFile, pkgParams, null);
         else
@@ -746,6 +867,11 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             fail("Could not find a ingestor for type 'AIP'");
         }
         
+        if(!aipFile.exists())
+        {
+            fail("AIP Package File does NOT exist: " + aipFile.getAbsolutePath());
+        }
+        
         // If unspecified, set default PackageParameters
         if (pkgParams==null)
             pkgParams = new PackageParameters();
@@ -753,7 +879,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Ensure restore mode is enabled
         pkgParams.setRestoreModeEnabled(true);
         
-        // Actually disseminate the object(s) to AIPs
+        // Actually replace the object(s) from AIPs
         if(recursive)
             sip.replaceAll(context, dso, aipFile, pkgParams);
         else
@@ -765,7 +891,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
      * be used in conjunction with "assertObjectsExist" and "assertObjectsNotExist"
      * methods below, in order to assert whether a restoration succeeded or not.
      * <P>
-     * In HashMap, Key is the object handle, and Value is "[type-text]||[title]".
+     * In HashMap, Key is the object handle, and Value is "[type-text]::[title]".
      * @param dso DSpaceObject
      * @param infoMap HashMap
      * @throws SQLException 
@@ -823,7 +949,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
      * Assert the objects listed in a HashMap all exist in DSpace and have 
      * properties equal to HashMap value(s).
      * <P>
-     * In HashMap, Key is the object handle, and Value is "[type-text]||[title]".
+     * In HashMap, Key is the object handle, and Value is "[type-text]::[title]".
      * @param infoMap HashMap of objects to check for
      * @throws SQLException 
      */
@@ -838,17 +964,17 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         {
             // The Key is the Handle, so make sure this object exists
             DSpaceObject obj = HandleManager.resolveToObject(context, key);
-            assertThat("compareObjectInfo object " + key + " exists", obj, notNullValue());
+            assertThat("assertObjectsExist object " + key + " (info=" + infoMap.get(key) + ") exists", obj, notNullValue());
             
             // Get the typeText & name of this object from the values
             String info = infoMap.get(key);
             String[] values = info.split(valueseparator);
             String typeText = values[0];
             String name = values[1];
-            //log.info("For obj " + key + " found typeText=" + typeText + " and name=" + name);
             
-            assertEquals("compareObjectInfo object " + key + " type", obj.getTypeText(), typeText);
-            assertEquals("compareObjectInfo object " + key + " name", obj.getName(), name);
+            // Also assert type and name are correct
+            assertEquals("assertObjectsExist object " + key + " type", obj.getTypeText(), typeText);
+            assertEquals("assertObjectsExist object " + key + " name", obj.getName(), name);
         }
         
     }
@@ -869,7 +995,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         {
             // The key is the Handle, so make sure this object does NOT exist
             DSpaceObject obj = HandleManager.resolveToObject(context, key);
-            assertThat("compareObjectInfo object " + key + " exists", obj, nullValue());
+            assertThat("assertObjectsNotExist object " + key + " (info=" + infoMap.get(key) + ") doesn't exist", obj, nullValue());
         }
     }
 }
