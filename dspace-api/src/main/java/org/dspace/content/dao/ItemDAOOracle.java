@@ -20,11 +20,11 @@ import org.dspace.core.Constants;
 
 public class ItemDAOOracle extends ItemDAO
 {
-    private static String selectPrimaryBitstreamID;
+    private static String SELECT_PRIMARY_BITSTREAM_ID;
 
-    private static String selectFirstBitstreamID;
+    private static String SELECT_FIRST_BITSTREAM_ID;
 
-    private static String selectNamedBitstreamID;
+    private static String SELECT_NAMED_BITSTREAM_ID;
 
     ItemDAOOracle(Context ctx)
     {
@@ -36,8 +36,8 @@ public class ItemDAOOracle extends ItemDAO
                     MetadataSchema.DC_SCHEMA_ID, "title", null).getFieldID();
         } catch (SQLException ex) { /* SNH */ }
 
-        if (null == selectPrimaryBitstreamID)
-            selectPrimaryBitstreamID =
+        if (null == SELECT_PRIMARY_BITSTREAM_ID)
+            SELECT_PRIMARY_BITSTREAM_ID =
                 "SELECT bundle.primary_bitstream_id"
                     + " FROM item2bundle"
                     + "  JOIN bundle USING (bundle_id)"
@@ -46,11 +46,11 @@ public class ItemDAOOracle extends ItemDAO
                     + "   AND MD1.resource_id = bundle_id"
                     + "   AND MD1.metadata_field_id = " + MD_FIELD_ID_NAME
                     + "  )"
-                    + " WHERE item2bundle.item_id=?"
-                    + "  AND MD1.text_value=?";
+                    + " WHERE item2bundle.item_id = ?"
+                    + "  AND dbms_lob.compare(MD1.text_value, ?) = 0";
 
-        if (null == selectFirstBitstreamID)
-            selectFirstBitstreamID =
+        if (null == SELECT_FIRST_BITSTREAM_ID)
+            SELECT_FIRST_BITSTREAM_ID =
                 "SELECT bundle2bitstream.bitstream_id"
                     + " FROM item2bundle"
                     + "  JOIN bundle USING (bundle_id)"
@@ -60,12 +60,12 @@ public class ItemDAOOracle extends ItemDAO
                     + "   AND MD1.resource_id = bundle_id"
                     + "   AND MD1.metadata_field_id = " + MD_FIELD_ID_NAME
                     + "  )"
-                    + " WHERE item2bundle.item_id=?"
-                    + "  AND MD1.text_value=?";
+                    + " WHERE item2bundle.item_id = ?"
+                    + "  AND dbms_lob.compare(MD1.text_value, ?) = 0";
 
-        if (null == selectNamedBitstreamID)
-            selectNamedBitstreamID =
-                "SELECT bitstream.bitstream_id"
+        if (null == SELECT_NAMED_BITSTREAM_ID)
+            SELECT_NAMED_BITSTREAM_ID =
+                "SELECT bitstream_id"
                     + " FROM item2bundle"
                     + "  JOIN bundle USING (bundle_id)"
                     + "  JOIN bundle2bitstream USING (bundle_id)"
@@ -80,9 +80,9 @@ public class ItemDAOOracle extends ItemDAO
                     + "   AND MD2.resource_id = bitstream_id"
                     + "   AND MD2.metadata_field_id = " + MD_FIELD_ID_NAME
                     + "  )"
-                    + " WHERE item2bundle.item_id=?"
-                    + "  AND MD1.text_value=? "
-                    + "  AND MD2.text_value=?";
+                    + " WHERE item2bundle.item_id = ?"
+                    + "  AND dbms_lob.compare(MD1.text_value, ?) = 0 "
+                    + "  AND dbms_lob.compare(MD2.text_value, ?) = 0";
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ItemDAOOracle extends ItemDAO
 
         try
         {
-            tri = DatabaseManager.query(context, selectPrimaryBitstreamID, itemId, bundleName);
+            tri = DatabaseManager.query(context, SELECT_PRIMARY_BITSTREAM_ID, itemId, bundleName);
 
             if (tri.hasNext())
             {
@@ -119,7 +119,7 @@ public class ItemDAOOracle extends ItemDAO
 
         try
         {
-            tri = DatabaseManager.query(context, selectFirstBitstreamID, itemId, bundleName);
+            tri = DatabaseManager.query(context, SELECT_FIRST_BITSTREAM_ID, itemId, bundleName);
             if (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -145,7 +145,7 @@ public class ItemDAOOracle extends ItemDAO
 
         try
         {
-            tri = DatabaseManager.query(context, selectNamedBitstreamID, itemId, bundleName, fileName);
+            tri = DatabaseManager.query(context, SELECT_NAMED_BITSTREAM_ID, itemId, bundleName, fileName);
             if (tri.hasNext())
             {
                 TableRow row = tri.next();
