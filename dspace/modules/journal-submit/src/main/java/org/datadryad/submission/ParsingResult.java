@@ -39,7 +39,7 @@ public class ParsingResult {
     /**
      * @param flawedId the flawedId to set
      */
-    public void setFlawedId(boolean flawedId) {
+    public void setHasFlawedId(boolean flawedId) {
         this.flawedId = flawedId;
     }
 
