@@ -10,13 +10,16 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.*;
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 
 import java.lang.RuntimeException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.io.*;
 import javax.mail.internet.MimeMessage;
+import javax.mail.Session;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -140,6 +143,31 @@ public class DryadGmailService {
             }
         }
         return resultMessages;
+    }
+
+    public static ArrayList<MimeMessage> processJournalEmails () throws IOException {
+        DryadGmailService dryadGmailService = new DryadGmailService();
+        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<MimeMessage> mimeMessages = new ArrayList<MimeMessage>();
+
+        labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
+        List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
+        // Print ID of each Thread.
+        if (messages != null) {
+            ArrayList<String> processedMessageIDs = new ArrayList<String>();
+            for (Message message : messages) {
+                ByteArrayInputStream postBody = new java.io.ByteArrayInputStream(Base64.decodeBase64(message.getRaw()));
+                Session session = Session.getInstance(new Properties());
+                try {
+                    MimeMessage mimeMessage = new MimeMessage(session, postBody);
+                    mimeMessages.add(mimeMessage);
+                } catch (javax.mail.MessagingException e) {
+                    throw new RuntimeException("MessagingException: " + e.getMessage());
+                }
+                dryadGmailService.modifyMessage(message.getId(), new ArrayList<String>(), labels);
+            }
+        }
+        return mimeMessages;
     }
 
     /**
