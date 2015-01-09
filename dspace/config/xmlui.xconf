@@ -142,6 +142,12 @@
              To enable this feature, uncomment the aspect below. -->
         <!-- <aspect name="SwordClient" path="resource://aspects/SwordClient/" /> -->
 
+		<!--
+			================
+			SEDICI Aspects
+			================ -->
+		<aspect name="DSpaceContextHelper" path="resource://aspects/ContextHelper/"/>
+
         <!--
             This demo aspect tests the various possible DRI features.
             It may be useful to developers in developing new aspects or themes.
