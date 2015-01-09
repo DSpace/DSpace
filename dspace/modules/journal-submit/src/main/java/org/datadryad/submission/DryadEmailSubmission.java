@@ -367,8 +367,7 @@ public class DryadEmailSubmission extends HttpServlet {
             throw new SubmissionException(result.getStatus());
         }
 
-        // isHas?
-        if (result.isHasFlawedId()) {
+        if (result.hasFlawedId()) {
             throw new SubmissionException("Result ID is flawed: "
                     + result.getSubmissionId());
         }
