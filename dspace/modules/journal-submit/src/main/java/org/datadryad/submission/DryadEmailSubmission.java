@@ -280,7 +280,8 @@ public class DryadEmailSubmission extends HttpServlet {
         LOGGER.debug("scheduling email harvesting");
         myEmailHarvester = new Timer();
         // schedule email harvesting to happen once an hour
-        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * 60 * 60);
+        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("submit.journal.email.timer"));
+        myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * timerInterval);
     }
 
     /**
