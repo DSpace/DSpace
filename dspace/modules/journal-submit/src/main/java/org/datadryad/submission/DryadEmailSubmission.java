@@ -563,7 +563,7 @@ public class DryadEmailSubmission extends HttpServlet {
         @Override
         public void run() {
             ArrayList<String> labels = new ArrayList<String>();
-            labels.add("journal-submit");
+            labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
             try {
                 List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
                 // Print ID of each Thread.

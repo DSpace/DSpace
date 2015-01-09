@@ -112,7 +112,7 @@ public class DryadGmailService {
         DryadGmailService dryadGmailService = new DryadGmailService();
         // TEST CASE:
         ArrayList<String> labels = new ArrayList<String>();
-        labels.add("test_gmail_api");
+        labels.add(ConfigurationManager.getProperty("submit.journal.email.testlabel"));
 
         String result = "messages ";
 
