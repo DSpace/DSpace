@@ -110,18 +110,19 @@ public class DryadGmailService {
 
     public static String testMethod() throws IOException {
         DryadGmailService dryadGmailService = new DryadGmailService();
-        // TEST CASE:
+
         ArrayList<String> labels = new ArrayList<String>();
         labels.add(ConfigurationManager.getProperty("submit.journal.email.testlabel"));
 
-        String result = "messages ";
+        String result = "";
 
-        List<Message> messages = dryadGmailService.listMessagesWithLabels(labels);
+        List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
         // Print ID of each Thread.
         if (messages != null) {
-            for (Message m : messages) {
-                Message message = dryadGmailService.myGmailService.users().messages().get(dryadGmailService.myUserID, m.getId()).execute();
-                result = result + "\n" + message.getSnippet();
+            ArrayList<String> processedMessageIDs = new ArrayList<String>();
+            result = result + ("got " + messages.size() + " test messages");
+            for (Message message : messages) {
+                result = result + ("Message: " + message.getId() + ", " + message.getSnippet());
             }
         }
         return result;

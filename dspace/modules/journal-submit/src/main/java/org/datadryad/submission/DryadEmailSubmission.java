@@ -106,18 +106,7 @@ public class DryadEmailSubmission extends HttpServlet {
             return;
         } else if (requestURI.contains("test")) {
             try {
-                dryadGmailService = new DryadGmailService();
-                ArrayList<String> labels = new ArrayList<String>();
-                labels.add("test_gmail_api");
-                List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
-                // Print ID of each Thread.
-                if (messages != null) {
-                    ArrayList<String> processedMessageIDs = new ArrayList<String>();
-                    LOGGER.info("got " + messages.size() + " test messages");
-                    for (Message message : messages) {
-                        LOGGER.info("Message: " + message.getId() + ", " + message.getSnippet());
-                    }
-                }
+                LOGGER.info(DryadGmailService.testMethod());
             } catch (IOException e) {
                 LOGGER.info(e.getMessage());
                 throw new RuntimeException(e.getMessage());
