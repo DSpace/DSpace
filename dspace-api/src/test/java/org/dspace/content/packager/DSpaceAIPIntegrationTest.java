@@ -66,13 +66,14 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
     private static String testMappedItemHandle = null;
     
     /** Create a temporary folder which will be cleaned up automatically by JUnit.
-        NOTE: A new temp folder is recreated & then deleted for EVERY test method below. **/
+        NOTE: As a ClassRule, this temp folder is shared by ALL tests below.
+        Its AIP contents are initialized in init() below. **/
     @ClassRule
     public static final TemporaryFolder testFolder = new TemporaryFolder();
     
     /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
+     * This method will be run during class initialization. It will initialize
+     * shared resources required for all the tests. It is only run once.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
@@ -104,9 +105,10 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
             //              - "GreatGrandchild Collection"
             //                  - "GreatGrandchild Collection Item #1"
             //                  - "GreatGrandchild Collection Item #2"
+            //                  - "Mapped Item" (mapped collection)
             //          - "Grandchild Collection"
             //              - "Grandchild Collection Item #1"
-            //              - "Grandchild Collection Item #2"
+            //              - "Mapped Item" (owning collection)
             //
             Community topCommunity = Community.create(null,context);
             topCommunity.addMetadata(MetadataSchema.DC_SCHEMA, "title", null, null, "Top Community");
@@ -309,7 +311,7 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         // Assert all objects in infoMap now exist again!
         assertObjectsExist(infoMap);
         
-        // SPECIAL CASE: Test Item Mapping restoration
+        // SPECIAL CASE: Test Item Mapping restoration was successful
         // In our community, we have one Item which should be in two Collections
         Item mappedItem = (Item) HandleManager.resolveToObject(context, testMappedItemHandle);
         assertEquals("testRestoreCommunityHierarchy() - Mapped Item's Collection mappings restored", 2, mappedItem.getCollections().length);
