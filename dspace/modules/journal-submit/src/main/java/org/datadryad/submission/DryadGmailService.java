@@ -161,10 +161,14 @@ public class DryadGmailService {
             }
         }
 
+        List<Message> messages = new ArrayList<Message>();
+        if (labelIDs.isEmpty()) {
+            return messages;
+        }
+
         ListMessagesResponse response = myGmailService.users().messages().list(myUserID)
                 .setLabelIds(labelIDs).execute();
 
-        List<Message> messages = new ArrayList<Message>();
         while (response.getMessages() != null) {
             messages.addAll(response.getMessages());
             if (response.getNextPageToken() != null) {
