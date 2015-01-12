@@ -122,8 +122,8 @@ public abstract class AbstractOpenSearchGenerator extends AbstractGenerator
     {
         if (this.validity == null)
         {
-                long expiry = System.currentTimeMillis() +
-                    ConfigurationManager.getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+            long expiry = ConfigurationManager
+                    .getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
         return this.validity;
