@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * 
@@ -32,6 +33,9 @@ public class DateUtils
     {
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'000Z'");
     	if (!init) sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
+        // We indicate that the returned date is in Zulu time (UTC) so we have
+        // to set the time zone of sdf correct.
+        sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
         String ret = sdf.format(date);
         return ret;
     }
