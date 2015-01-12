@@ -553,8 +553,11 @@ public class DescribeStep extends AbstractProcessingStep
                 lasts.remove(valToRemove);
                 if(isAuthorityControlled)
                 {
-                   auths.remove(valToRemove);
-                   confs.remove(valToRemove);
+                    if(valToRemove < auths.size())
+                    {
+                        auths.remove(valToRemove);
+                        confs.remove(valToRemove);
+                    }
                 }
             }
         }
