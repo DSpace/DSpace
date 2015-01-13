@@ -25,7 +25,8 @@
 		<display-name>DryadEmailSubmission</display-name>
 		<servlet-name>DryadEmailSubmission</servlet-name>
 		<servlet-class>org.datadryad.submission.DryadEmailSubmission</servlet-class>
-	</servlet>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
 	<servlet-mapping>
 		<servlet-name>DryadEmailSubmission</servlet-name>
