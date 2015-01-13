@@ -2,30 +2,77 @@
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
     
     <map:components>
-
+        <map:actions>
+            <map:action name="ValidateRequest" src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
+        </map:actions>
         <map:transformers>
-            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.journal.Navigation"/>
-            <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.journal.Statistics"/>
+            <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.journal.landing.Navigation"/>
+            <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
+            <map:transformer name="DryadInfo"           src="org.dspace.app.xmlui.aspect.journal.landing.DryadInfo"/>
+            <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
+            <map:transformer name="TopTenDownloads"     src="org.dspace.app.xmlui.aspect.journal.landing.TopTenDownloads"/>
+            <map:transformer name="MostRecentDeposits"  src="org.dspace.app.xmlui.aspect.journal.landing.MostRecentDeposits"/>
+            <map:transformer name="UserGeography"       src="org.dspace.app.xmlui.aspect.journal.landing.UserGeography"/>
         </map:transformers>
-
     </map:components>
     
     <map:pipelines>
         <map:pipeline>
-            <map:generate/>
             
-            <map:match pattern="journal/*">
-                <map:transform type="Navigation"/>
-                <map:transform type="Statistics"/>
+            <map:match type="wildcard" pattern="journal/*">
+
+                <!-- journal abbreviation is found: return page -->
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalAbbr" value="{1}"/>
+                    <map:parameter name="journalName" value="{1}"/>
+                    <map:generate/>
+                    <map:transform type="Navigation"/>
+                    <map:transform type="Banner">
+                        <map:parameter name="" value="{journalAbbr}"/>
+                        <map:parameter name="" value="{journalName}"/>
+                    </map:transform>
+                    <!--
+                    <map:transform type="DryadInfo">
+                        <map:parameter name="" value="{}"/>
+                    </map:transform>
+                    <map:transform type="JournalSearch">
+                        <map:parameter name="" value="{}"/>
+                    </map:transform>
+                    <map:transform type="TopTenDownloads">
+                        <map:parameter name="" value="{}"/>
+                    </map:transform>
+                    <map:transform type="MostRecentDeposits">
+                        <map:parameter name="" value="{}"/>
+                    </map:transform>
+                    <map:transform type="UserGeography">
+                        <map:parameter name="" value="{}"/>
+                    </map:transform>
+                    -->
+
+                    <map:serialize type="html"/>
+                </map:act>
+
+                <!-- journal abbreviation is not found: redirect -->
+                <map:redirect-to uri="journal"/>
+
+                <!-- handle errors for 'journal/*' 
+            not the right place for <handle-errors>
+                <map:handle-errors>
+                    <map:select type="exception">
+                        <map:redirect-to uri="journal"/>
+                    </map:select>
+                </map:handle-errors>
+                -->
             </map:match>
 
-            <map:match pattern="journal">
-                
+            <!-- page for all journals -->
+            <map:match type="wildcard" pattern="journal">
+                <map:generate/>
+                <map:serialize type="html"/>
             </map:match>
-
-            <map:serialize/>
 
         </map:pipeline>
     </map:pipelines>
     
 </map:sitemap>
+
