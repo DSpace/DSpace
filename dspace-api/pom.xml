@@ -113,6 +113,11 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+               <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -136,6 +141,7 @@
                 </plugins>
             </build>
         </profile>
+
         <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
              See also the 'skiptests' profile in Parent POM. -->
         <profile>
