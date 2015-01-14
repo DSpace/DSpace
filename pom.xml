@@ -107,6 +107,25 @@
                 </configuration>
              </plugin>
              <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                   <excludes>
+                      <exclude>**/Abstract*</exclude>
+                   </excludes>
+                   <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                </configuration>
+                <executions>
+                   <execution>
+                      <id>integration-test</id>
+                      <goals>
+                         <goal>integration-test</goal>
+                         <goal>verify</goal>
+                      </goals>
+                   </execution>
+                </executions>
+             </plugin>
+             <plugin>
                   <groupId>org.codehaus.mojo</groupId>
                   <artifactId>findbugs-maven-plugin</artifactId>
                   <version>3.0.0</version>
@@ -303,6 +322,22 @@
            </activation>
            <properties>
                <maven.test.skip>true</maven.test.skip>
+           </properties>
+       </profile>
+
+       <!-- Skip Integration Tests by default, but allow override on
+           command line by setting property "-DskipITs=false" -->
+       <profile>
+           <id>skipits</id>
+           <activation>
+               <!-- This profile should be active at all times, unless the user
+                    specifies a different value for "skipITs" -->
+               <property>
+                   <name>!skipITs</name>
+               </property>
+           </activation>
+           <properties>
+               <skipITs>true</skipITs>
            </properties>
        </profile>
 
