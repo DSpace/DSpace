@@ -58,68 +58,68 @@ public class RestIndex {
                 	"Server path: " + servletContext.getContextPath() +
                 	"<h2>Index</h2>" +
                 		"<ul>" +
-                			"<li>GET / - It returns this page.</li>" +
-                			"<li>GET /test - Return string \"REST api is running\". It is method for testing.</li>" +
-                			"<li>POST /login - Method for login into DSpace RESTful api. You must post User class. Example: {\"email\":\"test@dspace\",\"password\":\"pass\"}. It returns token under which will must sending requests. In header \"rest-dspace-token\"</li>" +
-                			"<li>POST /logout - Method for logout from DSpace RESTful api. You must post request with header \"rest-dspace-token\" token</li>" +
+                			"<li>GET / - Return this page.</li>" +
+                			"<li>GET /test - Return the string \"REST api is running\" for testing purposes.</li>" +
+                			"<li>POST /login - Method for logging into the DSpace RESTful API. You must post User class. Example: {\"email\":\"test@dspace\",\"password\":\"pass\"}. Returns a token which must be included in future requests in the \"rest-dspace-token\" header.</li>" +
+                			"<li>POST /logout - Method for logging out of the DSpace RESTful API. The request must include the \"rest-dspace-token\" token</li> header." +
                 		"</ul>" +
                 	"<h2>Communities</h2>" +
                 		"<ul>" +
-                			"<li>GET /communities - Returns array of all communities in DSpace.</li>" +
-                			"<li>GET /communities/top-communities - Returns array of all top communities in DSpace.</li>" +
-                			"<li>GET /communities/{communityId} - Returns community.</li>" +
-                			"<li>GET /communities/{communityId}/collections - Returns array of collections of community.</li>" +
-                			"<li>GET /communities/{communityId}/communities - Returns array of subcommunities of community.</li>" +
-                			"<li>POST /communities - Create new community at top level. You must post community.</li>" +
-                			"<li>POST /communities/{communityId}/collections - Create new collections in community. You must post collection.</li>" +
-                			"<li>POST /communities/{communityId}/communities - Create new subcommunity in community. You must post community.</li>" +
-                			"<li>PUT /communities/{communityId} - Update community.</li>" +
-                			"<li>DELETE /communities/{communityId} - Delete community.</li>" +
-                			"<li>DELETE /communities/{communityId}/collections/{collectionId} - Delete collection in community.</li>" +
-                			"<li>DELETE /communities/{communityId}/communities/{communityId2} - Delete subcommunity in community.</li>" +
+                			"<li>GET /communities - Return an array of all communities in DSpace.</li>" +
+                			"<li>GET /communities/top-communities - Returns an array of all top-leve communities in DSpace.</li>" +
+                			"<li>GET /communities/{communityId} - Returns a community with the specified ID.</li>" +
+                			"<li>GET /communities/{communityId}/collections - Returns an array of collections of the specified community.</li>" +
+                			"<li>GET /communities/{communityId}/communities - Returns an array of subcommunities of the specified community.</li>" +
+                			"<li>POST /communities - Create a new top-level community. You must post a community.</li>" +
+                			"<li>POST /communities/{communityId}/collections - Create a new collection in the specified community. You must post a collection.</li>" +
+                			"<li>POST /communities/{communityId}/communities - Create a new subcommunity in the specified community. You must post a community.</li>" +
+                			"<li>PUT /communities/{communityId} - Update the specified community.</li>" +
+                			"<li>DELETE /communities/{communityId} - Delete the specified community.</li>" +
+                			"<li>DELETE /communities/{communityId}/collections/{collectionId} - Delete the specified collection in the specified community.</li>" +
+                			"<li>DELETE /communities/{communityId}/communities/{communityId2} - Delete the specified subcommunity (communityId2) in the specified community (communityId).</li>" +
                 		"</ul>" +
                 	"<h2>Collections</h2>" +
                 	"<ul>" +
-                  		"<li>GET /collections - Return all collections of DSpace in array.</li>" +
-                  		"<li>GET /collections/{collectionId} - Return collection with id.</li>" +
-                  		"<li>GET /collections/{collectionId}/items - Return all items of collection.</li>" +
-                  		"<li>POST /collections/{collectionId}/items - Create posted item in collection.</li>" +
-                  		"<li>POST /collections/find-collection - Find collection by passed name.</li>" +
-                  		"<li>PUT /collections/{collectionId} </li> - Update collection. You muset post collection." +
-                  		"<li>DELETE /collections/{collectionId} - Delete collection from DSpace.</li>" +
-                  		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete item in collection. </li>" +
+                  		"<li>GET /collections - Return all DSpace collections in array.</li>" +
+                  		"<li>GET /collections/{collectionId} - Return a collection with the specified ID.</li>" +
+                  		"<li>GET /collections/{collectionId}/items - Return all items of the specified collection.</li>" +
+                  		"<li>POST /collections/{collectionId}/items - Create an item in the specified collection. You must post an item.</li>" +
+                  		"<li>POST /collections/find-collection - Find a collection by name.</li>" +
+                  		"<li>PUT /collections/{collectionId} </li> - Update the specified collection. You must post a collection." +
+                  		"<li>DELETE /collections/{collectionId} - Delete the specified collection from DSpace.</li>" +
+                  		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete the specified item (itemId) in the specified collection (collectionId). </li>" +
                   	"</ul>" +
                   	"<h2>Items</h2>" +
                   	"<ul>" +
-                  		"<li>GET /items - Return list of items.</li>" +
-                  		"<li>GET /items/{item id} - Return item.</li>" +
-                  		"<li>GET /items/{item id}/metadata - Return item metadata.</li>" +
-                  		"<li>GET /items/{item id}/bitstreams - Return item bitstreams.</li>" +
-                  		"<li>POST /items/find-by-metadata-field - Find items by metadata entry.</li>" +
-                  		"<li>POST /items/{item id}/metadata - Add metadata to item.</li>" +
-                  		"<li>POST /items/{item id}/bitstreams - Add bitstream to item.</li>" +
-                  		"<li>PUT /items/{item id}/metadata - Update metadata in item.</li>" +
-                  		"<li>DELETE /items/{item id} - Delete item.</li>" +
-                  		"<li>DELETE /items/{item id}/metadata - Clear item metadata.</li>" +
-                  		"<li>DELETE /items/{item id}/bitstreams/{bitstream id} - Delete item bitstream.</li>" +
+                  		"<li>GET /items - Return a list of items.</li>" +
+                  		"<li>GET /items/{item id} - Return the specified item.</li>" +
+                  		"<li>GET /items/{item id}/metadata - Return metadata of the specified item.</li>" +
+                  		"<li>GET /items/{item id}/bitstreams - Return bitstreams of the specified item.</li>" +
+                  		"<li>POST /items/find-by-metadata-field - Find items by the specified metadata value.</li>" +
+                  		"<li>POST /items/{item id}/metadata - Add metadata to the specified item.</li>" +
+                  		"<li>POST /items/{item id}/bitstreams - Add a bitstream to the specified item.</li>" +
+                  		"<li>PUT /items/{item id}/metadata - Update metadata in the specified item.</li>" +
+                  		"<li>DELETE /items/{item id} - Delete the specified item.</li>" +
+                  		"<li>DELETE /items/{item id}/metadata - Clear metadata of the specified item.</li>" +
+                  		"<li>DELETE /items/{item id}/bitstreams/{bitstream id} - Delete the specified bitstream of the specified item.</li>" +
                   	"</ul>" +
                   	"<h2>Bitstreams</h2>" +
                   	"<ul>" +
                   		"<li>GET /bitstreams - Return all bitstreams in DSpace.</li>" +
-                  		"<li>GET /bitstreams/{bitstream id} - Return bitstream.</li>" +
-                  		"<li>GET /bitstreams/{bitstream id}/policy - Return bitstream policies.</li>" +
-                  		"<li>POST /bitstreams/{bitstream id}/retrieve - Return data of bitstream.</li>" +
-                  		"<li>POST /bitstreams/{bitstream id}/policy - Add policy to item.</li>" +
-                  		"<li>PUT /bitstreams/{bitstream id}/data - Update data of bitstream.</li>" +
-                  		"<li>PUT /bitstreams/{bitstream id} - Update metadata of bitstream.</li>" +
-                  		"<li>DELETE /bitstreams/{bitstream id} - Delete bitstream from DSpace.</li>" +
-                  		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete bitstream policy.</li>" +
+                  		"<li>GET /bitstreams/{bitstream id} - Return the specified bitstream.</li>" +
+                  		"<li>GET /bitstreams/{bitstream id}/policy - Return policies of the specified bitstream.</li>" +
+                  		"<li>GET /bitstreams/{bitstream id}/retrieve - Return the contents of the specified bitstream.</li>" +
+                  		"<li>POST /bitstreams/{bitstream id}/policy - Add a policy to the specified bitstream.</li>" +
+                  		"<li>PUT /bitstreams/{bitstream id}/data - Update the contents of the specified bitstream.</li>" +
+                  		"<li>PUT /bitstreams/{bitstream id} - Update metadata of the specified bitstream.</li>" +
+                  		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
+                  		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
                 "</body></html> ";
     }
     
     /**
-     * Method for only test if rest api is running.
+     * Method only for testing whether the REST API is running.
      * 
      * @return String "REST api is running."
      */
@@ -131,11 +131,11 @@ public class RestIndex {
     }
 
     /**
-     * Method for login user into REST api.
+     * Method to login a user into REST API.
      * 
      * @param user
-     *            User which will be logged into REST api.
-     * @return Returns response code OK with token. Otherwise returns response
+     *            User which will be logged in to REST API.
+     * @return Returns response code OK and a token. Otherwise returns response
      *         code FORBIDDEN(403).
      */
     @POST
@@ -155,14 +155,14 @@ public class RestIndex {
     }
 
     /**
-     * Method for logout from DSpace REST api. It removes token and user from
+     * Method to logout a user from DSpace REST API. Removes the token and user from
      * TokenHolder.
      * 
      * @param headers
-     *            Request header which contains header with key
-     *            "rest-dspace-token" and value of token.
-     * @return Return response OK, otherwise BAD_REQUEST, if was problem with
-     *         logout or token is incorrect.
+     *            Request header which contains the header named
+     *            "rest-dspace-token" containing the token as value.
+     * @return Return response OK, otherwise BAD_REQUEST, if there was a problem with
+     *         logout or the token is incorrect.
      */
     @POST
     @Path("/logout")
@@ -191,10 +191,12 @@ public class RestIndex {
     }
 
     /**
-     * ? status: OK
-     * authenticated: TRUE | FALSE
-     * epersonEMAIL: user@dspace.org
-     * epersonNAME: Joe User
+     * Method to check current status of the service and logged in user.
+     * 
+     * okay: true | false
+     * authenticated: true | false
+     * epersonEMAIL: user@example.com
+     * epersonNAME: John Doe
      * @param headers
      * @return
      */
