@@ -164,7 +164,7 @@
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table</xsl:with-param>
             </xsl:call-template>
-            <!-- rows and cols atributes are not allowed in strict
+            <!-- rows and cols attributes are not allowed in strict
             <xsl:attribute name="rows"><xsl:value-of select="@rows"/></xsl:attribute>
             <xsl:attribute name="cols"><xsl:value-of select="@cols"/></xsl:attribute>
 

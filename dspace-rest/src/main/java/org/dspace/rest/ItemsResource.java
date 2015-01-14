@@ -431,7 +431,7 @@ public class ItemsResource extends Resource
      *             ContextException. When was problem with creating context of
      *             DSpace.
      */
-    // TODO Add option to add bitsream by URI.(for very big files)
+    // TODO Add option to add bitstream by URI.(for very big files)
     @POST
     @Path("/{item_id}/bitstreams")
     public Bitstream addItemBitstream(@PathParam("item_id") Integer itemId, InputStream inputStream,
