@@ -141,6 +141,13 @@ public class IndexVersion
                 throw new IOException("Could not read Lucene segments files in " + dir.getAbsolutePath(), ie);
             }
 
+            // If we have a valid Solr index dir, but it has no existing segments
+            // then just return an empty string. It's a valid but empty index.
+            if(sis!=null && sis.size()==0)
+            {
+                return "";
+            }
+            
             // Loop through our Lucene segment files to locate the OLDEST
             // version. It is possible for individual segment files to be
             // created by different versions of Lucene. So, we just need
