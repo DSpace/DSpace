@@ -15,6 +15,7 @@
             <map:transformer name="UserGeography"       src="org.dspace.app.xmlui.aspect.journal.landing.UserGeography"/>
         </map:transformers>
         <map:matchers default="wildcard"/>
+        <map:selectors/>
     </map:components>
     
     <map:pipelines>
@@ -62,6 +63,8 @@
                 <map:serialize type="xml"/>
             </map:match>
 
+            <!-- nothing to handle here in this aspect -->
+            <map:serialize type="xml"/>
         </map:pipeline>
     </map:pipelines>
     
