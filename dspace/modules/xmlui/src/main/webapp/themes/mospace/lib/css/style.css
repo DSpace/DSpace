@@ -76,7 +76,7 @@ select.multiple {
     font-weight: normal;
     float: left;
     position: absolute; 
-    bottom: 0; 
+    bottom: -25px; 
 }
 
 #ds-user-box {
