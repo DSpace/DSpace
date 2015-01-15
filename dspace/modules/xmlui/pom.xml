@@ -352,6 +352,27 @@
                    <groupId>net.sf.ehcache</groupId>
                </exclusion>
            </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+       
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>xmlui-journal-landing-webapp</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+           <exclusions>
+               <exclusion>
+                   <artifactId>ehcache</artifactId>
+                   <groupId>net.sf.ehcache</groupId>
+               </exclusion>
+           </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>xmlui-journal-landing-webapp</artifactId>
+           <type>war</type>
+           <version>${project.version}</version>
        </dependency>
 
        <dependency>

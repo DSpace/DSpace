@@ -20,49 +20,36 @@ import org.dspace.app.xmlui.wing.element.Table;
 */
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import org.apache.avalon.framework.parameters.ParameterException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
 
 /**
  *
  * @author Nathan Day
  */
-public class Banner extends AbstractDSpaceTransformer {
+public class JournalSearch extends AbstractDSpaceTransformer {
     
-    private static final Logger log = Logger.getLogger(Banner.class);
+    private static final Logger log = Logger.getLogger(JournalSearch.class);
     
     // 
-    private static final Message ABC = message("");
+    // private static final Message ABC = message(""); 
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         // ------------------
-        // Journal X
-        // 1 sentence scope
-        // Publisher:
-        // Society: 
-        // Editorial review:
+        // Search data in Dryad associated with Journal X
+        // 
         // ------------------
-        //List bannerList = landingWrapper.addList("journal-landing-banner");
-        //Item i1 = bannerList.addItem();
-        //i1.addContent("the medium is the message");
-        String journalName;
-        try {
-            journalName = this.parameters.getParameter(PARAM_JOURNAL_NAME);
-        } catch (ParameterException ex) {
-            log.error("Failed to retrieve journal metadata from parameters");
-            return;
-        }
 
-        Division div = body.addDivision(DRI_LANDING_PAGE_BANNER_DIV);
-        Para p = div.addPara(DRI_LANDING_PAGE_BANNER_PARA, DRI_LANDING_PAGE_BANNER_PARA);
-        p.addContent("The journal name is: " + journalName);
     }
 }

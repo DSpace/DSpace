@@ -46,6 +46,8 @@ public class UserGeography extends AbstractDSpaceTransformer {
         // Geographic breakdown of users
         // 
         // ------------------
+
+        // see com.maxmind.geoip
     }
 
 }
