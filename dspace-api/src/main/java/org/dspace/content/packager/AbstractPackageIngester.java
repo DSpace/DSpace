@@ -26,6 +26,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 
 /**
  * An abstract implementation of a DSpace Package Ingester, which
@@ -76,9 +77,9 @@ public abstract class AbstractPackageIngester
      * Map of all successfully ingested/replaced DSpace objects for current 
      * import process (used by ingestAll()/replaceAll()).
      * The key is the package file (which was used to create the object),
-     * and the value is the DSpaceObject created/replaced.
+     * and the value is the Identifier (i.e. Handle) of the DSpaceObject created/replaced.
      **/
-    private Map<File, DSpaceObject> pkgIngestedMap = new LinkedHashMap<File, DSpaceObject>();
+    private Map<File, String> pkgIngestedMap = new LinkedHashMap<File, String>();
 
     /**
      * Recursively create one or more DSpace Objects out of the contents
@@ -90,7 +91,8 @@ public abstract class AbstractPackageIngester
      * collection-level package, and also create an Item for every item-level
      * package referenced by the collection-level package.
      * <p>
-     * The output of this method is one or more newly created <code>DspaceObject<code>s.
+     * The output of this method is one or more newly created DSpaceObject Identifiers
+     * (i.e. Handles).
      * <p>
      * The packager <em>may</em> choose not to implement <code>ingestAll</code>,
      * or simply forward the call to <code>ingest</code> if it is unable to support
@@ -116,7 +118,7 @@ public abstract class AbstractPackageIngester
      *  implement <code>ingestAll</code>
      */
     @Override
-    public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent, File pkgFile,
+    public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,
@@ -200,12 +202,16 @@ public abstract class AbstractPackageIngester
                             // If this newly ingested parent object was a Collection,
                             // lookup the newly ingested child Item and make sure
                             // it is mapped to this Collection.
-                            Item childItem = (Item) getIngestedMap().get(childPkg);
-                            // Ensure Item is mapped to Collection that referenced it
-                            Collection collection = (Collection) dso;
-                            if (childItem!=null && !childItem.isIn(collection))
+                            String childHandle = getIngestedMap().get(childPkg);
+                            if(childHandle!=null)
                             {
-                                collection.addItem(childItem);
+                                Item childItem = (Item) HandleManager.resolveToObject(context, childHandle);
+                                // Ensure Item is mapped to Collection that referenced it
+                                Collection collection = (Collection) dso;
+                                if (childItem!=null && !childItem.isIn(collection))
+                                {
+                                    collection.addItem(childItem);
+                                }
                             }
                         }
                     }
@@ -232,7 +238,8 @@ public abstract class AbstractPackageIngester
      * initial object to replace, any additional objects to replace must be
      * determined based on the referenced packages (or initial package itself).
      * <p>
-     * The output of this method is one or more replaced <code>DspaceObject<code>s.
+     * The output of this method is one or more replaced DSpaceObject Identifiers
+     * (i.e. Handles).
      * <p>
      * The packager <em>may</em> choose not to implement <code>replaceAll</code>,
      * since it somewhat contradicts the archival nature of DSpace. It also
@@ -244,7 +251,7 @@ public abstract class AbstractPackageIngester
      *            if object to replace can be determined from package
      * @param pkgFile  The package file to ingest.
      * @param params Properties-style list of options specific to this packager
-     * @return List of DSpaceObjects replaced
+     * @return List of Identifiers of DSpaceObjects replaced
      *
      * @throws PackageValidationException if initial package (or any referenced package)
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
@@ -252,7 +259,7 @@ public abstract class AbstractPackageIngester
      *  implement <code>replaceAll</code>
      */
     @Override
-    public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+    public List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,
@@ -319,12 +326,16 @@ public abstract class AbstractPackageIngester
                             // If this newly ingested parent object was a Collection,
                             // lookup the newly ingested child Item and make sure
                             // it is mapped to this Collection.
-                            Item childItem = (Item) getIngestedMap().get(childPkg);
-                            // Ensure Item is mapped to Collection that referenced it
-                            Collection collection = (Collection) replacedDso;
-                            if (childItem!=null && !childItem.isIn(collection))
+                            String childHandle = getIngestedMap().get(childPkg);
+                            if(childHandle!=null)
                             {
-                                collection.addItem(childItem);
+                                Item childItem = (Item) HandleManager.resolveToObject(context, childHandle);
+                                // Ensure Item is mapped to Collection that referenced it
+                                Collection collection = (Collection) replacedDso;
+                                if (childItem!=null && !childItem.isIn(collection))
+                                {
+                                    collection.addItem(childItem);
+                                }
                             }
                         }
                     }
@@ -400,7 +411,7 @@ public abstract class AbstractPackageIngester
         // Add to list of successfully ingested packages
         if(!pkgIngestedMap.containsKey(pkgFile))
         {
-            pkgIngestedMap.put(pkgFile, dso);
+            pkgIngestedMap.put(pkgFile, dso.getHandle());
         }
     }
 
@@ -410,30 +421,30 @@ public abstract class AbstractPackageIngester
      * 
      * <P>
      * The Map "key" is the package file which was parsed, and the "value"
-     * is the resulting DSpaceObject which was created/replaced.
+     * is the Identifier (i.e. Handle) of the DSpaceObject which was created/replaced.
      * 
      * @return Map of DSpaceObjects which have been created/replaced.
      */
-    protected Map<File,DSpaceObject> getIngestedMap()
+    protected Map<File,String> getIngestedMap()
     {
         return pkgIngestedMap;
     }
     
     /**
-     * Return List of all DSpaceObjects which have been ingested/replaced by
+     * Return List of all DSpaceObject Identifiers which have been ingested/replaced by
      * this instance of the Ingester.
      * <P>
      * This list can be useful in reporting back to the user what content has
      * been added or replaced.  It's used by ingestAll() and replaceAll() to
      * return this list of everything that was ingested/replaced.
      *
-     * @return List of DSpaceObjects which have been added/replaced
+     * @return List of Identifiers for DSpaceObjects which have been added/replaced
      */
-    protected List<DSpaceObject> getIngestedList()
+    protected List<String> getIngestedList()
     {
         // We have the list of ingested objects in our IngestedMap.
         // So, we simply have to convert that Collection to a List
-        java.util.Collection<DSpaceObject> coll = pkgIngestedMap.values();
+        java.util.Collection<String> coll = pkgIngestedMap.values();
         
         if(coll instanceof List)
             return (List) coll;

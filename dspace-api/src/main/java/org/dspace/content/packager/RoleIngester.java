@@ -490,7 +490,7 @@ public class RoleIngester implements PackageIngester
      * org.dspace.content.packager.PackageParameters, java.lang.String)
      */
     @Override
-    public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent,
+    public List<String> ingestAll(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageException, UnsupportedOperationException,
             CrosswalkException, AuthorizeException, SQLException, IOException
@@ -526,7 +526,7 @@ public class RoleIngester implements PackageIngester
      * org.dspace.content.packager.PackageParameters)
      */
     @Override
-    public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+    public List<String> replaceAll(Context context, DSpaceObject dso,
             File pkgFile, PackageParameters params) throws PackageException,
             UnsupportedOperationException, CrosswalkException,
             AuthorizeException, SQLException, IOException
