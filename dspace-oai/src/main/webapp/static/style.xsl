@@ -500,7 +500,7 @@
             <div class="text-center">
                 <a class="btn btn-primary">
                 <xsl:attribute name="href">
-                    <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=ListSets&amp;resumptionToken=', text())"></xsl:value-of>
+                    <xsl:value-of select="concat(/oai:OAI-PMH/oai:request/text(), '?verb=',/oai:OAI-PMH/oai:request/@verb,'&amp;resumptionToken=', text())"></xsl:value-of>
                 </xsl:attribute>
                     Show More
                 </a>
