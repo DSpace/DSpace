@@ -86,7 +86,7 @@ public class CollectionsResource extends Resource
     public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collectionId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -99,7 +99,7 @@ public class CollectionsResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
-            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             collection = new Collection(dspaceCollection, expand, context, limit, offset);
@@ -155,7 +155,7 @@ public class CollectionsResource extends Resource
     public org.dspace.rest.common.Collection[] getCollections(@QueryParam("expand") String expand,
             @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -183,7 +183,7 @@ public class CollectionsResource extends Resource
                             offset);
                     collections.add(collection);
                     writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
-                            xforwarderfor, headers, request, context);
+                            xforwardedfor, headers, request, context);
                 }
             }
             context.complete();
@@ -241,7 +241,7 @@ public class CollectionsResource extends Resource
     public org.dspace.rest.common.Item[] getCollectionItems(@PathParam("collection_id") Integer collectionId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -254,7 +254,7 @@ public class CollectionsResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
-            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             items = new ArrayList<Item>();
@@ -267,7 +267,7 @@ public class CollectionsResource extends Resource
                     if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
-                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
                 }
@@ -321,7 +321,7 @@ public class CollectionsResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item addCollectionItem(@PathParam("collection_id") Integer collectionId, Item item,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -335,7 +335,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             log.trace("Creating item in collection(id=" + collectionId + ").");
@@ -422,7 +422,7 @@ public class CollectionsResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response updateCollection(@PathParam("collection_id") Integer collectionId,
             org.dspace.rest.common.Collection collection, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -435,7 +435,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             dspaceCollection.setMetadata("name", collection.getName());
@@ -494,7 +494,7 @@ public class CollectionsResource extends Resource
     @Path("/{collection_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response deleteCollection(@PathParam("collection_id") Integer collectionId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -507,7 +507,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
-            writeStats(dspaceCollection, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             org.dspace.content.Community community = (org.dspace.content.Community) dspaceCollection.getParentObject();
@@ -566,7 +566,7 @@ public class CollectionsResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response deleteCollectionItem(@PathParam("collection_id") Integer collectionId, @PathParam("item_id") Integer itemId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -610,9 +610,9 @@ public class CollectionsResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
-            writeStats(item, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(item, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             dspaceCollection.removeItem(item);
 

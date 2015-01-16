@@ -313,7 +313,7 @@ public class ElasticSearchLogger {
         }
     }
 
-    public void post(DSpaceObject dspaceObject, String ip, String userAgent, String xforwarderfor, EPerson currentUser) {
+    public void post(DSpaceObject dspaceObject, String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
         //log.info("DS-ES post for type:"+dspaceObject.getType() + " -- " + dspaceObject.getName());
 
         client = ElasticSearchLogger.getInstance().getClient();
@@ -329,14 +329,14 @@ public class ElasticSearchLogger {
 
             // Save our basic info that we already have
 
-            if (isUseProxies() && xforwarderfor != null) {
+            if (isUseProxies() && xforwardedfor != null) {
                 /* This header is a comma delimited list */
-                for (String xfip : xforwarderfor.split(",")) {
+                for (String xfip : xforwardedfor.split(",")) {
                     /* proxy itself will sometime populate this header with the same value in
                         remote address. ordering in spec is vague, we'll just take the last
                         not equal to the proxy
                     */
-                    if (!xforwarderfor.contains(ip)) {
+                    if (!xforwardedfor.contains(ip)) {
                         ip = xfip.trim();
                     }
                 }

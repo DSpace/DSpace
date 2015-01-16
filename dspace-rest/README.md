@@ -55,7 +55,7 @@ View/Download a specific Bitstream
 
 ####Statistics
 Recording of statistics for view of items or download of bitstreams (set stats = true in rest.cfg to enable stats recording)
-http://localhost:8080/rest/items/:ID?userIP=ip&userAgent=userAgent&xforwarderfor=xforwarderfor
+http://localhost:8080/rest/items/:ID?userIP=ip&userAgent=userAgent&xforwardedfor=xforwardedfor
 If no parameters are given the details of httprequest sender are used in statistics. 
 This enables tools to record the details of their user rather then themselves.
 

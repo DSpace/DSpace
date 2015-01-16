@@ -73,7 +73,7 @@ public class CommunitiesResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Community getCommunity(@PathParam("community_id") Integer communityId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -86,7 +86,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             community = new Community(dspaceCommunity, expand, context);
@@ -139,7 +139,7 @@ public class CommunitiesResource extends Resource
     public Community[] getCommunities(@QueryParam("expand") String expand,
             @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -167,7 +167,7 @@ public class CommunitiesResource extends Resource
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
-                            xforwarderfor, headers, request, context);
+                            xforwardedfor, headers, request, context);
                     communities.add(community);
                 }
             }
@@ -221,7 +221,7 @@ public class CommunitiesResource extends Resource
     public Community[] getTopCommunities(@QueryParam("expand") String expand,
             @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -249,7 +249,7 @@ public class CommunitiesResource extends Resource
                 {
                     Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
-                            xforwarderfor, headers, request, context);
+                            xforwardedfor, headers, request, context);
                     communities.add(community);
                 }
             }
@@ -303,7 +303,7 @@ public class CommunitiesResource extends Resource
     public Collection[] getCommunityCollections(@PathParam("community_id") Integer communityId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -316,7 +316,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -334,7 +334,7 @@ public class CommunitiesResource extends Resource
                 {
                     collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
                     writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
-                            xforwarderfor, headers, request, context);
+                            xforwardedfor, headers, request, context);
                 }
             }
 
@@ -389,7 +389,7 @@ public class CommunitiesResource extends Resource
     public Community[] getCommunityCommunities(@PathParam("community_id") Integer communityId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("20") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -402,7 +402,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.READ);
-            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -420,7 +420,7 @@ public class CommunitiesResource extends Resource
                 {
                     communities.add(new Community(dspaceCommunities[i], expand, context));
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
-                            xforwarderfor, headers, request, context);
+                            xforwardedfor, headers, request, context);
                 }
             }
 
@@ -464,7 +464,7 @@ public class CommunitiesResource extends Resource
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Community createCommunity(Community community, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -489,7 +489,7 @@ public class CommunitiesResource extends Resource
             }
 
             org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(null, context);
-            writeStats(dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             dspaceCommunity.setMetadata("name", community.getName());
@@ -549,7 +549,7 @@ public class CommunitiesResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Collection addCommunityCollection(@PathParam("community_id") Integer communityId, Collection collection,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -562,7 +562,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             org.dspace.content.Collection dspaceCollection = dspaceCommunity.createCollection();
@@ -633,7 +633,7 @@ public class CommunitiesResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Community addCommunityCommunity(@PathParam("community_id") Integer communityId, Community community,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -647,7 +647,7 @@ public class CommunitiesResource extends Resource
             org.dspace.content.Community dspaceParentCommunity = findCommunity(context, communityId,
                     org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceParentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceParentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(dspaceParentCommunity, context);
@@ -713,7 +713,7 @@ public class CommunitiesResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response updateCommunity(@PathParam("community_id") Integer communityId, Community community,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -725,7 +725,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
-            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             // dspaceCommunity.setLogo(arg0); // TODO Add this option.
@@ -780,7 +780,7 @@ public class CommunitiesResource extends Resource
     @DELETE
     @Path("/{community_id}")
     public Response deleteCommunity(@PathParam("community_id") Integer communityId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -792,7 +792,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.DELETE);
-            writeStats(community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             community.delete();
@@ -850,7 +850,7 @@ public class CommunitiesResource extends Resource
     @Path("/{community_id}/collections/{collection_id}")
     public Response deleteCommunityCollection(@PathParam("community_id") Integer communityId,
             @PathParam("collection_id") Integer collectionId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -892,9 +892,9 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
-            writeStats(collection, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(collection, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             community.removeCollection(collection);
@@ -956,7 +956,7 @@ public class CommunitiesResource extends Resource
     @Path("/{community_id}/communities/{community_id2}")
     public Response deleteCommunityCommunity(@PathParam("community_id") Integer parentCommunityId,
             @PathParam("community_id2") Integer subcommunityId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -999,9 +999,9 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            writeStats(parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor,
+            writeStats(parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
-            writeStats(subcommunity, UsageEvent.Action.DELETE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(subcommunity, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             parentCommunity.removeSubcommunity(subcommunity);

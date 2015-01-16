@@ -98,13 +98,13 @@ public class Resource
      *            Action that was performed.
      * @param user_ip
      * @param user_agent
-     * @param xforwarderfor
+     * @param xforwardedfor
      * @param headers
      * @param request
      * @param context
      */
     protected void writeStats(DSpaceObject dspaceObject, UsageEvent.Action action,
-                              String user_ip, String user_agent, String xforwarderfor, HttpHeaders headers, HttpServletRequest request, Context context)
+                              String user_ip, String user_agent, String xforwardedfor, HttpHeaders headers, HttpServletRequest request, Context context)
     {
         if (!writeStatistics)
         {
@@ -118,7 +118,7 @@ public class Resource
         else
         {
             new DSpace().getEventService().fireEvent(
-                    new UsageEvent(action, user_ip, user_agent, xforwarderfor, context, dspaceObject));
+                    new UsageEvent(action, user_ip, user_agent, xforwardedfor, context, dspaceObject));
         }
 
         log.debug("fired event");
