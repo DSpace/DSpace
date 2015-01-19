@@ -260,7 +260,7 @@
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
 
-            <!-- Add theme javascipt  -->
+            <!-- Add theme javascript  -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
                 <script type="text/javascript">
                     <xsl:attribute name="src">

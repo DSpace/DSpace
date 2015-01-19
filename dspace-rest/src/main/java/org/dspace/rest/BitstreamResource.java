@@ -602,7 +602,7 @@ public class BitstreamResource extends Resource
      *         that id does not exist and UNAUTHORIZED(401) if user is not
      *         allowed to delete bitstream.
      * @throws WebApplicationException
-     *             Can be thron if there was a problem reading or editting
+     *             Can be thrown if there was a problem reading or editing
      *             the database. Or problem deleting the file. Or problem with
      *             authorization to bitstream and bundles. Or problem with
      *             creating context.
