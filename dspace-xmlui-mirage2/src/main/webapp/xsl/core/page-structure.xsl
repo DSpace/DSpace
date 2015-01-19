@@ -816,7 +816,7 @@
             <script src="{$theme-path}{@src}">&#160;</script>
         </xsl:for-each>
 
-        <!-- Add javascipt specified in DRI -->
+        <!-- Add javascript specified in DRI -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script>
                 <xsl:attribute name="src">

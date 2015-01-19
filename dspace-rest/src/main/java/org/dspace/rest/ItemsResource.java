@@ -751,11 +751,11 @@ public class ItemsResource extends Resource
      *         found, UNAUTHORIZED(401) if user is not allowed to delete item
      *         metadata.
      * @throws WebApplicationException
-     *             It is thrown by three exceptions. SQLException, when was
-     *             problem with reading item from database or editting metadata
-     *             fields. AuthorizeException, when was problem with
-     *             authorization to item. And ContextException, when was problem
-     *             with creating context of DSpace.
+     *             Thrown by three exceptions. SQLException, when there was
+     *             a problem reading item from database or editing metadata
+     *             fields. AuthorizeException, when there was a problem with
+     *             authorization to item. And ContextException, when there was a problem
+     *             with creating a DSpace context.
      */
     @DELETE
     @Path("/{item_id}/metadata")

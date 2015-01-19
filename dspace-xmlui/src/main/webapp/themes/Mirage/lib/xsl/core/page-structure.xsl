@@ -702,7 +702,7 @@
 
 
 
-        <!-- Add theme javascipt  -->
+        <!-- Add theme javascript  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='url']">
             <script type="text/javascript">
                 <xsl:attribute name="src">
