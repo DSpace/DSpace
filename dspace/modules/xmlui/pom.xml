@@ -398,12 +398,7 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.5.6</version>
         </dependency>
-      <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-solrj</artifactId>
-         <version>1.4.0.1</version>
-         <type>jar</type>
-      </dependency>
+
    </dependencies>
 
 </project>
