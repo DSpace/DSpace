@@ -217,7 +217,7 @@ public class GenerateSitemaps
         if (makeHTMLMap)
         {
             html = new HTMLSitemapGenerator(outputDir, htmlMapStem + "?map=", null);
-            log.info("Generate HTLM map");
+            log.info("Generate HTML map");
         }
 
         if (makeSitemapOrg)
