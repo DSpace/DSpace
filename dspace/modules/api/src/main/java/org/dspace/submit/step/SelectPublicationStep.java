@@ -398,15 +398,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     }
 
                     addEmailsAndEmbargoSettings(journalConcept, item);
-
+                    item.addMetadata("prism", "publicationName", null, null, title);
+                    item.update();
                 }
-                item.addMetadata("prism", "publicationName", null, null, title);
-                item.update();
-            }
-            else {
-                if(journalVals.indexOf(journalID)!=-1){
-
-                    String journalPath = journalDirs.get(journalVals.indexOf(journalID));
+                else {
+                    String journalPath = JournalUtils.getMetadataDir(journalConcept);
                     log.debug("journalPath: " + journalPath);
 
                     //We have a valid journal
@@ -466,6 +462,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 }
 
             }
+
             else
             {
                 item.addMetadata("prism", "publicationName", null, null, title);
