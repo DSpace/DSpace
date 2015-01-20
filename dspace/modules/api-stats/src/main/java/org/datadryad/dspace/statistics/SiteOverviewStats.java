@@ -1,33 +1,18 @@
 package org.datadryad.dspace.statistics;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.text.DateFormat;
-import java.util.logging.Level;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
+import static org.datadryad.dspace.statistics.SolrUtils.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 public class SiteOverviewStats  {
 
@@ -61,7 +46,6 @@ public class SiteOverviewStats  {
     }
 
     private Context context;
-    private CommonsHttpSolrServer solr;
     
     private String dataFileCount;
     private String dataFileCount_30day;
@@ -107,7 +91,6 @@ public class SiteOverviewStats  {
     
     public SiteOverviewStats(Context context) throws SQLException, StatisticsException, MalformedURLException, SolrServerException {
         this.context = context;
-        solr = getSolr();
         getStats();
     }
 
@@ -115,15 +98,15 @@ public class SiteOverviewStats  {
         // TODO: rewrite these to use xpaths and remove getCollectionCount(), getSolrResponseCount
         this.dataFileCount = getCollectionCount("stats.datafiles.coll", null);
         this.dataFileCount_30day = getCollectionCount("stats.datafiles.coll", formattedThirtyDayPrior);
-        this.dataPackageCount = getSolrResponseCount("location:l2 AND DSpaceStatus:Archived", null);
-        this.dataPackageCount_30day = getSolrResponseCount("location:l2 AND DSpaceStatus:Archived", "dc.date.issued_dt:[NOW-30DAY TO NOW]");
+        this.dataPackageCount = getSolrResponseCount(solrSearchUrlBase, "location:l2 AND DSpaceStatus:Archived", null);
+        this.dataPackageCount_30day = getSolrResponseCount(solrSearchUrlBase, "location:l2 AND DSpaceStatus:Archived", "dc.date.issued_dt:[NOW-30DAY TO NOW]");
         // /TODO
-        this.journalCount = getSolrXPathResult(solrSearchUrlBase + PUB_SEARCH, PUB_COUNTER);
-        this.journalCount_30day = getSolrXPathResult(solrSearchUrlBase + PUB_SEARCH_30DAY, PUB_COUNTER);
-        this.uniqAuthors = getSolrXPathResult(solrSearchUrlBase + AUTH_SEARCH, AUTH_COUNTER);
-        this.uniqAuthors_30day = getSolrXPathResult(solrSearchUrlBase + AUTH_SEARCH_30DAY, AUTH_COUNTER);
-        this.totalFileDownload = getSolrXPathResult(solrStatsUrlBase + DOWN_SEARCH, DOWN_COUNTER);
-        this.totalFileDownload_30day = getSolrXPathResult(solrStatsUrlBase + DOWN_SEARCH_30DAY, DOWN_COUNTER);
+        this.journalCount = getSolrXPathResult(solrSearchUrlBase, PUB_SEARCH, PUB_COUNTER);
+        this.journalCount_30day = getSolrXPathResult(solrSearchUrlBase, PUB_SEARCH_30DAY, PUB_COUNTER);
+        this.uniqAuthors = getSolrXPathResult(solrSearchUrlBase, AUTH_SEARCH, AUTH_COUNTER);
+        this.uniqAuthors_30day = getSolrXPathResult(solrSearchUrlBase, AUTH_SEARCH_30DAY, AUTH_COUNTER);
+        this.totalFileDownload = getSolrXPathResult(solrStatsUrlBase, DOWN_SEARCH, DOWN_COUNTER);
+        this.totalFileDownload_30day = getSolrXPathResult(solrStatsUrlBase, DOWN_SEARCH_30DAY, DOWN_COUNTER);
     }
     
     private String getCollectionCount(String colName, String formattedDate) {
@@ -144,63 +127,4 @@ public class SiteOverviewStats  {
         }
         return Integer.toString(result);
     }
-    
-    private String getSolrResponseCount(String qString, String filter) {
-        long count = 0;
-        try {
-            SolrQuery query = new SolrQuery();
-            query = query.setQuery(qString);
-            if (filter != null) query = query.setFilterQueries(filter);
-            QueryResponse response = solr.query(query);
-            count = response.getResults().getNumFound();
-        } catch (SolrServerException details) {
-            LOGGER.error(details.getMessage(), details);
-        }
-        return Long.toString(count);
-    }
-
-    private String getSolrXPathResult(String queryUrl, String resultPath) {
-        String result = "";
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            GetMethod get = new GetMethod(queryUrl);
-
-            switch (new HttpClient().executeMethod(get)) {
-                case 200:
-                case 201:
-                case 202:
-                    Document doc = db.parse(get.getResponseBodyAsStream());
-                    doc.getDocumentElement().normalize();
-                    XPathFactory xpf = XPathFactory.newInstance();
-                    XPath xpath = xpf.newXPath();
-                    result = xpath.evaluate(resultPath, doc);
-                    break;
-                default:
-                    LOGGER.error("Solr search failed to respond as expected for url: " + queryUrl);
-            }
-            get.releaseConnection();
-        }
-        catch (ParserConfigurationException details) {
-            LOGGER.error(details.getMessage(), details);
-        }
-        catch (XPathExpressionException details) {
-            LOGGER.error(details.getMessage(), details);
-        } catch (SAXException ex) {
-            java.util.logging.Logger.getLogger(SiteOverviewStats.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(SiteOverviewStats.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
-    }
-    
-    private CommonsHttpSolrServer getSolr() throws MalformedURLException, SolrServerException {
-        CommonsHttpSolrServer solr;
-        solr = new CommonsHttpSolrServer(solrSearchUrlBase);
-        solr.setBaseURL(solrSearchUrlBase);
-        SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        solr.query(solrQuery);
-        return solr;
-    }
-
 }

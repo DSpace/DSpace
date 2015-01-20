@@ -20,36 +20,46 @@ import org.dspace.app.xmlui.wing.element.Table;
 */
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
-import java.io.IOException;
-import java.util.Map;
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
 
 /**
  *
  * @author Nathan Day
  */
-public class JournalSearch extends AbstractDSpaceTransformer {
+public class Banner extends AbstractDSpaceTransformer {
     
-    private static final Logger log = Logger.getLogger(JournalSearch.class);
+    private static final Logger log = Logger.getLogger(Banner.class);
     
     // 
-    // private static final Message ABC = message(""); 
+    private static final Message ABC = message("");
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         // ------------------
-        // Search data in Dryad associated with Journal X
-        // 
+        // Journal X
+        // 1 sentence scope
+        // Publisher:
+        // Society: 
+        // Editorial review:
         // ------------------
+        String journalName;
+        try {
+            journalName = this.parameters.getParameter(PARAM_JOURNAL_NAME);
+        } catch (ParameterException ex) {
+            log.error("Failed to retrieve journal metadata from parameters");
+            return;
+        }
 
+        Division div = body.addDivision(BANNER_DIV);
+        Para p = div.addPara(BANNER_PARA, null);
+        p.addContent("The journal name is: " + journalName);
     }
 }

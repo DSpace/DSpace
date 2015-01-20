@@ -40,10 +40,12 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="lib/xsl/aspect/JournalLandingPage/main.xsl"/>
     <xsl:import href="integrated-view.xsl"/>
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
     <xsl:import href="DryadSearch.xsl"/>
+    
     <xsl:output indent="yes"/>
     <xsl:variable name="iframe.maxheight" select="confman:getIntProperty('iframe.maxheight', 300)"/>
     <xsl:variable name="iframe.maxwidth" select="confman:getIntProperty('iframe.maxwidth', 600)"/>

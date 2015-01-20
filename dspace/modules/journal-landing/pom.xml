@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace.modules</groupId>
-    <artifactId>xmlui-journal-landing</artifactId>
+    <artifactId>journal-landing</artifactId>
     <packaging>pom</packaging>
     <name>Dryad Journal Landing Pages</name>
     <description>Dryad Journal Landing Pages</description>
@@ -33,7 +33,7 @@
    </build>
 
     <modules>
-        <module>xmlui-journal-landing-webapp</module>
+        <module>journal-landing-webapp</module>
     </modules>
 
 </project>

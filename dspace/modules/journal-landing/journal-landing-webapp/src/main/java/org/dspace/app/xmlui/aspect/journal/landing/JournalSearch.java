@@ -12,12 +12,6 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Para;
-/*
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Table;
-*/
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import java.sql.SQLException;
@@ -31,21 +25,21 @@ import java.io.IOException;
  *
  * @author Nathan Day
  */
-public class MostRecentDeposits extends AbstractDSpaceTransformer {
+public class JournalSearch extends AbstractDSpaceTransformer {
     
-    private static final Logger log = Logger.getLogger(MostRecentDeposits.class);
-    
-    // 
-    private static final Message ABC = message(""); 
+    private static final Logger log = Logger.getLogger(JournalSearch.class);
+    private static final Message T_panelHeadFormatString = message("xmlui.JournalLandingPage.JournalSearch.panel_head"); 
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         // ------------------
-        // Most recent deposits
+        // Search data in Dryad associated with Journal X
         // 
         // ------------------
+        Division searchDiv = body.addDivision(SEARCH_DIV);
+        
+        
     }
-
 }

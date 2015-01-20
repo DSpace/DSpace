@@ -40,12 +40,16 @@
                     <map:transform type="JournalSearch">
                         <map:parameter name="" value="{}"/>
                     </map:transform>
+                    -->
                     <map:transform type="TopTenDownloads">
-                        <map:parameter name="" value="{}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
                     </map:transform>
                     <map:transform type="MostRecentDeposits">
-                        <map:parameter name="" value="{}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
                     </map:transform>
+                    <!--
                     <map:transform type="UserGeography">
                         <map:parameter name="" value="{}"/>
                     </map:transform>
