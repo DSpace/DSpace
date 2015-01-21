@@ -106,7 +106,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 LOGGER.info(e.getMessage());
                 throw new RuntimeException(e.getMessage());
             }
-        } else if (requestURI.contains("run")) {
             try {
                 ArrayList<MimeMessage> messages = DryadGmailService.processJournalEmails();
                 if (messages != null) {
@@ -121,6 +120,7 @@ public class DryadEmailSubmission extends HttpServlet {
             } catch (IOException e) {
                 LOGGER.info("Exception thrown: " + e.getMessage() + ", " + e.getClass().getName());
             }
+        } else if (requestURI.contains("retrieve")) {
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     "GET is not supported, you must POST to this service");
