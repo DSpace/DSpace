@@ -1072,16 +1072,6 @@
             <version>1.8.7</version>
          </dependency>
          <dependency>
-	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcprov-jdk15</artifactId>
-	        <version>1.44</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcmail-jdk15</artifactId>
-	        <version>1.44</version>
-	    </dependency>
-         <dependency>
            <groupId>org.apache.poi</groupId>
            <artifactId>poi</artifactId>
            <version>3.6</version>
