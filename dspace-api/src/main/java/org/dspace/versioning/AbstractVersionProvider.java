@@ -27,8 +27,8 @@ public abstract class AbstractVersionProvider {
     private Set<String> ignoredMetadataFields;
 
     protected void copyMetadata(Item itemNew, Item nativeItem){
-        DCValue[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue aMd : md) {
+        Metadatum[] md = nativeItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum aMd : md) {
             String unqualifiedMetadataField = aMd.schema + "." + aMd.element;
             String qualifiedMetadataField = unqualifiedMetadataField + (aMd.qualifier == null ? "" : "." + aMd.qualifier);
             if(getIgnoredMetadataFields().contains(qualifiedMetadataField) ||
@@ -38,7 +38,7 @@ public abstract class AbstractVersionProvider {
                 continue;
             }
 
-            itemNew.addMetadata(aMd.schema, aMd.element, aMd.qualifier, aMd.language, aMd.value);
+            itemNew.addMetadata(aMd.schema, aMd.element, aMd.qualifier, aMd.language, aMd.value, aMd.authority, aMd.confidence);
         }
     }
 
@@ -64,7 +64,13 @@ public abstract class AbstractVersionProvider {
 
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException {
         int idNew = BitstreamStorageManager.clone(context, nativeBitstream.getID());
-        return Bitstream.find(context, idNew);
+	    Bitstream newBitstream = Bitstream.find(context, idNew);
+	    Metadatum[] bitstreamMeta = nativeBitstream.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+	    for (Metadatum value : bitstreamMeta) {
+		    newBitstream.addMetadata(value.schema, value.element, value.qualifier, value.language, value.value, value.authority, value.confidence);
+	    }
+	    newBitstream.updateMetadata();
+	    return newBitstream;
     }
 
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {

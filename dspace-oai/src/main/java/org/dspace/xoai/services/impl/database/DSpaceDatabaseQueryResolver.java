@@ -10,9 +10,12 @@ package org.dspace.xoai.services.impl.database;
 import com.lyncode.xoai.dataprovider.filter.Scope;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
 import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
@@ -22,11 +25,8 @@ import org.dspace.xoai.services.api.database.DatabaseQueryResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
-    private static Logger log = LogManager.getLogger(DSpaceDatabaseQueryResolver.class);
+    private static final Logger log = LogManager.getLogger(DSpaceDatabaseQueryResolver.class);
 
     @Autowired
     DSpaceFilterResolver filterResolver;
@@ -61,10 +61,7 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
         }
 
         query += " ORDER BY i.item_id";
-        String db = configurationService.getProperty("db.name");
-        boolean postgres = true;
-        // Assuming Postgres as default
-        if ("oracle".equals(db))  postgres = false;
+        boolean postgres = ! DatabaseManager.isOracle();
         if (postgres)
         {
             query += " OFFSET ? LIMIT ?";

@@ -9,7 +9,6 @@ package org.dspace.content;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -273,7 +272,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testGetDC 0",dc,notNullValue());
         assertTrue("testGetDC 1",dc.length == 0);
     }
@@ -288,29 +287,29 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testGetMetadata_4args 0",dc,notNullValue());
         assertTrue("testGetMetadata_4args 1",dc.length == 0);
     }
 
     /**
-     * Test of getMetadata method, of class Item.
+     * Test of getMetadataByMetadataString method, of class Item.
      */
     @Test
     public void testGetMetadata_String()
     {
         String mdString = "dc.contributor.author";
-        DCValue[] dc = it.getMetadata(mdString);
+        Metadatum[] dc = it.getMetadataByMetadataString(mdString);
         assertThat("testGetMetadata_String 0",dc,notNullValue());
         assertTrue("testGetMetadata_String 1",dc.length == 0);
 
         mdString = "dc.contributor.*";
-        dc = it.getMetadata(mdString);
+        dc = it.getMetadataByMetadataString(mdString);
         assertThat("testGetMetadata_String 2",dc,notNullValue());
         assertTrue("testGetMetadata_String 3",dc.length == 0);
 
         mdString = "dc.contributor";
-        dc = it.getMetadata(mdString);
+        dc = it.getMetadataByMetadataString(mdString);
         assertThat("testGetMetadata_String 4",dc,notNullValue());
         assertTrue("testGetMetadata_String 5",dc.length == 0);
     }
@@ -328,7 +327,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         it.addMetadata("test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
-        DCValue[] values = it.getMetadata("dc", "type", null, null);
+        Metadatum[] values = it.getMetadata("dc", "type", null, null);
         assertTrue("Return results", values.length == 1);
     }
 
@@ -344,7 +343,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addDC(element, qualifier, lang, values);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testAddDC_4args_1 0",dc,notNullValue());
         assertTrue("testAddDC_4args_1 1",dc.length == 2);
         assertThat("testAddDC_4args_1 2",dc[0].element,equalTo(element));
@@ -369,7 +368,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String value = "value";
         it.addDC(element, qualifier, lang, value);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testAddDC_4args_2 0",dc,notNullValue());
         assertTrue("testAddDC_4args_2 1",dc.length == 1);
         assertThat("testAddDC_4args_2 2",dc[0].element,equalTo(element));
@@ -391,7 +390,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addMetadata(schema, element, qualifier, lang, values);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_5args_1 1",dc.length == 2);
         assertThat("testAddMetadata_5args_1 2",dc[0].schema,equalTo(schema));
@@ -424,7 +423,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int[] confidences = {0,0};
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_1 1",dc.length == 2);
         assertThat("testAddMetadata_7args_1 2",dc[0].schema,equalTo(schema));
@@ -460,7 +459,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int[] confidences = {0,0};
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_1 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_1 1",dc.length == 2);
         assertThat("testAddMetadata_7args_1 2",dc[0].schema,equalTo(schema));
@@ -492,7 +491,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         String[] values = {"value0","value1"};
         it.addMetadata(schema, element, qualifier, lang, values);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_5args_2 1",dc.length == 2);
         assertThat("testAddMetadata_5args_2 2",dc[0].schema,equalTo(schema));
@@ -525,7 +524,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int confidences = 0;
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_2 1",dc.length == 1);
         assertThat("testAddMetadata_7args_2 2",dc[0].schema,equalTo(schema));
@@ -554,7 +553,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         int confidences = 0;
         it.addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testAddMetadata_7args_2 0",dc,notNullValue());
         assertTrue("testAddMetadata_7args_2 1",dc.length == 1);
         assertThat("testAddMetadata_7args_2 2",dc[0].schema,equalTo(schema));
@@ -580,7 +579,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
 
         it.clearDC(element, qualifier, lang);
 
-        DCValue[] dc = it.getDC(element, qualifier, lang);
+        Metadatum[] dc = it.getDC(element, qualifier, lang);
         assertThat("testClearDC 0",dc,notNullValue());
         assertTrue("testClearDC 1",dc.length == 0);
     }
@@ -600,7 +599,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
 
         it.clearMetadata(schema, element, qualifier, lang);
 
-        DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
+        Metadatum[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testClearMetadata 0",dc,notNullValue());
         assertTrue("testClearMetadata 1",dc.length == 0);
     }
@@ -1466,14 +1465,24 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     {
         //we disable the permission testing as it's shared with other methods where it's already tested (can edit)
         context.turnOffAuthorisationSystem();
+
+        // Create two new collections to test with
         Collection from = Collection.create(context);
         Collection to = Collection.create(context);
-        it.setOwningCollection(from);
 
-        it.move(from, to);
+        // Create a new item to test with
+        // (Ensures the item is not already mapped to another collection by a different test)
+        Item item = Item.create(context);
+        item.setOwningCollection(from);
+        from.addItem(item);
+        assertThat("testMove 0",item.getOwningCollection(), equalTo(from));
+
+        // Now, test the move
+        item.move(from, to);
         context.restoreAuthSystemState();
-        assertThat("testMove 0",it.getOwningCollection(), notNullValue());
-        assertThat("testMove 1",it.getOwningCollection(), equalTo(to));
+
+        assertThat("testMove 1",item.getOwningCollection(), notNullValue());
+        assertThat("testMove 2",item.getOwningCollection(), equalTo(to));
     }
 
     /**

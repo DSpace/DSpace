@@ -33,6 +33,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowAuthorizatio
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
 importClass(Packages.org.dspace.core.ConfigurationManager);
 
@@ -541,6 +542,18 @@ function startMetadataImport()
 	cocoon.exit();
 }
 
+function startBatchImport()
+{
+
+    assertAdministrator();
+
+    doBatchImport();
+
+    cocoon.redirectTo(cocoon.request.getContextPath());
+    getDSContext().complete();
+    cocoon.exit();
+}
+
 /**
  * Start creating a new collection.
  */
@@ -800,7 +813,12 @@ function doEditEPerson(epersonID)
         		// the user is loged in as another user, we can't let them continue on
         		// using this flow because they might not have permissions. So forward
         		// them to the homepage.
-        		cocoon.redirectTo(cocoon.request.getContextPath(),true);
+			var siteRoot = cocoon.request.getContextPath();	
+			if (siteRoot == "")
+			{
+				siteRoot = "/";
+			}
+        		cocoon.redirectTo(siteRoot,true);
 				getDSContext().complete();
 				cocoon.exit();
         	}
@@ -1929,6 +1947,61 @@ function doMetadataImportConfirm()
     var result = FlowMetadataImportUtils.processMetadataImport(getDSContext(),cocoon.request);
     assertAdministrator();
     sendPageAndWait("admin/metadataimport/confirm",{},result);
+    return null;
+}
+
+/**
+ * Manage batch metadata import
+ *
+ */
+
+function doBatchImport()
+{
+    var result;
+
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/batchimport/main",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_upload"))
+        {
+            result = doBatchImportUpload();
+
+        }
+
+    } while (true);
+}
+
+function doBatchImportUpload()
+{
+    var result = FlowBatchImportUtils.processUploadZIP(getDSContext(),cocoon.request);
+
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/batchimport/upload",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            return null;
+        }
+        else if (cocoon.request.get("submit_confirm"))
+        {
+
+            result = doBatchImportConfirm();
+            return result;
+        }
+    } while (true);
+}
+
+function doBatchImportConfirm()
+{
+    var result = FlowBatchImportUtils.processBatchImport(getDSContext(),cocoon.request);
+    assertAdministrator();
+    sendPageAndWait("admin/batchimport/confirm",{},result);
     return null;
 }
 

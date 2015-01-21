@@ -27,8 +27,8 @@ import java.util.List;
 
 public class HarvestedCollection 
 {
-	private Context context;
-	private TableRow harvestRow;
+	private final Context context;
+	private final TableRow harvestRow;
 
 	public static final int TYPE_NONE = 0;
 	public static final int TYPE_DMD = 1;
@@ -238,7 +238,7 @@ public class HarvestedCollection
     public static Integer findOldestHarvest (Context c) throws SQLException {
     	String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1"; 
         
-    	if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+    	if (DatabaseManager.isOracle())
         {
             query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc";
         }
@@ -263,7 +263,7 @@ public class HarvestedCollection
     public static Integer findNewestHarvest (Context c) throws SQLException {
         String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1"; 
         
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1 order by last_harvested desc";
         }

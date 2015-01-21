@@ -10,10 +10,17 @@ package org.dspace.content;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
 import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.elasticsearch.common.collect.Lists;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -222,9 +229,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         assertThat("testGetMetadata 0",c.getMetadata("name"), equalTo(""));
         assertThat("testGetMetadata 1",c.getMetadata("short_description"), equalTo(""));
         assertThat("testGetMetadata 2",c.getMetadata("introductory_text"), equalTo(""));
-        assertThat("testGetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(""));
         assertThat("testGetMetadata 4",c.getMetadata("copyright_text"), equalTo(""));
-        assertThat("testGetMetadata 5",c.getMetadata("template_item_id"), equalTo(""));
         assertThat("testGetMetadata 6",c.getMetadata("provenance_description"), equalTo(""));
         assertThat("testGetMetadata 7",c.getMetadata("side_bar_text"), equalTo(""));
         assertThat("testGetMetadata 8",c.getMetadata("license"), equalTo(""));
@@ -234,12 +239,10 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of setMetadata method, of class Collection.
      */
     @Test
-    public void testSetMetadata()
-    {
+    public void testSetMetadata() throws SQLException {
         String name = "name";
         String sdesc = "short description";
         String itext = "introductory text";
-        String logo = "1";
         String copy = "copyright declaration";
         String sidebar = "side bar text";
         String tempItem = "3";
@@ -249,20 +252,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         c.setMetadata("name", name);
         c.setMetadata("short_description", sdesc);
         c.setMetadata("introductory_text", itext);
-        c.setMetadata("logo_bitstream_id", logo);
         c.setMetadata("copyright_text", copy);
         c.setMetadata("side_bar_text", sidebar);
-        c.setMetadata("template_item_id", tempItem);
         c.setMetadata("provenance_description", provDesc);
         c.setMetadata("license", license);
 
         assertThat("testSetMetadata 0",c.getMetadata("name"), equalTo(name));
         assertThat("testSetMetadata 1",c.getMetadata("short_description"), equalTo(sdesc));
         assertThat("testSetMetadata 2",c.getMetadata("introductory_text"), equalTo(itext));
-        assertThat("testSetMetadata 3",c.getMetadata("logo_bitstream_id"), equalTo(logo));
         assertThat("testSetMetadata 4",c.getMetadata("copyright_text"), equalTo(copy));
         assertThat("testSetMetadata 5",c.getMetadata("side_bar_text"), equalTo(sidebar));
-        assertThat("testGetMetadata 6",c.getMetadata("template_item_id"), equalTo(tempItem));
         assertThat("testGetMetadata 7",c.getMetadata("provenance_description"), equalTo(provDesc));
         assertThat("testGetMetadata 8",c.getMetadata("license"), equalTo(license));
     }
@@ -689,8 +688,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of setLicense method, of class Collection.
      */
     @Test
-    public void testSetLicense()
-    {
+    public void testSetLicense() throws SQLException {
         String license = "license for test";
         c.setLicense(license);
         assertThat("testSetLicense 0", c.getLicense(), notNullValue());
@@ -1828,6 +1826,76 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         found = Collection.findAuthorized(context, null, Constants.READ);
         assertThat("testFindAuthorized 9",found,notNullValue());
         assertTrue("testFindAuthorized 10",found.length >= 1);
+    }
+
+    /**
+     * Test of findAuthorizedOptimized method, of class Collection.
+     * We create some collections and some users with varying auth, and ensure we can access them all properly.
+     */
+    @Test
+    public void testFindAuthorizedOptimized() throws Exception
+    {
+        context.turnOffAuthorisationSystem();
+        Community com = Community.create(null, context);
+        Collection collectionA = Collection.create(context);
+        Collection collectionB = Collection.create(context);
+        Collection collectionC = Collection.create(context);
+
+        com.addCollection(collectionA);
+        com.addCollection(collectionB);
+        com.addCollection(collectionC);
+
+        EPerson epersonA = EPerson.create(context);
+        EPerson epersonB = EPerson.create(context);
+        EPerson epersonC = EPerson.create(context);
+        EPerson epersonD = EPerson.create(context);
+
+        //personA can submit to collectionA and collectionC
+        AuthorizeManager.addPolicy(context, collectionA, Constants.ADD, epersonA);
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonA);
+
+        //personB can submit to collectionB and collectionC
+        AuthorizeManager.addPolicy(context, collectionB, Constants.ADD, epersonB);
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonB);
+
+        //personC can only submit to collectionC
+        AuthorizeManager.addPolicy(context, collectionC, Constants.ADD, epersonC);
+
+        //personD no submission powers
+
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(epersonA);
+        Collection[] personACollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized A", personACollections.length == 2);
+        List<Collection> aList = Arrays.asList(personACollections);
+        assertTrue("testFindAuthorizeOptimized A.A", aList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized A.A", aList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized A.A", aList.contains(collectionC));
+
+        context.setCurrentUser(epersonB);
+        Collection[] personBCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized B", personBCollections.length == 2);
+        List<Collection> bList = Arrays.asList(personBCollections);
+        assertFalse("testFindAuthorizeOptimized B.A", bList.contains(collectionA));
+        assertTrue("testFindAuthorizeOptimized B.B", bList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized B.C", bList.contains(collectionC));
+
+        context.setCurrentUser(epersonC);
+        Collection[] personCCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized C", personCCollections.length == 1);
+        List<Collection> cList = Arrays.asList(personCCollections);
+        assertFalse("testFindAuthorizeOptimized C.A", cList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized C.B", cList.contains(collectionB));
+        assertTrue("testFindAuthorizeOptimized C.C", cList.contains(collectionC));
+
+        context.setCurrentUser(epersonD);
+        Collection[] personDCollections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        assertTrue("testFindAuthorizeOptimized D", personDCollections.length == 0);
+        List<Collection> dList = Arrays.asList(personDCollections);
+        assertFalse("testFindAuthorizeOptimized D.A", dList.contains(collectionA));
+        assertFalse("testFindAuthorizeOptimized D.B", dList.contains(collectionB));
+        assertFalse("testFindAuthorizeOptimized D.C", dList.contains(collectionC));
     }
 
     /**

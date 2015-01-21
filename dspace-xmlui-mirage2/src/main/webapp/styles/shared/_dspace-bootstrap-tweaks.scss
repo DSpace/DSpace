@@ -118,4 +118,25 @@ table#aspect_administrative_ControlPanel_table_users a{
     }
 }
 
+/* Fixes an issue where checkboxes in tables are positioned much too low */
+.ds-table .checkbox {
+    margin-top:0;
+    margin-bottom:0;
 
+    input[type="checkbox"]{
+        top: 0;
+    }
+}
+
+
+/*
+ * Themed error page (exception2dri.xsl) styles
+ * -------
+ */
+span.bold {
+    font-weight: bold;
+}
+/* Preserve whitespace. Used to display error stack in a readable way. */
+p.pre {
+    white-space:pre;
+}

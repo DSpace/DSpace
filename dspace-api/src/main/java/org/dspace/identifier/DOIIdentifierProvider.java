@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
@@ -613,7 +613,7 @@ public class DOIIdentifierProvider
         }
         catch (SQLException ex)
         {
-            log.error("SQLException occured while deleting a DOI out of an item: "
+            log.error("SQLException occurred while deleting a DOI out of an item: "
                     + ex.getMessage());
             throw new RuntimeException("Error while deleting a DOI out of the " +
                     "metadata of an Item " + dso.getID(), ex);
@@ -848,8 +848,8 @@ public class DOIIdentifierProvider
         }
         Item item = (Item)dso;
 
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        for (DCValue id : metadata)
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        for (Metadatum id : metadata)
         {
             if (id.value.startsWith(DOI.RESOLVER + "/10."))
             {
@@ -911,10 +911,10 @@ public class DOIIdentifierProvider
         }
         Item item = (Item)dso;
 
-        DCValue[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        Metadatum[] metadata = item.getMetadata(MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         List<String> remainder = new ArrayList<String>();
 
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.equals(DOI.DOIToExternalForm(doi)))
             {

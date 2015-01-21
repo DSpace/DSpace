@@ -32,5 +32,11 @@ public class PipelineTest {
                 .getTransformed());
 
         assertThat(output, xPath("/oai_dc:dc/dc:title", equalTo("Teste")));
+        
+        input.close();
+        input = null;
+        xslt.close();
+        xslt = null;
+        output = null;
     }
 }

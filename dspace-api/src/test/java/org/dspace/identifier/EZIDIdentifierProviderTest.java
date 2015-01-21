@@ -49,8 +49,8 @@ public class EZIDIdentifierProviderTest
 
     private static void dumpMetadata(Item eyetem)
     {
-        DCValue[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue metadatum : metadata)
+        Metadatum[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum metadatum : metadata)
             System.out.printf("Metadata:  %s.%s.%s(%s) = %s\n",
                     metadatum.schema,
                     metadatum.element,

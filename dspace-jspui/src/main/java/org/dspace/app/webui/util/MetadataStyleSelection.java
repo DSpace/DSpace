@@ -10,7 +10,7 @@ package org.dspace.app.webui.util;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
@@ -34,7 +34,7 @@ public class MetadataStyleSelection extends AKeyBasedStyleSelection
     public String getStyleForItem(Item item) throws SQLException
     {
         String metadata = ConfigurationManager.getProperty("webui.itemdisplay.metadata-style");
-        DCValue[] value = item.getMetadata(metadata);
+        Metadatum[] value = item.getMetadataByMetadataString(metadata);
         String styleName = "default";
         if (value.length > 0)
         {

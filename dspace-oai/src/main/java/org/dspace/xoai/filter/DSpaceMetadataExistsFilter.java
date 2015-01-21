@@ -12,6 +12,7 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
@@ -72,7 +73,7 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
             List<Object> args = new ArrayList<Object>(fields.size());
             where.append("(");
             for (int i = 0; i < fields.size(); i++) {
-                where.append("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.item_id=i.item_id AND tmp.metadata_field_id=?)");
+                where.append("EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?)");
                 args.add(fieldResolver.getFieldID(context, fields.get(i)));
 
                 if (i < fields.size() - 1)

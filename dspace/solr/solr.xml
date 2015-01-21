@@ -32,6 +32,7 @@
     <core name="search" instanceDir="search" />
     <core name="statistics" instanceDir="statistics" />
     <core name="oai" instanceDir="oai" />
+    <core name="authority" instanceDir="authority" />
   </cores>
   
 </solr>

@@ -25,7 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -113,7 +113,7 @@ public class WorkflowManager
     private static Map<Integer, Boolean> noEMail = new HashMap<Integer, Boolean>();
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(WorkflowManager.class);
+    private static final Logger log = Logger.getLogger(WorkflowManager.class);
 
     /**
      * Translate symbolic name of workflow state into number.
@@ -748,7 +748,7 @@ public class WorkflowManager
             String handle = HandleManager.findHandle(c, i);
 
             // Get title
-            DCValue[] titles = i.getDC("title", null, Item.ANY);
+            Metadatum[] titles = i.getDC("title", null, Item.ANY);
             String title = "";
             try
             {
@@ -773,7 +773,8 @@ public class WorkflowManager
         catch (MessagingException e)
         {
             log.warn(LogManager.getHeader(c, "notifyOfArchive",
-                    "cannot email user" + " item_id=" + i.getID()));
+                    "cannot email user; item_id=" + i.getID()
+                    + ":  " + e.getMessage()));
         }
     }
 
@@ -935,8 +936,9 @@ public class WorkflowManager
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
-                                          " of workflow_item_id" + wi.getID()));
+            log.warn(LogManager.getHeader(c, "notifyOfCuration",
+                    "cannot email users of workflow_item_id " + wi.getID()
+                            + ":  " + e.getMessage()));
         }
     }
 
@@ -1005,8 +1007,9 @@ public class WorkflowManager
                 String gid = (mygroup != null) ?
                              String.valueOf(mygroup.getID()) : "none";
                 log.warn(LogManager.getHeader(c, "notifyGroupofTask",
-                        "cannot email user" + " group_id" + gid
-                                + " workflow_item_id" + wi.getID()));
+                        "cannot email user group_id=" + gid
+                                + " workflow_item_id=" + wi.getID()
+                                + ":  " + e.getMessage()));
             }
         }
     }
@@ -1045,9 +1048,10 @@ public class WorkflowManager
         {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
+                    "cannot email user eperson_id=" + e.getID()
+                            + " eperson_email=" + e.getEmail()
+                            + " workflow_item_id=" + wi.getID()
+                            + ":  " + re.getMessage()));
 
             throw re;
         }
@@ -1055,9 +1059,10 @@ public class WorkflowManager
         {
             // log this email error
             log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user" + " eperson_id" + e.getID()
-                            + " eperson_email" + e.getEmail()
-                            + " workflow_item_id" + wi.getID()));
+                    "cannot email user eperson_id=" + e.getID()
+                            + " eperson_email=" + e.getEmail()
+                            + " workflow_item_id=" + wi.getID()
+                            + ":  " + ex.getMessage()));
         }
     }
 
@@ -1078,7 +1083,7 @@ public class WorkflowManager
     public static String getItemTitle(WorkflowItem wi) throws SQLException
     {
         Item myitem = wi.getItem();
-        DCValue[] titles = myitem.getDC("title", null, Item.ANY);
+        Metadatum[] titles = myitem.getDC("title", null, Item.ANY);
 
         // only return the first element, or "Untitled"
         if (titles.length > 0)

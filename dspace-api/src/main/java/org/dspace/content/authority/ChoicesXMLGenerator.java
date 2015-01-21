@@ -102,6 +102,12 @@ public class ChoicesXMLGenerator
                 AttributesImpl va = new AttributesImpl();
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 va.addAttribute("", "value", "value", "string", mdav.value);
+                if(mdav.extras != null){
+                    for(String extraLabel : mdav.extras.keySet()){
+                        va.addAttribute("", extraLabel, extraLabel, "string", mdav.extras.get(extraLabel));
+                    }
+                }
+
                 if (result.defaultSelected == i)
                 {
                     va.addAttribute("", "selected", "selected", "boolean", "");

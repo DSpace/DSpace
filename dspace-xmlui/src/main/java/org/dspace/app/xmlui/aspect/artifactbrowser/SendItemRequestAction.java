@@ -26,7 +26,7 @@ import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -101,17 +101,22 @@ public class SendItemRequestAction extends AbstractAction
         }
         
         Item item = (Item) dso;
-        String title="";
-        DCValue[] titleDC = item.getDC("title", null, Item.ANY);
-        if (titleDC != null || titleDC.length > 0) {
-        	title=titleDC[0].value;
+        String title = "";
+        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
+        if (titleDC == null || titleDC.length == 0) {
+            titleDC = item.getDC("title", Item.ANY, Item.ANY); // dc.title with qualifier term
+        }
+        if (titleDC != null && titleDC.length > 0) {
+            title = titleDC[0].value;
         }
         
-		RequestItemAuthor requestItemAuthor = new DSpace()
-				.getServiceManager()
-				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
-						RequestItemAuthorExtractor.class)
-				.getRequestItemAuthor(context, item);
+        RequestItemAuthor requestItemAuthor = new DSpace()
+                .getServiceManager()
+                .getServiceByName(
+                        RequestItemAuthorExtractor.class.getName(),
+                        RequestItemAuthorExtractor.class
+                )
+                .getRequestItemAuthor(context, item);
 
         RequestItem requestItem = new RequestItem(item.getID(), Integer.parseInt(bitstreamId), requesterEmail, requesterName, message, Boolean.getBoolean(allFiles));
 

@@ -43,7 +43,7 @@
     -->
     <!-- TODO: figure out why i18n tags break the go button -->
     <xsl:template match="dri:options">
-        <div id="ds-options" class="word-break">
+        <div id="ds-options" class="word-break hidden-print">
             <xsl:if test="not(contains(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'], 'discover'))">
                 <div id="ds-search-option" class="ds-option-set">
                     <!-- The form, complete with a text box and a button, all built from attributes referenced
@@ -126,9 +126,9 @@
             <!-- DS-984 Add RSS Links to Options Box -->
             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
                 <div>
-                    <h6 class="ds-option-set-head">
+                    <h2 class="ds-option-set-head h6">
                         <i18n:text>xmlui.feed.header</i18n:text>
-                    </h6>
+                    </h2>
                     <div id="ds-feed-option" class="ds-option-set list-group">
                         <xsl:call-template name="addRSSLinks"/>
                     </div>

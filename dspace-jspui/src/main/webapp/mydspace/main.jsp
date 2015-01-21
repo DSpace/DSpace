@@ -32,7 +32,7 @@
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.SupervisedItem" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
@@ -42,6 +42,7 @@
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
 <%@ page import="java.util.List" %>
+<%@page import="org.dspace.app.itemimport.BatchUpload"%>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -65,6 +66,8 @@
         (SupervisedItem[]) request.getAttribute("supervised.items");
     
     List<String> exportsAvailable = (List<String>)request.getAttribute("export.archives");
+    
+    List<BatchUpload> importsAvailable = (List<BatchUpload>)request.getAttribute("import.uploads");
     
     // Is the logged in user an admin
     Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
@@ -114,7 +117,7 @@
 
         for (int i = 0; i < owned.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 owned[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                                                   : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -181,7 +184,7 @@
 
         for (int i = 0; i < pooled.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 pooled[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -251,7 +254,7 @@
 
         for (int i = 0; i < workspaceItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 workspaceItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -297,7 +300,7 @@
 
         for (int i = 0; i < supervisedItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 supervisedItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -350,7 +353,7 @@
 <%
         for (int i = 0; i < workflowItems.length; i++)
         {
-            DCValue[] titleArray =
+            Metadatum[] titleArray =
                 workflowItems[i].getItem().getDC("title", null, Item.ANY);
             String title = (titleArray.length > 0 ? titleArray[0].value
                     : LocaleSupport.getLocalizedMessage(pageContext,"jsp.general.untitled") );
@@ -399,6 +402,89 @@
 		<% } %>
 	</ol>
 	<%} %>
+	
+	<%if(importsAvailable!=null && importsAvailable.size()>0){ %>
+	<h3><fmt:message key="jsp.mydspace.main.heading8"/></h3>
+	<ul class="exportArchives" style="list-style-type: none;">
+		<% int i=0;
+			for(BatchUpload batchUpload : importsAvailable){
+		%>
+			<li style="padding-top:5px; margin-top:10px">
+				<div style="float:left"><b><%= batchUpload.getDateFormatted() %></b></div>
+				<% if (batchUpload.isSuccessful()){ %>
+					<div style= "float:left">&nbsp;&nbsp;--> <span style="color:green"><fmt:message key="jsp.dspace-admin.batchimport.success"/></span></div>
+				<% } else { %>
+					<div style= "float:left;">&nbsp;&nbsp;--> <span style="color:red"><fmt:message key="jsp.dspace-admin.batchimport.failure"/></span></div>
+				<% } %>
+				<div style="float:left; padding-left:20px">
+					<a id="a2_<%= i%>" style="display:none; font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.hide"/>)</i></a>
+					<a id="a1_<%= i%>" style="font-size:12px" href="javascript:showMoreClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.show"/>)</i></a>
+				</div><br/>
+				<div id="moreinfo_<%= i%>" style="clear:both; display:none; margin-top:15px; padding:10px; border:1px solid; border-radius:4px; border-color:#bbb">
+					<div><fmt:message key="jsp.dspace-admin.batchimport.itemstobeimported"/>: <b><%= batchUpload.getTotalItems() %></b></div>
+					<div style="float:left"><fmt:message key="jsp.dspace-admin.batchimport.itemsimported"/>: <b><%= batchUpload.getItemsImported() %></b></div>
+					<div style="float:left; padding-left:20px">
+					<a id="a4_<%= i%>" style="display:none; font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.hideitems"/>)</i></a>
+					<a id="a3_<%= i%>" style="font-size:12px" href="javascript:showItemsClicked(<%= i%>);"><i>(<fmt:message key="jsp.dspace-admin.batchimport.showitems"/>)</i></a>
+				</div>
+				<br/>
+					<div id="iteminfo_<%= i%>" style="clear:both; display:none; border:1px solid; background-color:#eeeeee; margin:30px 20px">
+						<%
+							for(String handle : batchUpload.getHandlesImported()){
+						%>
+							<div style="padding-left:10px"><a href="<%= request.getContextPath() %>/handle/<%= handle %>"><%= handle %></a></div>
+						<%
+							}
+						%>
+					</div>
+					<div style="margin-top:10px">
+						<form action="<%= request.getContextPath() %>/mydspace" method="post">
+							<input type="hidden" name="step" value="7">
+							<input type="hidden" name="uploadid" value="<%= batchUpload.getDir().getName() %>">
+							<input class="btn btn-info" type="submit" name="submit_mapfile" value="<fmt:message key="jsp.dspace-admin.batchimport.downloadmapfile"/>">
+							<% if (!batchUpload.isSuccessful()){ %>
+								<input class="btn btn-warning" type="submit" name="submit_resume" value="<fmt:message key="jsp.dspace-admin.batchimport.resume"/>">
+							<% } %>
+							<input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.batchimport.deleteitems"/>">
+						</form>
+					<div>
+					<% if (!batchUpload.getErrorMsgHTML().equals("")){ %>
+						<div style="margin-top:20px; padding-left:20px; background-color:#eee">
+							<div style="padding-top:10px; font-weight:bold">
+								<fmt:message key="jsp.dspace-admin.batchimport.errormsg"/>
+							</div>
+							<div style="padding-top:20px">
+								<%= batchUpload.getErrorMsgHTML() %>
+							</div>
+						</div>
+					<% } %>
+				</div>
+				<br/>
+			</li> 
+		<% i++;
+			} 
+		%>
+	</ul>
+	<%} %>
+	
+	<script>
+		function showMoreClicked(index){
+			$('#moreinfo_'+index).toggle( "slow", function() {
+				// Animation complete.
+			  });
+			$('#a1_'+index).toggle();
+			$('#a2_'+index).toggle();
+		}
+		
+		function showItemsClicked(index){
+			$('#iteminfo_'+index).toggle( "slow", function() {
+				// Animation complete.
+			  });
+			$('#a3_'+index).toggle();
+			$('#a4_'+index).toggle();
+		}
+	</script>
+	
 	</div>
 </div>	
 </dspace:layout>

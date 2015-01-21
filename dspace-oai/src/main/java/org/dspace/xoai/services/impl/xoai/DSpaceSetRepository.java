@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -34,9 +33,9 @@ import java.util.List;
  */
 public class DSpaceSetRepository implements SetRepository
 {
-    private static Logger log = LogManager.getLogger(DSpaceSetRepository.class);
+    private static final Logger log = LogManager.getLogger(DSpaceSetRepository.class);
 
-    private Context _context;
+    private final Context _context;
 
     public DSpaceSetRepository(Context context)
     {
@@ -75,12 +74,19 @@ public class DSpaceSetRepository implements SetRepository
         return 0;
     }
 
+    /**
+     * Produce a list of DSpaceCommunitySet.  The list is a segment of the full
+     * list of Community ordered by ID.
+     *
+     * @param offset start this far down the list of Community.
+     * @param length return up to this many Sets.
+     * @return some Sets representing the Community list segment.
+     */
     private List<Set> community(int offset, int length)
     {
         List<Set> array = new ArrayList<Set>();
-        StringBuffer query = new StringBuffer("SELECT community_id, name, handle FROM community c, handle h WHERE h.resource_id=community_id AND h.resource_type_id=? ORDER BY community_id");
+        StringBuffer query = new StringBuffer("SELECT community_id FROM community ORDER BY community_id");
         List<Serializable> params = new ArrayList<Serializable>();
-        params.add(Constants.COMMUNITY);
 
         DatabaseManager.applyOffsetAndLimit(query,params,offset,length);
 
@@ -92,9 +98,10 @@ public class DSpaceSetRepository implements SetRepository
             while (iterator.hasNext() && i < length)
             {
                 TableRow row = iterator.next();
+                int communityID = row.getIntColumn("community_id");
+                Community community = Community.find(_context, communityID);
                 array.add(DSpaceSet.newDSpaceCommunitySet(
-                        row.getStringColumn("handle"),
-                        row.getStringColumn("name")));
+                        community.getHandle(), community.getName()));
                 i++;
             }
         }
@@ -105,12 +112,19 @@ public class DSpaceSetRepository implements SetRepository
         return array;
     }
 
+    /**
+     * Produce a list of DSpaceCollectionSet.  The list is a segment of the full
+     * list of Collection ordered by ID.
+     *
+     * @param offset start this far down the list of Collection.
+     * @param length return up to this many Sets.
+     * @return some Sets representing the Collection list segment.
+     */
     private List<Set> collection(int offset, int length)
     {
         List<Set> array = new ArrayList<Set>();
-        StringBuffer query = new StringBuffer("SELECT collection_id, name, handle FROM collection c, handle h WHERE h.resource_id=collection_id AND h.resource_type_id=? ORDER BY collection_id");
+        StringBuffer query = new StringBuffer("SELECT collection_id FROM collection ORDER BY collection_id");
         List<Serializable> params = new ArrayList<Serializable>();
-        params.add(Constants.COLLECTION);
 
         DatabaseManager.applyOffsetAndLimit(query,params,offset,length);
 
@@ -122,9 +136,11 @@ public class DSpaceSetRepository implements SetRepository
             while (iterator.hasNext() && i < length)
             {
                 TableRow row = iterator.next();
+                int collectionID = row.getIntColumn("collection_id");
+                Collection collection = Collection.find(_context, collectionID);
                 array.add(DSpaceSet.newDSpaceCollectionSet(
-                        row.getStringColumn("handle"),
-                        row.getStringColumn("name")));
+                        collection.getHandle(),
+                        collection.getName()));
                 i++;
             }
         }
@@ -139,7 +155,7 @@ public class DSpaceSetRepository implements SetRepository
     public ListSetsResult retrieveSets(int offset, int length)
     {
         // Only database sets (virtual sets are added by lyncode common library)
-        log.debug("Quering sets. Offset: " + offset + " - Length: " + length);
+        log.debug("Querying sets. Offset: " + offset + " - Length: " + length);
         List<Set> array = new ArrayList<Set>();
         int communityCount = this.getCommunityCount();
         log.debug("Communities: " + communityCount);

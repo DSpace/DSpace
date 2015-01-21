@@ -77,6 +77,8 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+        
+        req = null;
     }
 
     /**

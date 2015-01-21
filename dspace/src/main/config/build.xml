@@ -26,7 +26,7 @@
 
 Common usage:
 
-  Fresh install, including database setup and registry loading:
+  Fresh install of DSpace:
     % ant fresh_install
 
   Update existing installation, leaving data and configuration intact:
@@ -94,6 +94,11 @@ Common usage:
 
     <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
     <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
+    
+    <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
+    <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
+    <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
+    
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -132,18 +137,14 @@ Common usage:
     	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
+        <echo message="update_solr_indexes --> Checks if any Solr indexes need upgrading (to latest Solr), and if so, upgrades them." />
         <echo message="" />
         <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
         <echo message="install_code    --> Install compiled code into ${dspace.dir}" />
         <echo message="" />
-        <echo message="fresh_install   --> Perform a fresh installation of the software, " />
-        <echo message="                    including the databases &amp; config" />
-        <echo message="setup_database  --> Create database tables" />
-        <echo message="load_registries --> Load metadata &amp; file format registries into the " />
-        <echo message="                    database" />
+        <echo message="fresh_install   --> Perform a fresh installation of the software. " />
         <echo message="" />
         <echo message="clean_backups   --> Remove .bak directories under install directory" />
-        <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
         <echo message="test_database   --> Attempt to connect to the DSpace database in order to verify that configuration is correct" />
         <echo message="" />
         <echo message="" />
@@ -182,10 +183,10 @@ Common usage:
     </target>
 
     <!-- ============================================================= -->
-    <!-- Update an installation (except database)                      -->
+    <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_configs,update_code,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -536,7 +537,7 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- Update an installation (except database)                      -->
+    <!-- Update core code only (no webapps or configs)                 -->
     <!-- ============================================================= -->
 
     <target name="update_code" description="Update installed code (without clobbering data/config)">
@@ -655,15 +656,19 @@ Common usage:
 
     <target name="copy_webapps">
 
+        <!-- Copy webapp files to /webapps (excluding any filtered files) -->
         <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
             <fileset dir="webapps">
                 <exclude name="**/web.xml" />
+                <exclude name="**/robots.txt" />
             </fileset>
         </copy>
 
+        <!-- Ensure specific webapp files (web.xml, robots.txt) are filtered -->
         <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
             <fileset dir="webapps">
                 <include name="**/web.xml" />
+                <include name="**/robots.txt" />
             </fileset>
             <filterchain>
                 <expandproperties />
@@ -698,6 +703,10 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
 
+        <war destfile="${dspace.dir}/webapps/rdf.war">
+            <fileset dir="${dspace.dir}/webapps/rdf/"/>
+        </war>
+
         <war destfile="${dspace.dir}/webapps/rest.war">
             <fileset dir="${dspace.dir}/webapps/rest/"/>
         </war>
@@ -727,6 +736,8 @@ Common usage:
         <mkdir dir="${dspace.dir}/etc" />
 
         <mkdir dir="${dspace.dir}/webapps" />
+
+        <mkdir dir="${dspace.dir}/triplestore" />
 
         <mkdir dir="${org.dspace.app.itemexport.work.dir}" />
 
@@ -783,113 +794,13 @@ Common usage:
 
     <!-- Test the connection to the database -->
     <target name="test_database">
-        <java classname="org.dspace.storage.rdbms.DatabaseManager" classpathref="class.path" fork="yes" failonerror="yes">
+        <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="test" />
         </java>
     </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Create the database tables                                    -->
-    <!-- ============================================================= -->
-
-    <!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-    <target name="setup_database" description="Create database tables">
-
-        <!-- Load the Schema -->
-        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="setup-database" />
-            <arg value="database_schema.sql" />
-        </java>
-
-        <!-- Add the browse tables -->
-        <java classname="org.dspace.browse.InitializeBrowseDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="database_schema.sql" />
-        </java>
-
-    </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Remove the database tables                                    -->
-    <!-- ============================================================= -->
-
-    <!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-    <target name="clean_database" description="Removes DSpace database tables, destroying data">
-
-        <java classname="org.dspace.browse.InitializeBrowseDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="clean-database.sql" />
-        </java>
-
-        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="clean-database" />
-            <arg value="clean-database.sql" />
-        </java>
-
-    </target>
-
-
-    <!-- ============================================================= -->
-    <!-- Load the initial contents of the registries into the database -->
-    <!-- ============================================================= -->
-
-    <!-- Loads bitstream format and Dublin Core type registries -->
-    <target name="load_registries" description="Load initial contents of registries">
-
-        <!-- first import the bitstream registry -->
-        <java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg value="-bitstream" />
-            <arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
-        </java>
-
-        <!-- finally import the metadata elements -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'" />
-        </java>
-
-        <!-- Import the new DCTerms schema -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/dcterms-types.xml'" />
-        </java>
-
-        <!-- FIXME: this should be more modular -->
-        <!-- import the SWORD required metadata -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'" />
-        </java>
-
-    </target>
-
 
     <!-- ============================================================= -->
     <!-- Install fresh code but do not touch the database              -->
@@ -947,7 +858,7 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="fresh_install"
-            depends="init_installation,init_configs,test_database,setup_database,load_registries,install_code"
+            depends="init_installation,init_configs,test_database,install_code"
             description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
@@ -958,22 +869,9 @@ Common usage:
 
     	<antcall target="init_geolite" />
 
-        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-f" />
-        </java>
-
-        <java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
-        </java>
-
         <echo>
 ====================================================================
- The DSpace code has been installed, and the database initialized.
+ The DSpace code has been installed.
 
  To complete installation, you should do the following:
 
@@ -984,11 +882,12 @@ Common usage:
    the appropriate place for your servlet container.
    (e.g. '$CATALINA_HOME/webapps' for Tomcat)
 
+ * Start up your servlet container (e.g. Tomcat). DSpace now will
+   initialize the database on the first startup.
+
  * Make an initial administrator account (an e-person) in DSpace:
 
    ${dspace.dir}/bin/dspace create-administrator
-
- * Start up your servlet container (Tomcat etc.)
 
  You should then be able to access your DSpace's 'home page':
 
@@ -999,7 +898,7 @@ Common usage:
 
     </target>
 
-	<!-- installes GeoCity resolution database -->
+	<!-- installs GeoCity resolution database -->
     <target name="update_geolite">
         <echo>Downloading: ${geolite}</echo>
         <trycatch property="geolite.error">
@@ -1045,6 +944,240 @@ You may manually install this file by following these steps:
 
     <target name="init_geolite" depends="check_geolite" if="need.geolite">
         <antcall target="update_geolite" />
+    </target>
+    
+    <!-- Check if any Solr indexes need updating to the version of Solr/Lucene we are using. -->
+    <target name="update_solr_indexes">
+        <echo>Checking if any Solr indexes (${dspace.dir}/solr/*) need upgrading...</echo>
+
+        <!-- 
+            For each index, this is currently a two step process:
+             (1) Ensure the index is upgraded to Solr/Lucene 3.5.0
+                 (really old indexes need upgrading to this version first)
+             (2) Then, we can upgrade from 3.5.0 to latest version of Lucene
+        -->
+
+        <!-- Determine what version of Solr/Lucene is being used in DSpace. -->
+        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" outputproperty="latest_version">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <arg value="-v" />
+        </java>
+        <echo>Current version of Solr/Lucene: ${latest_version}</echo>
+
+        <!-- First, let's do the Solr Statistics index -->
+        <property name="stats.index" value="${dspace.dir}/solr/statistics/data/index/"/>
+        <if>
+            <available file="${stats.index}" type="dir"/>
+            <then>
+                <!-- Ensure Statistics index is >= Solr/Lucene 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${stats.index}"/>
+                    <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
+                </antcall>
+                <!-- Ensure Statistics index is upgraded to latest version (included in DSpace) -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${stats.index}"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
+                </antcall>
+            </then>
+        </if>
+
+        <!-- Next, let's do the Discovery Solr index.
+             NOTE: Discovery will be reindexed post database migration, but this
+             is here as a safety measure for older versions of Solr/Lucene -->
+        <property name="discovery.index" value="${dspace.dir}/solr/search/data/index/"/>
+        <if>
+            <available file="${discovery.index}" type="dir"/>
+            <then>
+                <!-- Ensure Discovery index is >= Solr/Lucene 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${discovery.index}"/>
+                    <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
+                </antcall>
+                <!-- Ensure Discovery index is upgraded to latest version (included in DSpace) -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${discovery.index}"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
+                </antcall>
+            </then>
+        </if>
+
+        <!-- Next, let's do the OAI-PMH Solr index -->
+        <property name="oai.index" value="${dspace.dir}/solr/oai/data/index/"/>
+        <if>
+            <available file="${oai.index}" type="dir"/>
+            <then>
+                <!-- Ensure OAI index is >= Solr/Lucene 3.5.0 -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${oai.index}"/>
+                    <param name="version" value="3.5.0"/>
+                    <param name="included" value="false"/>
+                </antcall>
+                <!-- Ensure OAI index is upgraded to latest version (included in DSpace) -->
+                <antcall target="check_solr_index">
+                    <param name="indexDir" value="${oai.index}"/>
+                    <param name="version" value="${latest_version}"/>
+                    <param name="included" value="true"/>
+                </antcall>
+            </then>
+        </if>
+
+        <!-- Finally, cleanup any Lucene JARs that were downloaded into the Ant build directory -->
+        <!-- (These JARs are automatically downloaded when an index needs an upgrade). -->
+        <echo>Cleanup any downloaded lucene-core-*.jar files. We don't need them anymore.</echo>
+        <delete>
+            <fileset dir="." includes="lucene-core-*.jar"/>
+        </delete>
+    </target>
+    
+    <!-- Target to check an existing Solr index to see if it            -->
+    <!-- meets a particular version requirement.                        -->
+    <!-- If the index is outdated, "upgrade_solr_index" is              -->
+    <!-- called to upgrade it to the specified version.                 -->
+    <!-- REQUIRES these params:                                         -->
+    <!--   * indexDir  = Full path to Index directory                   -->
+    <!--   * version   = Version of Solr to check against.              -->
+    <!--   * included  = Whether this version of Solr/Lucene is already -->
+    <!--                 included in DSpace classpath.                  -->
+    <target name="check_solr_index">       
+        <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
+        <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
+        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" resultproperty="version_returncode" outputproperty="version_compare">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <arg value="${indexDir}" />
+            <arg value="${version}" />
+        </java>
+
+        <!-- Fail if the previous command returns a non-zero result, as this
+             means we couldn't determine the Solr index version.
+             We need this special error handling, since we are capturing the
+             output in ${version_compare}. -->
+        <fail>
+          <condition>
+              <not>
+                <equals arg1="${version_returncode}" arg2="0"/>
+              </not>
+          </condition>
+ERROR occurred while checking Solr index version:
+${version_compare}
+        </fail>
+        
+        <!-- If the above java command returned -1, that means this index is NOT yet
+             upgraded to the specified Solr version. So, let's upgrade it! -->
+        <if>
+            <equals arg1="${version_compare}" arg2="-1"/>
+            <then>
+                <echo message="The Solr index in ${indexDir} needs an upgrade to Solr ${version}"/>
+                <!-- Call 'upgrade_solr_index' to actually upgrade the index-->
+                <antcall target="upgrade_solr_index">
+                    <param name="indexDir" value="${indexDir}"/>
+                    <param name="version" value="${version}"/>
+                    <param name="included" value="${included}"/>
+                </antcall>
+            </then>
+            <else>
+                <echo message="The Solr index in ${indexDir} IS >= Solr ${version}. Looks good!"/>
+            </else>
+        </if>
+    </target>
+    
+    <!-- Target to actually *upgrade* an existing Solr index            -->
+    <!-- REQUIRES these params:                                         -->
+    <!--   * indexDir  = Full path to Index directory                   -->
+    <!--   * version   = Version of Solr to upgrade to                  -->
+    <!--   * included  = Whether this version of Solr/Lucene is already -->
+    <!--                 included in DSpace classpath. If 'false', then -->
+    <!--                 the appropriate Lucene JAR will be downloaded. -->
+    <target name="upgrade_solr_index">
+        <echo>Upgrading Solr/Lucene Index at ${indexDir} to Solr/Lucene ${version}.</echo>
+
+        <!-- Replace the "[version]" placeholders in ${lucene-core} with the actual ${version}-->
+        <propertyregex property="lucene-core.jar" input="${lucene-core}" regexp="\[version\]" replace="${version}" global="true"/>
+        
+        <!-- Download the appropriate version of the lucene-core.jar, if we
+             haven't already AND it's not included on our DSpace classpath. -->
+        <if>
+            <and>
+                <not>
+                    <available file="./lucene-core-${version}.jar"/>
+                </not>
+                <equals arg1="${included}" arg2="false" casesensitive="false"/>
+            </and>
+            <then>
+                <echo>Downloading ${lucene-core.jar}</echo>
+                <trycatch property="lucene.download.error">
+                    <try>
+                        <get src="${lucene-core.jar}" dest="./lucene-core-${version}.jar" verbose="true"/>
+                    </try>
+                    <catch>
+                        <echo>
+====================================================================
+WARNING : FAILED TO DOWNLOAD LUCENE-CORE.JAR
+          (Needed to upgrade your existing Solr indexes)
+
+Underlying Error: ${lucene.download.error}
+
+In order to upgrade your Solr indexes to the latest version,
+you will need to do the following:
+
+(1) Manually download the lucene-core-${version}.jar at:
+
+    ${lucene-core.jar}
+
+(2) Place the JAR in the "[src]/dspace/target/dspace-installer" directory.
+
+    [src]/dspace/target/dspace-installer/${lucene-core}.jar
+
+(3) Manually re-run the following 'ant' upgrade command:
+
+    ant update_solr_indexes
+
+For more information, please see the Upgrade Instructions.
+====================================================================
+                        </echo>
+                    </catch>
+                </trycatch>
+            </then>
+        </if>
+  
+        <!-- If we downloaded a "lucene-core-*.jar" in the previous step,
+             then use that downloaded JAR to upgrade the Solr/Lucene Index -->
+        <if>
+            <and>
+                <available file="./lucene-core-${version}.jar"/>
+                <equals arg1="${included}" arg2="false" casesensitive="false"/>
+            </and>
+            <then>
+                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
+                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
+                <java classname="org.apache.lucene.index.IndexUpgrader" classpath="./lucene-core-${version}.jar" fork="yes" failonerror="yes">
+                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <arg value="${indexDir}" />
+                </java>
+            </then>
+        </if>
+
+        <!-- Otherwise, if "included=true" then use the Lucene JAR included
+             in the DSpace classpath to upgrade the Solr/Lucene Index -->
+        <if>
+            <equals arg1="${included}" arg2="true" casesensitive="false"/>
+            <then>
+                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
+                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
+                <java classname="org.apache.lucene.index.IndexUpgrader" classpathref="class.path" fork="yes" failonerror="yes">
+                    <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+                    <sysproperty key="dspace.log.init.disable" value="true" />
+                    <arg value="${indexDir}" />
+                </java>
+            </then>
+        </if>
     </target>
 
 </project>

@@ -16,6 +16,7 @@ import org.dspace.xoai.services.api.database.HandleResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.dspace.xoai.tests.DSpaceBasicTestConfiguration;
 import org.dspace.xoai.tests.helpers.stubs.StubbedFieldResolver;
+import org.junit.After;
 import org.junit.Before;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -33,6 +34,14 @@ public abstract class AbstractQueryResolverTest {
     @Before
     public void setUp () {
         applicationContext = new AnnotationConfigApplicationContext(DSpaceBasicTestConfiguration.class);
+    }
+    
+    @After
+    public void tearDown() {
+        //Nullify all resoruces so that JUnit cleans them up
+        applicationContext = null;
+        handleResolver = null;
+        collectionsService = null;
     }
 
 

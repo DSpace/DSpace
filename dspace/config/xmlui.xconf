@@ -100,19 +100,20 @@
         -->
         <!-- <aspect name="Statistics - Elastic Search" path="resource://aspects/StatisticsElasticSearch/" /> -->
 
+        <!-- Additionally you may choose to expose your Google Analytics statistics in DSpace -->
+        <!-- <aspect name="StatisticsGoogleAnalytics" path="resource://aspects/StatisticsGoogleAnalytics/" /> -->
+
         <!-- =========================
              Approval Workflow Systems
              ========================= -->
         <!-- By default, DSpace uses a legacy 3-step approval workflow for new submissions -->
         <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
 
-
         <!-- If you prefer, a Configurable XML-based Workflow is available. To enable it, you can
              uncomment the below aspect and comment out the "Original Workflow" aspect above.
              PLEASE NOTE: in order to use the configurable workflow you must also run the
              database migration scripts as detailed in the DSpace Documentation -->
         <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
-
 
         <!-- ==============
              Search Engines
@@ -124,10 +125,10 @@
             with Searching Artifacts aspect will cause UI overlap issues
             
 			@deprecated Since DSpace 4 the system use an abstraction layer named
- 			Discovery to provide access to different search provider. The
- 			legacy system build upon Apache Lucene is likely to be removed in
- 			a future version. If you are interested in use Lucene as backend
- 			for the DSpace search system please consider to build a Lucene
+ 			Discovery to provide access to different search providers. The
+ 			legacy system built upon Apache Lucene is likely to be removed in
+ 			a future version. If you are interested in using Lucene as backend
+ 			for the DSpace search system, please consider to build a Lucene
  			implementation of the Discovery interfaces
         -->
         <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />-->

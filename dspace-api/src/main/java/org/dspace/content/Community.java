@@ -16,10 +16,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
@@ -30,9 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.util.*;
 
 /**
  * Class representing a community
@@ -47,13 +42,10 @@ import java.util.MissingResourceException;
 public class Community extends DSpaceObject
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(Community.class);
-
-    /** Our context */
-    private Context ourContext;
+    private static final Logger log = Logger.getLogger(Community.class);
 
     /** The table row corresponding to this item */
-    private TableRow communityRow;
+    private final TableRow communityRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -63,9 +55,6 @@ public class Community extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /** The default group of administrators */
     private Group admins;
@@ -86,7 +75,12 @@ public class Community extends DSpaceObject
      */
     Community(Context context, TableRow row) throws SQLException
     {
-        ourContext = context;
+        super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("community");
+
         communityRow = row;
 
         // Get the logo bitstream
@@ -107,7 +101,6 @@ public class Community extends DSpaceObject
         context.cache(this, row.getIntColumn("community_id"));
 
         modified = false;
-        modifiedMetadata = false;
 
         admins = groupFromColumn("admin");
 
@@ -261,8 +254,25 @@ public class Community extends DSpaceObject
      */
     public static Community[] findAll(Context context) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.queryTable(context, "community",
-                "SELECT * FROM community ORDER BY name");
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Communities - ",e);
+            throw e;
+        }
 
         List<Community> communities = new ArrayList<Community>();
 
@@ -314,10 +324,25 @@ public class Community extends DSpaceObject
     public static Community[] findAllTop(Context context) throws SQLException
     {
         // get all communities that are not children
-        TableRowIterator tri = DatabaseManager.queryTable(context, "community",
-                "SELECT * FROM community WHERE NOT community_id IN "
-                        + "(SELECT child_comm_id FROM community2community) "
-                        + "ORDER BY name");
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community c  "
+                    + "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+                    + "WHERE NOT c.community_id IN (SELECT child_comm_id FROM community2community) ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+            tri = DatabaseManager.query(context,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Top Communities - ",e);
+            throw e;
+        }
 
         List<Community> topCommunities = new ArrayList<Community>();
 
@@ -393,10 +418,12 @@ public class Community extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
+    @Deprecated
     public String getMetadata(String field)
     {
-    	String metadata = communityRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+        String[] MDValue = getMDValueByLegacyField(field);
+        String value = getMetadataFirstValue(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -411,9 +438,9 @@ public class Community extends DSpaceObject
      *                if the requested metadata field doesn't exist
      * @exception MissingResourceException
      */
-    public void setMetadata(String field, String value)throws MissingResourceException
-    {
-        if ((field.trim()).equals("name") 
+    @Deprecated
+    public void setMetadata(String field, String value) throws MissingResourceException {
+        if ((field.trim()).equals("name")
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -425,28 +452,31 @@ public class Community extends DSpaceObject
                 value = "Untitled";
             }
         }
-        
-        /* 
-         * Set metadata field to null if null 
+
+        String[] MDValue = getMDValueByLegacyField(field);
+
+        /*
+         * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if(value == null)
         {
-            communityRow.setColumnNull(field);
+            clearMetadata(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            modifiedMetadata = true;
         }
         else
         {
-            communityRow.setColumn(field, value.trim());
+            setMetadataSingleValue(MDValue[0], MDValue[1], MDValue[2], null, value);
         }
-        
-        modifiedMetadata = true;
+
         addDetails(field);
     }
 
     public String getName()
     {
-        return getMetadata("name");
+        String value = getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return value == null ? "" : value;
     }
 
     /**
@@ -536,10 +566,7 @@ public class Community extends DSpaceObject
         }
         if (modifiedMetadata)
         {
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, 
-                    Constants.COMMUNITY, getID(), getDetails(), 
-                    getIdentifiers(ourContext)));
-            modifiedMetadata = false;
+            updateMetadata();
             clearDetails();
         }
     }
@@ -629,12 +656,27 @@ public class Community extends DSpaceObject
         List<Collection> collections = new ArrayList<Collection>();
 
         // Get the table rows
-        TableRowIterator tri = DatabaseManager.queryTable(
-        	ourContext,"collection",
-            "SELECT collection.* FROM collection, community2collection WHERE " +
-            "community2collection.collection_id=collection.collection_id " +
-            "AND community2collection.community_id= ? ORDER BY collection.name",
-            getID());
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community2collection c2c, collection c "
+                    + "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) "
+                    + "WHERE c2c.collection_id=c.collection_id AND c2c.community_id=? ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+            tri = DatabaseManager.query(
+                    ourContext,
+                    query,
+                    Constants.COLLECTION,
+                    MetadataField.findByElement(ourContext, MetadataSchema.find(ourContext, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
+                    getID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Collections for this community - ",e);
+            throw e;
+        }
 
         // Make Collection objects
         try
@@ -685,13 +727,30 @@ public class Community extends DSpaceObject
         List<Community> subcommunities = new ArrayList<Community>();
 
         // Get the table rows
-        TableRowIterator tri = DatabaseManager.queryTable(
-                ourContext,"community",
-                "SELECT community.* FROM community, community2community WHERE " +
-                "community2community.child_comm_id=community.community_id " + 
-                "AND community2community.parent_comm_id= ? ORDER BY community.name",
-                getID());
-        
+        TableRowIterator tri = null;
+        try {
+            String query = "SELECT c.* FROM community2community c2c, community c " +
+                    "LEFT JOIN metadatavalue m on (m.resource_id = c.community_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
+                    "WHERE c2c.child_comm_id=c.community_id " +
+                    "AND c2c.parent_comm_id= ? ";
+            if(DatabaseManager.isOracle()){
+                query += " ORDER BY cast(m.text_value as varchar2(128))";
+            }else{
+                query += " ORDER BY m.text_value";
+            }
+
+            tri = DatabaseManager.query(
+                    ourContext,
+                    query,
+                    Constants.COMMUNITY,
+                    MetadataField.findByElement(ourContext, MetadataSchema.find(ourContext, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
+                    getID()
+            );
+        } catch (SQLException e) {
+            log.error("Find all Sub Communities - ",e);
+            throw e;
+        }
+
 
         // Make Community objects
         try
@@ -1204,6 +1263,9 @@ public class Community extends DSpaceObject
 
         // Remove all associated authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
+
+        // Delete the Dublin Core
+        removeMetadataFromDatabase();
 
         // get rid of the content count cache if it exists
         try

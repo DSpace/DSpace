@@ -34,7 +34,7 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.app.xmlui.wing.element.Value;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -57,7 +57,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_submit_update = message("xmlui.general.update");
         private static final Message T_submit_return = message("xmlui.general.return");
         private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
-    private static final Message T_template_head = message("xmlui.administrative.item.general.template_head");
+        private static final Message T_template_head = message("xmlui.administrative.item.general.template_head");
         private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
         private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
         private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
@@ -82,18 +82,24 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_column4 = message("xmlui.administrative.item.EditItemMetadataForm.column4");
         private static final Message T_unlock = message("xmlui.authority.confidence.unlock.help");
 
-        public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException
-        {
-                Item item = Item.find(context, parameters.getParameterAsInteger("itemID",-1));
-                Collection owner = item.getOwningCollection();
-                int collectionID = (owner == null) ? -1 : owner.getID();
-        
-                pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
-                pageMeta.addMetadata("title").addContent(T_title);
+        public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
+            Item item = Item.find(context, parameters.getParameterAsInteger("itemID", -1));
+            Collection owner = item.getOwningCollection();
+            int collectionID = (owner == null) ? -1 : owner.getID();
 
-                pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-                pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
-                pageMeta.addTrail().addContent(T_trail);
+            pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
+            pageMeta.addMetadata("title").addContent(T_title);
+
+
+            pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
+            pageMeta.addMetadata("javascript", "static", "datatables", true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
+            pageMeta.addMetadata("stylesheet", "screen", "person-lookup", true).addContent("../../static/css/authority/person-lookup.css");
+            pageMeta.addMetadata("javascript", null, "person-lookup", true).addContent("../../static/js/person-lookup.js");
+
+
+            pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+            pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
+            pageMeta.addTrail().addContent(T_trail);
         }
 
         /**
@@ -108,7 +114,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 // Get our parameters and state
                 int itemID = parameters.getParameterAsInteger("itemID",-1);
                 Item item = Item.find(context, itemID);
-                DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+                Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 Arrays.sort(values, new DCValueComparator());
                 String baseURL = contextPath+"/admin/item?administrative-continue="+knot.getId();
 
@@ -215,7 +221,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 header.addCell().addContent(T_column4);
 
                 ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
-                for(DCValue value : values)
+                for(Metadatum value : values)
                 {
                         String name = value.schema + "_" + value.element;
                         if (value.qualifier != null)
@@ -271,7 +277,11 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                             if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
                             {
                                 mdValue.setChoices(fieldKey);
-                                mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                if(Params.PRESENTATION_AUTHORLOOKUP.equals(cmgr.getPresentation(fieldKey))){
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_AUTHORLOOKUP);
+                                }else{
+                                    mdValue.setChoicesPresentation(Params.PRESENTATION_LOOKUP);
+                                }
                                 mdValue.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
                             }
                         }
@@ -302,8 +312,8 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
          */
         static class DCValueComparator implements Comparator, Serializable {
                 public int compare(Object arg0, Object arg1) {
-                        final DCValue o1 = (DCValue)arg0;
-                        final DCValue o2 = (DCValue)arg1;
+                        final Metadatum o1 = (Metadatum)arg0;
+                        final Metadatum o2 = (Metadatum)arg1;
                         final String s1 = o1.schema + o1.element + (o1.qualifier==null?"":("." + o1.qualifier));
                         final  String s2 = o2.schema + o2.element + (o2.qualifier==null?"":("." + o2.qualifier));
                         return s1.compareTo(s2);

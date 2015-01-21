@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>5.0-SNAPSHOT</version>
+		<version>6.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -48,12 +48,12 @@
                 <module>xmlui</module>
             </modules>
         </profile>
+        <!-- Note:- The LNI module is not built by default and is considered deprecated.
+            To build it activate the profile with '-Pdspace-lni'. -->
         <profile>
             <id>dspace-lni</id>
             <activation>
-                <file>
-                    <exists>lni/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>lni</module>
@@ -68,6 +68,17 @@
             </activation>
             <modules>
                 <module>jspui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-rdf</id>
+            <activation>
+                <file>
+                    <exists>rdf/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>rdf</module>
             </modules>
         </profile>
         <profile>

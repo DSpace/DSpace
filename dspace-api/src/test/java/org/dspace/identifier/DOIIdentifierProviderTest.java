@@ -125,8 +125,8 @@ public class DOIIdentifierProviderTest
 
     private static void dumpMetadata(Item eyetem)
     {
-        DCValue[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue metadatum : metadata)
+        Metadatum[] metadata = eyetem.getMetadata("dc", Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum metadatum : metadata)
             System.out.printf("Metadata: %s.%s.%s(%s) = %s\n",
                     metadatum.schema,
                     metadatum.element,
@@ -161,14 +161,14 @@ public class DOIIdentifierProviderTest
         String sql = "DELETE FROM Doi WHERE resource_type_id = ? AND resource_id = ?";
         DatabaseManager.updateQuery(context, sql, item.getType(), item.getID());
         
-        DCValue[] metadata = item.getMetadata(
+        Metadatum[] metadata = item.getMetadata(
                 DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         List<String> remainder = new ArrayList<String>();
 
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (!id.value.startsWith(DOI.RESOLVER))
             {
@@ -310,12 +310,12 @@ public class DOIIdentifierProviderTest
         provider.saveDOIToObject(context, item, doi);
         context.restoreAuthSystemState();
         
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean result = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi)))
             {
@@ -365,12 +365,12 @@ public class DOIIdentifierProviderTest
         provider.removeDOIFromObject(context, item, doi);
         context.restoreAuthSystemState();
         
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi)))
             {
@@ -461,13 +461,13 @@ public class DOIIdentifierProviderTest
         context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -494,7 +494,7 @@ public class DOIIdentifierProviderTest
                 null);
         foundDOI1 = false;
         foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -643,13 +643,13 @@ public class DOIIdentifierProviderTest
         context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {
@@ -690,13 +690,13 @@ public class DOIIdentifierProviderTest
         context.restoreAuthSystemState();
 
         // assure that the right one was removed
-        DCValue[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
+        Metadatum[] metadata = item.getMetadata(DOIIdentifierProvider.MD_SCHEMA, 
                 DOIIdentifierProvider.DOI_ELEMENT,
                 DOIIdentifierProvider.DOI_QUALIFIER,
                 null);
         boolean foundDOI1 = false;
         boolean foundDOI2 = false;
-        for (DCValue id : metadata)
+        for (Metadatum id : metadata)
         {
             if (id.value.equals(DOI.DOIToExternalForm(doi1)))
             {

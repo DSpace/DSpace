@@ -56,6 +56,8 @@ public class DSpaceKernelImplTest {
         assertEquals(kernel.getConfigurationService(), kernelImpl.getConfigurationService());
         assertEquals(kernel.getServiceManager(), kernelImpl.getServiceManager());
         kernelImpl.stop();
+        
+        kernel = null;
     }
 
     @Test
@@ -87,6 +89,10 @@ public class DSpaceKernelImplTest {
         assertNotSame(kernel.getServiceManager(), kernel2.getServiceManager());
 
         kernelImpl2.stop();
+        kernelImpl2.destroy();
+        kernelImpl2 = null;
+        kernel = kernel2 = null;
+        
         kernelImpl.stop();
     }
 
@@ -96,6 +102,9 @@ public class DSpaceKernelImplTest {
         ClassLoader cl1 = new URLClassLoader(new URL[0], current);
         cl1.getParent();
         // TODO
+        
+        cl1 = null;
+        current = null;
     }
 
 }

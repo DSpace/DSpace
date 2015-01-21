@@ -122,6 +122,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
+        int collection_id = UIUtil.getIntParameter(request, "collection");
         int collectionID = UIUtil.getIntParameter(request, "collectionid");
         Collection col = null;
 
@@ -153,12 +154,13 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             else
             {
                 // Show all collections
-                collections = Collection.findAuthorized(context, null,
+                collections = Collection.findAuthorizedOptimized(context,
                         Constants.ADD);
             }
 
             // save collections to request for JSP
             request.setAttribute("collections", collections);
+            request.setAttribute("collection_id", collection_id);
             request.setAttribute("collectionID", collectionID);
 
             Map<String, List<String>> identifiers2providers = slService

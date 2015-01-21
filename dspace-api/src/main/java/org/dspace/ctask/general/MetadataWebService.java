@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -228,7 +228,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             String itemId = item.getHandle();
             if (itemId == null) {
             	// we are still in workflow - no handle assigned - try title
-            	DCValue[] titleDc = item.getMetadata("dc", "title", null, Item.ANY);
+            	Metadatum[] titleDc = item.getMetadata("dc", "title", null, Item.ANY);
             	String title = (titleDc.length > 0) ? titleDc[0].value : "untitled - dbId: " + item.getID();
             	itemId = "Workflow item: " + title;
             } else {
@@ -236,7 +236,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
             }
             resultSb.append(itemId);
             // Only proceed if item has a value for service template parameter
-            DCValue[] dcVals = item.getMetadata(lookupField);
+            Metadatum[] dcVals = item.getMetadataByMetadataString(lookupField);
             if (dcVals.length > 0 && dcVals[0].value.length() > 0) {
             	String value = transform(dcVals[0].value, lookupTransform);
             	status = callService(value, item, resultSb);
@@ -319,7 +319,7 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
        						continue;
        					}
        				} else {
-       					for (DCValue dcVal : item.getMetadata(info.schema, info.element, info.qualifier, Item.ANY)) {
+       					for (Metadatum dcVal : item.getMetadata(info.schema, info.element, info.qualifier, Item.ANY)) {
        						values.add(dcVal.value);
        					}
        				}

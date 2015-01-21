@@ -29,7 +29,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -145,9 +145,9 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Fetch the document type (dc.type)
         String documentType = "";
-        if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+        if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
         {
-            documentType = item.getMetadata("dc.type")[0].value;
+            documentType = item.getMetadataByMetadataString("dc.type")[0].value;
         }
         
         // Step 1:
@@ -324,7 +324,7 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                     qualifier = Item.ANY;
                 }
-                DCValue[] values = item.getMetadata(inputs[i].getSchema(),
+                Metadatum[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), qualifier, Item.ANY);
 
                 if ((inputs[i].isRequired() && values.length == 0) &&
@@ -553,8 +553,11 @@ public class DescribeStep extends AbstractProcessingStep
                 lasts.remove(valToRemove);
                 if(isAuthorityControlled)
                 {
-                   auths.remove(valToRemove);
-                   confs.remove(valToRemove);
+                    if(valToRemove < auths.size())
+                    {
+                        auths.remove(valToRemove);
+                        confs.remove(valToRemove);
+                    }
                 }
             }
         }

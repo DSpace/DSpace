@@ -66,8 +66,6 @@ public class MediaFilterManager
     
     //suffix (in dspace.cfg) for input formats supported by each filter
     public static final String INPUT_FORMATS_SUFFIX = "inputFormats";
-    
-    static boolean updateIndex = true; // default to updating index
 
     static boolean isVerbose = false; // default to not verbose
 
@@ -123,8 +121,6 @@ public class MediaFilterManager
                 "do not print anything except in the event of errors.");
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
-        options.addOption("n", "noindex", false,
-                "do NOT update the search index after filtering bitstreams");
         options.addOption("i", "identifier", true,
         		"ONLY process bitstreams belonging to identifier");
         options.addOption("m", "maximum", true,
@@ -181,11 +177,6 @@ public class MediaFilterManager
         }
 
         isQuiet = line.hasOption('q');
-
-        if (line.hasOption('n'))
-        {
-            updateIndex = false;
-        }
 
         if (line.hasOption('f'))
         {
@@ -369,24 +360,6 @@ public class MediaFilterManager
             						applyFiltersItem(c, (Item)dso);
             						break;
             	}
-            }
-          
-            // update search index?
-            if (updateIndex)
-            {
-                if (!isQuiet)
-                {
-                    System.out.println("Updating search index:");
-                }
-                DSIndexer.setBatchProcessingMode(true);
-                try
-                {
-                    DSIndexer.updateIndex(c);
-                }
-                finally
-                {
-                    DSIndexer.setBatchProcessingMode(false);
-                }
             }
 
             c.complete();
@@ -755,15 +728,24 @@ public class MediaFilterManager
                 + " (item: " + item.getHandle() + ")");
         }
 
-        InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
-        if (destStream == null)
-        {
-            if (!isQuiet)
+        InputStream destStream;
+        try {
+            System.out.println("File: " + newName);
+            destStream = formatFilter.getDestinationStream(source.retrieve());
+            if (destStream == null)
             {
-                System.out.println("SKIPPED: bitstream " + source.getID()
+                if (!isQuiet)
+                {
+                    System.out.println("SKIPPED: bitstream " + source.getID()
                         + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
-            }
+                }
 
+                return false;
+            }
+        }
+        catch (OutOfMemoryError oome)
+        {
+            System.out.println("!!! OutOfMemoryError !!!");
             return false;
         }
 
