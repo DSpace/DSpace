@@ -18,6 +18,6 @@
     -->
     <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Search data in Dryad associated with %s</message>
     <message key="xmlui.JournalLandingPage.MostRecentDeposits.panel_head">Most recent deposits</message>
-    <message key="xmlui.JournalLandingPage.TopTenRecentDeposits.panel_head">Most recent deposits</message>
+    <message key="xmlui.JournalLandingPage.TopTenRecentDeposits.panel_head">Top ten viewed files</message>
     
 </catalogue>

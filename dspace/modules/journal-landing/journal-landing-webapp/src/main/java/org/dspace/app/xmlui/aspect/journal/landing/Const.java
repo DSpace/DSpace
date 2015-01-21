@@ -26,8 +26,8 @@ public class Const {
     public static final String MOST_RECENT_DEPOSITS_DIV = "journal-landing-recent";
     public static final String MOST_RECENT_DEPOSITS_REFS = "journal-landing-recent-refs";
     
-    public static final String MOST_TOPTEN_DEPOSITS_DIV = "journal-landing-topten";
-    public static final String MOST_TOPTEN_DEPOSITS_REFS = "journal-landing-topten-refs";
+    public static final String TOPTEN_DEPOSITS_DIV = "journal-landing-topten";
+    public static final String TOPTEN_DEPOSITS_REFS = "journal-landing-topten-refs";
 
     
     

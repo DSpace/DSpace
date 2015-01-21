@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
+import org.apache.commons.collections.ExtendedProperties;
 import org.xml.sax.SAXException;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
@@ -47,7 +48,8 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     
     private static final Message T_mostRecent = message("xmlui.JournalLandingPage.MostRecentDeposits.panel_head");
     
-    ArrayList<DSpaceObject> references = new ArrayList<DSpaceObject>();
+    ArrayList<DSpaceObject> references;
+    ArrayList<String> dates;
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
@@ -57,9 +59,15 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         // Most recent deposits
         // 
         // ------------------
-        Division div = body.addDivision(MOST_RECENT_DEPOSITS_DIV);
-        div.setHead(T_mostRecent);
-        ReferenceSet refs = div.addReferenceSet(MOST_RECENT_DEPOSITS_REFS, null);
+        Division mostRecent = body.addDivision(MOST_RECENT_DEPOSITS_DIV);
+        mostRecent.setHead(T_mostRecent);
+        
+        Division items = mostRecent.addDivision("items");
+        Division date = mostRecent.addDivision("date");
+        
+        ReferenceSet refs = items.addReferenceSet(MOST_RECENT_DEPOSITS_REFS, "summaryList");
+        references = new ArrayList<DSpaceObject>();
+        dates = new ArrayList<String>();
         try {
             performSearch(null);
         } catch (SearchServiceException e) {
@@ -67,6 +75,8 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         }
         for (DSpaceObject ref : references)
             refs.addReference(ref);        
+        references = null;
+        dates = null;
     }
 
     /**
@@ -100,6 +110,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
+        ExtendedProperties config = SearchUtils.getConfig();
         if (queryResults != null && !includeRestrictedItems)  {
             for (Iterator<SolrDocument> it = queryResults.getResults().iterator(); it.hasNext() && references.size() < numberOfItemsToShow;) {
                 SolrDocument doc = it.next();
@@ -114,6 +125,8 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
                             && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) obj))
                     {
                         references.add(obj);
+                        dates.add(doc.getFieldValue(config.getString("recent.submissions.sort-option")).toString());
+                        
                     }
                 } catch (SQLException ex) {
                     log.error(ex.getMessage(), ex);

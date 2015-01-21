@@ -6,7 +6,7 @@
             <map:action name="ValidateRequest" src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
         </map:actions>
         <map:transformers>
-            <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.dryadinfo.Navigation"/>
+            <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.journal.landing.Navigation"/>
             <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
             <map:transformer name="DryadInfo"           src="org.dspace.app.xmlui.aspect.journal.landing.DryadInfo"/>
             <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
@@ -19,7 +19,7 @@
     </map:components>
     
     <map:pipelines>
-        <map:pipeline>
+        <map:pipeline type="noncaching">
             <map:generate/>
             
             <map:match type="wildcard" pattern="journal/*">

@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -53,8 +52,8 @@ public class TopTenDownloads extends AbstractFiltersTransformer {
     private static final Logger log = Logger.getLogger(TopTenDownloads.class);
     private static final Message T_head = message("xmlui.JournalLandingPage.TopTenRecentDeposits.panel_head"); 
     
-    ArrayList<DSpaceObject> references = new ArrayList<DSpaceObject>();
-    ArrayList<String> downloads = new ArrayList<String>();
+    ArrayList<DSpaceObject> references;
+    ArrayList<String> downloads;
         
     @Override
     public void addBody(Body body) throws SAXException, WingException,
@@ -64,11 +63,19 @@ public class TopTenDownloads extends AbstractFiltersTransformer {
         // Top 10 downloads
         // 
         // ------------------
-        Division div = body.addDivision(MOST_TOPTEN_DEPOSITS_DIV);
-        div.setHead(T_head);
-        ReferenceSet refs = div.addReferenceSet(MOST_TOPTEN_DEPOSITS_REFS, null);
-        List list = div.addList("most-viewed-count", List.TYPE_SIMPLE, "most-viewed-count");
+        Division topTen = body.addDivision(TOPTEN_DEPOSITS_DIV);
+        topTen.setHead(T_head);
+        Division items = topTen.addDivision("items");
+        Division count = topTen.addDivision("count");
+       
+        // items.setHead(); Month/Year/All-time
+        // count.setHead(); "Downloads"
+        
+        ReferenceSet refs = items.addReferenceSet(TOPTEN_DEPOSITS_REFS, "summaryList");
+        List list = count.addList("most-viewed-count", List.TYPE_SIMPLE, "most-viewed-count");
 
+        references = new ArrayList<DSpaceObject>();
+        downloads = new ArrayList<String>();
         try {
             performSearch(null);
         } catch (SearchServiceException e) {
@@ -79,6 +86,8 @@ public class TopTenDownloads extends AbstractFiltersTransformer {
             refs.addReference(ref);
         for (String s : downloads)
             list.addItem(s);
+        references = null;
+        downloads = null;
     }
 
     /**
