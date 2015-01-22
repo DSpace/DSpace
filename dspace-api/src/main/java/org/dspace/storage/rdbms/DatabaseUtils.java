@@ -188,7 +188,9 @@ public class DatabaseUtils
                     // NOTE: This looks odd, but all we really need to do is ensure the
                     // DatabaseManager auto-initializes. It'll take care of the migration itself.
                     // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
-                    DatabaseManager.getDbName();
+                    Connection connection = dataSource.getConnection();
+                    DatabaseUtils.updateDatabase(dataSource, connection);
+                    connection.close();
                 }
                 System.out.println("Done.");
             }

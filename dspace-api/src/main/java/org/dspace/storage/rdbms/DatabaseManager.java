@@ -1374,7 +1374,8 @@ public class DatabaseManager
             // FINALLY, ensure database schema is up-to-date.
             // If not, upgrade/migrate database. (NOTE: This needs to run LAST
             // as it may need some of the initialized variables set above)
-            DatabaseUtils.updateDatabase(dataSource, connection);
+            if (ConfigurationManager.getBooleanProperty("db.migration.automatic", false))
+                DatabaseUtils.updateDatabase(dataSource, connection);
 
             connection.close();
         }
