@@ -267,6 +267,7 @@
                                 <entry key="article" value="subtype" />
                                 <entry key="doi" value="doi"/>
                                 <entry key="keywords" value="allkeywords" />
+                                <entry key="keywords" value="keywords" />
                                 <entry key="language" value="language"/>
                                 <entry key="document_type" value="subtype"/>
                                 <entry key="volume" value="volume" />
@@ -294,13 +295,30 @@
 	<bean id="csvDataLoader" class="gr.ekt.bteio.loaders.CSVDataLoader">
 		<property name="fieldMap">
 			<map>
-				<entry key="0" value="title" />
+				<!--<entry key="0" value="title" />
 				<entry key="1" value="authors" />
 				<entry key="2" value="issued" />
 				<entry key="3" value="journal" />
 				<entry key="4" value="abstract" />
 				<entry key="5" value="jissn" />
 				<entry key="6" value="subtype" />
+                               -->
+                               
+                                <entry key="0" value="authors" />
+				<entry key="1" value="title" />
+				<entry key="2" value="issued" />
+				<entry key="3" value="journal" />
+                                <entry key="4" value="volume" />
+                                <entry key="11" value="url" />
+				<entry key="12" value="abstract" />
+                                <entry key="13" value="allkeywords" />
+                                <entry key="14" value="editors" />
+                                <entry key="15" value="publisher" />
+                                <entry key="16" value="jissn" />
+                                <entry key="19" value="doi" />
+                                <entry key="20" value="language" />
+				<entry key="21" value="subtype" />
+                                
 			</map>
 		</property>
 		<property name="skipLines" value="1" />
@@ -332,6 +350,7 @@
 		<property name="fieldMap">
 			<map>
 				<entry key="TI" value="title" />
+                                <entry key="T1" value="title" />
                                 <entry key="T2" value="titleAlternative" />
 				<entry key="AU" value="authors" />
                                 <entry key="A1" value="authors" />
@@ -346,7 +365,7 @@
                                 <entry key="DO" value="doi"/> 
                                 <entry key="VL" value="volume"/> 
                                 <entry key="PB" value="publisher"/>     
-                                <entry key="TY" value="subtype"/>
+                                <entry key="M3" value="subtype"/>
                                 <entry key="LA" value="language"/> 
                                 <entry key="UR" value="url"/>                
 			</map>
@@ -361,6 +380,11 @@
 				<entry key="AB" value="abstract" />
 				<entry key="PY" value="issued" />
 				<entry key="SO" value="journal" />
+                                <entry key="VL" value="volume" />
+                                <entry key="DI" value="doi"/>
+                                <entry key="SN" value="jissn" />
+                                <entry key="LA" value="language"/> 
+                                <entry key="DT" value="subtype"/> 
 			</map>
 		</property>
 	</bean>
@@ -568,7 +592,8 @@
 				<entry value="translators" key="dc.contributor.other" />
 				<entry value="chairs" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
-				<entry value="allkeywords" key="dc.subject" />
+				<entry value="allkeywords" key="dc.subject.other" />
+                                <entry value="keywords" key="dc.subject.other" />
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
