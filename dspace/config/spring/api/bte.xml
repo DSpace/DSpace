@@ -303,21 +303,22 @@
 				<entry key="5" value="jissn" />
 				<entry key="6" value="subtype" />
                                -->
-                               
+                               <!-- Modificación de la configuración formato csv, de acuerdo al orden de las columnas en que se exporta en la base de datos de scopus -->
                                 <entry key="0" value="authors" />
 				<entry key="1" value="title" />
 				<entry key="2" value="issued" />
-				<entry key="3" value="journal" />
-                                <entry key="4" value="volume" />
-                                <entry key="11" value="url" />
-				<entry key="12" value="abstract" />
-                                <entry key="13" value="allkeywords" />
-                                <entry key="14" value="editors" />
-                                <entry key="15" value="publisher" />
-                                <entry key="16" value="jissn" />
-                                <entry key="19" value="doi" />
-                                <entry key="20" value="language" />
-				<entry key="21" value="subtype" />
+                                <entry key="3" value="volume" />
+                                <entry key="9" value="url" />
+				<entry key="10" value="abstract" />
+                                <entry key="11" value="allkeywords" />
+                                <entry key="11" value="keywords" />
+                                <entry key="12" value="editors" />
+                                <entry key="13" value="publisher" />
+                                <!--<entry key="16" value="jissn" />-->
+                                <entry key="14" value="doi" />
+                                <entry key="15" value="language" />
+				<entry key="16" value="subtype" />
+                                <entry key="17" value="journal" />
                                 
 			</map>
 		</property>
@@ -362,6 +363,7 @@
 				<entry key="AB" value="abstract" />
                                 <entry key="N2" value="abstract" />
                                 <entry key="KW" value="allkeywords"/>
+                                <entry key="KW" value="keywords"/>
                                 <entry key="DO" value="doi"/> 
                                 <entry key="VL" value="volume"/> 
                                 <entry key="PB" value="publisher"/>     
