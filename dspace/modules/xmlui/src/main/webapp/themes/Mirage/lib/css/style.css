@@ -1541,7 +1541,7 @@ a.learn-to-submit-button:hover {
     padding-top: 0px;
     padding-bottom: 8px;
 }
-#browse-data-buttons {
+div.tab-buttons {
     padding-top: 8px;
     padding-bottom: 0px;
 } 

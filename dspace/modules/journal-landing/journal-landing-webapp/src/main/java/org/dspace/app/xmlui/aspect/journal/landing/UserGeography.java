@@ -7,47 +7,54 @@ package org.dspace.app.xmlui.aspect.journal.landing;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Para;
-/*
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Table;
-*/
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
-import java.sql.SQLException;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
+import org.dspace.core.Constants;
 
 /**
  *
  * @author Nathan Day
  */
-public class UserGeography extends AbstractDSpaceTransformer {
+public class UserGeography extends JournalLandingTabbedTransformer {
     
     private static final Logger log = Logger.getLogger(UserGeography.class);
-
-    // 
-    private static final Message ABC = message(""); 
     
     @Override
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+            Parameters parameters) throws ProcessingException, SAXException,
+            IOException
     {
-        // ------------------
-        // Geographic breakdown of users
-        // 
-        // ------------------
+        super.setup(resolver, objectModel, src, parameters);
+        
+        divData = new DivData();
+        divData.sortOption = "total.download.sort-option";
+        divData.sortFieldOption = "total.download.sort-option";
+        divData.n = USER_GEO;
+        divData.T_div_head = message("xmlui.JournalLandingPage.UserGeography.panel_head");
 
-        // see com.maxmind.geoip
+        tabData = new ArrayList<TabData>(2);
+        TabData tb1 = new TabData();
+        tb1.n = USER_GEO_VIEWS;
+        tb1.buttonLabel = message("xmlui.JournalLandingPage.UserGeography.tab-views");
+        tb1.query = "search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:" + journalName;
+        tb1.refHead = message("xmlui.JournalLandingPage.UserGeography.item_head");
+        tb1.valHead = message("xmlui.JournalLandingPage.UserGeography.tab-views");
+        tabData.add(tb1);
+
+        TabData tb2 = new TabData();
+        tb2.n = USER_GEO_DOWNLOADS;
+        tb2.buttonLabel = message("xmlui.JournalLandingPage.UserGeography.tab-downloads");
+        tb2.query = "search.resourcetype:" + Constants.BITSTREAM + " AND prism.publicationName:" + journalName;
+        tb2.refHead = message("xmlui.JournalLandingPage.UserGeography.item_head");
+        tb2.valHead = message("xmlui.JournalLandingPage.UserGeography.tab-downloads");
+        tabData.add(tb2);        
     }
-
 }

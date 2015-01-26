@@ -16,7 +16,7 @@ import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.commons.collections.ExtendedProperties;
 import org.xml.sax.SAXException;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -73,8 +73,15 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
         }
-        for (DSpaceObject ref : references)
-            refs.addReference(ref);        
+        if (references.isEmpty()) {
+            refs.addReference(null);
+            vals.addItem(EMPTY_VAL);
+        } else {
+            for (DSpaceObject ref : references)
+                refs.addReference(ref);
+            for (String s : dates)
+                vals.addItem(s);
+        }
         references = null;
         dates = null;
     }
@@ -88,8 +95,8 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
         if (queryResults != null) return;
         queryArgs = prepareDefaultFilters(getView());
-        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-        queryArgs.setRows(1000);
+        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:" + journalName);
+        queryArgs.setRows(10);
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
         if(sortField != null){
             queryArgs.setSortField(
@@ -102,6 +109,8 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         try {
             c = ContextUtil.obtainContext(objectModel);
             queryResults = service.search(c, queryArgs);
+            log.debug(queryArgs.toString());
+            log.debug((queryResults.getResults().toString()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return;
@@ -111,6 +120,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
         ExtendedProperties config = SearchUtils.getConfig();
+        Object o;
         if (queryResults != null && !includeRestrictedItems)  {
             for (Iterator<SolrDocument> it = queryResults.getResults().iterator(); it.hasNext() && references.size() < numberOfItemsToShow;) {
                 SolrDocument doc = it.next();
@@ -118,15 +128,21 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
                 try {
                     obj = SearchUtils.findDSpaceObject(context, doc);
                 } catch (SQLException ex) {
-                    java.util.logging.Logger.getLogger(MostRecentDeposits.class.getName()).log(Level.SEVERE, null, ex);
+                    log.error(ex);
+                    return;
                 }
                 try {
                     if (obj != null
                             && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) obj))
                     {
                         references.add(obj);
-                        dates.add(doc.getFieldValue(config.getString("recent.submissions.sort-option")).toString());
-                        
+                        // dates.add(doc.getFieldValue(config.getString("recent.submissions.sort-option")).toString());
+                        o = doc.getFieldValue(config.getString("recent.submissions.sort-option"));
+                        if (o instanceof ArrayList) {
+                            dates.add(((ArrayList) o).get(0).toString());
+                        } else if (o instanceof String) {
+                            dates.add(o.toString());
+                        }
                     }
                 } catch (SQLException ex) {
                     log.error(ex.getMessage(), ex);
