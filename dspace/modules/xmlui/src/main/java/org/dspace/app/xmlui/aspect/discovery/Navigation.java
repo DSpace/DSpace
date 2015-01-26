@@ -154,7 +154,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
         */
 
-        if(AuthorizeManager.isAdmin(context)){
+        if(AuthorizeManager.isCuratorOrAdmin(context)){
             List admin = options.addList("administrative");
             admin.setHead(T_administrative_head);
 
