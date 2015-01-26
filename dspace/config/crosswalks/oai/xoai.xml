@@ -220,20 +220,20 @@
                     <LeftCondition>
                         <And>
                             <LeftCondition>
-                                <Custom ref="titleExistsFilter"/>
+                                <Custom ref="titleExistsCondition"/>
                             </LeftCondition>
                             <RightCondition>
-                                <Custom ref="authorExistsFilter"/>
+                                <Custom ref="authorExistsCondition"/>
                             </RightCondition>
                         </And>
                     </LeftCondition>
                     <RightCondition>
                         <And>
                             <LeftCondition>
-                                <Custom ref="driverDocumentTypeFilter"/>
+                                <Custom ref="driverDocumentTypeCondition"/>
                             </LeftCondition>
                             <RightCondition>
-                                <Custom ref="openaireRelationFilter"/>
+                                <Custom ref="openaireRelationCondition"/>
                             </RightCondition>
                         </And>
                     </RightCondition>
