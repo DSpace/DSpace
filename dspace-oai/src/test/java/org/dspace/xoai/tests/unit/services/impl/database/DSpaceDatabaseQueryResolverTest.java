@@ -110,10 +110,17 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
                 .withValue(FIELD_1)
                 .withName("fields"));
 
-        scopedFilters.add(new ScopedFilter(new CustomCondition(getFilterResolver(),
-                DSpaceMetadataExistsFilter.class,
-                filterConfiguration),
-                Scope.Query));
+        final DSpaceMetadataExistsFilter metadataExistsFilter = new DSpaceMetadataExistsFilter();
+        metadataExistsFilter.setConfiguration(filterConfiguration);
+        autowire(metadataExistsFilter);
+        scopedFilters.add(new ScopedFilter(new Condition()
+        {
+            @Override
+            public Filter getFilter()
+            {
+                return metadataExistsFilter;
+            }
+        }, Scope.Query));
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
@@ -134,10 +141,17 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
                 )
                 .withName("fields"));
 
-        scopedFilters.add(new ScopedFilter(new CustomCondition(getFilterResolver(),
-                DSpaceMetadataExistsFilter.class,
-                filterConfiguration),
-                Scope.Query));
+        final DSpaceMetadataExistsFilter metadataExistsFilter = new DSpaceMetadataExistsFilter();
+        metadataExistsFilter.setConfiguration(filterConfiguration);
+        autowire(metadataExistsFilter);
+        scopedFilters.add(new ScopedFilter(new Condition()
+        {
+            @Override
+            public Filter getFilter()
+            {
+                return metadataExistsFilter;
+            }
+        }, Scope.Query));
 
         DatabaseQuery result = underTest.buildQuery(scopedFilters, START, LENGTH);
 
