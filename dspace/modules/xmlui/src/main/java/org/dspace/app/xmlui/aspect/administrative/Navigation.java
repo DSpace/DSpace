@@ -216,15 +216,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
                 context.setHead(T_context_head);
                 context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-//                if (AuthorizeManager.isAdmin(this.context, dso))
-//                {
-//                    context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
-//                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
-//                }
-//                else
-//                {
-
-              //  }
+                if (AuthorizeManager.isAdmin(this.context, dso)||AuthorizeManager.isCuratorOrAdmin(this.context))
+                {
+                    context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                }
             }
             else
             {
