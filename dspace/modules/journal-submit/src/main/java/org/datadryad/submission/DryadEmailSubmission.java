@@ -106,21 +106,9 @@ public class DryadEmailSubmission extends HttpServlet {
                 LOGGER.info(e.getMessage());
                 throw new RuntimeException(e.getMessage());
             }
-        } else if (requestURI.contains("run")) {
-            try {
-                ArrayList<MimeMessage> messages = DryadGmailService.processJournalEmails();
-                if (messages != null) {
-                    for (MimeMessage message : messages) {
-                        try {
-                            processMimeMessage(message);
-                        } catch (Exception details) {
-                            LOGGER.info("Exception thrown: " + details.getMessage() + ", " + details.getClass().getName());
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                LOGGER.info("Exception thrown: " + e.getMessage() + ", " + e.getClass().getName());
-            }
+        } else if (requestURI.contains("retrieve")) {
+            LOGGER.info("manually running DryadGmailService");
+            retrieveMail();
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     "GET is not supported, you must POST to this service");
@@ -161,6 +149,24 @@ public class DryadEmailSubmission extends HttpServlet {
         }
     }
 
+    private void retrieveMail () {
+        LOGGER.info ("retrieving mail with label '" + ConfigurationManager.getProperty("submit.journal.email.label") + "'");
+        try {
+            ArrayList<MimeMessage> messages = DryadGmailService.processJournalEmails();
+            if (messages != null) {
+                LOGGER.info("retrieved " + messages.size() + " messages");
+                for (MimeMessage message : messages) {
+                    try {
+                        processMimeMessage(message);
+                    } catch (Exception details) {
+                        LOGGER.info("Exception thrown while processing MIME message: " + details.getMessage() + ", " + details.getClass().getName());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.info("Exception thrown: " + e.getMessage() + ", " + e.getClass().getName());
+        }
+    }
     /**
      * This method was added because multipart content may contain other multipart content; this
      * needs to dig down until some text is found
@@ -558,20 +564,7 @@ public class DryadEmailSubmission extends HttpServlet {
     private class DryadEmailSubmissionHarvester extends TimerTask {
         @Override
         public void run() {
-            try {
-                ArrayList<MimeMessage> messages = DryadGmailService.processJournalEmails();
-                if (messages != null) {
-                    for (MimeMessage message : messages) {
-                        try {
-                            processMimeMessage(message);
-                        } catch (Exception details) {
-                            LOGGER.info("Exception thrown: " + details.getMessage() + ", " + details.getClass().getName());
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                LOGGER.info("Exception thrown: " + e.getMessage() + ", " + e.getClass().getName());
-            }
+            retrieveMail();
         }
     }
 }
