@@ -6,11 +6,11 @@
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -22,7 +22,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
-import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -34,7 +33,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
@@ -130,13 +128,13 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
             } catch (SearchServiceException e) {
                 log.error(e.getMessage(), e);
             }
-            if (references.isEmpty()) {
+            if (references.size() == 0) {
                 list.addItem(EMPTY_VAL);
             } else {
                 for (DSpaceObject ref : references)
                     refs.addReference(ref);
                 for (String s : values)
-                    list.addItem(s);
+                    list.addItem().addContent(s);
             }
         }
     }
@@ -148,7 +146,7 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
      */
     @Override
     public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        if (queryResults != null) return;
+        if (queryResults != null) return;        
         queryArgs = prepareDefaultFilters(getView());
         queryArgs.setQuery(q);
         queryArgs.setRows(10);
@@ -160,19 +158,14 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
             );
         }
         SearchService service = getSearchService();
-        Context c = null;
-        try {
-            c = ContextUtil.obtainContext(objectModel);
-        } catch (SQLException ex) {
-            log.error(ex.getMessage());
-        }
-        queryResults = (QueryResponse) service.search(c, queryArgs);
+log.debug(queryArgs);
+        queryResults = (QueryResponse) service.search(context, queryArgs);
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty(includeRestricted,includeRestrictedDefault);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt(submissionSize, submissionSizeDefault);
-        ExtendedProperties config = SearchUtils.getConfig();
+        String config = SearchUtils.getConfig().getString(sortOption);
         if (queryResults != null && !includeRestrictedItems)  {
-            for (Iterator<SolrDocument> it = queryResults.getResults().iterator(); it.hasNext() && references.size() < numberOfItemsToShow;) {
-                SolrDocument doc = it.next();
+            for (SolrDocument doc : queryResults.getResults()) {
+                if (references.size() > numberOfItemsToShow) break;
                 DSpaceObject obj = null;
                 try {
                     obj = SearchUtils.findDSpaceObject(context, doc);
@@ -184,7 +177,8 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
                         && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) obj))
                     {
                         references.add(obj);
-                        Object o = doc.getFieldValue(config.getString(sortOption));
+                        Object o = doc.getFieldValue(config);
+                        
                         if (o instanceof ArrayList) {
                             values.add(((ArrayList) o).get(0).toString());
                         } else if (o instanceof String) {
@@ -203,4 +197,11 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
     public String getView() {
         return "site";
     }
+    
+    @Override
+    public Serializable getKey() {
+        // do not allow this to be cached
+        return null;
+    }
+    
 }

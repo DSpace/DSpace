@@ -30,10 +30,9 @@ public class SolrUtils {
     public static String getSolrXPathResult(String searchUrlBase, String queryUrl, String resultPath) {
         String result = "";
         try {
-            CommonsHttpSolrServer solr = getSolr(searchUrlBase);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            GetMethod get = new GetMethod(queryUrl);
+            GetMethod get = new GetMethod(searchUrlBase + queryUrl);
 
             switch (new HttpClient().executeMethod(get)) {
                 case 200:
