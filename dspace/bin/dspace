@@ -61,6 +61,12 @@ else
 fi
 
 
+# If the user only wants the CLASSPATH, just give it now.
+if [ "$1" = "classpath" ]; then
+  echo $FULLPATH
+  exit 0
+fi
+
 
 
 #Allow user to specify java options through JAVA_OPTS variable

@@ -1,1 +1,6 @@
-<XOAIDescription xmlns="http://www.lyncode.com/XOAIConfiguration">Biblioteca Digital Universidad Icesi - XOAI: OAI-PMH Java Toolkit</XOAIDescription>
+<oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+<scheme>oai</scheme>
+<repositoryIdentifier>${dspace.hostname}</repositoryIdentifier>
+<delimiter>:</delimiter>
+<sampleIdentifier>oai:${dspace.hostname}:${handle.prefix}/1234</sampleIdentifier>
+</oai-identifier>

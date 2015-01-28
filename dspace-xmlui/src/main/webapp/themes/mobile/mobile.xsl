@@ -135,12 +135,6 @@
         <xsl:text>/themes/mobile/lib/cookies.js</xsl:text>
         </xsl:attribute>&#160;</script>
 
-        <script>
-        <xsl:attribute name="src">
-        <xsl:value-of select="$mobile-url"/>
-        <xsl:text>/themes/mobile/lib/m-tweaks.js</xsl:text>
-        </xsl:attribute>&#160;</script>
-
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -694,7 +688,7 @@
                            </xsl:attribute>
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
-                                <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'])"/>
+                                <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>
                                 <xsl:text>/themes/mobile/lib/images/default-thumbnail.png</xsl:text>
                                 </xsl:attribute>
                             </img>

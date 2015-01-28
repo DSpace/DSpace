@@ -81,6 +81,11 @@
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
+      <file>
+         <source>config/crosswalks/oai/description.xml</source>
+         <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
    </files>
 
    <!--

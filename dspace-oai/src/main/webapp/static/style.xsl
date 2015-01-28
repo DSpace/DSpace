@@ -728,14 +728,20 @@
 									</td>
 									<td class="clear"></td>
 								</tr>
-								<tr class="info">
-									<td class="name">Description</td>
-									<td class="value">
-										<xsl:value-of
-											select="oai:OAI-PMH/oai:Identify/oai:description/node()/text()" />
-									</td>
-									<td class="clear"></td>
-								</tr>
+                                                                <tr class="info">
+                                                                        <td class="name">Repository identifier</td>
+                                                                        <td class="value">
+                                                                                <xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:description//*[local-name() = 'repositoryIdentifier']/text()" />
+                                                                        </td>
+                                                                        <td class="clear"></td>
+                                                                </tr>
+                                                                <tr class="info">
+                                                                        <td class="name">Sample identifier</td>
+                                                                        <td class="value">
+                                                                                <xsl:value-of select="oai:OAI-PMH/oai:Identify/oai:description//*[local-name() = 'sampleIdentifier']/text()" />
+                                                                        </td>
+                                                                        <td class="clear"></td>
+                                                                </tr>
 								<tr>
 									<td class="separator"></td>
 								</tr>

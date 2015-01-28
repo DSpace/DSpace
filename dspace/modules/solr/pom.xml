@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>solr</artifactId>
-   <version>4.1</version>
+   <version>4.3-SNAPSHOT</version>
    <packaging>war</packaging>
    <name>DSpace SOLR :: Local Customizations</name>
    <description>
@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>4.1</version>
+      <version>4.3-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -58,7 +58,7 @@
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>4.1</version>
+           <version>4.3-SNAPSHOT</version>
            <classifier>skinny</classifier>
            <type>war</type>
        </dependency>
@@ -66,7 +66,7 @@
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>4.1</version>
+           <version>4.3-SNAPSHOT</version>
            <classifier>classes</classifier>
            <type>jar</type>
        </dependency>

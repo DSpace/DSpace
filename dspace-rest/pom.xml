@@ -3,14 +3,14 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>4.1</version>
+    <version>4.3-SNAPSHOT</version>
     <name>DSpace RESTful web services API</name>
     <url>http://demo.dspace.org</url>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>4.1</version>
+        <version>4.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
