@@ -6,7 +6,7 @@ Therefore, all `database_schema*.sql` files have been removed. Starting
 with DSpace 4.x -> 5.0 upgrade, you will no longer need to manually run any
 SQL scripts to upgrade your database.
 
-Please see the [5.0 Upgrade Instructions](https://wiki.duraspace.org/display/DSDOC5x/Upgrading+to+5.x)
+Please see the [5.0 Upgrade Instructions](https://wiki.duraspace.org/display/DSDOC5x/Upgrading+DSpace)
 for more information on upgrading to DSpace 5.
 
 
