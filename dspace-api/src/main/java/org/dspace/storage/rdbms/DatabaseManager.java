@@ -881,22 +881,22 @@ public class DatabaseManager
     }
 
     /**
-     * Return the canonical name for a table.
+     * Return the canonical name for a database object.
      *
-     * @param table
-     *            The name of the table.
-     * @return The canonical name of the table.
+     * @param db_object
+     *            The name of the database object.
+     * @return The canonical name of the database object.
      */
-    static String canonicalize(String table)
+    static String canonicalize(String db_object)
     {
-        // Oracle expects upper-case table names
+        // Oracle expects upper-case table names, schemas, etc.
         if (isOracle)
         {
-            return (table == null) ? null : table.toUpperCase();
+            return (db_object == null) ? null : db_object.toUpperCase();
         }
 
         // default database postgres wants lower-case table names
-        return (table == null) ? null : table.toLowerCase();
+        return (db_object == null) ? null : db_object.toLowerCase();
     }
 
     ////////////////////////////////////////
@@ -1237,7 +1237,7 @@ public class DatabaseManager
 
         try
         {
-            String schema = ConfigurationManager.getProperty("db.schema");
+            String schema = canonicalize(ConfigurationManager.getProperty("db.schema"));
             if(StringUtils.isBlank(schema)){
                 schema = null;
             }
