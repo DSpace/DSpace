@@ -291,6 +291,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
 
+    public String getPublicationName() throws SQLException {
+        return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+    }
+
+    
     public void setPublicationName(String publicationName) throws SQLException {
         addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
     }
@@ -492,7 +497,7 @@ public class DryadDataPackage extends DryadObject {
     public String getPublicationDOI() throws SQLException {
         return getSingleMetadataValue(RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER);
     }
-
+    
     public void setTitle(String title) throws SQLException {
         // Need to filter just on metadata values that are publication DOIs
         addSingleMetadataValue(Boolean.TRUE, TITLE_SCHEMA, TITLE_ELEMENT, null, title);
