@@ -24,7 +24,12 @@ All extra tools in the Mirage 2 build process run on either Node.js or Ruby, so 
     mvn package -Dmirage2.on=true -Dmirage2.deps.included=false
 ```
 
+> *WARNING:* Git will need to be installed on the machine running the build in all cases. It will not be installed automatically
+
 ## Prerequisites for OSX / Linux ##
+
+### Git ###
+If you don't have git installed, go to the [git downloads page](http://git-scm.com/downloads) and follow the instructions for your OS
 
 ### Node ###
 
@@ -105,11 +110,14 @@ Afterwards the command `compass` should show a help message.
 
 ## Prerequisites for Windows ##
 
-### Node on Windows ###
+### Git ###
+If you don't have git installed, you can download the installer [here](http://git-scm.com/download/win).
+
+### Node ###
 
 Download and install [Node.js](http://nodejs.org/) using the Windows installer version.
 
-### Bower on Windows ###
+### Bower ###
 
 You can install [Bower](http://bower.io/) using the node package manager. The `-g` means install it globally, not as part of a specific project.
 
@@ -121,7 +129,7 @@ Execute following command in Windows command prompt:
 ```
 Afterwards the command `bower` should show a help message.
 
-### Grunt on Windows ###
+### Grunt ###
 
 [Grunt](http://gruntjs.com/) should also be installed globally using the node package manager:
 
@@ -133,7 +141,7 @@ Perform the following in a Windows command prompt:
 
 Afterwards the command `grunt --version` should show the grunt-cli version number
 
-### Ruby on Windows ###
+### Ruby ###
 
 Download and install: [Ruby Installer](http://rubyinstaller.org/)
 
@@ -149,7 +157,7 @@ Open "advanced sytem settings". Open "Advanced" tab, and click "environment vari
 
 Add new variables `GEM_HOME` and `GEM_PATH` pointing to your Ruby gems directory.
 
-### Compass on Windows ###
+### Compass ###
 
 > *WARNING:* **Make sure you are using compatible versions of SASS and Compass.** For example, [Compass v0.12.0 was incompatible with SASS v3.3](https://github.com/Compass/compass/issues/1544). But, Compass v1.0.0 is compatible with SASS v3.3
 
