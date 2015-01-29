@@ -27,6 +27,7 @@ META-INF/
 /*.properties
 !/build.properties
 !/test.properties
+!/dev.properties
 
 ##Mac noise
 .DS_Store
