@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
+import org.dspace.xoai.services.api.database.FieldResolver;
 
 /**
  * 
@@ -23,7 +24,13 @@ import org.dspace.xoai.filter.results.SolrFilterResult;
 public abstract class DSpaceFilter implements Filter
 {
     /** The configuration from xoai.xml file */
-    private ParameterMap configuration;
+    protected ParameterMap configuration;
+
+    /** The configuration from xoai.xml file */
+    protected FieldResolver fieldResolver;
+
+    /** The oai context */
+    protected Context context;
 
     public abstract DatabaseFilterResult buildDatabaseQuery(Context context);
     public abstract SolrFilterResult buildSolrQuery();
@@ -54,5 +61,39 @@ public abstract class DSpaceFilter implements Filter
     public void setConfiguration(ParameterMap configuration)
     {
         this.configuration = configuration;
+    }
+
+    /**
+     * @return the fieldResolver
+     */
+    public FieldResolver getFieldResolver()
+    {
+        return fieldResolver;
+    }
+
+    /**
+     * @param fieldResolver
+     *            the fieldResolver to set
+     */
+    public void setFieldResolver(FieldResolver fieldResolver)
+    {
+        this.fieldResolver = fieldResolver;
+    }
+
+    /**
+     * @return the context
+     */
+    public Context getContext()
+    {
+        return context;
+    }
+
+    /**
+     * @param context
+     *            the context to set
+     */
+    public void setContext(Context context)
+    {
+        this.context = context;
     }
 }
